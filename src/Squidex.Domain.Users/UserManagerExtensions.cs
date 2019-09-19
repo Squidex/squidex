@@ -256,6 +256,7 @@ namespace Squidex.Domain.Users
             if (claims.Any())
             {
                 var oldClaims = await userManager.GetClaimsAsync(user);
+
                 var oldClaimsToRemove = new List<Claim>();
 
                 foreach (var oldClaim in oldClaims)
@@ -276,7 +277,7 @@ namespace Squidex.Domain.Users
                     }
                 }
 
-                return await userManager.AddClaimsAsync(user, claims);
+                return await userManager.AddClaimsAsync(user, claims.Where(x => !string.IsNullOrWhiteSpace(x.Value)));
             }
 
             return IdentityResult.Success;

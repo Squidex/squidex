@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -43,9 +44,9 @@ namespace Migrate_01.Migrations
             this.eventStore = eventStore;
         }
 
-        public async Task UpdateAsync()
+        public Task UpdateAsync()
         {
-            await Task.WhenAll(
+            return Task.WhenAll(
                 RebuildAppIndexes(),
                 RebuildRuleIndexes(),
                 RebuildSchemaIndexes());
@@ -56,6 +57,29 @@ namespace Migrate_01.Migrations
             var appsByName = new Dictionary<string, Guid>();
             var appsByUser = new Dictionary<string, HashSet<Guid>>();
 
+            bool HasApp(NamedId<Guid> appId, bool consistent, out Guid id)
+            {
+                return appsByName.TryGetValue(appId.Name, out id) && (!consistent || id == appId.Id);
+            }
+
+            HashSet<Guid> Index(string contributorId)
+            {
+                return appsByUser.GetOrAddNew(contributorId);
+            }
+
+            void RemoveApp(NamedId<Guid> appId, bool consistent)
+            {
+                if (HasApp(appId, consistent, out var id))
+                {
+                    foreach (var apps in appsByUser.Values)
+                    {
+                        apps.Remove(id);
+                    }
+
+                    appsByName.Remove(appId.Name);
+                }
+            }
+
             await eventStore.QueryAsync(storedEvent =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -63,24 +87,29 @@ namespace Migrate_01.Migrations
                 switch (@event.Payload)
                 {
                     case AppCreated appCreated:
-                        appsByName[appCreated.Name] = appCreated.AppId.Id;
-                        break;
-                    case AppContributorAssigned appContributorAssigned:
-                        appsByUser.GetOrAddNew(appContributorAssigned.ContributorId).Add(appContributorAssigned.AppId.Id);
-                        break;
-                    case AppContributorRemoved contributorRemoved:
-                        appsByUser.GetOrAddNew(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
-                        break;
-                    case AppArchived appArchived:
                         {
-                            foreach (var apps in appsByUser.Values)
-                            {
-                                apps.Remove(appArchived.AppId.Id);
-                            }
+                            RemoveApp(appCreated.AppId, false);
 
-                            appsByName.Remove(appArchived.AppId.Name);
+                            appsByName[appCreated.Name] = appCreated.AppId.Id;
                             break;
                         }
+
+                    case AppContributorAssigned appContributorAssigned:
+                        {
+                            if (HasApp(appContributorAssigned.AppId, true, out _))
+                            {
+                                Index(appContributorAssigned.ContributorId).Add(appContributorAssigned.AppId.Id);
+                            }
+
+                            break;
+                        }
+
+                    case AppContributorRemoved contributorRemoved:
+                        Index(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
+                        break;
+                    case AppArchived appArchived:
+                        RemoveApp(appArchived.AppId, true);
+                        break;
                 }
 
                 return TaskHelper.Done;
@@ -98,6 +127,11 @@ namespace Migrate_01.Migrations
         {
             var rulesByApp = new Dictionary<Guid, HashSet<Guid>>();
 
+            HashSet<Guid> Index(RuleEvent @event)
+            {
+                return rulesByApp.GetOrAddNew(@event.AppId.Id);
+            }
+
             await eventStore.QueryAsync(storedEvent =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -105,10 +139,10 @@ namespace Migrate_01.Migrations
                 switch (@event.Payload)
                 {
                     case RuleCreated ruleCreated:
-                        rulesByApp.GetOrAddNew(ruleCreated.AppId.Id).Add(ruleCreated.RuleId);
+                        Index(ruleCreated).Add(ruleCreated.RuleId);
                         break;
                     case RuleDeleted ruleDeleted:
-                        rulesByApp.GetOrAddNew(ruleDeleted.AppId.Id).Remove(ruleDeleted.RuleId);
+                        Index(ruleDeleted).Remove(ruleDeleted.RuleId);
                         break;
                 }
 
@@ -125,6 +159,11 @@ namespace Migrate_01.Migrations
         {
             var schemasByApp = new Dictionary<Guid, Dictionary<string, Guid>>();
 
+            Dictionary<string, Guid> Index(SchemaEvent @event)
+            {
+                return schemasByApp.GetOrAddNew(@event.AppId.Id);
+            }
+
             await eventStore.QueryAsync(storedEvent =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -132,10 +171,10 @@ namespace Migrate_01.Migrations
                 switch (@event.Payload)
                 {
                     case SchemaCreated schemaCreated:
-                        schemasByApp.GetOrAddNew(schemaCreated.AppId.Id)[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
+                        Index(schemaCreated)[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
                         break;
                     case SchemaDeleted schemaDeleted:
-                        schemasByApp.GetOrAddNew(schemaDeleted.AppId.Id).Remove(schemaDeleted.SchemaId.Name);
+                        Index(schemaDeleted).Remove(schemaDeleted.SchemaId.Name);
                         break;
                 }
 

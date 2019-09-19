@@ -66,6 +66,8 @@ namespace Squidex.Domain.Users
 
             if (Permissions != null)
             {
+                yield return new Claim(SquidexClaimTypes.Permissions, string.Empty);
+
                 foreach (var permission in Permissions)
                 {
                     yield return new Claim(SquidexClaimTypes.Permissions, permission.Id);
