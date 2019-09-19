@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var expires = eventTime.Plus(Constants.ExpirationTime);
 
-                if (expires < now)
+                if (eventTime.Plus(Constants.StaleTime) < now)
                 {
                     return null;
                 }
