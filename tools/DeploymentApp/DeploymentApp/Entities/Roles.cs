@@ -52,7 +52,8 @@ namespace DeploymentApp.Entities
                 "contents.commentary.update",
                 "contents.commentary-type.read",
                 "contents.commodity.read",
-                "contents.region.read"
+                "contents.region.read",
+                "contents.period.read"
             });
         }
 
@@ -67,7 +68,8 @@ namespace DeploymentApp.Entities
                 "contents.commentary.publish",
                 "contents.commentary-type.read",
                 "contents.commodity.read",
-                "contents.region.read"
+                "contents.region.read",
+                "contents.period.read"
             });
         }
 
@@ -82,7 +84,8 @@ namespace DeploymentApp.Entities
                 "contents.commentary.publish",
                 "contents.commentary-type.read",
                 "contents.commodity.read",
-                "contents.region.read"
+                "contents.region.read",
+                "contents.period.read"
             });
         }
     }

@@ -1,4 +1,4 @@
-import { browser, by, element, ElementFinder, protractor, WebElement } from 'protractor';
+import { browser, by, element, ElementFinder, protractor } from 'protractor';
 import { constants } from './../utils/constants';
 
 
@@ -12,22 +12,20 @@ export class ContentPage extends BrowserUtil {
 
     public getRefData = element.all(by.xpath('//div[@class=\'control-dropdown-items\']/div/span'));
 
-    public async getCommentaryEditorFrame(): Promise<WebElement> {
-        return await element(by.xpath('//iframe[@src=\'' + constants.refDataLocators.editorUrl + '\']')).getWebElement();
+    public getCommentaryEditorFrame() {
+        return element(by.xpath(`//iframe[@src=\'${constants.refDataLocators.editorUrl}\']`));
     }
 
-    public async commentaryEditor() {
-        return await this.waitForElementToBePresent(element(by.xpath('//iframe[@src=\'' + constants.refDataLocators.editorUrl + '\']')));
+    public commentaryEditor() {
+        return this.getWhenVisible(element(by.xpath(`//iframe[@src=\'${constants.refDataLocators.editorUrl}\']`)));
     }
 
-    public async getSearchBar() {
-        return await element(by.xpath('//input[@placeholder=\'Search\']'));
+    public getSearchBar() {
+        return element(by.xpath('//input[@placeholder=\'Search\']'));
     }
 
-    public async getContentTable() {
-        return await element.all(
-            by.xpath('//div[@class=\'control-dropdown-items\']/div/span')
-        );
+    public getContentTable() {
+        return element.all(by.xpath('//div[@class=\'control-dropdown-items\']/div/span'));
     }
 
     public async selectTodaysDate() {
@@ -35,43 +33,46 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async autoSavePopUp() {
-        return await this.waitForElementToBePresent(element(by.xpath('//div[@class=\'modal-content\']')));
+        return await this.getWhenVisible(element(by.xpath('//div[@class=\'modal-content\']')));
     }
 
     public async acceptAutoSave() {
         return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Yes')));
     }
 
-    public async getCommentaryEditorInput() {
-        return await element(by.xpath('//div[@contenteditable=\'true\']'));
+    public $commentaryInput() {
+        return element(by.xpath('//div[@contenteditable=\'true\']'));
     }
 
-    public async getReferencePlaceHolder(referenceName: string) {
-        return await element(
-            by.xpath(
-                '//label[contains(text(), \'' + referenceName + '\')]/following-sibling::div/sqx-references-dropdown/sqx-dropdown/span/div/input[@class=\'form-control\']'
-            )
-        );
+    public getReferencePlaceHolder(referenceName: string) {
+        return element(by.xpath(`//label[contains(text(), \'${referenceName}\')]/following-sibling::div/sqx-references-dropdown/sqx-dropdown/span/div/input[@class=\'form-control\']`));
     }
 
-    public async getEditorToolBarOptions(option: string) {
-        return await element(by.className(option));
+    public getEditorToolBarOptions(option: string) {
+        return element(by.className(option));
     }
 
     public async getCalender() {
         return await element(by.xpath('//div[@class=\'input-group\']/input'));
     }
 
-    public async clickOnNewButton() {
-        return await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//button[@routerlink=\'new\']')));
-    }
-
     public async saveContent() {
-        return await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//button[text() = \' Save \']')));
+        await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//button[text() = \' Save \']')));
+
+        // Just wait a little bit for the animation to finish.
+        await browser.sleep(1000);
     }
 
-    public async picktodaysDate() {
-        return await element(by.buttonText('Today'));
+    public $newButton() {
+        return element(by.xpath('//button[@routerlink=\'new\']'));
+    }
+
+    public $dateLabel() {
+        return element(by.xpath('//label[contains(text(), \' Created For Date  \')]'));
+    }
+
+    public $dateTodayButton() {
+        return element(by.buttonText('Today'));
     }
 
     public async captureContentValidationMessage() {
@@ -90,17 +91,6 @@ export class ContentPage extends BrowserUtil {
         await this.writeCommentary(commentary);
     }
 
-
-    public async navigateToCommentaryAppPage() {
-        const commentaryApp = element(by.cssContainingText('.card-title', 'commentary'));
-        const content = element(by.cssContainingText('.nav-text', 'Content'));
-        const commentarySchema = element(by.xpath('//li[1]//a[1]//span[1]'));
-        await this.waitForElementToBeVisibleAndClick(commentaryApp);
-        await this.waitForElementToBeVisibleAndClick(content);
-        await this.waitForElementToBeVisibleAndClick(commentarySchema);
-        await this.clickOnNewButton();
-    }
-
     public async selectContentValue(content: string) {
         await this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content);
         if (this.searchResult.isPresent() && (await this.searchResult.getText()).indexOf(content) !== -1) {
@@ -109,28 +99,28 @@ export class ContentPage extends BrowserUtil {
         await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
-    public async datePicker(addDays: number) {
-        expect(await this.calendar);
-        let today = new Date();
-        let date = today.getDate() + addDays;
-        let month = today.getMonth() + 1; // By default January counts as 0
-        let year = today.getFullYear();
-        return year + '-' + month + '-' + date;
+    public getDateFromNow(addDays: number) {
+        const today = new Date();
+
+        return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate() + addDays}`;
     }
 
     public async selectDate(number: number) {
         await this.waitForElementToBeVisibleAndClick(this.calendar);
         await this.calendar.clear();
-        await this.calendar.sendKeys(await this.datePicker(number));
+        await this.calendar.sendKeys(this.getDateFromNow(number));
+
+        this.$dateLabel().click();
     }
 
     public async selectContentFromDropDown(contentType: string, value: string) {
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(contentType));
+        await this.scrollIntoViewAndClick(this.getReferencePlaceHolder(contentType));
+
         await this.selectContentValue(value);
     }
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
-        const editorFrame = await this.getCommentaryEditorFrame();
+        const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
         try {
             await browser.switchTo().frame(editorFrame);
             return await contentEntryPlaceHolder.getText();
@@ -141,10 +131,10 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async writeCommentary(commentaryText: string) {
-        const editorFrame = await this.getCommentaryEditorFrame();
+        const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
         try {
             await browser.switchTo().frame(editorFrame);
-            const editor = await this.getCommentaryEditorInput();
+            const editor = await this.$commentaryInput();
             await this.waitForElementToBePresentAndWrite(editor, commentaryText);
         } finally {
             await browser.switchTo().defaultContent();
@@ -153,11 +143,12 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async randomValueSelection(number: number) {
-        this.getRefData.count().then( (numberOfItems) => {
-        return Math.floor(Math.random() * numberOfItems + number );
-        }).then(async (randomNumber) => {
-            await this.waitForElementToBeVisibleAndClick(this.getRefData.get(randomNumber));
-        });
+        const itemsCount = await this.getRefData.count();
+        const itemIndex = Math.min(5, Math.floor(Math.random() * itemsCount + number));
+
+        const selected = await this.getRefData.get(itemIndex);
+
+        await this.scrollIntoViewAndClick(selected);
     }
 
     public async selectRandomReferences() {
@@ -182,12 +173,14 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string) {
-        const editorFrame = await this.scrollIntoView(await this.getCommentaryEditorFrame());
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
+
+        const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
         await this.commentaryEditorTest(commentary);
         try {
             await browser.switchTo().frame(editorFrame);
-            const editor = await this.getEditorToolBarOptions(editorToolBarOption);
-            await this.waitForElementToBeVisibleAndClick(editor);
+            const button = this.getEditorToolBarOptions(editorToolBarOption);
+            await this.waitForElementToBeVisibleAndClick(button);
         } finally {
             await browser.switchTo().defaultContent();
             await browser.waitForAngular();

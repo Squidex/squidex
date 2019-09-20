@@ -1,30 +1,52 @@
-import { by, element, ElementFinder, promise } from 'protractor';
+import { browser, by, element, ElementFinder } from 'protractor';
 
-/**
- * Class representing login page.
- * Login window which opens after clicking on Login button on Squidex base page
- */
-export class HomePage {
-    // to validate Squidex home page options after login
-    public commentaryDisplay(): ElementFinder {
-        return element(by.className('card-title'));
+import { BrowserUtil } from './../utils';
+
+export class HomePage extends BrowserUtil {
+    public getAppCard(appName: string) {
+        return element(by.cssContainingText('.card-title', appName));
     }
 
-    public userNameDisplay(): promise.Promise<string> {
-        return element(by.className('apps-title')).getText();
+    public getProfileDropdown() {
+        return element(by.css('.user'));
     }
 
-    public userProfileIconDisplay(): ElementFinder {
+    public getWelcomeElement() {
+        return element(by.className('apps-title'));
+    }
+
+    public getProfileIcon(): ElementFinder {
         return element(by.className('user-picture'));
     }
 
-    public userLogout() {
-        const userProfile = element(by.css('.user'));
-        const logoutButton = userProfile.element(
-            by.xpath('//a[contains(text(),\'Logout\')]')
-        );
-        userProfile.click().then(async () => {
-            await logoutButton.click();
-        });
+    public getLogoutButton() {
+        return this.getProfileDropdown().element(by.xpath('//a[contains(text(),\'Logout\')]'));
+    }
+
+    public async getWelcomeText() {
+        return await this.waitForElementToBeVisibleAndGetText(this.getWelcomeElement());
+    }
+
+    public async selectCommentaryApp() {
+        return this.selectApp('commentary');
+    }
+
+    public async selectApp(appName: string) {
+        const card = this.getAppCard(appName);
+
+        await this.waitForElementToBeVisibleAndClick(card);
+    }
+
+    public async navigateTo() {
+        await browser.get(`${browser.params.baseUrl}/app`);
+    }
+
+    public async resetBrowserLocalStore() {
+        await browser.executeScript('localStorage.clear()');
+    }
+
+    public async logout() {
+        await this.getProfileDropdown().click();
+        await this.getLogoutButton().click();
     }
 }

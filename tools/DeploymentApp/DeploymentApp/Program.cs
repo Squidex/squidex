@@ -83,17 +83,22 @@ namespace DeploymentApp
                 {
                     foreach (var (id, name) in TestData.CommentaryTypes)
                     {
-                        await clientManager.CreateIdNameContentAsync("commentary-type", id, name);
+                        await clientManager.CreateIdDataAsync("commentary-type", id, name);
                     }
 
                     foreach (var (id, name) in TestData.Regions)
                     {
-                        await clientManager.CreateIdNameContentAsync("region", id, name);
+                        await clientManager.CreateIdDataAsync("region", id, name);
                     }
 
                     foreach (var (id, name) in TestData.Commodities)
                     {
-                        await clientManager.CreateIdNameContentAsync("commodity", id, name);
+                        await clientManager.CreateIdDataAsync("commodity", id, name);
+                    }
+
+                    foreach (var (id, name) in TestData.Periods)
+                    {
+                        await clientManager.CreateIdDataAsync("period", id, name);
                     }
 
                     foreach (var (createdFor, commentaryType, commodity, region, body) in TestData.Commentaries)

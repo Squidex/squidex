@@ -1,84 +1,104 @@
-import { by, element } from 'protractor';
+import { browser, by, element } from 'protractor';
 
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
-    public async getContentsList() {
-        return await element.all(by.xpath('//table[@class=\'table table-items table-fixed\']/tbody/tr[@ng-reflect-can-clone=\'true\']/td[7]/sqx-content-value/span')).getWebElements();
+    public $contentsItem() {
+        return element(by.xpath('//sqx-content-value/span'));
     }
 
-    public async getBoldContentText() {
-        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/div/b'));
+    public $contentItems() {
+        return element.all(by.xpath('//sqx-content-value/span'));
     }
 
-    public async getItalicContentText() {
-        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/div/i'));
+    public $boldText() {
+        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/b'));
     }
 
-    public async getBulletPointContentTest() {
-        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ul/li'));
+    public $italicText() {
+        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/i'));
     }
 
-    public async getNumberedContentText() {
-        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ol/li'));
+    public $bulletPointText() {
+        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ul/li'));
     }
 
-    public async getCommentaryEditorInput() {
-        return await element(by.xpath('//div[@contenteditable=\'true\']/div'));
+    public $numberedText() {
+        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ol/li'));
+    }
+
+    public $commentaryInput() {
+        return element(by.xpath('//div[@contenteditable=\'true\']/div'));
     }
 
     public async getCommentaryCreationSuccessMessageText() {
-        return await this.waitForElementToBeVisibleAndGetText(await element(by.xpath('//div[@class=\'alert alert-dismissible alert-info ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[@class=\'alert alert-dismissible alert-info ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
     }
 
     public async getCommentaryCreationFailureMessageText() {
-        return await this.waitForElementToBeVisibleAndGetText(await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
     }
 
-    public async verifyRefDataSelection(referenceName: string) {
-        // tslint:disable-next-line: max-line-length
-        return await this.waitForElementToBeVisibleAndGetText(await element(by.xpath('//label[contains(text(),\'' + referenceName + '\')]/following-sibling::div/sqx-references-dropdown/sqx-dropdown/span/div[@class=\'selection\']/div/span')));
+    public async getRefDataSelection(referenceName: string) {
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath(`//label[contains(text(),\'${referenceName}\')]/following-sibling::div/sqx-references-dropdown/sqx-dropdown/span/div[@class=\'selection\']/div/span`)));
     }
 
     public async selectContentByText(contentBody: string) {
-        await this.getContentsList().then(async (contents) => {
-            contents.filter(async (content) => {
-                await content.getText().then(async (text) => {
-                    return (text.indexOf(contentBody) !== -1);
-                });
+        await this.waitForElementToBePresent(this.$contentsItem());
+
+        const contents = await this.$contentItems().getWebElements();
+
+        expect(contents.length).toBeGreaterThan(0);
+
+        for (let content of contents) {
+            const text = await content.getText();
+
+            if (text.indexOf(contentBody) >= 0) {
                 await content.click();
-            });
-        });
+                return;
+            }
+        }
+
+        throw `No Element with contentBody ${contentBody} found`;
     }
 
     public async verifyCommentaryCreation() {
         await this.commentaryEditor();
-        return await this.getCommentary(await this.getCommentaryEditorInput());
+        return await this.getCommentary(this.$commentaryInput());
     }
 
     public async verifyBoldCommentaryCreation() {
         await this.selectContentByText('Bold');
         await this.getCommentaryEditorFrame();
-        return await this.getCommentary(await this.getBoldContentText());
+        return await this.getCommentary(this.$boldText());
     }
 
 
     public async verifyItalicCommentaryCreation() {
         await this.selectContentByText('Italic');
         await this.getCommentaryEditorFrame();
-        return await this.getCommentary(await this.getItalicContentText());
+        return await this.getCommentary(this.$italicText());
     }
 
 
     public async verifyNumberedCommentaryCreation() {
         await this.selectContentByText('Numbered');
         await this.getCommentaryEditorFrame();
-        return await this.getCommentary(await this.getNumberedContentText());
+        return await this.getCommentary(await this.$numberedText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
         await this.selectContentByText('Bullet');
         await this.getCommentaryEditorFrame();
-        return await this.getCommentary(await this.getBulletPointContentTest());
+        return await this.getCommentary(await this.$bulletPointText());
+    }
+
+    public async clickOnNewButton() {
+        await this.waitForElementToBeVisible(this.$newButton());
+
+        // Just wait a little bit for the animation to finish.
+        await browser.sleep(1000);
+
+        return this.$newButton().click();
     }
 }

@@ -27,21 +27,21 @@ namespace Squidex.ICIS.Validation.Validators
         {
             if (data.TryGetGuid("commentarytype", out var commentaryTypeId))
             {
-                var validationContent = await contentQuery.FindContentAsync(context.WithUnpublished(true), "commentary-type", commentaryTypeId);
+                var commentaryType = await contentQuery.FindContentAsync(context.WithUnpublished(true), "commentary-type", commentaryTypeId);
 
-                return ValidateContentFieldCharacterCount(validationContent, "character-limit", data, "body").ToList();
+                return ValidateContentFieldCharacterCount(commentaryType, "character-limit", data, "body").ToList();
             }
 
             return null;
         }
 
-        private IEnumerable<ValidationError> ValidateContentFieldCharacterCount(IEnrichedContentEntity validationContent,
+        private IEnumerable<ValidationError> ValidateContentFieldCharacterCount(IEnrichedContentEntity commentaryType,
             string validationField, NamedContentData content, string contentField)
         {
             if (content.TryGetValue(contentField, out var body) &&
                 body != null &&
-                validationContent != null &&
-                validationContent.Data.TryGetValue(validationField, out var characterLimits))
+                commentaryType != null &&
+                commentaryType.Data.TryGetValue(validationField, out var characterLimits))
             {
                 foreach (var language in body)
                 {

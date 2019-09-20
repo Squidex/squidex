@@ -1,43 +1,32 @@
 import { browser } from 'protractor';
 
 import {
-  BrowserUtil,
-  constants,
-  Users
+    constants,
+    Users
 } from './../../utils';
 
 import {
-  HomePage,
-  LoginPage
+    HomePage,
+    LoginPage
 } from './../../pages';
 
 describe('User Login', () => {
-  const authors = Users;
-  let loginPage: LoginPage;
-  let homePage: HomePage;
-  let browserPage: BrowserUtil;
+    const homePage = new HomePage();
+    const loginPage = new LoginPage();
 
-  beforeAll(async () => {
-    loginPage = new LoginPage();
-    homePage = new HomePage();
-    browserPage = new BrowserUtil();
-    await loginPage.login(
-      authors.find(obj => {
-        return obj.name === 'vegaEditor';
-      })
-    );
-  });
+    beforeAll(async () => {
+        await loginPage.login(Users.find(u => u.name === 'vegaEditor'));
+    });
 
-  afterAll(() => {
-    homePage.userLogout();
-  });
+    afterAll(async () => {
+        await homePage.logout();
+    });
 
+    it('Login with Vega Editor credentials', async () => {
+        const welcomeText = await homePage.getWelcomeText();
+        expect(welcomeText).toEqual(constants.loginTest.editorWelcomeMessage);
 
-  it('Login with Vega Editor credentials', async () => {
-    expect(await browserPage.getCurrentURL()).toBe(
-      `${browser.params.baseUrl}/app`
-    );
-    const text = await homePage.userNameDisplay();
-    expect(text).toEqual(constants.loginTest.editorWelcomeMessage);
-  });
+        const currentUrl = await homePage.getCurrentURL();
+        expect(currentUrl).toBe(`${browser.params.baseUrl}/app`);
+    });
 });

@@ -9,7 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,   
     "removeComments": false,             
-    "preserveConstEnums": true,    
+    "preserveConstEnums": true, 
     "outDir": "_out",                     
     "esModuleInterop": true,
     "types": [

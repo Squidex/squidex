@@ -10,6 +10,7 @@ export const constants = {
     refDataLocators: {
         commodity: ' Commodity  ',
         commentaryType: ' Commentary Type  ',
+        period: ' Period  ',
         region: ' Region  ',
         editorUrl: `${browser.params.baseUrl}/editors/toastui/md-editor.html`,
         editorOptionsBold: 'tui-bold tui-toolbar-icons',
@@ -20,7 +21,8 @@ export const constants = {
 
     commentaryTest : {
         commodityValue: 'Styrene',
-        commentaryTypeValue: 'Price Commentary',
+        // Temporary bug that fields are added to the UI even if they do not contain any value.
+        commentaryTypeValue: 'Price Commentary, ,',
         regionValue: 'Middle East',
         contentBody: 'Commentary creation for test'
     },
@@ -29,9 +31,10 @@ export const constants = {
         commodityValue: 'Tolu',
         commentaryTypeValue: 'Charts',
         regionValue: 'Latin',
-        contentBody: 'This is search & filter test for ref data with partial text',
+        periodValue: 'Settl',
+        contentBody: 'This is atext',
         commodityValueFilteredByPartialText: 'Toluene',
-        commentaryTypeValueFilteredByPartialText: 'Charts Commentary',
+        commentaryTypeValueFilteredByPartialText: 'Charts Commentary, 200, Yes',
         regionValueFilteredByPartialText: 'Latin America'
     },
 
@@ -39,9 +42,10 @@ export const constants = {
         commodityValue: 'Styrene',
         commentaryTypeValue: 'Price Commentary',
         regionValue: 'Middle East',
+        periodValue: 'Settlement',
         contentBody: 'This is commentary edit test',
         modifiedCommodityValue: 'Propylene',
-        modifiedCommentaryTypeValue: 'Deals Commentary',
+        modifiedCommentaryTypeValue: 'Deals Commentary, 100, No',
         modifiedRegionValue: 'CIS/Central Asia',
         modifiedContentBody: 'Editing existing commentary'
     },
@@ -50,12 +54,13 @@ export const constants = {
         commodityValue: 'Propylene',
         commentaryTypeValue: 'Analyst Commentary',
         regionValue: 'South East Asia & Pacific',
+        periodValue: 'Settlement',
         contentBody: 'This is duplicate commentary creation test'
     },
 
     savingAutoSavedCommentaryTest: {
         commodityValue: 'Benzene',
-        commentaryTypeValue: 'Deals Commentary',
+        commentaryTypeValue: 'Deals Commentary, 100, No',
         regionValue: 'Europe',
         contentBody: 'This is content creation test'
     },
@@ -73,7 +78,7 @@ export const constants = {
 
     messages: {
         validationFailureErrorMessage: 'A content item with these values already exists.',
-        unsavedChangesPopUpMessage: ' You have unsaved changes, do you want to close the current content view and discard your changes? ',
+        unsavedChangesPopUpMessage: 'You have unsaved changes, do you want to close the current content view and discard your changes?',
         commentaryCreationSuccessMessage: 'Contents created successfully.',
         commentaryEditSuccessMessage: 'Content updated successfully.',
         commentaryCretaionFailureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).'

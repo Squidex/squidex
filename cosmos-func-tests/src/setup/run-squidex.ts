@@ -23,7 +23,7 @@ export function startSquidex(silent = true) {
         }
     });
 
-    squidex.on('close', (code) => {
+    squidex!.on('close', (code) => {
         console.log(`Child exited with code ${code}`);
 
         if (code !== 0) {

@@ -182,6 +182,18 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 Label = "Character Limit"
                             }
+                        },
+
+                        new UpsertSchemaFieldDto
+                        {
+                            Name = "requires-period",
+                            Properties = new BooleanFieldPropertiesDto
+                            {
+                                Editor = BooleanFieldEditor.Checkbox,
+                                IsListField = true,
+                                IsReferenceField = true,
+                                Label = "Required Period"
+                            }
                         }
                     };
 

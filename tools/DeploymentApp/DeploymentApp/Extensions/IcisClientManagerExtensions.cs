@@ -280,7 +280,7 @@ namespace DeploymentApp.Extensions
             }
         }
 
-        public static async Task CreateIdNameContentAsync(this SquidexClientManager clientManager, string schema, string id, string name)
+        public static async Task CreateIdDataAsync(this SquidexClientManager clientManager, string schema, string id, object data)
         {
             var client = clientManager.GetClient<TestData, object>(schema);
 
@@ -299,17 +299,24 @@ namespace DeploymentApp.Extensions
                 }
                 else
                 {
-                    await client.CreateAsync(new
+                    if (data is string name)
                     {
-                        id = new
+                        await client.CreateAsync(new
                         {
-                            iv = id
-                        },
-                        name = new
-                        {
-                            iv = name
-                        }
-                    });
+                            id = new
+                            {
+                                iv = id
+                            },
+                            name = new
+                            {
+                                iv = name
+                            }
+                        });
+                    }
+                    else
+                    {
+                        await client.CreateAsync(data);
+                    }
 
                     ConsoleHelper.Success();
                 }

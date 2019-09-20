@@ -7,7 +7,7 @@
     "webdriver": "webdriver-manager update --versions.standalone=3.141.59 --versions.chrome=76.0.3809.68 && start webdriver-manager start --versions.standalone=3.141.59",
     "pretest": "tsc",
     "test": "protractor ./_out/config.dev.js",
-    "test:running": "protractor ./_out/config.dev.running.js",
+    "test:running": "tsc && protractor ./_out/config.dev.running.js",
     "test:ci": "protractor ./_out/config.ci.js",
     "protractor": "./node_modules/protractor/built/cli.js"
   },

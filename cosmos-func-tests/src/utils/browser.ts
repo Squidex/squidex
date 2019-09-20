@@ -5,6 +5,8 @@ import {
     WebElement
 } from 'protractor';
 
+const until = protractor.ExpectedConditions;
+
 /**
  * Utility class for commonly called Protractor.browser methods.
  * The methods should be static and
@@ -12,29 +14,37 @@ import {
  */
 export class BrowserUtil {
     // waits for element to be present on the DOM - angular
-    public async waitForElementToBePresent(locator: ElementFinder, timeout = 20000) {
-        const until = protractor.ExpectedConditions;
-        await browser.wait(until.visibilityOf(locator), timeout);
+    public async getWhenVisible(locator: ElementFinder, timeout = 5000): Promise<WebElement> {
+        await this.waitForElementToBeVisible(locator, timeout);
         return await locator;
     }
 
+    public async waitForElementToBeVisible(locator: ElementFinder, timeout = 5000) {
+        await browser.wait(until.visibilityOf(locator), timeout, `Element ${locator.locator().toString()} not visible`);
+    }
+
+    public async waitForElementToBeClickable(locator: ElementFinder, timeout = 5000) {
+        await browser.wait(until.elementToBeClickable(locator), timeout, `Element ${locator.locator().toString()} not clickable`);
+    }
+
+    public async waitForElementToBePresent(locator: ElementFinder, timeout = 5000) {
+        await browser.wait(until.presenceOf(locator), timeout, `Element ${locator.locator().toString()} not present`);
+    }
+
     // waits for the element to be clickable and clicks
-    public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 20000) {
-        const until = protractor.ExpectedConditions;
-        await browser.wait(until.elementToBeClickable(locator), timeout, 'Element not clickable');
+    public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 5000) {
+        await this.waitForElementToBeClickable(locator, timeout);
         return await locator.click();
     }
 
-    public async waitForElementToBeVisibleAndGetText(locator: ElementFinder, timeout = 20000) {
-        const until = protractor.ExpectedConditions;
-        await browser.wait(until.elementToBeClickable(locator), timeout, 'Element not clickable');
+    public async waitForElementToBeVisibleAndGetText(locator: ElementFinder, timeout = 5000) {
+        await this.waitForElementToBeClickable(locator, timeout);
         return await locator.getText();
     }
 
     // waits for the element to be present and writes
     public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
-        const until = protractor.ExpectedConditions;
-        await browser.wait(until.presenceOf(locator), timeout);
+        await this.getWhenVisible(locator, timeout);
         await locator.clear();
         await locator.sendKeys(text);
     }
@@ -66,20 +76,14 @@ export class BrowserUtil {
     }
 
     // scrolls down the page - vertically and brings the element into view
-    public async scrollIntoViewAndClick(webelement: ElementFinder) {
-        await browser
-            .executeScript('arguments[0].scrollIntoView()', webelement)
-            .then(() => {
-                webelement.click();
-            });
+    public async scrollIntoViewAndClick(webElement: ElementFinder) {
+        await browser.executeScript('arguments[0].scrollIntoView()', webElement);
+
+        await new BrowserUtil().waitForElementToBeVisibleAndClick(webElement);
     }
 
-    public async scrollIntoView(webelement: ElementFinder | WebElement): Promise<ElementFinder | WebElement> {
-        await browser
-            .executeScript('arguments[0].scrollIntoView()', webelement)
-            .then(() => {
-                return webelement;
-            });
+    public async scrollIntoView(webElement: ElementFinder): Promise<ElementFinder | WebElement> {
+        await browser.executeScript('arguments[0].scrollIntoView()', webElement);
     }
 
     // waits for the page to load before performing any further operations. waits until the document.ready state becomes interactive or complete and returns the same.
@@ -98,7 +102,7 @@ export class BrowserUtil {
 
     // get current url of the page
     public async getCurrentURL() {
-        return await browser.getCurrentUrl().then(url => url);
+        return await browser.getCurrentUrl();
     }
 
     // wait for angular enabled

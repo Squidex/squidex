@@ -1,14 +1,101 @@
-﻿namespace DeploymentApp.Entities
+﻿using System.Collections.Generic;
+
+namespace DeploymentApp.Entities
 {
     public static class TestData
     {
-        public static (string Id, string Name)[] CommentaryTypes =
+        public static (string Id, object Data)[] CommentaryTypes =
         {
-            ("1", "Overview"),
-            ("2", "Price Commentary"),
-            ("3", "Deals Commentary"),
-            ("4", "Charts Commentary"),
-            ("5", "Analyst Commentary")
+            ("1", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "1"
+                },
+                ["name"] = new
+                {
+                    iv = "Overview"
+                }
+            }),
+            ("2", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "2"
+                },
+                ["name"] = new
+                {
+                    iv = "Price Commentary"
+                },
+                ["character-limit"] = new
+                {
+                },
+                ["requires-period"] =
+                {
+                }
+            }),
+            ("3", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "3"
+                },
+                ["name"] = new
+                {
+                    iv = "Deals Commentary"
+                },
+                ["character-limit"] = new
+                {
+                    iv = 100
+                },
+                ["requires-period"] = new
+                {
+                    iv = false
+                }
+            }),
+            ("4", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "4"
+                },
+                ["name"] = new
+                {
+                    iv = "Charts Commentary"
+                },
+                ["character-limit"] = new
+                {
+                    iv = 200
+                },
+                ["requires-period"] = new
+                {
+                    iv = true
+                }
+            }),
+            ("5", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "5"
+                },
+                ["name"] = new
+                {
+                    iv = "Analyst Commentary"
+                },
+                ["character-limit"] = new
+                {
+                    iv = 300
+                },
+                ["requires-period"] = new
+                {
+                    iv = false
+                }
+            })
+        };
+
+        public static (string Id, string Name)[] Periods =
+        {
+            ("http://iddn.icis.com/ref-data/period/9", "Settlement")
         };
 
         public static (string Id, string Name)[] Regions =
@@ -20,7 +107,8 @@
             ("http://iddn.icis.com/ref-data/location/5", "North America"),
             ("http://iddn.icis.com/ref-data/location/6", "North East Asia"),
             ("http://iddn.icis.com/ref-data/location/7", "South East Asia & Pacific"),
-            ("http://iddn.icis.com/ref-data/location/8", "South Asia")
+            ("http://iddn.icis.com/ref-data/location/8", "South Asia"),
+            ("http://iddn.icis.com/ref-data/location/9", "Europe")
         };
 
         public static (string Id, string Name)[] Commodities =
