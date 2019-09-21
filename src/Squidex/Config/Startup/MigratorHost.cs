@@ -25,7 +25,7 @@ namespace Squidex.Config.Startup
 
         protected override Task StartAsync(ISemanticLog log, CancellationToken ct)
         {
-            return migrator.MigrateAsync();
+            return migrator.MigrateAsync(ct);
         }
     }
 }
