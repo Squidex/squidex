@@ -302,6 +302,22 @@ describe('SchemasState', () => {
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
+            it('should update schema and selected schema when schema synced', () => {
+                const request = {};
+
+                const updated = createSchemaDetails(1, '_new');
+
+                schemasService.setup(x => x.putSchemaSync(app, schema1, It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
+
+                schemasState.synchronize(schema1, request).subscribe();
+
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+            });
+
             it('should update schema and selected schema when scripts configured', () => {
                 const request = { query: '<query-script>' };
 

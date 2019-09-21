@@ -8,7 +8,11 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { SchemaDetailsDto, SynchronizeSchemaForm } from '@app/shared';
+import {
+    SchemaDetailsDto,
+    SchemasState,
+    SynchronizeSchemaForm
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-export-form',
@@ -25,7 +29,8 @@ export class SchemaExportFormComponent implements OnChanges {
     public synchronizeForm = new SynchronizeSchemaForm(this.formBuilder);
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
     }
 
@@ -34,7 +39,22 @@ export class SchemaExportFormComponent implements OnChanges {
     }
 
     public synchronizeSchema() {
-        alert('Sync');
+        const value = this.synchronizeForm.submit();
+
+        if (value) {
+            const request = {
+                ...value.json,
+                noFieldDeletion: !value.fieldsDelete,
+                noFieldRecreation: !value.fieldsDelete
+            };
+
+            this.schemasState.synchronize(this.schema, request)
+                .subscribe(() => {
+                    this.synchronizeForm.submitCompleted();
+                }, error => {
+                    this.synchronizeForm.submitFailed(error);
+                });
+        }
     }
 
     public emitComplete() {
