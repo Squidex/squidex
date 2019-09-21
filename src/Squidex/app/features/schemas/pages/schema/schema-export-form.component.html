@@ -1,9 +1,31 @@
-<sqx-modal-dialog (close)="emitComplete()" large="true">
-    <ng-container title>
-        Export Schema
-    </ng-container>
+<form [formGroup]="synchronizeForm.form" (submit)="synchronizeSchema()">
+    <sqx-modal-dialog (close)="emitComplete()" large="true">
+        <ng-container title>
+            Export Schema
+        </ng-container>
 
-    <ng-container content>
-        <sqx-json-editor disabled [ngModel]="export"></sqx-json-editor>
-    </ng-container>
-</sqx-modal-dialog>  
+        <ng-container content>
+            <sqx-json-editor formControlName="json"></sqx-json-editor>
+        </ng-container>
+
+        <ng-container footer>
+            <div class="float-left form-inline">
+                <div class="form-check pr-4">
+                    <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete" />
+                    <label class="form-check-label" for="fieldsDelete">
+                        Delete fields
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate" />
+                    <label class="form-check-label" for="fieldsRecreate">
+                        Recreate fields
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="float-right btn btn-success" [disabled]="synchronizeForm.submitted | async">Synchronize</button>
+        </ng-container>
+    </sqx-modal-dialog>  
+</form>

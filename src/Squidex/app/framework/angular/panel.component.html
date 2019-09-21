@@ -18,7 +18,7 @@
 
             <ng-container  *ngIf="showClose">
                 <ng-container *ngIf="customClose; else defaultClose">
-                    <a class="panel-close" (click)="close.emit()">
+                    <a class="panel-close" (click)="emitClose()">
                         <i class="icon-close"></i>
                     </a>
                 </ng-container>

@@ -184,6 +184,10 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
+    public emitLanguageChange(language: AppLanguageDto) {
+        this.languageChange.emit(language);
+    }
+
     public prefix(language: AppLanguageDto) {
         return `(${language.iso2Code})`;
     }

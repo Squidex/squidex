@@ -42,7 +42,7 @@ export class ContentComponent implements OnChanges {
     public statusChange = new EventEmitter<string>();
 
     @Output()
-    public selectedChange = new EventEmitter();
+    public selectedChange = new EventEmitter<boolean>();
 
     @Input()
     public selected = false;
@@ -138,6 +138,10 @@ export class ContentComponent implements OnChanges {
         this.patchForm.submitCompleted();
 
         this.updateValues();
+    }
+
+    public emitSelectedChange(isSelected: boolean) {
+        this.selectedChange.emit(isSelected);
     }
 
     public emitDelete() {

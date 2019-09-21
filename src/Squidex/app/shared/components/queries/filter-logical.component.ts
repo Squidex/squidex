@@ -94,7 +94,11 @@ export class FilterLogicalComponent {
         }
     }
 
-    private emitChange() {
+    public emitRemove() {
+        this.remove.emit();
+    }
+
+    public emitChange() {
         this.change.emit();
     }
 }
