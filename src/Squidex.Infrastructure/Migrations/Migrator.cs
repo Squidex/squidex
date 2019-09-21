@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Migrations
                                 .WriteProperty("status", "Completed")
                                 .WriteProperty("migrator", name)))
                             {
-                                await migration.UpdateAsync(ct);
+                                await migration.UpdateAsync();
                             }
                         }
                         catch (Exception ex)
