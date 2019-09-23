@@ -100,7 +100,11 @@ export class FilterComparisonComponent implements OnChanges {
         this.fieldModel = newModel;
     }
 
-    private emitChange() {
+    public emitRemove() {
+        this.remove.emit();
+    }
+
+    public emitChange() {
         this.change.emit();
     }
 }

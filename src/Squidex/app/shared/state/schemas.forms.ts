@@ -65,6 +65,16 @@ export class AddPreviewUrlForm extends Form<FormGroup, { name: string, url: stri
     }
 }
 
+export class SynchronizeSchemaForm extends Form<FormGroup, { json: any, fieldsDelete: boolean, fieldsRecreate: boolean }> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            json: {},
+            fieldsDelete: false,
+            fieldsRecreate: false
+        }));
+    }
+}
+
 export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: string }> {
     constructor(
         private readonly formBuilder: FormBuilder

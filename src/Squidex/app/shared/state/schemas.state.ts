@@ -219,6 +219,14 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+        return this.schemasService.putSchemaSync(this.appName, schema, request, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
