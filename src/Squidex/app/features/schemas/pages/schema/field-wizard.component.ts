@@ -94,7 +94,7 @@ export class FieldWizardComponent implements OnInit {
         const value = this.editForm.submit();
 
         if (value) {
-            const properties = createProperties(this.field.properties['fieldType'], value);
+            const properties = createProperties(this.field.properties.fieldType, value);
 
             this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
                 .subscribe(() => {
