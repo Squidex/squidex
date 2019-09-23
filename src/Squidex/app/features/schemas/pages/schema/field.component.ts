@@ -115,7 +115,7 @@ export class FieldComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const properties = createProperties(this.field.properties['fieldType'], value);
+            const properties = createProperties(this.field.properties.fieldType, value);
 
             this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {

@@ -9,32 +9,22 @@ import { AbstractControl, FormArray } from '@angular/forms';
 
 import {
     AppLanguageDto,
-    ArrayFieldPropertiesDto,
-    AssetsFieldPropertiesDto,
-    BooleanFieldPropertiesDto,
     createProperties,
     DateTime,
-    DateTimeFieldPropertiesDto,
     EditContentForm,
     FieldDefaultValue,
     FieldFormatter,
     FieldPropertiesDto,
     FieldsValidators,
-    GeolocationFieldPropertiesDto,
     getContentValue,
     HtmlValue,
     ImmutableArray,
-    JsonFieldPropertiesDto,
     LanguageDto,
     NestedFieldDto,
-    NumberFieldPropertiesDto,
     PartitionConfig,
-    ReferencesFieldPropertiesDto,
     RootFieldDto,
     SchemaDetailsDto,
     SchemaPropertiesDto,
-    StringFieldPropertiesDto,
-    TagsFieldPropertiesDto,
     Version
 } from '@app/shared/internal';
 
@@ -67,9 +57,9 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should return configured fields as list fields if no schema field are declared', () => {
-        const field1 = createField({ properties: new ArrayFieldPropertiesDto({ isListField: true }) });
-        const field2 = createField({ properties: new ArrayFieldPropertiesDto({ isListField: false }), id: 2 });
-        const field3 = createField({ properties: new ArrayFieldPropertiesDto({ isListField: true }), id: 3 });
+        const field1 = createField({ properties: createProperties('Array', { isListField: true }) });
+        const field2 = createField({ properties: createProperties('Array', { isListField: false }), id: 2 });
+        const field3 = createField({ properties: createProperties('Array', { isListField: true }), id: 3 });
 
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
@@ -77,9 +67,9 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should return first fields as list fields if no schema field is declared', () => {
-        const field1 = createField({ properties: new ArrayFieldPropertiesDto() });
-        const field2 = createField({ properties: new ArrayFieldPropertiesDto(), id: 2 });
-        const field3 = createField({ properties: new ArrayFieldPropertiesDto(), id: 3 });
+        const field1 = createField({ properties: createProperties('Array') });
+        const field2 = createField({ properties: createProperties('Array'), id: 2 });
+        const field3 = createField({ properties: createProperties('Array'), id: 3 });
 
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
@@ -95,50 +85,50 @@ describe('SchemaDetailsDto', () => {
 
 describe('FieldDto', () => {
     it('should return label as display name', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto({ label: 'Label' }) });
+        const field = createField({ properties: createProperties('Array', { label: 'Label' }) });
 
         expect(field.displayName).toBe('Label');
     });
 
     it('should return name as display name if label is null', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto() });
+        const field = createField({ properties: createProperties('Assets') });
 
         expect(field.displayName).toBe('field1');
     });
 
     it('should return name as display name label is empty', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto({ label: '' }) });
+        const field = createField({ properties: createProperties('Assets', { label: '' }) });
 
         expect(field.displayName).toBe('field1');
     });
 
     it('should return placeholder as display placeholder', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto({ placeholder: 'Placeholder' }) });
+        const field = createField({ properties: createProperties('Assets', { placeholder: 'Placeholder' }) });
 
         expect(field.displayPlaceholder).toBe('Placeholder');
     });
 
     it('should return empty as display placeholder if placeholder is null', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto() });
+        const field = createField({ properties: createProperties('Assets') });
 
         expect(field.displayPlaceholder).toBe('');
     });
 
     it('should return localizable if partitioning is language', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto(), partitioning: 'language' });
+        const field = createField({ properties: createProperties('Assets'), partitioning: 'language' });
 
         expect(field.isLocalizable).toBeTruthy();
     });
 
     it('should not return localizable if partitioning is invarient', () => {
-        const field = createField({ properties: new AssetsFieldPropertiesDto(), partitioning: 'invariant' });
+        const field = createField({ properties: createProperties('Assets'), partitioning: 'invariant' });
 
         expect(field.isLocalizable).toBeFalsy();
     });
 });
 
 describe('ArrayField', () => {
-    const field = createField({ properties: new ArrayFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }) });
+    const field = createField({ properties: createProperties('Array', { isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(2);
@@ -162,7 +152,7 @@ describe('ArrayField', () => {
 });
 
 describe('AssetsField', () => {
-    const field = createField({ properties: new AssetsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }) });
+    const field = createField({ properties: createProperties('Assets', { isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(3);
@@ -186,7 +176,7 @@ describe('AssetsField', () => {
 });
 
 describe('TagsField', () => {
-    const field = createField({ properties: new TagsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }) });
+    const field = createField({ properties: createProperties('Tags', { isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(2);
@@ -210,7 +200,7 @@ describe('TagsField', () => {
 });
 
 describe('BooleanField', () => {
-    const field = createField({ properties: new BooleanFieldPropertiesDto('Checkbox', { isRequired: true }) });
+    const field = createField({ properties: createProperties('Boolean', { editor: 'Checkbox', isRequired: true }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(1);
@@ -229,7 +219,7 @@ describe('BooleanField', () => {
     });
 
     it('should return default value for default properties', () => {
-        const field2 = createField({ properties: new BooleanFieldPropertiesDto('Checkbox', { defaultValue: true }) });
+        const field2 = createField({ properties: createProperties('Boolean', { editor: 'Checkbox', defaultValue: true }) });
 
         expect(FieldDefaultValue.get(field2)).toBeTruthy();
     });
@@ -237,7 +227,7 @@ describe('BooleanField', () => {
 
 describe('DateTimeField', () => {
     const now = DateTime.parseISO_UTC('2017-10-12T16:30:10Z');
-    const field = createField({ properties: new DateTimeFieldPropertiesDto('DateTime', { isRequired: true }) });
+    const field = createField({ properties: createProperties('DateTime', { editor: 'DateTime', isRequired: true }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(1);
@@ -252,38 +242,38 @@ describe('DateTimeField', () => {
     });
 
     it('should format to date', () => {
-        const dateField = createField({ properties: new DateTimeFieldPropertiesDto('Date') });
+        const dateField = createField({ properties: createProperties('DateTime', { editor: 'Date' }) });
 
         expect(FieldFormatter.format(dateField, '2017-12-12T16:00:00Z')).toBe('2017-12-12');
     });
 
     it('should format to date time', () => {
-        const field2 = createField({ properties: new DateTimeFieldPropertiesDto('DateTime') });
+        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime' }) });
 
         expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
     });
 
     it('should return default for DateFieldProperties', () => {
-        const field2 = createField({ properties: new DateTimeFieldPropertiesDto('DateTime', { defaultValue: '2017-10-12T16:00:00Z' }) });
+        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', defaultValue: '2017-10-12T16:00:00Z' }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual('2017-10-12T16:00:00Z');
     });
 
     it('should return calculated date when Today for DateFieldProperties', () => {
-        const field2 = createField({ properties: new DateTimeFieldPropertiesDto('DateTime', { calculatedDefaultValue: 'Today' }) });
+        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Today' }) });
 
         expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T00:00:00Z');
     });
 
     it('should return calculated date when Now for DateFieldProperties', () => {
-        const field2 = createField({ properties: new DateTimeFieldPropertiesDto('DateTime', { calculatedDefaultValue: 'Now' }) });
+        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Now' }) });
 
         expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T16:30:10Z');
     });
 });
 
 describe('GeolocationField', () => {
-    const field = createField({ properties: new GeolocationFieldPropertiesDto({ isRequired: true }) });
+    const field = createField({ properties: createProperties('Geolocation', { isRequired: true }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(1);
@@ -303,7 +293,7 @@ describe('GeolocationField', () => {
 });
 
 describe('JsonField', () => {
-    const field = createField({ properties: new JsonFieldPropertiesDto({ isRequired: true }) });
+    const field = createField({ properties: createProperties('Json', { isRequired: true }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(1);
@@ -323,7 +313,7 @@ describe('JsonField', () => {
 });
 
 describe('NumberField', () => {
-    const field = createField({ properties: new NumberFieldPropertiesDto('Input', { isRequired: true, minValue: 1, maxValue: 6, allowedValues: [1, 3] }) });
+    const field = createField({ properties: createProperties('Number', { isRequired: true, minValue: 1, maxValue: 6, allowedValues: [1, 3] }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(3);
@@ -338,44 +328,44 @@ describe('NumberField', () => {
     });
 
     it('should format to stars if html allowed', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Stars') });
+        const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
         expect(FieldFormatter.format(field2, 3)).toEqual(new HtmlValue('&#9733; &#9733; &#9733; '));
     });
 
     it('should format to short star view for many stars', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Stars') });
+        const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
         expect(FieldFormatter.format(field2, 42)).toEqual(new HtmlValue('&#9733; 42'));
     });
 
     it('should format to short star view for no stars', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Stars') });
+        const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
         expect(FieldFormatter.format(field2, 0)).toEqual(new HtmlValue('&#9733; 0'));
     });
 
     it('should format to short star view for negative stars', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Stars') });
+        const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
         expect(FieldFormatter.format(field2, -13)).toEqual(new HtmlValue('&#9733; -13'));
     });
 
     it('should not format to stars if html not allowed', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Stars') });
+        const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
         expect(FieldFormatter.format(field2, 3, false)).toEqual('3');
     });
 
     it('should return default value for default properties', () => {
-        const field2 = createField({ properties: new NumberFieldPropertiesDto('Input', { defaultValue: 13 }) });
+        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13 }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual(13);
     });
 });
 
 describe('ReferencesField', () => {
-    const field = createField({ properties: new ReferencesFieldPropertiesDto('List', { isRequired: true, minItems: 1, maxItems: 5 }) });
+    const field = createField({ properties: createProperties('References', { editor: 'List', isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(3);
@@ -399,7 +389,7 @@ describe('ReferencesField', () => {
 });
 
 describe('StringField', () => {
-    const field = createField({ properties: new StringFieldPropertiesDto('Input', { isRequired: true, pattern: 'pattern', minLength: 1, maxLength: 5, allowedValues: ['a', 'b'] }) });
+    const field = createField({ properties: createProperties('String', { isRequired: true, pattern: 'pattern', minLength: 1, maxLength: 5, allowedValues: ['a', 'b'] }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(4);
@@ -414,7 +404,7 @@ describe('StringField', () => {
     });
 
     it('should return default value for default properties', () => {
-        const field2 = createField({ properties: new StringFieldPropertiesDto('Input', { defaultValue: 'MyDefault' }) });
+        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault' }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual('MyDefault');
     });
@@ -422,8 +412,8 @@ describe('StringField', () => {
 
 describe('GetContentValue', () => {
     const language = new LanguageDto('en', 'English');
-    const fieldInvariant = createField({ properties: new NumberFieldPropertiesDto('Input'), partitioning: 'invariant' });
-    const fieldLocalized = createField({ properties: new NumberFieldPropertiesDto('Input') });
+    const fieldInvariant = createField({ properties: createProperties('Number'), partitioning: 'invariant' });
+    const fieldLocalized = createField({ properties: createProperties('Number') });
 
     it('should resolve invariant field from references value', () => {
         const content: any = {

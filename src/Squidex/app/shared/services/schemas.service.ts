@@ -222,12 +222,8 @@ export class RootFieldDto extends FieldDto {
         return this.properties.fieldType === 'Array';
     }
 
-    public get isString() {
-        return this.properties.fieldType === 'String';
-    }
-
     public get isTranslatable() {
-        return this.isLocalizable && this.isString && (this.properties.editor === 'Input' || this.properties.editor === 'Textarea');
+        return this.isLocalizable && this.properties.isTranslateable;
     }
 
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
