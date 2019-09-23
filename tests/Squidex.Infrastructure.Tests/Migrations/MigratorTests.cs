@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.Migrations
 
             A.CallTo(() => migrator_1_2.UpdateAsync()).Throws(new ArgumentException());
 
-            await Assert.ThrowsAsync<MigrationFailedException>(sut.MigrateAsync);
+            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
 
             A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
             A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
@@ -147,7 +147,7 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(new InMemoryStatus(), path, log) { LockWaitMs = 2 };
 
-            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(sut.MigrateAsync)));
+            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync())));
 
             A.CallTo(() => migrator_0_1.UpdateAsync())
                 .MustHaveHappened(1, Times.Exactly);

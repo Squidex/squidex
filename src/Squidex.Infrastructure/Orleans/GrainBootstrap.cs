@@ -28,6 +28,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             for (var i = 1; i <= NumTries; i++)
             {
+                ct.ThrowIfCancellationRequested();
                 try
                 {
                     var grain = grainFactory.GetGrain<T>(SingleGrain.Id);
