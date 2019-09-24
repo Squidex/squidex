@@ -181,6 +181,33 @@ describe('SchemasService', () => {
         expect(schema!).toEqual(createSchemaDetails(12));
     }));
 
+    it('should make put request to synchronize schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['update/sync']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/sync' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putSchemaSync('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/sync');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12));
+
+        expect(schema!).toEqual(createSchemaDetails(12));
+    }));
+
     it('should make put request to update category',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 

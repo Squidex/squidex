@@ -41,6 +41,7 @@ export class SchemaDto {
     public readonly canOrderFields: boolean;
     public readonly canPublish: boolean;
     public readonly canReadContents: boolean;
+    public readonly canSynchronize: boolean;
     public readonly canUnpublish: boolean;
     public readonly canUpdate: boolean;
     public readonly canUpdateCategory: boolean;
@@ -69,6 +70,7 @@ export class SchemaDto {
         this.canOrderFields = hasAnyLink(links, 'fields/order');
         this.canPublish = hasAnyLink(links, 'publish');
         this.canReadContents = hasAnyLink(links, 'contents');
+        this.canSynchronize = hasAnyLink(this, 'update/sync');
         this.canUnpublish = hasAnyLink(links, 'unpublish');
         this.canUpdate = hasAnyLink(links, 'update');
         this.canUpdateCategory = hasAnyLink(links, 'update/category');
@@ -125,7 +127,7 @@ export class SchemaDetailsDto extends SchemaDto {
             const clone = {};
 
             for (const key in source) {
-                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0) {
+                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0 && key.indexOf('can') !== 0) {
                     const value = source[key];
 
                     if (value) {
@@ -139,7 +141,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
         const result: any = {
             fields: this.fields.map(field => {
-                const copy = cleanup(field, 'fieldId');
+                const copy = cleanup(field, 'fieldId', '_links');
 
                 copy.properties = cleanup(field.properties);
 
@@ -222,12 +224,8 @@ export class RootFieldDto extends FieldDto {
         return this.properties.fieldType === 'Array';
     }
 
-    public get isString() {
-        return this.properties.fieldType === 'String';
-    }
-
     public get isTranslatable() {
-        return this.isLocalizable && this.isString && (this.properties.editor === 'Input' || this.properties.editor === 'Textarea');
+        return this.isLocalizable && this.properties.isTranslateable;
     }
 
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
@@ -282,6 +280,11 @@ export interface UpdateSchemaCategoryDto {
 
 export interface UpdateFieldDto {
     readonly properties: FieldPropertiesDto;
+}
+
+export interface SynchronizeSchemaDto {
+    noFieldDeletiong?: boolean;
+    noFieldRecreation?: boolean;
 }
 
 export interface UpdateSchemaDto {
@@ -344,6 +347,21 @@ export class SchemasService {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
             }),
             pretifyError('Failed to update schema scripts. Please reload.'));
+    }
+
+    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto & any, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['update/sync'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'Updated', appName);
+            }),
+            pretifyError('Failed to synchronize schema. Please reload.'));
     }
 
     public putSchema(appName: string, resource: Resource, dto: UpdateSchemaDto, version: Version): Observable<SchemaDetailsDto> {
