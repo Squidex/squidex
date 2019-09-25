@@ -31,7 +31,17 @@ namespace Squidex.Extensions.Actions.Webhook
 
         protected override (string Description, WebhookJob Data) CreateJob(EnrichedEvent @event, WebhookAction action)
         {
-            var requestBody = ToEnvelopeJson(@event);
+            string requestBody;
+
+            if (!string.IsNullOrEmpty(action.Payload))
+            {
+                requestBody = Format(action.Payload, @event);
+            }
+            else
+            {
+                requestBody = ToEnvelopeJson(@event);
+            }
+
             var requestUrl = Format(action.Url, @event);
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";

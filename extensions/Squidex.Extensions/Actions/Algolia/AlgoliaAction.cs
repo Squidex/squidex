@@ -36,5 +36,10 @@ namespace Squidex.Extensions.Actions.Algolia
         [DataType(DataType.Text)]
         [Formattable]
         public string IndexName { get; set; }
+
+        [Display(Name = "Document", Description = "The optional custom document.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Document { get; set; }
     }
 }
