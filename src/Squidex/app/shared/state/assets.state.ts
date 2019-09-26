@@ -55,7 +55,7 @@ export class AssetsState extends State<Snapshot> {
         this.project(x => x.tags);
 
     public tagsSelected =
-        this.project(x => x.tags);
+        this.project(x => x.tagsSelected);
 
     public tags =
         this.projectFrom(this.tagsUnsorted, x => sort(x));
