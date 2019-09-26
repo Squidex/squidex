@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
@@ -32,7 +33,12 @@ namespace Squidex.Domain.Users
 
         public PermissionSet Permissions { get; set; }
 
-        public IEnumerable<Claim> ToClaims()
+        public List<Claim> ToClaims(bool initial)
+        {
+            return ToClaimsCore(initial).ToList();
+        }
+
+        private IEnumerable<Claim> ToClaimsCore(bool initial)
         {
             if (!string.IsNullOrWhiteSpace(DisplayName))
             {
@@ -66,7 +72,10 @@ namespace Squidex.Domain.Users
 
             if (Permissions != null)
             {
-                yield return new Claim(SquidexClaimTypes.Permissions, string.Empty);
+                if (!initial)
+                {
+                    yield return new Claim(SquidexClaimTypes.Permissions, string.Empty);
+                }
 
                 foreach (var permission in Permissions)
                 {

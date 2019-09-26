@@ -134,7 +134,7 @@ namespace Squidex.Domain.Users
             {
                 await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
 
-                var claims = values.ToClaims().ToList();
+                var claims = values.ToClaims(true);
 
                 if (claims.Count > 0)
                 {
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Users
 
         public static Task<IdentityResult> GenerateClientSecretAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
         {
-            var claims = new[] { new Claim(SquidexClaimTypes.ClientSecret, RandomHash.New()) };
+            var claims = new List<Claim> { new Claim(SquidexClaimTypes.ClientSecret, RandomHash.New()) };
 
             return userManager.SyncClaimsAsync(user, claims);
         }
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Users
                 await DoChecked(() => userManager.SetUserNameAsync(user, values.Email), "Cannot update email.");
             }
 
-            await DoChecked(() => userManager.SyncClaimsAsync(user, values.ToClaims().ToList()), "Cannot update user.");
+            await DoChecked(() => userManager.SyncClaimsAsync(user, values.ToClaims(false)), "Cannot update user.");
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public static async Task<IdentityResult> SyncClaimsAsync(this UserManager<IdentityUser> userManager, IdentityUser user, IEnumerable<Claim> claims)
+        public static async Task<IdentityResult> SyncClaimsAsync(this UserManager<IdentityUser> userManager, IdentityUser user, List<Claim> claims)
         {
             if (claims.Any())
             {
