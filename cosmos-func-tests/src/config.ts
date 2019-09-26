@@ -75,19 +75,23 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
 
         specs: ['./../_out/specs/**/*.spec.js'],
 
+        plugins: [
+            {
+                // The module name
+                package: 'protractor-image-comparison',
+                // Some options, see the docs for more
+                options: {
+                    baselineFolder: '../baseline',
+                    screenshotPath: '../images',
+                    savePerInstance: true,
+                    autoSaveBaseline: true,
+                    debug: true
+                },
+            },
+        ],
+
         onPrepare: async () => {
             console.log('Preparing');
-            const protractorImageComparison = require('protractor-image-comparison');
-            browser. protractorImageComparison = new protractorImageComparison(
-                {
-                    autoSaveBaseline: true,
-                    baselineFolder: '../baseline/',
-                    screenshotPath: '../images',
-                    debug: true,
-                    disableCSSAnimation: true,
-                    nativeWebScreenshot: true
-                }
-            );
             addHtmlReporter();
             try {
 

@@ -13,7 +13,7 @@ import {
     SearchPage
 } from './../../pages';
 
-xdescribe('Create Commentary', () => {
+describe('Create Commentary', () => {
     let hasRunBefore = false;
 
     const appPage = new AppPage();
