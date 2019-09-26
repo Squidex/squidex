@@ -3,7 +3,7 @@ import { browser, by, element, ElementFinder } from 'protractor';
 import { BrowserUtil } from './../utils';
 
 export class HomePage extends BrowserUtil {
-    public getAppCard(appName: string) {
+    public getAppName(appName: string) {
         return element(by.cssContainingText('.card-title', appName));
     }
 
@@ -23,16 +23,28 @@ export class HomePage extends BrowserUtil {
         return this.getProfileDropdown().element(by.xpath('//a[contains(text(),\'Logout\')]'));
     }
 
+    public getImage() {
+        return element(by.tagName('img')).get(1);
+    }
+
     public async getWelcomeText() {
         return await this.waitForElementToBeVisibleAndGetText(this.getWelcomeElement());
     }
 
-    public async selectCommentaryApp() {
-        return this.selectApp('commentary');
+    public async getDescription() {
+        return await this.waitForElementToBeVisibleAndGetText(element.all(by.css('.card-text')).get(1));
+    }
+
+    public async getAppNameAfterChange() {
+        return await this.waitForElementToBeVisibleAndGetText(element(by.css('.card-title')));
+    }
+
+    public async selectCommentaryApp(appName: string) {
+        return this.selectApp(appName);
     }
 
     public async selectApp(appName: string) {
-        const card = this.getAppCard(appName);
+        const card = this.getAppName(appName);
 
         await this.waitForElementToBeVisibleAndClick(card);
     }
@@ -49,4 +61,5 @@ export class HomePage extends BrowserUtil {
         await this.getProfileDropdown().click();
         await this.getLogoutButton().click();
     }
+
 }

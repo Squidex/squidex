@@ -13,7 +13,7 @@ import {
     SearchPage
 } from './../../pages';
 
-describe('Create Commentary', () => {
+xdescribe('Create Commentary', () => {
     let hasRunBefore = false;
 
     const appPage = new AppPage();
@@ -37,7 +37,7 @@ describe('Create Commentary', () => {
         // Then just reload to get the access token from the identity server.
         await homePage.navigateTo();
 
-        await homePage.selectCommentaryApp();
+        await homePage.selectCommentaryApp('Commentaries');
         await appPage.selectContentMenuItem();
         await appPage.selectCommentarySchema();
         await searchPage.clickOnNewButton();
@@ -53,7 +53,7 @@ describe('Create Commentary', () => {
         await homePage.logout();
     });
 
-    xit('should allow the user to search and filter ref data with text and bring the matching results', async () => {
+    it('should allow the user to search and filter ref data with text and bring the matching results', async () => {
         await contentPage.selectDate(3);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.commentaryTest.commodityValue);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.commentaryTest.commentaryTypeValue);
@@ -78,7 +78,7 @@ describe('Create Commentary', () => {
         expect(commentaryText).toBe(constants.commentaryTest.contentBody);
     });
 
-    xit('should allow the user to search and filter ref data with partial text and bring the matching results', async () => {
+    it('should allow the user to search and filter ref data with partial text and bring the matching results', async () => {
         await contentPage.selectDate(3);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.partialCommentaryTest.commodityValue);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.partialCommentaryTest.commentaryTypeValue);
@@ -167,7 +167,7 @@ describe('Create Commentary', () => {
             expect(alertMessage).toBe('Failed to save commentary: Period is required.');
         });
 
-        xit('should allow to create commentary if period is not required and no period set.', async () => {
+        it('should allow to create commentary if period is not required and no period set.', async () => {
             const testValues = {
                 body: 'ShortText',
                 commentaryTypeWithoutRequiredPeriod: 'Overview',
@@ -190,7 +190,7 @@ describe('Create Commentary', () => {
             expect(alertMessage).toBeDefined();
         });
 
-        xit('should allow to create commentary if period is required by commentary type and period is set', async () => {
+        it('should allow to create commentary if period is required by commentary type and period is set', async () => {
             const testValues = {
                 body: 'ShortText',
                 commentaryTypeWithRequiredPeriod: 'Charts Commentary, 200, Yes',
@@ -216,7 +216,7 @@ describe('Create Commentary', () => {
         });
     });
 
-    xit('should throw error for duplicate commentaries with same ref data', async () => {
+    it('should throw error for duplicate commentaries with same ref data', async () => {
         await contentPage.selectDate(3);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.duplicateCommentaryCreationTest.commodityValue);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.duplicateCommentaryCreationTest.commentaryTypeValue);
@@ -236,7 +236,7 @@ describe('Create Commentary', () => {
     });
 
     describe('VEGA-62: Autosaving', () => {
-        xit('should auto save commentary', async () => {
+        it('should auto save commentary', async () => {
             await contentPage.selectDate(4);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.commentaryTest.commodityValue);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.commentaryTest.commentaryTypeValue);
@@ -263,7 +263,7 @@ describe('Create Commentary', () => {
             expect(commentaryText).toBe(constants.commentaryTest.contentBody);
         });
 
-        xit('should save the auto saved commentary', async () => {
+        it('should save the auto saved commentary', async () => {
             await contentPage.selectDate(4);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.savingAutoSavedCommentaryTest.commodityValue);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.savingAutoSavedCommentaryTest.commentaryTypeValue);
@@ -305,7 +305,7 @@ describe('Create Commentary', () => {
             expect(commentaryAfterSave).toBe(constants.savingAutoSavedCommentaryTest.contentBody);
         });
 
-        xit('quit without saving the auto saved commentary and capture the pop-up', async () => {
+        it('quit without saving the auto saved commentary and capture the pop-up', async () => {
             await contentPage.selectDate(4);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.commentaryTest.commodityValue);
             await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.commentaryTest.commentaryTypeValue);
@@ -326,7 +326,7 @@ describe('Create Commentary', () => {
         });
     });
 
-    xit('should throw error for invalid ref data', async () => {
+    it('should throw error for invalid ref data', async () => {
         await contentPage.selectDate(3);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.invalidRefDataTest.invalidRefDataValue);
         await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.invalidRefDataTest.invalidRefDataValue);
@@ -338,25 +338,25 @@ describe('Create Commentary', () => {
         expect(alertMessage).toBe(constants.messages.commentaryCretaionFailureMessage);
     });
 
-    xit('should support Bold text', async () => {
+    it('should support Bold text', async () => {
         await contentPage.createCommentaryAndApplyEditorOptions(constants.tuiEditorOptionsTest.boldCommentaryContentBody, constants.refDataLocators.editorOptionsBold);
         const commentaryText = await searchPage.verifyBoldCommentaryCreation();
         expect(commentaryText).toBe(constants.tuiEditorOptionsTest.boldCommentaryContentBody);
     });
 
-    xit('should support Italic text', async () => {
+    it('should support Italic text', async () => {
         await contentPage.createCommentaryAndApplyEditorOptions(constants.tuiEditorOptionsTest.italicCommentaryContentBody, constants.refDataLocators.editorOptionsItalic);
         const commentaryText = await searchPage.verifyItalicCommentaryCreation();
         expect(commentaryText).toBe(constants.tuiEditorOptionsTest.italicCommentaryContentBody);
     });
 
-    xit('should support Numbered list', async () => {
+    it('should support Numbered list', async () => {
         await contentPage.createCommentaryAndApplyEditorOptions(constants.tuiEditorOptionsTest.numberedListContentBody, constants.refDataLocators.editorOptionsNumberedList);
         const commentaryText = await searchPage.verifyNumberedCommentaryCreation();
         expect(commentaryText).toBe(constants.tuiEditorOptionsTest.numberedListContentBody);
     });
 
-    xit('should support Bulleted list', async () => {
+    it('should support Bulleted list', async () => {
         await contentPage.createCommentaryAndApplyEditorOptions(constants.tuiEditorOptionsTest.bulletPointsContentBody, constants.refDataLocators.editorOptionsBulletPointList);
         const commentaryText = await searchPage.verifyBulletPointsCommentaryCreation();
         expect(commentaryText).toBe(constants.tuiEditorOptionsTest.bulletPointsContentBody);

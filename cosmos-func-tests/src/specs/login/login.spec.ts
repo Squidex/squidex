@@ -10,7 +10,7 @@ import {
     LoginPage
 } from './../../pages';
 
-describe('User Login', () => {
+xdescribe('User Login', () => {
     const homePage = new HomePage();
     const loginPage = new LoginPage();
 

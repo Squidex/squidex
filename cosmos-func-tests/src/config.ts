@@ -77,6 +77,17 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
 
         onPrepare: async () => {
             console.log('Preparing');
+            const protractorImageComparison = require('protractor-image-comparison');
+            browser. protractorImageComparison = new protractorImageComparison(
+                {
+                    autoSaveBaseline: true,
+                    baselineFolder: '../baseline/',
+                    screenshotPath: '../images',
+                    debug: true,
+                    disableCSSAnimation: true,
+                    nativeWebScreenshot: true
+                }
+            );
             addHtmlReporter();
             try {
 

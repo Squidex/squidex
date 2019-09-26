@@ -1,0 +1,53 @@
+import { by, element  } from 'protractor';
+import { BrowserUtil } from '../utils';
+let path = require('path');
+
+
+export class GeneralSettingsPage extends BrowserUtil {
+
+    public async labelField() {
+        return await element(by.css('#label'));
+    }
+
+    public async descriptionField() {
+        return await element(by.css('#description'));
+    }
+
+    public async uploadImageButton() {
+        return await element(by.buttonText('Upload File'));
+    }
+
+    public async saveContent() {
+        return await this.waitForElementToBeVisibleAndClick(element(by.buttonText('Save')));
+    }
+
+    public async appsDropDown() {
+        return await this.waitForElementToBeVisibleAndClick(element(by.id('app-name')));
+    }
+
+    public async selectAllApps() {
+        return await this.waitForElementToBeVisibleAndClick(element(by.cssContainingText('.all-apps-text', 'All Apps')));
+    }
+
+    public async updateLabel(label: string) {
+        await this.waitForElementToBePresentAndWrite(await this.labelField(), label);
+    }
+
+    public async updateDescription(desc: string) {
+        await this.waitForElementToBePresentAndWrite(await this.descriptionField(), desc);
+    }
+
+    public async navigateToAppHomePage() {
+        await this.appsDropDown();
+        await this.selectAllApps();
+    }
+
+    public async uploadImage() {
+        let imgToUpload = '../../images/website.jpg';
+        let absolutePath = path.resolve(__dirname, imgToUpload);
+        const button = await this.uploadImageButton();
+        await this.waitForElementToBePresentAndWrite(button, absolutePath);
+
+    }
+
+}

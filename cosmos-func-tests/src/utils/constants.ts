@@ -76,6 +76,14 @@ export const constants = {
         numberedListContentBody: 'Numbered List Test'
     },
 
+    labelAndDescVerificationTest: {
+        labelValue: 'Commentaries',
+        DescValue: 'This is the app to update Commentaries for Commodities based on regions',
+        labelValueWithoutSave: 'Commentaries - Save',
+        DescValueWithoutSave: 'Description Added',
+        imagePath: '../../images/website.jpg'
+    },
+
     messages: {
         validationFailureErrorMessage: 'A content item with these values already exists.',
         unsavedChangesPopUpMessage: 'You have unsaved changes, do you want to close the current content view and discard your changes?',
