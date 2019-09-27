@@ -1,0 +1,107 @@
+# Default values for cosmos.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+namespace : cosmos-systest
+environment: systest
+
+image:
+  repository: nexus.cha.rbxd.ds:8001/cosmos
+  tag: 2.0.105
+  pullPolicy: Always
+
+
+cosmos_deploy:
+  image:
+    repository: nexus.cha.rbxd.ds:8001/cosmos-deploy
+    tag: 2.0.105
+    pullPolicy: Always
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  port_name: http
+  port: 80
+
+container:
+  name: cport
+  port: 80
+
+ingress:
+  name: cosmos-systest-ingress
+  host: cosmos.systest.cha.eu-west-1.dev
+  annotations:
+    kubernetes.io/ingress.class: traefik-iog-platform
+    external-dns.alpha.kubernetes.io/hostname: cosmos.systest.cha.eu-west-1.dev
+    certmanager.k8s.io/cluster-issuer: iop-vault-issuer-cha-eu-west-1-dev
+  tls:
+    - hosts:
+      - cosmos.systest.cha.eu-west-1.dev
+      secretName: cosmos.systest.cha.eu-west-1.dev
+
+configmap:
+  name: cosmos-configs
+  mongoDb: cha-pre-live-ak0n6.mongodb.net
+  VaultSecretPath: "kv/cha/k8s/data/cosmos/systest?version=1"
+  VaultK8sRoleName: "kv-cosmos-read"
+  VaultK8sAuthPath: "auth/cha/eks-1"
+  secretsVersion: "1"
+##########################################
+# Application configuration (appsettings)
+##########################################
+application_configmap:
+  name: cosmos-app-configs
+###############################################################
+
+init_containers: true
+ServiceAccountName: cosmos
+VaultAddress: "https://vault_eu_prod.b2b.regn.net"
+
+vault_secrets:
+  name: cosmos-vault-secret
+  secretFiles:
+
+    vault.crt: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEijCCA3KgAwIBAgIQay0iJoZ+c6NJt7cqchus+zANBgkqhkiG9w0BAQsFADBg
+      MRMwEQYKCZImiZPyLGQBGRYDbmV0MRQwEgYKCZImiZPyLGQBGRYEcmVnbjETMBEG
+      CgmSJomT8ixkARkWA2IyYjEeMBwGA1UEAxMVYjJiLVJCSVFIU1BLSVAwMDJWLUNB
+      MB4XDTE3MDgxNzA5MzY1N1oXDTI3MDgxNzA5NDY1N1owYDETMBEGCgmSJomT8ixk
+      ARkWA25ldDEUMBIGCgmSJomT8ixkARkWBHJlZ24xEzARBgoJkiaJk/IsZAEZFgNi
+      MmIxHjAcBgNVBAMTFWIyYi1SQklRSFNQS0lQMDAyVi1DQTCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAMv3KNkRI/WzMqcLwkSsKU3vM5coMtDbqdPccdXU
+      MufO94gQXzWsLYN4gUVW2BQq2ULolCzwEDuEep61By2uKw4myr9RHENM8zy7cQXs
+      VvrkNiE+cyYa2zxxM34ImJDc19vHdBovX0zcY3jT3uqtdJX42Etvh2zJoAi26SDk
+      9miXggePd9eoGfnE6MKxTdCtf3s7AHQxR9Y3Rx+uCMKOSWNN+LterAA2n7qMtu6n
+      Uo51ZXmCdJYQDgyvVgS2CgUZwfCwBvD3bCeDwM8FLOr/V/5FDDVvIDmREqQN1eeY
+      Y2q7UQTujHRFzF18Iw+Thk1eGV/zyNvaXr8ny7o1uOeIg80CAwEAAaOCAT4wggE6
+      MBMGCSsGAQQBgjcUAgQGHgQAQwBBMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8EBTAD
+      AQH/MB0GA1UdDgQWBBQjySkPLCVwclOIUQnzz5V3rO+1WzASBgkrBgEEAYI3FQEE
+      BQIDBQAFMIGsBgNVHR8EgaQwgaEwgZ6ggZuggZiGSmh0dHA6Ly9yYmlxaHNwa2lw
+      MDAzdi5iMmIucmVnbi5uZXQvQ2VydEVucm9sbC9iMmItUkJJUUhTUEtJUDAwMlYt
+      Q0EoNSkuY3JshkpodHRwOi8vcmJpcWhzcGtpcDAwNHYuYjJiLnJlZ24ubmV0L0Nl
+      cnRFbnJvbGwvYjJiLVJCSVFIU1BLSVAwMDJWLUNBKDUpLmNybDAjBgkrBgEEAYI3
+      FQIEFgQU2RDhuv3cL/CQBA4ZVzMUpO+Tqf4wDQYJKoZIhvcNAQELBQADggEBADHm
+      Vhw0S0ICMgXQDpXOp8nraCKsm9LpLcmi/SOtR35AgGQmxAxlPebKgIL3vpUOfnec
+      10htfOInwmF2dVheluEoFBPSbh0uXm3+Rm2p44/d6HTo5AkTygOQf3Fdu0IFqvBH
+      kXBLyQkgVfH2p3OjIfJAV+6seWBI3n+VvBg+YUVYHIqUCHzmxL07ztKuI7f6ZTuO
+      8AvcJzMcsjKkGeUNS3lNimEdI339C93BrBDNzPHZe7LOQr7SiFcIU32hIKfLLkWT
+      MM+pxYAJe1wZkDN1XvYgQ+R4W9XItalDf4y4ZwQIpYo60jZLS1OJQJngE3Tu6R2K
+      gA9dcD2vlZA86EhY8Mg=
+      -----END CERTIFICATE-----
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
