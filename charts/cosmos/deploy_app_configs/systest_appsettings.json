@@ -1,8 +1,0 @@
-{
-  "Url": "https://cosmos.systest.cha.eu-west-1.dev",
-  "IdentityServer": "http://identityservice.systest.tesla.cha.rbxd.ds/connect/token",
-  "ClientId": "CMSDeployer",
-  "ClientSecret": "p@55w0rd",
-  "GenerateTestData": true
-}
-  
