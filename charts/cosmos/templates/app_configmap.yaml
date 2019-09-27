@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Values.application_configmap.name }}
-  namespace: {{ .Values.namespace }}
-data:
-  Environment: {{ .Values.environment }}
-
-  {{- (.Files.Glob "app_configs/*").AsConfig | nindent 2 }}
