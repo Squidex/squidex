@@ -1,46 +1,49 @@
 {
-    "eventStore": {
-      "mongoDb": {
-        /*
-         * The connection string to your Mongo Server.
-         * 
-         * Read More: https://docs.mongodb.com/manual/reference/connection-string/
-         */
-        "configuration": "mongodb+srv://cosmos-systest-db-admin:fjYTXZzk6dqqDdl4@cha-pre-live-ak0n6.mongodb.net",
-        /*
-         * The name of the event store database.
-         */
-        "database": "cosmos-squidex-systest"
-      }
+  "eventStore": {
+    "mongoDb": {
+      "database": "cosmos-squidex-systest"
+    }
+  },
+
+  "store": {
+    "type": "MongoDb",
+    "mongoDb": {
+      "contentDatabase": "cosmos-squidexContent-systest",
+      "database": "cosmos-squidex-systest"
+    }
+  },
+
+  "identity": {
+    "icisAuthServer": "https://identityservice.systest.tesla.cha.rbxd.ds"
+  },
+
+  "kafka": {
+
+    "producer": {
+      "bootstrapServers": "b-2.pre-live-kafka-v1.rhncpj.c2.kafka.eu-west-1.amazonaws.com:9092"
     },
-  
-    "store": {
-      /*
-       * Define the type of the read store. 
-       * 
-       * Supported: MongoDb
-       */
-      "type": "MongoDb",
-      "mongoDb": {
-        /*
-         * The connection string to your Mongo Server.
-         * 
-         * Read More: https://docs.mongodb.com/manual/reference/connection-string/
-         */
-        "configuration": "mongodb+srv://cosmos-systest-db-admin:fjYTXZzk6dqqDdl4@cha-pre-live-ak0n6.mongodb.net",
-        /*
-         * The database for all your content collections (one collection per app).
-         */
-        "contentDatabase": "cosmos-squidexContent-systest",
-        /*
-         * The database for all your other read collections.
-         */
-        "database": "cosmos-squidex-systest"
-      }
+
+    "consumer": {
+      "bootstrapServers": "b-2.pre-live-kafka-v1.rhncpj.c2.kafka.eu-west-1.amazonaws.com"
     },
-  
-    "identity": {
-      "icisAuthServer": "https://identityservice.systest.tesla.cha.rbxd.ds"
+
+    "schemaRegistry": {
+      "schemaRegistryUrl": "schema-registry.cha.eu-west-1.dev"
+    },
+
+    "jsonConsumers": {
+      "appName": "commentary",
+      "clientName": "RefData"
+    },
+
+    "avroConsumers": {
+      "commodity": {
+        "topicName": "systest_cosmos_commodity_internal_2"
+      },
+      "region": {
+        "topicName": "systest_cosmos_region_internal_3"
+      }
     }
   }
+}
   

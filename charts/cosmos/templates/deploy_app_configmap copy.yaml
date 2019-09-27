@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cosmos-deploy-app-configs
+  namespace: {{ .Values.namespace }}
+data:
+  {{- (.Files.Glob "deploy_app_configs/*").AsConfig | nindent 2 }}

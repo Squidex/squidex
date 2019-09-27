@@ -1,17 +1,24 @@
-# Default values for rpet-cms-formio.
+# Default values for cosmos.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 namespace : cosmos-systest
+environment: systest
+
 image:
   repository: nexus.cha.rbxd.ds:8001/cosmos
-  tag: 2.0.89-k8s-test.1
+  tag: 2.0.105
   pullPolicy: Always
-env:
-    open:
-      Environment: "systest"
+
+
+cosmos_deploy:
+  image:
+    repository: nexus.cha.rbxd.ds:8001/cosmos-deploy
+    tag: 2.0.105
+    pullPolicy: Always
+
 
 imagePullSecrets: []
 nameOverride: ""
@@ -36,11 +43,11 @@ ingress:
     - hosts:
       - cosmos.systest.cha.eu-west-1.dev
       secretName: cosmos.systest.cha.eu-west-1.dev
-environment: systest
 
 configmap:
   name: cosmos-configs
-  mongoDb: cha-pre-live-ak0n6.mongodb.net/cosmos-systest
+  mongoDb: cha-pre-live-ak0n6.mongodb.net
+  VaultSecretPath: "kv/cha/k8s/data/cosmos/systest?version=1"
   VaultK8sRoleName: "kv-cosmos-read"
   VaultK8sAuthPath: "auth/cha/eks-1"
   secretsVersion: "1"
@@ -51,7 +58,7 @@ application_configmap:
   name: cosmos-app-configs
 ###############################################################
 
-init_containers: false
+init_containers: true
 ServiceAccountName: cosmos
 VaultAddress: "https://vault_eu_prod.b2b.regn.net"
 

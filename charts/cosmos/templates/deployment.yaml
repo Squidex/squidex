@@ -98,12 +98,9 @@ spec:
               containerPort: {{ .Values.container.port }}
               protocol: TCP
           env:
-{{- range $name, $value := .Values.env.open }}
-{{- if not (empty $value) }}
-            - name: {{ $name | quote }}
-              value: {{ $value | quote }}
-{{- end }}
-{{- end }}
+            - name: Environment
+              value: {{ .Values.environment }}
+
           volumeMounts:
           - name: cosmos-vol
             mountPath: "/app/conf" 

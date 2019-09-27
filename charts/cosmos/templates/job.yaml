@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ include "cosmos.fullname" . }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: cosmos-deploy
+        image: "{{ .Values.cosmos_deploy.image.repository }}:{{ .Values.cosmos_deploy.image.tag }}"
+        imagePullPolicy: {{ .Values.cosmos_deploy.image.pullPolicy }}
+        env:
+          - name: Environment
+            value: {{ .Values.environment }}
+          
+        volumeMounts:
+        - name: cosmos-deploy-vol
+          mountPath: "/app/conf" 
+
+        - name: shared-data
+          mountPath: "/app/secrets"
+
+      volumes:
+      - name: cosmos-deploy-vol
+        configMap:
+          name: cosmos-deploy-app-configs
+          items:
+            - key: {{ .Values.environment }}_appsettings.json
+              path: appsettings.{{ .Values.environment }}.json
+   
+      - name: shared-data
+        emptyDir: {}
+      
+      restartPolicy: OnFailure
+  backoffLimit: 4
