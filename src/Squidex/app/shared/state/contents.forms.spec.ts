@@ -707,6 +707,18 @@ describe('ContentForm', () => {
 
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
+
+        it('should subscribe to values', () => {
+            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+
+            let value: any;
+
+            simpleForm.value.subscribe(v => {
+                value = v;
+            });
+
+            expect(value).toEqual({ field1: { iv: 'Change' }});
+        });
     });
 
     describe('for editing content', () => {
