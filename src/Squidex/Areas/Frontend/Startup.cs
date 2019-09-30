@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Frontend.Middlewares;
 using Squidex.Pipeline.Squid;
@@ -21,7 +22,7 @@ namespace Squidex.Areas.Frontend
     {
         public static void ConfigureFrontend(this IApplicationBuilder app)
         {
-            var environment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             app.UseMiddleware<SquidMiddleware>();
 

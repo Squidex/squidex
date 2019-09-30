@@ -15,30 +15,19 @@ namespace Squidex.Config.Startup
 {
     public abstract class SafeHostedService : IHostedService
     {
-        private readonly IApplicationLifetime lifetime;
         private readonly ISemanticLog log;
         private bool isStarted;
 
-        protected SafeHostedService(IApplicationLifetime lifetime, ISemanticLog log)
+        protected SafeHostedService(ISemanticLog log)
         {
-            this.lifetime = lifetime;
-
             this.log = log;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                await StartAsync(log, cancellationToken);
+            await StartAsync(log, cancellationToken);
 
-                isStarted = true;
-            }
-            catch
-            {
-                lifetime.StopApplication();
-                throw;
-            }
+            isStarted = true;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

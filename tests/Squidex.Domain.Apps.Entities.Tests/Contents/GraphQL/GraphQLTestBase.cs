@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            data = data ??
+            data ??=
                 new NamedContentData()
                     .AddField("my-string",
                         new ContentFieldData()

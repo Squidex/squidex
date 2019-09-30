@@ -118,7 +118,7 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                var normalizedEmail = userManager.NormalizeKey(email);
+                var normalizedEmail = userManager.NormalizeEmail(email);
 
                 result = result.Where(x => x.NormalizedEmail.Contains(normalizedEmail));
             }

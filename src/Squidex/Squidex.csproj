@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -43,41 +39,34 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.1.0" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
-    <PackageReference Include="IdentityServer4" Version="2.5.3" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.5.3" />
-    <PackageReference Include="McMaster.NETCore.Plugins" Version="0.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
+    <PackageReference Include="IdentityServer4" Version="3.0.1" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
+    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="3.0.1" />
+    <PackageReference Include="McMaster.NETCore.Plugins" Version="0.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.0" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.4.2" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.4.2" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.4.2" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.6" />
-    <PackageReference Include="NJsonSchema" Version="10.0.23" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.0.6" />
+    <PackageReference Include="NJsonSchema" Version="10.0.24" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.1.2" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.7.0" />
-    <PackageReference Include="Orleans.WebHostCompatibilityLayer" Version="2.3.1" />
     <PackageReference Include="OrleansDashboard" Version="2.4.5" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="4.2.17" PrivateAssets="all" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="3.9.0" />
+    <PackageReference Include="ReportGenerator" Version="4.2.20" PrivateAssets="all" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="3.10.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 

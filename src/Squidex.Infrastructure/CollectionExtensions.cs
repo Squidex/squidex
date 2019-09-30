@@ -38,16 +38,6 @@ namespace Squidex.Infrastructure
             return enumerable.OrderBy(x => random.Next()).ToList();
         }
 
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable)
-        {
-            return new HashSet<T>(enumerable);
-        }
-
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T> comparer)
-        {
-            return new HashSet<T>(enumerable, comparer);
-        }
-
         public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();

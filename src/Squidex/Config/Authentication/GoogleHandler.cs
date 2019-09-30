@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -32,15 +33,23 @@ namespace Squidex.Config.Authentication
                 context.Identity.SetDisplayName(nameClaim);
             }
 
-            var pictureUrl = context.User?.Value<string>("picture");
+            string pictureUrl = null;
+
+            if (context.User.TryGetProperty("picture", out var picture) && picture.ValueKind == JsonValueKind.String)
+            {
+                pictureUrl = picture.GetString();
+            }
 
             if (string.IsNullOrWhiteSpace(pictureUrl))
             {
-                pictureUrl = context.User?["image"]?.Value<string>("url");
+                if (context.User.TryGetProperty("image", out var image) && image.TryGetProperty("url", out var url) && url.ValueKind == JsonValueKind.String)
+                {
+                    pictureUrl = url.GetString();
+                }
 
                 if (pictureUrl != null && pictureUrl.EndsWith("?sz=50", System.StringComparison.Ordinal))
                 {
-                    pictureUrl = pictureUrl.Substring(0, pictureUrl.Length - 6);
+                    pictureUrl = pictureUrl[0..^6];
                 }
             }
 

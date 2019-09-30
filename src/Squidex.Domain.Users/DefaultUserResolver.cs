@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
@@ -16,65 +18,84 @@ namespace Squidex.Domain.Users
 {
     public sealed class DefaultUserResolver : IUserResolver
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IUserFactory userFactory;
+        private readonly IServiceProvider serviceProvider;
 
-        public DefaultUserResolver(UserManager<IdentityUser> userManager, IUserFactory userFactory)
+        public DefaultUserResolver(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(userManager, nameof(userManager));
-            Guard.NotNull(userFactory, nameof(userFactory));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.userManager = userManager;
-            this.userFactory = userFactory;
+            this.serviceProvider = serviceProvider;
         }
 
         public async Task<bool> CreateUserIfNotExists(string email, bool invited)
         {
-            var user = userFactory.Create(email);
-
-            try
+            using (var scope = serviceProvider.CreateScope())
             {
-                var result = await userManager.CreateAsync(user);
+                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-                if (result.Succeeded)
+                var user = userFactory.Create(email);
+
+                try
                 {
-                    var values = new UserValues { DisplayName = email, Invited = invited };
+                    var result = await userManager.CreateAsync(user);
 
-                    await userManager.UpdateAsync(user, values);
+                    if (result.Succeeded)
+                    {
+                        var values = new UserValues { DisplayName = email, Invited = invited };
+
+                        await userManager.UpdateAsync(user, values);
+                    }
+
+                    return result.Succeeded;
                 }
-
-                return result.Succeeded;
-            }
-            catch
-            {
-                return false;
+                catch
+                {
+                    return false;
+                }
             }
         }
 
         public async Task<IUser> FindByIdOrEmailAsync(string idOrEmail)
         {
-            if (userFactory.IsId(idOrEmail))
+            using (var scope = serviceProvider.CreateScope())
             {
-                return await userManager.FindByIdWithClaimsAsync(idOrEmail);
-            }
-            else
-            {
-                return await userManager.FindByEmailWithClaimsAsyncAsync(idOrEmail);
+                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                if (userFactory.IsId(idOrEmail))
+                {
+                    return await userManager.FindByIdWithClaimsAsync(idOrEmail);
+                }
+                else
+                {
+                    return await userManager.FindByEmailWithClaimsAsyncAsync(idOrEmail);
+                }
             }
         }
 
         public async Task<List<IUser>> QueryByEmailAsync(string email)
         {
-            var result = await userManager.QueryByEmailAsync(email);
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-            return result.OfType<IUser>().ToList();
+                var result = await userManager.QueryByEmailAsync(email);
+
+                return result.OfType<IUser>().ToList();
+            }
         }
 
         public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
         {
-            var result = await userManager.QueryByIdsAync(ids);
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-            return result.OfType<IUser>().ToDictionary(x => x.Id);
+                var result = await userManager.QueryByIdsAync(ids);
+
+                return result.OfType<IUser>().ToDictionary(x => x.Id);
+            }
         }
     }
 }

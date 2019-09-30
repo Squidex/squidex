@@ -7,7 +7,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Migrate_01;
 using Squidex.Infrastructure.Log;
 
@@ -17,8 +16,8 @@ namespace Squidex.Config.Startup
     {
         private readonly RebuildRunner rebuildRunner;
 
-        public MigrationRebuilderHost(IApplicationLifetime lifetime, ISemanticLog log, RebuildRunner rebuildRunner)
-            : base(lifetime, log)
+        public MigrationRebuilderHost(RebuildRunner rebuildRunner, ISemanticLog log)
+            : base(log)
         {
             this.rebuildRunner = rebuildRunner;
         }

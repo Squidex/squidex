@@ -8,8 +8,12 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Squidex.Config;
+using Squidex.Config.Orleans;
+using Squidex.Config.Startup;
 using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
@@ -18,20 +22,27 @@ namespace Squidex
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            new WebHostBuilder()
-                .UseKestrel(k => { k.AddServerHeader = false; })
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            new HostBuilder()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIIS()
-                .UseStartup<WebStartup>()
-                .ConfigureLogging((hostingContext, builder) =>
+                .UseDefaultServiceProvider(options =>
                 {
-                    builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
+                    options.ValidateOnBuild = false;
+                })
+                .ConfigureLogging((context, builder) =>
+                {
+                    builder.AddConfiguration(context.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
                     builder.AddFilters();
+                })
+                .ConfigureWebHostDefaults(builder =>
+                {
+                    builder.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
+
+                    builder.UseStartup<Startup>();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
@@ -45,6 +56,19 @@ namespace Squidex
 
                     builder.AddCommandLine(args);
                 })
-                .Build();
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<InitializerHost>();
+                })
+                .UseOrleans((context, builder) =>
+                {
+                    builder.ConfigureOrleans(context.Configuration);
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<MigratorHost>();
+                    services.AddHostedService<MigrationRebuilderHost>();
+                    services.AddHostedService<BackgroundHost>();
+                });
     }
 }

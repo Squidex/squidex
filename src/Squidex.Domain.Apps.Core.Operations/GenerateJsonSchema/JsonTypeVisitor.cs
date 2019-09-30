@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             if (field.Properties.AllowedValues != null)
             {
-                var names = property.EnumerationNames = property.EnumerationNames ?? new Collection<string>();
+                var names = property.EnumerationNames ??= new Collection<string>();
 
                 foreach (var value in field.Properties.AllowedValues)
                 {

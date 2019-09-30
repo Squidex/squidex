@@ -27,10 +27,10 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userFactory.IsId(A<string>.That.StartsWith("id")))
                 .Returns(true);
 
-            A.CallTo(() => userManager.NormalizeKey(A<string>.Ignored))
+            A.CallTo(() => userManager.NormalizeEmail(A<string>.Ignored))
                 .ReturnsLazily(c => c.GetArgument<string>(0).ToUpperInvariant());
 
-            sut = new DefaultUserResolver(userManager, userFactory);
+            sut = new DefaultUserResolver(null);
         }
 
         [Fact]

@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Web;
 
@@ -19,7 +20,7 @@ namespace Squidex.Areas.IdentityServer
         {
             app.ApplicationServices.UseMyAdmin();
 
-            var environment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             app.Map(Constants.IdentityServerPrefix, identityApp =>
             {
@@ -32,9 +33,17 @@ namespace Squidex.Areas.IdentityServer
                     identityApp.UseExceptionHandler("/error");
                 }
 
+                identityApp.UseRouting();
+
+                identityApp.UseAuthentication();
+                identityApp.UseAuthorization();
+
                 identityApp.UseMyIdentityServer();
 
-                identityApp.UseMvc();
+                identityApp.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
             });
         }
     }

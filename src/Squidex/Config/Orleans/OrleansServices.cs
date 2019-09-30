@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -18,99 +19,95 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
-using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static IServiceCollection AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
+        public static void ConfigureOrleans(this ISiloBuilder builder, IConfiguration config)
         {
-            services.AddOrleans(config, environment, builder =>
+            builder.ConfigureServices(siloServices =>
             {
-                builder.ConfigureServices(siloServices =>
-                {
-                    siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
-                    siloServices.AddScoped<IActivationLimit, ActivationLimit>();
+                siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
+                siloServices.AddScoped<IActivationLimit, ActivationLimit>();
 
-                    siloServices.AddScoped(typeof(IGrainState<>), typeof(GrainState<>));
-                });
-
-                builder.ConfigureApplicationParts(parts =>
-                {
-                    parts.AddApplicationPart(SquidexEntities.Assembly);
-                    parts.AddApplicationPart(SquidexInfrastructure.Assembly);
-                });
-
-                builder.Configure<ClusterOptions>(options =>
-                {
-                    options.Configure();
-                });
-
-                builder.Configure<ProcessExitHandlingOptions>(options =>
-                {
-                    options.FastKillOnProcessExit = false;
-                });
-
-                builder.Configure<DashboardOptions>(options =>
-                {
-                    options.HideTrace = true;
-                });
-
-                builder.UseDashboard(options =>
-                {
-                    options.HostSelf = false;
-                });
-
-                builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
-                builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
-                builder.AddIncomingGrainCallFilter<LoggingFilter>();
-                builder.AddIncomingGrainCallFilter<StateFilter>();
-
-                var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
-                var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
-
-                var address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
-
-                builder.ConfigureEndpoints(
-                    address,
-                    orleansPortSilo,
-                    orleansPortGateway,
-                    true);
-
-                config.ConfigureByOption("orleans:clustering", new Alternatives
-                {
-                    ["MongoDB"] = () =>
-                    {
-                        builder.UseMongoDBClustering(options =>
-                        {
-                            options.Configure(config);
-                        });
-                    },
-                    ["Development"] = () =>
-                    {
-                        builder.UseDevelopmentClustering(new IPEndPoint(address, orleansPortSilo));
-
-                        builder.Configure<ClusterMembershipOptions>(options =>
-                        {
-                            options.ExpectedClusterSize = 1;
-                        });
-                    }
-                });
-
-                config.ConfigureByOption("store:type", new Alternatives
-                {
-                    ["MongoDB"] = () =>
-                    {
-                        builder.UseMongoDBReminders(options =>
-                        {
-                            options.Configure(config);
-                        });
-                    }
-                });
+                siloServices.AddScoped(typeof(IGrainState<>), typeof(GrainState<>));
             });
 
-            return services;
+            builder.ConfigureApplicationParts(parts =>
+            {
+                parts.AddApplicationPart(SquidexEntities.Assembly);
+                parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+            });
+
+            builder.Configure<ClusterOptions>(options =>
+            {
+                options.Configure();
+            });
+
+            builder.Configure<ProcessExitHandlingOptions>(options =>
+            {
+                options.FastKillOnProcessExit = false;
+            });
+
+            builder.Configure<DashboardOptions>(options =>
+            {
+                options.HideTrace = true;
+            });
+
+            builder.UseDashboard(options =>
+            {
+                options.HostSelf = false;
+            });
+
+            builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
+            builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
+            builder.AddIncomingGrainCallFilter<LoggingFilter>();
+            builder.AddIncomingGrainCallFilter<StateFilter>();
+
+            var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
+            var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
+
+            var address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
+
+            builder.ConfigureEndpoints(
+                address,
+                orleansPortSilo,
+                orleansPortGateway,
+                true);
+
+            config.ConfigureByOption("orleans:clustering", new Alternatives
+            {
+                ["MongoDB"] = () =>
+                {
+                    builder.UseMongoDBClustering(options =>
+                    {
+                        options.Configure(config);
+                    });
+                },
+                ["Development"] = () =>
+                {
+                    builder.UseDevelopmentClustering(new IPEndPoint(address, orleansPortSilo));
+
+                    builder.Configure<ClusterMembershipOptions>(options =>
+                    {
+                        options.ExpectedClusterSize = 1;
+                    });
+                }
+            });
+
+            config.ConfigureByOption("store:type", new Alternatives
+            {
+                ["MongoDB"] = () =>
+                {
+                    builder.UseMongoDBReminders(options =>
+                    {
+                        options.Configure(config);
+                    });
+                }
+            });
         }
 
         private static void Configure(this MongoDBOptions options, IConfiguration config)

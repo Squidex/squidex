@@ -112,7 +112,7 @@ namespace Squidex.Config.Domain
 
         public static IMvcBuilder AddMySerializers(this IMvcBuilder mvc)
         {
-            mvc.AddJsonOptions(options =>
+            mvc.AddNewtonsoftJson(options =>
             {
                 ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
             });

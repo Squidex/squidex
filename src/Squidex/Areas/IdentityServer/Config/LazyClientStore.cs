@@ -13,6 +13,7 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Apps.Core.Apps;
@@ -29,22 +30,23 @@ namespace Squidex.Areas.IdentityServer.Config
 {
     public class LazyClientStore : IClientStore
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly IServiceProvider serviceProvider;
         private readonly IAppProvider appProvider;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
         public LazyClientStore(
-            UserManager<IdentityUser> userManager,
+            IServiceProvider serviceProvider,
             IOptions<UrlsOptions> urlsOptions,
             IOptions<MyIdentityOptions> identityOptions,
             IAppProvider appProvider)
         {
-            Guard.NotNull(identityOptions, nameof(identityOptions));
-            Guard.NotNull(urlsOptions, nameof(urlsOptions));
-            Guard.NotNull(userManager, nameof(userManager));
             Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(identityOptions, nameof(identityOptions));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
-            this.userManager = userManager;
+            this.serviceProvider = serviceProvider;
+
             this.appProvider = appProvider;
 
             CreateStaticClients(urlsOptions, identityOptions);
@@ -73,11 +75,16 @@ namespace Squidex.Areas.IdentityServer.Config
                 }
             }
 
-            var user = await userManager.FindByIdWithClaimsAsync(clientId);
-
-            if (!string.IsNullOrWhiteSpace(user?.ClientSecret()))
+            using (var scope = serviceProvider.CreateScope())
             {
-                return CreateClientFromUser(user);
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                var user = await userManager.FindByIdWithClaimsAsync(clientId);
+
+                if (!string.IsNullOrWhiteSpace(user?.ClientSecret()))
+                {
+                    return CreateClientFromUser(user);
+                }
             }
 
             return null;

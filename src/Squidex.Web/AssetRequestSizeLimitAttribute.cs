@@ -6,8 +6,9 @@
 // ==========================================================================
 
 using System;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -15,29 +16,24 @@ using Squidex.Domain.Apps.Entities.Assets;
 namespace Squidex.Web
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class AssetRequestSizeLimitAttribute : Attribute, IFilterFactory, IOrderedFilter
+    public sealed class AssetRequestSizeLimitAttribute : Attribute, IAuthorizationFilter, IRequestSizePolicy
     {
-        public int Order { get; set; } = 900;
-
-        public bool IsReusable => true;
-
-        public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var assetOptions = serviceProvider.GetService<IOptions<AssetOptions>>();
+            var assetOptions = context.HttpContext.RequestServices.GetService<IOptions<AssetOptions>>();
 
-            if (assetOptions?.Value.MaxSize > 0)
+            var maxRequestBodySizeFeature = context.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
+
+            if (maxRequestBodySizeFeature?.IsReadOnly == false)
             {
-                var filter = serviceProvider.GetRequiredService<RequestSizeLimitFilter>();
-
-                filter.Bytes = assetOptions.Value.MaxSize;
-
-                return filter;
-            }
-            else
-            {
-                var filter = serviceProvider.GetRequiredService<DisableRequestSizeLimitFilter>();
-
-                return filter;
+                if (assetOptions?.Value.MaxSize > 0)
+                {
+                    maxRequestBodySizeFeature.MaxRequestBodySize = assetOptions.Value.MaxSize;
+                }
+                else
+                {
+                    maxRequestBodySizeFeature.MaxRequestBodySize = null;
+                }
             }
         }
     }

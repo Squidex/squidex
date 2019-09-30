@@ -7,7 +7,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 
@@ -17,8 +16,8 @@ namespace Squidex.Config.Startup
     {
         private readonly Migrator migrator;
 
-        public MigratorHost(Migrator migrator, IApplicationLifetime lifetime, ISemanticLog log)
-            : base(lifetime, log)
+        public MigratorHost(Migrator migrator, ISemanticLog log)
+            : base(log)
         {
             this.migrator = migrator;
         }

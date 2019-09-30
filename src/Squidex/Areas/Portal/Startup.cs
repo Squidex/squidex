@@ -18,6 +18,8 @@ namespace Squidex.Areas.Portal
             app.Map(Constants.PortalPrefix, portalApp =>
             {
                 portalApp.UseAuthentication();
+                portalApp.UseAuthorization();
+
                 portalApp.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
                 portalApp.UseMiddleware<PortalRedirectMiddleware>();
             });

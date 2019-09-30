@@ -19,6 +19,8 @@ namespace Squidex.Areas.OrleansDashboard
             app.Map(Constants.OrleansPrefix, orleansApp =>
             {
                 orleansApp.UseAuthentication();
+                orleansApp.UseAuthorization();
+
                 orleansApp.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
                 orleansApp.UseOrleansDashboard();
             });

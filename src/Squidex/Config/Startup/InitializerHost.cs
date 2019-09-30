@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -19,8 +18,8 @@ namespace Squidex.Config.Startup
     {
         private readonly IEnumerable<IInitializable> targets;
 
-        public InitializerHost(IEnumerable<IInitializable> targets, IApplicationLifetime lifetime, ISemanticLog log)
-            : base(lifetime, log)
+        public InitializerHost(IEnumerable<IInitializable> targets, ISemanticLog log)
+            : base(log)
         {
             this.targets = targets;
         }

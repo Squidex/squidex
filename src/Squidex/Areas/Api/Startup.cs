@@ -17,8 +17,17 @@ namespace Squidex.Areas.Api
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
+                appApi.UseRouting();
+
+                appApi.UseAuthentication();
+                appApi.UseAuthorization();
+
                 appApi.UseMyOpenApi();
-                appApi.UseMvc();
+
+                appApi.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
             });
         }
     }

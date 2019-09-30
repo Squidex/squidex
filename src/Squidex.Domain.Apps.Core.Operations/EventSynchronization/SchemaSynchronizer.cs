@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             }
             else
             {
-                options = options ?? new SchemaSynchronizationOptions();
+                options ??= new SchemaSynchronizationOptions();
 
                 SchemaEvent E(SchemaEvent @event)
                 {

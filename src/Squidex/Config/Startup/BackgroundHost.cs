@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -20,8 +19,8 @@ namespace Squidex.Config.Startup
     {
         private readonly IEnumerable<IBackgroundProcess> targets;
 
-        public BackgroundHost(IEnumerable<IBackgroundProcess> targets, IApplicationLifetime lifetime, ISemanticLog log)
-            : base(lifetime, log)
+        public BackgroundHost(IEnumerable<IBackgroundProcess> targets, ISemanticLog log)
+            : base(log)
         {
             this.targets = targets;
         }

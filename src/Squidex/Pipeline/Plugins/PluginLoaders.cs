@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using McMaster.NETCore.Plugins;
 using Squidex.Domain.Apps.Core;
@@ -38,12 +39,11 @@ namespace Squidex.Pipeline.Plugins
             {
                 if (candidate.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
                 {
-                    return PluginLoader.CreateFromAssemblyFile(candidate.FullName, PluginLoaderOptions.PreferSharedTypes);
-                }
-
-                if (candidate.Extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
-                {
-                    return PluginLoader.CreateFromConfigFile(candidate.FullName, SharedTypes);
+                    return PluginLoader.CreateFromAssemblyFile(candidate.FullName, config =>
+                    {
+                        config.PreferSharedTypes = true;
+                        config.SharedAssemblies.AddRange(SharedTypes.Select(x => x.Assembly.GetName()));
+                    });
                 }
             }
 

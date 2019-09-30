@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
         private IActionResult DeliverAsset(IAssetEntity asset, AssetQuery query)
         {
-            query = query ?? new AssetQuery();
+            query ??= new AssetQuery();
 
             if (asset == null || asset.FileVersion < query.Version)
             {

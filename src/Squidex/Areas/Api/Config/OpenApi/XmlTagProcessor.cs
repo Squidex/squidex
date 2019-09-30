@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                         if (description != null)
                         {
-                            tag.Description = tag.Description ?? string.Empty;
+                            tag.Description ??= string.Empty;
 
                             if (!tag.Description.Contains(description))
                             {

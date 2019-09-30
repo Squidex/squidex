@@ -24,7 +24,6 @@ using Squidex.Areas.Portal;
 using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
-using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
 using Squidex.Config.Web;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -39,21 +38,20 @@ using Squidex.Pipeline.Robots;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace Squidex
 {
-    public sealed class WebStartup
+    public sealed class Startup
     {
         private readonly IConfiguration config;
-        private readonly IHostingEnvironment environment;
 
-        public WebStartup(IConfiguration config, IHostingEnvironment environment)
+        public Startup(IConfiguration config)
         {
             this.config = config;
-
-            this.environment = environment;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
             services.AddLogging();
@@ -112,16 +110,6 @@ namespace Squidex
                 config.GetSection("ui"));
             services.Configure<MyNewsOptions>(
                 config.GetSection("news"));
-
-            services.AddHostedService<InitializerHost>();
-
-            services.AddOrleans(config, environment);
-
-            services.AddHostedService<MigratorHost>();
-            services.AddHostedService<MigrationRebuilderHost>();
-            services.AddHostedService<BackgroundHost>();
-
-            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app)
