@@ -18,7 +18,7 @@ namespace Squidex.ICIS.Kafka.Services
 {
     public static class CommentaryMapper
     {
-        private static readonly Status[] PublishedOnly = new Status[] { Status.Published };
+        private static readonly Status[] PublishedOrDraft = new Status[] { Status.Published, Status.Draft };
 
         public static async Task<Commentary> ToAvroAsync(EnrichedContentEvent contentEvent, IAppEntity commentaryApp, IContentRepository contentRepository)
         {
@@ -28,7 +28,7 @@ namespace Squidex.ICIS.Kafka.Services
             var commodityDbId = data.GetFirstReference("commodity");
             var regionDbId = data.GetFirstReference("region");
 
-            var referenced = await contentRepository.QueryAsync(commentaryApp, PublishedOnly, new HashSet<Guid> { commentaryTypeDbId, commodityDbId, regionDbId }, true);
+            var referenced = await contentRepository.QueryAsync(commentaryApp, PublishedOrDraft, new HashSet<Guid> { commentaryTypeDbId, commodityDbId, regionDbId }, true);
 
             var commentaryType = referenced.Find(x => x.Content.Id == commentaryTypeDbId).Content;
             var commentaryTypeId = commentaryType?.Data.GetString("id");

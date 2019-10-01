@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,8 @@ namespace Squidex.ICIS.Kafka.Producer
     {
         private readonly IProducer<string, T> producer;
 
-        protected KafkaProducer(IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<T>> log)
+        protected KafkaProducer(IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<T>> log,
+            Action<ProducerBuilder<string, T>> configure = null)
         {
             var builder = 
                 new ProducerBuilder<string, T>(options.Value.Producer)
@@ -27,13 +29,9 @@ namespace Squidex.ICIS.Kafka.Producer
                     .SetErrorHandler(LogFactory<T>.ProducerError(log))
                     .SetStatisticsHandler(LogFactory<T>.ProducerStats(log));
 
-            Configure(builder);
+            configure?.Invoke(builder);
 
             producer = builder.Build();
-        }
-
-        protected virtual void Configure(ProducerBuilder<string, T> builder)
-        {
         }
 
         public async Task<DeliveryResult<string, T>> Send(string topicName, string key, T val)

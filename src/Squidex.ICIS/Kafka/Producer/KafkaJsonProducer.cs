@@ -9,17 +9,17 @@ namespace Squidex.ICIS.Kafka.Producer
 {
     public sealed class KafkaJsonProducer : KafkaProducer<IRefDataEntity>
     {
-        private readonly Type type;
-
         public KafkaJsonProducer(Type type, IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<IRefDataEntity>> log) 
-            : base(options, log)
+            : base(options, log, Configure(type))
         {
-            this.type = type;
         }
 
-        protected override void Configure(ProducerBuilder<string, IRefDataEntity> builder)
+        private static Action<ProducerBuilder<string, IRefDataEntity>> Configure(Type type)
         {
-            builder.SetValueSerializer(new KafkaJsonSerializer<IRefDataEntity>(type));
+            return builder =>
+            {
+                builder.SetValueSerializer(new KafkaJsonSerializer<IRefDataEntity>(type));
+            };
         }
     }
 }
