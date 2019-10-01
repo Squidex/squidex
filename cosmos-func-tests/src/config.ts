@@ -29,8 +29,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                 showTotalDurationIn: 'header',
                 totalDurationFormat: 'hms'
             }
-         });
-         jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
+        });
+        jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
     }
 
     let isCleanup = false;
