@@ -56,11 +56,14 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                         await EnsureAppExistsAsync();
 
-                        // https://stackoverflow.com/a/37309427/1229622
-                        contextProvider.Context.App = app;
+                        var context = contextProvider.Context;
 
-                        var user = (ClaimsIdentity)contextProvider.Context.User.Identity;
+                        var user = (ClaimsIdentity)context.User.Identity;
                         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+
+                        // https://stackoverflow.com/a/37309427/1229622
+                        context.App = app;
+                        context.UpdatePermissions();
 
                         await handler.HandleAsync(actor, contextProvider.Context, consumed.Key, consumed.Value);
                     }

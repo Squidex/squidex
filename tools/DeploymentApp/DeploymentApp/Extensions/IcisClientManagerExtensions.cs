@@ -189,6 +189,23 @@ namespace DeploymentApp.Extensions
                 ConsoleHelper.Failed(e);
                 throw;
             }
+
+            try
+            {
+                ConsoleHelper.Start($"Updating language {languageCode}");
+
+                await appsClient.PutLanguageAsync(clientManager.App, languageCode, new UpdateLanguageDto
+                {
+                    IsOptional = true
+                });
+
+                ConsoleHelper.Success();
+            }
+            catch (Exception e)
+            {
+                ConsoleHelper.Failed(e);
+                throw;
+            }
         }
 
         public static async Task UpsertContributor(this SquidexClientManager clientManager, ContributorFactory factory)

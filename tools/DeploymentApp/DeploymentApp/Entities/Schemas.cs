@@ -33,6 +33,7 @@ namespace DeploymentApp.Entities
                         new UpsertSchemaFieldDto
                         {
                             Name = "name",
+                            Partitioning = "language",
                             Properties = new StringFieldPropertiesDto
                             {
                                 Editor = StringFieldEditor.Input,
@@ -40,8 +41,7 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 IsRequired = true,
                                 IsUnique = true,
-                                Label = "Name",
-                                Partitioning = "language"
+                                Label = "Name"
                             }
                         }
                     };
@@ -75,6 +75,7 @@ namespace DeploymentApp.Entities
                         new UpsertSchemaFieldDto
                         {
                             Name = "name",
+                            Partitioning = "language",
                             Properties = new StringFieldPropertiesDto
                             {
                                 Editor = StringFieldEditor.Input,
@@ -82,8 +83,7 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 IsRequired = true,
                                 IsUnique = true,
-                                Label = "Name",
-                                Partitioning = "language"
+                                Label = "Name"
                             }
                         }
                     };
@@ -118,6 +118,7 @@ namespace DeploymentApp.Entities
                         new UpsertSchemaFieldDto
                         {
                             Name = "name",
+                            Partitioning = "language",
                             Properties = new StringFieldPropertiesDto
                             {
                                 Editor = StringFieldEditor.Input,
@@ -125,8 +126,7 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 IsRequired = true,
                                 IsUnique = true,
-                                Label = "Name",
-                                Partitioning = "language"
+                                Label = "Name"
                             }
                         }
                     };
@@ -222,7 +222,6 @@ namespace DeploymentApp.Entities
                             new UpsertSchemaFieldDto
                             {
                                 Name = "createdfor",
-                                Partitioning = "invariant",
                                 Properties = new DateTimeFieldPropertiesDto()
                                 {
                                     CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today,
@@ -237,7 +236,6 @@ namespace DeploymentApp.Entities
                             new UpsertSchemaFieldDto
                             {
                                 Name = "commodity",
-                                Partitioning = "invariant",
                                 Properties = new ReferencesFieldPropertiesDto()
                                 {
                                     Editor = ReferencesFieldEditor.Dropdown,
