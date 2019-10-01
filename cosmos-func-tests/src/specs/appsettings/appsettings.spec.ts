@@ -52,7 +52,7 @@ describe('VEGA-323 : App Settings', () => {
     });
 
     describe('VEGA-316 : Changes to Landing Page and General Settings', () => {
-    xit('Change the label and description of the app and verify its updated on home page', async () => {
+    it('Change the label and description of the app and verify its updated on home page', async () => {
 
         // Arrange
         await generalSettingsPage.updateLabel(constants.labelAndDescVerificationTest.labelValue);
@@ -70,7 +70,7 @@ describe('VEGA-323 : App Settings', () => {
 
     });
 
-    xit('Change the label and description of the app and quit without saving verify its not updated on home page', async () => {
+    it('Change the label and description of the app and quit without saving verify its not updated on home page', async () => {
 
         // Arrange
         await generalSettingsPage.updateLabel(constants.labelAndDescVerificationTest.labelValue);
