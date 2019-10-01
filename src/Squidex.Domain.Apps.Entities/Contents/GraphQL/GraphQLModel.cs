@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
-        public (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
+        public (IGraphType? ResolveType, ValueResolver? Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
             return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType, fieldName));
         }
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return assetType;
         }
 
-        public IGraphType GetContentType(Guid schemaId)
+        public IGraphType? GetContentType(Guid schemaId)
         {
             var schema = schemasById.GetOrDefault(schemaId);
 
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
         }
 
-        public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
+        public async Task<(object? Data, object[]? Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
 

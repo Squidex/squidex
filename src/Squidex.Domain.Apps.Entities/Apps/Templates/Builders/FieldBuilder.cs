@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         protected T Properties<T>() where T : FieldProperties
         {
-            return field.Properties as T;
+            return (T)field.Properties;
         }
 
         protected FieldBuilder(UpsertSchemaField field)
@@ -25,14 +25,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             this.field = field;
         }
 
-        public FieldBuilder Label(string label)
+        public FieldBuilder Label(string? label)
         {
             field.Properties.Label = label;
 
             return this;
         }
 
-        public FieldBuilder Hints(string hints)
+        public FieldBuilder Hints(string? hints)
         {
             field.Properties.Hints = hints;
 

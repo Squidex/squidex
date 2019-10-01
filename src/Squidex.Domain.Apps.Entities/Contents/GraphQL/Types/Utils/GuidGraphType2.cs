@@ -20,19 +20,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
             Description = "The `Guid` scalar type global unique identifier";
         }
 
-        public override object Serialize(object value)
+        public override object? Serialize(object value)
         {
             return ParseValue(value)?.ToString();
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object value)
         {
             if (value is Guid guid)
             {
                 return guid;
             }
 
-            var inputValue = value?.ToString().Trim('"');
+            var inputValue = value?.ToString()?.Trim('"');
 
             if (Guid.TryParse(inputValue, out guid))
             {
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
             return null;
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object? ParseLiteral(IValue value)
         {
             if (value is StringValue stringValue)
             {

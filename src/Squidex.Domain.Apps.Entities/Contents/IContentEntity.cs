@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Status Status { get; }
 
-        ScheduleJob ScheduleJob { get; }
+        ScheduleJob? ScheduleJob { get; }
 
-        NamedContentData Data { get; }
+        NamedContentData? Data { get; }
 
         NamedContentData DataDraft { get; }
 

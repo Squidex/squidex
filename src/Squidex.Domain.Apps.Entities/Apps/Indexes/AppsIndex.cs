@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().AddAsync(token);
         }
 
-        public Task<string> ReserveAsync(Guid id, string name)
+        public Task<string?> ReserveAsync(Guid id, string name)
         {
             return Index().ReserveAsync(id, name);
         }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity> GetAppAsync(string name)
+        public async Task<IAppEntity?> GetAppAsync(string name)
         {
             using (Profiler.TraceMethod<AppsIndex>())
             {
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity> GetAppAsync(Guid appId)
+        public async Task<IAppEntity?> GetAppAsync(Guid appId)
         {
             using (Profiler.TraceMethod<AppsIndex>())
             {
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 var index = Index();
 
-                string token = await CheckAppAsync(index, createApp);
+                var token = await CheckAppAsync(index, createApp);
 
                 try
                 {
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<string> CheckAppAsync(IAppsByNameIndexGrain index, CreateApp command)
+        private async Task<string?> CheckAppAsync(IAppsByNameIndexGrain index, CreateApp command)
         {
             var name = command.Name;
 

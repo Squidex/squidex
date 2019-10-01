@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             Guard.NotNull(context, nameof(context));
 
-            var result = context.Data;
+            var result = context.Data!;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             Guard.NotNull(context, nameof(context));
 
-            var result = context.Data;
+            var result = context.Data!;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 }
                 catch (Exception)
                 {
-                    result = context.Data;
+                    result = context.Data!;
                 }
             }
 

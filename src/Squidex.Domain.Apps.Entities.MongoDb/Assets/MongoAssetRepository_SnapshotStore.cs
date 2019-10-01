@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, Guid>
     {
-        async Task<(AssetState Value, long Version)> ISnapshotStore<AssetState, Guid>.ReadAsync(Guid key)
+        async Task<(AssetState? Value, long Version)> ISnapshotStore<AssetState, Guid>.ReadAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {

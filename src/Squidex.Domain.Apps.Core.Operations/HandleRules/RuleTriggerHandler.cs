@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return false;
         }
 
-        protected abstract Task<TEnrichedEvent> CreateEnrichedEventAsync(Envelope<TEvent> @event);
+        protected abstract Task<TEnrichedEvent?> CreateEnrichedEventAsync(Envelope<TEvent> @event);
 
         protected abstract bool Trigger(TEnrichedEvent @event, TTrigger trigger);
 

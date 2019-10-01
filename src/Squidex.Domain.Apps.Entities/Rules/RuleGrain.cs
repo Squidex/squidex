@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.appProvider = appProvider;
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

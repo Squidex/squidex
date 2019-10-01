@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return contents.InitializeAsync(ct);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, bool inDraft, ClrQuery query, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, bool inDraft, ClrQuery query, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(ids, nameof(ids));
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(ids, nameof(ids));
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id, bool includeDraft = true)
+        public async Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, Guid id, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contents.QueryIdsAsync(await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
+                return await contents.QueryIdsAsync((await appProvider.GetSchemaAsync(appId, schemaId))!, filterNode);
             }
         }
 

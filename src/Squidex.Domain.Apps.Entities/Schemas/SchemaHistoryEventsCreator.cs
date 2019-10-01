@@ -71,23 +71,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 "deleted field {[Field]} of schema {[Name]}.");
         }
 
-        protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
+            HistoryEvent? result = null;
+
             if (@event.Payload is SchemaEvent schemaEvent)
             {
                 var channel = $"schemas.{schemaEvent.SchemaId.Name}";
 
-                var result = ForEvent(@event.Payload, channel).Param("Name", schemaEvent.SchemaId.Name);
+                result = ForEvent(@event.Payload, channel).Param("Name", schemaEvent.SchemaId.Name);
 
                 if (schemaEvent is FieldEvent fieldEvent)
                 {
                     result.Param("Field", fieldEvent.FieldId.Name);
                 }
-
-                return Task.FromResult(result);
             }
 
-            return Task.FromResult<HistoryEvent>(null);
+            return Task.FromResult(result);
         }
     }
 }

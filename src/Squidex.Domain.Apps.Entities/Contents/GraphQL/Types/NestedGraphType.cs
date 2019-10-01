@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 var fieldInfo = model.GetGraphType(schema, nestedField, nestedName);
 
-                if (fieldInfo.ResolveType != null)
+                if (fieldInfo.ResolveType != null && fieldInfo.Resolver != null)
                 {
-                    var resolver = ValueResolver(nestedField, fieldInfo);
+                    var resolver = ValueResolver(nestedField, fieldInfo.Resolver);
 
                     AddField(new FieldType
                     {
@@ -45,17 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = $"The structure of the {schemaName}.{fieldDisplayName} nested schema.";
         }
 
-        private static FuncFieldResolver<object> ValueResolver(NestedField nestedField, (IGraphType ResolveType, ValueResolver Resolver) fieldInfo)
+        private static FuncFieldResolver<object?> ValueResolver(NestedField nestedField, ValueResolver resolver)
         {
-            return new FuncFieldResolver<object>(c =>
+            return new FuncFieldResolver<object?>(c =>
             {
                 if (((JsonObject)c.Source).TryGetValue(nestedField.Name, out var value))
                 {
-                    return fieldInfo.Resolver(value, c);
+                    return resolver(value, c);
                 }
                 else
                 {
-                    return fieldInfo;
+                    return null;
                 }
             });
         }

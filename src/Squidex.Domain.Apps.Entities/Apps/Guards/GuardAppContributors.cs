@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AppContributors contributors, Roles roles, AssignContributor command, IUserResolver users, IAppLimitsPlan plan)
+        public static Task CanAssign(AppContributors contributors, Roles roles, AssignContributor command, IUserResolver users, IAppLimitsPlan? plan)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                         }
                         else
                         {
-                            if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
+                            if (plan != null && plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                             {
                                 e("You have reached the maximum number of contributors for your plan.");
                             }

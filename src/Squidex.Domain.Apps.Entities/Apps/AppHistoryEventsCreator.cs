@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 "updated role {[Name]}");
         }
 
-        private HistoryEvent CreateEvent(IEvent @event)
+        private HistoryEvent? CreateEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return null;
         }
 
-        private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string role = null)
+        private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string? role = null)
         {
             return ForEvent(e, "settings.contributors").Param("Contributor", contributor).Param("Role", role);
         }
@@ -133,22 +133,22 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return ForEvent(e, "settings.roles").Param("Name", name);
         }
 
-        private HistoryEvent CreatePatternsEvent(IEvent e, Guid id, string name = null)
+        private HistoryEvent CreatePatternsEvent(IEvent e, Guid id, string? name = null)
         {
             return ForEvent(e, "settings.patterns").Param("PatternId", id).Param("Name", name);
         }
 
-        private HistoryEvent CreateClientsEvent(IEvent e, string id, string name = null)
+        private HistoryEvent CreateClientsEvent(IEvent e, string id, string? name = null)
         {
             return ForEvent(e, "settings.clients").Param("Id", id).Param("Name", name);
         }
 
-        private HistoryEvent CreatePlansEvent(IEvent e, string plan = null)
+        private HistoryEvent CreatePlansEvent(IEvent e, string? plan = null)
         {
             return ForEvent(e, "settings.plan").Param("Plan", plan);
         }
 
-        protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             return Task.FromResult(CreateEvent(@event.Payload));
         }

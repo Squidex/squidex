@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedAssetEntity> FindAssetAsync( Guid id)
+        public async Task<IEnrichedAssetEntity?> FindAssetAsync( Guid id)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 

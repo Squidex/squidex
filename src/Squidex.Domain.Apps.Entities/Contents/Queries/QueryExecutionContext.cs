@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class QueryExecutionContext
     {
-        private readonly ConcurrentDictionary<Guid, IContentEntity> cachedContents = new ConcurrentDictionary<Guid, IContentEntity>();
-        private readonly ConcurrentDictionary<Guid, IEnrichedAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IEnrichedAssetEntity>();
+        private readonly ConcurrentDictionary<Guid, IContentEntity?> cachedContents = new ConcurrentDictionary<Guid, IContentEntity?>();
+        private readonly ConcurrentDictionary<Guid, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<Guid, IEnrichedAssetEntity?>();
         private readonly IContentQueryService contentQuery;
         private readonly IAssetQueryService assetQuery;
         private readonly Context context;
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.context = context;
         }
 
-        public virtual async Task<IEnrichedAssetEntity> FindAssetAsync(Guid id)
+        public virtual async Task<IEnrichedAssetEntity?> FindAssetAsync(Guid id)
         {
             var asset = cachedAssets.GetOrDefault(id);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return asset;
         }
 
-        public virtual async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public virtual async Task<IContentEntity?> FindContentAsync(Guid schemaId, Guid id)
         {
             var content = cachedContents.GetOrDefault(id);
 

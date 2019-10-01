@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var schema = new JsonSchema { Title = "Asset", Type = JsonObjectType.Object };
 
-            void AddProperty(string name, JsonObjectType type, string format = null)
+            void AddProperty(string name, JsonObjectType type, string? format = null)
             {
                 var property = new JsonSchemaProperty { Type = type, Format = format };
 

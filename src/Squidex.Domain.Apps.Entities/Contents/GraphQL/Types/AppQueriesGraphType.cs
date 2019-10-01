@@ -26,14 +26,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schema in schemas)
             {
-                var schemaId = schema.Id;
-                var schemaType = schema.TypeName();
-                var schemaName = schema.DisplayName();
-
                 var contentType = model.GetContentType(schema.Id);
 
-                AddContentFind(schemaId, schemaType, schemaName, contentType);
-                AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
+                if (contentType != null)
+                {
+                    var schemaId = schema.Id;
+                    var schemaType = schema.TypeName();
+                    var schemaName = schema.DisplayName();
+
+                    AddContentFind(schemaId, schemaType, schemaName, contentType);
+                    AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
+                }
             }
 
             Description = "The app queries.";

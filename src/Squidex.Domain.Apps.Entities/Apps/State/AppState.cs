@@ -33,10 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public Roles Roles { get; set; } = Roles.Empty;
 
         [DataMember]
-        public AppPlan Plan { get; set; }
+        public AppPlan? Plan { get; set; }
 
         [DataMember]
-        public AppImage Image { get; set; }
+        public AppImage? Image { get; set; }
 
         [DataMember]
         public AppClients Clients { get; set; } = AppClients.Empty;

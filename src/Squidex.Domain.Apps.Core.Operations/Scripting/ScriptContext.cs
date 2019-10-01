@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public Guid ContentId { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public NamedContentData? Data { get; set; }
 
         public NamedContentData DataOld { get; set; }
 

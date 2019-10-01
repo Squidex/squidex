@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.serializer = serializer;
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -345,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             SimpleMapper.Map(command, @event);
 
-            NamedId<long> GetFieldId(long? id)
+            NamedId<long>? GetFieldId(long? id)
             {
                 if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
                 {

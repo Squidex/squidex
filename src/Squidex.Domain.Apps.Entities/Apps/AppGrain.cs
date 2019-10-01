@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotArchived();
 
@@ -311,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private IAppLimitsPlan GetPlan()
+        private IAppLimitsPlan? GetPlan()
         {
             return appPlansProvider.GetPlan(Snapshot.Plan?.PlanId);
         }
@@ -479,7 +479,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 @event.AppId = NamedId.Of(Snapshot.Id, Snapshot.Name);
             }
 
-            RaiseEvent(Envelope.Create(@event));
+            RaiseEvent(Envelope.Create(@event).To<IEvent>());
         }
 
         private static AppCreated CreateInitalEvent(string name)

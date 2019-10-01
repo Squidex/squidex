@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         [BsonRequired]
         [BsonElement]
-        public string LastDump { get; set; }
+        public string? LastDump { get; set; }
 
         [BsonRequired]
         [BsonElement]

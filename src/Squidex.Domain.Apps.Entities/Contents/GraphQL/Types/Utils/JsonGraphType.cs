@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public override object ParseLiteral(IValue value)
         {
-            if (value is JsonValue jsonGraphType)
+            if (value is JsonValueNode jsonGraphType)
             {
                 return jsonGraphType.Value;
             }

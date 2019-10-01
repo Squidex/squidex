@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
             return InstantPattern.General.Parse(value.ToString()).Value;
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object? ParseLiteral(IValue value)
         {
             if (value is InstantValue timeValue)
             {

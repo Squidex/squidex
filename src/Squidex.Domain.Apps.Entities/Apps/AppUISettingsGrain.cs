@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private JsonObject GetContainer(string path, bool add, out string key)
+        private JsonObject? GetContainer(string path, bool add, out string key)
         {
             Guard.NotNullOrEmpty(path, nameof(path));
 

@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
+        public async Task<IEnrichedContentEntity?> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                IContentEntity content;
+                IContentEntity? content;
 
                 if (version > EtagVersion.Empty)
                 {
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     }
                     else
                     {
-                        result.DataDraft = null;
+                        result.DataDraft = null!;
                     }
 
                     results.Add(result);
@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName)
         {
-            ISchemaEntity schema = null;
+            ISchemaEntity? schema = null;
 
             if (Guid.TryParse(schemaIdOrName, out var id))
             {
@@ -282,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return context.Permissions.Allows(permission);
         }
 
-        private static Status[] GetStatus(Context context)
+        private static Status[]? GetStatus(Context context)
         {
             if (context.IsFrontendClient || context.IsUnpublished())
             {
@@ -323,7 +323,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, WithDraft(context));
         }
 
-        private Task<IContentEntity> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
+        private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
         {
             return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, WithDraft(context));
         }

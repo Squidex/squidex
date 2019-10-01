@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities
 {
     public static class EntityMapper
     {
-        public static T Update<T>(this T entity, Envelope<IEvent> envelope, Action<SquidexEvent, T> updater = null) where T : IEntity
+        public static T Update<T>(this T entity, Envelope<IEvent> envelope, Action<SquidexEvent, T>? updater = null) where T : IEntity
         {
             var @event = (SquidexEvent)envelope.Payload;
 

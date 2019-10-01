@@ -53,18 +53,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             execution.UserContext = this;
         }
 
-        public override Task<IEnrichedAssetEntity> FindAssetAsync(Guid id)
+        public override async Task<IEnrichedAssetEntity?> FindAssetAsync(Guid id)
         {
             var dataLoader = GetAssetsLoader();
 
-            return dataLoader.LoadAsync(id);
+            return await dataLoader.LoadAsync(id);
         }
 
-        public override Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public override async Task<IContentEntity?> FindContentAsync(Guid schemaId, Guid id)
         {
             var dataLoader = GetContentsLoader(schemaId);
 
-            return dataLoader.LoadAsync(id);
+            return await dataLoader.LoadAsync(id);
         }
 
         public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 });
         }
 
-        private static ICollection<Guid> ParseIds(IJsonValue value)
+        private static ICollection<Guid>? ParseIds(IJsonValue value)
         {
             try
             {

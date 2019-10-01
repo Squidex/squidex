@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class NumberFieldProperties : FieldProperties
     {
-        public ReadOnlyCollection<double> AllowedValues { get; set; }
+        public ReadOnlyCollection<double>? AllowedValues { get; set; }
 
         public double? MaxValue { get; set; }
 

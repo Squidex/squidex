@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class TagsFieldProperties : FieldProperties
     {
-        public ReadOnlyCollection<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string>? AllowedValues { get; set; }
 
         public int? MinItems { get; set; }
 

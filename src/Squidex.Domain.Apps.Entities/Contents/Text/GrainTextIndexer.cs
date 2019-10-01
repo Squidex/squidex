@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return new Update { Id = contentId, Data = data, OnlyDraft = onlySelf };
         }
 
-        public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)
+        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)
         {
             if (string.IsNullOrWhiteSpace(queryText))
             {

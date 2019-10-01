@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Q query);
 
-        Task<IEnrichedAssetEntity> FindAssetAsync(Guid id);
+        Task<IEnrichedAssetEntity?> FindAssetAsync(Guid id);
     }
 }

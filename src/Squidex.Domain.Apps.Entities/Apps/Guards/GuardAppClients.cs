@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        private static AppClient GetClientOrThrow(AppClients clients, string id)
+        private static AppClient? GetClientOrThrow(AppClients clients, string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {

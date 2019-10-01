@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
     {
         private const string EventName = "Usage exceeded";
 
-        protected override Task<EnrichedUsageExceededEvent> CreateEnrichedEventAsync(Envelope<AppUsageExceeded> @event)
+        protected override Task<EnrichedUsageExceededEvent?> CreateEnrichedEventAsync(Envelope<AppUsageExceeded> @event)
         {
             var result = new EnrichedUsageExceededEvent
             {
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                 Name = EventName
             };
 
-            return Task.FromResult(result);
+            return Task.FromResult<EnrichedUsageExceededEvent?>(result);
         }
 
         protected override bool Trigger(EnrichedUsageExceededEvent @event, UsageTrigger trigger)

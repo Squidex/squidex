@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.History
     public sealed class ParsedHistoryEvent
     {
         private readonly HistoryEvent item;
-        private readonly Lazy<string> message;
+        private readonly Lazy<string?> message;
 
         public Guid Id
         {
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.History
             get { return item.Channel; }
         }
 
-        public string Message
+        public string? Message
         {
             get { return message.Value; }
         }
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.History
         {
             this.item = item;
 
-            message = new Lazy<string>(() =>
+            message = new Lazy<string?>(() =>
             {
                 if (texts.TryGetValue(item.Message, out var result))
                 {

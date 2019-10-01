@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Uri Url { get; set; }
 
         [DataMember]
-        public string NewAppName { get; set; }
+        public string? NewAppName { get; set; }
 
         [DataMember]
         public Instant Started { get; set; }

@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
-        public StringFieldBuilder Pattern(string pattern, string message = null)
+        public StringFieldBuilder Pattern(string pattern, string? message = null)
         {
             Properties<StringFieldProperties>().Pattern = pattern;
             Properties<StringFieldProperties>().PatternMessage = message;

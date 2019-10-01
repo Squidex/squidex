@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             }
         }
 
-        private async Task<IRuleEntity> GetRuleAsync(Guid id)
+        private async Task<IRuleEntity?> GetRuleAsync(Guid id)
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {

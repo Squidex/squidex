@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             this.grainFactory = grainFactory;
         }
 
-        public Task<Dictionary<string, string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids)
+        public Task<Dictionary<string, string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string>? names, HashSet<string>? ids)
         {
             return GetGrain(appId, group).NormalizeTagsAsync(names, ids);
         }

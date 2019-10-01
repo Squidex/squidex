@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly HashSet<string> contributors = new HashSet<string>();
         private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
-        private string appReservation;
+        private string? appReservation;
         private string appName;
 
         public override string Name { get; } = "Apps";
@@ -133,7 +133,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CleanupRestoreErrorAsync(Guid appId)
         {
-            await appsIndex.RemoveReservationAsync(appReservation);
+            if (appReservation != null)
+            {
+                await appsIndex.RemoveReservationAsync(appReservation);
+            }
         }
 
         private RefToken MapUser(string userId, RefToken fallback)
@@ -193,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await appsIndex.AddAsync(appReservation);
+            await appsIndex.AddAsync(appReservation!);
 
             await appsIndex.RebuildByContributorsAsync(appId, contributors);
         }

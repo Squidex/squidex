@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             GetWorkflowOrThrow(workflows, command.WorkflowId);
         }
 
-        private static Workflow GetWorkflowOrThrow(Workflows workflows, Guid id)
+        private static Workflow? GetWorkflowOrThrow(Workflows workflows, Guid id)
         {
             if (!workflows.TryGetValue(id, out var workflow))
             {

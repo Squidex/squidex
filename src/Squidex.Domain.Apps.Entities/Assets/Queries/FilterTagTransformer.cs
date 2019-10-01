@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.tagService = tagService;
         }
 
-        public static FilterNode<ClrValue> Transform(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
+        public static FilterNode<ClrValue>? Transform(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
         {
             Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return nodeIn.Accept(new FilterTagTransformer(appId, tagService));
         }
 
-        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn)
+        public override FilterNode<ClrValue>? Visit(CompareFilter<ClrValue> nodeIn)
         {
             if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
             {

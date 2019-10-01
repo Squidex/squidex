@@ -40,8 +40,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
         private readonly IGrainState<BackupState> state;
-        private CancellationTokenSource currentTask;
-        private BackupStateJob currentJob;
+        private CancellationTokenSource? currentTask;
+        private BackupStateJob? currentJob;
 
         public BackupGrain(
             IAssetStore assetStore,

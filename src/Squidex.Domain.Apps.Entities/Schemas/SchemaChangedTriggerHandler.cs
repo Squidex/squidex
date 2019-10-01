@@ -29,9 +29,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.scriptEngine = scriptEngine;
         }
 
-        protected override Task<EnrichedSchemaEvent> CreateEnrichedEventAsync(Envelope<SchemaEvent> @event)
+        protected override Task<EnrichedSchemaEvent?> CreateEnrichedEventAsync(Envelope<SchemaEvent> @event)
         {
-            var result = new EnrichedSchemaEvent();
+            EnrichedSchemaEvent? result = new EnrichedSchemaEvent();
 
             SimpleMapper.Map(@event.Payload, result);
 
@@ -61,7 +61,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     break;
             }
 
-            result.Name = $"Schema{result.Type}";
+            if (result != null)
+            {
+                result.Name = $"Schema{result.Type}";
+            }
 
             return Task.FromResult(result);
         }

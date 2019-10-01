@@ -35,14 +35,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
-        private IDisposable timer;
+        private IDisposable? timer;
         private DirectoryInfo directory;
-        private IndexWriter indexWriter;
-        private IndexReader indexReader;
-        private IndexSearcher indexSearcher;
-        private IndexState indexState;
-        private QueryParser queryParser;
-        private HashSet<string> currentLanguages;
+        private IndexWriter? indexWriter;
+        private IndexReader? indexReader;
+        private IndexSearcher? indexSearcher;
+        private IndexState? indexState;
+        private QueryParser? queryParser;
+        private HashSet<string>? currentLanguages;
         private int updates;
 
         public TextIndexerGrain(IAssetStore assetStore)
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private Task<bool> IndexInternalAsync(Update update)
         {
-            var content = new TextIndexContent(indexWriter, indexState, update.Id);
+            var content = new TextIndexContent(indexWriter!, indexState!, update.Id);
 
             content.Index(update.Data, update.OnlyDraft);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task<bool> CopyAsync(Guid id, bool fromDraft)
         {
-            var content = new TextIndexContent(indexWriter, indexState, id);
+            var content = new TextIndexContent(indexWriter!, indexState!, id);
 
             content.Copy(fromDraft);
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task<bool> DeleteAsync(Guid id)
         {
-            var content = new TextIndexContent(indexWriter, indexState, id);
+            var content = new TextIndexContent(indexWriter!, indexState!, id);
 
             content.Delete();
 
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var query = BuildQuery(queryText, context);
 
-                if (indexReader == null && indexWriter.NumDocs > 0)
+                if (indexReader == null && indexWriter!.NumDocs > 0)
                 {
                     OpenReader();
                 }
@@ -131,11 +131,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     var found = new HashSet<Guid>();
 
-                    var hits = indexSearcher.Search(query, MaxResults).ScoreDocs;
+                    var hits = indexSearcher!.Search(query, MaxResults).ScoreDocs;
 
                     foreach (var hit in hits)
                     {
-                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState, out var id))
+                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState!, out var id))
                         {
                             if (found.Add(id))
                             {
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private Query BuildQuery(string query, SearchContext context)
         {
-            if (queryParser == null || !currentLanguages.SetEquals(context.Languages))
+            if (queryParser == null || !currentLanguages!.SetEquals(context.Languages))
             {
                 var fields = context.Languages.Union(Invariant).ToArray();
 
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private void OpenReader()
         {
-            indexReader = indexWriter.GetReader(true);
+            indexReader = indexWriter!.GetReader(true);
             indexSearcher = new IndexSearcher(indexReader);
             indexState = new IndexState(indexWriter, indexReader, indexSearcher);
         }

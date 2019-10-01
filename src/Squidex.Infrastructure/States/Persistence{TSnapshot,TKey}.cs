@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot> where TKey : notnull
+    internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot> where TSnapshot : class where TKey : notnull
     {
         private readonly TKey ownerKey;
         private readonly Type ownerType;
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.States
                 versionSnapshot = position;
                 versionEvents = position;
 
-                if (applyState != null && position >= 0)
+                if (state != null && applyState != null && position >= 0)
                 {
                     applyState(state);
                 }

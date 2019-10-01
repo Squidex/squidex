@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 var index = Index(createSchema.AppId.Id);
 
-                string token = await CheckSchemaAsync(index, createSchema);
+                var token = await CheckSchemaAsync(index, createSchema);
 
                 try
                 {
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<string> CheckSchemaAsync(ISchemasByAppIndexGrain index, CreateSchema command)
+        private async Task<string?> CheckSchemaAsync(ISchemasByAppIndexGrain index, CreateSchema command)
         {
             var name = command.Name;
 

@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         }
                         catch (Exception)
                         {
-                            if (c.JobId.HasValue && Snapshot?.ScheduleJob.Id == c.JobId)
+                            if (c.JobId.HasValue && Snapshot?.ScheduleJob?.Id == c.JobId)
                             {
                                 CancelScheduling(c);
                             }
@@ -223,9 +223,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 Snapshot.DataDraft :
                 Snapshot.Data;
 
-            var newData = newDataFunc(currentData);
+            var newData = newDataFunc(currentData!);
 
-            if (!currentData.Equals(newData))
+            if (!currentData!.Equals(newData))
             {
                 var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, command, () => "Failed to update content.");
 
@@ -303,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void ScheduleStatus(ChangeContentStatus command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime!.Value }));
         }
 
         public void ChangeStatus(ChangeContentStatus command, StatusChange change)

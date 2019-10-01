@@ -31,8 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IGraphType GetAssetType();
 
-        IGraphType GetContentType(Guid schemaId);
+        IGraphType? GetContentType(Guid schemaId);
 
-        (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName);
+        (IGraphType? ResolveType, ValueResolver? Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName);
     }
 }

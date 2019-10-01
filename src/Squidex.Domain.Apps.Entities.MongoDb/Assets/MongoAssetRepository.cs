@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity> FindAssetBySlugAsync(Guid appId, string slug)
+        public async Task<IAssetEntity?> FindAssetBySlugAsync(Guid appId, string slug)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(Guid id, bool allowDeleted = false)
+        public async Task<IAssetEntity?> FindAssetAsync(Guid id, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {

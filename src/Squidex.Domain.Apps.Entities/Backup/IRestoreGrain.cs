@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IRestoreGrain : IGrainWithStringKey
     {
-        Task RestoreAsync(Uri url, RefToken actor, string newAppName = null);
+        Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null);
 
         Task<J<IRestoreJob>> GetJobAsync();
     }

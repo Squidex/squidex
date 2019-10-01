@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            IArrayField arrayField = null;
+            IArrayField? arrayField = null;
 
             if (command.ParentFieldId.HasValue)
             {

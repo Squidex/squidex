@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             }
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {

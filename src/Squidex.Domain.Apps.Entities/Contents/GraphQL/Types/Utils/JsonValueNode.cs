@@ -10,9 +10,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class JsonValue : ValueNode<IJsonValue>
+    public sealed class JsonValueNode : ValueNode<IJsonValue>
     {
-        public JsonValue(IJsonValue value)
+        public JsonValueNode(IJsonValue value)
         {
             Value = value;
         }

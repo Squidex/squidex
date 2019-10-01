@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return query;
         }
 
-        public static FilterNode<ClrValue> AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema, bool useDraft)
+        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema, bool useDraft)
         {
             var pathConverter = Adapt.Path(schema, useDraft);
 
@@ -62,28 +62,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return !includeDraft ? cursor.Not(x => x.DataDraftByIds, x => x.IsDeleted) : cursor;
         }
 
-        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[] status)
+        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[]? status)
         {
             return CreateFilter(null, schemaId, new List<Guid> { id }, status, null);
         }
 
-        public static FilterDefinition<MongoContentEntity> IdsByApp(Guid appId, ICollection<Guid> ids, Status[] status)
+        public static FilterDefinition<MongoContentEntity> IdsByApp(Guid appId, ICollection<Guid> ids, Status[]? status)
         {
             return CreateFilter(appId, null, ids, status, null);
         }
 
-        public static FilterDefinition<MongoContentEntity> IdsBySchema(Guid schemaId, ICollection<Guid> ids, Status[] status)
+        public static FilterDefinition<MongoContentEntity> IdsBySchema(Guid schemaId, ICollection<Guid> ids, Status[]? status)
         {
             return CreateFilter(null, schemaId, ids, status, null);
         }
 
-        public static FilterDefinition<MongoContentEntity> ToFilter(this ClrQuery query, Guid schemaId, ICollection<Guid> ids, Status[] status)
+        public static FilterDefinition<MongoContentEntity> ToFilter(this ClrQuery query, Guid schemaId, ICollection<Guid>? ids, Status[]? status)
         {
             return CreateFilter(null, schemaId, ids, status, query);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid? appId, Guid? schemaId, ICollection<Guid> ids, Status[] status,
-            ClrQuery query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid? appId, Guid? schemaId, ICollection<Guid>? ids, Status[]? status,
+            ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>();
 

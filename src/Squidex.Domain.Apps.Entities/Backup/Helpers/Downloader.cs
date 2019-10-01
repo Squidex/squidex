@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             else
             {
-                HttpResponseMessage response = null;
+                HttpResponseMessage? response = null;
                 try
                 {
                     using (var client = new HttpClient())
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 
         public static async Task<BackupReader> OpenArchiveAsync(this IBackupArchiveLocation backupArchiveLocation, string id, IJsonSerializer serializer)
         {
-            Stream stream = null;
+            Stream? stream = null;
 
             try
             {

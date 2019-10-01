@@ -13,16 +13,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services
     {
         IEnumerable<IAppLimitsPlan> GetAvailablePlans();
 
-        bool IsConfiguredPlan(string planId);
+        bool IsConfiguredPlan(string? planId);
 
-        IAppLimitsPlan GetPlanUpgradeForApp(IAppEntity app);
+        IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app);
 
-        IAppLimitsPlan GetPlanUpgrade(string planId);
+        IAppLimitsPlan? GetPlanUpgrade(string? planId);
 
-        IAppLimitsPlan GetPlanForApp(IAppEntity app);
+        IAppLimitsPlan? GetPlanForApp(IAppEntity app);
 
-        IAppLimitsPlan GetPlan(string planId);
+        IAppLimitsPlan? GetPlan(string? planId);
 
-        IAppLimitsPlan GetFreePlan();
+        IAppLimitsPlan? GetFreePlan();
     }
 }

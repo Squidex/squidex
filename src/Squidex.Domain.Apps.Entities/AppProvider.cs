@@ -40,29 +40,34 @@ namespace Squidex.Domain.Apps.Entities
             this.indexSchemas = indexSchemas;
         }
 
-        public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
+        public Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(Guid appId, Guid id)
         {
             return localCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
             {
-                var app = await GetAppAsync(appId);
-
-                if (app == null)
-                {
-                    return (null, null);
-                }
-
-                var schema = await GetSchemaAsync(appId, id, false);
-
-                if (schema == null)
-                {
-                    return (null, null);
-                }
-
-                return (app, schema);
+                return await GetAppWithSchemaUncachedAsync(appId, id);
             });
         }
 
-        public Task<IAppEntity> GetAppAsync(Guid appId)
+        private async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaUncachedAsync(Guid appId, Guid id)
+        {
+            var app = await GetAppAsync(appId);
+
+            if (app == null)
+            {
+                return (null, null);
+            }
+
+            var schema = await GetSchemaAsync(appId, id, false);
+
+            if (schema == null)
+            {
+                return (null, null);
+            }
+
+            return (app, schema);
+        }
+
+        public Task<IAppEntity?> GetAppAsync(Guid appId)
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appId})", async () =>
             {
@@ -70,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<IAppEntity> GetAppAsync(string appName)
+        public Task<IAppEntity?> GetAppAsync(string appName)
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
             {
@@ -86,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
+        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name)
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
@@ -94,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {

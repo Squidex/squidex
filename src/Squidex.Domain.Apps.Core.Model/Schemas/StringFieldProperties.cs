@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class StringFieldProperties : FieldProperties
     {
-        public ReadOnlyCollection<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string>? AllowedValues { get; set; }
 
         public int? MinLength { get; set; }
 
@@ -21,11 +21,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool InlineEditable { get; set; }
 
-        public string DefaultValue { get; set; }
+        public string? DefaultValue { get; set; }
 
-        public string Pattern { get; set; }
+        public string? Pattern { get; set; }
 
-        public string PatternMessage { get; set; }
+        public string? PatternMessage { get; set; }
 
         public StringFieldEditor Editor { get; set; }
 

@@ -51,16 +51,16 @@ namespace Squidex.Domain.Apps.Entities.History
             return new HistoryEvent(channel, message);
         }
 
-        public Task<HistoryEvent> CreateEventAsync(Envelope<IEvent> @event)
+        public Task<HistoryEvent?> CreateEventAsync(Envelope<IEvent> @event)
         {
             if (HasEventText(@event.Payload))
             {
                 return CreateEventCoreAsync(@event);
             }
 
-            return Task.FromResult<HistoryEvent>(null);
+            return Task.FromResult<HistoryEvent?>(null);
         }
 
-        protected abstract Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event);
+        protected abstract Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event);
     }
 }

@@ -13,6 +13,6 @@ namespace Squidex.Infrastructure.States
     {
         string GetStreamName(Type aggregateType, string id);
 
-        string WithNewId(string streamName, Func<string, string> idGenerator);
+        string WithNewId(string streamName, Func<string, string?> idGenerator);
     }
 }

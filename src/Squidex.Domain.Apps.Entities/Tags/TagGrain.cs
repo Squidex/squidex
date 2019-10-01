@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return state.WriteAsync();
         }
 
-        public async Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
+        public async Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string>? names, HashSet<string>? ids)
         {
             var result = new Dictionary<string, string>();
 

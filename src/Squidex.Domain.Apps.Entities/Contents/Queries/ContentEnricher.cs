@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         content.ReferenceData = new NamedContentData();
                     }
 
-                    content.ReferenceData.GetOrAddNew(field.Name);
+                    content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData());
                 }
 
                 try
@@ -137,9 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                     foreach (var content in contents)
                     {
-                        var fieldReference = content.ReferenceData[field.Name];
+                        var fieldReference = content.ReferenceData![field.Name];
 
-                        if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
+                        if (fieldReference != null && content.DataDraft!.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                         {
                             foreach (var partitionValue in fieldData)
                             {
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 {
                                     var value =
                                         formatted.GetOrAdd(referencedContents[0],
-                                            x => x.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
+                                            x => x.DataDraft!.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
 
                                     fieldReference.AddJsonValue(partitionValue.Key, value);
                                 }
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             foreach (var content in contents)
             {
-                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef.ResolvingReferences(), Ids.ContentOnly));
+                ids.AddRange(content.DataDraft!.GetReferencedIds(schema.SchemaDef.ResolvingReferences(), Ids.ContentOnly));
             }
 
             if (ids.Count > 0)

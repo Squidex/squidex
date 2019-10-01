@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentLoader = contentLoader;
         }
 
-        protected override async Task<EnrichedContentEvent> CreateEnrichedEventAsync(Envelope<ContentEvent> @event)
+        protected override async Task<EnrichedContentEvent?> CreateEnrichedEventAsync(Envelope<ContentEvent> @event)
         {
             var result = new EnrichedContentEvent();
 

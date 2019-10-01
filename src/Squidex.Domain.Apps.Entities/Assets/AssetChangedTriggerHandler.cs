@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetLoader = assetLoader;
         }
 
-        protected override async Task<EnrichedAssetEvent> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
+        protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
         {
             var result = new EnrichedAssetEvent();
 

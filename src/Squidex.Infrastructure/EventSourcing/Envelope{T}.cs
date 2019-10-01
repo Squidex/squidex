@@ -35,9 +35,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return new Envelope<TOther>((payload as TOther)!, headers.Clone());
         }
 
-        public static implicit operator Envelope<IEvent>?(Envelope<T>? source)
+        public static implicit operator Envelope<IEvent>(Envelope<T> source)
         {
-            return source == null ? source : new Envelope<IEvent>(source.payload, source.headers);
+            return source == null ? source! : new Envelope<IEvent>(source.payload, source.headers);
         }
     }
 }

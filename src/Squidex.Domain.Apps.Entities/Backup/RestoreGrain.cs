@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string newAppName)
+        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName)
         {
             Guard.NotNull(url, nameof(url));
             Guard.NotNull(actor, nameof(actor));

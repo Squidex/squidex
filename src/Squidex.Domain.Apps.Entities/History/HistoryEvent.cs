@@ -44,11 +44,16 @@ namespace Squidex.Domain.Apps.Entities.History
             Message = message;
         }
 
-        public HistoryEvent Param<T>(string key, T value)
+        public HistoryEvent Param(string key, object? value)
         {
-            if (!Equals(value, default(T)))
+            if (value != null)
             {
-                Parameters[key] = value.ToString();
+                var formatted = value.ToString();
+
+                if (formatted != null)
+                {
+                    Parameters[key] = formatted;
+                }
             }
 
             return this;

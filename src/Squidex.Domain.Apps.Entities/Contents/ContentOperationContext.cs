@@ -53,13 +53,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var context = new ContentOperationContext
             {
-                appEntity = appEntity,
+                appEntity = appEntity!,
                 assetRepository = assetRepository,
                 command = command,
                 contentRepository = contentRepository,
                 message = message,
                 schemaId = schemaId,
-                schemaEntity = schemaEntity,
+                schemaEntity = schemaEntity!,
                 scriptEngine = scriptEngine
             };
 

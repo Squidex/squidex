@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<Workflow> GetWorkflowAsync(Guid appId, Guid schemaId)
         {
-            Workflow result = null;
+            Workflow? result = null;
 
             var app = await appProvider.GetAppAsync(appId);
 

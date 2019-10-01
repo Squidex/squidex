@@ -19,13 +19,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const int NotFound = -1;
         private const string MetaFor = "_fd";
-        private readonly IndexSearcher indexSearcher;
+        private readonly IndexSearcher? indexSearcher;
         private readonly IndexWriter indexWriter;
         private readonly BinaryDocValues binaryValues;
         private readonly Dictionary<(Guid, byte), BytesRef> changes = new Dictionary<(Guid, byte), BytesRef>();
         private bool isClosed;
 
-        public IndexState(IndexWriter indexWriter, IndexReader indexReader = null, IndexSearcher indexSearcher = null)
+        public IndexState(IndexWriter indexWriter, IndexReader? indexReader = null, IndexSearcher? indexSearcher = null)
         {
             this.indexSearcher = indexSearcher;
             this.indexWriter = indexWriter;

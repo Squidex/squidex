@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        public static void CanChangePlan(ChangePlan command, AppPlan plan, IAppPlansProvider appPlans)
+        public static void CanChangePlan(ChangePlan command, AppPlan? plan, IAppPlansProvider appPlans)
         {
             Guard.NotNull(command, nameof(command));
 

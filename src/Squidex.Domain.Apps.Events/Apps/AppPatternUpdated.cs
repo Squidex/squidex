@@ -19,6 +19,6 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public string Pattern { get; set; }
 
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 }

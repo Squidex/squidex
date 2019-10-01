@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
         }
 
-        public Task MarkSentAsync(Guid jobId, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextAttempt)
+        public Task MarkSentAsync(Guid jobId, string? dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextAttempt)
         {
             return Collection.UpdateOneAsync(x => x.Id == jobId,
                 Update

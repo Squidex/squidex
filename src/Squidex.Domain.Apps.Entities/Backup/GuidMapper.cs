@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return newToOldGuid.GetOrCreate(newGuid, x => x);
         }
 
-        public string NewGuidOrNull(string value)
+        public string? NewGuidOrNull(string value)
         {
             if (TryGenerateNewGuidString(value, out var result) || TryGenerateNewNamedId(value, out result))
             {
@@ -43,11 +44,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return value;
         }
 
-        private bool TryGenerateNewGuidString(string value, out string result)
+        private bool TryGenerateNewGuidString(string value, [MaybeNullWhen(false)] out string result)
         {
             if (value.Length == GuidLength)
             {
-                if (strings.TryGetValue(value, out result))
+                if (strings.TryGetValue(value, out result!))
                 {
                     return true;
                 }
@@ -62,16 +63,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
             }
 
-            result = null;
+            result = null!;
 
             return false;
         }
 
-        private bool TryGenerateNewNamedId(string value, out string result)
+        private bool TryGenerateNewNamedId(string value, [MaybeNullWhen(false)] out string result)
         {
             if (value.Length > GuidLength)
             {
-                if (strings.TryGetValue(value, out result))
+                if (strings.TryGetValue(value, out result!))
                 {
                     return true;
                 }
@@ -86,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
             }
 
-            result = null;
+            result = null!;
 
             return false;
         }

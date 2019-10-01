@@ -186,9 +186,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = "An asset";
         }
 
-        private static IFieldResolver Resolve(Func<IEnrichedAssetEntity, object> action)
+        private static IFieldResolver Resolve(Func<IEnrichedAssetEntity, object?> action)
         {
-            return new FuncFieldResolver<IEnrichedAssetEntity, object>(c => action(c.Source));
+            return new FuncFieldResolver<IEnrichedAssetEntity, object?>(c => action(c.Source));
         }
     }
 }

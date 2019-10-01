@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Pattern { get; set; }
 
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public AddPattern()
         {

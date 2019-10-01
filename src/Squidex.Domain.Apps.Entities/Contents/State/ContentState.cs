@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public NamedContentData DataDraft { get; set; }
 
         [DataMember]
-        public ScheduleJob ScheduleJob { get; set; }
+        public ScheduleJob? ScheduleJob { get; set; }
 
         [DataMember]
         public bool IsPending { get; set; }
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
         }
 
-        private void UpdateData(NamedContentData data, NamedContentData dataDraft, bool isPending)
+        private void UpdateData(NamedContentData? data, NamedContentData? dataDraft, bool isPending)
         {
             if (data != null)
             {

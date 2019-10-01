@@ -23,6 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         int NumCalls { get; }
 
-        string LastDump { get; }
+        string? LastDump { get; }
     }
 }

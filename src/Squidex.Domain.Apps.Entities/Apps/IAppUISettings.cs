@@ -13,12 +13,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppUISettings
     {
-        Task<JsonObject> GetAsync(Guid appId, string userId);
+        Task<JsonObject> GetAsync(Guid appId, string? userId);
 
-        Task SetAsync(Guid appId, string userId, string path, IJsonValue value);
+        Task SetAsync(Guid appId, string? userId, string path, IJsonValue value);
 
-        Task SetAsync(Guid appId, string userId, JsonObject settings);
+        Task SetAsync(Guid appId, string? userId, JsonObject settings);
 
-        Task RemoveAsync(Guid appId, string userId, string path);
+        Task RemoveAsync(Guid appId, string? userId, string path);
     }
 }

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return base.OnActivateAsync(key);
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task<HashSet<string>> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
+        private async Task<HashSet<string>?> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
         {
             if (tags == null)
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return new HashSet<string>(normalized.Values);
         }
 
-        public void Create(CreateAsset command, HashSet<string> tagIds)
+        public void Create(CreateAsset command, HashSet<string>? tagIds)
         {
             var @event = SimpleMapper.Map(command, new AssetCreated
             {
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(@event);
         }
 
-        public void Annotate(AnnotateAsset command, HashSet<string> tagIds)
+        public void Annotate(AnnotateAsset command, HashSet<string>? tagIds)
         {
             var @event = SimpleMapper.Map(command, new AssetAnnotated());
 

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             get { return false; }
         }
 
-        public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string planId)
+        public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string? planId)
         {
             return Task.FromResult<IChangePlanResult>(new PlanResetResult());
         }

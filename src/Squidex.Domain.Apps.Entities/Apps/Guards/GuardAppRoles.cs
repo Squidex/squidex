@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        private static Role GetRoleOrThrow(Roles roles, string name)
+        private static Role? GetRoleOrThrow(Roles roles, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

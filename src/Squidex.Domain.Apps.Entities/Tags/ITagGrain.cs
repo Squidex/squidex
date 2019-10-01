@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 {
     public interface ITagGrain : IGrainWithStringKey
     {
-        Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids);
+        Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string>? names, HashSet<string>? ids);
 
         Task<Dictionary<string, string>> GetTagIdsAsync(HashSet<string> names);
 

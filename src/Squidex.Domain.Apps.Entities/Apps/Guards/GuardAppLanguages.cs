@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        private static LanguageConfig GetConfigOrThrow(LanguagesConfig languages, Language language)
+        private static LanguageConfig? GetConfigOrThrow(LanguagesConfig languages, Language language)
         {
             if (language == null)
             {

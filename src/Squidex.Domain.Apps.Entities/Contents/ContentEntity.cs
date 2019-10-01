@@ -33,15 +33,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public NamedContentData? Data { get; set; }
 
         public NamedContentData DataDraft { get; set; }
 
-        public NamedContentData ReferenceData { get; set; }
+        public NamedContentData? ReferenceData { get; set; }
 
         public Status Status { get; set; }
 
-        public StatusInfo[] Nexts { get; set; }
+        public StatusInfo[]? Nexts { get; set; }
 
         public string StatusColor { get; set; }
 

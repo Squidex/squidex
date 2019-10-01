@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions);
 
-        Task<IAppEntity> GetAppAsync(string name);
+        Task<IAppEntity?> GetAppAsync(string name);
 
-        Task<IAppEntity> GetAppAsync(Guid appId);
+        Task<IAppEntity?> GetAppAsync(Guid appId);
 
-        Task<string> ReserveAsync(Guid id, string name);
+        Task<string?> ReserveAsync(Guid id, string name);
 
         Task<bool> AddAsync(string token);
 

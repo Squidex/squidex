@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             }).Published().WithLabel(name);
         }
 
-        public SchemaBuilder WithLabel(string label)
+        public SchemaBuilder WithLabel(string? label)
         {
-            command.Properties = command.Properties ?? new SchemaProperties();
+            command.Properties ??= new SchemaProperties();
             command.Properties.Label = label;
 
             return this;
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 }
             };
 
-            command.Fields = command.Fields ?? new List<UpsertSchemaField>();
+            command.Fields ??= new List<UpsertSchemaField>();
             command.Fields.Add(field);
 
             return field;

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity
     {
-        private NamedContentData data;
+        private NamedContentData? data;
         private NamedContentData dataDraft;
 
         [BsonId]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRequired]
         [BsonElement("rf")]
         [BsonRepresentation(BsonType.String)]
-        public List<Guid> ReferencedIds { get; set; }
+        public List<Guid>? ReferencedIds { get; set; }
 
         [BsonRequired]
         [BsonElement("rd")]
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonIgnoreIfNull]
         [BsonElement("sj")]
         [BsonJson]
-        public ScheduleJob ScheduleJob { get; set; }
+        public ScheduleJob? ScheduleJob { get; set; }
 
         [BsonRequired]
         [BsonElement("ai")]
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public RefToken LastModifiedBy { get; set; }
 
         [BsonIgnore]
-        public NamedContentData Data
+        public NamedContentData? Data
         {
             get { return data; }
         }
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public void ParseData(Schema schema, IJsonSerializer serializer)
         {
-            data = DataByIds.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
+            data = DataByIds?.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
 
             if (DataDraftByIds != null)
             {

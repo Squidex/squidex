@@ -29,13 +29,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 if (typeof(Analyzer).IsAssignableFrom(type))
                 {
-                    var language = type.Namespace.Split('.').Last();
+                    var language = type.Namespace!.Split('.').Last();
 
                     if (language.Length == 2)
                     {
                         try
                         {
-                            var analyzer = Activator.CreateInstance(type, version);
+                            var analyzer = Activator.CreateInstance(type, version)!;
 
                             analyzers[language] = (Analyzer)analyzer;
                         }

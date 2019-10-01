@@ -126,11 +126,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             foreach (var field in data)
             {
-                foreach (var fieldValue in field.Value)
+                if (field.Value != null)
                 {
-                    var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
+                    foreach (var fieldValue in field.Value)
+                    {
+                        var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
 
-                    AppendJsonText(fieldValue.Value, appendText);
+                        AppendJsonText(fieldValue.Value, appendText);
+                    }
                 }
             }
 

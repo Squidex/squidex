@@ -116,9 +116,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = $"The structure of a {schemaName} content type.";
         }
 
-        private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object> action)
+        private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object?> action)
         {
-            return new FuncFieldResolver<IEnrichedContentEntity, object>(c => action(c.Source));
+            return new FuncFieldResolver<IEnrichedContentEntity, object?>(c => action(c.Source));
         }
     }
 }

@@ -47,36 +47,36 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             return plansList;
         }
 
-        public bool IsConfiguredPlan(string planId)
+        public bool IsConfiguredPlan(string? planId)
         {
             return planId != null && plansById.ContainsKey(planId);
         }
 
-        public IAppLimitsPlan GetPlanForApp(IAppEntity app)
+        public IAppLimitsPlan? GetPlanForApp(IAppEntity app)
         {
             Guard.NotNull(app, nameof(app));
 
             return GetPlan(app.Plan?.PlanId);
         }
 
-        public IAppLimitsPlan GetPlan(string planId)
+        public IAppLimitsPlan? GetPlan(string? planId)
         {
             return GetPlanCore(planId);
         }
 
-        public IAppLimitsPlan GetFreePlan()
+        public IAppLimitsPlan? GetFreePlan()
         {
             return GetPlanCore(plansList.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Costs))?.Id);
         }
 
-        public IAppLimitsPlan GetPlanUpgradeForApp(IAppEntity app)
+        public IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app)
         {
             Guard.NotNull(app, nameof(app));
 
             return GetPlanUpgrade(app.Plan?.PlanId);
         }
 
-        public IAppLimitsPlan GetPlanUpgrade(string planId)
+        public IAppLimitsPlan? GetPlanUpgrade(string? planId)
         {
             var plan = GetPlanCore(planId);
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             return null;
         }
 
-        private ConfigAppLimitsPlan GetPlanCore(string planId)
+        private ConfigAppLimitsPlan GetPlanCore(string? planId)
         {
             return plansById.GetOrDefault(planId ?? string.Empty) ?? plansById.Values.FirstOrDefault() ?? Infinite;
         }

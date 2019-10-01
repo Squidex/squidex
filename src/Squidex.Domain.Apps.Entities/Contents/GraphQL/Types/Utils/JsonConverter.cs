@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public IValue Convert(object value, IGraphType type)
         {
-            return new JsonValue(value as JsonObject);
+            return new JsonValueNode(value as JsonObject ?? JsonValue.Null);
         }
 
         public bool Matches(object value, IGraphType type)

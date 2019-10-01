@@ -9,8 +9,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class UpdateApp : AppCommand
     {
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

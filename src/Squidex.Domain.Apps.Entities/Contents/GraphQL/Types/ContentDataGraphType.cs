@@ -68,11 +68,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = $"The structure of the {schemaName} content type.";
         }
 
-        private static FuncFieldResolver<object> PartitionResolver(ValueResolver valueResolver, string key)
+        private static FuncFieldResolver<object?> PartitionResolver(ValueResolver valueResolver, string key)
         {
-            return new FuncFieldResolver<object>(c =>
+            return new FuncFieldResolver<object?>(c =>
             {
-                if (((ContentFieldData)c.Source).TryGetValue(key, out var value))
+                if (((ContentFieldData)c.Source).TryGetValue(key, out var value) && value != null)
                 {
                     return valueResolver(value, c);
                 }
@@ -83,11 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private static FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>> FieldResolver(RootField field)
+        private static FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>?> FieldResolver(RootField field)
         {
-            return new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>>(c =>
+            return new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>?>(c =>
             {
-                return c.Source.GetOrDefault(field.Name);
+                return c.Source?.GetOrDefault(field.Name);
             });
         }
     }
