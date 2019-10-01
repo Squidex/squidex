@@ -28,11 +28,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.field = field;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             try
             {
-                var typedValue = value;
+                object? typedValue = value;
 
                 if (value is IJsonValue jsonValue)
                 {

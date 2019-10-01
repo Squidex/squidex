@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                             switch (reader.TokenType)
                             {
                                 case JsonToken.PropertyName:
-                                    var propertyName = reader.Value.ToString();
+                                    var propertyName = reader.Value.ToString()!;
 
                                     if (!reader.Read())
                                     {
@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonToken.Date:
                     return JsonValue.Create(((DateTime)reader.Value).ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
                 case JsonToken.String:
-                    return JsonValue.Create(reader.Value.ToString());
+                    return JsonValue.Create(reader.Value.ToString()!);
                 case JsonToken.Null:
                 case JsonToken.Undefined:
                     return JsonValue.Null;

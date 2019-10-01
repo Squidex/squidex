@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return actionTypes; }
         }
 
-        public RuleRegistry(IEnumerable<RuleActionRegistration> registrations = null)
+        public RuleRegistry(IEnumerable<RuleActionRegistration>? registrations = null)
         {
             if (registrations != null)
             {
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             actionTypes[name] = definition;
         }
 
-        private static T GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
+        private static T? GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
         {
             var result = property.GetCustomAttribute<T>();
 

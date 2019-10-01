@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Security
             TestClaimExtension(OpenIdClaims.Email, x => x.OpenIdEmail());
         }
 
-        private static void TestClaimExtension(string claimType, Func<ClaimsPrincipal, string> getter)
+        private static void TestClaimExtension(string claimType, Func<ClaimsPrincipal, string?> getter)
         {
             var claimValue = Guid.NewGuid().ToString();
 

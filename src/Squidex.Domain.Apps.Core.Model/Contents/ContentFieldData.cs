@@ -19,12 +19,12 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public ContentFieldData AddValue(object value)
+        public ContentFieldData AddValue(object? value)
         {
             return AddJsonValue(JsonValue.Create(value));
         }
 
-        public ContentFieldData AddValue(string key, object value)
+        public ContentFieldData AddValue(string key, object? value)
         {
             return AddJsonValue(key, JsonValue.Create(value));
         }
@@ -43,7 +43,6 @@ namespace Squidex.Domain.Apps.Core.Contents
             if (Language.IsValidLanguage(key))
             {
                 this[key] = value;
-                // this[string.Intern(key)] = value;
             }
             else
             {
@@ -53,12 +52,12 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as ContentFieldData);
         }
 
-        public bool Equals(ContentFieldData other)
+        public bool Equals(ContentFieldData? other)
         {
             return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
         }

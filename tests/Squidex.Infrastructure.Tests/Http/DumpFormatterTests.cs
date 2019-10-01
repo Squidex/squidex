@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure.Http
             Assert.Equal(expected, dump);
         }
 
-        private static HttpRequestMessage CreateRequest(HttpContent content = null)
+        private static HttpRequestMessage CreateRequest(HttpContent? content = null)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri("https://cloud.squidex.io"));
 
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.Http
             return request;
         }
 
-        private static HttpResponseMessage CreateResponse(HttpContent content = null)
+        private static HttpResponseMessage CreateResponse(HttpContent? content = null)
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK);
 

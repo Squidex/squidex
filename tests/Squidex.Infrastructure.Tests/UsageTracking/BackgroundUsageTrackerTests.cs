@@ -196,7 +196,7 @@ namespace Squidex.Infrastructure.UsageTracking
             await sut.TrackAsync(key3, null, 0.5, 2000);
             await sut.TrackAsync(key3, null, 0.5, 6000);
 
-            UsageUpdate[] updates = null;
+            UsageUpdate[]? updates = null;
 
             A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
                 .Invokes((UsageUpdate[] u) => updates = u);

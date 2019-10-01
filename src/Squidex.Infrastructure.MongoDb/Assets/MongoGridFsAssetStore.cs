@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GeneratePublicUrl(string fileName)
+        public string? GeneratePublicUrl(string fileName)
         {
             return null;
         }

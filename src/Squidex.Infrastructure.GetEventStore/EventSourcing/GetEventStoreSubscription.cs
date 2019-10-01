@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly IEventStoreConnection connection;
         private readonly IEventSubscriber subscriber;
         private readonly IJsonSerializer serializer;
-        private readonly string prefix;
+        private readonly string? prefix;
         private readonly EventStoreCatchUpSubscription subscription;
         private readonly long? position;
 
@@ -27,9 +27,9 @@ namespace Squidex.Infrastructure.EventSourcing
             IEventSubscriber subscriber,
             IJsonSerializer serializer,
             ProjectionClient projectionClient,
-            string position,
-            string prefix,
-            string streamFilter)
+            string? position,
+            string? prefix,
+            string? streamFilter)
         {
             this.connection = connection;
 
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     if (reason != SubscriptionDropReason.ConnectionClosed &&
                         reason != SubscriptionDropReason.UserInitiated)
                     {
-                        ex = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
+                        ex ??= new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
                         subscriber.OnErrorAsync(this, ex);
                     }

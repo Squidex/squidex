@@ -11,13 +11,13 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class StoredUsage
     {
-        public string Category { get; }
+        public string? Category { get; }
 
         public DateTime Date { get; }
 
         public Counters Counters { get;  }
 
-        public StoredUsage(string category, DateTime date, Counters counters)
+        public StoredUsage(string? category, DateTime date, Counters counters)
         {
             Guard.NotNull(counters, nameof(counters));
 

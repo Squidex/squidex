@@ -66,11 +66,11 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public T Deserialize<T>(string value, Type actualType = null, Func<string, string> stringConverter = null)
+        public T Deserialize<T>(string value, Type? actualType = null, Func<string, string>? stringConverter = null)
         {
             using (var textReader = new StringReader(value))
             {
-                actualType = actualType ?? typeof(T);
+                actualType ??= typeof(T);
 
                 using (var reader = GetReader(stringConverter, textReader))
                 {
@@ -79,11 +79,11 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public T Deserialize<T>(Stream stream, Type actualType = null, Func<string, string> stringConverter = null)
+        public T Deserialize<T>(Stream stream, Type? actualType = null, Func<string, string>? stringConverter = null)
         {
             using (var textReader = new StreamReader(stream))
             {
-                actualType = actualType ?? typeof(T);
+                actualType ??= typeof(T);
 
                 using (var reader = GetReader(stringConverter, textReader))
                 {
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        private static JsonTextReader GetReader(Func<string, string> stringConverter, TextReader textReader)
+        private static JsonTextReader GetReader(Func<string, string>? stringConverter, TextReader textReader)
         {
             return stringConverter != null ? new CustomReader(textReader, stringConverter) : new JsonTextReader(textReader);
         }

@@ -12,9 +12,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public sealed class Result
     {
-        public Exception Exception { get; private set; }
+        public Exception? Exception { get; private set; }
 
-        public string Dump { get; private set; }
+        public string? Dump { get; private set; }
 
         public RuleResult Status { get; private set; }
 
@@ -50,22 +50,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return Success("Completed");
         }
 
-        public static Result Create(string dump, RuleResult result)
+        public static Result Create(string? dump, RuleResult result)
         {
             return new Result { Dump = dump, Status = result };
         }
 
-        public static Result Success(string dump)
+        public static Result Success(string? dump)
         {
             return new Result { Dump = dump, Status = RuleResult.Success };
         }
 
-        public static Result Failed(Exception ex)
+        public static Result Failed(Exception? ex)
         {
             return Failed(ex, ex?.Message);
         }
 
-        public static Result SuccessOrFailed(Exception ex, string dump)
+        public static Result SuccessOrFailed(Exception? ex, string? dump)
         {
             if (ex != null)
             {
@@ -77,9 +77,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public static Result Failed(Exception ex, string dump)
+        public static Result Failed(Exception? ex, string? dump)
         {
-            var result = new Result { Exception = ex, Dump = dump ?? ex.Message };
+            var result = new Result { Exception = ex, Dump = dump ?? ex?.Message };
 
             if (ex is OperationCanceledException || ex is TimeoutException)
             {

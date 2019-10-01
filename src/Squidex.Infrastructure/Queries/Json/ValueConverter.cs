@@ -25,9 +25,9 @@ namespace Squidex.Infrastructure.Queries.Json
             InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
         };
 
-        public static ClrValue Convert(JsonSchema schema, IJsonValue value, PropertyPath path, List<string> errors)
+        public static ClrValue? Convert(JsonSchema schema, IJsonValue value, PropertyPath path, List<string> errors)
         {
-            ClrValue result = null;
+            ClrValue? result = null;
 
             switch (GetType(schema))
             {
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         {
                             if (value is JsonArray jsonArray)
                             {
-                                result = ParseArray<string>(errors, path, jsonArray, TryParseString);
+                                result = ParseArray<string>(errors, path, jsonArray, TryParseString!);
                             }
                             else if (TryParseString(errors, path, value, out var temp))
                             {
@@ -156,7 +156,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseString(List<string> errors, PropertyPath path, IJsonValue value, out string result)
+        private static bool TryParseString(List<string> errors, PropertyPath path, IJsonValue value, out string? result)
         {
             result = default;
 

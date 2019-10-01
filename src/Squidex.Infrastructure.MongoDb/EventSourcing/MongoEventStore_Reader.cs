@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 new CreateIndexModel<MongoEventCommit>(Index.Ascending(CreateIndexPath(property))));
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
+        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
             Guard.NotNullOrEmpty(property, nameof(property));
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
+        public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return Filter.And(filters);
         }
 
-        private static EventFilter CreateFilter(string streamFilter, StreamPosition streamPosition)
+        private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition)
         {
             var filters = new List<EventFilter>();
 
@@ -160,7 +160,7 @@ namespace Squidex.Infrastructure.EventSourcing
             filters.Add(Filter.Eq(CreateIndexPath(property), value));
         }
 
-        private static void AppendByStream(string streamFilter, List<EventFilter> filters)
+        private static void AppendByStream(string? streamFilter, List<EventFilter> filters)
         {
             if (!StreamFilter.IsAll(streamFilter))
             {
@@ -187,7 +187,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static EventPredicate CreateFilterExpression(string property, object value)
+        private static EventPredicate CreateFilterExpression(string? property, object? value)
         {
             if (!string.IsNullOrWhiteSpace(property))
             {

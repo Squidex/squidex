@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure
         private readonly Queue<Instant> retries = new Queue<Instant>();
         private readonly IClock clock;
 
-        public RetryWindow(TimeSpan windowDuration, int windowSize, IClock clock = null)
+        public RetryWindow(TimeSpan windowDuration, int windowSize, IClock? clock = null)
         {
             this.windowDuration = Duration.FromTimeSpan(windowDuration);
             this.windowSize = windowSize + 1;

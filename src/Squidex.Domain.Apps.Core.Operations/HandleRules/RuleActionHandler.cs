@@ -47,12 +47,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return formatter.ToEnvelope(@event);
         }
 
-        protected string Format(Uri uri, EnrichedEvent @event)
+        protected string? Format(Uri uri, EnrichedEvent @event)
         {
             return formatter.Format(uri.ToString(), @event);
         }
 
-        protected string Format(string text, EnrichedEvent @event)
+        protected string? Format(string text, EnrichedEvent @event)
         {
             return formatter.Format(text, @event);
         }
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             var (description, data) = await CreateJobAsync(@event, (TAction)action);
 
-            return (description, data);
+            return (description, data!);
         }
 
         async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data, CancellationToken ct)

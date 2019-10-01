@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Etag { get; }
 
-        public AppImage(string mimeType, string etag = null)
+        public AppImage(string mimeType, string? etag = null)
         {
             Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
 

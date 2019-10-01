@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonArray();
         }
 
-        public static JsonArray Array(params object[] values)
+        public static JsonArray Array(params object?[] values)
         {
             return new JsonArray(values);
         }
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonObject();
         }
 
-        public static IJsonValue Create(object value)
+        public static IJsonValue Create(object? value)
         {
             if (value == null)
             {
@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return Create(value.Value);
         }
 
-        public static IJsonValue Create(string value)
+        public static IJsonValue Create(string? value)
         {
             if (value == null)
             {

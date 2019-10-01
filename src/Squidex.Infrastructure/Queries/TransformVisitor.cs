@@ -9,21 +9,30 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public abstract class TransformVisitor<TValue> : FilterNodeVisitor<FilterNode<TValue>, TValue>
+    public abstract class TransformVisitor<TValue> : FilterNodeVisitor<FilterNode<TValue>?, TValue>
     {
-        public override FilterNode<TValue> Visit(CompareFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(CompareFilter<TValue> nodeIn)
         {
             return nodeIn;
         }
 
-        public override FilterNode<TValue> Visit(LogicalFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn)
         {
-            return new LogicalFilter<TValue>(nodeIn.Type, nodeIn.Filters.Select(x => x.Accept(this)).ToList());
+            var inner = nodeIn.Filters.Select(x => x.Accept(this)!).Where(x => x != null).ToList();
+
+            return new LogicalFilter<TValue>(nodeIn.Type, inner);
         }
 
-        public override FilterNode<TValue> Visit(NegateFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(NegateFilter<TValue> nodeIn)
         {
-            return new NegateFilter<TValue>(nodeIn.Filter.Accept(this));
+            var inner = nodeIn.Filter.Accept(this);
+
+            if (inner == null)
+            {
+                return inner;
+            }
+
+            return new NegateFilter<TValue>(inner);
         }
     }
 }

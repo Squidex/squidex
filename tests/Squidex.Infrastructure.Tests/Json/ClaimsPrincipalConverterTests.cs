@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Json
         [Fact]
         public void Should_serialize_and_deserialize_null_principal()
         {
-            ClaimsPrincipal value = null;
+            ClaimsPrincipal? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 

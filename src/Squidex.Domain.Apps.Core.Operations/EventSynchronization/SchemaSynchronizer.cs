@@ -19,7 +19,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
     public static class SchemaSynchronizer
     {
-        public static IEnumerable<IEvent> Synchronize(this Schema source, Schema target, IJsonSerializer serializer, Func<long> idGenerator, SchemaSynchronizationOptions options = null)
+        public static IEnumerable<IEvent> Synchronize(this Schema source, Schema? target, IJsonSerializer serializer, Func<long> idGenerator,
+            SchemaSynchronizationOptions? options = null)
         {
             Guard.NotNull(source, nameof(source));
             Guard.NotNull(serializer, nameof(serializer));
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             {
                 options ??= new SchemaSynchronizationOptions();
 
-                SchemaEvent E(SchemaEvent @event)
+                static SchemaEvent E(SchemaEvent @event)
                 {
                     return @event;
                 }
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             IJsonSerializer serializer,
             Func<long> idGenerator,
             Func<T, T, bool> canUpdate,
-            NamedId<long> parentId, SchemaSynchronizationOptions options) where T : class, IField
+            NamedId<long>? parentId, SchemaSynchronizationOptions options) where T : class, IField
         {
             FieldEvent E(FieldEvent @event)
             {
@@ -110,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
             foreach (var targetField in target.Ordered)
             {
-                NamedId<long> id = null;
+                NamedId<long>? id = null;
 
                 var canCreateField = true;
 
@@ -140,7 +141,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (canCreateField)
                 {
-                    var partitioning = (string)null;
+                    var partitioning = (string?)null;
 
                     if (targetField is IRootField rootField)
                     {
@@ -185,7 +186,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     if ((sourceField == null || sourceField is IArrayField) && targetField is IArrayField targetArrayField)
                     {
-                        var fields = ((IArrayField)sourceField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
+                        var fields = (sourceField as IArrayField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
 
                         var events = SyncFields(fields, targetArrayField.FieldCollection, serializer, idGenerator, CanUpdate, id, options);
 

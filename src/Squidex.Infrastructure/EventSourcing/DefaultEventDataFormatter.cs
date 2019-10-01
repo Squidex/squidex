@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.EventSourcing
             this.serializer = serializer;
         }
 
-        public Envelope<IEvent> Parse(EventData eventData, Func<string, string> stringConverter = null)
+        public Envelope<IEvent> Parse(EventData eventData, Func<string, string>? stringConverter = null)
         {
             var payloadType = typeNameRegistry.GetType(eventData.Type);
             var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);

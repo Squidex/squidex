@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Log.Adapter
     public class SemanticLogLoggerProvider : ILoggerProvider
     {
         private readonly IServiceProvider services;
-        private ISemanticLog log;
+        private ISemanticLog? log;
 
         public SemanticLogLoggerProvider(IServiceProvider services)
         {
@@ -23,12 +23,12 @@ namespace Squidex.Infrastructure.Log.Adapter
             this.services = services;
         }
 
-        internal SemanticLogLoggerProvider(ISemanticLog log)
+        internal SemanticLogLoggerProvider(ISemanticLog? log)
         {
             this.log = log;
         }
 
-        public static SemanticLogLoggerProvider ForTesting(ISemanticLog log)
+        public static SemanticLogLoggerProvider ForTesting(ISemanticLog? log)
         {
             return new SemanticLogLoggerProvider(log);
         }

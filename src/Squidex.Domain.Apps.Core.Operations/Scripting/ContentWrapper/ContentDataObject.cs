@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                     {
                         var value = (ContentDataProperty)kvp.Value;
 
-                        if (value.ContentField.TryUpdate(out var fieldData))
+                        if (value.ContentField != null && value.ContentField.TryUpdate(out var fieldData))
                         {
                             contentData[kvp.Key] = fieldData;
                         }

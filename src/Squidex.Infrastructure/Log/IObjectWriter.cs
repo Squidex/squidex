@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Log
 {
     public interface IObjectWriter
     {
-        IObjectWriter WriteProperty(string property, string value);
+        IObjectWriter WriteProperty(string property, string? value);
 
         IObjectWriter WriteProperty(string property, double value);
 
@@ -31,5 +31,7 @@ namespace Squidex.Infrastructure.Log
         IObjectWriter WriteArray(string property, Action<IArrayWriter> arrayWriter);
 
         IObjectWriter WriteArray<T>(string property, T context, Action<T, IArrayWriter> arrayWriter);
+
+        string ToString();
     }
 }

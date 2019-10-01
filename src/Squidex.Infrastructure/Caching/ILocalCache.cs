@@ -13,10 +13,10 @@ namespace Squidex.Infrastructure.Caching
     {
         IDisposable StartContext();
 
-        void Add(object key, object value);
+        void Add(object key, object? value);
 
         void Remove(object key);
 
-        bool TryGetValue(object key, out object value);
+        bool TryGetValue(object key, out object? value);
     }
 }

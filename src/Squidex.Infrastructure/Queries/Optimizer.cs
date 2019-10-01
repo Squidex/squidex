@@ -17,14 +17,14 @@ namespace Squidex.Infrastructure.Queries
         {
         }
 
-        public static FilterNode<TValue> Optimize(FilterNode<TValue> source)
+        public static FilterNode<TValue>? Optimize(FilterNode<TValue> source)
         {
             return source?.Accept(Instance);
         }
 
-        public override FilterNode<TValue> Visit(LogicalFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn)
         {
-            var pruned = nodeIn.Filters.Select(x => x.Accept(this)).Where(x => x != null).ToList();
+            var pruned = nodeIn.Filters.Select(x => x.Accept(this)!).Where(x => x != null).ToList();
 
             if (pruned.Count == 1)
             {
@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Queries
             return new LogicalFilter<TValue>(nodeIn.Type, pruned);
         }
 
-        public override FilterNode<TValue> Visit(NegateFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(NegateFilter<TValue> nodeIn)
         {
             var pruned = nodeIn.Filter.Accept(this);
 

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public RootField(long id, string name, Partitioning partitioning, T properties = null, IFieldSettings settings = null)
+        public RootField(long id, string name, Partitioning partitioning, T? properties = null, IFieldSettings? settings = null)
             : base(id, name, partitioning, settings)
         {
             SetProperties(properties ?? new T());

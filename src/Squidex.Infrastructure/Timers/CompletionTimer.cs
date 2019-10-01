@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Timers
         private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
         private readonly Task runTask;
         private int oneCallState;
-        private CancellationTokenSource wakeupToken;
+        private CancellationTokenSource? wakeupToken;
 
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {

@@ -43,14 +43,14 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                return bool.Parse(value.ToString());
+                return bool.Parse(value.ToString()!);
             }
 
             if (nodeIn.TypeReference.Definition == GuidType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                return Guid.Parse(value.ToString());
+                return Guid.Parse(value.ToString()!);
             }
 
             if (nodeIn.TypeReference.Definition == DateTimeType)

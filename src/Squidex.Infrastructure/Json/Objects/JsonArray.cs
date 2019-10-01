@@ -23,12 +23,12 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        internal JsonArray(params object[] values)
+        internal JsonArray(params object?[] values)
             : base(ToList(values))
         {
         }
 
-        private static List<IJsonValue> ToList(IEnumerable<object> values)
+        private static List<IJsonValue> ToList(IEnumerable<object?> values)
         {
             return values?.Select(JsonValue.Create).ToList() ?? new List<IJsonValue>();
         }
@@ -43,17 +43,17 @@ namespace Squidex.Infrastructure.Json.Objects
             base.SetItem(index, item ?? JsonValue.Null);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as JsonArray);
         }
 
-        public bool Equals(IJsonValue other)
+        public bool Equals(IJsonValue? other)
         {
             return Equals(other as JsonArray);
         }
 
-        public bool Equals(JsonArray array)
+        public bool Equals(JsonArray? array)
         {
             if (array == null || array.Count != Count)
             {

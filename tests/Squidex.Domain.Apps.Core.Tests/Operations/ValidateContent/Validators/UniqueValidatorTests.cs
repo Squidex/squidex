@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             return new ValidationContext(contentId, schemaId,
                 (schema, filterNode) =>
                 {
-                    filter(filterNode.ToString());
+                    filter(filterNode.ToString()!);
 
                     return Task.FromResult<IReadOnlyList<Guid>>(new List<Guid> { id });
                 },

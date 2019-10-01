@@ -13,9 +13,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public abstract class ContentData<T> : Dictionary<T, ContentFieldData>, IEquatable<ContentData<T>>
+    public abstract class ContentData<T> : Dictionary<T, ContentFieldData?>, IEquatable<ContentData<T>> where T : notnull
     {
-        public IEnumerable<KeyValuePair<T, ContentFieldData>> ValidValues
+        public IEnumerable<KeyValuePair<T, ContentFieldData?>> ValidValues
         {
             get { return this.Where(x => x.Value != null); }
         }
@@ -43,11 +43,17 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 foreach (var otherValue in source)
                 {
-                    var fieldValue = target.GetOrAddNew(otherValue.Key);
-
-                    foreach (var value in otherValue.Value)
+                    if (otherValue.Value != null)
                     {
-                        fieldValue[value.Key] = value.Value;
+                        var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+
+                        if (fieldValue != null)
+                        {
+                            foreach (var value in otherValue.Value)
+                            {
+                                fieldValue[value.Key] = value.Value;
+                            }
+                        }
                     }
                 }
             }
@@ -75,12 +81,12 @@ namespace Squidex.Domain.Apps.Core.Contents
             return target;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as ContentData<T>);
         }
 
-        public bool Equals(ContentData<T> other)
+        public bool Equals(ContentData<T>? other)
         {
             return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
         }

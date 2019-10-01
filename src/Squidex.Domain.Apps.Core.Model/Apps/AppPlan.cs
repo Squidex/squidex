@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             PlanId = planId;
         }
 
-        public static AppPlan Build(RefToken owner, string planId)
+        public static AppPlan? Build(RefToken owner, string planId)
         {
             if (planId == null)
             {

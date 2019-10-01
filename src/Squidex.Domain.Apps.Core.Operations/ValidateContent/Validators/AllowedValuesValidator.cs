@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.allowedValues = allowedValues;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value != null && value is T typedValue && !allowedValues.Contains(typedValue))
             {

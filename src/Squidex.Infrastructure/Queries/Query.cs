@@ -11,9 +11,9 @@ namespace Squidex.Infrastructure.Queries
 {
     public class Query<TValue>
     {
-        public FilterNode<TValue> Filter { get; set; }
+        public FilterNode<TValue>? Filter { get; set; }
 
-        public string FullText { get; set; }
+        public string? FullText { get; set; }
 
         public long Skip { get; set; }
 

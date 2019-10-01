@@ -30,12 +30,12 @@ namespace Squidex.Infrastructure.Security
         }
 
         public PermissionSet(params string[] permissions)
-            : this(permissions?.Select(x => new Permission(x)))
+            : this(permissions?.Select(x => new Permission(x))!)
         {
         }
 
         public PermissionSet(IEnumerable<string> permissions)
-            : this(permissions?.Select(x => new Permission(x)))
+            : this(permissions?.Select(x => new Permission(x))!)
         {
         }
 
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Security
             display = new Lazy<string>(() => string.Join(";", this.permissions));
         }
 
-        public bool Allows(Permission other)
+        public bool Allows(Permission? other)
         {
             if (other == null)
             {
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Security
             return permissions.Any(x => x.Allows(other));
         }
 
-        public bool Includes(Permission other)
+        public bool Includes(Permission? other)
         {
             if (other == null)
             {

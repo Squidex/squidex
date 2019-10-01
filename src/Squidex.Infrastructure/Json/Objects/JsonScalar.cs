@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public abstract class JsonScalar<T> : IJsonValue, IEquatable<JsonScalar<T>>
+    public abstract class JsonScalar<T> : IJsonValue, IEquatable<JsonScalar<T>> where T : notnull
     {
         public abstract JsonValueType Type { get; }
 
@@ -20,17 +20,17 @@ namespace Squidex.Infrastructure.Json.Objects
             Value = value;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as JsonScalar<T>);
         }
 
-        public bool Equals(IJsonValue other)
+        public bool Equals(IJsonValue? other)
         {
             return Equals(other as JsonScalar<T>);
         }
 
-        public bool Equals(JsonScalar<T> other)
+        public bool Equals(JsonScalar<T>? other)
         {
             return other != null && other.Type == Type && Equals(other.Value, Value);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            return Value.ToString();
+            return Value.ToString()!;
         }
 
         public virtual string ToJsonString()

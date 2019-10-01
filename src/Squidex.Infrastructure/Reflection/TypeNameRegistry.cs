@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Reflection
         private readonly Dictionary<Type, string> namesByType = new Dictionary<Type, string>();
         private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
-        public TypeNameRegistry(IEnumerable<ITypeProvider> providers = null)
+        public TypeNameRegistry(IEnumerable<ITypeProvider>? providers = null)
         {
             if (providers != null)
             {

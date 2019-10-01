@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Validation
     {
         public static void It(Func<string> message, Action<AddValidation> action)
         {
-            List<ValidationError> errors = null;
+            List<ValidationError>? errors = null;
 
             var addValidation = new AddValidation((m, p) =>
             {
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Validation
 
         public static async Task It(Func<string> message, Func<AddValidation, Task> action)
         {
-            List<ValidationError> errors = null;
+            List<ValidationError>? errors = null;
 
             var addValidation = new AddValidation((m, p) =>
             {

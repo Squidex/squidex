@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return engine;
         }
 
-        private Engine CreateScriptEngine(IReferenceResolver resolver = null, Dictionary<string, Func<string>> customFormatters = null)
+        private Engine CreateScriptEngine(IReferenceResolver? resolver = null, Dictionary<string, Func<string>>? customFormatters = null)
         {
             var engine = new Engine(options =>
             {
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public string Interpolate(string name, object context, string script, Dictionary<string, Func<string>> customFormatters = null)
+        public string? Interpolate(string name, object context, string script, Dictionary<string, Func<string>>? customFormatters = null)
         {
             try
             {

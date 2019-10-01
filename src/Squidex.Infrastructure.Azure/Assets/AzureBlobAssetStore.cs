@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GeneratePublicUrl(string fileName)
+        public string? GeneratePublicUrl(string fileName)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
 

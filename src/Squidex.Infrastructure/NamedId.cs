@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure
 {
     public static class NamedId
     {
-        public static NamedId<T> Of<T>(T id, string name)
+        public static NamedId<T> Of<T>(T id, string name) where T : notnull
         {
             return new NamedId<T>(id, name);
         }

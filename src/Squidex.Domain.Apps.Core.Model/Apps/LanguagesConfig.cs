@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -79,12 +80,12 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public static LanguagesConfig Build(params LanguageConfig[] configs)
         {
-            return Build(configs?.ToList());
+            return Build(configs?.ToList()!);
         }
 
         public static LanguagesConfig Build(params Language[] languages)
         {
-            return Build(languages?.Select(x => new LanguageConfig(x)).ToList());
+            return Build(languages?.Select(x => new LanguageConfig(x)).ToList()!);
         }
 
         [Pure]
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public LanguagesConfig Set(Language language, bool isOptional = false, IEnumerable<Language> fallback = null)
+        public LanguagesConfig Set(Language language, bool isOptional = false, IEnumerable<Language>? fallback = null)
         {
             Guard.NotNull(language, nameof(language));
 
@@ -113,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newMaster = Master?.Language == config.Language ? config : Master;
 
-            return new LanguagesConfig(newLanguages, newMaster);
+            return new LanguagesConfig(newLanguages, newMaster!);
         }
 
         [Pure]
@@ -146,7 +147,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return languages.TryGetValue(language, out config);
         }
 
-        public bool TryGetItem(string key, out IFieldPartitionItem item)
+        public bool TryGetItem(string key, [MaybeNullWhen(false)] out IFieldPartitionItem item)
         {
             if (Language.IsValidLanguage(key) && languages.TryGetValue(key, out var value))
             {
@@ -156,7 +157,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             }
             else
             {
-                item = null;
+                item = null!;
 
                 return false;
             }

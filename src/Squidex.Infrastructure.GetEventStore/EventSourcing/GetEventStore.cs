@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing
             this.connection = connection;
             this.serializer = serializer;
 
-            this.prefix = prefix?.Trim(' ', '-').WithFallback("squidex");
+            this.prefix = prefix.Trim(' ', '-').WithFallback("squidex");
 
             projectionClient = new ProjectionClient(connection, prefix, projectionHost);
         }
@@ -50,10 +50,10 @@ namespace Squidex.Infrastructure.EventSourcing
                 throw new ConfigurationException("Cannot connect to event store.", ex);
             }
 
-            await projectionClient.ConnectAsync(ct);
+            await projectionClient.ConnectAsync();
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(streamFilter, nameof(streamFilter));
 
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return projectionClient.CreateProjectionAsync(property, string.Empty);
         }
 
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
             Guard.NotNullOrEmpty(property, nameof(property));
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
 

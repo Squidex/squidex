@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, oldData);
 
-            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]!["iv"]);
             Assert.Equal(JsonValue.Array("id4"), GetNestedTags(newData));
         }
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, null);
 
-            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]!["iv"]);
             Assert.Equal(JsonValue.Array("id4"), GetNestedTags(newData));
         }
 
@@ -97,13 +97,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, null);
 
-            Assert.Equal(JsonValue.Array("name2_1", "name2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("name2_1", "name2_2"), newData["tags2"]!["iv"]);
             Assert.Equal(JsonValue.Array("name4"), GetNestedTags(newData));
         }
 
         private static IJsonValue GetNestedTags(NamedContentData newData)
         {
-            var array = (JsonArray)newData["array"]["iv"];
+            var array = (JsonArray)newData["array"]!["iv"];
             var arrayItem = (JsonObject)array[0];
 
             return arrayItem["nestedTags2"];

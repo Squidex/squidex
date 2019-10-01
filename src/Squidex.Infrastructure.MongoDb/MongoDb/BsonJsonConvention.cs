@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.MongoDb
                         var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
                         var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
 
-                        memberMap.SetSerializer((IBsonSerializer)bsonSerializer);
+                        memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
                     }
                     else if (memberMap.MemberType == typeof(JToken))
                     {

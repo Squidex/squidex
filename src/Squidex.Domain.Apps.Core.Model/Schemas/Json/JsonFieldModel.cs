@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public FieldProperties Properties { get; set; }
 
         [JsonProperty]
-        public JsonNestedFieldModel[] Children { get; set; }
+        public JsonNestedFieldModel[]? Children { get; set; }
 
         public RootField ToField()
         {

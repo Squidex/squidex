@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Tasks
 
         private static Task CreateDoneTask()
         {
-            var result = new TaskCompletionSource<object>();
+            var result = new TaskCompletionSource<object?>();
 
             result.SetResult(null);
 

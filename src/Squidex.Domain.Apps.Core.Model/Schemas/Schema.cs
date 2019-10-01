@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public Schema(string name, SchemaProperties properties = null, bool isSingleton = false)
+        public Schema(string name, SchemaProperties? properties = null, bool isSingleton = false)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 

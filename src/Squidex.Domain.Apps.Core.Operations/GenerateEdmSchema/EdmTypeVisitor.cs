@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
-    public sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference>
+    public sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference?>
     {
         private readonly EdmTypeFactory typeFactory;
 
@@ -20,12 +20,12 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             this.typeFactory = typeFactory;
         }
 
-        public IEdmTypeReference CreateEdmType(IField field)
+        public IEdmTypeReference? CreateEdmType(IField field)
         {
             return field.Accept(this);
         }
 
-        public IEdmTypeReference Visit(IArrayField field)
+        public IEdmTypeReference? Visit(IArrayField field)
         {
             var (fieldEdmType, created) = typeFactory($"Data.{field.Name.ToPascalCase()}.Item");
 
@@ -45,52 +45,52 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return new EdmComplexTypeReference(fieldEdmType, false);
         }
 
-        public IEdmTypeReference Visit(IField<AssetsFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<AssetsFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(IField<BooleanFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<BooleanFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.Boolean, field);
         }
 
-        public IEdmTypeReference Visit(IField<DateTimeFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<DateTimeFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.DateTimeOffset, field);
         }
 
-        public IEdmTypeReference Visit(IField<GeolocationFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<GeolocationFieldProperties> field)
         {
             return null;
         }
 
-        public IEdmTypeReference Visit(IField<JsonFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<JsonFieldProperties> field)
         {
             return null;
         }
 
-        public IEdmTypeReference Visit(IField<NumberFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<NumberFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.Double, field);
         }
 
-        public IEdmTypeReference Visit(IField<ReferencesFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<ReferencesFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(IField<StringFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<StringFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(IField<TagsFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<TagsFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(IField<UIFieldProperties> field)
+        public IEdmTypeReference? Visit(IField<UIFieldProperties> field)
         {
             return null;
         }

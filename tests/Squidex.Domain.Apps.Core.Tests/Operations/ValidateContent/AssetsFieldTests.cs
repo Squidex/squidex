@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 });
         }
 
-        private static IJsonValue CreateValue(params Guid[] ids)
+        private static IJsonValue CreateValue(params Guid[]? ids)
         {
             return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }

@@ -414,11 +414,11 @@ namespace Squidex.Infrastructure.Queries
             return value;
         }
 
-        private static string Q(string value)
+        private static string? Q(string value)
         {
             var parser = EdmModel.ParseQuery(value);
 
-            return parser.ToQuery().ToString();
+            return parser?.ToQuery().ToString();
         }
     }
 }

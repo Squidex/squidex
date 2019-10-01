@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Queries
             var source = ClrFilter.Eq("property", 1);
             var result = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Property == 1", result.ToString());
+            Assert.Equal("Property == 1", result!.ToString());
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Queries
             var source = ClrFilter.Eq("root.child", 1);
             var result = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Root.Child == 1", result.ToString());
+            Assert.Equal("Root.Child == 1", result!.ToString());
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public NestedField(long id, string name, T properties = null, IFieldSettings settings = null)
+        public NestedField(long id, string name, T? properties = null, IFieldSettings? settings = null)
             : base(id, name, settings)
         {
             SetProperties(properties ?? new T());

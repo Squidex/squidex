@@ -36,27 +36,27 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return new JsonSchemaProperty { Type = JsonObjectType.Boolean };
         }
 
-        public static JsonSchemaProperty DateTimeProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty DateTimeProperty(string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonSchemaProperty GuidProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty GuidProperty(string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonSchemaProperty NumberProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty NumberProperty(string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.Number, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonSchemaProperty ObjectProperty(JsonSchema item, string description = null, bool isRequired = false)
+        public static JsonSchemaProperty ObjectProperty(JsonSchema item, string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.Object, Reference = item, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonSchemaProperty StringProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.String, Description = description, IsRequired = isRequired };
         }

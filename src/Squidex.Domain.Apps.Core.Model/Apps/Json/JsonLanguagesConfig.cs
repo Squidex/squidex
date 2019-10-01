@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         public Dictionary<string, JsonLanguageConfig> Languages { get; set; }
 
         [JsonProperty]
-        public Language Master { get; set; }
+        public Language? Master { get; set; }
 
         public JsonLanguagesConfig()
         {

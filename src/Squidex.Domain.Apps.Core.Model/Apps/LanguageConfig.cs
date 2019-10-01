@@ -44,12 +44,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return LanguageFallbacks.Select(x => x.Iso2Code); }
         }
 
-        public LanguageConfig(Language language, bool isOptional = false, IEnumerable<Language> fallback = null)
+        public LanguageConfig(Language language, bool isOptional = false, IEnumerable<Language>? fallback = null)
             : this(language, isOptional, fallback?.ToArray())
         {
         }
 
-        public LanguageConfig(Language language, bool isOptional = false, params Language[] fallback)
+        public LanguageConfig(Language language, bool isOptional = false, params Language[]? fallback)
         {
             Guard.NotNull(language, nameof(language));
 

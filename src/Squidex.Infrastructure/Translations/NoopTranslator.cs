@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Translations
 {
     public sealed class NoopTranslator : ITranslator
     {
-        public Task<Translation> Translate(string sourceText, Language targetLanguage, Language sourceLanguage = null, CancellationToken ct = default)
+        public Task<Translation> Translate(string sourceText, Language targetLanguage, Language? sourceLanguage = null, CancellationToken ct = default)
         {
             var result = new Translation(TranslationResult.NotImplemented);
 

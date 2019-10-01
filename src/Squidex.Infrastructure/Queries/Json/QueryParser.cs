@@ -43,7 +43,10 @@ namespace Squidex.Infrastructure.Queries.Json
             {
                 var filter = JsonFilterVisitor.Parse(query.Filter, schema, errors);
 
-                result.Filter = Optimizer<ClrValue>.Optimize(filter);
+                if (filter != null)
+                {
+                    result.Filter = Optimizer<ClrValue>.Optimize(filter);
+                }
             }
         }
 

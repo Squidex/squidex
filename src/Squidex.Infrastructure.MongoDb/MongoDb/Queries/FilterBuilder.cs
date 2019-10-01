@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class FilterBuilder
     {
-        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ClrQuery query, bool supportsSearch = true)
+        public static (FilterDefinition<T>? Filter, bool Last) BuildFilter<T>(this ClrQuery query, bool supportsSearch = true)
         {
             if (query.FullText != null)
             {

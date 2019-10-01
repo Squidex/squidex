@@ -134,7 +134,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (obj.TryGetValue(key, out var v))
             {
-                return v.ToString();
+                return v.ToString()!;
             }
 
             return string.Empty;

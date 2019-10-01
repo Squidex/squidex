@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Assets
         private readonly AsyncLock readerLock = new AsyncLock();
         private readonly AsyncLock writerLock = new AsyncLock();
 
-        public string GeneratePublicUrl(string fileName)
+        public string? GeneratePublicUrl(string fileName)
         {
             return null;
         }

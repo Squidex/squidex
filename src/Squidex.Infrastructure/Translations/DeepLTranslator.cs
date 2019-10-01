@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
 namespace Squidex.Infrastructure.Translations
 {
     public sealed class DeepLTranslator : ITranslator
@@ -42,7 +44,7 @@ namespace Squidex.Infrastructure.Translations
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<Translation> Translate(string sourceText, Language targetLanguage, Language sourceLanguage = null, CancellationToken ct = default)
+        public async Task<Translation> Translate(string sourceText, Language targetLanguage, Language? sourceLanguage = null, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(sourceText) || targetLanguage == null)
             {

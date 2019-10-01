@@ -65,8 +65,8 @@ namespace Squidex.Infrastructure.Assets
 
             var imageInfo = await sut.GetImageInfoAsync(source);
 
-            Assert.Equal(600, imageInfo.PixelHeight);
-            Assert.Equal(600, imageInfo.PixelWidth);
+            Assert.Equal(600, imageInfo!.PixelHeight);
+            Assert.Equal(600, imageInfo!.PixelWidth);
         }
 
         [Fact]
@@ -81,12 +81,12 @@ namespace Squidex.Infrastructure.Assets
 
         private Stream GetPng()
         {
-            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.png");
+            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.png")!;
         }
 
         private Stream GetJpeg()
         {
-            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.jpg");
+            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.jpg")!;
         }
     }
 }

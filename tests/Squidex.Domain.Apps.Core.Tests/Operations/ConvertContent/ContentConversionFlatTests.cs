@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var output = data.ToFlatten();
 
-            var expected = new Dictionary<string, object>
+            var expected = new Dictionary<string, object?>
             {
                 {
                     "field1",

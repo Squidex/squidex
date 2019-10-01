@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             var releaseLock1 = await sut.AcquireLockAsync("Key1");
 
-            await sut.ReleaseLockAsync(releaseLock1);
+            await sut.ReleaseLockAsync(releaseLock1!);
 
             var releaseLock2 = await sut.AcquireLockAsync("Key1");
 

@@ -28,8 +28,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         protected EventConsumerManagerGrain(
             IEnumerable<IEventConsumer> eventConsumers,
-            IGrainIdentity identity,
-            IGrainRuntime runtime)
+            IGrainIdentity? identity,
+            IGrainRuntime? runtime)
             : base(identity, runtime)
         {
             Guard.NotNull(eventConsumers, nameof(eventConsumers));
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return Task.FromResult(true);
         }
 
-        public Task ActivateAsync(string streamName)
+        public Task ActivateAsync(string? streamName)
         {
             var tasks =
                 eventConsumers

@@ -22,17 +22,17 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as JsonNull);
         }
 
-        public bool Equals(IJsonValue other)
+        public bool Equals(IJsonValue? other)
         {
             return Equals(other as JsonNull);
         }
 
-        public bool Equals(JsonNull other)
+        public bool Equals(JsonNull? other)
         {
             return other != null;
         }

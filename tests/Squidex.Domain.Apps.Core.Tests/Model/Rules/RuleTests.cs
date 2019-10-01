@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
                 .Where(x => x.BaseType == typeof(RuleTrigger))
                 .Select(Activator.CreateInstance)
                 .Select(x => new[] { x })
-                .ToList();
+                .ToList()!;
 
         private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction1());
 

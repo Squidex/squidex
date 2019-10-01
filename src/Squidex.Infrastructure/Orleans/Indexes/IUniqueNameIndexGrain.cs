@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 {
     public interface IUniqueNameIndexGrain<T>
     {
-        Task<string> ReserveAsync(T id, string name);
+        Task<string?> ReserveAsync(T id, string name);
 
         Task<bool> AddAsync(string token);
 

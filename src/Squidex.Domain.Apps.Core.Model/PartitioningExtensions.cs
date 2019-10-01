@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core
             Partitioning.Invariant.Key
         };
 
-        public static bool IsValidPartitioning(this string value)
+        public static bool IsValidPartitioning(this string? value)
         {
             return value == null || AllowedPartitions.Contains(value);
         }

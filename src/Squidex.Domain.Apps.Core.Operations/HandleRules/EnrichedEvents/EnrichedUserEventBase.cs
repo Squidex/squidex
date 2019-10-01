@@ -16,6 +16,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
         public RefToken Actor { get; set; }
 
         [IgnoreDataMember]
-        public IUser User { get; set; }
+        public IUser? User { get; set; }
     }
 }

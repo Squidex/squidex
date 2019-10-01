@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract T Accept<T>(IFieldVisitor<T> visitor, IField field);
 
-        public abstract RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null);
+        public abstract RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null);
 
-        public abstract NestedField CreateNestedField(long id, string name, IFieldSettings settings = null);
+        public abstract NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null);
     }
 }

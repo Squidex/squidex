@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Collections
 {
     public static class ArrayDictionary
     {
-        public static ArrayDictionary<TKey, TValue> ToArrayDictionary<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keyExtractor)
+        public static ArrayDictionary<TKey, TValue> ToArrayDictionary<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keyExtractor) where TKey : notnull
         {
             return new ArrayDictionary<TKey, TValue>(source.Select(x => new KeyValuePair<TKey, TValue>(keyExtractor(x), x)).ToArray());
         }

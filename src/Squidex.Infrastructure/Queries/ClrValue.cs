@@ -18,13 +18,13 @@ namespace Squidex.Infrastructure.Queries
     {
         public static readonly ClrValue Null = new ClrValue(null, ClrValueType.Null, false);
 
-        public object Value { get; }
+        public object? Value { get; }
 
         public ClrValueType ValueType { get; }
 
         public bool IsList { get; }
 
-        private ClrValue(object value, ClrValueType valueType, bool isList)
+        private ClrValue(object? value, ClrValueType valueType, bool isList)
         {
             Value = value;
             ValueType = valueType;
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Queries
             return new ClrValue(value, ClrValueType.Int64, false);
         }
 
-        public static implicit operator ClrValue(string value)
+        public static implicit operator ClrValue(string? value)
         {
             return value != null ? new ClrValue(value, ClrValueType.String, false) : Null;
         }
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.Queries
             return ToString(Value);
         }
 
-        private static string ToString(object value)
+        private static string ToString(object? value)
         {
             if (value == null)
             {

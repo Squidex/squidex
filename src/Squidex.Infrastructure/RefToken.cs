@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
@@ -40,12 +41,12 @@ namespace Squidex.Infrastructure
             return $"{Type}:{Identifier}";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as RefToken);
         }
 
-        public bool Equals(RefToken other)
+        public bool Equals(RefToken? other)
         {
             return other != null && (ReferenceEquals(this, other) || (Type.Equals(other.Type) && Identifier.Equals(other.Identifier)));
         }
@@ -55,7 +56,7 @@ namespace Squidex.Infrastructure
             return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
         }
 
-        public static bool TryParse(string value, out RefToken result)
+        public static bool TryParse(string value, [MaybeNullWhen(false)] out RefToken result)
         {
             if (value != null)
             {
@@ -69,7 +70,7 @@ namespace Squidex.Infrastructure
                 }
             }
 
-            result = null;
+            result = null!;
 
             return false;
         }

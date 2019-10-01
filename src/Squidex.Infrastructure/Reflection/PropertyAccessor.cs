@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Reflection
             {
                 if (propertyInfo.CanRead)
                 {
-                    getMethod = (Func<TObject, TValue>)propertyInfo.GetGetMethod(true).CreateDelegate(typeof(Func<TObject, TValue>));
+                    getMethod = (Func<TObject, TValue>)propertyInfo.GetGetMethod(true)!.CreateDelegate(typeof(Func<TObject, TValue>));
                 }
                 else
                 {
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Reflection
 
                 if (propertyInfo.CanWrite)
                 {
-                    setMethod = (Action<TObject, TValue>)propertyInfo.GetSetMethod(true).CreateDelegate(typeof(Action<TObject, TValue>));
+                    setMethod = (Action<TObject, TValue>)propertyInfo.GetSetMethod(true)!.CreateDelegate(typeof(Action<TObject, TValue>));
                 }
                 else
                 {
@@ -38,14 +38,14 @@ namespace Squidex.Infrastructure.Reflection
                 }
             }
 
-            public object Get(object source)
+            public object? Get(object source)
             {
                 return getMethod((TObject)source);
             }
 
-            public void Set(object source, object value)
+            public void Set(object source, object? value)
             {
-                setMethod((TObject)source, (TValue)value);
+                setMethod((TObject)source, (TValue)value!);
             }
         }
 
@@ -56,17 +56,17 @@ namespace Squidex.Infrastructure.Reflection
             Guard.NotNull(targetType, nameof(targetType));
             Guard.NotNull(propertyInfo, nameof(propertyInfo));
 
-            internalAccessor = (IPropertyAccessor)Activator.CreateInstance(typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType), propertyInfo);
+            internalAccessor = (IPropertyAccessor)Activator.CreateInstance(typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType), propertyInfo)!;
         }
 
-        public object Get(object target)
+        public object? Get(object target)
         {
             Guard.NotNull(target, nameof(target));
 
             return internalAccessor.Get(target);
         }
 
-        public void Set(object target, object value)
+        public void Set(object target, object? value)
         {
             Guard.NotNull(target, nameof(target));
 

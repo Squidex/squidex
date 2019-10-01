@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.TestHelpers
         {
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            return Task.FromResult<object>(null);
+            return Task.FromResult<object?>(null);
         }
     }
 }

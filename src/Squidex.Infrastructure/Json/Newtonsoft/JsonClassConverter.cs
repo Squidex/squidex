@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             get { yield return typeof(T); }
         }
 
-        public sealed override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public sealed override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
             {

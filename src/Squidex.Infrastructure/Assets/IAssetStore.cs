@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Assets
 {
     public interface IAssetStore
     {
-        string GeneratePublicUrl(string fileName);
+        string? GeneratePublicUrl(string fileName);
 
         Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default);
 

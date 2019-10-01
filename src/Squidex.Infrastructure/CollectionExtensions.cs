@@ -80,12 +80,12 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection)
+        public static int OrderedHashCode<T>(this IEnumerable<T> collection) where T : notnull
         {
             return collection.OrderedHashCode(EqualityComparer<T>.Default);
         }
 
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer) where T : notnull
         {
             Guard.NotNull(comparer, nameof(comparer));
 
@@ -101,12 +101,12 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
-        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
+        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary) where TKey : notnull
         {
             return DictionaryHashCode(dictionary, EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default);
         }
 
-        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
+        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer) where TKey : notnull
         {
             var hashCode = 17;
 
@@ -123,39 +123,39 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
-        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue> other)
+        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue> other) where TKey : notnull
         {
             return EqualsDictionary(dictionary, other, EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default);
         }
 
-        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue> other, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
+        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue> other, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer) where TKey : notnull
         {
             var comparer = new KeyValuePairComparer<TKey, TValue>(keyComparer, valueComparer);
 
             return other != null && dictionary.Count == other.Count && !dictionary.Except(other, comparer).Any();
         }
 
-        public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
+        public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
         {
-            return dictionary.GetOrCreate(key, _ => default);
+            return dictionary.GetOrCreate(key, _ => default!);
         }
 
-        public static TValue GetOrAddDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        public static TValue GetOrAddDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
         {
-            return dictionary.GetOrAdd(key, _ => default);
+            return dictionary.GetOrAdd(key, _ => default!);
         }
 
-        public static TValue GetOrNew<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TValue : class, new()
+        public static TValue GetOrNew<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull where TValue : class, new()
         {
             return dictionary.GetOrCreate(key, _ => new TValue());
         }
 
-        public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : class, new()
+        public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull where TValue : class, new()
         {
             return dictionary.GetOrAdd(key, _ => new TValue());
         }
 
-        public static TValue GetOrCreate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
+        public static TValue GetOrCreate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure
             return result;
         }
 
-        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue fallback)
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue fallback) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
@@ -177,7 +177,7 @@ namespace Squidex.Infrastructure
             return result;
         }
 
-        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
@@ -189,7 +189,7 @@ namespace Squidex.Infrastructure
             return result;
         }
 
-        public static TValue GetOrAdd<TKey, TContext, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TContext context, Func<TKey, TContext, TValue> creator)
+        public static TValue GetOrAdd<TKey, TContext, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TContext context, Func<TKey, TContext, TValue> creator) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {

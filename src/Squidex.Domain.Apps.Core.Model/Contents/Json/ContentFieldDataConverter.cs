@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
                 switch (reader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        var propertyName = reader.Value.ToString();
+                        var propertyName = reader.Value.ToString()!;
 
                         if (!reader.Read())
                         {

@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Log
             var key = "MyKey";
 
             A.CallTo(() => lockGrain.AcquireLockAsync(key))
-                .Returns(Task.FromResult<string>(null));
+                .Returns(Task.FromResult<string?>(null));
 
             await sut.ReadLogAsync(key, dateFrom, dateTo, stream, TimeSpan.FromSeconds(1));
 

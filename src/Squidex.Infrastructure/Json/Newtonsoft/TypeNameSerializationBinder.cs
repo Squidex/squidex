@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return type ?? base.BindToType(assemblyName, typeName);
         }
 
-        public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
+        public override void BindToName(Type serializedType, out string? assemblyName, out string typeName)
         {
             assemblyName = null;
 

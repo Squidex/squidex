@@ -15,17 +15,17 @@ namespace Squidex.Infrastructure.Http
 {
     public static class DumpFormatter
     {
-        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string responseBody)
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage? response, string? responseBody)
         {
             return BuildDump(request, response, null, responseBody, TimeSpan.Zero);
         }
 
-        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody)
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage? response, string? requestBody, string? responseBody)
         {
             return BuildDump(request, response, requestBody, responseBody, TimeSpan.Zero);
         }
 
-        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody, TimeSpan elapsed, bool isTimeout = false)
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage? response, string? requestBody, string? responseBody, TimeSpan elapsed, bool isTimeout = false)
         {
             var writer = new StringBuilder();
 
@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Http
             return writer.ToString();
         }
 
-        private static void AppendRequest(this StringBuilder writer, HttpRequestMessage request, string requestBody)
+        private static void AppendRequest(this StringBuilder writer, HttpRequestMessage request, string? requestBody)
         {
             var method = request.Method.ToString().ToUpperInvariant();
 
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.Http
             }
         }
 
-        private static void AppendResponse(this StringBuilder writer, HttpResponseMessage response, string responseBody, TimeSpan elapsed, bool isTimeout)
+        private static void AppendResponse(this StringBuilder writer, HttpResponseMessage? response, string? responseBody, TimeSpan elapsed, bool isTimeout)
         {
             if (response != null)
             {
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Http
             }
         }
 
-        private static void AppendHeaders(this StringBuilder writer, HttpHeaders headers)
+        private static void AppendHeaders(this StringBuilder writer, HttpHeaders? headers)
         {
             if (headers == null)
             {

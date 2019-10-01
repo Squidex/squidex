@@ -15,11 +15,11 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public IReadOnlyDictionary<Status, WorkflowTransition> Transitions { get; }
 
-        public string Color { get; }
+        public string? Color { get; }
 
         public bool NoUpdate { get; }
 
-        public WorkflowStep(IReadOnlyDictionary<Status, WorkflowTransition> transitions = null, string color = null, bool noUpdate = false)
+        public WorkflowStep(IReadOnlyDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, bool noUpdate = false)
         {
             Transitions = transitions ?? EmptyTransitions;
 

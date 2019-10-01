@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Commands
         public void Should_return_fallback_if_no_method_is_defined()
         {
             A.CallTo(() => context.InterfaceMethod)
-                .Returns(null);
+                .Returns(null!);
 
             var result = DomainObjectGrainFormatter.Format(context);
 

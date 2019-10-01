@@ -17,9 +17,9 @@ namespace Squidex.Infrastructure.Orleans
     {
         private readonly Dictionary<string, string> locks = new Dictionary<string, string>();
 
-        public Task<string> AcquireLockAsync(string key)
+        public Task<string?> AcquireLockAsync(string key)
         {
-            string releaseToken = null;
+            string? releaseToken = null;
 
             if (!locks.ContainsKey(key))
             {

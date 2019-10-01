@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var actual = input.ConvertId2Id(schema, converter);
 
-            var cleanedValue = (JsonArray)actual[5]["iv"];
+            var cleanedValue = (JsonArray)actual[5]!["iv"];
 
             Assert.Equal(1, cleanedValue.Count);
             Assert.Equal(id1.ToString(), cleanedValue[0].ToString());

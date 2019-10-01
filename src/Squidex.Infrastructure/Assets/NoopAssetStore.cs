@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class NoopAssetStore : IAssetStore
     {
-        public string GeneratePublicUrl(string fileName)
+        public string? GeneratePublicUrl(string fileName)
         {
             return null;
         }

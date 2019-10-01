@@ -185,8 +185,8 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()).To<IEvent>());
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()).To<IEvent>());
 
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
@@ -209,7 +209,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
-            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent()).To<IEvent>()));
         }
 
         [Fact]

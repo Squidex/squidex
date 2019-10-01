@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
     {
         private readonly JsonConverter[] converters;
         private readonly object lockObject = new object();
-        private Dictionary<Type, JsonConverter> converterCache = new Dictionary<Type, JsonConverter>();
+        private Dictionary<Type, JsonConverter?> converterCache = new Dictionary<Type, JsonConverter?>();
 
         public ConverterContractResolver(params JsonConverter[] converters)
         {
@@ -60,9 +60,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return base.CreateDictionaryContract(objectType);
         }
 
-        protected override JsonConverter ResolveContractConverter(Type objectType)
+        protected override JsonConverter? ResolveContractConverter(Type objectType)
         {
-            var result = base.ResolveContractConverter(objectType);
+            JsonConverter? result = base.ResolveContractConverter(objectType);
 
             if (result != null)
             {
@@ -86,8 +86,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     cache = converterCache;
 
                     var updatedCache = (cache != null)
-                        ? new Dictionary<Type, JsonConverter>(cache)
-                        : new Dictionary<Type, JsonConverter>();
+                        ? new Dictionary<Type, JsonConverter?>(cache)
+                        : new Dictionary<Type, JsonConverter?>();
                     updatedCache[objectType] = result;
 
                     converterCache = updatedCache;

@@ -18,9 +18,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0);
 
-        Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default);
+        Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default);
 
-        Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default);
+        Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default);
 
         Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events);
 
@@ -28,6 +28,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         Task DeleteStreamAsync(string streamName);
 
-        IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null);
+        IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null);
     }
 }

@@ -9,8 +9,8 @@ namespace Squidex.Infrastructure.Reflection
 {
     public interface IPropertyAccessor
     {
-        object Get(object target);
+        object? Get(object target);
 
-        void Set(object target, object value);
+        void Set(object target, object? value);
     }
 }

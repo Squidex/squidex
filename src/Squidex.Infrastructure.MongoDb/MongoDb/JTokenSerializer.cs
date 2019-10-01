@@ -12,11 +12,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class JTokenSerializer<T> : ClassSerializerBase<T> where T : JToken
+    public sealed class JTokenSerializer<T> : ClassSerializerBase<T?> where T : JToken
     {
         public static readonly JTokenSerializer<T> Instance = new JTokenSerializer<T>();
 
-        public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override T? Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var bsonReader = context.Reader;
 
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T? value)
         {
             var bsonWriter = context.Writer;
 

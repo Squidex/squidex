@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "[1]: Not an allowed value." });
         }
 
-        private static IJsonValue CreateValue(params string[] ids)
+        private static IJsonValue CreateValue(params string?[]? ids)
         {
             return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
         }

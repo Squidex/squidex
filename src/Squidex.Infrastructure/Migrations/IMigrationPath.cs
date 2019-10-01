@@ -11,6 +11,6 @@ namespace Squidex.Infrastructure.Migrations
 {
     public interface IMigrationPath
     {
-        (int Version, IEnumerable<IMigration> Migrations) GetNext(int version);
+        (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version);
     }
 }

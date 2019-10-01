@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Jint;
 using Jint.Native;
@@ -25,9 +26,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
         }
 
-        public bool TryConvert(Engine engine, object value, out JsValue result)
+        public bool TryConvert(Engine engine, object value, [MaybeNullWhen(false)] out JsValue result)
         {
-            result = null;
+            result = null!;
 
             if (value is Enum)
             {

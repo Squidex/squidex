@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (searchClause != null)
             {
-                result.FullText = SearchTermVisitor.Visit(searchClause.Expression).ToString();
+                result.FullText = SearchTermVisitor.Visit(searchClause.Expression).ToString()!;
             }
 
             FilterClause filterClause;

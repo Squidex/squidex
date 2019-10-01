@@ -13,39 +13,30 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectException : Exception
     {
-        private readonly string id;
-        private readonly string typeName;
+        public string? TypeName { get; }
 
-        public string TypeName
-        {
-            get { return typeName; }
-        }
+        public string Id { get; }
 
-        public string Id
-        {
-            get { return id; }
-        }
-
-        protected DomainObjectException(string message, string id, Type type, Exception inner = null)
+        protected DomainObjectException(string message, string id, Type type, Exception? inner = null)
             : base(message, inner)
         {
-            this.id = id;
+            Id = id;
 
-            typeName = type?.Name;
+            TypeName = type?.Name;
         }
 
         protected DomainObjectException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            id = info.GetString(nameof(id));
+            Id = info.GetString(nameof(Id))!;
 
-            typeName = info.GetString(nameof(typeName));
+            TypeName = info.GetString(nameof(TypeName))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(id), id);
-            info.AddValue(nameof(typeName), typeName);
+            info.AddValue(nameof(Id), Id);
+            info.AddValue(nameof(TypeName), TypeName);
 
             base.GetObjectData(info, context);
         }

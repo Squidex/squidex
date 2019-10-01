@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (value is JsonArray array)
             {
-                var result = new List<string>();
+                var result = new List<string?>();
 
                 foreach (var item in array)
                 {

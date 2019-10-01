@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure
         {
             Assert.Throws<ArgumentException>(() => Guard.NotDefault(Guid.Empty, "parameter"));
             Assert.Throws<ArgumentException>(() => Guard.NotDefault(0, "parameter"));
-            Assert.Throws<ArgumentException>(() => Guard.NotDefault((string)null, "parameter"));
+            Assert.Throws<ArgumentException>(() => Guard.NotDefault((string?)null, "parameter"));
             Assert.Throws<ArgumentException>(() => Guard.NotDefault(false, "parameter"));
         }
 
@@ -319,7 +319,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void NotEmpty_should_throw_for_null_collection()
         {
-            Assert.Throws<ArgumentNullException>(() => Guard.NotEmpty((int[])null, "parameter"));
+            Assert.Throws<ArgumentNullException>(() => Guard.NotEmpty((int[]?)null, "parameter"));
         }
 
         [Fact]

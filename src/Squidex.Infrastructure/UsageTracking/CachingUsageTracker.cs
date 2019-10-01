@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return inner.QueryAsync(key, fromDate, toDate);
         }
 
-        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
+        public Task TrackAsync(string key, string? category, double weight, double elapsedMs)
         {
             Guard.NotNull(key, nameof(key));
 

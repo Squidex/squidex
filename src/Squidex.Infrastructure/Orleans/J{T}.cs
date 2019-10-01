@@ -14,6 +14,8 @@ using Orleans.Serialization;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Infrastructure.Orleans
 {
     [Immutable]
@@ -47,13 +49,13 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         [CopierMethod]
-        public static object Copy(object input, ICopyContext context)
+        public static object? Copy(object? input, ICopyContext? context)
         {
             return input;
         }
 
         [SerializerMethod]
-        public static void Serialize(object input, ISerializationContext context, Type expected)
+        public static void Serialize(object? input, ISerializationContext context, Type? expected)
         {
             using (Profiler.TraceMethod(nameof(J)))
             {
@@ -66,7 +68,7 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         [DeserializerMethod]
-        public static object Deserialize(Type expected, IDeserializationContext context)
+        public static object? Deserialize(Type expected, IDeserializationContext context)
         {
             using (Profiler.TraceMethod(nameof(J)))
             {

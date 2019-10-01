@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         {
             var token = await sut.ReserveAsync(id1.Id, id1.Name);
 
-            await sut.RemoveReservationAsync(token);
+            await sut.RemoveReservationAsync(token!);
 
             var newToken = await sut.ReserveAsync(id1.Id, id1.Name);
 
@@ -145,13 +145,13 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         [Fact]
         public async Task Should_ignore_error_if_removing_reservation_with_Invalid_token()
         {
-            await sut.RemoveReservationAsync(null);
+            await sut.RemoveReservationAsync(null!);
         }
 
         [Fact]
         public async Task Should_ignore_error_if_completing_reservation_with_Invalid_token()
         {
-            await sut.AddAsync(null);
+            await sut.AddAsync(null!);
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         {
             var token = await sut.ReserveAsync(id.Id, id.Name);
 
-            await sut.AddAsync(token);
+            await sut.AddAsync(token!);
         }
     }
 }

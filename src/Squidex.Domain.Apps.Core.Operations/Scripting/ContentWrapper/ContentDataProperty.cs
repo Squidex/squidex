@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentDataProperty : CustomProperty
     {
         private readonly ContentDataObject contentData;
-        private ContentFieldObject contentField;
+        private ContentFieldObject? contentField;
         private JsValue value;
 
         protected override JsValue CustomValue
@@ -46,12 +46,12 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
         }
 
-        public ContentFieldObject ContentField
+        public ContentFieldObject? ContentField
         {
             get { return contentField; }
         }
 
-        public ContentDataProperty(ContentDataObject contentData, ContentFieldObject contentField = null)
+        public ContentDataProperty(ContentDataObject contentData, ContentFieldObject? contentField = null)
         {
             this.contentData = contentData;
             this.contentField = contentField;

@@ -17,19 +17,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         public static readonly Status Draft = new Status("Draft");
         public static readonly Status Published = new Status("Published");
 
-        private readonly string name;
+        private readonly string? name;
 
         public string Name
         {
             get { return name ?? "Unknown"; }
         }
 
-        public Status(string name)
+        public Status(string? name)
         {
             this.name = name;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Status status && Equals(status);
         }

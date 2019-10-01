@@ -14,13 +14,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class UniqueValidator : IValidator
     {
-        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             var count = context.Path.Count();
 
             if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))
             {
-                FilterNode<ClrValue> filter = null;
+                FilterNode<ClrValue>? filter = null;
 
                 if (value is string s)
                 {

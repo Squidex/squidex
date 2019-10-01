@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public class ArrayDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
+    public class ArrayDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> where TKey : notnull
     {
         private readonly IEqualityComparer<TKey> keyComparer;
         private readonly KeyValuePair<TKey, TValue>[] items;
@@ -141,7 +141,8 @@ namespace Squidex.Infrastructure.Collections
                 }
             }
 
-            value = default;
+            value = default!;
+
             return false;
         }
 

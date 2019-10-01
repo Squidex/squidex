@@ -29,10 +29,5 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             eventConsumerManagerGrain.Value.ActivateAsync(streamName);
         }
-
-        public IDisposable Subscribe(Action<string> handler)
-        {
-            return null;
-        }
     }
 }

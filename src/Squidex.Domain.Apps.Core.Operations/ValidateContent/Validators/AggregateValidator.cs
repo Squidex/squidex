@@ -13,14 +13,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class AggregateValidator : IValidator
     {
-        private readonly IValidator[] validators;
+        private readonly IValidator[]? validators;
 
-        public AggregateValidator(IEnumerable<IValidator> validators)
+        public AggregateValidator(IEnumerable<IValidator>? validators)
         {
             this.validators = validators?.ToArray();
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (validators?.Length > 0)
             {

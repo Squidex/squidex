@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Log
     {
         private readonly IClock clock;
 
-        public TimestampLogAppender(IClock clock = null)
+        public TimestampLogAppender(IClock? clock = null)
         {
             this.clock = clock ?? SystemClock.Instance;
         }

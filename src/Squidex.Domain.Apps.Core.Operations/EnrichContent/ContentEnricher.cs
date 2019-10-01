@@ -35,16 +35,20 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             foreach (var field in schema.Fields)
             {
                 var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
-                var fieldPartition = partitionResolver(field.Partitioning);
 
-                foreach (var partitionItem in fieldPartition)
+                if (fieldData != null)
                 {
-                    Enrich(field, fieldData, partitionItem);
-                }
+                    var fieldPartition = partitionResolver(field.Partitioning);
 
-                if (fieldData.Count > 0)
-                {
-                    data[field.Name] = fieldData;
+                    foreach (var partitionItem in fieldPartition)
+                    {
+                        Enrich(field, fieldData, partitionItem);
+                    }
+
+                    if (fieldData.Count > 0)
+                    {
+                        data[field.Name] = fieldData;
+                    }
                 }
             }
         }

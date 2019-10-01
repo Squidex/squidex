@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     public static class StreamFilter
     {
-        public static bool IsAll(string filter)
+        public static bool IsAll([NotNullWhen(false)] string? filter)
         {
             return string.IsNullOrWhiteSpace(filter)
                 || string.Equals(filter, ".*", StringComparison.OrdinalIgnoreCase)

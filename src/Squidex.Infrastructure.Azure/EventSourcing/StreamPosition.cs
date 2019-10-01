@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return string.Join("-", parts);
         }
 
-        public static implicit operator StreamPosition(string position)
+        public static implicit operator StreamPosition(string? position)
         {
             if (!string.IsNullOrWhiteSpace(position))
             {

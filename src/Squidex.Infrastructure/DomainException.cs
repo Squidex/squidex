@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure
         {
         }
 
-        public DomainException(string message, Exception inner)
+        public DomainException(string message, Exception? inner)
             : base(message, inner)
         {
         }

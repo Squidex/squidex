@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public string EventsFilter { get; }
 
         public CompoundEventConsumer(IEventConsumer first, params IEventConsumer[] inners)
-            : this(first?.Name, first, inners)
+            : this(first?.Name!, first!, inners)
         {
         }
 

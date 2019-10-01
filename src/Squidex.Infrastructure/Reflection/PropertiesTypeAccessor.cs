@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Reflection
             return AccessorCache.GetOrAdd(targetType, x => new PropertiesTypeAccessor(x));
         }
 
-        public void SetValue(object target, string propertyName, object value)
+        public void SetValue(object target, string propertyName, object? value)
         {
             Guard.NotNull(target, "target");
 
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Reflection
             accessor.Set(target, value);
         }
 
-        public object GetValue(object target, string propertyName)
+        public object? GetValue(object target, string propertyName)
         {
             Guard.NotNull(target, nameof(target));
 

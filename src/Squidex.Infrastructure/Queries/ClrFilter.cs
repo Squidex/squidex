@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Queries
             return Binary(path, CompareOperator.In, value);
         }
 
-        private static CompareFilter<ClrValue> Binary(PropertyPath path, CompareOperator @operator, ClrValue value)
+        private static CompareFilter<ClrValue> Binary(PropertyPath path, CompareOperator @operator, ClrValue? value)
         {
             return new CompareFilter<ClrValue>(path, @operator, value ?? ClrValue.Null);
         }

@@ -31,21 +31,21 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public static ObjectWrapper Create(Engine engine, ClaimsPrincipal principal)
         {
-            var id = principal.OpenIdSubject();
+            var id = principal.OpenIdSubject()!;
 
             var isClient = string.IsNullOrWhiteSpace(id);
 
             if (isClient)
             {
-                id = principal.OpenIdClientId();
+                id = principal.OpenIdClientId()!;
             }
 
             var name = principal.FindFirst(SquidexClaimTypes.DisplayName)?.Value;
 
-            return CreateUser(engine, id, isClient, principal.OpenIdEmail(), name, principal.Claims);
+            return CreateUser(engine, id, isClient, principal.OpenIdEmail()!, name, principal.Claims);
         }
 
-        private static ObjectWrapper CreateUser(Engine engine, string id, bool isClient, string email, string name, IEnumerable<Claim> allClaims)
+        private static ObjectWrapper CreateUser(Engine engine, string id, bool isClient, string email, string? name, IEnumerable<Claim> allClaims)
         {
             var claims =
                 allClaims.GroupBy(x => x.Type.Split(ClaimSeparators).Last())

@@ -16,11 +16,11 @@ namespace Squidex.Infrastructure.States
 
     public interface IStore<in TKey>
     {
-        IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent applyEvent);
+        IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent? applyEvent);
 
-        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot);
+        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot);
 
-        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent);
+        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent);
 
         ISnapshotStore<TState, TKey> GetSnapshotStore<TState>();
     }

@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class MongoExtensionsTests
     {
-        public sealed class Cursor<T> : IAsyncCursor<T>
+        public sealed class Cursor<T> : IAsyncCursor<T> where T : notnull
         {
             private readonly List<object> items = new List<object>();
             private int index = -1;

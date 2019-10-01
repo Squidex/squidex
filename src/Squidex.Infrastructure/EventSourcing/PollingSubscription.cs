@@ -18,8 +18,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public PollingSubscription(
             IEventStore eventStore,
             IEventSubscriber eventSubscriber,
-            string streamFilter,
-            string position)
+            string? streamFilter,
+            string? position)
         {
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));

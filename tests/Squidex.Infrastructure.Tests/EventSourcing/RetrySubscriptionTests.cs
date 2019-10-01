@@ -64,11 +64,11 @@ namespace Squidex.Infrastructure.EventSourcing
             var ex = new InvalidOperationException();
 
             await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(null, ex);
-            await OnErrorAsync(null, ex);
-            await OnErrorAsync(null, ex);
-            await OnErrorAsync(null, ex);
-            await OnErrorAsync(null, ex);
+            await OnErrorAsync(null!, ex);
+            await OnErrorAsync(null!, ex);
+            await OnErrorAsync(null!, ex);
+            await OnErrorAsync(null!, ex);
+            await OnErrorAsync(null!, ex);
             await sut.StopAsync();
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))

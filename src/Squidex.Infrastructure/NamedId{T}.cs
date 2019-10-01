@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -13,7 +14,7 @@ namespace Squidex.Infrastructure
 {
     public delegate bool Parser<T>(string input, out T result);
 
-    public sealed class NamedId<T> : IEquatable<NamedId<T>>
+    public sealed class NamedId<T> : IEquatable<NamedId<T>> where T : notnull
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
@@ -36,12 +37,12 @@ namespace Squidex.Infrastructure
             return $"{Id},{Name}";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as NamedId<T>);
         }
 
-        public bool Equals(NamedId<T> other)
+        public bool Equals(NamedId<T>? other)
         {
             return other != null && (ReferenceEquals(this, other) || (Id.Equals(other.Id) && Name.Equals(other.Name)));
         }
@@ -51,7 +52,7 @@ namespace Squidex.Infrastructure
             return (Id.GetHashCode() * 397) ^ Name.GetHashCode();
         }
 
-        public static bool TryParse(string value, Parser<T> parser, out NamedId<T> result)
+        public static bool TryParse(string value, Parser<T> parser, [MaybeNullWhen(false)] out NamedId<T> result)
         {
             if (value != null)
             {
@@ -83,7 +84,7 @@ namespace Squidex.Infrastructure
                 }
             }
 
-            result = null;
+            result = null!;
 
             return false;
         }

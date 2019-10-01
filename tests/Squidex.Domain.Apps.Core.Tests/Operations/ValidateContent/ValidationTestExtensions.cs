@@ -22,14 +22,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         public static readonly ValidationContext ValidContext = new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => EmptyReferences, x => EmptyAssets);
 
-        public static Task ValidateAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors, ValidationContext? context = null)
         {
             return validator.ValidateAsync(value,
                 CreateContext(context),
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this IValidator validator, object? value, IList<string> errors, ValidationContext? context = null)
         {
             return validator.ValidateAsync(
                 value,
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this IField field, object value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IField field, object? value, IList<string> errors, ValidationContext? context = null)
         {
             return new FieldValidator(FieldValueValidatorsFactory.CreateValidators(field).ToArray(), field)
                 .ValidateAsync(
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             };
         }
 
-        private static ValidationContext CreateContext(ValidationContext context)
+        private static ValidationContext CreateContext(ValidationContext? context)
         {
             return context ?? ValidContext;
         }

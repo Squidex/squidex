@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -28,8 +29,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         public Workflow(
             Status initial,
             IReadOnlyDictionary<Status, WorkflowStep> steps,
-            IReadOnlyList<Guid> schemaIds = null,
-            string name = null)
+            IReadOnlyList<Guid>? schemaIds = null,
+            string? name = null)
             : base(name ?? DefaultName)
         {
             Initial = initial;
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
         }
 
-        public static Workflow CreateDefault(string name = null)
+        public static Workflow CreateDefault(string? name = null)
         {
             return new Workflow(
                 Status.Draft, new Dictionary<Status, WorkflowStep>
@@ -91,13 +92,13 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
         }
 
-        public bool TryGetTransition(Status from, Status to, out WorkflowTransition transition)
+        public bool TryGetTransition(Status from, Status to, [MaybeNullWhen(false)] out WorkflowTransition transition)
         {
-            transition = null;
+            transition = null!;
 
             if (TryGetStep(from, out var step))
             {
-                if (step.Transitions.TryGetValue(to, out transition))
+                if (step.Transitions.TryGetValue(to, out transition!))
                 {
                     return true;
                 }
@@ -112,9 +113,9 @@ namespace Squidex.Domain.Apps.Core.Contents
             return false;
         }
 
-        public bool TryGetStep(Status status, out WorkflowStep step)
+        public bool TryGetStep(Status status, [MaybeNullWhen(false)] out WorkflowStep step)
         {
-            return Steps.TryGetValue(status, out step);
+            return Steps.TryGetValue(status, out step!);
         }
 
         public (Status Key, WorkflowStep) GetInitialStep()

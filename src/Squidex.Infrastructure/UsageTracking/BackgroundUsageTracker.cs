@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
+        public Task TrackAsync(string key, string? category, double weight, double elapsedMs)
         {
             key = GetKey(key);
 
@@ -183,7 +183,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return originalUsages.Sum(x => (long)x.Counters.Get(CounterTotalCalls));
         }
 
-        private static string GetCategory(string category)
+        private static string GetCategory(string? category)
         {
             return !string.IsNullOrWhiteSpace(category) ? category.Trim() : "*";
         }

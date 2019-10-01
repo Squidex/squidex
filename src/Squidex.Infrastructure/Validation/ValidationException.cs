@@ -26,24 +26,23 @@ namespace Squidex.Infrastructure.Validation
 
         public string Summary { get; }
 
-        public ValidationException(string summary, params ValidationError[] errors)
-            : this(summary, null, errors?.ToList())
+        public ValidationException(string summary, params ValidationError[]? errors)
+            : this(summary, errors?.ToList())
         {
         }
 
-        public ValidationException(string summary, IReadOnlyList<ValidationError> errors)
+        public ValidationException(string summary, IReadOnlyList<ValidationError>? errors)
             : this(summary, null, errors)
         {
-            this.errors = errors ?? FallbackErrors;
         }
 
-        public ValidationException(string summary, Exception inner, params ValidationError[] errors)
+        public ValidationException(string summary, Exception? inner, params ValidationError[]? errors)
             : this(summary, inner, errors?.ToList())
         {
         }
 
-        public ValidationException(string summary, Exception inner, IReadOnlyList<ValidationError> errors)
-            : base(FormatMessage(summary, errors), inner)
+        public ValidationException(string summary, Exception? inner, IReadOnlyList<ValidationError>? errors)
+            : base(FormatMessage(summary, errors), inner!)
         {
             Summary = summary;
 
@@ -53,9 +52,9 @@ namespace Squidex.Infrastructure.Validation
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Summary = info.GetString(nameof(Summary));
+            Summary = info.GetString(nameof(Summary))!;
 
-            errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>));
+            errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -66,7 +65,7 @@ namespace Squidex.Infrastructure.Validation
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(string summary, IReadOnlyList<ValidationError> errors)
+        private static string FormatMessage(string summary, IReadOnlyList<ValidationError>? errors)
         {
             var sb = new StringBuilder();
 

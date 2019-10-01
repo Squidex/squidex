@@ -73,8 +73,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var found = workflow.TryGetTransition(Status.Draft, Status.Archived, out var transition);
 
             Assert.True(found);
-            Assert.Equal("ToArchivedExpr", transition.Expression);
-            Assert.Equal("ToArchivedRole", transition.Role);
+            Assert.Equal("ToArchivedExpr", transition!.Expression);
+            Assert.Equal("ToArchivedRole", transition!.Role);
         }
 
         [Fact]
@@ -83,8 +83,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var found = workflow.TryGetTransition(new Status("Other"), Status.Draft, out var transition);
 
             Assert.True(found);
-            Assert.Null(transition.Expression);
-            Assert.Null(transition.Role);
+            Assert.Null(transition!.Expression);
+            Assert.Null(transition!.Role);
         }
 
         [Fact]

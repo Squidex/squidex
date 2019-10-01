@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Another content with the same value exists." });
         }
 
-        private static IJsonValue CreateValue(string v)
+        private static IJsonValue CreateValue(string? v)
         {
             return JsonValue.Create(v);
         }

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Queries.Json
             this.errors = errors;
         }
 
-        public static FilterNode<ClrValue> Parse(FilterNode<IJsonValue> filter, JsonSchema schema, List<string> errors)
+        public static FilterNode<ClrValue>? Parse(FilterNode<IJsonValue> filter, JsonSchema schema, List<string> errors)
         {
             var visitor = new JsonFilterVisitor(schema, errors);
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
         public override FilterNode<ClrValue> Visit(CompareFilter<IJsonValue> nodeIn)
         {
-            CompareFilter<ClrValue> result = null;
+            CompareFilter<ClrValue>? result = null;
 
             if (nodeIn.Path.TryGetProperty(schema, errors, out var property))
             {
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 }
             }
 
-            result = result ?? new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
+            result ??= new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
 
             return result;
         }

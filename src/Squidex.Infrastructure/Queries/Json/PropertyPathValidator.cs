@@ -6,13 +6,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using NJsonSchema;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, List<string> errors, out JsonSchema property)
+        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, List<string> errors, [MaybeNullWhen(false)] out JsonSchema property)
         {
             foreach (var element in path)
             {
@@ -33,7 +34,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         errors.Add($"Path '{path}' does not point to a valid property in the model.");
                     }
 
-                    property = null;
+                    property = null!;
 
                     return false;
                 }

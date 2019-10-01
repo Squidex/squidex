@@ -17,12 +17,12 @@ namespace Squidex.Infrastructure.Queries
         {
         }
 
-        public static FilterNode<TValue> Transform(FilterNode<TValue> node)
+        public static FilterNode<TValue>? Transform(FilterNode<TValue> node)
         {
             return node.Accept(Instance);
         }
 
-        public override FilterNode<TValue> Visit(CompareFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(CompareFilter<TValue> nodeIn)
         {
             return new CompareFilter<TValue>(nodeIn.Path.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Value);
         }

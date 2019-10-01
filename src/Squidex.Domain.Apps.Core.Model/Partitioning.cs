@@ -26,12 +26,12 @@ namespace Squidex.Domain.Apps.Core
             Key = key;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as Partitioning);
         }
 
-        public bool Equals(Partitioning other)
+        public bool Equals(Partitioning? other)
         {
             return string.Equals(other?.Key, Key, StringComparison.OrdinalIgnoreCase);
         }

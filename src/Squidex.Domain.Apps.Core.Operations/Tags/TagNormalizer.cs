@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Tags
 {
     public static class TagNormalizer
     {
-        public static async Task NormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, NamedContentData newData, NamedContentData oldData)
+        public static async Task NormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, NamedContentData newData, NamedContentData? oldData)
         {
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(schema, nameof(schema));
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                 {
                     foreach (var data in datas)
                     {
-                        if (data.TryGetValue(field.Name, out var fieldData))
+                        if (data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                         {
                             foreach (var partition in fieldData)
                             {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                         {
                             foreach (var data in datas)
                             {
-                                if (data.TryGetValue(field.Name, out var fieldData))
+                                if (data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                                 {
                                     foreach (var partition in fieldData)
                                     {

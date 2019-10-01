@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure
@@ -58,24 +59,24 @@ namespace Squidex.Infrastructure
             return AllLanguagesField.ContainsKey(iso2Code);
         }
 
-        public static bool TryGetLanguage(string iso2Code, out Language language)
+        public static bool TryGetLanguage(string iso2Code, [MaybeNullWhen(false)] out Language language)
         {
             Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
 
-            return AllLanguagesField.TryGetValue(iso2Code, out language);
+            return AllLanguagesField.TryGetValue(iso2Code, out language!);
         }
 
         public static implicit operator string(Language language)
         {
-            return language?.Iso2Code;
+            return language.Iso2Code;
         }
 
         public static implicit operator Language(string iso2Code)
         {
-            return GetLanguage(iso2Code);
+            return GetLanguage(iso2Code!);
         }
 
-        public static Language ParseOrNull(string input)
+        public static Language? ParseOrNull(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {

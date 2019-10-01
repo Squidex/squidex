@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private async Task<object> ExecuteCommandAsync(TCommand typedCommand)
+        private async Task<object?> ExecuteCommandAsync(TCommand typedCommand)
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId);
 

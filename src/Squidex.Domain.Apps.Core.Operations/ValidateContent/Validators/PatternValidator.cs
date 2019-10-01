@@ -16,16 +16,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
     {
         private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(20);
         private readonly Regex regex;
-        private readonly string errorMessage;
+        private readonly string? errorMessage;
 
-        public PatternValidator(string pattern, string errorMessage = null)
+        public PatternValidator(string pattern, string? errorMessage = null)
         {
             this.errorMessage = errorMessage;
 
-            regex = new Regex("^" + pattern + "$", RegexOptions.None, Timeout);
+            regex = new Regex($"^{pattern}$", RegexOptions.None, Timeout);
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue)
             {

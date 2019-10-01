@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize1()
         {
-            var source = new ValidationException("Summary", new ValidationError("Error1"), null);
+            var source = new ValidationException("Summary", new ValidationError("Error1"), null!);
             var result = source.SerializeAndDeserializeBinary();
 
             result.Errors.Should().BeEquivalentTo(source.Errors);

@@ -21,13 +21,19 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
 
-        public static string ToFullText<T>(this ContentData<T> data, int maxTotalLength = 1024 * 1024, int maxFieldLength = 1000, string separator = " ")
+        public static string ToFullText<T>(this ContentData<T> data, int maxTotalLength = 1024 * 1024, int maxFieldLength = 1000, string separator = " ") where T : notnull
         {
             var stringBuilder = new StringBuilder();
 
-            foreach (var value in data.Values.SelectMany(x => x.Values))
+            foreach (var fieldValue in data.Values)
             {
-                AppendText(value, stringBuilder, maxFieldLength, separator, false);
+                if (fieldValue != null)
+                {
+                    foreach (var value in fieldValue.Values)
+                    {
+                        AppendText(value, stringBuilder, maxFieldLength, separator, false);
+                    }
+                }
             }
 
             var result = stringBuilder.ToString();
@@ -113,8 +119,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             TDict2 target,
             IReadOnlyDictionary<TKey1, RootField> fields,
             Func<IRootField, TKey2> targetKey, params FieldConverter[] converters)
-            where TDict1 : IDictionary<TKey1, ContentFieldData>
-            where TDict2 : IDictionary<TKey2, ContentFieldData>
+            where TDict1 : IDictionary<TKey1, ContentFieldData?>
+            where TDict2 : IDictionary<TKey2, ContentFieldData?>
+            where TKey1 : notnull
+            where TKey2 : notnull
         {
             foreach (var fieldKvp in source)
             {
@@ -123,24 +131,27 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     continue;
                 }
 
-                var newvalue = fieldKvp.Value;
+                ContentFieldData? newValue = fieldKvp.Value;
 
-                if (converters != null)
+                if (newValue != null)
                 {
-                    foreach (var converter in converters)
+                    if (converters != null)
                     {
-                        newvalue = converter(newvalue, field);
-
-                        if (newvalue == null)
+                        foreach (var converter in converters)
                         {
-                            break;
+                            newValue = converter(newValue, field);
+
+                            if (newValue == null)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
 
-                if (newvalue != null)
+                if (newValue != null)
                 {
-                    target.Add(targetKey(field), newvalue);
+                    target.Add(targetKey(field), newValue);
                 }
             }
 

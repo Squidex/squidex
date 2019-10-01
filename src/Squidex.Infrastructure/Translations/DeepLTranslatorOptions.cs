@@ -9,6 +9,6 @@ namespace Squidex.Infrastructure.Translations
 {
     public sealed class DeepLTranslatorOptions
     {
-        public string AuthKey { get; set; }
+        public string? AuthKey { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure
         {
             var options = Options.Create(new LanguagesOptions
             {
-                ["en-Error"] = null
+                ["en-Error"] = null!
             });
 
             var sut = new LanguagesInitializer(options);

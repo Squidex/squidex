@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return jsonSerializer.Serialize(new { type = @event.Name, payload = @event, timestamp = @event.Timestamp });
         }
 
-        public string Format(string text, EnrichedEvent @event)
+        public string? Format(string text, EnrichedEvent @event)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -274,7 +274,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 path[i] = captures[i].Value;
             }
 
-            if (!data.TryGetValue(path[0], out var field))
+            if (!data.TryGetValue(path[0], out var field) || field == null)
             {
                 return Fallback;
             }

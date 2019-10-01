@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             enrichedEvent.AppId = @event.Payload.AppId;
         }
 
-        private Task<IUser> FindUserAsync(RefToken actor)
+        private Task<IUser?> FindUserAsync(RefToken actor)
         {
             var key = $"EventEnrichers_Users_${actor.Identifier}";
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
 
-                IUser user;
+                IUser? user;
                 try
                 {
                      user = await userResolver.FindByIdOrEmailAsync(actor.Identifier);

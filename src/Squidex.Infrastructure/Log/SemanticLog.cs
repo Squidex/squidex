@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Log
 
         private void LogFormattedText(SemanticLogLevel logLevel, string formattedText)
         {
-            List<Exception> exceptions = null;
+            List<Exception>? exceptions = null;
 
             for (var i = 0; i < channels.Length; i++)
             {

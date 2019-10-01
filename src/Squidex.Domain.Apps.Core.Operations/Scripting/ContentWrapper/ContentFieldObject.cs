@@ -18,17 +18,17 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentFieldObject : ObjectInstance
     {
         private readonly ContentDataObject contentData;
-        private readonly ContentFieldData fieldData;
+        private readonly ContentFieldData? fieldData;
         private HashSet<string> valuesToDelete;
         private Dictionary<string, PropertyDescriptor> valueProperties;
         private bool isChanged;
 
-        public ContentFieldData FieldData
+        public ContentFieldData? FieldData
         {
             get { return fieldData; }
         }
 
-        public ContentFieldObject(ContentDataObject contentData, ContentFieldData fieldData, bool isNew)
+        public ContentFieldObject(ContentDataObject contentData, ContentFieldData? fieldData, bool isNew)
             : base(contentData.Engine)
         {
             Extensible = true;
@@ -49,11 +49,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             contentData.MarkChanged();
         }
 
-        public bool TryUpdate(out ContentFieldData result)
+        public bool TryUpdate(out ContentFieldData? result)
         {
             result = fieldData;
 
-            if (isChanged)
+            if (isChanged && fieldData != null)
             {
                 if (valuesToDelete != null)
                 {
@@ -123,11 +123,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         {
             if (valueProperties == null)
             {
-                valueProperties = new Dictionary<string, PropertyDescriptor>(FieldData.Count);
+                valueProperties = new Dictionary<string, PropertyDescriptor>(fieldData?.Count ?? 0);
 
-                foreach (var kvp in FieldData)
+                if (fieldData != null)
                 {
-                    valueProperties.Add(kvp.Key, new ContentFieldProperty(this, kvp.Value));
+                    foreach (var kvp in fieldData)
+                    {
+                        valueProperties.Add(kvp.Key, new ContentFieldProperty(this, kvp.Value));
+                    }
                 }
             }
         }

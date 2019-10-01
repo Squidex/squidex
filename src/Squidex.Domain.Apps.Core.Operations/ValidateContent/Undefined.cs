@@ -11,12 +11,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         public static readonly object Value = new object();
 
-        public static bool IsUndefined(this object other)
+        public static bool IsUndefined(this object? other)
         {
             return ReferenceEquals(other, Value);
         }
 
-        public static bool IsNullOrUndefined(this object other)
+        public static bool IsNullOrUndefined(this object? other)
         {
             return other == null || other.IsUndefined();
         }

@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Plugins
             {
                 try
                 {
-                    var plugin = (IPlugin)Activator.CreateInstance(pluginType);
+                    var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
 
                     loadedPlugins.Add(plugin);
                 }

@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure.Translations
 {
     public interface ITranslator
     {
-        Task<Translation> Translate(string sourceText, Language targetLanguage, Language sourceLanguage = null, CancellationToken ct = default);
+        Task<Translation> Translate(string sourceText, Language targetLanguage, Language? sourceLanguage = null, CancellationToken ct = default);
     }
 }

@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void SequentialHashCode_should_ignore_null_values()
         {
-            var collection = new string[] { null, null };
+            var collection = new string?[] { null, null };
 
             Assert.Equal(17, collection.SequentialHashCode());
         }

@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Squidex.Infrastructure.Json.Objects
@@ -60,12 +61,12 @@ namespace Squidex.Infrastructure.Json.Objects
             inner = new Dictionary<string, IJsonValue>(obj.inner);
         }
 
-        public JsonObject Add(string key, object value)
+        public JsonObject Add(string key, object? value)
         {
             return Add(key, JsonValue.Create(value));
         }
 
-        public JsonObject Add(string key, IJsonValue value)
+        public JsonObject Add(string key, IJsonValue? value)
         {
             inner[key] = value ?? JsonValue.Null;
 
@@ -87,9 +88,9 @@ namespace Squidex.Infrastructure.Json.Objects
             return inner.ContainsKey(key);
         }
 
-        public bool TryGetValue(string key, out IJsonValue value)
+        public bool TryGetValue(string key, [MaybeNullWhen(false)] out IJsonValue value)
         {
-            return inner.TryGetValue(key, out value);
+            return inner.TryGetValue(key, out value!);
         }
 
         public IEnumerator<KeyValuePair<string, IJsonValue>> GetEnumerator()
@@ -102,7 +103,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return inner.GetEnumerator();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as JsonObject);
         }
@@ -112,7 +113,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return Equals(other as JsonObject);
         }
 
-        public bool Equals(JsonObject other)
+        public bool Equals(JsonObject? other)
         {
             return other != null && inner.EqualsDictionary(other.inner);
         }

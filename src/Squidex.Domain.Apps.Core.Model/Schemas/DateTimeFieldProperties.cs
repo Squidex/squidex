@@ -31,12 +31,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<DateTimeFieldProperties>)field);
         }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
         {
             return Fields.DateTime(id, name, partitioning, this, settings);
         }
 
-        public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
+        public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
         {
             return Fields.DateTime(id, name, this, settings);
         }

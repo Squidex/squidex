@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public override long Length
         {
-            get { return reader.Length; }
+            get => throw new NotSupportedException();
         }
 
         public override long Position
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var bytesLeft = reader.Length - reader.CurrentPosition;
+            var bytesLeft = reader.CurrentPosition;
 
             if (bytesLeft < count)
             {

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_throw_exception_if_getting_by_null_key()
         {
-            Assert.Throws<ArgumentNullException>(() => Language.GetLanguage(null));
+            Assert.Throws<ArgumentNullException>(() => Language.GetLanguage(null!));
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_make_implicit_conversion_to_language()
         {
-            Language language = "de";
+            Language language = "de"!;
 
             Assert.Equal(Language.DE, language);
         }
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_make_implicit_conversion_to_string()
         {
-            string iso2Code = Language.DE;
+            string iso2Code = Language.DE!;
 
             Assert.Equal("de", iso2Code);
         }
@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_language()
         {
-            Language value = null;
+            Language? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 

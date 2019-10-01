@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Log
         {
             using (var cts = new CancellationTokenSource(lockTimeout))
             {
-                string releaseToken = null;
+                string? releaseToken = null;
 
                 while (!cts.IsCancellationRequested)
                 {

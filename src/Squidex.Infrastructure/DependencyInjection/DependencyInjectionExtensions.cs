@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public delegate void Registrator(Type serviceType, Func<IServiceProvider, object> implementationFactory);
 
-        public sealed class InterfaceRegistrator<T>
+        public sealed class InterfaceRegistrator<T> where T : notnull
         {
             private readonly Registrator register;
             private readonly Registrator registerOptional;

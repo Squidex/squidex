@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             PreviewUrls = schema.PreviewUrls.ToDictionary(x => x.Key, x => x.Value);
         }
 
-        private static JsonNestedFieldModel[] CreateChildren(IField field)
+        private static JsonNestedFieldModel[]? CreateChildren(IField field)
         {
             if (field is ArrayField arrayField)
             {

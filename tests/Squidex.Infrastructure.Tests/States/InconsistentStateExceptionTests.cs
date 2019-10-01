@@ -20,7 +20,8 @@ namespace Squidex.Infrastructure.States
             var result = source.SerializeAndDeserializeBinary();
 
             Assert.IsType<InvalidOperationException>(result.InnerException);
-            Assert.Equal("Inner", result.InnerException.Message);
+
+            Assert.Equal("Inner", result.InnerException?.Message);
 
             Assert.Equal(result.ExpectedVersion, source.ExpectedVersion);
             Assert.Equal(result.CurrentVersion, source.CurrentVersion);

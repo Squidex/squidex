@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public string Display { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public bool IsFormattable { get; set; }
 

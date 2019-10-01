@@ -11,11 +11,11 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public static readonly WorkflowTransition Default = new WorkflowTransition();
 
-        public string Expression { get; }
+        public string? Expression { get; }
 
-        public string Role { get; }
+        public string? Role { get; }
 
-        public WorkflowTransition(string expression = null, string role = null)
+        public WorkflowTransition(string? expression = null, string? role = null)
         {
             Expression = expression;
 

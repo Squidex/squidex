@@ -19,14 +19,14 @@ namespace Squidex.Infrastructure.TestHelpers
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-        public static IJsonSerializer CreateSerializer(TypeNameRegistry typeNameRegistry = null)
+        public static IJsonSerializer CreateSerializer(TypeNameRegistry? typeNameRegistry = null)
         {
             var serializerSettings = DefaultSettings(typeNameRegistry);
 
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
-        public static JsonSerializerSettings DefaultSettings(TypeNameRegistry typeNameRegistry = null)
+        public static JsonSerializerSettings DefaultSettings(TypeNameRegistry? typeNameRegistry = null)
         {
             return new JsonSerializerSettings
             {

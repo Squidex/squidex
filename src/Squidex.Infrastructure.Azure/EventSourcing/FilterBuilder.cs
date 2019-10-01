@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return BuildQuery(filters, parameters);
         }
 
-        public static SqlQuerySpec CreateByFilter(string streamFilter, StreamPosition streamPosition)
+        public static SqlQuerySpec CreateByFilter(string? streamFilter, StreamPosition streamPosition)
         {
             var filters = new List<string>();
 
@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.EventSourcing
             parameters.Add(new SqlParameter("@value", value));
         }
 
-        private static void ForRegex(this ICollection<string> filters, SqlParameterCollection parameters, string streamFilter)
+        private static void ForRegex(this ICollection<string> filters, SqlParameterCollection parameters, string? streamFilter)
         {
             if (!StreamFilter.IsAll(streamFilter))
             {
@@ -139,7 +139,7 @@ namespace Squidex.Infrastructure.EventSourcing
             parameters.Add(new SqlParameter("@time", streamPosition.Timestamp));
         }
 
-        public static EventPredicate CreateExpression(string property, object value)
+        public static EventPredicate CreateExpression(string? property, object? value)
         {
             if (!string.IsNullOrWhiteSpace(property))
             {

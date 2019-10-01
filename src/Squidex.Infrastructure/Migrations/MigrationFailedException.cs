@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Migrations
         protected MigrationFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Name = info.GetString(nameof(Name));
+            Name = info.GetString(nameof(Name))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

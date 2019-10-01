@@ -90,12 +90,12 @@ namespace Squidex.Infrastructure.Security
             return id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as Permission);
         }
 
-        public bool Equals(Permission other)
+        public bool Equals(Permission? other)
         {
             return other != null && string.Equals(id, other.id, StringComparison.OrdinalIgnoreCase);
         }

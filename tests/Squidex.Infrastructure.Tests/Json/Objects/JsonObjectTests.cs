@@ -120,10 +120,10 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_cache_null()
         {
-            Assert.Same(JsonValue.Null, JsonValue.Create((string)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((string?)null));
             Assert.Same(JsonValue.Null, JsonValue.Create((bool?)null));
             Assert.Same(JsonValue.Null, JsonValue.Create((double?)null));
-            Assert.Same(JsonValue.Null, JsonValue.Create((object)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((object?)null));
             Assert.Same(JsonValue.Null, JsonValue.Create((Instant?)null));
         }
 
@@ -230,7 +230,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_create_null()
         {
-            var json = JsonValue.Create((object)null);
+            var json = JsonValue.Create((object?)null);
 
             Assert.Equal("null", json.ToJsonString());
             Assert.Equal("null", json.ToString());
@@ -271,7 +271,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var array = JsonValue.Array();
 
-            array.Add(null);
+            array.Add(null!);
 
             Assert.Same(JsonValue.Null, array[0]);
         }
@@ -281,7 +281,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var array = JsonValue.Array(1);
 
-            array[0] = null;
+            array[0] = null!;
 
             Assert.Same(JsonValue.Null, array[0]);
         }
@@ -291,7 +291,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var obj = JsonValue.Object();
 
-            obj.Add("key", null);
+            obj.Add("key", null!);
 
             Assert.Same(JsonValue.Null, obj["key"]);
         }
@@ -301,7 +301,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var obj = JsonValue.Object();
 
-            obj["key"] = null;
+            obj["key"] = null!;
 
             Assert.Same(JsonValue.Null, obj["key"]);
         }

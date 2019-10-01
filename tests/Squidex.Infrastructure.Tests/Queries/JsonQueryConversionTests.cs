@@ -334,7 +334,7 @@ namespace Squidex.Infrastructure.Queries
             Assert.Throws<ValidationException>(() => AssertQuery(json, null));
         }
 
-        private void AssertQuery(object json, string expectedFilter)
+        private void AssertQuery(object json, string? expectedFilter)
         {
             var filter = ConvertQuery(json);
 
@@ -343,7 +343,7 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(expectedFilter, filter);
         }
 
-        private void AssertFilter(object json, string expectedFilter)
+        private void AssertFilter(object json, string? expectedFilter)
         {
             var filter = ConvertFilter(json);
 
@@ -361,7 +361,7 @@ namespace Squidex.Infrastructure.Queries
             Assert.Null(filter);
         }
 
-        private string ConvertFilter<T>(T value)
+        private string? ConvertFilter<T>(T value)
         {
             var json = JsonHelper.DefaultSerializer.Serialize(value, true);
 
@@ -370,7 +370,7 @@ namespace Squidex.Infrastructure.Queries
             return JsonFilterVisitor.Parse(jsonFilter, schema, errors)?.ToString();
         }
 
-        private string ConvertQuery<T>(T value)
+        private string? ConvertQuery<T>(T value)
         {
             var json = JsonHelper.DefaultSerializer.Serialize(value, true);
 

@@ -14,5 +14,7 @@ namespace Squidex.Infrastructure.Json.Objects
         JsonValueType Type { get; }
 
         string ToJsonString();
+
+        string ToString();
     }
 }

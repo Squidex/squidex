@@ -15,16 +15,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     public sealed class ReferencesCleaner : IFieldVisitor<IJsonValue>
     {
         private readonly IJsonValue value;
-        private readonly ICollection<Guid> oldReferences;
+        private readonly ICollection<Guid>? oldReferences;
 
-        private ReferencesCleaner(IJsonValue value, ICollection<Guid> oldReferences)
+        private ReferencesCleaner(IJsonValue value, ICollection<Guid>? oldReferences)
         {
             this.value = value;
 
             this.oldReferences = oldReferences;
         }
 
-        public static IJsonValue CleanReferences(IField field, IJsonValue value, ICollection<Guid> oldReferences)
+        public static IJsonValue CleanReferences(IField field, IJsonValue value, ICollection<Guid>? oldReferences)
         {
             return field.Accept(new ReferencesCleaner(value, oldReferences));
         }
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            if (oldReferences.Contains(field.Properties.SchemaId))
+            if (oldReferences?.Contains(field.Properties.SchemaId) == true)
             {
                 return JsonValue.Array();
             }
@@ -50,9 +50,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             var isRemoved = false;
 
-            foreach (var oldReference in oldReferences)
+            if (oldReferences != null)
             {
-                isRemoved |= ids.Remove(oldReference);
+                foreach (var oldReference in oldReferences)
+                {
+                    isRemoved |= ids.Remove(oldReference);
+                }
             }
 
             return isRemoved ? ids.ToJsonArray() : value;

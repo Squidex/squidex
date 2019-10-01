@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Log
         private readonly string applicationSessionId;
 
         public ApplicationInfoLogAppender(Type type, Guid applicationSession)
-            : this(type?.Assembly, applicationSession)
+            : this(type?.Assembly!, applicationSession)
         {
         }
 
@@ -25,8 +25,8 @@ namespace Squidex.Infrastructure.Log
         {
             Guard.NotNull(assembly, nameof(assembly));
 
-            applicationName = assembly.GetName().Name;
-            applicationVersion = assembly.GetName().Version.ToString();
+            applicationName = assembly.GetName().Name!;
+            applicationVersion = assembly.GetName().Version!.ToString()!;
             applicationSessionId = applicationSession.ToString();
         }
 

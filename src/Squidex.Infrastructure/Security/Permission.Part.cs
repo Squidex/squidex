@@ -17,11 +17,11 @@ namespace Squidex.Infrastructure.Security
             private static readonly char[] AlternativeSeparators = { '|' };
             private static readonly char[] MainSeparators = { '.' };
 
-            public readonly string[] Alternatives;
+            public readonly string[]? Alternatives;
 
             public readonly bool Exclusion;
 
-            public Part(string[] alternatives, bool exclusion)
+            public Part(string[]? alternatives, bool exclusion)
             {
                 Alternatives = alternatives;
 
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Security
                     part = part.Substring(1);
                 }
 
-                string[] alternatives = null;
+                string[]? alternatives = null;
 
                 if (part != Any)
                 {

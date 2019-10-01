@@ -524,29 +524,29 @@ namespace Squidex.Infrastructure
             LowerCaseDiacritics = Diacritics.ToDictionary(x => x.Key, x => x.Value.ToLowerInvariant());
         }
 
-        public static bool IsSlug(this string value)
+        public static bool IsSlug(this string? value)
         {
             return value != null && SlugRegex.IsMatch(value);
         }
 
-        public static bool IsEmail(this string value)
+        public static bool IsEmail(this string? value)
         {
             return value != null && EmailRegex.IsMatch(value);
         }
 
-        public static bool IsPropertyName(this string value)
+        public static bool IsPropertyName(this string? value)
         {
             return value != null && PropertyNameRegex.IsMatch(value);
         }
 
-        public static string WithFallback(this string value, string fallback)
+        public static string WithFallback(this string? value, string fallback)
         {
             return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
         }
 
         public static string ToPascalCase(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (value.Length == 0)
             {
                 return string.Empty;
             }
@@ -720,7 +720,7 @@ namespace Squidex.Infrastructure
             return sb.ToString();
         }
 
-        public static string Slugify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')
+        public static string Slugify(this string value, ISet<char>? preserveHash = null, bool singleCharDiactric = false, char separator = '-')
         {
             var result = new StringBuilder(value.Length);
 
@@ -784,7 +784,7 @@ namespace Squidex.Infrastructure
             return url;
         }
 
-        public static string JoinNonEmpty(string separator, params string[] parts)
+        public static string JoinNonEmpty(string separator, params string?[] parts)
         {
             Guard.NotNull(separator, nameof(separator));
 

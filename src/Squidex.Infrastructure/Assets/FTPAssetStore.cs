@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Assets
             this.log = log;
         }
 
-        public string GeneratePublicUrl(string fileName)
+        public string? GeneratePublicUrl(string fileName)
         {
             return null;
         }

@@ -28,10 +28,10 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly Task processorTask;
         private readonly CosmosDbEventStore store;
         private readonly Regex regex;
-        private readonly string hostName;
+        private readonly string? hostName;
         private readonly IEventSubscriber subscriber;
 
-        public CosmosDbSubscription(CosmosDbEventStore store, IEventSubscriber subscriber, string streamFilter, string position = null)
+        public CosmosDbSubscription(CosmosDbEventStore store, IEventSubscriber subscriber, string? streamFilter, string? position = null)
         {
             this.store = store;
 
@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                                 var eventData = @event.ToEventData();
 
-                                await subscriber.OnEventAsync(this, new StoredEvent(commit.EventStream, hostName, eventStreamOffset, eventData));
+                                await subscriber.OnEventAsync(this, new StoredEvent(commit.EventStream, hostName ?? "None", eventStreamOffset, eventData));
                             }
                         }
                     }

@@ -10,6 +10,8 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable CS8601 // Possible null reference assignment.
+
 namespace Squidex.Infrastructure.Caching
 {
     public sealed class AsyncLocalCache : ILocalCache
@@ -29,7 +31,7 @@ namespace Squidex.Infrastructure.Caching
             return Cleaner;
         }
 
-        public void Add(object key, object value)
+        public void Add(object key, object? value)
         {
             var cacheKey = GetCacheKey(key);
 
@@ -53,7 +55,7 @@ namespace Squidex.Infrastructure.Caching
             }
         }
 
-        public bool TryGetValue(object key, out object value)
+        public bool TryGetValue(object key, out object? value)
         {
             var cacheKey = GetCacheKey(key);
 

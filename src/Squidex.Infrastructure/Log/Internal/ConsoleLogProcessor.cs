@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.Log.Internal
                 console = new AnsiLogConsole(false);
             }
 
-            outputTask = Task.Factory.StartNew(ProcessLogQueue, this, TaskCreationOptions.LongRunning);
+            outputTask = Task.Factory.StartNew(ProcessLogQueue!, this, TaskCreationOptions.LongRunning);
         }
 
         public void EnqueueMessage(LogMessageEntry message)

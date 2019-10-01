@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            if (!context.Grain.GetType().Namespace.StartsWith("Orleans", StringComparison.OrdinalIgnoreCase))
+            if (!context.Grain.GetType().Namespace!.StartsWith("Orleans", StringComparison.OrdinalIgnoreCase))
             {
                 using (localCache.StartContext())
                 {

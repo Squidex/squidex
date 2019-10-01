@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             Guard.NotNull(field, nameof(field));
 
-            if (source.TryGetValue(field.Id, out var fieldData))
+            if (source.TryGetValue(field.Id, out var fieldData) && fieldData != null)
             {
                 foreach (var partitionValue in fieldData)
                 {
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             Guard.NotNull(field, nameof(field));
 
-            if (source.TryGetValue(field.Name, out var fieldData))
+            if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
                 foreach (var partitionValue in fieldData)
                 {
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             foreach (var referenceField in referenceFields)
             {
-                if (data.TryGetValue(referenceField.Name, out var fieldData))
+                if (data.TryGetValue(referenceField.Name, out var fieldData) && fieldData != null)
                 {
                     if (fieldData.TryGetValue(partition, out var value))
                     {

@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Log
         private static readonly AsyncLocal<ProfilerSession> LocalSession = new AsyncLocal<ProfilerSession>();
         private static readonly AsyncLocalCleaner<ProfilerSession> Cleaner;
 
-        public static ProfilerSession Session
+        public static ProfilerSession? Session
         {
             get { return LocalSession.Value; }
         }
@@ -38,17 +38,17 @@ namespace Squidex.Infrastructure.Log
             return Cleaner;
         }
 
-        public static IDisposable TraceMethod(Type type, [CallerMemberName] string memberName = null)
+        public static IDisposable TraceMethod(Type type, [CallerMemberName] string? memberName = null)
         {
             return Trace($"{type.Name}/{memberName}");
         }
 
-        public static IDisposable TraceMethod<T>([CallerMemberName] string memberName = null)
+        public static IDisposable TraceMethod<T>([CallerMemberName] string? memberName = null)
         {
             return Trace($"{typeof(T).Name}/{memberName}");
         }
 
-        public static IDisposable TraceMethod(string objectName, [CallerMemberName] string memberName = null)
+        public static IDisposable TraceMethod(string objectName, [CallerMemberName] string? memberName = null)
         {
             return Trace($"{objectName}/{memberName}");
         }

@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_token()
         {
-            RefToken value = null;
+            RefToken? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 

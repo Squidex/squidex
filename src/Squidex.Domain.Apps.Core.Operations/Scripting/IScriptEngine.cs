@@ -21,6 +21,6 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         bool Evaluate(string name, object context, string script);
 
-        string Interpolate(string name, object context, string script, Dictionary<string, Func<string>> customFormatters = null);
+        string? Interpolate(string name, object context, string script, Dictionary<string, Func<string>>? customFormatters = null);
     }
 }

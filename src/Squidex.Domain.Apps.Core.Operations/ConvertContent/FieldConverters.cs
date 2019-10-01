@@ -19,17 +19,17 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate ContentFieldData FieldConverter(ContentFieldData data, IRootField field);
+    public delegate ContentFieldData? FieldConverter(ContentFieldData data, IRootField field);
 
     public static class FieldConverters
     {
         private static readonly Func<IField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IField, string> KeyIdResolver = f => f.Id.ToString();
 
-        private static readonly Func<IArrayField, string, IField> FieldByIdResolver =
+        private static readonly Func<IArrayField, string, IField?> FieldByIdResolver =
             (f, k) => long.TryParse(k, out var id) ? f.FieldsById.GetOrDefault(id) : null;
 
-        private static readonly Func<IArrayField, string, IField> FieldByNameResolver =
+        private static readonly Func<IArrayField, string, IField?> FieldByNameResolver =
             (f, k) => f.FieldsByName.GetOrDefault(k);
 
         public static FieldConverter ExcludeHidden()
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string> fields, IAssetUrlGenerator urlGenerator)
+        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IAssetUrlGenerator urlGenerator)
         {
             if (fields?.Any() != true)
             {
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter FilterLanguages(LanguagesConfig config, IEnumerable<Language> languages)
+        public static FieldConverter FilterLanguages(LanguagesConfig config, IEnumerable<Language>? languages)
         {
             if (languages?.Any() != true)
             {
@@ -260,7 +260,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         }
 
         private static FieldConverter ForNested(
-            Func<IArrayField, string, IField> fieldResolver,
+            Func<IArrayField, string, IField?> fieldResolver,
             Func<IField, string> keyResolver,
             params ValueConverter[] converters)
         {

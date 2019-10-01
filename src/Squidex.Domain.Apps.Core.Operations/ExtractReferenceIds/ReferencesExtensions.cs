@@ -14,12 +14,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtensions
     {
-        public static IEnumerable<Guid> GetReferencedIds(this IField field, IJsonValue value, Ids strategy = Ids.All)
+        public static IEnumerable<Guid> GetReferencedIds(this IField field, IJsonValue? value, Ids strategy = Ids.All)
         {
             return ReferencesExtractor.ExtractReferences(field, value, strategy);
         }
 
-        public static IJsonValue CleanReferences(this IField field, IJsonValue value, ICollection<Guid> oldReferences)
+        public static IJsonValue CleanReferences(this IField field, IJsonValue value, ICollection<Guid>? oldReferences)
         {
             if (IsNull(value))
             {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return result;
         }
 
-        public static HashSet<Guid> ToGuidSet(this IJsonValue value)
+        public static HashSet<Guid> ToGuidSet(this IJsonValue? value)
         {
             if (value is JsonArray array)
             {

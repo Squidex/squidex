@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public static class ContentConverterFlat
     {
-        public static object ToFlatLanguageModel(this NamedContentData content, LanguagesConfig languagesConfig, IReadOnlyCollection<Language> languagePreferences = null)
+        public static object ToFlatLanguageModel(this NamedContentData content, LanguagesConfig languagesConfig, IReadOnlyCollection<Language>? languagePreferences = null)
         {
             Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
@@ -36,13 +36,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 var fieldData = fieldValue.Value;
 
-                foreach (var language in languagePreferences)
+                if (fieldData != null)
                 {
-                    if (fieldData.TryGetValue(language, out var value) && value.Type != JsonValueType.Null)
+                    foreach (var language in languagePreferences)
                     {
-                        result[fieldValue.Key] = value;
+                        if (fieldData.TryGetValue(language, out var value) && value.Type != JsonValueType.Null)
+                        {
+                            result[fieldValue.Key] = value;
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
@@ -50,15 +53,15 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        public static Dictionary<string, object> ToFlatten(this NamedContentData content)
+        public static Dictionary<string, object?> ToFlatten(this NamedContentData content)
         {
-            var result = new Dictionary<string, object>();
+            var result = new Dictionary<string, object?>();
 
             foreach (var fieldValue in content)
             {
                 var fieldData = fieldValue.Value;
 
-                if (fieldData.Count == 1)
+                if (fieldData?.Count == 1)
                 {
                     result[fieldValue.Key] = fieldData.Values.First();
                 }

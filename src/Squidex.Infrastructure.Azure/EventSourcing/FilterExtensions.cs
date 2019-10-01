@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             }
 
-            return default;
+            return default!;
         }
 
         public static Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)

@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public sealed class CommandContext
     {
-        private Tuple<object> result;
+        private Tuple<object?>? result;
 
         public Guid ContextId { get; } = Guid.NewGuid();
 
@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Commands
 
         public ICommandBus CommandBus { get; }
 
-        public object PlainResult
+        public object? PlainResult
         {
             get { return result?.Item1; }
         }
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Commands
             CommandBus = commandBus;
         }
 
-        public CommandContext Complete(object resultValue = null)
+        public CommandContext Complete(object? resultValue = null)
         {
             result = Tuple.Create(resultValue);
 
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
 
         public T Result<T>()
         {
-            return (T)result?.Item1;
+            return (T)result?.Item1!;
         }
     }
 }

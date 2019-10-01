@@ -23,9 +23,9 @@ namespace Squidex.Infrastructure.Commands
                 context.Arguments?.Length == 1 &&
                 context.Arguments[0] != null)
             {
-                var argumentFullName = context.Arguments[0].ToString();
+                var argumentFullName = context.Arguments[0].ToString()!;
                 var argumentParts = argumentFullName.Split('.');
-                var argumentName = argumentParts[argumentParts.Length - 1];
+                var argumentName = argumentParts[^1];
 
                 return $"{nameof(IDomainObjectGrain.ExecuteAsync)}({argumentName})";
             }

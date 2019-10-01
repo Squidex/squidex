@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private static readonly HashSet<string> PrivateHeaders = new HashSet<string> { "$v", "$p", "$c", "$causedBy" };
 
-        public static StoredEvent Read(ResolvedEvent resolvedEvent, string prefix, IJsonSerializer serializer)
+        public static StoredEvent Read(ResolvedEvent resolvedEvent, string? prefix, IJsonSerializer serializer)
         {
             var @event = resolvedEvent.Event;
 
@@ -37,11 +37,11 @@ namespace Squidex.Infrastructure.EventSourcing
                 eventData);
         }
 
-        private static string GetStreamName(string prefix, RecordedEvent @event)
+        private static string GetStreamName(string? prefix, RecordedEvent @event)
         {
             var streamName = @event.EventStreamId;
 
-            if (streamName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            if (prefix != null && streamName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
                 streamName = streamName.Substring(prefix.Length + 1);
             }

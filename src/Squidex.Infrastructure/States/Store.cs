@@ -10,7 +10,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class Store<TKey> : IStore<TKey>
+    public sealed class Store<TKey> : IStore<TKey> where TKey : notnull
     {
         private readonly IServiceProvider services;
         private readonly IStreamNameResolver streamNameResolver;
@@ -32,22 +32,22 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        public IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent applyEvent)
+        public IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent? applyEvent)
         {
             return CreatePersistence(owner, key, applyEvent);
         }
 
-        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot)
+        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot)
         {
             return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
-        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent)
+        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
         {
             return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
-        private IPersistence CreatePersistence(Type owner, TKey key, HandleEvent applyEvent)
+        private IPersistence CreatePersistence(Type owner, TKey key, HandleEvent? applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.States
             return new Persistence<TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
-        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent)
+        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 

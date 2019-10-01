@@ -11,6 +11,8 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 
+#pragma warning disable IDE0044 // Add readonly modifier
+
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class FieldCollection<T> : Cloneable<FieldCollection<T>> where T : IField
@@ -21,8 +23,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
 
         private T[] fieldsOrdered;
-        private Dictionary<long, T> fieldsById;
-        private Dictionary<string, T> fieldsByName;
+        private Dictionary<long, T>? fieldsById;
+        private Dictionary<string, T>? fieldsByName;
 
         public IReadOnlyList<T> Ordered
         {

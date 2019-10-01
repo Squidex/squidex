@@ -22,14 +22,14 @@ namespace Squidex.Infrastructure.Queries.OData
                     EdmCoreModel.Instance.GetString(true)));
         }
 
-        public static ODataUriParser ParseQuery(this IEdmModel model, string query)
+        public static ODataUriParser? ParseQuery(this IEdmModel model, string query)
         {
             if (!model.EntityContainer.EntitySets().Any())
             {
                 return null;
             }
 
-            query = query ?? string.Empty;
+            query ??= string.Empty;
 
             var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
 

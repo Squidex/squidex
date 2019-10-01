@@ -51,13 +51,13 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_throw_exception_if_stream_to_download_is_null()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.DownloadAsync("File", null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.DownloadAsync("File", null!));
         }
 
         [Fact]
         public async Task Should_throw_exception_if_stream_to_upload_is_null()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.UploadAsync("File", null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.UploadAsync("File", null!));
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static async Task CheckEmpty(Func<string, Task> action)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => action(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => action(null!));
             await Assert.ThrowsAsync<ArgumentException>(() => action(string.Empty));
             await Assert.ThrowsAsync<ArgumentException>(() => action(" "));
         }

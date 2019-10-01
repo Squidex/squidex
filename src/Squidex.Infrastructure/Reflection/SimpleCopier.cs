@@ -17,9 +17,9 @@ namespace Squidex.Infrastructure.Reflection
         private struct PropertyMapper
         {
             private readonly IPropertyAccessor accessor;
-            private readonly Func<object, object> converter;
+            private readonly Func<object?, object?> converter;
 
-            public PropertyMapper(IPropertyAccessor accessor, Func<object, object> converter)
+            public PropertyMapper(IPropertyAccessor accessor, Func<object?, object?> converter)
             {
                 this.accessor = accessor;
                 this.converter = converter;
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Reflection
 
                     if (property.PropertyType.Implements<ICloneable>())
                     {
-                        Mappers.Add(new PropertyMapper(accessor, x => ((ICloneable)x)?.Clone()));
+                        Mappers.Add(new PropertyMapper(accessor, x => ((ICloneable)x!)?.Clone()));
                     }
                     else
                     {

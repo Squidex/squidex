@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 case CompareOperator.Empty:
                     return Filter.Or(
                         Filter.Exists(propertyName, false),
-                        Filter.Eq(propertyName, default(T)),
+                        Filter.Eq(propertyName, default(T)!),
                         Filter.Eq(propertyName, string.Empty),
                         Filter.Eq(propertyName, new T[0]));
                 case CompareOperator.StartsWith:
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 case CompareOperator.NotEquals:
                     return Filter.Ne(propertyName, value);
                 case CompareOperator.In:
-                    return Filter.In(propertyName, ((IList)value).OfType<object>());
+                    return Filter.In(propertyName, ((IList)value!).OfType<object>());
             }
 
             throw new NotSupportedException();
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
         private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Value.Value.ToString()), "i");
+            return new BsonRegularExpression(formatter(node.Value.Value!.ToString()!), "i");
         }
     }
 }

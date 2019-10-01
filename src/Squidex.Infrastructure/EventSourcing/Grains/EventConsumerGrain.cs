@@ -24,9 +24,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private TaskScheduler scheduler;
-        private IEventSubscription currentSubscription;
-        private IEventConsumer eventConsumer;
+        private TaskScheduler? scheduler;
+        private IEventSubscription? currentSubscription;
+        private IEventConsumer? eventConsumer;
 
         public EventConsumerGrain(
             EventConsumerFactory eventConsumerFactory,
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private Immutable<EventConsumerInfo> CreateInfo()
         {
-            return state.Value.ToInfo(eventConsumer.Name).AsImmutable();
+            return state.Value.ToInfo(eventConsumer!.Name).AsImmutable();
         }
 
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
@@ -77,7 +77,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             return DoAndUpdateStateAsync(async () =>
             {
-                if (eventConsumer.Handles(storedEvent.Value))
+                if (eventConsumer!.Handles(storedEvent.Value))
                 {
                     var @event = ParseKnownEvent(storedEvent.Value);
 
@@ -166,12 +166,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return CreateInfo();
         }
 
-        private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string caller = null)
+        private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string? caller = null)
         {
             return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; }, caller);
         }
 
-        private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string caller = null)
+        private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string? caller = null)
         {
             try
             {
@@ -191,7 +191,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 log.LogFatal(ex, w => w
                     .WriteProperty("action", caller)
                     .WriteProperty("status", "Failed")
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
+                    .WriteProperty("eventConsumer", eventConsumer!.Name));
 
                 state.Value = state.Value.Failed(ex);
             }
@@ -255,12 +255,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        private void Subscribe(string position)
+        private void Subscribe(string? position)
         {
             if (currentSubscription == null)
             {
                 currentSubscription?.StopAsync().Forget();
-                currentSubscription = CreateSubscription(eventConsumer.EventsFilter, position);
+                currentSubscription = CreateSubscription(eventConsumer!.EventsFilter, position);
             }
             else
             {
@@ -268,7 +268,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        private Envelope<IEvent> ParseKnownEvent(StoredEvent message)
+        private Envelope<IEvent>? ParseKnownEvent(StoredEvent message)
         {
             try
             {
@@ -292,14 +292,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return this.AsReference<IEventConsumerGrain>();
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string streamFilter, string position)
+        protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string streamFilter, string? position)
         {
             return new RetrySubscription(store, subscriber, streamFilter, position);
         }
 
-        private IEventSubscription CreateSubscription(string streamFilter, string position)
+        private IEventSubscription CreateSubscription(string streamFilter, string? position)
         {
-            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler), streamFilter, position);
+            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler!), streamFilter, position);
         }
     }
 }

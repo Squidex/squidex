@@ -49,13 +49,13 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_throw_exception_if_mapping_with_null_source()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((Class2<int, int>)null, new Class2<int, int>()));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((Class2<int, int>?)null!, new Class2<int, int>()));
         }
 
         [Fact]
         public void Should_throw_exception_if_mapping_with_null_target()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new Class2<int, int>(), (Class2<int, int>)null));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new Class2<int, int>(), (Class2<int, int>?)null!));
         }
 
         [Fact]

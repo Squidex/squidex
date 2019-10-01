@@ -13,15 +13,23 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentFieldProperty : CustomProperty
     {
         private readonly ContentFieldObject contentField;
-        private IJsonValue contentValue;
-        private JsValue value;
+        private IJsonValue? contentValue;
+        private JsValue? value;
         private bool isChanged;
 
-        protected override JsValue CustomValue
+        protected override JsValue? CustomValue
         {
             get
             {
-                return value ?? (value = JsonMapper.Map(contentValue, contentField.Engine));
+                if (value == null)
+                {
+                    if (contentValue != null)
+                    {
+                        value = JsonMapper.Map(contentValue, contentField.Engine);
+                    }
+                }
+
+                return value;
             }
             set
             {
@@ -47,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             get { return isChanged; }
         }
 
-        public ContentFieldProperty(ContentFieldObject contentField, IJsonValue contentValue = null)
+        public ContentFieldProperty(ContentFieldObject contentField, IJsonValue? contentValue = null)
         {
             this.contentField = contentField;
             this.contentValue = contentValue;

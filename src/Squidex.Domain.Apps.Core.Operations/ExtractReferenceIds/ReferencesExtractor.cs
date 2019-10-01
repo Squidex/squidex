@@ -15,17 +15,17 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public sealed class ReferencesExtractor : IFieldVisitor<IEnumerable<Guid>>
     {
-        private readonly IJsonValue value;
+        private readonly IJsonValue? value;
         private readonly Ids strategy;
 
-        private ReferencesExtractor(IJsonValue value, Ids strategy)
+        private ReferencesExtractor(IJsonValue? value, Ids strategy)
         {
             this.value = value;
 
             this.strategy = strategy;
         }
 
-        public static IEnumerable<Guid> ExtractReferences(IField field, IJsonValue value, Ids strategy)
+        public static IEnumerable<Guid> ExtractReferences(IField field, IJsonValue? value, Ids strategy)
         {
             return field.Accept(new ReferencesExtractor(value, strategy));
         }

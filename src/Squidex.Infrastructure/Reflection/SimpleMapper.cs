@@ -86,12 +86,12 @@ namespace Squidex.Infrastructure.Reflection
                 SetValue(target, value);
             }
 
-            protected void SetValue(object destination, object value)
+            protected void SetValue(object destination, object? value)
             {
                 targetAccessor.Set(destination, value);
             }
 
-            protected object GetValue(object source)
+            protected object? GetValue(object source)
             {
                 return sourceAccessor.Get(source);
             }

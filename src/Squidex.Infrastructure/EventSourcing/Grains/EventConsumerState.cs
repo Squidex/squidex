@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -14,9 +15,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         public bool IsStopped { get; set; }
 
-        public string Error { get; set; }
+        public string? Error { get; set; }
 
-        public string Position { get; set; }
+        public string? Position { get; set; }
 
         public EventConsumerState Reset()
         {
@@ -30,7 +31,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Failed(Exception ex)
         {
-            return new EventConsumerState { Position = Position, IsStopped = true, Error = ex?.ToString() };
+            return new EventConsumerState { Position = Position, IsStopped = true, Error = ex?.ToString()! };
         }
 
         public EventConsumerState Stopped()

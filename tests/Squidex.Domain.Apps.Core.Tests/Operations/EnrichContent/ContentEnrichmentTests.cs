@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
         }
 
         [Fact]
-        private void Should_enrich_with_default_values()
+        public void Should_enrich_with_default_values()
         {
             var data =
                 new NamedContentData()
@@ -52,18 +52,18 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
             data.Enrich(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, ((JsonScalar<double>)data["my-number"]["iv"]).Value);
+            Assert.Equal(456, ((JsonScalar<double>)data["my-number"]!["iv"]).Value);
 
-            Assert.Equal("de-string", data["my-string"]["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]["en"].ToString());
+            Assert.Equal("de-string", data["my-string"]!["de"].ToString());
+            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
 
-            Assert.Equal(now.ToString(), data["my-datetime"]["iv"].ToString());
+            Assert.Equal(now.ToString(), data["my-datetime"]!["iv"].ToString());
 
-            Assert.True(((JsonScalar<bool>)data["my-boolean"]["iv"]).Value);
+            Assert.True(((JsonScalar<bool>)data["my-boolean"]!["iv"]).Value);
         }
 
         [Fact]
-        private void Should_also_enrich_with_default_values_when_string_is_empty()
+        public void Should_also_enrich_with_default_values_when_string_is_empty()
         {
             var data =
                 new NamedContentData()
@@ -76,8 +76,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
             data.Enrich(schema, languagesConfig.ToResolver());
 
-            Assert.Equal("en-string", data["my-string"]["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]["en"].ToString());
+            Assert.Equal("en-string", data["my-string"]!["de"].ToString());
+            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
         }
 
         [Fact]

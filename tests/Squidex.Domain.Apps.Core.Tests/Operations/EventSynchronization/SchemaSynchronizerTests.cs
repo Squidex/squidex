@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         public void Should_create_events_if_schema_deleted()
         {
             var sourceSchema = new Schema("source");
-            var targetSchema = (Schema)null;
+            var targetSchema = (Schema?)null;
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 

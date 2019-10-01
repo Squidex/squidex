@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure
     {
         public static readonly Type Type = typeof(None);
 
+        public static readonly None Value = new None();
+
         private None()
         {
         }

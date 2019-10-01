@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Orleans
         {
         }
 
-        protected GrainBase(IGrainIdentity identity, IGrainRuntime runtime)
+        protected GrainBase(IGrainIdentity? identity, IGrainRuntime? runtime)
             : base(identity, runtime)
         {
         }

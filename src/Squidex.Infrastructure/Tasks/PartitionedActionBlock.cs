@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         public PartitionedActionBlock(Action<TInput> action, Func<TInput, long> partitioner)
-            : this (action?.ToAsync(), partitioner, new ExecutionDataflowBlockOptions())
+            : this (action?.ToAsync()!, partitioner, new ExecutionDataflowBlockOptions())
         {
         }
 
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         public PartitionedActionBlock(Action<TInput> action, Func<TInput, long> partitioner, ExecutionDataflowBlockOptions dataflowBlockOptions)
-            : this(action?.ToAsync(), partitioner, dataflowBlockOptions)
+            : this(action?.ToAsync()!, partitioner, dataflowBlockOptions)
         {
         }
 

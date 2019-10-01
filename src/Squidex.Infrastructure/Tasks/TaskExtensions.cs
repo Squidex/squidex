@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 action(x);
 
-                return default;
+                return default!;
             };
         }
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await action(x);
 
-                return default;
+                return default!;
             };
         }
 
@@ -80,11 +80,11 @@ namespace Squidex.Infrastructure.Tasks
 
         public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             using (cancellationToken.Register(state =>
             {
-                ((TaskCompletionSource<object>)state).TrySetResult(null);
+                ((TaskCompletionSource<object>)state!).TrySetResult(null!);
             },
             tcs))
             {

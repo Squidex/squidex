@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TTrigger); }
         }
 
-        async Task<EnrichedEvent> IRuleTriggerHandler.CreateEnrichedEventAsync(Envelope<AppEvent> @event)
+        async Task<EnrichedEvent?> IRuleTriggerHandler.CreateEnrichedEventAsync(Envelope<AppEvent> @event)
         {
             return await CreateEnrichedEventAsync(@event.To<TEvent>());
         }

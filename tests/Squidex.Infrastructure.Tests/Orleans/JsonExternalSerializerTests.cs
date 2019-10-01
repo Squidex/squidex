@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public void Should_not_copy_null()
         {
-            var v = (string)null;
+            var v = (string?)null;
             var c = J<int>.Copy(v, null);
 
             Assert.Null(c);
@@ -35,8 +35,8 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public void Should_copy_null_json()
         {
-            var v = new J<List<int>>(null);
-            var c = (J<List<int>>)J<object>.Copy(v, null);
+            var v = new J<List<int>?>(null);
+            var c = (J<List<int>>)J<object>.Copy(v, null)!;
 
             Assert.Null(c.Value);
         }
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Orleans
         public void Should_not_copy_immutable_values()
         {
             var v = new List<int> { 1, 2, 3 }.AsJ();
-            var c = (J<List<int>>)J<object>.Copy(v, null);
+            var c = (J<List<int>>)J<object>.Copy(v, null)!;
 
             Assert.Same(v.Value, c.Value);
         }
@@ -64,17 +64,18 @@ namespace Squidex.Infrastructure.Orleans
 
         private static void SerializeAndDeserialize<T>(T value, Action<T, T> equals) where T : class
         {
-            var buffer = new MemoryStream();
+            using (var buffer = new MemoryStream())
+            {
+                J<object>.Serialize(J.Of(value), CreateWriter(buffer), typeof(T));
 
-            J<object>.Serialize(J.Of(value), CreateWriter(buffer), typeof(T));
+                buffer.Position = 0;
 
-            buffer.Position = 0;
+                var copy = (J<T>)J<object>.Deserialize(typeof(J<T>), CreateReader(buffer))!;
 
-            var copy = (J<T>)J<object>.Deserialize(typeof(J<T>), CreateReader(buffer));
+                equals(copy.Value, value);
 
-            equals(copy.Value, value);
-
-            Assert.NotSame(value, copy.Value);
+                Assert.NotSame(value, copy.Value);
+            }
         }
 
         private static DeserializationContext CreateReader(MemoryStream buffer)
@@ -85,8 +86,8 @@ namespace Squidex.Infrastructure.Orleans
                 .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
-            A.CallTo(() => reader.Length)
-                .ReturnsLazily(x => (int)buffer.Length);
+            // A.CallTo(() => reader.Length)
+            //    .ReturnsLazily(x => (int)buffer.Length);
 
             return new DeserializationContext(null) { StreamReader = reader };
         }

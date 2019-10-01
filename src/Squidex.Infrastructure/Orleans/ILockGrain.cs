@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Orleans
 {
     public interface ILockGrain : IGrainWithStringKey
     {
-        Task<string> AcquireLockAsync(string key);
+        Task<string?> AcquireLockAsync(string key);
 
         Task ReleaseLockAsync(string releaseToken);
     }

@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Security
 {
     public static class Extensions
     {
-        public static RefToken Token(this ClaimsPrincipal principal)
+        public static RefToken? Token(this ClaimsPrincipal principal)
         {
             var subjectId = principal.OpenIdSubject();
 
@@ -32,37 +32,37 @@ namespace Squidex.Infrastructure.Security
             return null;
         }
 
-        public static string OpenIdSubject(this ClaimsPrincipal principal)
+        public static string? OpenIdSubject(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Subject)?.Value;
         }
 
-        public static string OpenIdClientId(this ClaimsPrincipal principal)
+        public static string? OpenIdClientId(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.ClientId)?.Value;
         }
 
-        public static string UserOrClientId(this ClaimsPrincipal principal)
+        public static string? UserOrClientId(this ClaimsPrincipal principal)
         {
             return principal.OpenIdSubject() ?? principal.OpenIdClientId();
         }
 
-        public static string OpenIdPreferredUserName(this ClaimsPrincipal principal)
+        public static string? OpenIdPreferredUserName(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.PreferredUserName)?.Value;
         }
 
-        public static string OpenIdName(this ClaimsPrincipal principal)
+        public static string? OpenIdName(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Name)?.Value;
         }
 
-        public static string OpenIdNickName(this ClaimsPrincipal principal)
+        public static string? OpenIdNickName(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.NickName)?.Value;
         }
 
-        public static string OpenIdEmail(this ClaimsPrincipal principal)
+        public static string? OpenIdEmail(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Email)?.Value;
         }

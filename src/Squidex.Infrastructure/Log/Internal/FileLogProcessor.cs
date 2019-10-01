@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             this.path = path;
 
-            outputTask = Task.Factory.StartNew(ProcessLogQueue, this, TaskCreationOptions.LongRunning);
+            outputTask = Task.Factory.StartNew(ProcessLogQueue!, this, TaskCreationOptions.LongRunning);
         }
 
         protected override void DisposeObject(bool disposing)

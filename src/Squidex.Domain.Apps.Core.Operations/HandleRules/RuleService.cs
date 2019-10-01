@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
+        public virtual async Task<RuleJob?> CreateJobAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.isPartial = isPartial;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value.IsNullOrUndefined())
             {
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     var (isOptional, validator) = field.Value;
 
-                    var fieldValue = Undefined.Value;
+                    object? fieldValue = Undefined.Value;
 
                     if (!values.TryGetValue(name, out var temp))
                     {

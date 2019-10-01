@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Model
         [Fact]
         public void Should_consider_null_as_valid_partitioning()
         {
-            string partitioning = null;
+            string? partitioning = null;
 
             Assert.True(partitioning.IsValidPartitioning());
         }

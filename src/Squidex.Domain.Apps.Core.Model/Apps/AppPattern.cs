@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Core.Apps
     {
         public string Pattern { get; }
 
-        public string Message { get; }
+        public string? Message { get; }
 
-        public AppPattern(string name, string pattern, string message = null)
+        public AppPattern(string name, string pattern, string? message = null)
             : base(name)
         {
             Guard.NotNullOrEmpty(pattern, nameof(pattern));

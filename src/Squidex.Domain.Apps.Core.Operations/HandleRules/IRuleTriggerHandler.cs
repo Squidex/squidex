@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         Type TriggerType { get; }
 
-        Task<EnrichedEvent> CreateEnrichedEventAsync(Envelope<AppEvent> @event);
+        Task<EnrichedEvent?> CreateEnrichedEventAsync(Envelope<AppEvent> @event);
 
         bool Trigger(EnrichedEvent @event, RuleTrigger trigger);
 

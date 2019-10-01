@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly IStore<Guid> store;
         private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
-        private IPersistence persistence;
+        private IPersistence? persistence;
 
         public override T Snapshot
         {
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Commands
                 return snapshots[(int)version + 1];
             }
 
-            return default;
+            return default!;
         }
 
         protected sealed override void ApplyEvent(Envelope<IEvent> @event)
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override async Task WriteAsync(Envelope<IEvent>[] events, long previousVersion)
         {
-            if (events.Length > 0)
+            if (events.Length > 0 && persistence != null)
             {
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 

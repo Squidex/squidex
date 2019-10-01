@@ -10,7 +10,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal sealed class Persistence<TKey> : Persistence<None, TKey>, IPersistence
+    internal sealed class Persistence<TKey> : Persistence<None, TKey>, IPersistence where TKey : notnull
     {
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.States
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<None, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
-            HandleEvent applyEvent)
+            HandleEvent? applyEvent)
             : base(ownerKey, ownerType, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
         {
         }

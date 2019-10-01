@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (context.IsOptional)
             {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             return TaskHelper.Done;
         }
 
-        private bool IsEmptyString(object value)
+        private bool IsEmptyString(object? value)
         {
             return value is string typed && validateEmptyStrings && string.IsNullOrWhiteSpace(typed);
         }

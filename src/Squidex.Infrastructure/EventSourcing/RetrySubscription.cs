@@ -21,13 +21,13 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
-        private readonly string streamFilter;
-        private IEventSubscription currentSubscription;
-        private string position;
+        private readonly string? streamFilter;
+        private IEventSubscription? currentSubscription;
+        private string? position;
 
         public int ReconnectWaitMs { get; set; } = 5000;
 
-        public RetrySubscription(IEventStore eventStore, IEventSubscriber eventSubscriber, string streamFilter, string position)
+        public RetrySubscription(IEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
         {
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));

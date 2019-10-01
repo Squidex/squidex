@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Squidex.Domain.Apps.Core
@@ -51,11 +52,11 @@ namespace Squidex.Domain.Apps.Core
         {
         }
 
-        public bool TryGetItem(string key, out IFieldPartitionItem item)
+        public bool TryGetItem(string key, [MaybeNullWhen(false)] out IFieldPartitionItem item)
         {
             var isFound = string.Equals(key, Key, StringComparison.OrdinalIgnoreCase);
 
-            item = isFound ? this : null;
+            item = isFound ? this : null!;
 
             return isFound;
         }

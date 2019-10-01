@@ -44,9 +44,9 @@ namespace Squidex.Infrastructure.Orleans.Indexes
             return state.WriteAsync();
         }
 
-        public Task<string> ReserveAsync(T id, string name)
+        public Task<string?> ReserveAsync(T id, string name)
         {
-            string token = default;
+            string? token = null;
 
             if (!IsInUse(name) && !IsReserved(name))
             {
@@ -60,7 +60,9 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
         public async Task<bool> AddAsync(string token)
         {
-            if (reservations.TryGetValue(token ?? string.Empty, out var reservation))
+            token ??= string.Empty;
+
+            if (reservations.TryGetValue(token, out var reservation))
             {
                 state.Value.Names.Add(reservation.Name, reservation.Id);
 

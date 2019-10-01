@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_guid_token()
         {
-            NamedId<Guid> value = null;
+            NamedId<Guid>? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_long_token()
         {
-            NamedId<long> value = null;
+            NamedId<long>? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_string_token()
         {
-            NamedId<string> value = null;
+            NamedId<string>? value = null;
 
             var serialized = value.SerializeAndDeserialize();
 

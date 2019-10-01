@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Must not have more than 1 item(s)." });
         }
 
-        private static IJsonValue CreateValue(params JsonObject[] ids)
+        private static IJsonValue CreateValue(params JsonObject[]? ids)
         {
             return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
         }

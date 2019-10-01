@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class UniqueValuesValidator<T> : IValidator
     {
-        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is IEnumerable<T> items && items.Any())
             {

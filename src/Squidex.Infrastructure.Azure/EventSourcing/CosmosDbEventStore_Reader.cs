@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class CosmosDbEventStore : IEventStore, IInitializable
     {
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
+        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
             Guard.NotNullOrEmpty(property, nameof(property));
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
+        public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
 

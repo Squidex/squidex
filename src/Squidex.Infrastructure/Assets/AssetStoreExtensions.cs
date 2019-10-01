@@ -14,12 +14,12 @@ namespace Squidex.Infrastructure.Assets
 {
     public static class AssetStoreExtensions
     {
-        public static string GeneratePublicUrl(this IAssetStore store, Guid id, long version, string suffix)
+        public static string? GeneratePublicUrl(this IAssetStore store, Guid id, long version, string suffix)
         {
             return store.GeneratePublicUrl(id.ToString(), version, suffix);
         }
 
-        public static string GeneratePublicUrl(this IAssetStore store, string id, long version, string suffix)
+        public static string? GeneratePublicUrl(this IAssetStore store, string id, long version, string suffix)
         {
             return store.GeneratePublicUrl(GetFileName(id, version, suffix));
         }
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
             return store.DeleteAsync(GetFileName(id, version, suffix));
         }
 
-        public static string GetFileName(string id, long version, string suffix = null)
+        public static string GetFileName(string id, long version, string? suffix = null)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 

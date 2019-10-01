@@ -88,69 +88,70 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Clear();
         }
 
-        protected Task<object> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler, Mode.Create);
         }
 
-        protected Task<object> CreateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> CreateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToAsync(), Mode.Create);
+            return InvokeAsync(command, handler?.ToAsync()!, Mode.Create);
         }
 
-        protected Task<object> CreateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> CreateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler.ToDefault<TCommand, object>(), Mode.Create);
         }
 
-        protected Task<object> Create<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> Create<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Create);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync()!, Mode.Create);
         }
 
-        protected Task<object> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler, Mode.Update);
         }
 
-        protected Task<object> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToAsync(), Mode.Update);
+            return InvokeAsync(command, handler?.ToAsync()!, Mode.Update);
         }
 
-        protected Task<object> UpdateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpdateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), Mode.Update);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()!, Mode.Update);
         }
 
-        protected Task<object> Update<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> Update<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Update);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync()!, Mode.Update);
         }
 
-        protected Task<object> UpsertReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpsertReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler, Mode.Upsert);
         }
 
-        protected Task<object> UpsertReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpsertReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToAsync(), Mode.Upsert);
+            return InvokeAsync(command, handler?.ToAsync()!, Mode.Upsert);
         }
 
-        protected Task<object> UpsertAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> UpsertAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), Mode.Upsert);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()!, Mode.Upsert);
         }
 
-        protected Task<object> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object?> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Upsert);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync()!, Mode.Upsert);
         }
 
-        private async Task<object> InvokeAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler, Mode mode) where TCommand : class, IAggregateCommand
+        private async Task<object?> InvokeAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler, Mode mode) where TCommand : class, IAggregateCommand
         {
             Guard.NotNull(command, nameof(command));
+            Guard.NotNull(handler, nameof(handler));
 
             if (command.ExpectedVersion != EtagVersion.Any && command.ExpectedVersion != Version)
             {
@@ -213,13 +214,13 @@ namespace Squidex.Infrastructure.Commands
 
         protected abstract Task WriteAsync(Envelope<IEvent>[] events, long previousVersion);
 
-        public async Task<J<object>> ExecuteAsync(J<IAggregateCommand> command)
+        public async Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command)
         {
             var result = await ExecuteAsync(command.Value);
 
             return result;
         }
 
-        protected abstract Task<object> ExecuteAsync(IAggregateCommand command);
+        protected abstract Task<object?> ExecuteAsync(IAggregateCommand command);
     }
 }

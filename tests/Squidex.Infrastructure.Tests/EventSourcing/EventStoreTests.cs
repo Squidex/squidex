@@ -261,7 +261,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
             await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
 
-            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString());
+            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString()!);
 
             var expected = new[]
             {
@@ -277,7 +277,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return Sut.QueryAsync(streamName, position);
         }
 
-        private async Task<IReadOnlyList<StoredEvent>> QueryWithFilterAsync(string property, object value)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithFilterAsync(string property, object value)
         {
             using (var cts = new CancellationTokenSource(30000))
             {
@@ -301,7 +301,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task<IReadOnlyList<StoredEvent>> QueryWithCallbackAsync(string streamFilter = null, string position = null)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithCallbackAsync(string? streamFilter = null, string? position = null)
         {
             using (var cts = new CancellationTokenSource(30000))
             {
@@ -325,11 +325,11 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task<IReadOnlyList<StoredEvent>> QueryWithSubscriptionAsync(string streamFilter, Func<Task> action = null, bool fromBeginning = false)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter, Func<Task>? action = null, bool fromBeginning = false)
         {
             var subscriber = new EventSubscriber();
 
-            IEventSubscription subscription = null;
+            IEventSubscription? subscription = null;
             try
             {
                 subscription = Sut.CreateSubscription(subscriber, streamFilter, fromBeginning ? null : subscriptionPosition);
@@ -362,11 +362,14 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             finally
             {
-                await subscription.StopAsync();
+                if (subscription != null)
+                {
+                    await subscription.StopAsync();
+                }
             }
         }
 
-        private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent> actual, params StoredEvent[] expected)
+        private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent>? actual, params StoredEvent[] expected)
         {
             var actualArray = actual.Select(x => new StoredEvent(x.StreamName, "Position", x.EventStreamNumber, x.Data)).ToArray();
 

@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.TestHelpers
         {
         }
 
-        protected override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.TestHelpers
                     });
             }
 
-            return Task.FromResult<object>(null);
+            return Task.FromResult<object?>(null);
         }
     }
 

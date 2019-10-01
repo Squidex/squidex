@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 {
     public sealed class ImageSharpAssetThumbnailGenerator : IAssetThumbnailGenerator
     {
-        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string mode = null, int? quality = null)
+        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string? mode = null, int? quality = null)
         {
             return Task.Run(() =>
             {
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             });
         }
 
-        public Task<ImageInfo> GetImageInfoAsync(Stream source)
+        public Task<ImageInfo?> GetImageInfoAsync(Stream source)
         {
             return Task.Run(() =>
             {

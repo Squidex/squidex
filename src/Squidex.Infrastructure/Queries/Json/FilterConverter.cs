@@ -40,18 +40,20 @@ namespace Squidex.Infrastructure.Queries.Json
                 throw new JsonException($"Expected StartObject, but got {reader.TokenType}.");
             }
 
-            FilterNode<IJsonValue> result = null;
+            FilterNode<IJsonValue>? result = null;
 
-            var comparePath = (PropertyPath)null;
+            PropertyPath? comparePath = null;
+
             var compareOperator = (CompareOperator)99;
-            var compareValue = (IJsonValue)null;
+
+            IJsonValue? compareValue = null!;
 
             while (reader.Read())
             {
                 switch (reader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        var propertyName = reader.Value.ToString();
+                        var propertyName = reader.Value.ToString()!;
 
                         if (!reader.Read())
                         {

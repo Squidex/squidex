@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot>
+    internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot> where TKey : notnull
     {
         private readonly TKey ownerKey;
         private readonly Type ownerType;
@@ -26,8 +26,8 @@ namespace Squidex.Infrastructure.States
         private readonly IEventEnricher<TKey> eventEnricher;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
-        private readonly HandleSnapshot<TSnapshot> applyState;
-        private readonly HandleEvent applyEvent;
+        private readonly HandleSnapshot<TSnapshot>? applyState;
+        private readonly HandleEvent? applyEvent;
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version;
@@ -44,8 +44,8 @@ namespace Squidex.Infrastructure.States
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             PersistenceMode persistenceMode,
-            HandleSnapshot<TSnapshot> applyState,
-            HandleEvent applyEvent)
+            HandleSnapshot<TSnapshot>? applyState,
+            HandleEvent? applyEvent)
         {
             this.ownerKey = ownerKey;
             this.ownerType = ownerType;
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.States
             {
                 if (version == EtagVersion.Empty)
                 {
-                    throw new DomainObjectNotFoundException(ownerKey.ToString(), ownerType);
+                    throw new DomainObjectNotFoundException(ownerKey.ToString()!, ownerType);
                 }
                 else
                 {
@@ -197,7 +197,7 @@ namespace Squidex.Infrastructure.States
 
         private string GetStreamName()
         {
-            return streamNameResolver.GetStreamName(ownerType, ownerKey.ToString());
+            return streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!);
         }
 
         private bool UseSnapshots()
@@ -210,7 +210,7 @@ namespace Squidex.Infrastructure.States
             return persistenceMode == PersistenceMode.EventSourcing || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
         }
 
-        private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)
+        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
         {
             try
             {

@@ -36,12 +36,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return fields; }
         }
 
-        public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties properties = null, IFieldSettings settings = null)
+        public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
             : base(id, name, partitioning, properties, settings)
         {
         }
 
-        public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties properties = null, IFieldSettings settings = null)
+        public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
             : this(id, name, partitioning, properties, settings)
         {
             Guard.NotNull(fields, nameof(fields));

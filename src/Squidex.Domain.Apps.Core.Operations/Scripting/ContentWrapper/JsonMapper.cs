@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper
     {
-        public static JsValue Map(IJsonValue value, Engine engine)
+        public static JsValue Map(IJsonValue? value, Engine engine)
         {
             if (value == null)
             {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return target;
         }
 
-        public static IJsonValue Map(JsValue value)
+        public static IJsonValue Map(JsValue? value)
         {
             if (value == null || value.IsNull() || value.IsUndefined())
             {

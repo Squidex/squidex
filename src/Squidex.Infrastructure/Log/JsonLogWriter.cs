@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
-        IObjectWriter IObjectWriter.WriteProperty(string property, string value)
+        IObjectWriter IObjectWriter.WriteProperty(string property, string? value)
         {
             jsonWriter.WritePropertyName(Format(property));
             jsonWriter.WriteValue(value);

@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly IStore<Guid> store;
         private T snapshot = new T { Version = EtagVersion.Empty };
-        private IPersistence<T> persistence;
+        private IPersistence<T>? persistence;
 
         public override T Snapshot
         {
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override async Task WriteAsync(Envelope<IEvent>[] events, long previousVersion)
         {
-            if (events.Length > 0)
+            if (events.Length > 0 && persistence != null)
             {
                 await persistence.WriteEventsAsync(events);
                 await persistence.WriteSnapshotAsync(Snapshot);

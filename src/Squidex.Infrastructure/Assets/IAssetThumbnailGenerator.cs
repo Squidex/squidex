@@ -12,8 +12,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public interface IAssetThumbnailGenerator
     {
-        Task<ImageInfo> GetImageInfoAsync(Stream source);
+        Task<ImageInfo?> GetImageInfoAsync(Stream source);
 
-        Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string mode = null, int? quality = null);
+        Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string? mode = null, int? quality = null);
     }
 }
