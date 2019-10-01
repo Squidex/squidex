@@ -50,7 +50,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                         new ContentFieldData()
                             .AddValue(Instant.FromUnixTimeSeconds(1200).ToString()));
 
-            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.IsSameSequenceAs(Status.Published),
+            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.IsSameSequenceAs(Status.Published, Status.Draft),
                     A<HashSet<Guid>>.That.Matches(x =>
                         x.Count == 3 &&
                         x.Contains(commentaryTypeId) &&
