@@ -89,8 +89,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                     savePerInstance: true,
                     autoSaveBaseline: true,
                     debug: true
-                },
-            },
+                }
+            }
         ],
 
         onPrepare: async () => {
