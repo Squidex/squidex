@@ -7,14 +7,12 @@
 
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Squidex.Config;
+using Squidex.Areas.IdentityServer.Config;
+using Squidex.Config.Domain;
 using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
-using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
 {
@@ -34,9 +32,7 @@ namespace Squidex
                 })
                 .ConfigureLogging((context, builder) =>
                 {
-                    builder.AddConfiguration(context.Configuration.GetSection("logging"));
-                    builder.AddSemanticLog();
-                    builder.AddFilters();
+                    builder.ConfigureForSquidex(context.Configuration);
                 })
                 .ConfigureWebHostDefaults(builder =>
                 {
@@ -46,28 +42,33 @@ namespace Squidex
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
-                    builder.Sources.Clear();
-
-                    builder.AddJsonFile($"appsettings.json", true);
-                    builder.AddJsonFile($"appsettings.Custom.json", true);
-                    builder.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
-
-                    builder.AddEnvironmentVariables();
-
-                    builder.AddCommandLine(args);
+                    builder.ConfigureForSquidex(hostContext.HostingEnvironment, args);
                 })
                 .ConfigureServices(services =>
                 {
+                    // Step 0: Log all configuration.
+                    services.AddHostedService<LogConfigurationHost>();
+
+                    // Step 1: Initialize all services.
                     services.AddHostedService<InitializerHost>();
+
+                    // Step 2: Create admin user.
+                    services.AddHostedService<CreateAdminHost>();
                 })
                 .UseOrleans((context, builder) =>
                 {
-                    builder.ConfigureOrleans(context.Configuration);
+                    // Step 3: Start Orleans.
+                    builder.ConfigureForSquidex(context.Configuration);
                 })
                 .ConfigureServices(services =>
                 {
+                    // Step 4: Run migration.
                     services.AddHostedService<MigratorHost>();
+
+                    // Step 5: Run rebuild processes.
                     services.AddHostedService<MigrationRebuilderHost>();
+
+                    // Step 6: Start background processes.
                     services.AddHostedService<BackgroundHost>();
                 });
     }

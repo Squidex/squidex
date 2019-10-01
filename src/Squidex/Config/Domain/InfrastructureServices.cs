@@ -5,25 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.DataProtection.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Orleans;
+using Squidex.Areas.Api.Controllers.Contents;
+using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
-using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
+using Squidex.Areas.Api.Controllers.UI;
+using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Domain.Users;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Shared.Users;
+using Squidex.Pipeline.Robots;
+using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 #pragma warning disable RECS0092 // Convert field to readonly
 
@@ -31,12 +36,12 @@ namespace Squidex.Config.Domain
 {
     public static class InfrastructureServices
     {
-        public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexInfrastructure(this IServiceCollection services, IConfiguration config)
         {
-            services.AddHealthChecks()
-                .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
-                .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
-                .AddCheck<OrleansAppsHealthCheck>("Orleans App", tags: new[] { "cluster" });
+            services.Configure<UrlsOptions>(
+                config.GetSection("urls"));
+            services.Configure<ExposedConfiguration>(
+                config.GetSection("exposedConfiguration"));
 
             services.AddSingletonAs(c => new CachingUsageTracker(
                     c.GetRequiredService<BackgroundUsageTracker>(),
@@ -46,41 +51,62 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
-            services.AddSingletonAs<FeaturesService>()
+            services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
                 .AsSelf();
+
+            services.AddSingletonAs<GrainTagService>()
+                .As<ITagService>();
+
+            services.AddSingletonAs<AsyncLocalCache>()
+                .As<ILocalCache>();
+
+            services.AddSingletonAs<JintScriptEngine>()
+                .AsOptional<IScriptEngine>();
+
+            services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
+        }
+
+        public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<UsageOptions>(
+                config.GetSection("usage"));
 
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();
 
-            services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
-                .AsSelf();
-
             services.AddSingletonAs<GrainBootstrap<IUsageTrackerGrain>>()
                 .AsSelf();
+        }
+
+        public static void AddSquidexTranslation(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<DeepLTranslatorOptions>(
+                config.GetSection("translations:deepL"));
+            services.Configure<LanguagesOptions>(
+                config.GetSection("languages"));
 
             services.AddSingletonAs<LanguagesInitializer>()
                 .AsSelf();
 
             services.AddSingletonAs<DeepLTranslator>()
                 .As<ITranslator>();
+        }
 
-            services.AddSingletonAs<AsyncLocalCache>()
-                .As<ILocalCache>();
+        public static void AddSquidexControllerServices(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<RobotsTxtOptions>(
+                config.GetSection("robots"));
+            services.Configure<ETagOptions>(
+                config.GetSection("etags"));
+            services.Configure<MyContentsControllerOptions>(
+                config.GetSection("contentsController"));
+            services.Configure<MyUIOptions>(
+                config.GetSection("ui"));
+            services.Configure<MyNewsOptions>(
+                config.GetSection("news"));
 
-            services.AddSingletonAs<HttpContextAccessor>()
-                .As<IHttpContextAccessor>();
-
-            services.AddSingletonAs<ActionContextAccessor>()
-                .As<IActionContextAccessor>();
-
-            services.AddSingletonAs<DefaultUserResolver>()
-                .AsOptional<IUserResolver>();
-
-            services.AddSingletonAs<AssetUserPictureStore>()
-                .AsOptional<IUserPictureStore>();
-
-            services.AddSingletonAs<DefaultXmlRepository>()
-                .As<IXmlRepository>();
+            services.AddSingletonAs<FeaturesService>()
+                .AsSelf();
         }
     }
 }

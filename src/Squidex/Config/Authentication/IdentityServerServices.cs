@@ -17,7 +17,7 @@ namespace Squidex.Config.Authentication
 {
     public static class IdentityServerServices
     {
-        public static AuthenticationBuilder AddMyIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
+        public static AuthenticationBuilder AddSquidexIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
             var apiScope = Constants.ApiScope;
 

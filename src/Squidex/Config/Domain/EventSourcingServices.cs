@@ -22,9 +22,9 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
 {
-    public static class EventStoreServices
+    public static class EventSourcingServices
     {
-        public static void AddMyEventStoreServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexEventSourcing(this IServiceCollection services, IConfiguration config)
         {
             config.ConfigureByOption("eventStore:type", new Alternatives
             {

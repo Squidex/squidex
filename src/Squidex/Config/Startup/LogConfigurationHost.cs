@@ -1,34 +1,40 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Startup
 {
-    public static class LoggingExtensions
+    public sealed class LogConfigurationHost : SafeHostedService
     {
-        public static void LogConfiguration(this IServiceProvider services)
-        {
-            var log = services.GetRequiredService<ISemanticLog>();
+        private readonly IConfiguration configuration;
 
+        public LogConfigurationHost(ISemanticLog log, IConfiguration configuration)
+            : base(log)
+        {
+            this.configuration = configuration;
+        }
+
+        protected override Task StartAsync(ISemanticLog log, CancellationToken ct)
+        {
             log.LogInformation(w => w
                 .WriteProperty("message", "Application started")
                 .WriteObject("environment", c =>
                 {
-                    var config = services.GetRequiredService<IConfiguration>();
-
                     var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    var orderedConfigs = config.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
+                    var orderedConfigs = configuration.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
                     foreach (var (key, val) in orderedConfigs)
                     {
@@ -38,6 +44,8 @@ namespace Squidex.Config.Domain
                         }
                     }
                 }));
+
+            return TaskHelper.Done;
         }
     }
 }

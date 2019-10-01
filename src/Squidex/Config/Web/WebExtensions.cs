@@ -24,21 +24,21 @@ namespace Squidex.Config.Web
 {
     public static class WebExtensions
     {
-        public static IApplicationBuilder UseMyLocalCache(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexLocalCache(this IApplicationBuilder app)
         {
             app.UseMiddleware<LocalCacheMiddleware>();
 
             return app;
         }
 
-        public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestLogPerformanceMiddleware>();
 
             return app;
         }
 
-        public static IApplicationBuilder UseMyHealthCheck(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexHealthCheck(this IApplicationBuilder app)
         {
             var serializer = app.ApplicationServices.GetRequiredService<IJsonSerializer>();
 
@@ -90,14 +90,14 @@ namespace Squidex.Config.Web
             return app;
         }
 
-        public static IApplicationBuilder UseMyRobotsTxt(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexRobotsTxt(this IApplicationBuilder app)
         {
             app.Map("/robots.txt", builder => builder.UseMiddleware<RobotsTxtMiddleware>());
 
             return app;
         }
 
-        public static void UseMyCors(this IApplicationBuilder app)
+        public static void UseSquidexCors(this IApplicationBuilder app)
         {
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
@@ -105,7 +105,7 @@ namespace Squidex.Config.Web
                 .AllowAnyHeader());
         }
 
-        public static void UseMyForwardingRules(this IApplicationBuilder app)
+        public static void UseSquidexForwardingRules(this IApplicationBuilder app)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

@@ -41,7 +41,7 @@ namespace Squidex.Config.Domain
 {
     public static class StoreServices
     {
-        public static void AddMyStoreServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexStoreServices(this IServiceCollection services, IConfiguration config)
         {
             config.ConfigureByOption("store:type", new Alternatives
             {

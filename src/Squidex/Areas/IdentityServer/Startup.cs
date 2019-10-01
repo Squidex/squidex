@@ -18,8 +18,6 @@ namespace Squidex.Areas.IdentityServer
     {
         public static void ConfigureIdentityServer(this IApplicationBuilder app)
         {
-            app.ApplicationServices.UseMyAdmin();
-
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             app.Map(Constants.IdentityServerPrefix, identityApp =>
@@ -38,7 +36,7 @@ namespace Squidex.Areas.IdentityServer
                 identityApp.UseAuthentication();
                 identityApp.UseAuthorization();
 
-                identityApp.UseMyIdentityServer();
+                identityApp.UseSquidexIdentityServer();
 
                 identityApp.UseEndpoints(endpoints =>
                 {

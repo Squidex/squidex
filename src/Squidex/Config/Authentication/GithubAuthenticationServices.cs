@@ -12,7 +12,7 @@ namespace Squidex.Config.Authentication
 {
     public static class GithubAuthenticationServices
     {
-        public static AuthenticationBuilder AddMyExternalGithubAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        public static AuthenticationBuilder AddSquidexExternalGithubAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
         {
             if (identityOptions.IsGithubAuthConfigured())
             {

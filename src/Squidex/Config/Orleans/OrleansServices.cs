@@ -26,7 +26,7 @@ namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static void ConfigureOrleans(this ISiloBuilder builder, IConfiguration config)
+        public static void ConfigureForSquidex(this ISiloBuilder builder, IConfiguration config)
         {
             builder.ConfigureServices(siloServices =>
             {
@@ -117,6 +117,7 @@ namespace Squidex.Config.Orleans
 
             options.ConnectionString = mongoConfiguration;
             options.CollectionPrefix = "Orleans_";
+
             options.DatabaseName = mongoDatabaseName;
         }
 

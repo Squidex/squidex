@@ -13,7 +13,7 @@ namespace Squidex.Config.Authentication
 {
     public static class OidcServices
     {
-        public static AuthenticationBuilder AddMyExternalOdic(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        public static AuthenticationBuilder AddSquidexExternalOdic(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
         {
             if (identityOptions.IsOidcConfigured())
             {

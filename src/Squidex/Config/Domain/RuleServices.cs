@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -13,14 +14,18 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
 {
     public static class RuleServices
     {
-        public static void AddMyRuleServices(this IServiceCollection services)
+        public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
         {
+            services.Configure<RuleOptions>(
+                config.GetSection("rules"));
+
             services.AddSingletonAs<EventEnricher>()
                 .As<IEventEnricher>();
 
@@ -46,6 +51,9 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<RuleService>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
                 .AsSelf();
         }
     }

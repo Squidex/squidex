@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
-using Squidex.Config.Authentication;
+using Squidex.Config.Startup;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
@@ -22,33 +22,33 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
-    public static class IdentityServerExtensions
+    public sealed class CreateAdminHost : SafeHostedService
     {
-        public static IApplicationBuilder UseSquidexIdentityServer(this IApplicationBuilder app)
-        {
-             app.UseIdentityServer();
+        private readonly IServiceProvider serviceProvider;
+        private readonly MyIdentityOptions identityOptions;
 
-             return app;
+        public CreateAdminHost(ISemanticLog log, IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
+            : base(log)
+        {
+            this.serviceProvider = serviceProvider;
+
+            this.identityOptions = identityOptions.Value;
         }
 
-        public static IServiceProvider UseSquidexAdmin(this IServiceProvider services)
+        protected override async Task StartAsync(ISemanticLog log, CancellationToken ct)
         {
-            var options = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+            IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
 
-            IdentityModelEventSource.ShowPII = options.ShowPII;
-
-            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-            var userFactory = services.GetRequiredService<IUserFactory>();
-
-            var log = services.GetRequiredService<ISemanticLog>();
-
-            if (options.IsAdminConfigured())
+            if (identityOptions.IsAdminConfigured())
             {
-                var adminEmail = options.AdminEmail;
-                var adminPass = options.AdminPassword;
-
-                Task.Run(async () =>
+                using (var scope = serviceProvider.CreateScope())
                 {
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                    var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+
+                    var adminEmail = identityOptions.AdminEmail;
+                    var adminPass = identityOptions.AdminPassword;
+
                     if (userManager.SupportsQueryableUsers && !userManager.Users.Any())
                     {
                         try
@@ -70,10 +70,8 @@ namespace Squidex.Areas.IdentityServer.Config
                                 .WriteProperty("status", "failed"));
                         }
                     }
-                }).Wait();
+                }
             }
-
-            return services;
         }
     }
 }

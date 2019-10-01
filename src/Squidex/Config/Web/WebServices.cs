@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,7 +23,7 @@ namespace Squidex.Config.Web
 {
     public static class WebServices
     {
-        public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
@@ -50,8 +52,11 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<ContextProvider>()
                 .As<IContextProvider>();
 
-            services.AddSingletonAs<ApiPermissionUnifier>()
-                .AsOptional<IClaimsTransformation>();
+            services.AddSingletonAs<HttpContextAccessor>()
+                .As<IHttpContextAccessor>();
+
+            services.AddSingletonAs<ActionContextAccessor>()
+                .As<IActionContextAccessor>();
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -65,11 +70,8 @@ namespace Squidex.Config.Web
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })
-            .AddMyPlugins(config)
-            .AddMySerializers();
-
-            services.AddCors();
-            services.AddRouting();
+            .AddSquidexPlugins(config)
+            .AddSquidexSerializers();
         }
     }
 }

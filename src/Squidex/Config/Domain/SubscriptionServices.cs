@@ -18,7 +18,7 @@ namespace Squidex.Config.Domain
 {
     public static class SubscriptionServices
     {
-        public static void AddMySubscriptionServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexSubscriptions(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty());
 

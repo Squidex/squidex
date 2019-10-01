@@ -17,7 +17,7 @@ namespace Squidex.Config.Domain
 {
     public static class EventPublishersServices
     {
-        public static void AddMyEventPublishersServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexEventPublisher(this IServiceCollection services, IConfiguration config)
         {
             var eventPublishers = config.GetSection("eventPublishers");
 

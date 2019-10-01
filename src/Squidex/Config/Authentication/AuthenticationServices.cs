@@ -6,27 +6,33 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Areas.IdentityServer;
+using Squidex.Domain.Users;
 
 namespace Squidex.Config.Authentication
 {
     public static class AuthenticationServices
     {
-        public static void AddMyAuthentication(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexAuthentication(this IServiceCollection services, IConfiguration config)
         {
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
+            services.AddSingletonAs<DefaultXmlRepository>()
+                .As<IXmlRepository>();
+
             services.AddAuthentication()
-                .AddMyCookie()
-                .AddMyExternalGithubAuthentication(identityOptions)
-                .AddMyExternalGoogleAuthentication(identityOptions)
-                .AddMyExternalMicrosoftAuthentication(identityOptions)
-                .AddMyExternalOdic(identityOptions)
-                .AddMyIdentityServerAuthentication(identityOptions, config);
+                .AddSquidexCookies()
+                .AddSquidexExternalGithubAuthentication(identityOptions)
+                .AddSquidexExternalGoogleAuthentication(identityOptions)
+                .AddSquidexExternalMicrosoftAuthentication(identityOptions)
+                .AddSquidexExternalOdic(identityOptions)
+                .AddSquidexIdentityServerAuthentication(identityOptions, config);
         }
 
-        public static AuthenticationBuilder AddMyCookie(this AuthenticationBuilder builder)
+        public static AuthenticationBuilder AddSquidexCookies(this AuthenticationBuilder builder)
         {
             builder.Services.ConfigureApplicationCookie(options =>
             {

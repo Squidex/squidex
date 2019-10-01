@@ -17,7 +17,7 @@ namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
-        public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
+        public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
         {
             var pluginManager = new PluginManager();
 

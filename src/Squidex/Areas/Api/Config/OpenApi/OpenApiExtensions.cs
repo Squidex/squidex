@@ -11,7 +11,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 {
     public static class OpenApiExtensions
     {
-        public static void UseMyOpenApi(this IApplicationBuilder app)
+        public static void UseSquidexOpenApi(this IApplicationBuilder app)
         {
             app.UseOpenApi();
         }

@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api
                 appApi.UseAuthentication();
                 appApi.UseAuthorization();
 
-                appApi.UseMyOpenApi();
+                appApi.UseSquidexOpenApi();
 
                 appApi.UseEndpoints(endpoints =>
                 {

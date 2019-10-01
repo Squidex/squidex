@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
@@ -19,12 +20,13 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Users;
 using Squidex.Shared.Identity;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
     public static class IdentityServerServices
     {
-        public static void AddMyIdentityServer(this IServiceCollection services)
+        public static void AddSquidexIdentityServer(this IServiceCollection services)
         {
             X509Certificate2 certificate;
 
@@ -50,6 +52,7 @@ namespace Squidex.Areas.IdentityServer.Config
             });
 
             services.AddDataProtection().SetApplicationName("Squidex");
+
             services.AddSingleton(GetApiResources());
             services.AddSingleton(GetIdentityResources());
 
@@ -59,6 +62,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 PwnedPasswordValidator>();
             services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
+            services.AddSingleton<IClaimsTransformation,
+                ApiPermissionUnifier>();
             services.AddSingleton<IClientStore,
                 LazyClientStore>();
             services.AddSingleton<IResourceStore,

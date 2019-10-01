@@ -11,16 +11,48 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Domain
 {
     public static class AssetServices
     {
-        public static void AddMyAssetServices(this IServiceCollection services, IConfiguration config)
+        public static void AddSquidexAssets(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<AssetOptions>(
+                config.GetSection("assets"));
+
+            services.AddSingletonAs<AssetQueryParser>()
+                .AsSelf();
+
+            services.AddSingletonAs<AssetEnricher>()
+                .As<IAssetEnricher>();
+
+            services.AddSingletonAs<AssetQueryService>()
+                .As<IAssetQueryService>();
+
+            services.AddSingletonAs<AssetLoader>()
+                .As<IAssetLoader>();
+
+            services.AddSingletonAs<AssetUsageTracker>()
+                .As<IAssetUsageTracker>().As<IEventConsumer>();
+
+            services.AddSingletonAs<FileTypeTagGenerator>()
+                .As<ITagGenerator<CreateAsset>>();
+
+            services.AddSingletonAs<ImageTagGenerator>()
+                .As<ITagGenerator<CreateAsset>>();
+        }
+
+        public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)
         {
             config.ConfigureByOption("assetStore:type", new Alternatives
             {

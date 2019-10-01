@@ -64,7 +64,7 @@ namespace Squidex.Config.Domain
             return settings;
         }
 
-        public static IServiceCollection AddMySerializers(this IServiceCollection services)
+        public static IServiceCollection AddSquidexSerializers(this IServiceCollection services)
         {
             services.AddSingletonAs<AutoAssembyTypeProvider<SquidexCoreModel>>()
                 .As<ITypeProvider>();
@@ -110,7 +110,7 @@ namespace Squidex.Config.Domain
             return services;
         }
 
-        public static IMvcBuilder AddMySerializers(this IMvcBuilder mvc)
+        public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder mvc)
         {
             mvc.AddNewtonsoftJson(options =>
             {

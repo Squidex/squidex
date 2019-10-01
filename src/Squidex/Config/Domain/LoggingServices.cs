@@ -8,15 +8,27 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Domain
 {
     public static class LoggingServices
     {
-        public static void AddMyLoggingServices(this IServiceCollection services, IConfiguration config)
+        public static void ConfigureForSquidex(this ILoggingBuilder builder, IConfiguration config)
+        {
+            builder.AddConfiguration(config.GetSection("logging"));
+
+            builder.AddSemanticLog();
+            builder.AddFilters();
+
+            builder.Services.AddServices(config);
+        }
+
+        private static void AddServices(this IServiceCollection services, IConfiguration config)
         {
             if (config.GetValue<bool>("logging:human"))
             {
@@ -42,7 +54,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(_ => new ConsoleLogChannel(useColors))
                 .As<ILogChannel>();
 
-            services.AddSingletonAs(_ => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
+            services.AddSingletonAs(_ => new ApplicationInfoLogAppender(typeof(LoggingServices).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();
 
             services.AddSingletonAs<ActionContextLogAppender>()
@@ -62,6 +74,49 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<NoopLogStore>()
                 .AsOptional<ILogStore>();
+        }
+
+        private static void AddFilters(this ILoggingBuilder builder)
+        {
+            builder.AddFilter((category, level) =>
+            {
+                if (category.StartsWith("Orleans.Runtime.NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Error;
+                }
+
+                if (category.StartsWith("Orleans.Runtime.SafeTimer", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Error;
+                }
+
+                if (category.StartsWith("Orleans.Runtime.Scheduler", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Warning;
+                }
+
+                if (category.StartsWith("Orleans.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Warning;
+                }
+
+                if (category.StartsWith("Runtime.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Warning;
+                }
+
+                if (category.StartsWith("Microsoft.AspNetCore.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Warning;
+                }
+#if LOG_ALL_IDENTITY_SERVER
+                if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+#endif
+                return level >= LogLevel.Information;
+            });
         }
     }
 }

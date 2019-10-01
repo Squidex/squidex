@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 {
     public static class OpenApiServices
     {
-        public static void AddMyOpenApiSettings(this IServiceCollection services)
+        public static void AddSquidexOpenApiSettings(this IServiceCollection services)
         {
             services.AddSingletonAs<ErrorDtoProcessor>()
                 .As<IDocumentProcessor>();
