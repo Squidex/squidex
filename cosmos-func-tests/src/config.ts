@@ -1,3 +1,4 @@
+
 import { browser, Config } from 'protractor';
 
 import {
@@ -8,9 +9,11 @@ import {
     stopSquidex
 } from './setup';
 
+
 export function buildConfig(options: { url: string, setup: boolean }): Config {
 
     function addHtmlReporter() {
+        let moment = require('moment');
         const HtmlReporter = require('protractor-beautiful-reporter');
         let reporter = new HtmlReporter({
             baseDirectory: '_results-reports'
@@ -18,7 +21,7 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             , jsonsSubfolder: 'jsons'
             , excludeSkippedSpecs: true
             , takeScreenShotsOnlyForFailedSpecs: true
-            , docTitle: 'Cosmos Test Suite Last Run Report'
+            , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss Z')
             , docName: 'lastrunresults.html'
             , gatherBrowserLogs: false
             , preserveDirectory: false
@@ -81,8 +84,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                 package: 'protractor-image-comparison',
                 // Some options, see the docs for more
                 options: {
-                    baselineFolder: '../baseline',
-                    screenshotPath: '../images',
+                    baselineFolder: '../_baseline',
+                    screenshotPath: '../_images',
                     savePerInstance: true,
                     autoSaveBaseline: true,
                     debug: true

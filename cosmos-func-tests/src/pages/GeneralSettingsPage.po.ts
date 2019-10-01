@@ -1,4 +1,4 @@
-import { by, element  } from 'protractor';
+import { by, element } from 'protractor';
 import { BrowserUtil } from '../utils';
 let path = require('path');
 
@@ -14,7 +14,15 @@ export class GeneralSettingsPage extends BrowserUtil {
     }
 
     public async uploadImageButton() {
-        return await element(by.buttonText('Upload File'));
+        return await element(by.xpath('//span[contains(text(),\'Upload File\')]'));
+    }
+
+    public async imagePathInput() {
+        return await element(by.xpath('//input[@type=\'file\']'));
+    }
+
+    public async imgSrc() {
+        return await this.getWhenVisible(element(by.tagName('sqx-avatar')).element(by.tagName('img')));
     }
 
     public async saveContent() {
@@ -42,11 +50,14 @@ export class GeneralSettingsPage extends BrowserUtil {
         await this.selectAllApps();
     }
 
-    public async uploadImage() {
-        let imgToUpload = '../../images/website.jpg';
-        let absolutePath = path.resolve(__dirname, imgToUpload);
-        const button = await this.uploadImageButton();
-        await this.waitForElementToBePresentAndWrite(button, absolutePath);
+
+    public async uploadImage(imgPath: string) {
+
+        let absolutePath = path.resolve(__dirname, imgPath);
+        await this.imagePathInput().then((imageInput) => {
+            imageInput.sendKeys(absolutePath);
+        });
+        await this.uploadImageButton();
 
     }
 

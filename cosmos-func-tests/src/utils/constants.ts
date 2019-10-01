@@ -81,7 +81,8 @@ export const constants = {
         DescValue: 'This is the app to update Commentaries for Commodities based on regions',
         labelValueWithoutSave: 'Commentaries - Save',
         DescValueWithoutSave: 'Description Added',
-        imagePath: '../../images/website.jpg'
+        imagePath: '../../_images/website.jpg',
+        imagesrc: `${browser.params.baseUrl}/api/apps/commentary/image`
     },
 
     messages: {

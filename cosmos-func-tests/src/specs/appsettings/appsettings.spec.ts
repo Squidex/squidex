@@ -1,4 +1,3 @@
-import { browser } from 'protractor';
 import {
     constants,
     Users
@@ -53,7 +52,7 @@ describe('VEGA-323 : App Settings', () => {
     });
 
     describe('VEGA-316 : Changes to Landing Page and General Settings', () => {
-    it('Change the label and description of the app and verify its updated on home page', async () => {
+    xit('Change the label and description of the app and verify its updated on home page', async () => {
 
         // Arrange
         await generalSettingsPage.updateLabel(constants.labelAndDescVerificationTest.labelValue);
@@ -71,7 +70,7 @@ describe('VEGA-323 : App Settings', () => {
 
     });
 
-    it('Change the label and description of the app and quit without saving verify its not updated on home page', async () => {
+    xit('Change the label and description of the app and quit without saving verify its not updated on home page', async () => {
 
         // Arrange
         await generalSettingsPage.updateLabel(constants.labelAndDescVerificationTest.labelValue);
@@ -91,13 +90,14 @@ describe('VEGA-323 : App Settings', () => {
     it('Upload Image for the app and verify its updated and visible on home page', async () => {
 
         // Arrange
-        await generalSettingsPage.uploadImage();
+        await generalSettingsPage.uploadImage(constants.labelAndDescVerificationTest.imagePath);
 
         // Act
         await generalSettingsPage.navigateToAppHomePage();
 
         // Assert
-        expect(await browser.imageComparision.checkElement(homePage.getImage(), constants.labelAndDescVerificationTest.imagePath)).toEqual(0);
+        const src = await generalSettingsPage.imgSrc();
+        expect<any>(src.getAttribute('src')).toBe(constants.labelAndDescVerificationTest.imagesrc);
 
     });
 
