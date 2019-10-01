@@ -19,6 +19,10 @@ export class AppPage extends BrowserUtil {
         await this.selectMenuItem('Content');
     }
 
+    public async selectSettingsMenuItems() {
+        await this.selectMenuItem('Settings');
+    }
+
     public async selectMenuItem(navText: string) {
         const navItem = this.$mainNav(navText);
 

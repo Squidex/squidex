@@ -1,3 +1,4 @@
+
 import { browser, Config } from 'protractor';
 
 import {
@@ -8,9 +9,11 @@ import {
     stopSquidex
 } from './setup';
 
+
 export function buildConfig(options: { url: string, setup: boolean }): Config {
 
     function addHtmlReporter() {
+        let moment = require('moment');
         const HtmlReporter = require('protractor-beautiful-reporter');
         let reporter = new HtmlReporter({
             baseDirectory: '_results-reports'
@@ -18,7 +21,7 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             , jsonsSubfolder: 'jsons'
             , excludeSkippedSpecs: true
             , takeScreenShotsOnlyForFailedSpecs: true
-            , docTitle: 'Cosmos Test Suite Last Run Report'
+            , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss Z')
             , docName: 'lastrunresults.html'
             , gatherBrowserLogs: false
             , preserveDirectory: false
@@ -26,8 +29,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                 showTotalDurationIn: 'header',
                 totalDurationFormat: 'hms'
             }
-         });
-         jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
+        });
+        jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
     }
 
     let isCleanup = false;
@@ -74,6 +77,21 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         },
 
         specs: ['./../_out/specs/**/*.spec.js'],
+
+        plugins: [
+            {
+                // The module name
+                package: 'protractor-image-comparison',
+                // Some options, see the docs for more
+                options: {
+                    baselineFolder: '../_baseline',
+                    screenshotPath: '../_images',
+                    savePerInstance: true,
+                    autoSaveBaseline: true,
+                    debug: true
+                }
+            }
+        ],
 
         onPrepare: async () => {
             console.log('Preparing');

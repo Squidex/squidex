@@ -49,6 +49,12 @@ export class BrowserUtil {
         await locator.sendKeys(text);
     }
 
+    public async waitForElementToBePresentClickAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
+        await this.getWhenVisible(locator, timeout);
+        await locator.click();
+        await locator.sendKeys(text);
+    }
+
     // brings the element to focus and clicks
     public async mouseMoveAndClick(locator: ElementFinder) {
         await browser.actions().mouseMove(locator).perform();
