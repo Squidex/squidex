@@ -24,13 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
         [Fact]
         public async Task Should_do_nothing_when_changing_plan()
         {
-            await sut.ChangePlanAsync(null, null, null);
+            await sut.ChangePlanAsync(null!, null!, null);
         }
 
         [Fact]
         public async Task Should_not_return_portal_link()
         {
-            Assert.Equal(string.Empty, await sut.GetPortalLinkAsync(null));
+            Assert.Equal(string.Empty, await sut.GetPortalLinkAsync(null!));
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var context = await CommandBus.PublishAsync(request.ToCommand());
 
-            string redirectUri = null;
+            string? redirectUri = null;
 
             if (context.PlainResult is RedirectToCheckoutResult result)
             {

@@ -20,7 +20,7 @@ namespace Squidex.Web
 
         public Func<Stream, Task> Callback { get; }
 
-        public FileCallbackResult(string contentType, string name, bool send404, Func<Stream, Task> callback)
+        public FileCallbackResult(string contentType, string? name, bool send404, Func<Stream, Task> callback)
             : base(contentType)
         {
             FileDownloadName = name;

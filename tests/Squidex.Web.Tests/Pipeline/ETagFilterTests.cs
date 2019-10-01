@@ -49,13 +49,13 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_convert_empty_strong_to_weak_tag()
+        public async Task Should_not_convert_empty_string_to_weak_tag()
         {
             httpContext.Response.Headers[HeaderNames.ETag] = string.Empty;
 
             await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
 
-            Assert.Null((string)httpContext.Response.Headers[HeaderNames.ETag]);
+            Assert.Equal(string.Empty, httpContext.Response.Headers[HeaderNames.ETag]);
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
 
-            Assert.Equal(304, (executedContext.Result as StatusCodeResult).StatusCode);
+            Assert.Equal(304, (executedContext.Result as StatusCodeResult)!.StatusCode);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
 
-            Assert.Equal(200, (executedContext.Result as StatusCodeResult).StatusCode);
+            Assert.Equal(200, (executedContext.Result as StatusCodeResult)!.StatusCode);
         }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.IO;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -31,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 .Returns(A.Dummy<IUser>());
 
             A.CallTo(() => appPlans.GetPlan("notfound"))
-                .Returns(null);
+                .Returns(null!);
 
             A.CallTo(() => appPlans.GetPlan("basic"))
                 .Returns(basicPlan);
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUploadImage_should_not_throw_exception_if_app_name_is_valid()
         {
-            var command = new UploadAppImage { File = new AssetFile("file.png", "image/png", 100, () => null) };
+            var command = new UploadAppImage { File = new AssetFile("file.png", "image/png", 100, () => new MemoryStream()) };
 
             GuardApp.CanUploadImage(command);
         }
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new ChangePlan { Actor = new RefToken("user", "me") };
 
-            AppPlan plan = null;
+            AppPlan? plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
                 new ValidationError("Plan id is required.", "PlanId"));
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new ChangePlan { PlanId = "notfound", Actor = new RefToken("user", "me") };
 
-            AppPlan plan = null;
+            AppPlan? plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
                 new ValidationError("A plan with this id does not exist.", "PlanId"));

@@ -13,14 +13,14 @@ namespace Squidex.Web
 {
     public static class Extensions
     {
-        public static string GetClientId(this ClaimsPrincipal principal)
+        public static string? GetClientId(this ClaimsPrincipal principal)
         {
             var clientId = principal.FindFirst(OpenIdClaims.ClientId)?.Value;
 
             return clientId?.GetClientParts().ClientId;
         }
 
-        public static (string App, string ClientId) GetClientParts(this string clientId)
+        public static (string? App, string? ClientId) GetClientParts(this string clientId)
         {
             var parts = clientId.Split(':', '~');
 

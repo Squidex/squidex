@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         public static UserDto FromUser(IUser user, ApiController controller)
         {
             var userPermssions = user.Permissions().ToIds();
-            var userName = user.DisplayName();
+            var userName = user.DisplayName()!;
 
             var result = SimpleMapper.Map(user, new UserDto { DisplayName = userName, Permissions = userPermssions });
 

@@ -12,7 +12,7 @@ namespace Squidex.Areas.IdentityServer.Views
 {
     public static class Extensions
     {
-        public static string RootContentUrl(this IUrlHelper urlHelper, string contentPath)
+        public static string? RootContentUrl(this IUrlHelper urlHelper, string contentPath)
         {
             if (string.IsNullOrEmpty(contentPath))
             {

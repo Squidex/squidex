@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Areas.Api.Controllers.Users.Assets.Avatar.png"))
             {
-                AvatarBytes = new byte[avatarStream.Length];
+                AvatarBytes = new byte[avatarStream!.Length];
 
                 avatarStream.Read(AvatarBytes, 0, AvatarBytes.Length);
             }

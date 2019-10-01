@@ -274,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_properties_null()
         {
-            var command = new UpdateField { FieldId = 2, Properties = null };
+            var command = new UpdateField { FieldId = 2, Properties = null! };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
                 new ValidationError("Properties is required.", "Properties"));
@@ -328,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_properties_null()
         {
-            var command = new AddField { Name = "field5", Properties = null };
+            var command = new AddField { Name = "field5", Properties = null! };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
                 new ValidationError("Properties is required.", "Properties"));

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Users
 {
     public static class UserManagerExtensions
     {
-        public static async Task<UserWithClaims> GetUserWithClaimsAsync(this UserManager<IdentityUser> userManager, ClaimsPrincipal principal)
+        public static async Task<UserWithClaims?> GetUserWithClaimsAsync(this UserManager<IdentityUser> userManager, ClaimsPrincipal principal)
         {
             if (principal == null)
             {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Users
             return user;
         }
 
-        public static async Task<UserWithClaims> ResolveUserAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
+        public static async Task<UserWithClaims?> ResolveUserAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
         {
             if (user == null)
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Users
             return new UserWithClaims(user, claims);
         }
 
-        public static async Task<UserWithClaims> FindByIdWithClaimsAsync(this UserManager<IdentityUser> userManager, string id)
+        public static async Task<UserWithClaims?> FindByIdWithClaimsAsync(this UserManager<IdentityUser> userManager, string id)
         {
             if (id == null)
             {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Users
             return await userManager.ResolveUserAsync(user);
         }
 
-        public static async Task<UserWithClaims> FindByEmailWithClaimsAsyncAsync(this UserManager<IdentityUser> userManager, string email)
+        public static async Task<UserWithClaims?> FindByEmailWithClaimsAsyncAsync(this UserManager<IdentityUser> userManager, string email)
         {
             if (email == null)
             {
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Users
             return await userManager.ResolveUserAsync(user);
         }
 
-        public static async Task<UserWithClaims> FindByLoginWithClaimsAsync(this UserManager<IdentityUser> userManager, string loginProvider, string providerKey)
+        public static async Task<UserWithClaims?> FindByLoginWithClaimsAsync(this UserManager<IdentityUser> userManager, string loginProvider, string providerKey)
         {
             if (loginProvider == null || providerKey == null)
             {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Users
             return await userManager.ResolveUserAsync(user);
         }
 
-        public static Task<long> CountByEmailAsync(this UserManager<IdentityUser> userManager, string email = null)
+        public static Task<long> CountByEmailAsync(this UserManager<IdentityUser> userManager, string? email = null)
         {
             var count = QueryUsers(userManager, email).LongCount();
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Users
             return result.ToList();
         }
 
-        public static async Task<List<UserWithClaims>> QueryByEmailAsync(this UserManager<IdentityUser> userManager, string email = null, int take = 10, int skip = 0)
+        public static async Task<List<UserWithClaims>> QueryByEmailAsync(this UserManager<IdentityUser> userManager, string? email = null, int take = 10, int skip = 0)
         {
             var users = QueryUsers(userManager, email).Skip(skip).Take(take).ToList();
 
@@ -108,11 +108,11 @@ namespace Squidex.Domain.Users
         {
             return Task.WhenAll(users.Select(async user =>
             {
-                return await userManager.ResolveUserAsync(user);
+                return (await userManager.ResolveUserAsync(user))!;
             }));
         }
 
-        public static IQueryable<IdentityUser> QueryUsers(UserManager<IdentityUser> userManager, string email = null)
+        public static IQueryable<IdentityUser> QueryUsers(UserManager<IdentityUser> userManager, string? email = null)
         {
             var result = userManager.Users;
 
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Users
                 throw;
             }
 
-            return await userManager.ResolveUserAsync(user);
+            return (await userManager.ResolveUserAsync(user))!;
         }
 
         public static async Task<UserWithClaims> UpdateAsync(this UserManager<IdentityUser> userManager, string id, UserValues values)
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Users
 
             await UpdateAsync(userManager, user, values);
 
-            return await userManager.ResolveUserAsync(user);
+            return (await userManager.ResolveUserAsync(user))!;
         }
 
         public static Task<IdentityResult> GenerateClientSecretAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Users
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)), "Cannot lock user.");
 
-            return await userManager.ResolveUserAsync(user);
+            return (await userManager.ResolveUserAsync(user))!;
         }
 
         public static async Task<UserWithClaims> UnlockAsync(this UserManager<IdentityUser> userManager, string id)
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Users
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null), "Cannot unlock user.");
 
-            return await userManager.ResolveUserAsync(user);
+            return (await userManager.ResolveUserAsync(user))!;
         }
 
         private static async Task DoChecked(Func<Task<IdentityResult>> action, string message)

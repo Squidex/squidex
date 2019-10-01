@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         public async Task Should_add_error_if_schemas_ids_are_not_valid()
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
-                .Returns(Task.FromResult<ISchemaEntity>(null));
+                .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             var trigger = new ContentChangedTriggerV2
             {

@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
-            var userOrClientId = HttpContext.User.UserOrClientId();
+            var userOrClientId = HttpContext.User.UserOrClientId()!;
             var userPermissions = HttpContext.Permissions();
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
@@ -265,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var userOrClientId = HttpContext.User.UserOrClientId();
+            var userOrClientId = HttpContext.User.UserOrClientId()!;
             var userPermissions = HttpContext.Permissions();
 
             var result = context.Result<IAppEntity>();

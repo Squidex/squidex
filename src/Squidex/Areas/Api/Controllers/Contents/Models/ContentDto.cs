@@ -42,17 +42,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The data of the content item.
         /// </summary>
         [Required]
-        public object Data { get; set; }
+        public object? Data { get; set; }
 
         /// <summary>
         /// The pending changes of the content item.
         /// </summary>
-        public object DataDraft { get; set; }
+        public object? DataDraft { get; set; }
 
         /// <summary>
         /// The reference data for the frontend UI.
         /// </summary>
-        public NamedContentData ReferenceData { get; set; }
+        public NamedContentData? ReferenceData { get; set; }
 
         /// <summary>
         /// Indicates if the draft data is pending.
@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The scheduled status.
         /// </summary>
-        public ScheduleJobDto ScheduleJob { get; set; }
+        public ScheduleJobDto? ScheduleJob { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.
@@ -147,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
                 if (Status == Status.Published)
                 {
-                    AddPutLink("draft/propose", controller.Url((ContentsController x) => nameof(x.PutContent), values) + "?asDraft=true");
+                    AddPutLink("draft/propose", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft=true");
                 }
 
                 AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));

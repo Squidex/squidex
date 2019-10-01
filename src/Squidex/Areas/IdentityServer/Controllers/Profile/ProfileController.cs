@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Identity;
@@ -50,7 +51,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         [HttpGet]
         [Route("/account/profile/")]
-        public async Task<IActionResult> Profile(string successMessage = null)
+        public async Task<IActionResult> Profile(string? successMessage = null)
         {
             var user = await userManager.GetUserWithClaimsAsync(User);
 
@@ -159,9 +160,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             return await userManager.UpdateSafeAsync(user.Identity, new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore });
         }
 
-        private async Task<IActionResult> MakeChangeAsync(Func<UserWithClaims, Task<IdentityResult>> action, string successMessage, ChangeProfileModel model = null)
+        private async Task<IActionResult> MakeChangeAsync(Func<UserWithClaims, Task<IdentityResult>> action, string successMessage, ChangeProfileModel? model = null)
         {
             var user = await userManager.GetUserWithClaimsAsync(User);
+
+            if (user == null)
+            {
+                throw new DomainException("Cannot find user.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -190,8 +196,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             return View(nameof(Profile), await GetProfileVM(user, model, errorMessage));
         }
 
-        private async Task<ProfileVM> GetProfileVM(UserWithClaims user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)
+        private async Task<ProfileVM> GetProfileVM(UserWithClaims? user, ChangeProfileModel? model = null, string? errorMessage = null, string? successMessage = null)
         {
+            if (user == null)
+            {
+                throw new DomainException("Cannot find user.");
+            }
+
             var taskForProviders = signInManager.GetExternalProvidersAsync();
             var taskForPassword = userManager.HasPasswordAsync(user.Identity);
             var taskForLogins = userManager.GetLoginsAsync(user.Identity);
@@ -201,12 +212,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             var result = new ProfileVM
             {
                 Id = user.Id,
-                ClientSecret = user.ClientSecret(),
+                ClientSecret = user.ClientSecret()!,
                 Email = user.Email,
                 ErrorMessage = errorMessage,
                 ExternalLogins = taskForLogins.Result,
                 ExternalProviders = taskForProviders.Result,
-                DisplayName = user.DisplayName(),
+                DisplayName = user.DisplayName()!,
                 IsHidden = user.IsHidden(),
                 HasPassword = taskForPassword.Result,
                 HasPasswordAuth = identityOptions.AllowPasswordAuth,

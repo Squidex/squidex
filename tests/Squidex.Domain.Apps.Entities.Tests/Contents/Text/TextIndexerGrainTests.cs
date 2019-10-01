@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await sut.CopyAsync(ids2[0], fromDraft);
         }
 
-        private async Task TestSearchAsync(List<Guid> expected, string text, Scope target = Scope.Draft, TextIndexerGrain grain = null)
+        private async Task TestSearchAsync(List<Guid>? expected, string text, Scope target = Scope.Draft, TextIndexerGrain? grain = null)
         {
             context.Scope = target;
 

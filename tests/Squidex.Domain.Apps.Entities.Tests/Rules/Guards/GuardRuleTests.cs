@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = CreateCommand(new CreateRule
             {
-                Trigger = null,
+                Trigger = null!,
                 Action = new TestAction
                 {
                     Url = validUrl
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 {
                     Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
                 },
-                Action = null
+                Action = null!
             });
 
             await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),

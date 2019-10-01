@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected static IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
+        protected static IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData? data = null, NamedContentData? dataDraft = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModified = now,
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data,
-                DataDraft = dataDraft,
+                DataDraft = dataDraft!,
                 Status = Status.Draft,
                 StatusColor = "red"
             };

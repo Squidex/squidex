@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_name_empty()
         {
-            var command = new AddRole { Name = null };
+            var command = new AddRole { Name = null! };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanAdd(roles_0, command),
                 new ValidationError("Name is required.", "Name"));
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanDelete_should_throw_exception_if_name_empty()
         {
-            var command = new DeleteRole { Name = null };
+            var command = new DeleteRole { Name = null! };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanDelete(roles_0, command, contributors, clients),
                 new ValidationError("Name is required.", "Name"));
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = null, Permissions = new[] { "P1" } };
+            var command = new UpdateRole { Name = null!, Permissions = new[] { "P1" } };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Name is required.", "Name"));
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = roleName, Permissions = null };
+            var command = new UpdateRole { Name = roleName, Permissions = null! };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Permissions is required.", "Permissions"));

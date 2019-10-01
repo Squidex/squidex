@@ -12,6 +12,6 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// Optional redirect uri.
         /// </summary>
-        public string RedirectUri { get; set; }
+        public string? RedirectUri { get; set; }
     }
 }

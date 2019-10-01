@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns((app, schema));
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data);
+                .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data!);
 
             patched = patch.MergeInto(data);
 
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(ScriptContext(data, null, Status.Draft, default), "<create-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(ScriptContext(data, null!, Status.Draft, default), "<create-script>"))
                 .MustHaveHappened();
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
                 .MustNotHaveHappened();
@@ -439,7 +439,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
-            Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob.Status);
+            Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob!.Status);
             Assert.Equal(dueTime, sut.Snapshot.ScheduleJob.DueTime);
 
             LastEvents
@@ -457,7 +457,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecuteChangeStatusAsync(Status.Published, Instant.MaxValue);
 
-            var command = new ChangeContentStatus { Status = Status.Published, JobId = sut.Snapshot.ScheduleJob.Id };
+            var command = new ChangeContentStatus { Status = Status.Published, JobId = sut.Snapshot.ScheduleJob!.Id };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, Status.Published, User))
                 .Returns(false);
@@ -555,12 +555,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
         }
 
-        private ScriptContext ScriptContext(NamedContentData newData, NamedContentData oldData, Status newStatus, Status oldStatus)
+        private ScriptContext ScriptContext(NamedContentData newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
         {
             return A<ScriptContext>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
         }
 
-        private bool M(ScriptContext x, NamedContentData newData, NamedContentData oldData, Status newStatus, Status oldStatus)
+        private bool M(ScriptContext x, NamedContentData newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
         {
             return
                 Equals(x.Data, newData) &&

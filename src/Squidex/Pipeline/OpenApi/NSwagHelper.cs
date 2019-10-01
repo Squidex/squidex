@@ -28,7 +28,7 @@ namespace Squidex.Pipeline.OpenApi
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {
-                using (var streamReader = new StreamReader(resourceStream))
+                using (var streamReader = new StreamReader(resourceStream!))
                 {
                     return streamReader.ReadToEnd();
                 }
@@ -78,7 +78,7 @@ namespace Squidex.Pipeline.OpenApi
             operation.AddParameter(name, schema, OpenApiParameterKind.Query, description, false);
         }
 
-        public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description, string format = null)
+        public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description, string? format = null)
         {
             var schema = new JsonSchema { Type = type, Format = format };
 
@@ -104,7 +104,7 @@ namespace Squidex.Pipeline.OpenApi
             operation.Parameters.Add(parameter);
         }
 
-        public static void AddResponse(this OpenApiOperation operation, string statusCode, string description, JsonSchema schema = null)
+        public static void AddResponse(this OpenApiOperation operation, string statusCode, string description, JsonSchema? schema = null)
         {
             var response = new OpenApiResponse { Description = description, Schema = schema };
 

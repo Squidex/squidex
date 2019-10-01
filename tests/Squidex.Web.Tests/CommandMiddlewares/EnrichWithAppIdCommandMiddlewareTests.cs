@@ -44,7 +44,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
-            appContext.App = null;
+            appContext.App = null!;
 
             var command = new CreateContent();
             var context = Ctx(command);

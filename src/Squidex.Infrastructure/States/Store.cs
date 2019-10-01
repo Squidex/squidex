@@ -37,12 +37,12 @@ namespace Squidex.Infrastructure.States
             return CreatePersistence(owner, key, applyEvent);
         }
 
-        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot) where TState : class
+        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot)
         {
             return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
-        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent) where TState : class
+        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
         {
             return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.States
             return new Persistence<TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
-        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent) where TState : class
+        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.States
             return new Persistence<TState, TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
 
-        public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>() where TState : class
+        public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()
         {
             return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
         }

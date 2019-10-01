@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null, [FromQuery] string q = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
             var assets = await assetQuery.QueryAsync(Context,
                 Q.Empty

@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return contentEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
-        public async Task<(ContentState? Value, long Version)> ReadAsync(Guid key, Func<Guid, Guid, Task<ISchemaEntity>> getSchema)
+        public async Task<(ContentState Value, long Version)> ReadAsync(Guid key, Func<Guid, Guid, Task<ISchemaEntity>> getSchema)
         {
             var contentEntity =
                 await Collection.Find(x => x.Id == key)
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }
 
-            return (null, EtagVersion.NotFound);
+            return (null!, EtagVersion.NotFound);
         }
 
         public Task ReadAllAsync(Func<ContentState, long, Task> callback, Func<Guid, Guid, Task<ISchemaEntity>> getSchema, CancellationToken ct = default)

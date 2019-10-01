@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetLoader.GetAsync(@event.AssetId, 12))
                 .Returns(new AssetEntity());
 
-            var result = await sut.CreateEnrichedEventAsync(envelope);
+            var result = await sut.CreateEnrichedEventAsync(envelope) as EnrichedAssetEvent;
 
-            Assert.Equal(type, ((EnrichedAssetEvent)result).Type);
+            Assert.Equal(type, result!.Type);
         }
 
         [Fact]

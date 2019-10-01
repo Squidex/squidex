@@ -56,7 +56,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public async Task<IUser> FindByIdOrEmailAsync(string idOrEmail)
+        public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail)
         {
             using (var scope = serviceProvider.CreateScope())
             {

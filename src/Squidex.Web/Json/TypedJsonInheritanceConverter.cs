@@ -53,7 +53,7 @@ namespace Squidex.Web.Json
 
                     if (method != null && method.IsStatic)
                     {
-                        var types = (IEnumerable<Type>)method.Invoke(null, new object[0]);
+                        var types = (IEnumerable<Type>)method.Invoke(null, new object[0])!;
 
                         foreach (var type in types)
                         {

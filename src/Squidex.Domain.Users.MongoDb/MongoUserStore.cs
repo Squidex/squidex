@@ -167,7 +167,7 @@ namespace Squidex.Domain.Users.MongoDb
         {
             if (!IsId(userId))
             {
-                return null;
+                return null!;
             }
 
             return await Collection.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken);
@@ -313,12 +313,12 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task<string> GetTokenAsync(IdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(loginProvider, name));
+            return Task.FromResult(((MongoUser)user).GetToken(loginProvider, name)!);
         }
 
         public Task<string> GetAuthenticatorKeyAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, AuthenticatorKeyTokenName));
+            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, AuthenticatorKeyTokenName)!);
         }
 
         public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)

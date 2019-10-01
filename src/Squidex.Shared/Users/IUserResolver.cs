@@ -14,7 +14,7 @@ namespace Squidex.Shared.Users
     {
         Task<bool> CreateUserIfNotExists(string email, bool invited = false);
 
-        Task<IUser> FindByIdOrEmailAsync(string idOrEmail);
+        Task<IUser?> FindByIdOrEmailAsync(string idOrEmail);
 
         Task<List<IUser>> QueryByEmailAsync(string email);
 

@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         private static string Q(ClrQuery query)
         {
             var rendered =
-                query.AdjustToModel().BuildFilter<MongoAssetEntity>(false).Filter
+                query.AdjustToModel().BuildFilter<MongoAssetEntity>(false).Filter!
                     .Render(Serializer, Registry).ToString();
 
             return rendered;

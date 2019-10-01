@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Events.Schemas
     {
         public string Name { get; set; }
 
-        public string Partitioning { get; set; }
+        public string? Partitioning { get; set; }
 
         public FieldProperties Properties { get; set; }
     }

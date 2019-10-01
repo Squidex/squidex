@@ -19,7 +19,7 @@ namespace Squidex.Web
         {
         }
 
-        public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly assembly = null)
+        public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly? assembly = null)
         {
             Guard.NotNull(configured, nameof(configured));
             Guard.NotNull(configuration, nameof(configuration));
@@ -38,7 +38,7 @@ namespace Squidex.Web
             {
                 if (!ContainsKey("version"))
                 {
-                    this["version"] = assembly.GetName().Version.ToString();
+                    this["version"] = assembly.GetName()!.Version!.ToString();
                 }
             }
         }

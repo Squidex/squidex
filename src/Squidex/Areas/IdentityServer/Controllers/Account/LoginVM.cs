@@ -11,7 +11,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public class LoginVM
     {
-        public string ReturnUrl { get; set; }
+        public string? ReturnUrl { get; set; }
 
         public bool IsLogin { get; set; }
 

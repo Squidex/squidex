@@ -32,11 +32,11 @@ namespace Squidex.Areas.IdentityServer.Config
 
             var assembly = typeof(IdentityServerServices).Assembly;
 
-            using (var certStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
+            using (var certificateStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
             {
-                var certData = new byte[certStream.Length];
+                var certData = new byte[certificateStream!.Length];
 
-                certStream.Read(certData, 0, certData.Length);
+                certificateStream.Read(certData, 0, certData.Length);
                 certificate = new X509Certificate2(certData, "password",
                     X509KeyStorageFlags.MachineKeySet |
                     X509KeyStorageFlags.PersistKeySet |

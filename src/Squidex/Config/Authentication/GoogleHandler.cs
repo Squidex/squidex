@@ -33,7 +33,7 @@ namespace Squidex.Config.Authentication
                 context.Identity.SetDisplayName(nameClaim);
             }
 
-            string pictureUrl = null;
+            string? pictureUrl = null;
 
             if (context.User.TryGetProperty("picture", out var picture) && picture.ValueKind == JsonValueKind.String)
             {

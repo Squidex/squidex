@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = null,
+                        Properties = null!,
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                             new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
-                                Properties = null
+                                Properties = null!
                             }
                         }
                     }
@@ -467,7 +467,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_throw_exception_if_field_ids_null()
         {
-            var command = new ReorderFields { FieldIds = null };
+            var command = new ReorderFields { FieldIds = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanReorder(schema_0, command),
                 new ValidationError("Field ids is required.", "FieldIds"));
@@ -492,7 +492,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanConfigurePreviewUrls_should_throw_exception_if_preview_urls_null()
         {
-            var command = new ConfigurePreviewUrls { PreviewUrls = null };
+            var command = new ConfigurePreviewUrls { PreviewUrls = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigurePreviewUrls(command),
                 new ValidationError("Preview Urls is required.", "PreviewUrls"));

@@ -31,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool NoUpdate { get; set; }
 
-        public static WorkflowStepDto FromWorkflowStep(WorkflowStep step)
+        public static WorkflowStepDto? FromWorkflowStep(WorkflowStep step)
         {
             if (step == null)
             {
@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Transitions = step.Transitions.ToDictionary(
                     y => y.Key,
-                    y => WorkflowTransitionDto.FromWorkflowTransition(y.Value))
+                    y => WorkflowTransitionDto.FromWorkflowTransition(y.Value)!)
             });
         }
 
@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return new WorkflowStep(
                 Transitions?.ToDictionary(
                     y => y.Key,
-                    y => y.Value?.ToTransition()),
+                    y => y.Value?.ToTransition()!),
                 Color, NoUpdate);
         }
     }

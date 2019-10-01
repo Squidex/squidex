@@ -24,32 +24,32 @@ namespace Squidex.Web
             AddGetLink("self", href);
         }
 
-        public void AddGetLink(string rel, string href, string metadata = null)
+        public void AddGetLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "GET", href, metadata);
         }
 
-        public void AddPatchLink(string rel, string href, string metadata = null)
+        public void AddPatchLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "PATCH", href, metadata);
         }
 
-        public void AddPostLink(string rel, string href, string metadata = null)
+        public void AddPostLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "POST", href, metadata);
         }
 
-        public void AddPutLink(string rel, string href, string metadata = null)
+        public void AddPutLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "PUT", href, metadata);
         }
 
-        public void AddDeleteLink(string rel, string href, string metadata = null)
+        public void AddDeleteLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "DELETE", href, metadata);
         }
 
-        public void AddLink(string rel, string method, string href, string metadata = null)
+        public void AddLink(string rel, string method, string href, string? metadata = null)
         {
             Guard.NotNullOrEmpty(rel, nameof(rel));
             Guard.NotNullOrEmpty(href, nameof(href));

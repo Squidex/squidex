@@ -52,19 +52,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             return planId != null && plansById.ContainsKey(planId);
         }
 
-        public IAppLimitsPlan? GetPlanForApp(IAppEntity app)
+        public IAppLimitsPlan? GetPlan(string? planId)
+        {
+            return plansById.GetOrDefault(planId ?? string.Empty);
+        }
+
+        public IAppLimitsPlan GetPlanForApp(IAppEntity app)
         {
             Guard.NotNull(app, nameof(app));
 
-            return GetPlan(app.Plan?.PlanId);
+            return GetPlanCore(app.Plan?.PlanId);
         }
 
-        public IAppLimitsPlan? GetPlan(string? planId)
-        {
-            return GetPlanCore(planId);
-        }
-
-        public IAppLimitsPlan? GetFreePlan()
+        public IAppLimitsPlan GetFreePlan()
         {
             return GetPlanCore(plansList.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Costs))?.Id);
         }

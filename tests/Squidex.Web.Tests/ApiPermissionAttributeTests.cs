@@ -44,7 +44,7 @@ namespace Squidex.Web
             {
                 isNextCalled = true;
 
-                return Task.FromResult<ActionExecutedContext>(null);
+                return Task.FromResult<ActionExecutedContext?>(null);
             };
         }
 

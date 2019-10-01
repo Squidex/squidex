@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task<(ContentState? Value, long Version)> ISnapshotStore<ContentState, Guid>.ReadAsync(Guid key)
+        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, Guid>.ReadAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {

@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
                 .Returns(new ContentEntity { SchemaId = SchemaMatch });
 
-            var result = await sut.CreateEnrichedEventAsync(envelope);
+            var result = await sut.CreateEnrichedEventAsync(envelope) as EnrichedContentEvent;
 
-            Assert.Equal(type, ((EnrichedContentEvent)result).Type);
+            Assert.Equal(type, result!.Type);
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             });
         }
 
-        private void TestForTrigger(bool handleAll, NamedId<Guid> schemaId, string condition, Action<ContentChangedTriggerV2> action)
+        private void TestForTrigger(bool handleAll, NamedId<Guid>? schemaId, string? condition, Action<ContentChangedTriggerV2> action)
         {
             var trigger = new ContentChangedTriggerV2 { HandleAll = handleAll };
 
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, A<string>.Ignored))
                     .MustNotHaveHappened();
             }
             else

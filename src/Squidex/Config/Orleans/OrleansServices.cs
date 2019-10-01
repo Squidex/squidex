@@ -33,7 +33,7 @@ namespace Squidex.Config.Orleans
                 siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
                 siloServices.AddScoped<IActivationLimit, ActivationLimit>();
 
-                siloServices.AddScoped(typeof(IGrainState<>), typeof(GrainState<>));
+                siloServices.AddScoped(typeof(IGrainState<>), typeof(Squidex.Infrastructure.Orleans.GrainState<>));
             });
 
             builder.ConfigureApplicationParts(parts =>
@@ -90,11 +90,6 @@ namespace Squidex.Config.Orleans
                 ["Development"] = () =>
                 {
                     builder.UseDevelopmentClustering(new IPEndPoint(address, orleansPortSilo));
-
-                    builder.Configure<ClusterMembershipOptions>(options =>
-                    {
-                        options.ExpectedClusterSize = 1;
-                    });
                 }
             });
 

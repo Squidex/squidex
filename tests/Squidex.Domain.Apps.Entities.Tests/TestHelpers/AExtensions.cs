@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return that.Matches(x => x.ToString() == query);
         }
 
-        public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[] values)
+        public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[]? values)
         {
             if (values == null)
             {

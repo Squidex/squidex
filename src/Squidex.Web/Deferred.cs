@@ -36,7 +36,7 @@ namespace Squidex.Web
         {
             Guard.NotNull(factory, nameof(factory));
 
-            return new Deferred(async () => await factory());
+            return new Deferred(async () => (await factory())!);
         }
     }
 }

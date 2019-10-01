@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task Should_throw_exception_if_no_state_returned()
         {
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(null));
+                .Returns(J.Of<IContentEntity>(null!));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
         }

@@ -136,9 +136,9 @@ namespace Squidex.Shared
             {
                 if (field.IsLiteral && !field.IsInitOnly)
                 {
-                    var value = (string)field.GetValue(null);
+                    var value = field.GetValue(null) as string;
 
-                    if (value.StartsWith(App, StringComparison.OrdinalIgnoreCase))
+                    if (value?.StartsWith(App, StringComparison.OrdinalIgnoreCase) == true)
                     {
                         if (value.IndexOf("{name}", App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
                         {

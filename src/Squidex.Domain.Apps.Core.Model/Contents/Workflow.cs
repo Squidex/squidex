@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public Workflow(
             Status initial,
-            IReadOnlyDictionary<Status, WorkflowStep> steps,
+            IReadOnlyDictionary<Status, WorkflowStep>? steps,
             IReadOnlyList<Guid>? schemaIds = null,
             string? name = null)
             : base(name ?? DefaultName)

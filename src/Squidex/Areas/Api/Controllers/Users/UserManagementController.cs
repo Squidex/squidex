@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [Route("user-management/")]
         [ProducesResponseType(typeof(UsersDto), 200)]
         [ApiPermission(Permissions.AdminUsersRead)]
-        public async Task<IActionResult> GetUsers([FromQuery] string query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var taskForItems = userManager.QueryByEmailAsync(query, take, skip);
             var taskForCount = userManager.CountByEmailAsync(query);

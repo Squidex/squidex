@@ -64,7 +64,7 @@ namespace Squidex.Web.Pipeline
             {
                 isNextCalled = true;
 
-                return Task.FromResult<ActionExecutedContext>(null);
+                return Task.FromResult<ActionExecutedContext?>(null);
             };
 
             sut = new ApiCostsFilter(appPlansProvider, usageTracker);
@@ -82,7 +82,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
-            Assert.Equal(429, (actionContext.Result as StatusCodeResult).StatusCode);
+            Assert.Equal(429, (actionContext.Result as StatusCodeResult)?.StatusCode);
             Assert.False(isNextCalled);
 
             A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))

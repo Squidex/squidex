@@ -31,6 +31,6 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public int? PixelHeight { get; set; }
 
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string>? Tags { get; set; }
     }
 }

@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Draft,
                     new Dictionary<Status, WorkflowStep>
                     {
-                        [Status.Published] = null,
+                        [Status.Published] = null!,
                         [Status.Draft] = new WorkflowStep()
                     }),
                 WorkflowId = workflowId
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             new WorkflowStep(
                                 new Dictionary<Status, WorkflowTransition>
                                 {
-                                    [Status.Draft] = null
+                                    [Status.Draft] = null!
                                 })
                     }),
                 WorkflowId = workflowId

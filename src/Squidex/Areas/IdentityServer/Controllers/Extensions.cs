@@ -17,7 +17,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
 {
     public static class Extensions
     {
-        public static async Task<ExternalLoginInfo> GetExternalLoginInfoWithDisplayNameAsync(this SignInManager<IdentityUser> signInManager, string expectedXsrf = null)
+        public static async Task<ExternalLoginInfo> GetExternalLoginInfoWithDisplayNameAsync(this SignInManager<IdentityUser> signInManager, string? expectedXsrf = null)
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 

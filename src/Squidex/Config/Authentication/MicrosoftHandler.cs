@@ -16,7 +16,7 @@ namespace Squidex.Config.Authentication
     {
         public override Task CreatingTicket(OAuthCreatingTicketContext context)
         {
-            string displayName = null;
+            string? displayName = null;
 
             if (context.User.TryGetProperty("displayName", out var element1) && element1.ValueKind == JsonValueKind.String)
             {
@@ -28,7 +28,7 @@ namespace Squidex.Config.Authentication
                 context.Identity.SetDisplayName(displayName);
             }
 
-            string id = null;
+            string? id = null;
 
             if (context.User.TryGetProperty("id", out var element2) && element2.ValueKind == JsonValueKind.String)
             {

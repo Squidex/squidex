@@ -41,7 +41,7 @@ namespace Squidex.Web.CommandMiddlewares
             {
                 var schemaId = await GetSchemaIdAsync(context);
 
-                schemaCommand.SchemaId = schemaId;
+                schemaCommand.SchemaId = schemaId!;
             }
 
             if (context.Command is SchemaCommand schemaSelfCommand && schemaSelfCommand.SchemaId == Guid.Empty)
@@ -54,9 +54,9 @@ namespace Squidex.Web.CommandMiddlewares
             await next();
         }
 
-        private async Task<NamedId<Guid>> GetSchemaIdAsync(CommandContext context)
+        private async Task<NamedId<Guid>?> GetSchemaIdAsync(CommandContext context)
         {
-            NamedId<Guid> appId = null;
+            NamedId<Guid>? appId = null;
 
             if (context.Command is IAppCommand appCommand)
             {
@@ -74,9 +74,9 @@ namespace Squidex.Web.CommandMiddlewares
 
                 if (routeValues.ContainsKey("name"))
                 {
-                    var schemaName = routeValues["name"].ToString();
+                    var schemaName = routeValues["name"].ToString()!;
 
-                    ISchemaEntity schema;
+                    ISchemaEntity? schema;
 
                     if (Guid.TryParse(schemaName, out var id))
                     {

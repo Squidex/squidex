@@ -20,6 +20,6 @@ namespace Squidex.Web
         public string Method { get; set; }
 
         [Display(Description = "Additional data about the link.")]
-        public string Metadata { get; set; }
+        public string? Metadata { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace Squidex.Web
 {
     public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
     {
-        private static readonly List<Func<Exception, IActionResult>> Handlers = new List<Func<Exception, IActionResult>>();
+        private static readonly List<Func<Exception, IActionResult?>> Handlers = new List<Func<Exception, IActionResult?>>();
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
@@ -81,7 +81,7 @@ namespace Squidex.Web
 
         public void OnException(ExceptionContext context)
         {
-            IActionResult result = null;
+            IActionResult? result = null;
 
             foreach (var handler in Handlers)
             {
@@ -111,7 +111,7 @@ namespace Squidex.Web
                 {
                     return e.Message;
                 }
-            }).ToArray();
+            }).ToArray() ?? new string[0];
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Error
         }
 
         [Route("error/")]
-        public async Task<IActionResult> Error(string errorId = null)
+        public async Task<IActionResult> Error(string? errorId = null)
         {
             await signInManager.SignOutAsync();
 

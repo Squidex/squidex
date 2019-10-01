@@ -980,7 +980,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_null_when_querying_dataDraft_and_no_draft_content_is_available()
         {
             var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null);
+            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null!);
 
             var query = @"
                 query {
@@ -1004,7 +1004,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     findMySchemaContent = new
                     {
-                        dataDraft = (object)null
+                        dataDraft = (object)null!
                     }
                 }
             };

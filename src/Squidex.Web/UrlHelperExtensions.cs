@@ -33,12 +33,12 @@ namespace Squidex.Web
             }
         }
 
-        public static string Url<T>(this IUrlHelper urlHelper, Func<T, string> action, object values = null) where T : Controller
+        public static string Url<T>(this IUrlHelper urlHelper, Func<T?, string> action, object? values = null) where T : Controller
         {
             return urlHelper.Action(action(null), NameOf<T>.Controller, values);
         }
 
-        public static string Url<T>(this Controller controller, Func<T, string> action, object values = null) where T : Controller
+        public static string Url<T>(this Controller controller, Func<T?, string> action, object? values = null) where T : Controller
         {
             return controller.Url.Url(action, values);
         }

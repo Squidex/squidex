@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public async Task Should_not_add_to_indexes_on_create_if_name_taken()
         {
             A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
-                .Returns(Task.FromResult<string>(null));
+                .Returns(Task.FromResult<string?>(null));
 
             var context =
                 new CommandContext(Create(appId.Name), commandBus)

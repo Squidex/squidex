@@ -18,16 +18,16 @@ namespace Squidex.Domain.Apps.Entities
 
         public IReadOnlyList<Guid> Ids { get; private set; }
 
-        public string ODataQuery { get; private set; }
+        public string? ODataQuery { get; private set; }
 
-        public string JsonQuery { get; private set; }
+        public string? JsonQuery { get; private set; }
 
-        public Q WithODataQuery(string odataQuery)
+        public Q WithODataQuery(string? odataQuery)
         {
             return Clone(c => c.ODataQuery = odataQuery);
         }
 
-        public Q WithJsonQuery(string jsonQuery)
+        public Q WithJsonQuery(string? jsonQuery)
         {
             return Clone(c => c.JsonQuery = jsonQuery);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities
             return Clone(c => c.Ids = ids.ToList());
         }
 
-        public Q WithIds(string ids)
+        public Q WithIds(string? ids)
         {
             if (!string.IsNullOrEmpty(ids))
             {

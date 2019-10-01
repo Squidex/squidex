@@ -67,7 +67,7 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_throw_exception_if_schema_not_found()
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, "other-schema"))
-                .Returns(Task.FromResult<ISchemaEntity>(null));
+                .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             actionContext.RouteData.Values["name"] = "other-schema";
 

@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed file extensions.
         /// </summary>
-        public string[] AllowedExtensions { get; set; }
+        public string[]? AllowedExtensions { get; set; }
 
         /// <summary>
         /// True, if duplicate values are allowed.

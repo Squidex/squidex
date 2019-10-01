@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
             {
                 var authorizeAttributes =
                     context.MethodInfo.GetCustomAttributes<AuthorizeAttribute>(true).Union(
-                    context.MethodInfo.DeclaringType.GetCustomAttributes<AuthorizeAttribute>(true))
+                    context.MethodInfo.DeclaringType!.GetCustomAttributes<AuthorizeAttribute>(true))
                         .ToArray();
 
                 if (authorizeAttributes.Any())

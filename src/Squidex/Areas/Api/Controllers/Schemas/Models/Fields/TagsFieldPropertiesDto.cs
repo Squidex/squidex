@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public string[] AllowedValues { get; set; }
+        public string[]? AllowedValues { get; set; }
 
         /// <summary>
         /// The editor that is used to manage this field.

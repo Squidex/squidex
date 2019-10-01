@@ -33,7 +33,7 @@ namespace Squidex.Pipeline.Plugins
             typeof(SquidexWeb)
         };
 
-        public static PluginLoader LoadPlugin(string pluginPath)
+        public static PluginLoader? LoadPlugin(string pluginPath)
         {
             foreach (var candidate in GetPaths(pluginPath))
             {
@@ -61,11 +61,21 @@ namespace Squidex.Pipeline.Plugins
 
             if (!Path.IsPathRooted(pluginPath))
             {
-                candidate = new FileInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), pluginPath));
+                var assembly = Assembly.GetEntryAssembly();
 
-                if (candidate.Exists)
+                if (assembly != null)
                 {
-                    yield return candidate;
+                    var directory = Path.GetDirectoryName(assembly.Location);
+
+                    if (directory != null)
+                    {
+                        candidate = new FileInfo(Path.Combine(directory, pluginPath));
+
+                        if (candidate.Exists)
+                        {
+                            yield return candidate;
+                        }
+                    }
                 }
             }
         }

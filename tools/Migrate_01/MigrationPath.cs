@@ -25,7 +25,7 @@ namespace Migrate_01
             this.serviceProvider = serviceProvider;
         }
 
-        public (int Version, IEnumerable<IMigration> Migrations) GetNext(int version)
+        public (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version)
         {
             if (version == CurrentVersion)
             {

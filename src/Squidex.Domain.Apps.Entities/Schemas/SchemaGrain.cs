@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 }
                 else if (command is FieldCommand fc && @event is FieldEvent fe)
                 {
-                    fe.FieldId = GetFieldId(fc.FieldId);
+                    fe.FieldId = GetFieldId(fc.FieldId)!;
                 }
             }
 

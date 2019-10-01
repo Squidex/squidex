@@ -52,7 +52,7 @@ namespace Squidex.Areas.IdentityServer.Config
             CreateStaticClients(urlsOptions, identityOptions);
         }
 
-        public async Task<Client> FindClientByIdAsync(string clientId)
+        public async Task<Client?> FindClientByIdAsync(string clientId)
         {
             var client = staticClients.GetOrDefault(clientId);
 
@@ -63,7 +63,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
             var (appName, appClientId) = clientId.GetClientParts();
 
-            if (!string.IsNullOrWhiteSpace(appName))
+            if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
             {
                 var app = await appProvider.GetAppAsync(appName);
 

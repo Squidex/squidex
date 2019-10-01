@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetQuery query)
         {
-            IAssetEntity asset;
+            IAssetEntity? asset;
 
             if (Guid.TryParse(idOrSlug, out var guid))
             {
@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             return DeliverAsset(asset, query);
         }
 
-        private IActionResult DeliverAsset(IAssetEntity asset, AssetQuery query)
+        private IActionResult DeliverAsset(IAssetEntity? asset, AssetQuery query)
         {
             query ??= new AssetQuery();
 

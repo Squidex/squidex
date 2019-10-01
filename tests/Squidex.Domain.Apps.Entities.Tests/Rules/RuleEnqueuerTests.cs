@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 .Returns(job1);
 
             A.CallTo(() => ruleService.CreateJobAsync(rule2, ruleEntity2.Id, @event))
-                .Returns(Task.FromResult<RuleJob>(null));
+                .Returns(Task.FromResult<RuleJob?>(null));
 
             await sut.On(@event);
 

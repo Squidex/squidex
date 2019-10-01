@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return app;
         }
 
-        public static ISchemaEntity Schema(NamedId<Guid> appId, NamedId<Guid> schemaId, Schema schemaDef = null)
+        public static ISchemaEntity Schema(NamedId<Guid> appId, NamedId<Guid> schemaId, Schema? schemaDef = null)
         {
             var schema = A.Fake<ISchemaEntity>();
 
@@ -49,17 +49,17 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return schema;
         }
 
-        public static ClaimsPrincipal ApiUser(string role = null)
+        public static ClaimsPrincipal ApiUser(string? role = null)
         {
             return CreateUser(role, "api");
         }
 
-        public static ClaimsPrincipal FrontendUser(string role = null)
+        public static ClaimsPrincipal FrontendUser(string? role = null)
         {
             return CreateUser(role, DefaultClients.Frontend);
         }
 
-        private static ClaimsPrincipal CreateUser(string role, string client)
+        private static ClaimsPrincipal CreateUser(string? role, string client)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

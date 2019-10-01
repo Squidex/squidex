@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public string Slug { get; set; }
 
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string>? Tags { get; set; }
     }
 }

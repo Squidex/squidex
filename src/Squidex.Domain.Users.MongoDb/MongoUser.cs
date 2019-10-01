@@ -63,7 +63,7 @@ namespace Squidex.Domain.Users.MongoDb
             claims.Foreach(RemoveClaim);
         }
 
-        internal string GetToken(string loginProvider, string name)
+        internal string? GetToken(string loginProvider, string name)
         {
             return Tokens.FirstOrDefault(t => t.LoginProvider == loginProvider && t.Name == name)?.Value;
         }

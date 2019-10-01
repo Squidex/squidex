@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null);
+            var result = await sut.GetNextsAsync(content, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null);
+            var result = await sut.GetNextsAsync(content, null!);
 
             result.Should().BeEquivalentTo(expected);
         }

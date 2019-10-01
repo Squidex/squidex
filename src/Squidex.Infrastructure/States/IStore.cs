@@ -18,10 +18,10 @@ namespace Squidex.Infrastructure.States
     {
         IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent? applyEvent);
 
-        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot) where TState : class;
+        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot);
 
-        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent) where TState : class;
+        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent);
 
-        ISnapshotStore<TState, TKey> GetSnapshotStore<TState>() where TState : class;
+        ISnapshotStore<TState, TKey> GetSnapshotStore<TState>();
     }
 }

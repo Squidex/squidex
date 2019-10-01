@@ -280,7 +280,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private string Q(ClrQuery query, bool useDraft = false)
         {
             var rendered =
-                query.AdjustToModel(schemaDef, useDraft).BuildFilter<MongoContentEntity>().Filter
+                query.AdjustToModel(schemaDef, useDraft).BuildFilter<MongoContentEntity>().Filter!
                     .Render(Serializer, Registry).ToString();
 
             return rendered;

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         public string Pattern { get; set; }
 
         [JsonProperty]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public JsonAppPattern()
         {

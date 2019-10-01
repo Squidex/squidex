@@ -84,12 +84,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Gets the current plan name.
         /// </summary>
-        public string PlanName { get; set; }
+        public string? PlanName { get; set; }
 
         /// <summary>
         /// Gets the next plan name.
         /// </summary>
-        public string PlanUpgrade { get; set; }
+        public string? PlanUpgrade { get; set; }
 
         public static AppDto FromApp(IAppEntity app, string userId, PermissionSet userPermissions, IAppPlansProvider plans, ApiController controller)
         {
@@ -139,7 +139,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
-            PlanName = plans.GetPlanForApp(app)?.Name;
+            PlanName = plans.GetPlanForApp(app).Name;
         }
 
         private void SetImage(IAppEntity app, ApiController controller)

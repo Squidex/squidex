@@ -134,7 +134,7 @@ namespace Squidex.Pipeline.Squid
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Pipeline.Squid.icon-{name}.svg"))
             {
-                using (var streamReader = new StreamReader(resourceStream))
+                using (var streamReader = new StreamReader(resourceStream!))
                 {
                     return streamReader.ReadToEnd();
                 }

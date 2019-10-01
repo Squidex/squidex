@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IFieldResolver ResolveAssetSourceUrl()
         {
-            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
+            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IFieldResolver ResolveAssetThumbnailUrl()
         {
-            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
+            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 

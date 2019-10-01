@@ -9,8 +9,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class ConsentVM
     {
-        public string ReturnUrl { get; set; }
+        public string? ReturnUrl { get; set; }
 
-        public string PrivacyUrl { get; set; }
+        public string? PrivacyUrl { get; set; }
     }
 }

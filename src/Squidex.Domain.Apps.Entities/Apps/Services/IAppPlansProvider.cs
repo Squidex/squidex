@@ -19,10 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services
 
         IAppLimitsPlan? GetPlanUpgrade(string? planId);
 
-        IAppLimitsPlan? GetPlanForApp(IAppEntity app);
-
         IAppLimitsPlan? GetPlan(string? planId);
 
-        IAppLimitsPlan? GetFreePlan();
+        IAppLimitsPlan GetPlanForApp(IAppEntity app);
+
+        IAppLimitsPlan GetFreePlan();
     }
 }

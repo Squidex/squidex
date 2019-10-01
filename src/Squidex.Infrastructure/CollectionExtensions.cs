@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure
             return enumerable.OrderBy(x => random.Next()).ToList();
         }
 
-        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
         {
             return source ?? Enumerable.Empty<T>();
         }

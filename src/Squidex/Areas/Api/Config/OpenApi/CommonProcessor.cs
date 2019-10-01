@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             logoUrl = urlOptions.Value.BuildUrl("images/logo-white.png", false);
 
-            if (!exposedValues.TryGetValue("version", out version))
+            if (!exposedValues.TryGetValue("version", out version!) || version == null)
             {
                 version = "1.0";
             }

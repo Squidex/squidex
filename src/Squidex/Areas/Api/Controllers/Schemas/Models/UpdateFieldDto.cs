@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public UpdateField ToCommand(long id, long? parentId = null)
         {
-            return new UpdateField { ParentFieldId = parentId, FieldId = id, Properties = Properties?.ToProperties() };
+            return new UpdateField { ParentFieldId = parentId, FieldId = id, Properties = Properties?.ToProperties()! };
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             A.CallTo(() => users.FindByIdOrEmailAsync("3@email.com")).Returns(user3);
 
             A.CallTo(() => users.FindByIdOrEmailAsync("notfound"))
-                .Returns(Task.FromResult<IUser>(null));
+                .Returns(Task.FromResult<IUser?>(null));
 
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(10);

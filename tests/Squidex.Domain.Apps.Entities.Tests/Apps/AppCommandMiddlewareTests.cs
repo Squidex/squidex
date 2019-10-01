@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var context = CreateContextForCommand(command);
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(Task.FromResult<ImageInfo>(null));
+                .Returns(Task.FromResult<ImageInfo?>(null));
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
         }

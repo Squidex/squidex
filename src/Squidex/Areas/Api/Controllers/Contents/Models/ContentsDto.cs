@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [Required]
         public StatusInfoDto[] Statuses { get; set; }
 
-        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, ApiController controller, ISchemaEntity schema, IContentWorkflow workflow)
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, ApiController controller, ISchemaEntity? schema, IContentWorkflow workflow)
         {
             var result = new ContentsDto
             {
@@ -44,9 +44,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 Items = contents.Select(x => ContentDto.FromContent(context, x, controller)).ToArray()
             };
 
-            await result.AssignStatusesAsync(workflow, schema);
+            if (schema != null)
+            {
+                await result.AssignStatusesAsync(workflow, schema);
 
-            return result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+                return result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+            }
+            else
+            {
+                return result;
+            }
         }
 
         private async Task AssignStatusesAsync(IContentWorkflow workflow, ISchemaEntity schema)

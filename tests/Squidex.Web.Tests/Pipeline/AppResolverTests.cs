@@ -55,7 +55,7 @@ namespace Squidex.Web.Pipeline
             {
                 isNextCalled = true;
 
-                return Task.FromResult<ActionExecutedContext>(null);
+                return Task.FromResult<ActionExecutedContext?>(null);
             };
 
             sut = new AppResolver(appProvider);
@@ -65,7 +65,7 @@ namespace Squidex.Web.Pipeline
         public async Task Should_return_not_found_if_app_not_found()
         {
             A.CallTo(() => appProvider.GetAppAsync(appName))
-                .Returns(Task.FromResult<IAppEntity>(null));
+                .Returns(Task.FromResult<IAppEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -159,7 +159,7 @@ namespace Squidex.Web.Pipeline
                 .MustNotHaveHappened();
         }
 
-        private static IAppEntity CreateApp(string name, string appUser = null, string appClient = null)
+        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null)
         {
             var appEntity = A.Fake<IAppEntity>();
 

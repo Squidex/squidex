@@ -15,11 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         bool CanGenerateAssetSourceUrl { get; }
 
+        string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset);
+
+        string? GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset);
+
         string GenerateAssetUrl(IAppEntity app, IAssetEntity asset);
-
-        string GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset);
-
-        string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset);
 
         string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content);
     }

@@ -20,7 +20,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexSubscriptions(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty());
+            services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty()!);
 
             services.AddSingletonAs<ConfigAppPlansProvider>()
                 .AsOptional<IAppPlansProvider>();

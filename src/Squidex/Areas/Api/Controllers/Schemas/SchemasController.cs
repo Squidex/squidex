@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {
-            ISchemaEntity schema;
+            ISchemaEntity? schema;
 
             if (Guid.TryParse(name, out var id))
             {

@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The plan owner.
         /// </summary>
-        public string PlanOwner { get; set; }
+        public string? PlanOwner { get; set; }
 
         /// <summary>
         /// Indicates if there is a billing portal.

@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
 {
     public abstract class ParentFieldEvent : SchemaEvent
     {
-        public NamedId<long> ParentFieldId { get; set; }
+        public NamedId<long>? ParentFieldId { get; set; }
     }
 }

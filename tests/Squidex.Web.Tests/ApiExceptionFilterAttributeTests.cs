@@ -45,14 +45,14 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            var result = context.Result as ObjectResult;
+            var result = (ObjectResult)context.Result!;
 
             Assert.Equal(400, result.StatusCode);
             Assert.Equal(400, (result.Value as ErrorDto)?.StatusCode);
 
-            Assert.Equal(ex.Summary, (result.Value as ErrorDto).Message);
+            Assert.Equal(ex.Summary, (result.Value as ErrorDto)!.Message);
 
-            Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, (result.Value as ErrorDto).Details);
+            Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, (result.Value as ErrorDto)!.Details);
         }
 
         [Fact]
@@ -112,12 +112,12 @@ namespace Squidex.Web
 
         private static void Validate(int statusCode, ExceptionContext context)
         {
-            var result = context.Result as ObjectResult;
+            var result = (ObjectResult)context.Result!;
 
             Assert.Equal(statusCode, result.StatusCode);
             Assert.Equal(statusCode, (result.Value as ErrorDto)?.StatusCode);
 
-            Assert.Equal(context.Exception.Message, (result.Value as ErrorDto).Message);
+            Assert.Equal(context.Exception.Message, (result.Value as ErrorDto)!.Message);
         }
     }
 }

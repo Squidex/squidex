@@ -52,10 +52,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
         private readonly ContentQueryService sut;
 
-        public static IEnumerable<object[]> ApiStatusTests = new[]
+        public static IEnumerable<object?[]> ApiStatusTests = new[]
         {
-            new object[] { 0, new[] { Status.Published } },
-            new object[] { 1, null }
+            new object?[] { 0, new[] { Status.Published } },
+            new object?[] { 1, null }
         };
 
         public ContentQueryServiceTests()
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
-            Assert.Equal(contentTransformed, result.Data);
+            Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
-            Assert.Equal(contentTransformed, result.Data);
+            Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 10);
 
-            Assert.Equal(contentTransformed, result.Data);
+            Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
         }
 
@@ -428,25 +428,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private void SetupContents(Status[] status, int count, int total, IContentEntity content, bool inDraft, bool includeDraft)
+        private void SetupContents(Status[]? status, int count, int total, IContentEntity content, bool inDraft, bool includeDraft)
         {
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<ClrQuery>.Ignored, includeDraft))
                 .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
         }
 
-        private void SetupContents(Status[] status, int total, List<Guid> ids, bool includeDraft)
+        private void SetupContents(Status[]? status, int total, List<Guid> ids, bool includeDraft)
         {
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
                 .Returns(ResultList.Create(total, ids.Select(CreateContent).Shuffle()));
         }
 
-        private void SetupContents(Status[] status, List<Guid> ids, bool includeDraft)
+        private void SetupContents(Status[]? status, List<Guid> ids, bool includeDraft)
         {
             A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
         }
 
-        private void SetupContent(Status[] status, IContentEntity content, bool includeDraft)
+        private void SetupContent(Status[]? status, IContentEntity? content, bool includeDraft)
         {
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.That.Is(status), contentId, includeDraft))
                 .Returns(content);
@@ -464,10 +464,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private void SetupSchemaNotFound()
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
-                .Returns((ISchemaEntity)null);
+                .Returns((ISchemaEntity?)null);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
-                .Returns((ISchemaEntity)null);
+                .Returns((ISchemaEntity?)null);
         }
 
         private void SetupEnricher()

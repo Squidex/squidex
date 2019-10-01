@@ -54,22 +54,22 @@ namespace Squidex.Shared.Users
             return user.HasClaimValue(SquidexClaimTypes.PictureUrl, SquidexClaimTypes.PictureUrlStore);
         }
 
-        public static string ClientSecret(this IUser user)
+        public static string? ClientSecret(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.ClientSecret);
         }
 
-        public static string PictureUrl(this IUser user)
+        public static string? PictureUrl(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.PictureUrl);
         }
 
-        public static string DisplayName(this IUser user)
+        public static string? DisplayName(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
         }
 
-        public static string GetClaimValue(this IUser user, string type)
+        public static string? GetClaimValue(this IUser user, string type)
         {
             return user.Claims.FirstOrDefault(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase))?.Value;
         }
@@ -89,7 +89,7 @@ namespace Squidex.Shared.Users
             return user.Claims.Any(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static string PictureNormalizedUrl(this IUser user)
+        public static string? PictureNormalizedUrl(this IUser user)
         {
             var url = user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.PictureUrl)?.Value;
 

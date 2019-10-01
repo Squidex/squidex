@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             if (users.TryGetValue(ContributorId, out var user))
             {
-                ContributorName = user.DisplayName();
+                ContributorName = user.DisplayName()!;
             }
             else
             {

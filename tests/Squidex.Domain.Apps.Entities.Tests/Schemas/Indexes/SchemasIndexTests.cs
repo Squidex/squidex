@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         public async Task Should_not_add_to_index_on_create_if_name_taken()
         {
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
-                .Returns(Task.FromResult<string>(null));
+                .Returns(Task.FromResult<string?>(null));
 
             var context =
                 new CommandContext(Create(schemaId.Name), commandBus)

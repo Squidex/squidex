@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UploadImage_should_create_events_and_update_state()
         {
-            var command = new UploadAppImage { File = new AssetFile("image.png", "image/png", 100, () => null) };
+            var command = new UploadAppImage { File = new AssetFile("image.png", "image/png", 100, () => new MemoryStream()) };
 
             await ExecuteCreateAsync();
 
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("image/png", sut.Snapshot.Image.MimeType);
+            Assert.Equal("image/png", sut.Snapshot.Image!.MimeType);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -173,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.True(result.Value is PlanChangedResult);
 
-            Assert.Equal(planIdPaid, sut.Snapshot.Plan.PlanId);
+            Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
             LastEvents
                 .ShouldHaveSameEvents(

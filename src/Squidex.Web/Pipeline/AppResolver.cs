@@ -86,7 +86,7 @@ namespace Squidex.Web.Pipeline
             return context.ActionDescriptor.FilterDescriptors.Any(x => x.Filter is AllowAnonymousFilter);
         }
 
-        private static (string, PermissionSet) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
             var clientId = user.GetClientId();
 
@@ -98,7 +98,7 @@ namespace Squidex.Web.Pipeline
             return (null, null);
         }
 
-        private static (string, PermissionSet) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
         {
             var subjectId = user.OpenIdSubject();
 

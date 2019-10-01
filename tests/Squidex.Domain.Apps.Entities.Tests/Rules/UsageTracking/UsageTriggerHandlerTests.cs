@@ -59,10 +59,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
 
-            var result = (EnrichedUsageExceededEvent)await sut.CreateEnrichedEventAsync(Envelope.Create<AppEvent>(@event));
+            var result = await sut.CreateEnrichedEventAsync(Envelope.Create<AppEvent>(@event)) as EnrichedUsageExceededEvent;
 
-            Assert.Equal(@event.CallsCurrent, result.CallsCurrent);
-            Assert.Equal(@event.CallsLimit, result.CallsLimit);
+            Assert.Equal(@event.CallsCurrent, result!.CallsCurrent);
+            Assert.Equal(@event.CallsLimit, result!.CallsLimit);
         }
     }
 }

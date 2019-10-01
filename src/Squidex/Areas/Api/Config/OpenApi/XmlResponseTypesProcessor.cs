@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using NSwag;
@@ -26,7 +27,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             if (!string.IsNullOrWhiteSpace(returnsDescription))
             {
-                foreach (Match match in ResponseRegex.Matches(returnsDescription))
+                foreach (var match in ResponseRegex.Matches(returnsDescription).OfType<Match>())
                 {
                     var statusCode = match.Groups["Code"].Value;
 

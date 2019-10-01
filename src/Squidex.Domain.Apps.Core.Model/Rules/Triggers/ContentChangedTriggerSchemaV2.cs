@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     {
         public Guid SchemaId { get; set; }
 
-        public string Condition { get; set; }
+        public string? Condition { get; set; }
     }
 }

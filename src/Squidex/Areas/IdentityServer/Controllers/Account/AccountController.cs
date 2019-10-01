@@ -95,14 +95,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         [HttpGet]
         [Route("account/consent/")]
-        public IActionResult Consent(string returnUrl = null)
+        public IActionResult Consent(string? returnUrl = null)
         {
             return View(new ConsentVM { PrivacyUrl = identityOptions.PrivacyUrl, ReturnUrl = returnUrl });
         }
 
         [HttpPost]
         [Route("account/consent/")]
-        public async Task<IActionResult> Consent(ConsentModel model, string returnUrl = null)
+        public async Task<IActionResult> Consent(ConsentModel model, string? returnUrl = null)
         {
             if (!model.ConsentToCookies)
             {
@@ -122,6 +122,11 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
 
             var user = await userManager.GetUserWithClaimsAsync(User);
+
+            if (user == null)
+            {
+                throw new DomainException("Cannot find user.");
+            }
 
             var update = new UserValues
             {
@@ -158,7 +163,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         [HttpGet]
         [Route("account/signup/")]
-        public Task<IActionResult> Signup(string returnUrl = null)
+        public Task<IActionResult> Signup(string? returnUrl = null)
         {
             return LoginViewAsync(returnUrl, false, false);
         }
@@ -166,14 +171,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [HttpGet]
         [Route("account/login/")]
         [ClearCookies]
-        public Task<IActionResult> Login(string returnUrl = null)
+        public Task<IActionResult> Login(string? returnUrl = null)
         {
             return LoginViewAsync(returnUrl, true, false);
         }
 
         [HttpPost]
         [Route("account/login/")]
-        public async Task<IActionResult> Login(LoginModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
@@ -192,7 +197,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
         }
 
-        private async Task<IActionResult> LoginViewAsync(string returnUrl, bool isLogin, bool isFailed)
+        private async Task<IActionResult> LoginViewAsync(string? returnUrl, bool isLogin, bool isFailed)
         {
             var allowPasswordAuth = identityOptions.AllowPasswordAuth;
 
@@ -224,7 +229,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         [HttpPost]
         [Route("account/external/")]
-        public IActionResult External(string provider, string returnUrl = null)
+        public IActionResult External(string provider, string? returnUrl = null)
         {
             var properties =
                 signInManager.ConfigureExternalAuthenticationProperties(provider,
@@ -235,7 +240,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         [HttpGet]
         [Route("account/external-callback/")]
-        public async Task<IActionResult> ExternalCallback(string returnUrl = null)
+        public async Task<IActionResult> ExternalCallback(string? returnUrl = null)
         {
             var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
@@ -253,7 +258,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var isLoggedIn = result.Succeeded;
 
-            UserWithClaims user;
+            UserWithClaims? user;
 
             if (isLoggedIn)
             {
@@ -381,7 +386,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
         }
 
-        private IActionResult RedirectToReturnUrl(string returnUrl)
+        private IActionResult RedirectToReturnUrl(string? returnUrl)
         {
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -393,7 +398,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
         }
 
-        private async Task<bool> MakeIdentityOperation(Func<Task<IdentityResult>> action, [CallerMemberName] string operationName = null)
+        private async Task<bool> MakeIdentityOperation(Func<Task<IdentityResult>> action, [CallerMemberName] string? operationName = null)
         {
             try
             {

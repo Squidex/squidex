@@ -23,19 +23,19 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Optional label for the editor.
         /// </summary>
         [StringLength(100)]
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         /// <summary>
         /// Hints to describe the schema.
         /// </summary>
         [StringLength(1000)]
-        public string Hints { get; set; }
+        public string? Hints { get; set; }
 
         /// <summary>
         /// Placeholder to show when no value has been entered.
         /// </summary>
         [StringLength(100)]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         /// <summary>
         /// Indicates if the field is required.
@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Optional url to the editor.
         /// </summary>
-        public string EditorUrl { get; set; }
+        public string? EditorUrl { get; set; }
 
         public abstract FieldProperties ToProperties();
 

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.IO;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;
 using Xunit;
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset
             {
-                File = new AssetFile("File.DOCX", "Mime", 100, () => null)
+                File = new AssetFile("File.DOCX", "Mime", 100, () => new MemoryStream())
             };
 
             sut.GenerateTags(command, tags);
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset
             {
-                File = new AssetFile("File", "Mime", 100, () => null)
+                File = new AssetFile("File", "Mime", 100, () => new MemoryStream())
             };
 
             sut.GenerateTags(command, tags);

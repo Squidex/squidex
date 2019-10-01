@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
-                .Returns(Task.FromResult<StatusInfo>(null));
+                .Returns(Task.FromResult<StatusInfo>(null!));
 
             var result = await sut.EnrichAsync(source, requestContext);
 

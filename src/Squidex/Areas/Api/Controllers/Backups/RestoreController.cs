@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
-            await restoreGrain.RestoreAsync(request.Url, User.Token(), request.Name);
+            await restoreGrain.RestoreAsync(request.Url, User.Token()!, request.Name);
 
             return NoContent();
         }

@@ -34,7 +34,7 @@ namespace Migrate_01.Migrations
 
                 var writesBatches = new List<WriteModel<BsonDocument>>();
 
-                async Task WriteAsync(WriteModel<BsonDocument> model, bool force)
+                async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
                     if (model != null)
                     {

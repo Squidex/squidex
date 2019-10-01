@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_always_allow_publish_on_create()
         {
-            var result = await sut.CanPublishOnCreateAsync(null, null, null);
+            var result = await sut.CanPublishOnCreateAsync(null!, null!, null!);
 
             Assert.True(result);
         }
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var expected = new StatusInfo(Status.Draft, StatusColors.Draft);
 
-            var result = await sut.GetInitialStatusAsync(null);
+            var result = await sut.GetInitialStatusAsync(null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanMoveToAsync(content, Status.Draft, null);
+            var result = await sut.CanMoveToAsync(content, Status.Draft, null!);
 
             Assert.True(result);
         }
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextsAsync(content, null);
+            var result = await sut.GetNextsAsync(content, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null);
+            var result = await sut.GetNextsAsync(content, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null);
+            var result = await sut.GetNextsAsync(content, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(null);
+            var result = await sut.GetAllAsync(null!);
 
             result.Should().BeEquivalentTo(expected);
         }

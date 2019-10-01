@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 
-            Assert.Equal(type, ((EnrichedSchemaEvent)result).Type);
+            Assert.Equal(type, ((EnrichedSchemaEvent)result!).Type);
         }
 
         [Fact]

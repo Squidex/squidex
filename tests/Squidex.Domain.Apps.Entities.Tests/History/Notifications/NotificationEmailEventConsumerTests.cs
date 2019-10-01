@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
             var @event = CreateEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(Task.FromResult<IUser>(null));
+                .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
             var @event = CreateEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
-                .Returns(Task.FromResult<IUser>(null));
+                .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
 

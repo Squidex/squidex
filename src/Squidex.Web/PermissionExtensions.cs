@@ -18,27 +18,27 @@ namespace Squidex.Web
             return httpContext.Context().Permissions;
         }
 
-        public static bool Includes(this HttpContext httpContext, Permission permission, PermissionSet additional = null)
+        public static bool Includes(this HttpContext httpContext, Permission permission, PermissionSet? additional = null)
         {
             return httpContext.Permissions().Includes(permission) || additional?.Includes(permission) == true;
         }
 
-        public static bool Includes(this ApiController controller, Permission permission, PermissionSet additional = null)
+        public static bool Includes(this ApiController controller, Permission permission, PermissionSet? additional = null)
         {
             return controller.HttpContext.Includes(permission) || additional?.Includes(permission) == true;
         }
 
-        public static bool HasPermission(this HttpContext httpContext, Permission permission, PermissionSet additional = null)
+        public static bool HasPermission(this HttpContext httpContext, Permission permission, PermissionSet? additional = null)
         {
             return httpContext.Permissions().Allows(permission) || additional?.Allows(permission) == true;
         }
 
-        public static bool HasPermission(this ApiController controller, Permission permission, PermissionSet additional = null)
+        public static bool HasPermission(this ApiController controller, Permission permission, PermissionSet? additional = null)
         {
             return controller.HttpContext.HasPermission(permission) || additional?.Allows(permission) == true;
         }
 
-        public static bool HasPermission(this ApiController controller, string id, string app = "*", string schema = "*", PermissionSet additional = null)
+        public static bool HasPermission(this ApiController controller, string id, string app = "*", string schema = "*", PermissionSet? additional = null)
         {
             if (app == "*")
             {
