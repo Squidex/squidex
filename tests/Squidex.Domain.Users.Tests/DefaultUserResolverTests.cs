@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Squidex.Domain.Users
@@ -30,7 +32,28 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.NormalizeEmail(A<string>.Ignored))
                 .ReturnsLazily(c => c.GetArgument<string>(0).ToUpperInvariant());
 
-            sut = new DefaultUserResolver(null);
+            var serviceProvider = A.Fake<IServiceProvider>();
+
+            var scope = A.Fake<IServiceScope>();
+
+            var scopeFactory = A.Fake<IServiceScopeFactory>();
+
+            A.CallTo(() => scopeFactory.CreateScope())
+                .Returns(scope);
+
+            A.CallTo(() => scope.ServiceProvider)
+                .Returns(serviceProvider);
+
+            A.CallTo(() => serviceProvider.GetService(typeof(IServiceScopeFactory)))
+                .Returns(scopeFactory);
+
+            A.CallTo(() => serviceProvider.GetService(typeof(IUserFactory)))
+                .Returns(userFactory);
+
+            A.CallTo(() => serviceProvider.GetService(typeof(UserManager<IdentityUser>)))
+                .Returns(userManager);
+
+            sut = new DefaultUserResolver(serviceProvider);
         }
 
         [Fact]
