@@ -68,6 +68,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 LazyClientStore>();
             services.AddSingleton<IResourceStore,
                 InMemoryResourcesStore>();
+            services.AddSingleton<IXmlRepository,
+                DefaultXmlRepository>();
 
             services.AddIdentityServer(options =>
                 {

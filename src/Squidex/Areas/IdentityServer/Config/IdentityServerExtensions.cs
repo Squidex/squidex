@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
-using Squidex.Config.Authentication;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;

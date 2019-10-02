@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
 using Squidex.Shared.Users;
-using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Authentication
 {

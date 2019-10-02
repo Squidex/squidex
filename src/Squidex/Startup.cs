@@ -11,8 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
+using Squidex.Areas.IdentityServer.Config;
 using Squidex.Areas.OrleansDashboard;
 using Squidex.Areas.Portal;
+using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
@@ -32,11 +34,15 @@ namespace Squidex
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
+            services.AddMemoryCache();
+
             services.AddSquidexMvcWithPlugins(config);
 
             services.AddSquidexApps();
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexAssets(config);
+            services.AddSquidexAuthentication(config);
             services.AddSquidexBackups();
             services.AddSquidexCommands(config);
             services.AddSquidexComments();
@@ -45,6 +51,8 @@ namespace Squidex
             services.AddSquidexEventSourcing(config);
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory();
+            services.AddSquidexIdentity(config);
+            services.AddSquidexIdentityServer();
             services.AddSquidexInfrastructure(config);
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);

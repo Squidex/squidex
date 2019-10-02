@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains

@@ -42,6 +42,7 @@ namespace Squidex.Pipeline.Plugins
                     return PluginLoader.CreateFromAssemblyFile(candidate.FullName, config =>
                     {
                         config.PreferSharedTypes = true;
+
                         config.SharedAssemblies.AddRange(SharedTypes.Select(x => x.Assembly.GetName()));
                     });
                 }
