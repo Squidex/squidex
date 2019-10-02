@@ -26,8 +26,8 @@ namespace Squidex.Infrastructure.Assets
 
         public virtual async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
-            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
+            Guard.NotNullOrEmpty(sourceFileName);
+            Guard.NotNullOrEmpty(targetFileName);
 
             if (!streams.TryGetValue(sourceFileName, out var sourceStream))
             {
@@ -42,8 +42,8 @@ namespace Squidex.Infrastructure.Assets
 
         public virtual async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
-            Guard.NotNull(stream, nameof(stream));
+            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNull(stream);
 
             if (!streams.TryGetValue(fileName, out var sourceStream))
             {
@@ -65,8 +65,8 @@ namespace Squidex.Infrastructure.Assets
 
         public virtual async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
-            Guard.NotNull(stream, nameof(stream));
+            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNull(stream);
 
             var memoryStream = new MemoryStream();
 
@@ -103,7 +103,7 @@ namespace Squidex.Infrastructure.Assets
 
         public virtual Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             streams.TryRemove(fileName, out _);
 

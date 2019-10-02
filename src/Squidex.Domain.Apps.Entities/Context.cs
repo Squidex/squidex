@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Context(ClaimsPrincipal user)
         {
-            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(user);
 
             User = user;
 

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
     {
         public static async Task CanCreate(ISchemaEntity schema, IContentWorkflow contentWorkflow, CreateContent command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot created content.", e =>
             {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static async Task CanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, UpdateContent command, bool isProposal)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot update content.", e =>
             {
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static async Task CanPatch(IContentEntity content, IContentWorkflow contentWorkflow, PatchContent command, bool isProposal)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot patch content.", e =>
             {
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static void CanDiscardChanges(bool isPending, DiscardChanges command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (!isPending)
             {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static Task CanChangeStatus(ISchemaEntity schema, IContentEntity content, IContentWorkflow contentWorkflow, ChangeContentStatus command, bool isChangeConfirm)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (schema.SchemaDef.IsSingleton && command.Status != Status.Published)
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static void CanDelete(ISchemaEntity schema, DeleteContent command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (schema.SchemaDef.IsSingleton)
             {

@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public static Func<TInput, TOutput> ToDefault<TInput, TOutput>(this Action<TInput> action)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(action);
 
             return x =>
             {
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public static Func<TInput, Task<TOutput>> ToDefault<TInput, TOutput>(this Func<TInput, Task> action)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(action);
 
             return async x =>
             {
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public static Func<TInput, Task<TOutput>> ToAsync<TInput, TOutput>(this Func<TInput, TOutput> action)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(action);
 
             return x =>
             {

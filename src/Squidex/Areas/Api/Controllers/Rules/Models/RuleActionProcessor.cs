@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
         public RuleActionProcessor(RuleRegistry ruleRegistry)
         {
-            Guard.NotNull(ruleRegistry, nameof(ruleRegistry));
+            Guard.NotNull(ruleRegistry);
 
             this.ruleRegistry = ruleRegistry;
         }

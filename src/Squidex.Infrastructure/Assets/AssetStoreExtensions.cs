@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Assets
 
         public static string GetFileName(string id, long version, string? suffix = null)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
         }

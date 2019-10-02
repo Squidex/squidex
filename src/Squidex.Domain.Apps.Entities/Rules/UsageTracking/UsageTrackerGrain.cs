@@ -46,8 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public UsageTrackerGrain(IGrainState<GrainState> state, IUsageTracker usageTracker)
         {
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(usageTracker, nameof(usageTracker));
+            Guard.NotNull(state);
+            Guard.NotNull(usageTracker);
 
             this.state = state;
 

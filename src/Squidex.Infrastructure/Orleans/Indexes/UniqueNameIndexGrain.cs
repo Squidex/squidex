@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
         public UniqueNameIndexGrain(IGrainState<TState> state)
         {
-            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(state);
 
             this.state = state;
         }

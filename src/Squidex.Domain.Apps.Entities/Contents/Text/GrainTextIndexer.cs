@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public GrainTextIndexer(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }

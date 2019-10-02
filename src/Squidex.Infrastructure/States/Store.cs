@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.States
 
         private IPersistence CreatePersistence(Type owner, TKey key, HandleEvent? applyEvent)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             var snapshotStore = GetSnapshotStore<None>();
 
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.States
 
         private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             var snapshotStore = GetSnapshotStore<TState>();
 

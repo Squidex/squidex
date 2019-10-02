@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public static T Copy<T>(this T source) where T : class, new()
         {
-            Guard.NotNull(source, nameof(source));
+            Guard.NotNull(source);
 
             return ClassCopier<T>.CopyThis(source);
         }

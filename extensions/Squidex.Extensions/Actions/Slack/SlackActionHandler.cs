@@ -25,7 +25,7 @@ namespace Squidex.Extensions.Actions.Slack
         public SlackActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
+            Guard.NotNull(httpClientFactory);
 
             this.httpClientFactory = httpClientFactory;
         }

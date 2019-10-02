@@ -21,8 +21,8 @@ namespace Squidex.Infrastructure.Orleans
 
         public ActivationLimit(IGrainActivationContext context, IActivationLimiter limiter)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(limiter, nameof(limiter));
+            Guard.NotNull(context);
+            Guard.NotNull(limiter);
 
             this.context = context;
             this.limiter = limiter;

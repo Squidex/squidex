@@ -47,10 +47,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CosmosDbEventStore(DocumentClient documentClient, string masterKey, string database, JsonSerializerSettings serializerSettings)
         {
-            Guard.NotNull(documentClient, nameof(documentClient));
-            Guard.NotNull(serializerSettings, nameof(serializerSettings));
-            Guard.NotNullOrEmpty(masterKey, nameof(masterKey));
-            Guard.NotNullOrEmpty(database, nameof(database));
+            Guard.NotNull(documentClient);
+            Guard.NotNull(serializerSettings);
+            Guard.NotNullOrEmpty(masterKey);
+            Guard.NotNullOrEmpty(database);
 
             this.documentClient = documentClient;
 

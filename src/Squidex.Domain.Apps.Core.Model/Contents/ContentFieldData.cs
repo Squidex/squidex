@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddJsonValue(string key, IJsonValue value)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             if (Language.IsValidLanguage(key))
             {

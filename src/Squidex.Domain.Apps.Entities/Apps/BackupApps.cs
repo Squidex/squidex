@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex, IUserResolver userResolver)
         {
-            Guard.NotNull(appsIndex, nameof(appsIndex));
-            Guard.NotNull(appUISettings, nameof(appUISettings));
-            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(appsIndex);
+            Guard.NotNull(appUISettings);
+            Guard.NotNull(userResolver);
 
             this.appsIndex = appsIndex;
             this.appUISettings = appUISettings;

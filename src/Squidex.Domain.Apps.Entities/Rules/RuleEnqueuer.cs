@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
+            Guard.NotNull(appProvider);
+            Guard.NotNull(cache);
+            Guard.NotNull(ruleEventRepository);
+            Guard.NotNull(ruleService);
 
             this.appProvider = appProvider;
 

@@ -22,8 +22,8 @@ namespace Squidex.Infrastructure.Assets
 
         public AzureBlobAssetStore(string connectionString, string containerName)
         {
-            Guard.NotNullOrEmpty(containerName, nameof(containerName));
-            Guard.NotNullOrEmpty(connectionString, nameof(connectionString));
+            Guard.NotNullOrEmpty(containerName);
+            Guard.NotNullOrEmpty(connectionString);
 
             this.connectionString = connectionString;
             this.containerName = containerName;
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Assets
 
         public string? GeneratePublicUrl(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             if (blobContainer.Properties.PublicAccess != BlobContainerPublicAccessType.Blob)
             {
@@ -64,8 +64,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
-            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
+            Guard.NotNullOrEmpty(sourceFileName);
+            Guard.NotNullOrEmpty(targetFileName);
 
             try
             {
@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             try
             {
@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             try
             {
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Assets
 
         public Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
 

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Users
 
         public PwnedPasswordValidator(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             this.log = log;
         }

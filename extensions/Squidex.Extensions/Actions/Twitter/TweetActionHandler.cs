@@ -25,7 +25,7 @@ namespace Squidex.Extensions.Actions.Twitter
         public TweetActionHandler(RuleEventFormatter formatter, IOptions<TwitterOptions> twitterOptions)
             : base(formatter)
         {
-            Guard.NotNull(twitterOptions, nameof(twitterOptions));
+            Guard.NotNull(twitterOptions);
 
             this.twitterOptions = twitterOptions.Value;
         }

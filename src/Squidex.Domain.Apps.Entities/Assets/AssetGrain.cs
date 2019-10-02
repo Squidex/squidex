@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetGrain(IStore<Guid> store, ITagService tagService, IActivationLimit limit, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(tagService);
 
             this.tagService = tagService;
 

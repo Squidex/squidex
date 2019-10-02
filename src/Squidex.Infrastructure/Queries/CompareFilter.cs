@@ -17,9 +17,9 @@ namespace Squidex.Infrastructure.Queries
 
         public CompareFilter(PropertyPath path, CompareOperator @operator, TValue value)
         {
-            Guard.NotNull(path, nameof(path));
-            Guard.NotNull(value, nameof(value));
-            Guard.Enum(@operator, nameof(@operator));
+            Guard.NotNull(path);
+            Guard.NotNull(value);
+            Guard.Enum(@operator);
 
             Path = path;
 

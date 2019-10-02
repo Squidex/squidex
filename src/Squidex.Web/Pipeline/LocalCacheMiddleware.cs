@@ -18,7 +18,7 @@ namespace Squidex.Web.Pipeline
 
         public LocalCacheMiddleware(ILocalCache localCache)
         {
-            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(localCache);
 
             this.localCache = localCache;
         }

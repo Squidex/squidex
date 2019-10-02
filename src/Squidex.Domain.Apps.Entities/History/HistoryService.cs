@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators)
         {
-            Guard.NotNull(repository, nameof(repository));
-            Guard.NotNull(creators, nameof(creators));
+            Guard.NotNull(repository);
+            Guard.NotNull(creators);
 
             this.creators = creators.ToList();
 

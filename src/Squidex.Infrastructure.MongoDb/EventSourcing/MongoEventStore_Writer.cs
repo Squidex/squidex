@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             return Collection.DeleteManyAsync(x => x.EventStream == streamName);
         }
@@ -34,13 +34,13 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotEmpty(commitId, nameof(commitId));
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
+            Guard.NotEmpty(commitId);
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
 
             using (Profiler.TraceMethod<MongoEventStore>())
             {

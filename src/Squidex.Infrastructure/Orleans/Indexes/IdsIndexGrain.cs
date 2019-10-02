@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
         public IdsIndexGrain(IGrainState<TState> state)
         {
-            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(state);
 
             this.state = state;
         }

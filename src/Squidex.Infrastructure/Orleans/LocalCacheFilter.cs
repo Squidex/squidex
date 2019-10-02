@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public LocalCacheFilter(ILocalCache localCache)
         {
-            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(localCache);
 
             this.localCache = localCache;
         }

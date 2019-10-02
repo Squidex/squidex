@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(options);
+            Guard.NotNull(tagService);
 
             this.jsonSerializer = jsonSerializer;
             this.options = options.Value;
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public virtual ClrQuery ParseQuery(Context context, Q q)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {

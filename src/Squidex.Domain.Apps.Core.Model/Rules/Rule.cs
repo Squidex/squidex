@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public Rule(RuleTrigger trigger, RuleAction action)
         {
-            Guard.NotNull(trigger, nameof(trigger));
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(trigger);
+            Guard.NotNull(action);
 
             this.trigger = trigger;
             this.trigger.Freeze();
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Update(RuleTrigger newTrigger)
         {
-            Guard.NotNull(newTrigger, nameof(newTrigger));
+            Guard.NotNull(newTrigger);
 
             if (newTrigger.GetType() != trigger.GetType())
             {
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Update(RuleAction newAction)
         {
-            Guard.NotNull(newAction, nameof(newAction));
+            Guard.NotNull(newAction);
 
             if (newAction.GetType() != action.GetType())
             {

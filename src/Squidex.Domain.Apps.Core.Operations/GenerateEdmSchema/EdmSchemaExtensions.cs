@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory typeFactory)
         {
-            Guard.NotNull(typeFactory, nameof(typeFactory));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(typeFactory);
+            Guard.NotNull(partitionResolver);
 
             var (edmType, _) = typeFactory("Data");
 

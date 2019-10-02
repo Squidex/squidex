@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public GrainState(IGrainActivationContext context)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             this.context = context;
 

@@ -27,14 +27,14 @@ namespace Squidex.Web
 
         public static Deferred Response(Func<object> factory)
         {
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(factory);
 
             return new Deferred(() => Task.FromResult(factory()));
         }
 
         public static Deferred AsyncResponse<T>(Func<Task<T>> factory)
         {
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(factory);
 
             return new Deferred(async () => (await factory())!);
         }

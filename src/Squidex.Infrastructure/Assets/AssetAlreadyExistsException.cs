@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static string FormatMessage(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             return $"An asset with name '{fileName}' already exists.";
         }

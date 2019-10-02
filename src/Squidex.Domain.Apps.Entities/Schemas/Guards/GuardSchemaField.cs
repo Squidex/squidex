@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
     {
         public static void CanAdd(Schema schema, AddField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot add a new field.", e =>
             {
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanUpdate(Schema schema, UpdateField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanHide(Schema schema, HideField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanShow(Schema schema, ShowField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanDisable(Schema schema, DisableField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanDelete(Schema schema, DeleteField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanEnable(Schema schema, EnableField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanLock(Schema schema, LockField command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 

@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Commands
 
         public LogCommandMiddleware(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             this.log = log;
         }

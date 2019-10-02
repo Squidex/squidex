@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(Roles roles, AddRole command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot add role.", e =>
             {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanDelete(Roles roles, DeleteRole command, AppContributors contributors, AppClients clients)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetRoleOrThrow(roles, command.Name);
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(Roles roles, UpdateRole command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetRoleOrThrow(roles, command.Name);
 

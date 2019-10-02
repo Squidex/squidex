@@ -19,14 +19,14 @@ namespace Squidex.Infrastructure.Commands
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
-            Guard.NotNull(middlewares, nameof(middlewares));
+            Guard.NotNull(middlewares);
 
             this.middlewares = middlewares.Reverse().ToList();
         }
 
         public async Task<CommandContext> PublishAsync(ICommand command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var context = new CommandContext(command, this);
 

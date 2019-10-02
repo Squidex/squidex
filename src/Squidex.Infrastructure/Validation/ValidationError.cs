@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Validation
 
         public ValidationError(string message, params string[] propertyNames)
         {
-            Guard.NotNullOrEmpty(message, nameof(message));
+            Guard.NotNullOrEmpty(message);
 
             this.message = message;
 

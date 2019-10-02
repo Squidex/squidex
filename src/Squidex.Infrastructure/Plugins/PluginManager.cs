@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Plugins
 
         public void Add(string name, Assembly assembly)
         {
-            Guard.NotNull(assembly, nameof(assembly));
+            Guard.NotNull(assembly);
 
             var pluginTypes =
                 assembly.GetTypes()
@@ -52,17 +52,17 @@ namespace Squidex.Infrastructure.Plugins
 
         public void LogException(string plugin, string action, Exception exception)
         {
-            Guard.NotNull(plugin, nameof(plugin));
-            Guard.NotNull(action, nameof(action));
-            Guard.NotNull(exception, nameof(exception));
+            Guard.NotNull(plugin);
+            Guard.NotNull(action);
+            Guard.NotNull(exception);
 
             exceptions.Add((plugin, action, exception));
         }
 
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            Guard.NotNull(services, nameof(services));
-            Guard.NotNull(config, nameof(config));
+            Guard.NotNull(services);
+            Guard.NotNull(config);
 
             foreach (var plugin in loadedPlugins)
             {
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.Plugins
 
         public void ConfigureBefore(IApplicationBuilder app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
             {
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Plugins
 
         public void ConfigureAfter(IApplicationBuilder app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
             {
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.Plugins
 
         public void Log(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             if (loadedPlugins.Count > 0 || exceptions.Count > 0)
             {

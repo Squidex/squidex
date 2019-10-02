@@ -22,9 +22,9 @@ namespace Squidex.Infrastructure.Assets
 
         public AssetFile(string fileName, string mimeType, long fileSize, Func<Stream> openAction)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
-            Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
-            Guard.GreaterEquals(fileSize, 0, nameof(fileSize));
+            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(mimeType);
+            Guard.GreaterEquals(fileSize, 0);
 
             FileName = fileName;
             FileSize = fileSize;

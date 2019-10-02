@@ -32,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public BackupAssets(IStore<Guid> store, IAssetStore assetStore, ITagService tagService)
             : base(store)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
-            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(assetStore);
+            Guard.NotNull(tagService);
 
             this.assetStore = assetStore;
 

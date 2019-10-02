@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(subscriber, nameof(subscriber));
+            Guard.NotNull(subscriber);
 
             ThrowIfDisposed();
 
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task CreateIndexAsync(string property)
         {
-            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNullOrEmpty(property);
 
             ThrowIfDisposed();
 
@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             ThrowIfDisposed();
 
@@ -78,9 +78,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(callback);
+            Guard.NotNullOrEmpty(property);
+            Guard.NotNull(value);
 
             ThrowIfDisposed();
 
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             ThrowIfDisposed();
 

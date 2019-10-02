@@ -35,11 +35,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventDataFormatter);
+            Guard.NotNull(eventConsumerFactory);
+            Guard.NotNull(state);
+            Guard.NotNull(log);
 
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;

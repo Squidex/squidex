@@ -21,8 +21,8 @@ namespace Squidex.Web
 
         public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly? assembly = null)
         {
-            Guard.NotNull(configured, nameof(configured));
-            Guard.NotNull(configuration, nameof(configuration));
+            Guard.NotNull(configured);
+            Guard.NotNull(configuration);
 
             foreach (var kvp in configured)
             {

@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Json.Objects
             }
             set
             {
-                Guard.NotNull(key, nameof(key));
+                Guard.NotNull(key);
 
                 inner[key] = value ?? JsonValue.Null;
             }

@@ -29,9 +29,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscription(IEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-            Guard.NotNull(streamFilter, nameof(streamFilter));
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventSubscriber);
+            Guard.NotNull(streamFilter);
 
             this.position = position;
 

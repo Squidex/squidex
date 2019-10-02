@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.States
         public MongoSnapshotStore(IMongoDatabase database, JsonSerializer jsonSerializer)
             : base(database)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(jsonSerializer);
 
             BsonJsonConvention.Register(jsonSerializer);
         }

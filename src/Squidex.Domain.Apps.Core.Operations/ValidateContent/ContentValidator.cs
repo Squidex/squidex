@@ -34,9 +34,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ContentValidator(Schema schema, PartitionResolver partitionResolver, ValidationContext context)
         {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(schema);
+            Guard.NotNull(context);
+            Guard.NotNull(partitionResolver);
 
             this.schema = schema;
             this.context = context;
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public Task ValidatePartialAsync(NamedContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(true);
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public Task ValidateAsync(NamedContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(false);
 

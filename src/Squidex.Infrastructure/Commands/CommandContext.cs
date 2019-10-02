@@ -31,8 +31,8 @@ namespace Squidex.Infrastructure.Commands
 
         public CommandContext(ICommand command, ICommandBus commandBus)
         {
-            Guard.NotNull(command, nameof(command));
-            Guard.NotNull(commandBus, nameof(commandBus));
+            Guard.NotNull(command);
+            Guard.NotNull(commandBus);
 
             Command = command;
             CommandBus = commandBus;

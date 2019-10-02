@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider)
             : base(store, log)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appProvider);
 
             this.appProvider = appProvider;
         }

@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.Assets
 
         public ImageInfo(int pixelWidth, int pixelHeight)
         {
-            Guard.GreaterThan(pixelWidth, 0, nameof(pixelWidth));
-            Guard.GreaterThan(pixelHeight, 0, nameof(pixelHeight));
+            Guard.GreaterThan(pixelWidth, 0);
+            Guard.GreaterThan(pixelHeight, 0);
 
             PixelWidth = pixelWidth;
             PixelHeight = pixelHeight;

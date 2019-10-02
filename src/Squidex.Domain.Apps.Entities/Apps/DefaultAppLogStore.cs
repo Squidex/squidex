@@ -19,14 +19,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public DefaultAppLogStore(ILogStore logStore)
         {
-            Guard.NotNull(logStore, nameof(logStore));
+            Guard.NotNull(logStore);
 
             this.logStore = logStore;
         }
 
         public Task ReadLogAsync(string appId, DateTime from, DateTime to, Stream stream)
         {
-            Guard.NotNull(appId, nameof(appId));
+            Guard.NotNull(appId);
 
             return logStore.ReadLogAsync(appId, from, to, stream);
         }

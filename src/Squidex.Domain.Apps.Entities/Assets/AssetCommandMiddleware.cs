@@ -35,11 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
-            Guard.NotNull(assetEnricher, nameof(assetEnricher));
-            Guard.NotNull(assetStore, nameof(assetStore));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
-            Guard.NotNull(tagGenerators, nameof(tagGenerators));
+            Guard.NotNull(assetEnricher);
+            Guard.NotNull(assetStore);
+            Guard.NotNull(assetQuery);
+            Guard.NotNull(assetThumbnailGenerator);
+            Guard.NotNull(tagGenerators);
 
             this.assetStore = assetStore;
             this.assetEnricher = assetEnricher;

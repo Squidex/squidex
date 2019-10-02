@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public UsageTrackerCommandMiddleware(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             usageTrackerGrain = grainFactory.GetGrain<IUsageTrackerGrain>(SingleGrain.Id);
         }

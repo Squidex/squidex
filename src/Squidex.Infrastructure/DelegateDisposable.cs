@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure
 
         public DelegateDisposable(Action action)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(action);
 
             this.action = action;
         }

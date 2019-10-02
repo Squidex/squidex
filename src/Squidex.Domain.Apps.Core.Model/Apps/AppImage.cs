@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public AppImage(string mimeType, string? etag = null)
         {
-            Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
+            Guard.NotNullOrEmpty(mimeType);
 
             MimeType = mimeType;
 

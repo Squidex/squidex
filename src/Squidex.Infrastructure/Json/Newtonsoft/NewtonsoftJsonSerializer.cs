@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public NewtonsoftJsonSerializer(JsonSerializerSettings settings)
         {
-            Guard.NotNull(settings, nameof(settings));
+            Guard.NotNull(settings);
 
             this.settings = settings;
 

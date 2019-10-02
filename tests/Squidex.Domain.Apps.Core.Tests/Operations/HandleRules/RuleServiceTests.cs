@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(ValidRule().Disable(), ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(ValidRule().Disable(), ruleId, @event);
 
             Assert.Null(job);
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new InvalidEvent());
 
-            var job = await sut.CreateJobAsync(ValidRule(), ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(ValidRule(), ruleId, @event);
 
             Assert.Null(job);
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(RuleInvalidTrigger(), ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(RuleInvalidTrigger(), ruleId, @event);
 
             Assert.Null(job);
 
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(RuleInvalidAction(), ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(RuleInvalidAction(), ruleId, @event);
 
             Assert.Null(job);
 
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated()).SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
 
-            var job = await sut.CreateJobAsync(ValidRule(), ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(ValidRule(), ruleId, @event);
 
             Assert.Null(job);
 
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Trigger(@event.Payload, rule.Trigger, ruleId))
                 .Returns(false);
 
-            var job = await sut.CreateJobAsync(rule, ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(rule, ruleId, @event);
 
             Assert.Null(job);
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventAsync(A<Envelope<AppEvent>>.That.Matches(x => x.Payload == @event.Payload)))
                 .Returns(Task.FromResult<EnrichedEvent?>(null));
 
-            var job = await sut.CreateJobAsync(rule, ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(rule, ruleId, @event);
 
             Assert.Null(job);
         }
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Trigger(enrichedEvent, rule.Trigger))
                 .Returns(false);
 
-            var job = await sut.CreateJobAsync(rule, ruleId, @event.To<IEvent>());
+            var job = await sut.CreateJobAsync(rule, ruleId, @event);
 
             Assert.Null(job);
         }
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, rule.Action))
                 .Returns((actionDescription, new ValidData { Value = 10 }));
 
-            var job = (await sut.CreateJobAsync(rule, ruleId, @event.To<IEvent>()))!;
+            var job = (await sut.CreateJobAsync(rule, ruleId, @event))!;
 
             Assert.Equal(actionData, job.ActionData);
             Assert.Equal(actionName, job.ActionName);

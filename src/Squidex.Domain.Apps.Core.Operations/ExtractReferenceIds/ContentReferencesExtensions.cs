@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, Schema schema, Ids strategy = Ids.All)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             foreach (var field in schema.Fields)
             {
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, IField field, Ids strategy = Ids.All)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (source.TryGetValue(field.Id, out var fieldData) && fieldData != null)
             {
@@ -54,14 +54,14 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, Schema schema, Ids strategy = Ids.All)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             return GetReferencedIds(source, schema.Fields, strategy);
         }
 
         public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IEnumerable<IField> fields, Ids strategy = Ids.All)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             foreach (var field in fields)
             {
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IField field, Ids strategy = Ids.All)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static JsonObject FormatReferences(this NamedContentData data, Schema schema, LanguagesConfig languages, string separator = ", ")
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = JsonValue.Object();
 
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partition, string separator)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var sb = new StringBuilder();
 

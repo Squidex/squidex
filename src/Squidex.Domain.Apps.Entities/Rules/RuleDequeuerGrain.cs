@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
         {
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(ruleEventRepository);
+            Guard.NotNull(ruleService);
+            Guard.NotNull(clock);
+            Guard.NotNull(log);
 
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;

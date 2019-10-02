@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         public static object ToFlatLanguageModel(this NamedContentData content, LanguagesConfig languagesConfig, IReadOnlyCollection<Language>? languagePreferences = null)
         {
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+            Guard.NotNull(languagesConfig);
 
             if (languagePreferences == null || languagePreferences.Count == 0)
             {

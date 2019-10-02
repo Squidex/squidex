@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Commands
 
         public EnrichWithTimestampCommandMiddleware(IClock clock)
         {
-            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(clock);
 
             this.clock = clock;
         }

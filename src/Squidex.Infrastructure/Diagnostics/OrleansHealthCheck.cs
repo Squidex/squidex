@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public OrleansHealthCheck(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             managementGrain = grainFactory.GetGrain<IManagementGrain>(0);
         }

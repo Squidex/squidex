@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(LanguagesConfig languages, AddLanguage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot add language.", e =>
             {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanRemove(LanguagesConfig languages, RemoveLanguage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var config = GetConfigOrThrow(languages, command.Language);
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(LanguagesConfig languages, UpdateLanguage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var config = GetConfigOrThrow(languages, command.Language);
 

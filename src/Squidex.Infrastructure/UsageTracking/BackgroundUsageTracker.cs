@@ -31,8 +31,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
-            Guard.NotNull(usageRepository, nameof(usageRepository));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(usageRepository);
+            Guard.NotNull(log);
 
             this.usageRepository = usageRepository;
 
@@ -190,7 +190,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static string GetKey(string key)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             return $"{key}_API";
         }

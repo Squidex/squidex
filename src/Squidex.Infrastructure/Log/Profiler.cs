@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Log
 
         public static IDisposable Trace(string key)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             var session = LocalSession.Value;
 

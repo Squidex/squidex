@@ -44,14 +44,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             ISemanticLog log,
             TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(ruleOptions, nameof(ruleOptions));
-            Guard.NotNull(ruleTriggerHandlers, nameof(ruleTriggerHandlers));
-            Guard.NotNull(ruleActionHandlers, nameof(ruleActionHandlers));
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
-            Guard.NotNull(eventEnricher, nameof(eventEnricher));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(ruleOptions);
+            Guard.NotNull(ruleTriggerHandlers);
+            Guard.NotNull(ruleActionHandlers);
+            Guard.NotNull(typeNameRegistry);
+            Guard.NotNull(eventEnricher);
+            Guard.NotNull(clock);
+            Guard.NotNull(log);
 
             this.typeNameRegistry = typeNameRegistry;
 
@@ -69,8 +69,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public virtual async Task<RuleJob?> CreateJobAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule, nameof(rule));
-            Guard.NotNull(@event, nameof(@event));
+            Guard.NotNull(rule);
+            Guard.NotNull(@event);
 
             try
             {

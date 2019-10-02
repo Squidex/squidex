@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Log
 
         public ConstantsLogWriter(Action<IObjectWriter> objectWriter)
         {
-            Guard.NotNull(objectWriter, nameof(objectWriter));
+            Guard.NotNull(objectWriter);
 
             this.objectWriter = objectWriter;
         }

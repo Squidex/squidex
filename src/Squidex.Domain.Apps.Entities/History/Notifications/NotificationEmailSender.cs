@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
             IEmailUrlGenerator emailUrlGenerator,
             ISemanticLog log)
         {
-            Guard.NotNull(texts, nameof(texts));
-            Guard.NotNull(emailSender, nameof(emailSender));
-            Guard.NotNull(emailUrlGenerator, nameof(emailUrlGenerator));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(texts);
+            Guard.NotNull(emailSender);
+            Guard.NotNull(emailUrlGenerator);
+            Guard.NotNull(log);
 
             this.texts = texts.Value;
             this.emailSender = emailSender;
@@ -45,9 +45,9 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
 
         public Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated)
         {
-            Guard.NotNull(assigner, nameof(assigner));
-            Guard.NotNull(assignee, nameof(assignee));
-            Guard.NotNull(appName, nameof(appName));
+            Guard.NotNull(assigner);
+            Guard.NotNull(assignee);
+            Guard.NotNull(appName);
 
             if (assignee.HasConsent())
             {

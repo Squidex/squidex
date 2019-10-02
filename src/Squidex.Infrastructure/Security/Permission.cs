@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Security
 
         public Permission(string id)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             this.id = id;
         }

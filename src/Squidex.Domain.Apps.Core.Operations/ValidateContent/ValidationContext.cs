@@ -60,8 +60,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             ImmutableQueue<string> propertyPath,
             bool isOptional)
         {
-            Guard.NotNull(checkAsset, nameof(checkAsset));
-            Guard.NotNull(checkContent, nameof(checkAsset));
+            Guard.NotNull(checkAsset);
+            Guard.NotNull(checkContent);
 
             this.propertyPath = propertyPath;
 

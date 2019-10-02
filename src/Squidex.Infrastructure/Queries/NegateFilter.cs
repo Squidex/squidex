@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Queries
 
         public NegateFilter(FilterNode<TValue> filter)
         {
-            Guard.NotNull(filter, nameof(filter));
+            Guard.NotNull(filter);
 
             Filter = filter;
         }

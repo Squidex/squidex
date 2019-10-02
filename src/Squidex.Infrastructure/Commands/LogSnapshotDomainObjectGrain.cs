@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Commands
         protected LogSnapshotDomainObjectGrain(IStore<Guid> store, ISemanticLog log)
             : base(log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             this.store = store;
         }

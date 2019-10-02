@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public RuleEventFormatter(IJsonSerializer jsonSerializer, IRuleUrlGenerator urlGenerator, IScriptEngine scriptEngine)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(scriptEngine);
+            Guard.NotNull(urlGenerator);
 
             this.jsonSerializer = jsonSerializer;
             this.scriptEngine = scriptEngine;

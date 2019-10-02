@@ -50,7 +50,7 @@ namespace Squidex.Web
 
         protected ApiController(ICommandBus commandBus)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
+            Guard.NotNull(commandBus);
 
             CommandBus = commandBus;
         }

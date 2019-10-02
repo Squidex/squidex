@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         public CommentsGrain(IStore<Guid> store, ISemanticLog log)
             : base(log)
         {
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(store);
 
             this.store = store;
         }

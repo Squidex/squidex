@@ -42,10 +42,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IUserResolver userResolver)
             : base(store, log)
         {
-            Guard.NotNull(initialPatterns, nameof(initialPatterns));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
+            Guard.NotNull(initialPatterns);
+            Guard.NotNull(userResolver);
+            Guard.NotNull(appPlansProvider);
+            Guard.NotNull(appPlansBillingManager);
 
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
@@ -479,7 +479,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 @event.AppId = NamedId.Of(Snapshot.Id, Snapshot.Name);
             }
 
-            RaiseEvent(Envelope.Create(@event).To<IEvent>());
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private static AppCreated CreateInitalEvent(string name)

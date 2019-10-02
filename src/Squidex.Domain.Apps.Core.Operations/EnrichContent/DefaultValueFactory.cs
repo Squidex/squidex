@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
         public static IJsonValue CreateDefaultValue(IField field, Instant now)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             return field.Accept(new DefaultValueFactory(now));
         }

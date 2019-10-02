@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldCollection(T[] fields)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             fieldsOrdered = fields;
         }
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Reorder(List<long> ids)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             if (ids.Count != fieldsOrdered.Length || ids.Any(x => !ById.ContainsKey(x)))
             {
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Add(T field)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (ByName.ContainsKey(field.Name))
             {
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Update(long fieldId, Func<T, T> updater)
         {
-            Guard.NotNull(updater, nameof(updater));
+            Guard.NotNull(updater);
 
             if (!ById.TryGetValue(fieldId, out var field))
             {

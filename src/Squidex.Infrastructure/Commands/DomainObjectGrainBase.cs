@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObjectGrainBase(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             this.log = log;
         }
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual void RaiseEvent(Envelope<IEvent> @event)
         {
-            Guard.NotNull(@event, nameof(@event));
+            Guard.NotNull(@event);
 
             @event.SetAggregateId(id);
 
@@ -150,8 +150,8 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<object?> InvokeAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, Mode mode) where TCommand : class, IAggregateCommand
         {
-            Guard.NotNull(command, nameof(command));
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(command);
+            Guard.NotNull(handler);
 
             if (command.ExpectedVersion != EtagVersion.Any && command.ExpectedVersion != Version)
             {

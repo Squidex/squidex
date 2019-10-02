@@ -40,14 +40,14 @@ namespace Squidex.Infrastructure.Reflection
 
         public static PropertiesTypeAccessor Create(Type targetType)
         {
-            Guard.NotNull(targetType, nameof(targetType));
+            Guard.NotNull(targetType);
 
             return AccessorCache.GetOrAdd(targetType, x => new PropertiesTypeAccessor(x));
         }
 
         public void SetValue(object target, string propertyName, object? value)
         {
-            Guard.NotNull(target, "target");
+            Guard.NotNull(target);
 
             var accessor = FindAccessor(propertyName);
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public object? GetValue(object target, string propertyName)
         {
-            Guard.NotNull(target, nameof(target));
+            Guard.NotNull(target);
 
             var accessor = FindAccessor(propertyName);
 
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Reflection
 
         private IPropertyAccessor FindAccessor(string propertyName)
         {
-            Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+            Guard.NotNullOrEmpty(propertyName);
 
             if (!accessors.TryGetValue(propertyName, out var accessor))
             {

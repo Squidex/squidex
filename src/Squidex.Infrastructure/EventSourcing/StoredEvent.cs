@@ -19,9 +19,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public StoredEvent(string streamName, string eventPosition, long eventStreamNumber, EventData data)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNullOrEmpty(eventPosition, nameof(eventPosition));
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(eventPosition);
+            Guard.NotNull(data);
 
             Data = data;
 

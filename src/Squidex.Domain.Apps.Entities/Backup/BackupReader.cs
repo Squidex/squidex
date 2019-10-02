@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupReader(IJsonSerializer serializer, Stream stream)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serializer);
 
             this.serializer = serializer;
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task<T> ReadJsonAttachmentAsync<T>(string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -87,8 +87,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNullOrEmpty(name);
+            Guard.NotNull(handler);
 
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler)
         {
-            Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(formatter, nameof(formatter));
-            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
+            Guard.NotNull(handler);
+            Guard.NotNull(formatter);
+            Guard.NotNull(streamNameResolver);
 
             while (true)
             {

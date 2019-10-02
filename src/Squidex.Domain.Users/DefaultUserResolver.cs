@@ -22,7 +22,7 @@ namespace Squidex.Domain.Users
 
         public DefaultUserResolver(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider);
 
             this.serviceProvider = serviceProvider;
         }

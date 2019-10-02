@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         protected BackupHandlerWithStore(IStore<Guid> store)
         {
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(store);
 
             this.store = store;
         }

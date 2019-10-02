@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Logging(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             return next =>
             {

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public void Execute(ScriptContext context, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             if (!string.IsNullOrWhiteSpace(script))
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public NamedContentData ExecuteAndTransform(ScriptContext context, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             var result = context.Data!;
 
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public NamedContentData Transform(ScriptContext context, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             var result = context.Data!;
 

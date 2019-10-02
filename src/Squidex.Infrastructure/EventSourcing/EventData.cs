@@ -17,9 +17,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public EventData(string type, EnvelopeHeaders headers, string payload)
         {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(headers, nameof(headers));
-            Guard.NotNull(payload, nameof(payload));
+            Guard.NotNull(type);
+            Guard.NotNull(headers);
+            Guard.NotNull(payload);
 
             Headers = headers;
 

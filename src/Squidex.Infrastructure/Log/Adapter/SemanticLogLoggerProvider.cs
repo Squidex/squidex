@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Log.Adapter
 
         public SemanticLogLoggerProvider(IServiceProvider services)
         {
-            Guard.NotNull(services, nameof(services));
+            Guard.NotNull(services);
 
             this.services = services;
         }

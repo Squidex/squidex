@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public AsyncLocalCleaner(AsyncLocal<T> asyncLocal)
         {
-            Guard.NotNull(asyncLocal, nameof(asyncLocal));
+            Guard.NotNull(asyncLocal);
 
             this.asyncLocal = asyncLocal;
         }

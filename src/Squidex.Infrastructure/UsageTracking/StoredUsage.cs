@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public StoredUsage(string? category, DateTime date, Counters counters)
         {
-            Guard.NotNull(counters, nameof(counters));
+            Guard.NotNull(counters);
 
             Category = category;
             Counters = counters;

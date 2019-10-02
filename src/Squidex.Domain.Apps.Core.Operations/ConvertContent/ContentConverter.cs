@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new NamedContentData(content.Count);
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static IdContentData ConvertId2Id(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new IdContentData(content.Count);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new NamedContentData(content.Count);
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new IdContentData(content.Count);
 

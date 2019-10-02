@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Caching
 
         public LRUCache(int capacity, Action<TKey, TValue>? itemEvicted = null)
         {
-            Guard.GreaterThan(capacity, 0, nameof(capacity));
+            Guard.GreaterThan(capacity, 0);
 
             this.capacity = capacity;
 

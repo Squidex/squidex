@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core
 
         public Partitioning(string key)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             Key = key;
         }

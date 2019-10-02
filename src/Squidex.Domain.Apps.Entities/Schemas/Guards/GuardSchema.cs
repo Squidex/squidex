@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
     {
         public static void CanCreate(CreateSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot create schema.", e =>
             {
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanSynchronize(SynchronizeSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot synchronize schema.", e =>
             {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanReorder(Schema schema, ReorderFields command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             IArrayField? arrayField = null;
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot configure preview urls.", error =>
             {
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanPublish(Schema schema, PublishSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (schema.IsPublished)
             {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanUnpublish(Schema schema, UnpublishSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (!schema.IsPublished)
             {
@@ -108,22 +108,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanUpdate(Schema schema, UpdateSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanConfigureScripts(Schema schema, ConfigureScripts command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanChangeCategory(Schema schema, ChangeCategory command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanDelete(Schema schema, DeleteSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         private static void ValidateUpsert(UpsertCommand command, AddValidation e)

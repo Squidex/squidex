@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public HistoryEvent(string channel, string message)
         {
-            Guard.NotNullOrEmpty(channel, nameof(channel));
-            Guard.NotNullOrEmpty(message, nameof(message));
+            Guard.NotNullOrEmpty(channel);
+            Guard.NotNullOrEmpty(message);
 
             Channel = channel;
 

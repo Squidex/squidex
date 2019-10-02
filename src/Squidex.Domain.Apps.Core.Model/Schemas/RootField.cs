@@ -53,9 +53,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected RootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.GreaterThan(id, 0, nameof(id));
-            Guard.NotNull(partitioning, nameof(partitioning));
+            Guard.NotNullOrEmpty(name);
+            Guard.GreaterThan(id, 0);
+            Guard.NotNull(partitioning);
 
             fieldId = id;
             fieldName = name;

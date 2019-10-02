@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Email
 
         public SmtpEmailSender(IOptions<SmptOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(options);
 
             var config = options.Value;
 

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public RulesIndex(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }

@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonWriter(IBsonWriter bsonWriter)
         {
-            Guard.NotNull(bsonWriter, nameof(bsonWriter));
+            Guard.NotNull(bsonWriter);
 
             this.bsonWriter = bsonWriter;
         }

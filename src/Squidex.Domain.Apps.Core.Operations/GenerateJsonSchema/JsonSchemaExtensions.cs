@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
     {
         public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver, bool withHidden = false)
         {
-            Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(schemaResolver);
+            Guard.NotNull(partitionResolver);
 
             var schemaName = schema.Name.ToPascalCase();
 

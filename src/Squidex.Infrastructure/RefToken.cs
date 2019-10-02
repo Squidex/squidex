@@ -28,8 +28,8 @@ namespace Squidex.Infrastructure
 
         public RefToken(string type, string identifier)
         {
-            Guard.NotNullOrEmpty(type, nameof(type));
-            Guard.NotNullOrEmpty(identifier, nameof(identifier));
+            Guard.NotNullOrEmpty(type);
+            Guard.NotNullOrEmpty(identifier);
 
             Type = type.ToLowerInvariant();
 

@@ -18,7 +18,7 @@ namespace Squidex.Pipeline.Robots
 
         public RobotsTxtMiddleware(IOptions<RobotsTxtOptions> robotsTxtOptions)
         {
-            Guard.NotNull(robotsTxtOptions, nameof(robotsTxtOptions));
+            Guard.NotNull(robotsTxtOptions);
 
             this.robotsTxtOptions = robotsTxtOptions.Value;
         }

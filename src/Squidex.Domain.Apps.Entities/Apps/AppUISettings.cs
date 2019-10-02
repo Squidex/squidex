@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettings(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(options);
 
             threshold = 1024 * 1024 * options.Value.Threshold;
         }

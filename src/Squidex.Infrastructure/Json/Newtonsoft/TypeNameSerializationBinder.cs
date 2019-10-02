@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public TypeNameSerializationBinder(TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(typeNameRegistry);
 
             this.typeNameRegistry = typeNameRegistry;
         }

@@ -29,10 +29,10 @@ namespace Squidex.Domain.Apps.Entities
 
         public AppProvider(ILocalCache localCache, IAppsIndex indexForApps, IRulesIndex indexRules, ISchemasIndex indexSchemas)
         {
-            Guard.NotNull(indexForApps, nameof(indexForApps));
-            Guard.NotNull(indexRules, nameof(indexRules));
-            Guard.NotNull(indexSchemas, nameof(indexSchemas));
-            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(indexForApps);
+            Guard.NotNull(indexRules);
+            Guard.NotNull(indexSchemas);
+            Guard.NotNull(localCache);
 
             this.localCache = localCache;
             this.indexForApps = indexForApps;

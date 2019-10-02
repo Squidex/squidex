@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Assets
 
         public GoogleCloudAssetStore(string bucketName)
         {
-            Guard.NotNullOrEmpty(bucketName, nameof(bucketName));
+            Guard.NotNullOrEmpty(bucketName);
 
             this.bucketName = bucketName;
         }
@@ -50,8 +50,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
-            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
+            Guard.NotNullOrEmpty(sourceFileName);
+            Guard.NotNullOrEmpty(targetFileName);
 
             try
             {
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             try
             {
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             try
             {
@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNullOrEmpty(fileName);
 
             try
             {

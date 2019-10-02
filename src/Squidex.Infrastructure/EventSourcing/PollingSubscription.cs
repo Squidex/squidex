@@ -21,8 +21,8 @@ namespace Squidex.Infrastructure.EventSourcing
             string? streamFilter,
             string? position)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventSubscriber);
 
             timer = new CompletionTimer(5000, async ct =>
             {

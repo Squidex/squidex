@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.Queries
 
         public SortNode(PropertyPath path, SortOrder order)
         {
-            Guard.NotNull(path, nameof(path));
-            Guard.Enum(order, nameof(order));
+            Guard.NotNull(path);
+            Guard.Enum(order);
 
             Path = path;
 

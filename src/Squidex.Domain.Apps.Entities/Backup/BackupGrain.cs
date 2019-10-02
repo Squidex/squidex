@@ -54,15 +54,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ISemanticLog log,
             IGrainState<BackupState> state)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
-            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(assetStore);
+            Guard.NotNull(backupArchiveLocation);
+            Guard.NotNull(clock);
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventDataFormatter);
+            Guard.NotNull(serviceProvider);
+            Guard.NotNull(serializer);
+            Guard.NotNull(state);
+            Guard.NotNull(log);
 
             this.assetStore = assetStore;
             this.backupArchiveLocation = backupArchiveLocation;

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure
     {
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidNumber(float target, [CallerArgumentExpression("target")] string parameterName)
+        public static void ValidNumber(float target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (float.IsNaN(target) || float.IsPositiveInfinity(target) || float.IsNegativeInfinity(target))
             {
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidNumber(double target, [CallerArgumentExpression("target")] string parameterName)
+        public static void ValidNumber(double target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (double.IsNaN(target) || double.IsPositiveInfinity(target) || double.IsNegativeInfinity(target))
             {
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidSlug(string? target, [CallerArgumentExpression("target")] string parameterName)
+        public static void ValidSlug(string? target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidPropertyName(string? target, [CallerArgumentExpression("target")] string parameterName)
+        public static void ValidPropertyName(string? target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType<T>(object? target, [CallerArgumentExpression("target")] string parameterName)
+        public static void HasType<T>(object? target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && target.GetType() != typeof(T))
             {
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType(object? target, [AllowNull] Type expectedType, [CallerArgumentExpression("target")] string parameterName)
+        public static void HasType(object? target, [AllowNull] Type expectedType, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && expectedType != null && target.GetType() != expectedType)
             {
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNullOrEmpty(string? target, [CallerArgumentExpression("target")] string parameterName)
+        public static void NotNullOrEmpty(string? target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNull(target, parameterName);
 
@@ -198,7 +198,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidFileName(string? target, [CallerArgumentExpression("target")] string parameterName)
+        public static void ValidFileName(string? target, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 

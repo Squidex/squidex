@@ -49,8 +49,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Update(string name, params string[] permissions)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(permissions, nameof(permissions));
+            Guard.NotNullOrEmpty(name);
+            Guard.NotNull(permissions);
 
             if (!TryGetValue(name, out var role))
             {

@@ -45,13 +45,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IScriptEngine scriptEngine,
             ContentQueryParser queryParser)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
-            Guard.NotNull(contentEnricher, nameof(contentEnricher));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
-            Guard.NotNull(queryParser, nameof(queryParser));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(appProvider);
+            Guard.NotNull(assetUrlGenerator);
+            Guard.NotNull(contentEnricher);
+            Guard.NotNull(contentRepository);
+            Guard.NotNull(contentVersionLoader);
+            Guard.NotNull(queryParser);
+            Guard.NotNull(scriptEngine);
 
             this.appProvider = appProvider;
             this.assetUrlGenerator = assetUrlGenerator;
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {

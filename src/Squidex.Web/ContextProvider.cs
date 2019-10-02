@@ -37,7 +37,7 @@ namespace Squidex.Web
 
         public ContextProvider(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
+            Guard.NotNull(httpContextAccessor);
 
             this.httpContextAccessor = httpContextAccessor;
         }

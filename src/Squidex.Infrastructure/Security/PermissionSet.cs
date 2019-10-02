@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Security
 
         public PermissionSet(IEnumerable<Permission> permissions)
         {
-            Guard.NotNull(permissions, nameof(permissions));
+            Guard.NotNull(permissions);
 
             this.permissions = permissions.ToList();
 

@@ -40,10 +40,10 @@ namespace Squidex.Areas.IdentityServer.Config
             IOptions<MyIdentityOptions> identityOptions,
             IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(identityOptions, nameof(identityOptions));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(urlsOptions, nameof(urlsOptions));
+            Guard.NotNull(appProvider);
+            Guard.NotNull(identityOptions);
+            Guard.NotNull(serviceProvider);
+            Guard.NotNull(urlsOptions);
 
             this.serviceProvider = serviceProvider;
 

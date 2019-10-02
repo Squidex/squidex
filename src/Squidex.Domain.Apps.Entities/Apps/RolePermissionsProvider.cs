@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public RolePermissionsProvider(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appProvider);
 
             this.appProvider = appProvider;
         }

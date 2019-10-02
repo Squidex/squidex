@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
     {
         public static void CanAnnotate(AnnotateAsset command, string oldFileName, string oldSlug)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot rename asset.", e =>
             {
@@ -40,17 +40,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static void CanCreate(CreateAsset command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanUpdate(UpdateAsset command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanDelete(DeleteAsset command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Commands
         protected DomainObjectGrain(IStore<Guid> store, ISemanticLog log)
             : base(log)
         {
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(store);
 
             this.store = store;
         }

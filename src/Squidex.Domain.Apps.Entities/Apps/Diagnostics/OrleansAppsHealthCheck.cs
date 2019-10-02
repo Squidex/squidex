@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
 
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             index = grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
         }

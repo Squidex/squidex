@@ -16,16 +16,16 @@ namespace Squidex.Infrastructure.States
 
         public string GetStreamName(Type aggregateType, string id)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
-            Guard.NotNull(aggregateType, nameof(aggregateType));
+            Guard.NotNullOrEmpty(id);
+            Guard.NotNull(aggregateType);
 
             return $"{aggregateType.TypeName(true, Suffixes)}-{id}";
         }
 
         public string WithNewId(string streamName, Func<string, string?> idGenerator)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(idGenerator, nameof(idGenerator));
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(idGenerator);
 
             var positionOfDash = streamName.IndexOf('-');
 

@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         public Role(string name, PermissionSet permissions)
             : base(name)
         {
-            Guard.NotNull(permissions, nameof(permissions));
+            Guard.NotNull(permissions);
 
             Permissions = permissions;
         }

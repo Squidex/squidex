@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(AddWorkflow command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot add workflow.", e =>
             {
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetWorkflowOrThrow(workflows, command.WorkflowId);
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanDelete(Workflows workflows, DeleteWorkflow command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetWorkflowOrThrow(workflows, command.WorkflowId);
         }

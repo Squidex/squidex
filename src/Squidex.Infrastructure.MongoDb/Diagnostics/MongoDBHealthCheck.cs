@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public MongoDBHealthCheck(IMongoDatabase mongoDatabase)
         {
-            Guard.NotNull(mongoDatabase, nameof(mongoDatabase));
+            Guard.NotNull(mongoDatabase);
 
             this.mongoDatabase = mongoDatabase;
         }

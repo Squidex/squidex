@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {
-            Guard.NotNull(notifier, nameof(notifier));
+            Guard.NotNull(notifier);
 
             this.notifier = notifier;
         }

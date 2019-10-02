@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
     {
         public static Task CanCreate(CreateRule command, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(() => "Cannot create rule.", async e =>
             {
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(() => "Cannot update rule.", async e =>
             {
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public static void CanEnable(EnableRule command, Rule rule)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (rule.IsEnabled)
             {
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public static void CanDisable(DisableRule command, Rule rule)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             if (!rule.IsEnabled)
             {
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public static void CanDelete(DeleteRule command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
     }
 }

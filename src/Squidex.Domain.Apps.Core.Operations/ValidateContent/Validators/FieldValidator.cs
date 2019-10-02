@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public FieldValidator(IEnumerable<IValidator> validators, IField field)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             this.validators = validators.ToArray();
 

@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public AsyncLockPool(int poolSize)
         {
-            Guard.GreaterThan(poolSize, 0, nameof(poolSize));
+            Guard.GreaterThan(poolSize, 0);
 
             locks = new AsyncLock[poolSize];
 
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task<IDisposable> LockAsync(object target)
         {
-            Guard.NotNull(target, nameof(target));
+            Guard.NotNull(target);
 
             return locks[Math.Abs(target.GetHashCode() % locks.Length)].LockAsync();
         }

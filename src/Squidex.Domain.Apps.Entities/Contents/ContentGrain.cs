@@ -46,11 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IActivationLimit limit)
             : base(store, log)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(appProvider);
+            Guard.NotNull(scriptEngine);
+            Guard.NotNull(assetRepository);
+            Guard.NotNull(contentWorkflow);
+            Guard.NotNull(contentRepository);
 
             this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;

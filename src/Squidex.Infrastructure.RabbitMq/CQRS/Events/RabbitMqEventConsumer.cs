@@ -38,10 +38,10 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public RabbitMqEventConsumer(IJsonSerializer jsonSerializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
         {
-            Guard.NotNullOrEmpty(uri, nameof(uri));
-            Guard.NotNullOrEmpty(eventPublisherName, nameof(eventPublisherName));
-            Guard.NotNullOrEmpty(exchange, nameof(exchange));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNullOrEmpty(uri);
+            Guard.NotNullOrEmpty(eventPublisherName);
+            Guard.NotNullOrEmpty(exchange);
+            Guard.NotNull(jsonSerializer);
 
             connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);

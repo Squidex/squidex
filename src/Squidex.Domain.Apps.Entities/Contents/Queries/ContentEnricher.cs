@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentEnricher(Lazy<IContentQueryService> contentQuery, IContentWorkflow contentWorkflow)
         {
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
+            Guard.NotNull(contentQuery);
+            Guard.NotNull(contentWorkflow);
 
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context)
         {
-            Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content);
 
             var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), context);
 
@@ -52,8 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
-            Guard.NotNull(contents, nameof(contents));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contents);
+            Guard.NotNull(context);
 
             using (Profiler.TraceMethod<ContentEnricher>())
             {

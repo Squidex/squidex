@@ -20,7 +20,7 @@ namespace Squidex.Shared.Users
 
         public ClientUser(RefToken token)
         {
-            Guard.NotNull(token, nameof(token));
+            Guard.NotNull(token);
 
             this.token = token;
 

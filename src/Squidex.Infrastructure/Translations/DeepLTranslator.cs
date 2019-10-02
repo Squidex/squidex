@@ -36,8 +36,8 @@ namespace Squidex.Infrastructure.Translations
 
         public DeepLTranslator(IOptions<DeepLTranslatorOptions> deepLOptions, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(deepLOptions, nameof(deepLOptions));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(deepLOptions);
+            Guard.NotNull(jsonSerializer);
 
             this.deepLOptions = deepLOptions.Value;
 

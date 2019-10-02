@@ -35,9 +35,9 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
 
         public NotificationEmailEventConsumer(INotificationEmailSender emailSender, IUserResolver userResolver, ISemanticLog log)
         {
-            Guard.NotNull(emailSender, nameof(emailSender));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(emailSender);
+            Guard.NotNull(userResolver);
+            Guard.NotNull(log);
 
             this.emailSender = emailSender;
             this.userResolver = userResolver;

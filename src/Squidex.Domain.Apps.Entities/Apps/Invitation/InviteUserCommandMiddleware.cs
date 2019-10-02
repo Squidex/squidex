@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public InviteUserCommandMiddleware(IUserResolver userResolver)
         {
-            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(userResolver);
 
             this.userResolver = userResolver;
         }

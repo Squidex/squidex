@@ -17,8 +17,8 @@ namespace Squidex.Infrastructure.Queries
 
         public LogicalFilter(LogicalFilterType type, IReadOnlyList<FilterNode<TValue>> filters)
         {
-            Guard.NotNull(filters, nameof(filters));
-            Guard.Enum(type, nameof(type));
+            Guard.NotNull(filters);
+            Guard.Enum(type);
 
             Filters = filters;
 

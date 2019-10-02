@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static IEnumerable<IEvent> Synchronize(this Schema source, Schema? target, IJsonSerializer serializer, Func<long> idGenerator,
             SchemaSynchronizationOptions? options = null)
         {
-            Guard.NotNull(source, nameof(source));
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(idGenerator, nameof(idGenerator));
+            Guard.NotNull(source);
+            Guard.NotNull(serializer);
+            Guard.NotNull(idGenerator);
 
             if (target == null)
             {

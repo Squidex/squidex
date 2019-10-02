@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaGrain(IStore<Guid> store, ISemanticLog log, IJsonSerializer serializer)
             : base(store, log)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serializer);
 
             this.serializer = serializer;
         }

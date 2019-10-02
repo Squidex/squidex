@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanCreate(CreateApp command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot create app.", e =>
             {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUploadImage(UploadAppImage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot upload image.", e =>
             {
@@ -44,17 +44,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(UpdateApp command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanRemoveImage(RemoveAppImage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanChangePlan(ChangePlan command, AppPlan? plan, IAppPlansProvider appPlans)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(() => "Cannot change plan.", e =>
             {

@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerGrain(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
+            Guard.NotNull(assetStore);
 
             this.assetStore = assetStore;
         }

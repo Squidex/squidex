@@ -44,8 +44,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public virtual ClrQuery ParseQuery(Context context, ISchemaEntity schema, Q q)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(context);
+            Guard.NotNull(schema);
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {

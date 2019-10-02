@@ -24,8 +24,8 @@ namespace Squidex.Infrastructure.Log
 
         public LockingLogStore(ILogStore inner, IGrainFactory grainFactory)
         {
-            Guard.NotNull(inner, nameof(inner));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(inner);
+            Guard.NotNull(grainFactory);
 
             this.inner = inner;
 

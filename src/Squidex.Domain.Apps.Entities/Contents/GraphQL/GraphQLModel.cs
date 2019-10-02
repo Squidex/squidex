@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public async Task<(object? Data, object[]? Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             var result = await new DocumentExecuter().ExecuteAsync(execution =>
             {

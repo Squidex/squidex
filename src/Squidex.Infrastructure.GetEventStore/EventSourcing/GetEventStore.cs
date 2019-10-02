@@ -28,8 +28,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public GetEventStore(IEventStoreConnection connection, IJsonSerializer serializer, string prefix, string projectionHost)
         {
-            Guard.NotNull(connection, nameof(connection));
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(connection);
+            Guard.NotNull(serializer);
 
             this.connection = connection;
             this.serializer = serializer;
@@ -55,23 +55,23 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(streamFilter, nameof(streamFilter));
+            Guard.NotNull(streamFilter);
 
             return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
         {
-            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNullOrEmpty(property);
 
             return projectionClient.CreateProjectionAsync(property, string.Empty);
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(callback);
+            Guard.NotNullOrEmpty(property);
+            Guard.NotNull(value);
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -154,7 +154,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             return connection.DeleteStreamAsync(GetStreamName(streamName), ExpectedVersion.Any);
         }
@@ -166,15 +166,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+            Guard.GreaterEquals(expectedVersion, -1);
 
             return AppendEventsInternalAsync(streamName, expectedVersion, events);
         }
 
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
 
             using (Profiler.TraceMethod<GetEventStore>(nameof(AppendAsync)))
             {

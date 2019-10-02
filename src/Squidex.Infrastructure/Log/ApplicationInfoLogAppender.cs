@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Log
 
         public ApplicationInfoLogAppender(Assembly assembly, Guid applicationSession)
         {
-            Guard.NotNull(assembly, nameof(assembly));
+            Guard.NotNull(assembly);
 
             applicationName = assembly.GetName().Name!;
             applicationVersion = assembly.GetName().Version!.ToString()!;

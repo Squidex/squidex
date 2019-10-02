@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Assets
 
         public HasherStream(Stream inner, HashAlgorithmName hashAlgorithmName)
         {
-            Guard.NotNull(inner, nameof(inner));
+            Guard.NotNull(inner);
 
             this.inner = inner;
 

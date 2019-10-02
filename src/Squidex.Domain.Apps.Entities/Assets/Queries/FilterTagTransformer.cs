@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public static FilterNode<ClrValue>? Transform(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
         {
-            Guard.NotNull(nodeIn, nameof(nodeIn));
-            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(nodeIn);
+            Guard.NotNull(tagService);
 
             return nodeIn.Accept(new FilterTagTransformer(appId, tagService));
         }

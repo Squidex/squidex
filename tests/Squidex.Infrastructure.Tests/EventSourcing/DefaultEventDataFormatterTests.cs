@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.EventSourcing
             inputEvent.SetEventStreamNumber(1);
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
-            var eventData = sut.ToEventData(inputEvent.To<IEvent>(), commitId);
+            var eventData = sut.ToEventData(inputEvent, commitId);
 
             var outputEvent = sut.Parse(eventData).To<MyEvent>();
 
@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
 
-            var eventData = sut.ToEventData(inputEvent.To<IEvent>(), Guid.NewGuid());
+            var eventData = sut.ToEventData(inputEvent, Guid.NewGuid());
 
             var outputEvent = sut.Parse(eventData).To<MyEvent>();
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
 
-            var eventData = sut.ToEventData(inputEvent.To<IEvent>(), Guid.NewGuid(), false);
+            var eventData = sut.ToEventData(inputEvent, Guid.NewGuid(), false);
 
             var outputEvent = sut.Parse(eventData).To<MyEvent>();
 

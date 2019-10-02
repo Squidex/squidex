@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
         public ContentEnricher(Schema schema, PartitionResolver partitionResolver)
         {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(schema);
+            Guard.NotNull(partitionResolver);
 
             this.schema = schema;
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
         public void Enrich(NamedContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             foreach (var field in schema.Fields)
             {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
         private static void Enrich(IField field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
         {
-            Guard.NotNull(fieldData, nameof(fieldData));
+            Guard.NotNull(fieldData);
 
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant());
 

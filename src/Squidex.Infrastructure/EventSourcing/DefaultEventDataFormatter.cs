@@ -20,8 +20,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public DefaultEventDataFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
         {
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(typeNameRegistry);
+            Guard.NotNull(serializer);
 
             this.typeNameRegistry = typeNameRegistry;
 

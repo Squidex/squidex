@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core
 
         protected Named(string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             Name = name;
         }
