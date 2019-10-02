@@ -9,7 +9,11 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as moment from 'moment';
 
-import { StatefulControlComponent, Types } from '@app/framework/internal';
+import {
+    StatefulControlComponent,
+    Types,
+    UIOptions
+} from '@app/framework/internal';
 
 declare module 'pikaday/pikaday';
 
@@ -49,6 +53,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     public timeControl = new FormControl();
     public dateControl = new FormControl();
 
+    public hideDateButtons: boolean;
+
     public get showTime() {
         return this.mode === 'DateTime';
     }
@@ -57,8 +63,10 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         return !!this.dateValue;
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
+    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
         super(changeDetector, {});
+
+        this.hideDateButtons = !!uiOptions.get('hideDateButtons');
     }
 
     public ngOnInit() {
