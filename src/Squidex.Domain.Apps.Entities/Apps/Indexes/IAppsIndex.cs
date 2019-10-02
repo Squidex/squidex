@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task<string?> ReserveAsync(Guid id, string name);
 
-        Task<bool> AddAsync(string token);
+        Task<bool> AddAsync(string? token);
 
-        Task RemoveReservationAsync(string token);
+        Task RemoveReservationAsync(string? token);
 
         Task RebuildByContributorsAsync(string contributorId, HashSet<Guid> apps);
 

@@ -19,7 +19,9 @@ namespace Squidex.Infrastructure.Tasks
         {
             if (task.IsCompleted)
             {
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
                 var ignored = task.Exception;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             }
             else
             {

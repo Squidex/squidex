@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
+        private static readonly List<Guid> EmptyIds = new List<Guid>();
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
         private readonly ITextIndexer indexer;
@@ -116,19 +117,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
-        {
-            using (Profiler.TraceMethod<MongoContentRepository>())
-            {
-                return await contents.QueryIdsAsync((await appProvider.GetSchemaAsync(appId, schemaId))!, filterNode);
-            }
-        }
-
         public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 await contents.QueryScheduledWithoutDataAsync(now, callback);
+            }
+        }
+
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+
+                if (schema == null)
+                {
+                    return EmptyIds;
+                }
+
+                return await contents.QueryIdsAsync(schema, filterNode);
             }
         }
 

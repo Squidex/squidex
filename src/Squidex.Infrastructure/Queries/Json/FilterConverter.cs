@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var compareOperator = (CompareOperator)99;
 
-            IJsonValue? compareValue = null!;
+            IJsonValue? compareValue = null;
 
             while (reader.Read())
             {

@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await appsIndex.AddAsync(appReservation!);
+            await appsIndex.AddAsync(appReservation);
 
             await appsIndex.RebuildByContributorsAsync(appId, contributors);
         }

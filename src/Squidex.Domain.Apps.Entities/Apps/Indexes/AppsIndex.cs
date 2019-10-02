@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().RebuildAsync(appsByName);
         }
 
-        public Task RemoveReservationAsync(string token)
+        public Task RemoveReservationAsync(string? token)
         {
             return Index().RemoveReservationAsync(token);
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().GetIdsAsync();
         }
 
-        public Task<bool> AddAsync(string token)
+        public Task<bool> AddAsync(string? token)
         {
             return Index().AddAsync(token);
         }

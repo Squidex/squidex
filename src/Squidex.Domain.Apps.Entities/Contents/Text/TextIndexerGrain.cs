@@ -89,27 +89,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private Task<bool> IndexInternalAsync(Update update)
         {
-            var content = new TextIndexContent(indexWriter!, indexState!, update.Id);
+            if (indexWriter != null && indexState != null)
+            {
+                var content = new TextIndexContent(indexWriter, indexState, update.Id);
 
-            content.Index(update.Data, update.OnlyDraft);
+                content.Index(update.Data, update.OnlyDraft);
+            }
 
             return TryFlushAsync();
         }
 
         public Task<bool> CopyAsync(Guid id, bool fromDraft)
         {
-            var content = new TextIndexContent(indexWriter!, indexState!, id);
+            if (indexWriter != null && indexState != null)
+            {
+                var content = new TextIndexContent(indexWriter, indexState, id);
 
-            content.Copy(fromDraft);
+                content.Copy(fromDraft);
+            }
 
             return TryFlushAsync();
         }
 
         public Task<bool> DeleteAsync(Guid id)
         {
-            var content = new TextIndexContent(indexWriter!, indexState!, id);
+            if (indexWriter != null && indexState != null)
+            {
+                var content = new TextIndexContent(indexWriter, indexState, id);
 
-            content.Delete();
+                content.Delete();
+            }
 
             return TryFlushAsync();
         }
@@ -122,20 +131,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var query = BuildQuery(queryText, context);
 
-                if (indexReader == null && indexWriter!.NumDocs > 0)
+                if (indexReader == null && indexWriter?.NumDocs > 0)
                 {
                     OpenReader();
                 }
 
-                if (indexReader != null)
+                if (indexReader != null && indexSearcher != null && indexState != null)
                 {
                     var found = new HashSet<Guid>();
 
-                    var hits = indexSearcher!.Search(query, MaxResults).ScoreDocs;
+                    var hits = indexSearcher.Search(query, MaxResults).ScoreDocs;
 
                     foreach (var hit in hits)
                     {
-                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState!, out var id))
+                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState, out var id))
                         {
                             if (found.Add(id))
                             {
@@ -151,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private Query BuildQuery(string query, SearchContext context)
         {
-            if (queryParser == null || !currentLanguages!.SetEquals(context.Languages))
+            if (queryParser == null || currentLanguages == null || !currentLanguages.SetEquals(context.Languages))
             {
                 var fields = context.Languages.Union(Invariant).ToArray();
 
@@ -237,9 +246,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private void OpenReader()
         {
-            indexReader = indexWriter!.GetReader(true);
-            indexSearcher = new IndexSearcher(indexReader);
-            indexState = new IndexState(indexWriter, indexReader, indexSearcher);
+            if (indexWriter != null)
+            {
+                indexReader = indexWriter!.GetReader(true);
+                indexSearcher = new IndexSearcher(indexReader);
+                indexState = new IndexState(indexWriter, indexReader, indexSearcher);
+            }
         }
 
         private void CleanReader()

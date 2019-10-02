@@ -51,15 +51,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(appId, schemaId);
 
+            if (appEntity == null)
+            {
+                throw new InvalidOperationException("Cannot resolve app.");
+            }
+
+            if (schemaEntity == null)
+            {
+                throw new InvalidOperationException("Cannot resolve schema.");
+            }
+
             var context = new ContentOperationContext
             {
-                appEntity = appEntity!,
+                appEntity = appEntity,
                 assetRepository = assetRepository,
                 command = command,
                 contentRepository = contentRepository,
                 message = message,
                 schemaId = schemaId,
-                schemaEntity = schemaEntity!,
+                schemaEntity = schemaEntity,
                 scriptEngine = scriptEngine
             };
 

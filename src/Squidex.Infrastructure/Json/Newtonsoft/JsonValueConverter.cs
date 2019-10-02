@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonToken.Date:
                     return JsonValue.Create(((DateTime)reader.Value).ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
                 case JsonToken.String:
-                    return JsonValue.Create(reader.Value.ToString()!);
+                    return JsonValue.Create(reader.Value.ToString());
                 case JsonToken.Null:
                 case JsonToken.Undefined:
                     return JsonValue.Null;

@@ -23,11 +23,15 @@ namespace Squidex.Infrastructure.Commands
                 context.Arguments?.Length == 1 &&
                 context.Arguments[0] != null)
             {
-                var argumentFullName = context.Arguments[0].ToString()!;
-                var argumentParts = argumentFullName.Split('.');
-                var argumentName = argumentParts[^1];
+                var argumentFullName = context.Arguments[0].ToString();
 
-                return $"{nameof(IDomainObjectGrain.ExecuteAsync)}({argumentName})";
+                if (argumentFullName != null)
+                {
+                    var argumentParts = argumentFullName.Split('.');
+                    var argumentName = argumentParts[^1];
+
+                    return $"{nameof(IDomainObjectGrain.ExecuteAsync)}({argumentName})";
+                }
             }
 
             return context.InterfaceMethod.Name;

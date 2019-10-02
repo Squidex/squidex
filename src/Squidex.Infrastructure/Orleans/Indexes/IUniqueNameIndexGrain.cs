@@ -14,11 +14,11 @@ namespace Squidex.Infrastructure.Orleans.Indexes
     {
         Task<string?> ReserveAsync(T id, string name);
 
-        Task<bool> AddAsync(string token);
+        Task<bool> AddAsync(string? token);
 
         Task<long> CountAsync();
 
-        Task RemoveReservationAsync(string token);
+        Task RemoveReservationAsync(string? token);
 
         Task RemoveAsync(T id);
 

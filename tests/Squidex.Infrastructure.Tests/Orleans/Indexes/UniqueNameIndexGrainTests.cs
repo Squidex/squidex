@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         [Fact]
         public async Task Should_ignore_error_if_removing_reservation_with_Invalid_token()
         {
-            await sut.RemoveReservationAsync(null!);
+            await sut.RemoveReservationAsync(null);
         }
 
         [Fact]

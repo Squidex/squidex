@@ -261,7 +261,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
             await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
 
-            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString()!);
+            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString());
 
             var expected = new[]
             {

@@ -171,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var converters = GenerateConverters(context).ToArray();
 
-                var scriptText = schema.SchemaDef.Scripts.Query;
-                var scripting = !string.IsNullOrWhiteSpace(scriptText);
+                var script = schema.SchemaDef.Scripts.Query;
+                var scripting = !string.IsNullOrWhiteSpace(script);
 
                 var enriched = await contentEnricher.EnrichAsync(contents, context);
 
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         {
                             var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
 
-                            result.Data = scriptEngine.Transform(ctx, scriptText);
+                            result.Data = scriptEngine.Transform(ctx, script);
                         }
 
                         result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);

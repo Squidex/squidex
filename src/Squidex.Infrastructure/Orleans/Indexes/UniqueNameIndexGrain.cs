@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
             return Task.FromResult(token);
         }
 
-        public async Task<bool> AddAsync(string token)
+        public async Task<bool> AddAsync(string? token)
         {
             token ??= string.Empty;
 
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
             return false;
         }
 
-        public Task RemoveReservationAsync(string token)
+        public Task RemoveReservationAsync(string? token)
         {
             reservations.Remove(token ?? string.Empty);
 

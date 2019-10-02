@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Failed(Exception ex)
         {
-            return new EventConsumerState { Position = Position, IsStopped = true, Error = ex?.ToString()! };
+            return new EventConsumerState { Position = Position, IsStopped = true, Error = ex?.ToString() };
         }
 
         public EventConsumerState Stopped()
