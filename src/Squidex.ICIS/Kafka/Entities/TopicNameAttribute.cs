@@ -1,15 +1,21 @@
-﻿using System;
+﻿using Squidex.ICIS.Kafka.Consumer;
+using System;
 
 namespace Squidex.ICIS.Kafka.Entities
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class TopicNameAttribute : Attribute
     {
-        public string Name { get; }
+        private readonly string name;
 
         public TopicNameAttribute(string name)
         {
-            Name = name;
+            this.name = name;
+        }
+
+        public string GetName(ConsumerOptions options)
+        {
+            return name.Replace("{environment}", options.Environment);
         }
     }
 }

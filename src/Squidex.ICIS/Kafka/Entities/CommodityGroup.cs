@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.ICIS.Kafka.Entities
 {
-    [TopicName("iddn_ref_data_commodity_group")]
+    [TopicName("{environment}_iddn_commodity_group_external_1")]
     public sealed class CommodityGroup : IRefDataEntity
     {
         [JsonProperty("id")]

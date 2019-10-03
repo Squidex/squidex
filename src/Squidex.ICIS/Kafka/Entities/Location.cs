@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.ICIS.Kafka.Entities
 {
-    [TopicName("iddn_ref_data_location")]
+    [TopicName("{environment}_iddn_location_external_1")]
     public sealed class Location : IRefDataEntity
     {
         [JsonProperty("id")]

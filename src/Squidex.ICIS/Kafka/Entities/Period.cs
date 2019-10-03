@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.ICIS.Kafka.Entities
 {
-    [TopicName("iddn_ref_data_period")]
+    [TopicName("{environment}_iddn_period_external_1")]
     public sealed class Period : IRefDataEntity
     {
         [JsonProperty("id")]

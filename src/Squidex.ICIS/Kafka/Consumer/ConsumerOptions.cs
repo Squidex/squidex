@@ -7,5 +7,7 @@
         public string AppName { get; set; }
 
         public string ClientName { get; set; }
+
+        public string Environment { get; set; } = "integ";
     }
 }
