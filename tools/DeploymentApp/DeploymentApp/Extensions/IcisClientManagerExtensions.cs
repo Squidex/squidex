@@ -297,7 +297,7 @@ namespace DeploymentApp.Extensions
             }
         }
 
-        public static async Task CreateIdDataAsync(this SquidexClientManager clientManager, string schema, string id, object data)
+        public static async Task CreateIdDataAsync(this SquidexClientManager clientManager, string schema, string id, object data, bool isLocalized)
         {
             var client = clientManager.GetClient<TestData, object>(schema);
 
@@ -318,17 +318,38 @@ namespace DeploymentApp.Extensions
                 {
                     if (data is string name)
                     {
-                        await client.CreateAsync(new
+                        var content = new Object();
+
+                        if(isLocalized)
                         {
-                            id = new
+                            content = new 
                             {
-                                iv = id
-                            },
-                            name = new
+                                id = new
+                                {
+                                    iv = id
+                                },
+                                name = new
+                                {
+                                    en = name
+                                }
+                            };
+                        }
+                        else
+                        {
+                            content = new 
                             {
-                                iv = name
-                            }
-                        });
+                                id = new
+                                {
+                                    iv = id
+                                },
+                                name = new
+                                {
+                                    iv = name
+                                }
+                            };
+                        }
+                        
+                        await client.CreateAsync(content);
                     }
                     else
                     {
