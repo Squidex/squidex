@@ -49,6 +49,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool IsPending { get; set; }
 
-        public HashSet<string> CacheDependencies { get; set; }
+        public HashSet<object> CacheDependencies { get; set; }
     }
 }

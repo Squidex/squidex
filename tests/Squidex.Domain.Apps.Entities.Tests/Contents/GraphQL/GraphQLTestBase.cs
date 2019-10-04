@@ -40,9 +40,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly ISchemaEntity schema;
+        protected readonly ISchemaEntity schemaRef1;
+        protected readonly ISchemaEntity schemaRef2;
         protected readonly Context requestContext;
         protected readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         protected readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        protected readonly NamedId<Guid> schemaRefId1 = NamedId.Of(Guid.NewGuid(), "my-ref-schema1");
+        protected readonly NamedId<Guid> schemaRefId2 = NamedId.Of(Guid.NewGuid(), "my-ref-schema2");
         protected readonly IGraphQLService sut;
 
         public GraphQLTestBase()
@@ -50,7 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             app = Mocks.App(appId, Language.DE, Language.GermanGermany);
 
             var schemaDef =
-                new Schema("my-schema")
+                new Schema(schemaId.Name)
+                    .Publish()
                     .AddJson(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Language,
@@ -66,7 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddDateTime(7, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties())
                     .AddReferences(8, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = schemaId.Id })
+                        new ReferencesFieldProperties { SchemaId = schemaRefId1.Id })
+                    .AddReferences(81, "my-union", Partitioning.Invariant,
+                        new ReferencesFieldProperties())
                     .AddReferences(9, "my-invalid", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Guid.NewGuid() })
                     .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
@@ -79,10 +86,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
-                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" })
-                    .Publish();
+                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
+
+            var schemaRef1Def =
+                new Schema(schemaRefId1.Name)
+                    .Publish()
+                    .AddString(1, "ref1-field", Partitioning.Invariant);
+
+            schemaRef1 = Mocks.Schema(appId, schemaRefId1, schemaRef1Def);
+
+            var schemaRef2Def =
+                new Schema(schemaRefId2.Name)
+                    .Publish()
+                    .AddString(1, "ref2-field", Partitioning.Invariant);
+
+            schemaRef2 = Mocks.Schema(appId, schemaRefId2, schemaRef2Def);
 
             requestContext = new Context(Mocks.FrontendUser(), app);
 
@@ -119,6 +139,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-references",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Array(refId.ToString())))
+                    .AddField("my-union",
+                        new ContentFieldData()
+                            .AddValue("iv", JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
@@ -150,6 +173,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data,
                 DataDraft = dataDraft,
+                Status = Status.Draft,
+                StatusColor = "red"
+            };
+
+            return content;
+        }
+
+        protected static IEnrichedContentEntity CreateRefContent(Guid id, string field, string value)
+        {
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var data =
+                new NamedContentData()
+                    .AddField(field,
+                        new ContentFieldData()
+                            .AddValue("iv", value));
+
+            var content = new ContentEntity
+            {
+                Id = id,
+                Version = 1,
+                Created = now,
+                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
+                LastModified = now,
+                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
+                Data = data,
+                DataDraft = data,
                 Status = Status.Draft,
                 StatusColor = "red"
             };
@@ -207,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var appProvider = A.Fake<IAppProvider>();
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
-                .Returns(new List<ISchemaEntity> { schema });
+                .Returns(new List<ISchemaEntity> { schema, schemaRef1, schemaRef2 });
 
             var dataLoaderContext = new DataLoaderContextAccessor();
 

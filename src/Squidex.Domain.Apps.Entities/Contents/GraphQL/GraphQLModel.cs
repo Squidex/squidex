@@ -137,15 +137,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
-            return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType, fieldName));
+            return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, GetContentType, this, assetListType, fieldName));
         }
 
-        public IGraphType GetAssetType()
+        public IObjectGraphType GetAssetType()
         {
-            return assetType;
+            return assetType as IObjectGraphType;
         }
 
-        public IGraphType GetContentType(Guid schemaId)
+        public IObjectGraphType GetContentType(Guid schemaId)
         {
             var schema = schemasById.GetOrDefault(schemaId);
 

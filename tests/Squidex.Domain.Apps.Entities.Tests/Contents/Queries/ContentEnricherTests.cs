@@ -48,10 +48,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var result = await sut.EnrichAsync(source, requestContext);
 
-            Assert.Contains(requestContext.App.Version.ToString(), result.CacheDependencies);
+            Assert.Contains(requestContext.App.Version, result.CacheDependencies);
 
-            Assert.Contains(schema.Id.ToString(), result.CacheDependencies);
-            Assert.Contains(schema.Version.ToString(), result.CacheDependencies);
+            Assert.Contains(schema.Id, result.CacheDependencies);
+            Assert.Contains(schema.Version, result.CacheDependencies);
         }
 
         [Fact]

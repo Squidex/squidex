@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 var contentType = model.GetContentType(schema.Id);
 
-                AddContentFind(schemaId, schemaType, schemaName, contentType);
+                AddContentFind(schemaType, schemaName, contentType);
                 AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
             }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentFind(Guid schemaId, string schemaType, string schemaName, IGraphType contentType)
+        private void AddContentFind(string schemaType, string schemaName, IGraphType contentType)
         {
             AddField(new FieldType
             {
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    return e.FindContentAsync(schemaId, contentId);
+                    return e.FindContentAsync(contentId);
                 }),
                 Description = $"Find an {schemaName} content by id."
             });

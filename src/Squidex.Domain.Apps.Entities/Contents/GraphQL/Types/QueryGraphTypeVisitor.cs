@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -19,17 +21,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         private static readonly ValueResolver NoopResolver = (value, c) => value;
         private readonly ISchemaEntity schema;
-        private readonly Func<Guid, IGraphType> schemaResolver;
+        private readonly Func<Guid, IObjectGraphType> schemaResolver;
+        private readonly IDictionary<ISchemaEntity, ContentGraphType> schemaTypes;
         private readonly IGraphModel model;
         private readonly IGraphType assetListType;
         private readonly string fieldName;
 
-        public QueryGraphTypeVisitor(ISchemaEntity schema, Func<Guid, IGraphType> schemaResolver, IGraphModel model, IGraphType assetListType, string fieldName)
+        public QueryGraphTypeVisitor(ISchemaEntity schema,
+            IDictionary<ISchemaEntity, ContentGraphType> schemaTypes,
+            Func<Guid, IObjectGraphType> schemaResolver,
+            IGraphModel model,
+            IGraphType assetListType,
+            string fieldName)
         {
             this.model = model;
             this.assetListType = assetListType;
             this.schema = schema;
             this.schemaResolver = schemaResolver;
+            this.schemaTypes = schemaTypes;
             this.fieldName = fieldName;
         }
 
@@ -112,22 +121,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return (assetListType, resolver);
         }
 
-        private (IGraphType ResolveType, ValueResolver Resolver) ResolveReferences(IField field)
+        private (IGraphType ResolveType, ValueResolver Resolver) ResolveReferences(IField<ReferencesFieldProperties> field)
         {
-            var schemaId = ((ReferencesFieldProperties)field.RawProperties).SchemaId;
-
-            var contentType = schemaResolver(schemaId);
+            IGraphType contentType = schemaResolver(field.Properties.SingleId());
 
             if (contentType == null)
             {
-                return (null, null);
+                var union = new ReferenceGraphType(fieldName, schemaTypes, field.Properties.SchemaIds, schemaResolver);
+
+                if (!union.PossibleTypes.Any())
+                {
+                    return (null, null);
+                }
+
+                contentType = union;
             }
 
             var resolver = new ValueResolver((value, c) =>
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.GetReferencedContentsAsync(schemaId, value);
+                return context.GetReferencedContentsAsync(value);
             });
 
             var schemaFieldType = new ListGraphType(new NonNullGraphType(contentType));

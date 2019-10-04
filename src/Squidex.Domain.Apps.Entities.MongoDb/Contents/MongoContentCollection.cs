@@ -169,15 +169,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 });
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(ISchemaEntity schema, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(ISchemaEntity schema, FilterNode<ClrValue> filterNode)
         {
             var filter = filterNode.AdjustToModel(schema.SchemaDef, true).ToFilter(schema.Id);
 
             var contentEntities =
-                await Collection.Find(filter).Only(x => x.Id)
+                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
+            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
+        }
+
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(HashSet<Guid> ids)
+        {
+            var contentEntities =
+                await Collection.Find(Filter.In(x => x.Id, ids)).Only(x => x.Id, x => x.IndexedSchemaId)
+                    .ToListAsync();
+
+            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
