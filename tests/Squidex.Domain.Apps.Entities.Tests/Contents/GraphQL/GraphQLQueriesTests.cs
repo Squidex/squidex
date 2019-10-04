@@ -18,6 +18,95 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLQueriesTests : GraphQLTestBase
     {
+        [Fact]
+        public async Task Should_introspect()
+        {
+            const string query = @"              
+                query IntrospectionQuery {
+                  __schema {
+                    queryType { name }
+                    mutationType { name }
+                    subscriptionType { name }
+                    types {
+                      ...FullType
+                    }
+                    directives {
+                      name
+                      description
+                      args {
+                        ...InputValue
+                      }
+                      onOperation
+                      onFragment
+                      onField
+                    }
+                  }
+                }
+
+                fragment FullType on __Type {
+                  kind
+                  name
+                  description
+                  fields(includeDeprecated: true) {
+                    name
+                    description
+                    args {
+                      ...InputValue
+                    }
+                    type {
+                      ...TypeRef
+                    }
+                    isDeprecated
+                    deprecationReason
+                  }
+                  inputFields {
+                    ...InputValue
+                  }
+                  interfaces {
+                    ...TypeRef
+                  }
+                  enumValues(includeDeprecated: true) {
+                    name
+                    description
+                    isDeprecated
+                    deprecationReason
+                  }
+                  possibleTypes {
+                    ...TypeRef
+                  }
+                }
+
+                fragment InputValue on __InputValue {
+                  name
+                  description
+                  type { ...TypeRef }
+                  defaultValue
+                }
+
+                fragment TypeRef on __Type {
+                  kind
+                  name
+                  ofType {
+                    kind
+                    name
+                    ofType {
+                      kind
+                      name
+                      ofType {
+                        kind
+                        name
+                      }
+                    }
+                  }
+                }";
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, OperationName = "IntrospectionQuery" });
+
+            var json = serializer.Serialize(result.Response, true);
+
+            Assert.NotEmpty(json);
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -775,7 +864,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_also_fetch_referenced_contents_when_field_is_included_in_query()
         {
             var contentRefId = Guid.NewGuid();
-            var contentRef = CreateRefContent(contentRefId, "ref1-field", "ref1");
+            var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, contentRefId, Guid.Empty);
@@ -845,7 +934,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_also_fetch_union_contents_when_field_is_included_in_query()
         {
             var contentRefId = Guid.NewGuid();
-            var contentRef = CreateRefContent(contentRefId, "ref1-field", "ref1");
+            var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, contentRefId, Guid.Empty);
@@ -857,15 +946,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     data {
                       myUnion {
                         iv {
-                          id
-                          __typename
-                          ...MyRefSchema1Dto {
+                          ... on Content {
+                            id
+                          }
+                          ... on MyRefSchema1 {
                             data {
                               ref1Field {
                                 iv
                               }
                             }
                           }
+                          __typename
                         }
                       }
                     }
@@ -889,14 +980,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         id = content.Id,
                         data = new
                         {
-                            myReferences = new
+                            myUnion = new
                             {
                                 iv = new[]
                                 {
                                     new
                                     {
                                         id = contentRefId,
-                                        __typename = "MyRefSchema1Dto",
                                         data = new
                                         {
                                             ref1Field = new
@@ -904,6 +994,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                                 iv = "ref1"
                                             }
                                         },
+                                        __typename = "MyRefSchema1"
                                     }
                                 }
                             }

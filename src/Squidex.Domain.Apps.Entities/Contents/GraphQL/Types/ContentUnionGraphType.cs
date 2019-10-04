@@ -9,16 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ReferenceGraphType : UnionGraphType
+    public sealed class ContentUnionGraphType : UnionGraphType
     {
         private readonly Dictionary<Guid, IObjectGraphType> types = new Dictionary<Guid, IObjectGraphType>();
 
-        public ReferenceGraphType(string fieldName, IDictionary<ISchemaEntity, ContentGraphType> schemaTypes, IEnumerable<Guid> schemaIds, Func<Guid, IObjectGraphType> schemaResolver)
+        public ContentUnionGraphType(string fieldName, Dictionary<Guid, ContentGraphType> schemaTypes, IEnumerable<Guid> schemaIds)
         {
             Name = $"{fieldName}ReferenceUnionDto";
 
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 foreach (var schemaId in schemaIds)
                 {
-                    var schemaType = schemaResolver(schemaId);
+                    var schemaType = schemaTypes.GetOrDefault(schemaId);
 
                     if (schemaType != null)
                     {
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 foreach (var schemaType in schemaTypes)
                 {
-                    types[schemaType.Key.Id] = schemaType.Value;
+                    types[schemaType.Key] = schemaType.Value;
                 }
             }
 
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 if (value is IContentEntity content)
                 {
-                    return types.GetOrDefault(content.Id);
+                    return types.GetOrDefault(content.SchemaId.Id);
                 }
 
                 return null;

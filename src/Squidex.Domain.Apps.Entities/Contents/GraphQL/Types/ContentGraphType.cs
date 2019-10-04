@@ -15,12 +15,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
-        public ContentGraphType(IGraphModel model, ISchemaEntity schema, IComplexGraphType contentDataType)
-        {
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
+        private readonly ISchemaEntity schema;
+        private readonly string schemaType;
+        private readonly string schemaName;
 
-            Name = $"{schemaType}Dto";
+        public ContentGraphType(ISchemaEntity schema)
+        {
+            this.schema = schema;
+
+            schemaType = schema.TypeName();
+            schemaName = schema.DisplayName();
+
+            Name = $"{schemaType}";
 
             AddField(new FieldType
             {
@@ -84,92 +90,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.StatusColor),
                 Description = $"The color status of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "url",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = model.ResolveContentUrl(schema),
-                Description = $"The url to the the {schemaName} content."
             });
 
             Interface<ContentInterfaceGraphType>();
 
             Description = $"The structure of a {schemaName} content type.";
+
+            IsTypeOf = CheckType;
         }
 
-        public void Initialize(IGraphModel model, ISchemaEntity schema, IComplexGraphType contentDataType)
+        private bool CheckType(object value)
         {
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
+           return value is IContentEntity content && content.SchemaId?.Id == schema.Id;
+        }
 
-            Name = $"{schemaType}Dto";
-
-            AddField(new FieldType
-            {
-                Name = "id",
-                ResolvedType = AllTypes.NonNullGuid,
-                Resolver = Resolve(x => x.Id),
-                Description = $"The id of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "version",
-                ResolvedType = AllTypes.NonNullInt,
-                Resolver = Resolve(x => x.Version),
-                Description = $"The version of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "created",
-                ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.Created),
-                Description = $"The date and time when the {schemaName} content has been created."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "createdBy",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.CreatedBy.ToString()),
-                Description = $"The user that has created the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "lastModified",
-                ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.LastModified),
-                Description = $"The date and time when the {schemaName} content has been modified last."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "lastModifiedBy",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.LastModifiedBy.ToString()),
-                Description = $"The user that has updated the {schemaName} content last."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "status",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.Status.Name.ToUpperInvariant()),
-                Description = $"The the status of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "statusColor",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.StatusColor),
-                Description = $"The color status of the {schemaName} content."
-            });
-
+        public void Initialize(IGraphModel model)
+        {
             AddField(new FieldType
             {
                 Name = "url",
@@ -177,6 +113,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Resolver = model.ResolveContentUrl(schema),
                 Description = $"The url to the the {schemaName} content."
             });
+
+            var contentDataType = new ContentDataGraphType(schema, schemaName, schemaType, model);
 
             if (contentDataType.Fields.Any())
             {
@@ -196,10 +134,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Description = $"The draft data of the {schemaName} content."
                 });
             }
-
-            Interface<ContentInterfaceGraphType>();
-
-            Description = $"The structure of a {schemaName} content type.";
         }
 
         private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object> action)

@@ -11,6 +11,7 @@ using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -20,16 +21,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType ResolveType, ValueResolver Resolver)>
     {
         private static readonly ValueResolver NoopResolver = (value, c) => value;
+        private readonly Dictionary<Guid, ContentGraphType> schemaTypes;
         private readonly ISchemaEntity schema;
-        private readonly Func<Guid, IObjectGraphType> schemaResolver;
-        private readonly IDictionary<ISchemaEntity, ContentGraphType> schemaTypes;
         private readonly IGraphModel model;
         private readonly IGraphType assetListType;
         private readonly string fieldName;
 
         public QueryGraphTypeVisitor(ISchemaEntity schema,
-            IDictionary<ISchemaEntity, ContentGraphType> schemaTypes,
-            Func<Guid, IObjectGraphType> schemaResolver,
+            Dictionary<Guid, ContentGraphType> schemaTypes,
             IGraphModel model,
             IGraphType assetListType,
             string fieldName)
@@ -37,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             this.model = model;
             this.assetListType = assetListType;
             this.schema = schema;
-            this.schemaResolver = schemaResolver;
             this.schemaTypes = schemaTypes;
             this.fieldName = fieldName;
         }
@@ -123,11 +121,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private (IGraphType ResolveType, ValueResolver Resolver) ResolveReferences(IField<ReferencesFieldProperties> field)
         {
-            IGraphType contentType = schemaResolver(field.Properties.SingleId());
+            IGraphType contentType = schemaTypes.GetOrDefault(field.Properties.SingleId());
 
             if (contentType == null)
             {
-                var union = new ReferenceGraphType(fieldName, schemaTypes, field.Properties.SchemaIds, schemaResolver);
+                var union = new ContentUnionGraphType(fieldName, schemaTypes, field.Properties.SchemaIds);
 
                 if (!union.PossibleTypes.Any())
                 {
