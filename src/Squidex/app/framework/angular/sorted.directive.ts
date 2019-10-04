@@ -6,8 +6,7 @@
  */
 
 import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
-
-import * as Sortable from 'sortablejs';
+import Sortable from 'sortablejs';
 
 const DEFAULT_PROPS = { sort: true, animation: 150 };
 
