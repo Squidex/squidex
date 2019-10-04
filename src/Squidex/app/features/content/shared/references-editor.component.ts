@@ -85,7 +85,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     }
 
     public setContentItems(contentItems: ContentDto[]) {
-        let columnCount = 0;
+        let columnCount = 1;
 
         for (let content of contentItems) {
             columnCount = Math.max(columnCount, content.referenceFields.length);

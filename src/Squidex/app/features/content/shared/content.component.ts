@@ -48,9 +48,6 @@ export class ContentComponent implements OnChanges {
     public selected = false;
 
     @Input()
-    public selectable = true;
-
-    @Input()
     public language: AppLanguageDto;
 
     @Input()
@@ -61,12 +58,6 @@ export class ContentComponent implements OnChanges {
 
     @Input()
     public canClone: boolean;
-
-    @Input()
-    public isReadOnly = false;
-
-    @Input()
-    public isReference = false;
 
     @Input()
     public isCompact = false;
@@ -99,7 +90,7 @@ export class ContentComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['content']) {
-            this.patchAllowed = !this.isReadOnly && this.content.canUpdate;
+            this.patchAllowed = this.content.canUpdate;
         }
 
         if (changes['schema'] || changes['language']) {

@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import {
     FieldDto,
@@ -45,8 +45,6 @@ export class ReferencesValidationComponent implements OnInit {
             new FormControl(this.properties.minItems));
 
         this.editForm.setControl('schemaIds',
-            new FormControl(this.properties.schemaIds, [
-                Validators.required
-            ]));
+            new FormControl(this.properties.schemaIds));
     }
 }

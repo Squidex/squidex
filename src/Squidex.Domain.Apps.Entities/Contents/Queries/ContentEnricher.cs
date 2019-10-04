@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                             var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
 
                             var schemaName = schema.SchemaDef.Name;
-                            var schemaDisplayName = schema.DisplayName();
+                            var schemaDisplayName = schema.SchemaDef.DisplayNameUnchanged();
 
                             foreach (var content in group)
                             {

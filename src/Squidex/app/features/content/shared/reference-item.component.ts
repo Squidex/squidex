@@ -32,8 +32,8 @@ import {
                 <sqx-content-value [value]="value"></sqx-content-value>
             </td>
 
-            <td class="cell-time" *ngIf="!isCompact">
-                <span class="badge badge-pill truncate badge-primary">{{content.schemaDisplayName}}</span>
+            <td class="cell-label" *ngIf="!isCompact">
+                <span class="badge badge-pill truncate-inline badge-primary">{{content.schemaDisplayName}}</span>
             </td>
 
             <td class="cell-actions">
@@ -77,9 +77,7 @@ export class ReferenceItemComponent implements OnChanges {
     public values: any[] = [];
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['content'] || changes['language']) {
-            this.updateValues();
-        }
+        this.updateValues();
     }
 
     public emitDelete() {

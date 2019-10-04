@@ -54,6 +54,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.Properties.Label.WithFallback(schema.TypeName());
         }
 
+        public static string DisplayNameUnchanged(this Schema schema)
+        {
+            return schema.Properties.Label.WithFallback(schema.Name);
+        }
+
         public static Guid SingleId(this ReferencesFieldProperties properties)
         {
             return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : Guid.Empty;
