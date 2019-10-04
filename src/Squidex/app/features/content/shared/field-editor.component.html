@@ -34,7 +34,7 @@
                     <sqx-assets-editor [formControl]="control" [isCompact]="isCompact"></sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Toggle'">
                             <sqx-toggle [formControl]="control" [threeStates]="!field.properties.isRequired"></sqx-toggle>
                         </ng-container>
@@ -44,7 +44,7 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'DateTime'">
-                    <sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="control"></sqx-date-time-editor>
+                    <sqx-date-time-editor enforceTime="true" [mode]="field.rawProperties.editor" [formControl]="control"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
 					<sqx-geolocation-editor [isCompact]="isCompact" [formControl]="control"></sqx-geolocation-editor>
@@ -53,21 +53,21 @@
 					<sqx-json-editor [formControl]="control"></sqx-json-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
-					<ng-container [ngSwitch]="field.properties['editor']">
+					<ng-container [ngSwitch]="field.rawProperties.editor">
 						<ng-container *ngSwitchCase="'Input'">
 							<input class="form-control" type="number" [formControl]="control" [placeholder]="field.displayPlaceholder" />
 						</ng-container>
 						<ng-container *ngSwitchCase="'Stars'">
-							<sqx-stars [formControl]="control" [maximumStars]="field.properties['maxValue']"></sqx-stars>
+							<sqx-stars [formControl]="control" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-control" [formControl]="control">
 								<option [ngValue]="null"></option>
-								<option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+							<div class="form-check form-check-inline" *ngFor="let value of field.rawProperties.allowedValues">
 								<input class="form-check-input" type="radio" [value]="value" [formControl]="control" [name]="uniqueId" />
 								<label class="form-check-label">
 									{{value}}
@@ -77,14 +77,14 @@
 					</ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'References'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'List'">
                             <sqx-references-editor
                                 [formControl]="control" 
-                                [allowDuplicates]="field.properties['allowDuplicated']"
+                                [allowDuplicates]="field.rawProperties.allowDuplicated"
                                 [language]="language"
                                 [languages]="languages"
-                                [schemaId]="field.properties['schemaId']"
+                                [schemaIds]="field.rawProperties.schemaIds"
                                 [isCompact]="isCompact">
                             </sqx-references-editor>
                         </ng-container>
@@ -92,13 +92,13 @@
                             <sqx-references-dropdown
                                 [formControl]="control" 
                                 [language]="language"
-								[schemaId]="field.properties['schemaId']">
+								[schemaId]="field.rawProperties.singleId">
                             </sqx-references-dropdown>
                         </ng-container>
                     </ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'String'">
-					<ng-container [ngSwitch]="field.properties['editor']">
+					<ng-container [ngSwitch]="field.rawProperties.editor">
 						<ng-container *ngSwitchCase="'Input'">
 							<input class="form-control" type="text" [formControl]="control" [placeholder]="field.displayPlaceholder" />
 						</ng-container>
@@ -120,11 +120,11 @@
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-control" [formControl]="control">
 								<option [ngValue]="null"></option>
-								<option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+							<div class="form-check form-check-inline" *ngFor="let value of field.rawProperties.allowedValues">
 								<input class="form-check-input" type="radio" value="{{value}}" [formControl]="control" [name]="uniqueId" />
 								<label class="form-check-label">
 									{{value}}
@@ -137,16 +137,16 @@
 					</ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Tags'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Tags'">
-                            <sqx-tag-editor [formControl]="control" [placeholder]="field.displayPlaceholder" [suggestions]="field.properties['allowedValues']"></sqx-tag-editor>
+                            <sqx-tag-editor [formControl]="control" [placeholder]="field.displayPlaceholder" [suggestions]="field.rawProperties.allowedValues"></sqx-tag-editor>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Checkboxes'">
-                            <sqx-checkbox-group [formControl]="control" [values]="field.properties['allowedValues']"></sqx-checkbox-group>
+                            <sqx-checkbox-group [formControl]="control" [values]="field.rawProperties.allowedValues"></sqx-checkbox-group>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
                             <select multiple class="form-control" [formControl]="control">
-                                <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                                <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                             </select>
                         </ng-container>
                     </ng-container>

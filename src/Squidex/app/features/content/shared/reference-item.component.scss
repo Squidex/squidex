@@ -1,0 +1,24 @@
+@import '_vars';
+@import '_mixins';
+
+.reference-edit {
+    & {
+        position: relative;
+    }
+
+    &:hover {
+        .reference-menu {
+            display: block;
+        }
+    }
+
+    .reference-menu {
+        @include absolute(0, -.25rem, auto, auto);
+        display: none;
+        padding-left: 2rem;
+        min-height: 2.4rem;
+        max-height: 2.4rem;
+        white-space: nowrap;
+        background: $color-table-background;
+    }
+}

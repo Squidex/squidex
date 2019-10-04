@@ -27,6 +27,8 @@ import {
 
 import { encodeQuery, Query } from './../state/query';
 
+import { parseField, RootFieldDto } from './schemas.service';
+
 export class ScheduleDto {
     constructor(
         public readonly status: string,
@@ -86,7 +88,10 @@ export class ContentDto {
         public readonly isPending: boolean,
         public readonly data: ContentData | undefined,
         public readonly dataDraft: ContentData,
+        public readonly schemaName: string,
+        public readonly schemaDisplayName: string,
         public readonly referenceData: ContentReferences,
+        public readonly referenceFields: RootFieldDto[],
         public readonly version: Version
     ) {
         this._links = links;
@@ -145,6 +150,18 @@ export class ContentsService {
         const fullQuery = queryParts.join('&');
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(x => parseContent(x));
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('Failed to load contents. Please reload.'));
+    }
+
+    public getContentsByIds(appName: string, ids: string[]): Observable<ContentsDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/?ids=${ids.join(',')}`);
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
             map(({ total, items, statuses, _links }) => {
@@ -307,6 +324,9 @@ function parseContent(response: any) {
         response.isPending === true,
         response.data,
         response.dataDraft,
+        response.schemaName,
+        response.schemaDisplayName,
         response.referenceData,
+        response.referenceFields.map((item: any) => parseField(item)),
         new Version(response.version.toString()));
 }

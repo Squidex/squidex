@@ -8,7 +8,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { FieldDto, ReferencesFieldPropertiesDto, SchemasState } from '@app/shared';
+import {
+    FieldDto,
+    ReferencesFieldPropertiesDto,
+    SchemaTagConverter
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -26,7 +30,7 @@ export class ReferencesValidationComponent implements OnInit {
     public properties: ReferencesFieldPropertiesDto;
 
     constructor(
-        public readonly schemasState: SchemasState
+        public readonly schemasSource: SchemaTagConverter
     ) {
     }
 
@@ -40,8 +44,8 @@ export class ReferencesValidationComponent implements OnInit {
         this.editForm.setControl('minItems',
             new FormControl(this.properties.minItems));
 
-        this.editForm.setControl('schemaId',
-            new FormControl(this.properties.schemaId, [
+        this.editForm.setControl('schemaIds',
+            new FormControl(this.properties.schemaIds, [
                 Validators.required
             ]));
     }

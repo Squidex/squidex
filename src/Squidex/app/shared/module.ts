@@ -105,6 +105,7 @@ import {
     WorkflowsService,
     WorkflowsState
 } from './declarations';
+import { SchemaTagConverter } from './state/schema-tag-converter';
 
 @NgModule({
     imports: [
@@ -236,6 +237,7 @@ export class SqxSharedModule {
                 SchemaMustNotBeSingletonGuard,
                 SchemasService,
                 SchemasState,
+                SchemaTagConverter,
                 TranslationsService,
                 UIService,
                 UIState,

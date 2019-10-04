@@ -16,7 +16,6 @@ import {
     ContentDto,
     ContentsService,
     getContentValue,
-    MathHelper,
     SchemaDetailsDto,
     SchemasService,
     StatefulControlComponent,
@@ -112,7 +111,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     public ngOnInit() {
-        if (this.schemaId === MathHelper.EMPTY_GUID) {
+        if (!this.schemaId) {
             this.selectionControl.disable();
             return;
         }
@@ -171,6 +170,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 schema.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
                     .map(v => v.formatted)
+                    .filter(v => !!v)
                     .join(', ');
 
             return { name, id: content.id };

@@ -182,7 +182,7 @@ export class FieldDto {
     public readonly canUpdate: boolean;
 
     public get isInlineEditable(): boolean {
-        return !this.isDisabled && this.properties['inlineEditable'] === true;
+        return !this.isDisabled && this.rawProperties.inlineEditable === true;
     }
 
     public get displayName() {
@@ -191,6 +191,10 @@ export class FieldDto {
 
     public get displayPlaceholder() {
         return this.properties.placeholder || '';
+    }
+
+    public get rawProperties(): any {
+        return this.properties;
     }
 
     constructor(links: ResourceLinks,
@@ -608,42 +612,7 @@ function parseSchemas(response: any) {
 }
 
 function parseSchemaWithDetails(response: any) {
-    const fields = response.fields.map((item: any) => {
-        const propertiesDto =
-            createProperties(
-                item.properties.fieldType,
-                item.properties);
-
-        let nested: NestedFieldDto[] | null = null;
-
-        if (item.nested && item.nested.length > 0) {
-            nested = item.nested.map((nestedItem: any) => {
-                const nestedPropertiesDto =
-                    createProperties(
-                        nestedItem.properties.fieldType,
-                        nestedItem.properties);
-
-                return new NestedFieldDto(nestedItem._links,
-                    nestedItem.fieldId,
-                    nestedItem.name,
-                    nestedPropertiesDto,
-                    item.fieldId,
-                    nestedItem.isLocked,
-                    nestedItem.isHidden,
-                    nestedItem.isDisabled);
-            });
-        }
-
-        return new RootFieldDto(item._links,
-            item.fieldId,
-            item.name,
-            propertiesDto,
-            item.partitioning,
-            item.isLocked,
-            item.isHidden,
-            item.isDisabled,
-            nested || []);
-    });
+    const fields = response.fields.map((item: any) => parseField(item));
 
     const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
 
@@ -660,4 +629,41 @@ function parseSchemaWithDetails(response: any) {
         fields,
         response.scripts || {},
         response.previewUrls || {});
+}
+
+export function parseField(item: any) {
+    const propertiesDto =
+        createProperties(
+            item.properties.fieldType,
+            item.properties);
+
+    let nested: NestedFieldDto[] | null = null;
+
+    if (item.nested && item.nested.length > 0) {
+        nested = item.nested.map((nestedItem: any) => {
+            const nestedPropertiesDto =
+                createProperties(
+                    nestedItem.properties.fieldType,
+                    nestedItem.properties);
+
+            return new NestedFieldDto(nestedItem._links,
+                nestedItem.fieldId,
+                nestedItem.name,
+                nestedPropertiesDto,
+                item.fieldId,
+                nestedItem.isLocked,
+                nestedItem.isHidden,
+                nestedItem.isDisabled);
+        });
+    }
+
+    return new RootFieldDto(item._links,
+        item.fieldId,
+        item.name,
+        propertiesDto,
+        item.partitioning,
+        item.isLocked,
+        item.isHidden,
+        item.isDisabled,
+        nested || []);
 }

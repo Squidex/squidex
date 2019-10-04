@@ -44,9 +44,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 Items = contents.Select(x => ContentDto.FromContent(context, x, controller)).ToArray()
             };
 
-            await result.AssignStatusesAsync(workflow, schema);
+            if (schema != null)
+            {
+                await result.AssignStatusesAsync(workflow, schema);
 
-            return result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+                result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+            }
+
+            return result;
         }
 
         private async Task AssignStatusesAsync(IContentWorkflow workflow, ISchemaEntity schema)

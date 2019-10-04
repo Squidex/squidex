@@ -15,7 +15,10 @@ import {
     QueryModel,
     queryModelFromSchema,
     ResourceOwner,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    SchemaDto,
+    SchemasState,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -23,7 +26,8 @@ import {
     styleUrls: ['./contents-selector.component.scss'],
     templateUrl: './contents-selector.component.html',
     providers: [
-        ManualContentsState
+        ManualContentsState,
+        SchemasState
     ]
 })
 export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
@@ -42,7 +46,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public alreadySelected: ContentDto[];
 
-    @Input()
     public schema: SchemaDetailsDto;
 
     public queryModel: QueryModel;
@@ -54,22 +57,44 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     public minWidth: string;
 
     constructor(
-        public readonly contentsState: ManualContentsState
+        public readonly contentsState: ManualContentsState,
+        public readonly schemasState: SchemasState
     ) {
         super();
     }
 
     public ngOnInit() {
-        this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
-
         this.own(
             this.contentsState.statuses
                 .subscribe(() => {
                     this.updateModel();
                 }));
 
-        this.contentsState.schema = this.schema;
-        this.contentsState.load();
+        this.own(
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    this.schema = schema;
+
+                    this.minWidth = `${200 + (200 * schema.referenceFields.length)}px`;
+
+                    this.contentsState.schema = schema;
+                    this.contentsState.load();
+
+                    this.updateModel();
+                }));
+
+        this.schemasState.load()
+            .subscribe(() => {
+                this.selectSchema(this.schemasState.snapshot.schemas.at(0));
+            });
+    }
+
+    public selectSchema(selected: string | SchemaDto) {
+        if (Types.is(selected, SchemaDto)) {
+            this.schemasState.select(selected.id).subscribe();
+        } else {
+            this.schemasState.select(selected).subscribe();
+        }
     }
 
     public reload() {
@@ -136,7 +161,9 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     private updateModel() {
-        this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
+        if (this.schema) {
+            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
+        }
     }
 
     public trackByContent(content: ContentDto): string {

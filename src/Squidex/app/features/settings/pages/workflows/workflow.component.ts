@@ -11,6 +11,7 @@ import {
     ErrorDto,
     MathHelper,
     RoleDto,
+    SchemaTagConverter,
     WorkflowDto,
     WorkflowsState,
     WorkflowStep,
@@ -18,8 +19,6 @@ import {
     WorkflowTransition,
     WorkflowTransitionValues
 } from '@app/shared';
-
-import { SchemaTagConverter } from './schema-tag-converter';
 
 @Component({
     selector: 'sqx-workflow',

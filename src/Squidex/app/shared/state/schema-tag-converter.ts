@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import {
-    Converter,
-    SchemaDto,
-    SchemasState,
-    TagValue
-} from '@app/shared';
+import { Converter, TagValue } from '@app/framework';
 
+import { SchemaDto } from './../services/schemas.service';
+import { SchemasState } from './schemas.state';
+
+@Injectable()
 export class SchemaTagConverter implements Converter {
     private schemasSubscription: Subscription;
     private schemas: SchemaDto[] = [];
@@ -31,6 +31,10 @@ export class SchemaTagConverter implements Converter {
                     this.suggestions = this.schemas.map(x => new TagValue(x.id, x.name, x.id));
                 }
             });
+    }
+
+    public load() {
+        this.schemasState.load();
     }
 
     public destroy() {

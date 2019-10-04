@@ -174,7 +174,7 @@ export class ContentComponent implements OnChanges {
         }
     }
 
-    public trackByField(field: FieldDto) {
+    public trackByField(index: number, field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

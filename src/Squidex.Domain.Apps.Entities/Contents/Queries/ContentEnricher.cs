@@ -69,18 +69,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         var result = SimpleMapper.Map(content, new ContentEntity());
 
-                        await ResolveColorAsync(content, result, cache);
-
-                        if (ShouldEnrichWithStatuses(context))
+                        if (ShouldEnrich(context))
                         {
-                            await ResolveNextsAsync(content, result, context);
-                            await ResolveCanUpdateAsync(content, result);
+                            await ResolveColorAsync(content, result, cache);
+
+                            if (ShouldEnrichWithStatuses(context))
+                            {
+                                await ResolveNextsAsync(content, result, context);
+                                await ResolveCanUpdateAsync(content, result);
+                            }
                         }
-
-                        result.CacheDependencies = new HashSet<object>
-                        {
-                            appVersion
-                        };
 
                         results.Add(result);
                     }
@@ -89,16 +87,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
 
-                        var schemaIdentity = schema.Id.ToString();
-                        var schemaVersion = schema.Version.ToString();
-
                         foreach (var content in group)
                         {
-                            content.CacheDependencies.Add(schema.Id);
-                            content.CacheDependencies.Add(schema.Version);
+                            content.CacheDependencies = new HashSet<object>
+                            {
+                                schema.Id,
+                                schema.Version
+                            };
                         }
 
-                        if (ShouldEnrichWithReferences(context))
+                        if (ShouldEnrichWithSchema(context))
+                        {
+                            var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
+
+                            var schemaName = schema.SchemaDef.Name;
+                            var schemaDisplayName = schema.DisplayName();
+
+                            foreach (var content in group)
+                            {
+                                content.ReferenceFields = referenceFields;
+                                content.SchemaName = schemaName;
+                                content.SchemaDisplayName = schemaDisplayName;
+                            }
+                        }
+
+                        if (ShouldEnrich(context))
                         {
                             await ResolveReferencesAsync(schema, group, context);
                         }
@@ -152,9 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     content.CacheDependencies.Add(referencedSchema.Id);
                                     content.CacheDependencies.Add(referencedSchema.Version);
 
-                                    var value =
-                                        formatted.GetOrAdd(reference,
-                                            x => x.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
+                                    var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
                                     fieldReference.AddJsonValue(partitionValue.Key, value);
                                 }
@@ -173,6 +184,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     continue;
                 }
             }
+        }
+
+        private static JsonObject Format(IContentEntity content, Context context, ISchemaEntity referencedSchema)
+        {
+            return content.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig);
         }
 
         private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
@@ -242,12 +258,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return info.Color;
         }
 
+        private static bool ShouldEnrichWithSchema(Context context)
+        {
+            return context.IsFrontendClient;
+        }
+
         private static bool ShouldEnrichWithStatuses(Context context)
         {
             return context.IsFrontendClient || context.IsResolveFlow();
         }
 
-        private static bool ShouldEnrichWithReferences(Context context)
+        private static bool ShouldEnrich(Context context)
         {
             return context.IsFrontendClient && !context.IsNoEnrichment();
         }

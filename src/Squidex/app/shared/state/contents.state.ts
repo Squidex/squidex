@@ -144,6 +144,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private loadInternalCore(isReload = false) {
+        if (!this.appName) {
+            return empty();
+        }
+
         return this.contentsService.getContents(this.appName, this.schemaName,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,

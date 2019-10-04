@@ -9,12 +9,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import {
     RolesState,
-    SchemasState,
+    SchemaTagConverter,
     WorkflowDto,
     WorkflowsState
 } from '@app/shared';
-
-import { SchemaTagConverter } from './schema-tag-converter';
 
 @Component({
     selector: 'sqx-workflows-page',
@@ -22,11 +20,9 @@ import { SchemaTagConverter } from './schema-tag-converter';
     templateUrl: './workflows-page.component.html'
 })
 export class WorkflowsPageComponent implements OnInit, OnDestroy {
-    public schemasSource: SchemaTagConverter;
-
     constructor(
         public readonly rolesState: RolesState,
-        public readonly schemasState: SchemasState,
+        public readonly schemasSource: SchemaTagConverter,
         public readonly workflowsState: WorkflowsState
     ) {
     }
@@ -34,8 +30,7 @@ export class WorkflowsPageComponent implements OnInit, OnDestroy {
     public ngOnInit() {
         this.rolesState.load();
 
-        this.schemasSource = new SchemaTagConverter(this.schemasState);
-        this.schemasState.load();
+        this.schemasSource.load();
 
         this.workflowsState.load();
     }

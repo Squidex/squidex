@@ -7,7 +7,9 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using NodaTime;
+using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities;
@@ -85,6 +87,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string StatusColor { get; set; }
 
         /// <summary>
+        /// The name of the schema.
+        /// </summary>
+        public string SchemaName { get; set; }
+
+        /// <summary>
+        /// The display name of the schema.
+        /// </summary>
+        public string SchemaDisplayName { get; set; }
+
+        /// <summary>
+        /// The reference fields.
+        /// </summary>
+        public FieldDto[] ReferenceFields { get; set; }
+
+        /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
@@ -102,6 +119,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 response.Data = content.Data;
                 response.DataDraft = content.DataDraft;
+            }
+
+            if (content.ReferenceFields != null)
+            {
+                response.ReferenceFields = content.ReferenceFields.Select(FieldDto.FromField).ToArray();
             }
 
             if (content.ScheduleJob != null)

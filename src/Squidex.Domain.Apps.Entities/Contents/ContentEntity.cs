@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -44,6 +45,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public StatusInfo[] Nexts { get; set; }
 
         public string StatusColor { get; set; }
+
+        public string SchemaName { get; set; }
+
+        public string SchemaDisplayName { get; set; }
+
+        public RootField[] ReferenceFields { get; set; }
 
         public bool CanUpdate { get; set; }
 

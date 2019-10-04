@@ -200,7 +200,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
         } else if (field.properties.fieldType === 'DateTime') {
             type = TypeDateTime;
         } else if (field.properties.fieldType === 'References') {
-            const extra = field.properties['schemaId'];
+            const extra = field.rawProperties.singleId;
 
             type = { ...TypeReference, extra };
         }

@@ -367,7 +367,10 @@ describe('ContentsService', () => {
             isPending: true,
             data: {},
             dataDraft: {},
+            schemaName: 'my-schema',
+            schemaDisplayName: 'MySchema',
             referenceData: {},
+            referenceFields: [],
             version: `${id}`,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` }
@@ -391,6 +394,9 @@ export function createContent(id: number, suffix = '') {
         true,
         {},
         {},
+        'my-schema',
+        'MySchema',
         {},
+        [],
         new Version(`${id}`));
 }
