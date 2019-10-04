@@ -82,7 +82,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
                 {
                     filter(filterNode.ToString());
 
-                    return Task.FromResult<IReadOnlyList<Guid>>(new List<Guid> { id });
+                    return Task.FromResult<IReadOnlyList<(Guid, Guid)>>(new List<(Guid, Guid)> { (schemaId, id) });
+                },
+                (ids) =>
+                {
+                    return Task.FromResult<IReadOnlyList<(Guid, Guid)>>(new List<(Guid, Guid)> { (schemaId, id) });
                 },
                 ids =>
                 {

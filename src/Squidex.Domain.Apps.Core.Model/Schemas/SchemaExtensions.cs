@@ -54,11 +54,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.Properties.Label.WithFallback(schema.TypeName());
         }
 
+        public static Guid SingleId(this ReferencesFieldProperties properties)
+        {
+            return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : Guid.Empty;
+        }
+
         public static IEnumerable<IField<ReferencesFieldProperties>> ResolvingReferences(this Schema schema)
         {
             return schema.Fields.OfType<IField<ReferencesFieldProperties>>()
                 .Where(x =>
-                    x.Properties.SchemaId != Guid.Empty &&
                     x.Properties.ResolveReference &&
                     x.Properties.MaxItems == 1 &&
                     (x.Properties.IsListField || schema.Fields.Count == 1));
