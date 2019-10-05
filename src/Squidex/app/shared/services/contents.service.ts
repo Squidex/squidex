@@ -42,9 +42,9 @@ export type StatusInfo = { status: string; color: string; };
 
 export class ContentsDto extends ResultSet<ContentDto> {
     constructor(
-        public readonly statuses: StatusInfo[],
+        public readonly statuses: ReadonlyArray<StatusInfo>,
         total: number,
-        items: ContentDto[],
+        items: ReadonlyArray<ContentDto>,
         links?: ResourceLinks
     ) {
         super(total, items, links);
@@ -67,7 +67,7 @@ export type ContentData = { [fieldName: string ]: ContentFieldData };
 export class ContentDto {
     public readonly _links: ResourceLinks;
 
-    public readonly statusUpdates: StatusInfo[];
+    public readonly statusUpdates: ReadonlyArray<StatusInfo>;
 
     public readonly canDelete: boolean;
     public readonly canDraftDiscard: boolean;
@@ -91,7 +91,7 @@ export class ContentDto {
         public readonly schemaName: string,
         public readonly schemaDisplayName: string,
         public readonly referenceData: ContentReferences,
-        public readonly referenceFields: RootFieldDto[],
+        public readonly referenceFields: ReadonlyArray<RootFieldDto>,
         public readonly version: Version
     ) {
         this._links = links;
@@ -116,7 +116,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: string[]): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: ReadonlyArray<string>): Observable<ContentsDto> {
         const queryParts: string[] = [];
 
         if (ids && ids.length > 0) {
@@ -160,7 +160,7 @@ export class ContentsService {
             pretifyError('Failed to load contents. Please reload.'));
     }
 
-    public getContentsByIds(appName: string, ids: string[]): Observable<ContentsDto> {
+    public getContentsByIds(appName: string, ids: ReadonlyArray<string>): Observable<ContentsDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/?ids=${ids.join(',')}`);
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(

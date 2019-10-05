@@ -592,7 +592,7 @@ describe('SchemasState', () => {
 });
 
 function getCategories(schemasState: SchemasState) {
-    let categories: SchemaCategory[];
+    let categories: ReadonlyArray<SchemaCategory>;
 
     schemasState.categories.subscribe(result => {
         categories = result;

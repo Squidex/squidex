@@ -47,6 +47,7 @@ interface State {
     providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class AssetsEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
     @Input()
     public isCompact = false;
@@ -105,13 +106,13 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         this.next(s => ({ ...s, assets }));
     }
 
-    public addFiles(files: File[]) {
-        for (let file of files) {
+    public addFiles(files: ReadonlyArray<File>) {
+        for (const file of files) {
             this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
         }
     }
 
-    public selectAssets(assets: AssetDto[]) {
+    public selectAssets(assets: ReadonlyArray<AssetDto>) {
         this.setAssets(this.snapshot.assets.push(...assets));
 
         if (assets.length > 0) {
@@ -133,7 +134,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         }
     }
 
-    public sortAssets(assets: AssetDto[]) {
+    public sortAssets(assets: ReadonlyArray<AssetDto>) {
         if (assets) {
             this.setAssets(ImmutableArray.of(assets));
 
@@ -160,14 +161,15 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
     }
 
     private updateValue() {
-        let ids: string[] | null = this.snapshot.assets.values.map(x => x.id);
+        const ids = this.snapshot.assets.values.map(x => x.id);
 
         if (ids.length === 0) {
-            ids = null;
+            this.callChange(null);
+        } else {
+            this.callChange(ids);
         }
 
         this.callTouched();
-        this.callChange(ids);
     }
 
     public trackByAsset(index: number, asset: AssetDto) {

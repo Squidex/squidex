@@ -178,7 +178,7 @@ export class ContributorsState extends State<Snapshot> {
 const PAGE_SIZE = 10;
 
 function getPagedContributors(contributors: ContributorsList, page: number) {
-    return ImmutableArray.of(contributors.values.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
+    return contributors.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 }
 
 function getFilteredContributors(contributors: ContributorsList, query?: RegExp) {

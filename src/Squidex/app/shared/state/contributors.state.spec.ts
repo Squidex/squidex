@@ -70,7 +70,7 @@ describe('ContributorsState', () => {
         it('should only current page of contributors', () => {
             contributorsState.load().subscribe();
 
-            let contributors: ContributorDto[];
+            let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
                 contributors = result.values;
@@ -84,7 +84,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
             contributorsState.goNext();
 
-            let contributors: ContributorDto[];
+            let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
                 contributors = result.values;
@@ -99,7 +99,7 @@ describe('ContributorsState', () => {
             contributorsState.goNext();
             contributorsState.goPrev();
 
-            let contributors: ContributorDto[];
+            let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
                 contributors = result.values;
@@ -113,7 +113,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
             contributorsState.search('4');
 
-            let contributors: ContributorDto[];
+            let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
                 contributors = result.values;

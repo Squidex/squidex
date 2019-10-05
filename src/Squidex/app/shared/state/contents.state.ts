@@ -44,7 +44,7 @@ interface Snapshot {
     isLoaded?: boolean;
 
     // The statuses.
-    statuses?: StatusInfo[];
+    statuses?: ReadonlyArray<StatusInfo>;
 
     // The selected content.
     selectedContent?: ContentDto | null;
@@ -202,7 +202,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public changeManyStatus(contents: ContentDto[], status: string, dueTime: string | null): Observable<any> {
+    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
         return forkJoin(
             contents.map(c =>
                 this.contentsService.putStatus(this.appName, c, status, dueTime, c.version).pipe(
@@ -220,7 +220,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public deleteMany(contents: ContentDto[]): Observable<any> {
+    public deleteMany(contents: ReadonlyArray<ContentDto>): Observable<any> {
         return forkJoin(
             contents.map(c =>
                 this.contentsService.deleteContent(this.appName, c, c.version).pipe(
@@ -373,7 +373,7 @@ export class ManualContentsState extends ContentsStateBase {
 
 export type ContentQuery =  { color: string; } & SavedQuery;
 
-function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
+function buildQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<ContentQuery> {
     return statuses ? statuses.map(s => buildQuery(s)) : [];
 }
 

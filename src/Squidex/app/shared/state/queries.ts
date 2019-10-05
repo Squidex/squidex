@@ -32,11 +32,11 @@ const OLDEST_FIRST: Query = {
 };
 
 export class Queries {
-    public queries: Observable<SavedQuery[]>;
-    public queriesShared: Observable<SavedQuery[]>;
-    public queriesUser: Observable<SavedQuery[]>;
+    public queries: Observable<ReadonlyArray<SavedQuery>>;
+    public queriesShared: Observable<ReadonlyArray<SavedQuery>>;
+    public queriesUser: Observable<ReadonlyArray<SavedQuery>>;
 
-    public defaultQueries: SavedQuery[] = [
+    public defaultQueries: ReadonlyArray<SavedQuery> = [
         { name: 'All (newest first)', queryJson: '' },
         { name: 'All (oldest first)', queryJson: encodeQuery(OLDEST_FIRST), query: OLDEST_FIRST }
     ];
@@ -82,7 +82,7 @@ export class Queries {
 
         return this.queries.pipe(
             map(queries => {
-                for (let saved of queries) {
+                for (const saved of queries) {
                     if (saved.queryJson === json) {
                         return saved.name;
                     }

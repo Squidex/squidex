@@ -35,7 +35,7 @@ export class ContentHistoryPageComponent {
         if (channelPath) {
             const params = allParams(this.route);
 
-            for (let key in params) {
+            for (const key in params) {
                 if (params.hasOwnProperty(key)) {
                     const value = params[key];
 
@@ -47,7 +47,7 @@ export class ContentHistoryPageComponent {
         return channelPath;
     }
 
-    public events: Observable<HistoryEventDto[]> =
+    public events: Observable<ReadonlyArray<HistoryEventDto>> =
         merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))

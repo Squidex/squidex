@@ -24,8 +24,8 @@ export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    contents: ContentDto[];
-    contentNames: ContentName[];
+    contents: ReadonlyArray<ContentDto>;
+    contentNames: ReadonlyArray<ContentName>;
 
     selectedItem?: ContentName;
 }
@@ -48,7 +48,7 @@ const NO_EMIT = { emitEvent: false };
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[] | string> implements OnInit {
+export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnInit {
     private languageField: AppLanguageDto;
     private selectedId: string | undefined;
     private itemCount: number;
@@ -145,7 +145,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.selectionControl.setValue(undefined, NO_EMIT);
     }
 
-    private createContentNames(contents: ContentDto[]): ContentName[] {
+    private createContentNames(contents: ReadonlyArray<ContentDto>): ReadonlyArray<ContentName> {
         if (contents.length === 0) {
             return [];
         }

@@ -56,7 +56,7 @@ export class AppDto {
         public readonly name: string,
         public readonly label: string | undefined,
         public readonly description: string | undefined,
-        public readonly permissions: string[],
+        public readonly permissions: ReadonlyArray<string>,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly canAccessApi: boolean,
@@ -107,7 +107,7 @@ export class AppsService {
     ) {
     }
 
-    public getApps(): Observable<AppDto[]> {
+    public getApps(): Observable<ReadonlyArray<AppDto>> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
         return this.http.get<any[]>(url).pipe(

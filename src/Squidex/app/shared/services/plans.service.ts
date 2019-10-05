@@ -24,7 +24,7 @@ export type PlansDto = Versioned<{
     readonly currentPlanId: string,
     readonly planOwner: string,
     readonly hasPortal: boolean,
-    readonly plans: PlanDto[]
+    readonly plans: ReadonlyArray<PlanDto>
 }>;
 
 export class PlanDto {

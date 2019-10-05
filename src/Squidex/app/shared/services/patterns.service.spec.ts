@@ -166,7 +166,7 @@ describe('PatternsService', () => {
     }
 });
 
-export function createPatterns(...ids: number[]): PatternsPayload {
+export function createPatterns(...ids: ReadonlyArray<number>): PatternsPayload {
     return {
         items: ids.map(id => createPattern(id)),
         _links: {

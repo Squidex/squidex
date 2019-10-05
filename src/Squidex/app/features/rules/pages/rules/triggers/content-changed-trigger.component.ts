@@ -57,7 +57,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         const schemas: TriggerSchemaForm[] = [];
 
         if (this.trigger.schemas) {
-            for (let triggerSchema of this.trigger.schemas) {
+            for (const triggerSchema of this.trigger.schemas) {
                 const schema = this.schemas.find(s => s.id === triggerSchema.schemaId);
 
                 if (schema) {

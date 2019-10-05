@@ -29,7 +29,7 @@ import {
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();
 
-    public events: Observable<HistoryEventDto[]> =
+    public events: Observable<ReadonlyArray<HistoryEventDto>> =
         merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
@@ -50,7 +50,7 @@ export class HistoryComponent {
         if (channel) {
             const params = allParams(this.route);
 
-            for (let key in params) {
+            for (const key in params) {
                 if (params.hasOwnProperty(key)) {
                     const value = params[key];
 

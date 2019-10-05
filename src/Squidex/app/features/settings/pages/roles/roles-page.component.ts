@@ -17,13 +17,13 @@ import {
 } from '@app/shared';
 
 class PermissionsAutocomplete implements AutocompleteSource {
-    private permissions: string[] = [];
+    private permissions: ReadonlyArray<string> = [];
 
     constructor(appsState: AppsState, rolesService: RolesService) {
         rolesService.getPermissions(appsState.appName).subscribe(x => this.permissions = x);
     }
 
-    public find(query: string): Observable<any[]> {
+    public find(query: string): Observable<ReadonlyArray<any>> {
         return of(this.permissions.filter(y => y.indexOf(query) === 0));
     }
 }
@@ -51,7 +51,7 @@ export class RolesPageComponent implements OnInit {
         this.rolesState.load(true);
     }
 
-    public trackByRole(role: RoleDto) {
+    public trackByRole(index: number, role: RoleDto) {
         return role.name;
     }
 }

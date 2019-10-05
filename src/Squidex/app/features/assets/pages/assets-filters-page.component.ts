@@ -37,7 +37,7 @@ export class AssetsFiltersPageComponent {
         this.assetsState.search(query);
     }
 
-    public selectTags(tags: string[]) {
+    public selectTags(tags: ReadonlyArray<string>) {
         this.assetsState.selectTags(tags);
     }
 
@@ -49,7 +49,7 @@ export class AssetsFiltersPageComponent {
         this.assetsState.resetTags();
     }
 
-    public trackByTag(tag: { name: string }) {
+    public trackByTag(index: number, tag: { name: string }) {
         return tag.name;
     }
 }

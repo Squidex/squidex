@@ -21,6 +21,7 @@ import {
 interface State {
     dialogRequest?: DialogRequest | null;
 
+    // tslint:disable-next-line: readonly-array
     notifications: Notification[];
 
     tooltip?: Tooltip | null;

@@ -75,7 +75,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public isListView = false;
 
     @Input()
-    public allTags: string[];
+    public allTags: ReadonlyArray<string>;
 
     public editDialog = new DialogModel();
 

@@ -39,7 +39,7 @@ type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
     // The schema categories.
-    categories: string[];
+    categories: ReadonlyArray<string>;
 
     // The current schemas.
     schemas: SchemasList;
@@ -269,7 +269,7 @@ export class SchemasState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
     }
 
-    public orderFields(schema: SchemaDto, fields: any[], parent?: RootFieldDto): Observable<SchemaDetailsDto> {
+    public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -362,20 +362,20 @@ function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldD
     }
 }
 
-function buildCategories(categories: string[], schemas: SchemasList): SchemaCategory[] {
+function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList): ReadonlyArray<SchemaCategory> {
     const uniqueCategories: { [name: string]: true } = {};
 
-    for (let category of categories) {
+    for (const category of categories) {
         uniqueCategories[category] = true;
     }
 
-    for (let schema of schemas.values) {
+    for (const schema of schemas.values) {
         uniqueCategories[getCategory(schema)] = true;
     }
 
     const result: SchemaCategory[] = [];
 
-    for (let name in uniqueCategories) {
+    for (const name in uniqueCategories) {
         if (uniqueCategories.hasOwnProperty(name)) {
             result.push({ name, upper: name.toUpperCase(), schemas: schemas.filter(x => isSameCategory(name, x))});
         }

@@ -99,7 +99,7 @@ export class FieldComponent implements OnChanges {
         this.schemasState.hideField(this.schema, this.field);
     }
 
-    public sortFields(fields: NestedFieldDto[]) {
+    public sortFields(fields: ReadonlyArray<NestedFieldDto>) {
         this.schemasState.orderFields(this.schema, fields, <any>this.field).subscribe();
     }
 

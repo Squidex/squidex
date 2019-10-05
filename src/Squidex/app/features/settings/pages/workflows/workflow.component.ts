@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Component, Input, OnChanges } from '@angular/core';
 
 import {
@@ -30,7 +32,7 @@ export class WorkflowComponent implements OnChanges {
     public workflow: WorkflowDto;
 
     @Input()
-    public roles: RoleDto[];
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public schemasSource: SchemaTagConverter;
@@ -73,7 +75,7 @@ export class WorkflowComponent implements OnChanges {
     }
 
     public addStep() {
-        let index = this.workflow.steps.length;
+        const index = this.workflow.steps.length;
 
         for (let i = index; i < index + 100; i++) {
             const name = `Step${i}`;

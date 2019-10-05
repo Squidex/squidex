@@ -17,7 +17,7 @@ import {
 } from '@app/framework/internal';
 
 export interface AutocompleteSource {
-    find(query: string): Observable<any[]>;
+    find(query: string): Observable<ReadonlyArray<any>>;
 }
 
 const NO_EMIT = { emitEvent: false };
@@ -27,7 +27,7 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    suggestedItems: any[];
+    suggestedItems: ReadonlyArray<any>;
     suggestedIndex: number;
 }
 
@@ -41,6 +41,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class AutocompleteComponent extends StatefulControlComponent<State, any[]> implements OnInit {
     @Input()
     public source: AutocompleteSource;

@@ -167,7 +167,7 @@ describe('AppLanguagesService', () => {
     }
 });
 
-export function createLanguages(...codes: string[]): AppLanguagesPayload {
+export function createLanguages(...codes: ReadonlyArray<string>): AppLanguagesPayload {
     return {
         items: codes.map((code, i) => createLanguage(code, codes, i)),
         _links: {
@@ -176,7 +176,7 @@ export function createLanguages(...codes: string[]): AppLanguagesPayload {
         canCreate: true
     };
 }
-function createLanguage(code: string, codes: string[], i: number) {
+function createLanguage(code: string, codes: ReadonlyArray<string>, i: number) {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/languages/${code}` }
     };

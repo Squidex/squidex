@@ -32,11 +32,12 @@ import { SqxShellModule } from './shell';
 import { routing } from './app.routes';
 
 export function configApiUrl() {
-    let bases = document.getElementsByTagName('base');
+    const baseElements = document.getElementsByTagName('base');
+
     let baseHref = null;
 
-    if (bases.length > 0) {
-        baseHref = bases[0].href;
+    if (baseElements.length > 0) {
+        baseHref = baseElements[0].href;
     }
 
     if (!baseHref) {

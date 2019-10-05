@@ -31,25 +31,25 @@ import {
 })
 export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
-    public select = new EventEmitter<ContentDto[]>();
+    public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input()
-    public schemaIds: string[];
+    public schemaIds: ReadonlyArray<string>;
 
     @Input()
     public language: LanguageDto;
 
     @Input()
-    public languages: LanguageDto[];
+    public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
     public allowDuplicates: boolean;
 
     @Input()
-    public alreadySelected: ContentDto[];
+    public alreadySelected: ReadonlyArray<ContentDto>;
 
     public schema: SchemaDetailsDto;
-    public schemas: SchemaDto[] = [];
+    public schemas: ReadonlyArray<SchemaDto> = [];
 
     public queryModel: QueryModel;
 
@@ -147,7 +147,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents.values) {
+            for (const content of this.contentsState.snapshot.contents.values) {
                 if (!this.isItemAlreadySelected(content)) {
                     this.selectedItems[content.id] = content;
                 }
@@ -178,7 +178,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 }

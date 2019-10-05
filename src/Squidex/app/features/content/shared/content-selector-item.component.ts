@@ -65,12 +65,12 @@ export class ContentSelectorItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public fields: RootFieldDto[];
+    public fields: ReadonlyArray<RootFieldDto>;
 
     @Input('sqxContentSelectorItem')
     public content: ContentDto;
 
-    public values: any[] = [];
+    public values: ReadonlyArray<any> = [];
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['content'] || changes['language']) {
@@ -89,12 +89,14 @@ export class ContentSelectorItemComponent implements OnChanges {
     }
 
     private updateValues() {
-        this.values = [];
+        const values = [];
 
-        for (let field of this.fields) {
+        for (const field of this.fields) {
             const { formatted } = getContentValue(this.content, this.language, field);
 
-            this.values.push(formatted);
+            values.push(formatted);
         }
+
+        this.values = values;
     }
 }

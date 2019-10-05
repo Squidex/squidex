@@ -54,7 +54,7 @@ export class ContentComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
-    public schemaFields: RootFieldDto[];
+    public schemaFields: ReadonlyArray<RootFieldDto>;
 
     @Input()
     public canClone: boolean;
@@ -75,7 +75,7 @@ export class ContentComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public values: any[] = [];
+    public values: ReadonlyArray<any> = [];
 
     public get isDirty() {
         return this.patchForm && this.patchForm.form.dirty;
@@ -148,12 +148,12 @@ export class ContentComponent implements OnChanges {
     }
 
     private updateValues() {
-        this.values = [];
+        const values = [];
 
-        for (let field of this.schemaFields) {
+        for (const field of this.schemaFields) {
             const { value, formatted } = getContentValue(this.content, this.language, field);
 
-            this.values.push(formatted);
+            values.push(formatted);
 
             if (this.patchForm) {
                 const formControl = this.patchForm.form.controls[field.name];
@@ -163,6 +163,8 @@ export class ContentComponent implements OnChanges {
                 }
             }
         }
+
+        this.values = values;
     }
 
     public trackByField(index: number, field: FieldDto) {

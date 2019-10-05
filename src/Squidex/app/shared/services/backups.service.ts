@@ -62,7 +62,7 @@ export class RestoreDto {
         public readonly started: DateTime,
         public readonly stopped: DateTime | null,
         public readonly status: string,
-        public readonly log: string[]
+        public readonly log: ReadonlyArray<string>
     ) {
     }
 }

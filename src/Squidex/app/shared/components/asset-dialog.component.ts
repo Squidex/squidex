@@ -33,7 +33,7 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     public asset: AssetDto;
 
     @Input()
-    public allTags: string[];
+    public allTags: ReadonlyArray<string>;
 
     public isEditable = false;
 

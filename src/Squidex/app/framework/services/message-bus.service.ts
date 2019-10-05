@@ -28,7 +28,7 @@ export class MessageBus {
         this.message$.next({ channel: channel, data: message });
     }
 
-    public of<T>(messageType: { new(...args: any[]): T }): Observable<T> {
+    public of<T>(messageType: { new(...args: ReadonlyArray<any>): T }): Observable<T> {
         const channel = (<any>messageType).name;
 
         return this.message$.pipe(filter(m => m.channel === channel), map(m => m.data));

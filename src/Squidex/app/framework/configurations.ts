@@ -21,7 +21,7 @@ export class UIOptions {
         if (value) {
             const parts = path.split('.');
 
-            for (let part of parts) {
+            for (const part of parts) {
                 value = value[part];
 
                 if (!value) {

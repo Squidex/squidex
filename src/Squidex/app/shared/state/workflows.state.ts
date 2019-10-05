@@ -35,7 +35,7 @@ interface Snapshot {
     version: Version;
 
     // The errors.
-    errors: string[];
+    errors: ReadonlyArray<string>;
 
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;

@@ -37,7 +37,7 @@ export class FieldEditorComponent {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public isCompact = false;

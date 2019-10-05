@@ -35,7 +35,7 @@ describe('HistoryService', () => {
     it('should make get request to get history events',
         inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
 
-        let events: HistoryEventDto[];
+        let events: ReadonlyArray<HistoryEventDto>;
 
         historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
             events = result;

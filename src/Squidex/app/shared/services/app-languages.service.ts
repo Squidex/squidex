@@ -25,7 +25,7 @@ import {
 
 export type AppLanguagesDto = Versioned<AppLanguagesPayload>;
 export type AppLanguagesPayload = {
-    readonly items: AppLanguageDto[];
+    readonly items: ReadonlyArray<AppLanguageDto>;
 
     readonly canCreate: boolean;
 } & Resource;
@@ -42,7 +42,7 @@ export class AppLanguageDto {
         public readonly englishName: string,
         public readonly isMaster: boolean,
         public readonly isOptional: boolean,
-        public readonly fallback: string[]
+        public readonly fallback: ReadonlyArray<string>
     ) {
         this._links = links;
 
@@ -58,7 +58,7 @@ export interface AddAppLanguageDto {
 export interface UpdateAppLanguageDto {
     readonly isMaster?: boolean;
     readonly isOptional?: boolean;
-    readonly fallback?: string[];
+    readonly fallback?: ReadonlyArray<string>;
 }
 
 @Injectable()

@@ -189,11 +189,11 @@ export class AssetsState extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public selectTags(tags: string[]): Observable<any> {
+    public selectTags(tags: ReadonlyArray<string>): Observable<any> {
         this.next(s => {
             const tagsSelected = {};
 
-            for (let tag of tags) {
+            for (const tag of tags) {
                 tagsSelected[tag] = true;
             }
 
@@ -245,7 +245,7 @@ export class AssetsState extends State<Snapshot> {
 }
 
 function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
-    for (let tag of asset.tags) {
+    for (const tag of asset.tags) {
         if (tags[tag]) {
             tags[tag]++;
         } else {
@@ -255,7 +255,7 @@ function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
 }
 
 function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSelected: { [x: string]: boolean; }) {
-    for (let tag of previous.tags) {
+    for (const tag of previous.tags) {
         if (tags[tag] === 1) {
             delete tags[tag];
             delete tagsSelected[tag];

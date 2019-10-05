@@ -37,7 +37,7 @@ export class WorkflowsPageComponent implements OnInit {
         this.workflowsState.load(true);
     }
 
-    public trackByWorkflow(workflow: WorkflowDto) {
+    public trackByWorkflow(index: number, workflow: WorkflowDto) {
         return workflow.id;
     }
 }

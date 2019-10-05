@@ -13,6 +13,7 @@ import { PanelComponent } from './panel.component';
     selector: '[sqxPanelContainer]'
 })
 export class PanelContainerDirective implements AfterViewInit {
+    // tslint:disable-next-line: readonly-array
     private readonly panels: PanelComponent[] = [];
     private isViewInit = false;
     private containerWidth = 0;
@@ -55,7 +56,7 @@ export class PanelContainerDirective implements AfterViewInit {
 
         const panels = this.panels;
 
-        for (let panel of panels) {
+        for (const panel of panels) {
             if (!panel.isViewInit) {
                 return;
             }
@@ -64,7 +65,7 @@ export class PanelContainerDirective implements AfterViewInit {
         let currentSize = 0;
         let panelsWidthSpread = 0;
 
-        for (let panel of panels) {
+        for (const panel of panels) {
             if (panel.desiredWidth !== '*') {
                 const layoutWidth = panel.desiredWidth;
 
@@ -76,7 +77,7 @@ export class PanelContainerDirective implements AfterViewInit {
             }
         }
 
-        for (let panel of panels) {
+        for (const panel of panels) {
             if (panel.desiredWidth === '*') {
                 const layoutWidth = (this.containerWidth - currentSize) / panelsWidthSpread;
 
@@ -89,7 +90,7 @@ export class PanelContainerDirective implements AfterViewInit {
         let currentPosition = 0;
         let currentLayer = panels.length * 10;
 
-        for (let panel of panels) {
+        for (const panel of panels) {
             panel.arrange(currentPosition + 'px', currentLayer.toString());
 
             currentPosition += panel.renderWidth;

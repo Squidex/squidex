@@ -19,6 +19,7 @@ export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // tslint:disable-next-line: readonly-array
     checkedValues: string[];
 }
 
@@ -29,11 +30,12 @@ interface State {
     providers: [SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> {
     public readonly controlId = MathHelper.guid();
 
     @Input()
-    public values: string[] = [];
+    public values: ReadonlyArray<string> = [];
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {

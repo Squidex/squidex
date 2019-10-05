@@ -21,7 +21,7 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    suggestedItems: any[];
+    suggestedItems: ReadonlyArray<any>;
     selectedItem: any;
     selectedIndex: number;
     query?: RegExp;
@@ -34,9 +34,10 @@ interface State {
     providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class DropdownComponent extends StatefulControlComponent<State, any[]> implements AfterContentInit, ControlValueAccessor, OnChanges, OnInit {
     @Input()
-    public items: any[] = [];
+    public items: ReadonlyArray<any> = [];
 
     @Input()
     public searchProperty = 'name';

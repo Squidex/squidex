@@ -16,9 +16,9 @@ import { SchemasState } from './schemas.state';
 @Injectable()
 export class SchemaTagConverter implements Converter, OnDestroy {
     private schemasSubscription: Subscription;
-    private schemas: SchemaDto[] = [];
+    private schemas: ReadonlyArray<SchemaDto> = [];
 
-    public suggestions: TagValue[] = [];
+    public suggestions: ReadonlyArray<TagValue> = [];
 
     constructor(
         readonly schemasState: SchemasState

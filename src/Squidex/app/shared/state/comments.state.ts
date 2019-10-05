@@ -55,17 +55,17 @@ export class CommentsState extends State<Snapshot> {
                 this.next(s => {
                     let comments = s.comments;
 
-                    for (let created of payload.createdComments) {
+                    for (const created of payload.createdComments) {
                         if (!comments.find(x => x.id === created.id)) {
                             comments = comments.push(created);
                         }
                     }
 
-                    for (let updated of payload.updatedComments) {
+                    for (const updated of payload.updatedComments) {
                         comments = comments.replaceBy('id', updated);
                     }
 
-                    for (let deleted of payload.deletedComments) {
+                    for (const deleted of payload.deletedComments) {
                         comments = comments.filter(x => x.id !== deleted);
                     }
 

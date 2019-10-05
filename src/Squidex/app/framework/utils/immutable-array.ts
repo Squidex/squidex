@@ -9,8 +9,8 @@ export interface IdField {
     id: string;
 }
 
-function freeze<T>(items: T[]): T[] {
-    for (let item of items) {
+function freeze<T>(items: ReadonlyArray<T>): ReadonlyArray<T> {
+    for (const item of items) {
         Object.freeze(item);
     }
 
@@ -19,7 +19,7 @@ function freeze<T>(items: T[]): T[] {
 
 export class ImmutableArray<T> implements Iterable<T> {
     private static readonly EMPTY = new ImmutableArray<any>([]);
-    private readonly items: T[];
+    private readonly items: ReadonlyArray<T>;
 
     public [Symbol.iterator](): Iterator<T> {
         return this.items.values();
@@ -29,15 +29,15 @@ export class ImmutableArray<T> implements Iterable<T> {
         return this.items.length;
     }
 
-    public get values(): T[] {
+    public get values(): ReadonlyArray<T> {
         return [...this.items];
     }
 
-    public get mutableValues(): T[] {
+    public get mutableValues(): ReadonlyArray<T> {
         return this.items;
     }
 
-    private constructor(items: T[]) {
+    private constructor(items: ReadonlyArray<T>) {
         this.items = items;
     }
 
@@ -45,7 +45,7 @@ export class ImmutableArray<T> implements Iterable<T> {
         return ImmutableArray.EMPTY;
     }
 
-    public static of<V>(items?: V[]): ImmutableArray<V> {
+    public static of<V>(items?: ReadonlyArray<V>): ImmutableArray<V> {
         if (!items || items.length === 0) {
             return ImmutableArray.EMPTY;
         } else {
@@ -54,7 +54,13 @@ export class ImmutableArray<T> implements Iterable<T> {
     }
 
     public at(index: number) {
-        return this.values[index];
+        return this.items[index];
+    }
+
+    public each(action: (item: T, index?: number) => void) {
+        for (let i = 0; i < this.items.length; i++) {
+            action(this.items[i], i);
+        }
     }
 
     public map<R>(projection: (item: T) => R): ImmutableArray<R> {
@@ -67,6 +73,10 @@ export class ImmutableArray<T> implements Iterable<T> {
 
     public find(predicate: (item: T, index: number) => boolean): T | undefined {
         return this.items.find(predicate);
+    }
+
+    public slice(start?: number, end?: number) {
+        return new ImmutableArray<T>(this.items.slice(start, end));
     }
 
     public sort(compareFn?: (a: T, b: T) => number): ImmutableArray<T> {
@@ -93,28 +103,28 @@ export class ImmutableArray<T> implements Iterable<T> {
         return this.sort((a, b) => compareNumbersDesc(filter(a), filter(b)));
     }
 
-    public pushFront(...items: T[]): ImmutableArray<T> {
+    public pushFront(...items: ReadonlyArray<T>): ImmutableArray<T> {
         if (items.length === 0) {
             return this;
         }
         return new ImmutableArray<T>([...freeze(items), ...this.items]);
     }
 
-    public push(...items: T[]): ImmutableArray<T> {
+    public push(...items: ReadonlyArray<T>): ImmutableArray<T> {
         if (items.length === 0) {
             return this;
         }
         return new ImmutableArray<T>([...this.items, ...freeze(items)]);
     }
 
-    public remove(...items: T[]): ImmutableArray<T> {
+    public remove(...items: ReadonlyArray<T>): ImmutableArray<T> {
         if (items.length === 0) {
             return this;
         }
 
         const copy = this.items.slice();
 
-        for (let item of items) {
+        for (const item of items) {
             const index = copy.indexOf(item);
 
             if (index >= 0) {

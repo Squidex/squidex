@@ -55,7 +55,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public selectedFormControl: AbstractControl;
     public selectedFormControlCompare?: AbstractControl;
@@ -145,7 +145,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
             if (masterValue) {
                 if (this.showAllControls) {
-                    for (let language of this.languages) {
+                    for (const language of this.languages) {
                         if (!language.isMaster) {
                             this.translateValue(masterValue, masterCode, language.iso2Code);
                         }

@@ -1,6 +1,6 @@
 import MersenneTwister from 'mersenne-twister';
 
-const ALL_COLORS = [
+const ALL_COLORS: ReadonlyArray<string> = [
     'rgb(226,27,12)',
     'rgb(192,19,78)',
     'rgb(125,31,141)',
@@ -20,10 +20,10 @@ const ALL_COLORS = [
 
 const LAYERS = 3;
 
-const RADIUSES = [20, 25, 30, 35, 40, 45, 50];
+const RADIUSES: ReadonlyArray<number> = [20, 25, 30, 35, 40, 45, 50];
 
-const X_CENTERS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-const Y_CENTERS = [30, 40, 50, 60, 70];
+const X_CENTERS: ReadonlyArray<number> = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const Y_CENTERS: ReadonlyArray<number> = [30, 40, 50, 60, 70];
 
 function hash(str: string) {
     if (str.length === 0) {

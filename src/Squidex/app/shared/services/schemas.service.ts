@@ -28,7 +28,7 @@ import {
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export type SchemasDto = {
-    readonly items: SchemaDto[];
+    readonly items: ReadonlyArray<SchemaDto>;
 
     readonly canCreate: boolean;
 } & Resource;
@@ -82,9 +82,9 @@ export class SchemaDto {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
-    public readonly listFields: RootFieldDto[];
-    public readonly listFieldsEditable: RootFieldDto[];
-    public readonly referenceFields: RootFieldDto[];
+    public readonly listFields: ReadonlyArray<RootFieldDto>;
+    public readonly listFieldsEditable: ReadonlyArray<RootFieldDto>;
+    public readonly referenceFields: ReadonlyArray<RootFieldDto>;
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
@@ -95,7 +95,7 @@ export class SchemaDetailsDto extends SchemaDto {
         lastModified: DateTime,
         lastModifiedBy: string,
         version: Version,
-        public readonly fields: RootFieldDto[] = [],
+        public readonly fields: ReadonlyArray<RootFieldDto> = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {
@@ -237,14 +237,14 @@ export class RootFieldDto extends FieldDto {
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false,
-        public readonly nested: NestedFieldDto[] = []
+        public readonly nested: ReadonlyArray<NestedFieldDto> = []
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
 }
 
 const NONE_FIELD = new RootFieldDto({}, -1, '', createProperties('String'), 'invariant');
-const NONE_FIELDS = [NONE_FIELD];
+const NONE_FIELDS: ReadonlyArray<any> = [NONE_FIELD];
 
 export class NestedFieldDto extends FieldDto {
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
@@ -273,7 +273,7 @@ export interface AddFieldDto {
 
 export interface CreateSchemaDto {
     readonly name: string;
-    readonly fields?: RootFieldDto[];
+    readonly fields?: ReadonlyArray<RootFieldDto>;
     readonly properties?: SchemaPropertiesDto;
     readonly isSingleton?: boolean;
 }
@@ -458,7 +458,7 @@ export class SchemasService {
             pretifyError('Failed to add field. Please reload.'));
     }
 
-    public putFieldOrdering(appName: string, resource: Resource, dto: number[], version: Version): Observable<SchemaDetailsDto> {
+    public putFieldOrdering(appName: string, resource: Resource, dto: ReadonlyArray<number>, version: Version): Observable<SchemaDetailsDto> {
         const link = resource._links['fields/order'];
 
         const url = this.apiUrl.buildUrl(link.href);

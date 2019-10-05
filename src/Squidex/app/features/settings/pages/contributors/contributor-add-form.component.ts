@@ -29,12 +29,12 @@ export class UsersDataSource implements AutocompleteSource {
     ) {
     }
 
-    public find(query: string): Observable<any[]> {
+    public find(query: string): Observable<ReadonlyArray<any>> {
         return this.usersService.getUsers(query).pipe(
             withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
                 const results: any[] = [];
 
-                for (let user of users) {
+                for (const user of users) {
                     if (!contributors!.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }

@@ -42,7 +42,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectionCount = 0;
     public selectionCanDelete = false;
 
-    public nextStatuses: string[] = [];
+    public nextStatuses: ReadonlyArray<string> = [];
 
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
@@ -126,7 +126,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.create(content.dataDraft, false);
     }
 
-    private changeContentItems(contents: ContentDto[], action: string) {
+    private changeContentItems(contents: ReadonlyArray<ContentDto>, action: string) {
         if (contents.length === 0) {
             return;
         }
@@ -180,15 +180,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents.values) {
+            this.contentsState.snapshot.contents.each(content => {
                 this.selectedItems[content.id] = true;
-            }
+            });
         }
 
         this.updateSelectionSummary();
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 
@@ -199,17 +199,17 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
         const allActions = {};
 
-        for (let content of this.contentsState.snapshot.contents.values) {
-            for (let info of content.statusUpdates) {
+        this.contentsState.snapshot.contents.each(content => {
+            for (const info of content.statusUpdates) {
                 allActions[info.status] = info.color;
             }
-        }
+        });
 
-        for (let content of this.contentsState.snapshot.contents.values) {
+        this.contentsState.snapshot.contents.each(content => {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                for (let action in allActions) {
+                for (const action in allActions) {
                     if (!content.statusUpdates) {
                         delete allActions[action];
                     }
@@ -221,7 +221,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             } else {
                 this.selectedAll = false;
             }
-        }
+        });
 
         this.nextStatuses = Object.keys(allActions);
     }

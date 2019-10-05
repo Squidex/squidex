@@ -23,7 +23,7 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    contentItems: ContentDto[];
+    contentItems: ReadonlyArray<ContentDto>;
 
     columnCount: number;
 }
@@ -35,15 +35,16 @@ interface State {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class ReferencesEditorComponent extends StatefulControlComponent<State, string[]> {
     @Input()
-    public schemaIds: string[];
+    public schemaIds: ReadonlyArray<string>;
 
     @Input()
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public isCompact = false;
@@ -84,17 +85,17 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
         }
     }
 
-    public setContentItems(contentItems: ContentDto[]) {
+    public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
         let columnCount = 1;
 
-        for (let content of contentItems) {
+        for (const content of contentItems) {
             columnCount = Math.max(columnCount, content.referenceFields.length);
         }
 
         this.next(s => ({ ...s, contentItems, columnCount }));
     }
 
-    public select(contents: ContentDto[]) {
+    public select(contents: ReadonlyArray<ContentDto>) {
         this.setContentItems([...this.snapshot.contentItems, ...contents]);
 
         if (contents.length > 0) {
@@ -112,7 +113,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
         }
     }
 
-    public sort(contents: ContentDto[]) {
+    public sort(contents: ReadonlyArray<ContentDto>) {
         if (contents) {
             this.setContentItems(contents);
 
@@ -121,14 +122,15 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     }
 
     private updateValue() {
-        let ids: string[] | null = this.snapshot.contentItems.map(x => x.id);
+        const ids = this.snapshot.contentItems.map(x => x.id);
 
         if (ids.length === 0) {
-            ids = null;
+            this.callChange(null);
+        } else {
+            this.callChange(ids);
         }
 
         this.callTouched();
-        this.callChange(ids);
     }
 
     public trackByContent(index: number, content: ContentDto) {

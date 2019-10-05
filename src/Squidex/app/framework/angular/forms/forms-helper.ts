@@ -11,7 +11,7 @@ import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 
 import { Types } from './../../utils/types';
 
-export function formControls(form: AbstractControl): AbstractControl[] {
+export function formControls(form: AbstractControl): ReadonlyArray<AbstractControl> {
     if (Types.is(form, FormGroup)) {
         return Object.values(form.controls);
     } else if (Types.is(form, FormArray)) {

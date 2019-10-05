@@ -51,17 +51,17 @@ export class WorkflowStepComponent implements OnChanges {
     public step: WorkflowStep;
 
     @Input()
-    public roles: RoleDto[];
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public disabled: boolean;
 
     public onBlur = { updateOn: 'blur' };
 
-    public openSteps: WorkflowStep[];
+    public openSteps: ReadonlyArray<WorkflowStep>;
     public openStep: WorkflowStep;
 
-    public transitions: WorkflowTransitionView[];
+    public transitions: ReadonlyArray<WorkflowTransitionView>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['workflow'] || changes['step'] || false) {

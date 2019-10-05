@@ -772,7 +772,7 @@ describe('ContentForm', () => {
     }
 });
 
-type SchemaValues = { properties?: SchemaPropertiesDto; id?: number; fields?: RootFieldDto[]; };
+type SchemaValues = { properties?: SchemaPropertiesDto; id?: number; fields?: ReadonlyArray<RootFieldDto>; };
 
 function createSchema({ properties, id, fields }: SchemaValues = {}) {
     id = id || 1;
@@ -790,7 +790,7 @@ function createSchema({ properties, id, fields }: SchemaValues = {}) {
         fields);
 }
 
-type FieldValues = { properties: FieldPropertiesDto; id?: number; partitioning?: string; isDisabled?: boolean, nested?: NestedFieldDto[] };
+type FieldValues = { properties: FieldPropertiesDto; id?: number; partitioning?: string; isDisabled?: boolean, nested?: ReadonlyArray<NestedFieldDto> };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
     id = id || 1;

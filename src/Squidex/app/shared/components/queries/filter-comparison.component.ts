@@ -48,7 +48,7 @@ export class FilterComparisonComponent implements OnChanges {
         }
     }
 
-    public getStatus(statuses: StatusInfo[]) {
+    public getStatus(statuses: ReadonlyArray<StatusInfo>) {
         return statuses.find(x => x.status === this.filter.value);
     }
 

@@ -39,7 +39,7 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public arrayControl: FormArray;
@@ -62,7 +62,7 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
         this.form.arrayItemInsert(this.field, this.language, value);
     }
 
-    public sort(controls: AbstractControl[]) {
+    public sort(controls: ReadonlyArray<AbstractControl>) {
         for (let i = 0; i < controls.length; i++) {
             this.arrayControl.setControl(i, controls[i]);
         }

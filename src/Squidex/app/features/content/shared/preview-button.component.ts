@@ -20,6 +20,7 @@ import {
 interface State {
     selectedName?: string;
 
+    // tslint:disable-next-line: readonly-array
     alternativeNames: string[];
 }
 

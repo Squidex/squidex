@@ -235,18 +235,18 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                 });
 
                 searchBox.addListener('places_changed', () => {
-                    let places = searchBox.getPlaces();
+                    const places = searchBox.getPlaces();
 
                     if (places.length === 1) {
-                        let place = places[0];
+                        const place = places[0];
 
                         if (!place.geometry) {
                             return;
                         }
 
                         if (!this.snapshot.isDisabled) {
-                            let lat = place.geometry.location.lat();
-                            let lng = place.geometry.location.lng();
+                            const lat = place.geometry.location.lat();
+                            const lng = place.geometry.location.lng();
 
                             this.updateValue(lat, lng);
                             this.updateMarker(false, true);

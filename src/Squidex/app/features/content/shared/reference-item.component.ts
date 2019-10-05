@@ -74,7 +74,7 @@ export class ReferenceItemComponent implements OnChanges {
     @Input('sqxReferenceItem')
     public content: ContentDto;
 
-    public values: any[] = [];
+    public values: ReadonlyArray<any> = [];
 
     public ngOnChanges(changes: SimpleChanges) {
         this.updateValues();
@@ -85,7 +85,7 @@ export class ReferenceItemComponent implements OnChanges {
     }
 
     private updateValues() {
-        this.values = [];
+        const values = [];
 
         for (let i = 0; i < this.columnCount; i++) {
             const field = this.content.referenceFields[i];
@@ -93,10 +93,12 @@ export class ReferenceItemComponent implements OnChanges {
             if (field) {
                 const { formatted } = getContentValue(this.content, this.language, field);
 
-                this.values.push(formatted);
+                values.push(formatted);
             } else {
-                this.values.push('');
+                values.push('');
             }
         }
+
+        this.values = values;
     }
 }
