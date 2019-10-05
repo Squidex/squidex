@@ -7,8 +7,6 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { throwError } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -16,8 +14,6 @@ import {
     ContentDto,
     ContentsService,
     getContentValue,
-    SchemaDetailsDto,
-    SchemasService,
     StatefulControlComponent,
     Types,
     UIOptions
@@ -28,9 +24,7 @@ export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    schema?: SchemaDetailsDto | null;
-
-    contentItems: ContentDto[];
+    contents: ContentDto[];
     contentNames: ContentName[];
 
     selectedItem?: ContentName;
@@ -69,19 +63,17 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public set language(value: AppLanguageDto) {
         this.languageField = value;
 
-        this.next(s => ({ ...s, contentNames: this.createContentNames(s.schema, s.contentItems) }));
+        this.next(s => ({ ...s, contentNames: this.createContentNames(s.contents) }));
     }
 
     public selectionControl = new FormControl('');
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly schemasService: SchemasService
+        private readonly contentsService: ContentsService
     ) {
         super(changeDetector, {
-            schema: null,
-            contentItems: [],
+            contents: [],
             contentNames: []
         });
 
@@ -116,19 +108,12 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             return;
         }
 
-        this.schemasService.getSchema(this.appsState.appName, this.schemaId).pipe(
-                switchMap(schema => {
-                    if (schema) {
-                        return this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0);
-                    } else {
-                        return throwError('Invalid schema');
-                    }
-                }, (schema, contents) => ({ schema, contents })))
-            .subscribe(({ schema, contents }) => {
+        this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
+            .subscribe(contents => {
                 const contentItems = contents.items;
-                const contentNames = this.createContentNames(schema, contentItems);
+                const contentNames = this.createContentNames(contentItems);
 
-                this.next(s => ({ ...s, schema, contentItems, contentNames }));
+                this.next(s => ({ ...s, contents: contentItems, contentNames }));
 
                 this.selectContent();
             }, () => {
@@ -160,14 +145,14 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.selectionControl.setValue(undefined, NO_EMIT);
     }
 
-    private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ContentDto[]): ContentName[] {
-        if (contents.length === 0 || !schema) {
+    private createContentNames(contents: ContentDto[]): ContentName[] {
+        if (contents.length === 0) {
             return [];
         }
 
         const names = contents.map(content => {
             const name =
-                schema.referenceFields
+                content.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
                     .map(v => v.formatted)
                     .filter(v => !!v)
