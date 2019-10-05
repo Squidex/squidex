@@ -5,7 +5,7 @@
                 <select class="form-control form-control-dark"
                     [ngModel]="schema?.id"
                     (ngModelChange)="selectSchema($event)">
-                    <option *ngFor="let schema of schemasState.schemas | async; let i = index" [ngValue]="schema.id">
+                    <option *ngFor="let schema of schemas" [ngValue]="schema.id">
                         Select {{schema.displayName}}
                     </option>
                 </select>

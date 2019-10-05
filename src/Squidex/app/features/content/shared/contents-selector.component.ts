@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     ContentDto,
@@ -26,13 +26,15 @@ import {
     styleUrls: ['./contents-selector.component.scss'],
     templateUrl: './contents-selector.component.html',
     providers: [
-        ManualContentsState,
-        SchemasState
+        ManualContentsState
     ]
 })
 export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ContentDto[]>();
+
+    @Input()
+    public schemaIds: string[];
 
     @Input()
     public language: LanguageDto;
@@ -47,6 +49,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     public alreadySelected: ContentDto[];
 
     public schema: SchemaDetailsDto;
+    public schemas: SchemaDto[] = [];
 
     public queryModel: QueryModel;
 
@@ -58,7 +61,8 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
 
     constructor(
         public readonly contentsState: ManualContentsState,
-        public readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
+        private readonly changeDetector: ChangeDetectorRef
     ) {
         super();
     }
@@ -70,9 +74,25 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
                     this.updateModel();
                 }));
 
-        this.own(
-            this.schemasState.selectedSchema
-                .subscribe(schema => {
+        this.schemas = this.schemasState.snapshot.schemas.values;
+
+        if (this.schemaIds && this.schemaIds.length > 0) {
+            this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
+        }
+
+        this.selectSchema(this.schemas[0]);
+
+        this.changeDetector.detectChanges();
+    }
+
+    public selectSchema(selected: string | SchemaDto) {
+        if (Types.is(selected, SchemaDto)) {
+            selected = selected.id;
+        }
+
+        this.schemasState.loadSchema(selected)
+            .subscribe(schema => {
+                if (schema) {
                     this.schema = schema;
 
                     this.minWidth = `${200 + (200 * schema.referenceFields.length)}px`;
@@ -81,20 +101,10 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
                     this.contentsState.load();
 
                     this.updateModel();
-                }));
 
-        this.schemasState.load()
-            .subscribe(() => {
-                this.selectSchema(this.schemasState.snapshot.schemas.at(0));
+                    this.changeDetector.detectChanges();
+                }
             });
-    }
-
-    public selectSchema(selected: string | SchemaDto) {
-        if (Types.is(selected, SchemaDto)) {
-            this.schemasState.select(selected.id).subscribe();
-        } else {
-            this.schemasState.select(selected).subscribe();
-        }
     }
 
     public reload() {
@@ -138,7 +148,9 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
 
         if (isSelected) {
             for (let content of this.contentsState.snapshot.contents.values) {
-                this.selectedItems[content.id] = content;
+                if (!this.isItemAlreadySelected(content)) {
+                    this.selectedItems[content.id] = content;
+                }
             }
         }
 

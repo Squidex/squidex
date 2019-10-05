@@ -110,7 +110,7 @@ export class SchemasState extends State<Snapshot> {
             }));
     }
 
-    private loadSchema(idOrName: string | null) {
+    public loadSchema(idOrName: string | null) {
         return !idOrName ? of(null) :
             this.schemasService.getSchema(this.appName, idOrName).pipe(
                 catchError(() => of(null)));

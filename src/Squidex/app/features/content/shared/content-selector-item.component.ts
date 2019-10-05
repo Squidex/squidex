@@ -20,7 +20,7 @@ import {
     selector: '[sqxContentSelectorItem]',
     template: `
         <tr (click)="toggle()">
-            <td class="cell-select">
+            <td class="cell-select" sqxStopClick>
                 <input type="checkbox" class="form-check"
                     [disabled]="!selectable"
                     [ngModel]="selected || !selectable"
