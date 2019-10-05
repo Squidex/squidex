@@ -13,12 +13,12 @@
                 <i class="icon-close"></i>
             </button>
         </div>
-        <div class="form-group" *ngIf="showTime">
+        <div class="form-group" *ngIf="showTime && !hideDateButtons">
             <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Now (UTC)">
                 Now
             </button>
         </div>
-        <div class="form-group" *ngIf="!showTime">
+        <div class="form-group" *ngIf="!showTime && !hideDateButtons">
             <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Today (UTC)">
                 Today
             </button>
