@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { empty, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import {
@@ -103,26 +103,52 @@ export class SchemasState extends State<Snapshot> {
         return this.loadSchema(idOrName).pipe(
             tap(selectedSchema => {
                 this.next(s => {
-                    const schemas = selectedSchema ? s.schemas.replaceBy('id', selectedSchema) : s.schemas;
-
-                    return { ...s, selectedSchema, schemas };
+                    return { ...s, selectedSchema };
                 });
             }));
     }
 
-    public loadSchema(idOrName: string | null) {
-        return !idOrName ? of(null) :
-            this.schemasService.getSchema(this.appName, idOrName).pipe(
-                catchError(() => of(null)));
+    public loadSchema(idOrName: string | null, cached = false) {
+        if (!idOrName) {
+            return of(null);
+        }
+
+        if (cached) {
+            const found = this.snapshot.schemas.find(x => x.id === idOrName || x.name === idOrName);
+
+            if (Types.is(found, SchemaDetailsDto)) {
+                return of(found);
+            }
+        }
+
+        return this.schemasService.getSchema(this.appName, idOrName).pipe(
+            tap(schema => {
+                this.next(s => {
+                    const schemas = s.schemas.replaceBy('id', schema);
+
+                    return { ...s, schemas };
+                });
+            }),
+            catchError(() => of(null)));
     }
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            const selectedSchema = this.snapshot.selectedSchema;
-
-            this.resetState({ selectedSchema });
+            this.resetState({ selectedSchema: this.snapshot.selectedSchema });
         }
 
+        return this.loadInternal(isReload);
+    }
+
+    public loadIfNotLoaded(): Observable<any> {
+        if (this.snapshot.isLoaded) {
+            return empty();
+        }
+
+        return this.loadInternal(false);
+    }
+
+    private loadInternal(isReload = false): Observable<any> {
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
                 if (isReload) {

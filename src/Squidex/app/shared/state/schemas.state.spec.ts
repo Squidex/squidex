@@ -112,6 +112,30 @@ describe('SchemasState', () => {
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
+
+        it('should not load if already loaded', () => {
+            schemasService.setup(x => x.getSchemas(app))
+                .returns(() => of(oldSchemas)).verifiable();
+
+            schemasState.load(true).subscribe();
+            schemasState.loadIfNotLoaded().subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
+        it('should load if not loaded yet', () => {
+            schemasService.setup(x => x.getSchemas(app))
+                .returns(() => of(oldSchemas)).verifiable();
+
+            schemasState.load(true).subscribe();
+            schemasState.loadIfNotLoaded().subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
     });
 
     describe('Updates', () => {
@@ -167,7 +191,7 @@ describe('SchemasState', () => {
             expect().nothing();
         });
 
-        it('should return schema on select and load when not loaded', () => {
+        it('should return schema on select and reload always', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
                 .returns(() => of(schema)).verifiable();
 
@@ -180,6 +204,26 @@ describe('SchemasState', () => {
             expect(selectedSchema!).toBe(schema);
             expect(schemasState.snapshot.selectedSchema).toBe(schema);
             expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDetailsDto>schemasState.snapshot.schemas.at(0));
+        });
+
+        it('should return schema on get and cache it', () => {
+            schemasService.setup(x => x.getSchema(app, schema1.name))
+                .returns(() => of(schema)).verifiable(Times.exactly(1));
+
+            schemasState.loadSchema(schema1.name, true).subscribe();
+            schemasState.loadSchema(schema1.name, true).subscribe();
+
+            expect().nothing();
+        });
+
+        it('should return schema on get and reuse it from select when caching', () => {
+            schemasService.setup(x => x.getSchema(app, schema1.name))
+                .returns(() => of(schema)).verifiable(Times.exactly(1));
+
+            schemasState.select(schema1.name).subscribe();
+            schemasState.loadSchema(schema1.name, true).subscribe();
+
+            expect().nothing();
         });
 
         it('should return null on select  when loading failed', () => {

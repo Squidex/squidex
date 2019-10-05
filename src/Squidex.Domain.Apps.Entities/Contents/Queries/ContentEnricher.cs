@@ -69,15 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         var result = SimpleMapper.Map(content, new ContentEntity());
 
-                        if (ShouldEnrich(context))
-                        {
-                            await ResolveColorAsync(content, result, cache);
+                        await ResolveColorAsync(content, result, cache);
 
-                            if (ShouldEnrichWithStatuses(context))
-                            {
-                                await ResolveNextsAsync(content, result, context);
-                                await ResolveCanUpdateAsync(content, result);
-                            }
+                        if (ShouldEnrichWithStatuses(context))
+                        {
+                            await ResolveNextsAsync(content, result, context);
+                            await ResolveCanUpdateAsync(content, result);
                         }
 
                         results.Add(result);

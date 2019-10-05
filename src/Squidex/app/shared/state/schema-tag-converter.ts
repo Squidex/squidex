@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { Converter, TagValue } from '@app/framework';
@@ -14,7 +14,7 @@ import { SchemaDto } from './../services/schemas.service';
 import { SchemasState } from './schemas.state';
 
 @Injectable()
-export class SchemaTagConverter implements Converter {
+export class SchemaTagConverter implements Converter, OnDestroy {
     private schemasSubscription: Subscription;
     private schemas: SchemaDto[] = [];
 
@@ -24,20 +24,16 @@ export class SchemaTagConverter implements Converter {
         readonly schemasState: SchemasState
     ) {
         this.schemasSubscription =
-            schemasState.changes.subscribe(state => {
-                if (state.isLoaded) {
-                    this.schemas = state.schemas.values;
+            schemasState.schemas.subscribe(schemas => {
+                this.schemas = schemas.values;
 
-                    this.suggestions = this.schemas.map(x => new TagValue(x.id, x.name, x.id));
-                }
+                this.suggestions = this.schemas.map(x => new TagValue(x.id, x.name, x.id));
             });
+
+        this.schemasState.loadIfNotLoaded();
     }
 
-    public load() {
-        this.schemasState.load();
-    }
-
-    public destroy() {
+    public ngOnDestroy() {
         this.schemasSubscription.unsubscribe();
     }
 

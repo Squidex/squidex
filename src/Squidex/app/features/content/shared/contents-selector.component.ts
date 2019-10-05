@@ -90,7 +90,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
             selected = selected.id;
         }
 
-        this.schemasState.loadSchema(selected)
+        this.schemasState.loadSchema(selected, true)
             .subscribe(schema => {
                 if (schema) {
                     this.schema = schema;

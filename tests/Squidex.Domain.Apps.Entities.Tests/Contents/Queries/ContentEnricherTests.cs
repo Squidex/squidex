@@ -55,6 +55,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
+        public async Task Should_enrich_with_schema_infos()
+        {
+            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+
+            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+
+            var result = await sut.EnrichAsync(source, requestContext.WithResolveSchema());
+
+            Assert.Equal("my-schema", result.SchemaName);
+            Assert.Equal("my-schema", result.SchemaDisplayName);
+        }
+
+        [Fact]
         public async Task Should_enrich_content_with_status_color()
         {
             var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import {
     RolesState,
@@ -19,7 +19,7 @@ import {
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html'
 })
-export class WorkflowsPageComponent implements OnInit, OnDestroy {
+export class WorkflowsPageComponent implements OnInit {
     constructor(
         public readonly rolesState: RolesState,
         public readonly schemasSource: SchemaTagConverter,
@@ -30,13 +30,7 @@ export class WorkflowsPageComponent implements OnInit, OnDestroy {
     public ngOnInit() {
         this.rolesState.load();
 
-        this.schemasSource.load();
-
         this.workflowsState.load();
-    }
-
-    public ngOnDestroy() {
-        this.schemasSource.destroy();
     }
 
     public reload() {
