@@ -56,7 +56,7 @@ Array.prototype.removed = function<T>(value?: T) {
     return this.filter((v: T) => v !== value);
 };
 
-Array.prototype.sorted = function<T>() {
+Array.prototype.sorted = function() {
     const copy = [...this];
 
     copy.sort();
