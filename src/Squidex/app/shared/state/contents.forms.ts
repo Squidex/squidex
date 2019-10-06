@@ -14,7 +14,6 @@ import {
     DateTime,
     Form,
     formControls,
-    ImmutableArray,
     Types,
     ValidatorsEx
 } from '@app/framework';
@@ -404,8 +403,8 @@ export class PartitionConfig {
     private readonly invariant: ReadonlyArray<Partition> = [{ key: fieldInvariant, isOptional: false }];
     private readonly languages: ReadonlyArray<Partition>;
 
-    constructor(languages: ImmutableArray<AppLanguageDto>) {
-        this.languages = languages.values.map(l => this.get(l));
+    constructor(languages: ReadonlyArray<AppLanguageDto>) {
+        this.languages = languages.map(l => this.get(l));
     }
 
     public get(language?: AppLanguageDto) {
@@ -427,7 +426,7 @@ export class EditContentForm extends Form<FormGroup, any> {
 
     public value = new BehaviorSubject<any>(this.form.value);
 
-    constructor(languages: ImmutableArray<AppLanguageDto>,
+    constructor(languages: ReadonlyArray<AppLanguageDto>,
         private readonly schema: SchemaDetailsDto
     ) {
         super(new FormGroup({}));

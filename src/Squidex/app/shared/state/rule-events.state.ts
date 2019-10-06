@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     Pager,
     shareSubscribed,
     State
@@ -23,7 +22,7 @@ import { RuleEventDto, RulesService } from './../services/rules.service';
 
 interface Snapshot {
     // The current rule events.
-    ruleEvents: ImmutableArray<RuleEventDto>;
+    ruleEvents: ReadonlyArray<RuleEventDto>;
 
     // The pagination information.
     ruleEventsPager: Pager;
@@ -48,7 +47,7 @@ export class RuleEventsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ ruleEvents: ImmutableArray.of(), ruleEventsPager: new Pager(0) });
+        super({ ruleEvents: [], ruleEventsPager: new Pager(0) });
     }
 
     public load(isReload = false): Observable<any> {
@@ -63,13 +62,12 @@ export class RuleEventsState extends State<Snapshot> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
                 this.snapshot.ruleEventsPager.skip).pipe(
-            tap(({ total, items }) => {
+            tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
                 }
 
                 return this.next(s => {
-                    const ruleEvents = ImmutableArray.of(items);
                     const ruleEventsPager = s.ruleEventsPager.setCount(total);
 
                     return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };

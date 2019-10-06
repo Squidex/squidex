@@ -12,7 +12,6 @@ import {
     AppLanguageDto,
     ContentDto,
     ContentsState,
-    ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
@@ -45,7 +44,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public nextStatuses: ReadonlyArray<string> = [];
 
     public language: AppLanguageDto;
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public queryModel: QueryModel;
     public queries: Queries;
@@ -96,7 +95,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
-                    this.language = this.languages.at(0);
+                    this.language = this.languages[0];
 
                     this.updateModel();
                 }));
@@ -161,7 +160,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
-        return this.contentsState.snapshot.contents.values.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
@@ -180,9 +179,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            this.contentsState.snapshot.contents.each(content => {
+            for (let content of this.contentsState.snapshot.contents) {
                 this.selectedItems[content.id] = true;
-            });
+            }
         }
 
         this.updateSelectionSummary();
@@ -199,13 +198,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
         const allActions = {};
 
-        this.contentsState.snapshot.contents.each(content => {
+        for (let content of this.contentsState.snapshot.contents) {
             for (const info of content.statusUpdates) {
                 allActions[info.status] = info.color;
             }
-        });
+        }
 
-        this.contentsState.snapshot.contents.each(content => {
+        for (let content of this.contentsState.snapshot.contents) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
@@ -221,7 +220,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             } else {
                 this.selectedAll = false;
             }
-        });
+        }
 
         this.nextStatuses = Object.keys(allActions);
     }
@@ -234,7 +233,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateModel() {
         if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages.values, this.contentsState.snapshot.statuses);
+            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
         }
     }
 }

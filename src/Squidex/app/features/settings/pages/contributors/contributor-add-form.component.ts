@@ -16,7 +16,6 @@ import {
     ContributorsState,
     DialogModel,
     DialogService,
-    ImmutableArray,
     RoleDto,
     UsersService
 } from '@app/shared';
@@ -56,7 +55,7 @@ export class ContributorAddFormComponent implements OnInit {
     private defaultValue: any;
 
     @Input()
-    public roles: ImmutableArray<RoleDto>;
+    public roles: ReadonlyArray<RoleDto>;
 
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
 
@@ -71,7 +70,7 @@ export class ContributorAddFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.defaultValue = { role: this.roles.at(0).name, contributorId: '' };
+        this.defaultValue = { role: this.roles[0].name, contributorId: '' };
 
         this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
     }

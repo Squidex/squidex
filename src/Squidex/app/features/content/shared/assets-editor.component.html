@@ -42,7 +42,7 @@
                 </sqx-asset>
                 
                 <div
-                    [sqxSortModel]="snapshot.assets.mutableValues"
+                    [sqxSortModel]="snapshot.assets"
                     (sqxSort)="sortAssets($event)">
                     <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset">
                         <sqx-asset [asset]="asset" removeMode="true" 

@@ -14,7 +14,6 @@ import {
     DialogService,
     EditFieldForm,
     fadeAnimation,
-    ImmutableArray,
     ModalModel,
     NestedFieldDto,
     PatternDto,
@@ -42,7 +41,7 @@ export class FieldComponent implements OnChanges {
     public parent: RootFieldDto;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 
     public dropdown = new ModalModel();
 

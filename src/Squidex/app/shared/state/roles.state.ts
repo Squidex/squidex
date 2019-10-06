@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -41,7 +40,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type RolesList = ImmutableArray<RoleDto>;
+type RolesList = ReadonlyArray<RoleDto>;
 
 @Injectable()
 export class RolesState extends State<Snapshot> {
@@ -59,7 +58,7 @@ export class RolesState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ roles: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ roles: [], version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -103,9 +102,7 @@ export class RolesState extends State<Snapshot> {
     }
 
     private replaceRoles(payload: RolesPayload, version: Version) {
-        const { canCreate, items } = payload;
-
-        const roles = ImmutableArray.of(items);
+        const { canCreate, items: roles } = payload;
 
         this.next(s => {
             return { ...s, roles, isLoaded: true, version, canCreate };

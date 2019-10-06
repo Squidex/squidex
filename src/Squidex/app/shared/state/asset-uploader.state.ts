@@ -11,7 +11,6 @@ import { map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     MathHelper,
     State,
     Types
@@ -45,7 +44,7 @@ interface Snapshot {
 
 export class UploadCanceled {}
 
-type UploadList = ImmutableArray<Upload>;
+type UploadList = ReadonlyArray<Upload>;
 type UploadResult = AssetDto | number;
 
 @Injectable()
@@ -58,7 +57,7 @@ export class AssetUploaderState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ uploads: ImmutableArray.empty() });
+        super({ uploads: [] });
     }
 
     public stopUpload(upload: Upload) {
@@ -152,7 +151,7 @@ export class AssetUploaderState extends State<Snapshot> {
 
     private addUpload(upload: Upload) {
         this.next(s => {
-            const uploads = s.uploads.push(upload);
+            const uploads = [upload, ...s.uploads];
 
             return { ...s, uploads };
         });

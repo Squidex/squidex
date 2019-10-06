@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import {
     defined,
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Types
@@ -27,7 +26,7 @@ import {
 
 interface Snapshot {
     // All apps, loaded once.
-    apps: ImmutableArray<AppDto>;
+    apps: ReadonlyArray<AppDto>;
 
     // The selected app.
     selectedApp: AppDto | null;
@@ -56,7 +55,7 @@ export class AppsState extends State<Snapshot> {
         private readonly appsService: AppsService,
         private readonly dialogs: DialogService
     ) {
-        super({ apps: ImmutableArray.empty(), selectedApp: null });
+        super({ apps: [], selectedApp: null });
     }
 
     public select(name: string | null): Observable<AppDto | null> {
@@ -73,10 +72,8 @@ export class AppsState extends State<Snapshot> {
 
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
-            tap(payload => {
+            tap(apps => {
                 this.next(s => {
-                    const apps = ImmutableArray.of(payload);
-
                     return { ...s, apps };
                 });
             }),
@@ -87,7 +84,7 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const apps = s.apps.push(created).sortByStringAsc(x => x.displayName);
+                    const apps = [...s.apps, created].sortedByString(x => x.displayName);
 
                     return { ...s, apps };
                 });

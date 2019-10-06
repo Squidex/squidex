@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -38,7 +37,7 @@ interface Snapshot {
     canReadEvents?: boolean;
 }
 
-type RulesList = ImmutableArray<RuleDto>;
+type RulesList = ReadonlyArray<RuleDto>;
 
 @Injectable()
 export class RulesState extends State<Snapshot> {
@@ -59,7 +58,7 @@ export class RulesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ rules: ImmutableArray.empty() });
+        super({ rules: [] });
     }
 
     public load(isReload = false): Observable<any> {
@@ -68,14 +67,12 @@ export class RulesState extends State<Snapshot> {
         }
 
         return this.rulesService.getRules(this.appName).pipe(
-            tap(({ items, canCreate, canReadEvents }) => {
+            tap(({ items: rules, canCreate, canReadEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
 
                 this.next(s => {
-                    const rules = ImmutableArray.of(items);
-
                     return { ...s,
                         canCreate,
                         canReadEvents,
@@ -91,7 +88,7 @@ export class RulesState extends State<Snapshot> {
         return this.rulesService.postRule(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
-                    const rules = s.rules.push(created);
+                    const rules = [...s.rules, created];
 
                     return { ...s, rules };
                 });
@@ -103,7 +100,7 @@ export class RulesState extends State<Snapshot> {
         return this.rulesService.deleteRule(this.appName, rule, rule.version).pipe(
             tap(() => {
                 this.next(s => {
-                    const rules = s.rules.removeAll(x => x.id === rule.id);
+                    const rules = s.rules.removeBy('id', rule);
 
                     return { ...s, rules };
                 });

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 export module DateHelper {
     let momentInstance: any;

@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -34,7 +33,7 @@ export interface PlanInfo {
 
 interface Snapshot {
     // The current plans.
-    plans: ImmutableArray<PlanInfo>;
+    plans: ReadonlyArray<PlanInfo>;
 
     // Indicates if the user is the plan owner.
     isOwner?: boolean;
@@ -74,7 +73,7 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService
     ) {
-        super({ plans: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ plans: [], version: Version.EMPTY });
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
@@ -90,7 +89,7 @@ export class PlansState extends State<Snapshot> {
 
                 this.next(s => {
                     const planId = overridePlanId || payload.currentPlanId;
-                    const plans = ImmutableArray.of(payload.plans.map(x => this.createPlan(x, planId)));
+                    const plans = payload.plans.map(x => this.createPlan(x, planId));
 
                     return {
                         ...s,

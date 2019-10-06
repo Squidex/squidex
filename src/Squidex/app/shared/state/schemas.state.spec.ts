@@ -13,7 +13,6 @@ import { SchemaCategory, SchemasState } from './schemas.state';
 import {
     DialogService,
     FieldDto,
-    ImmutableArray,
     SchemaDetailsDto,
     SchemasService,
     UpdateSchemaCategoryDto,
@@ -68,14 +67,14 @@ describe('SchemasState', () => {
 
             schemasState.load().subscribe();
 
-            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
+            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
-                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
+                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
 
             schemasService.verifyAll();
@@ -88,15 +87,15 @@ describe('SchemasState', () => {
             schemasState.addCategory('category3');
             schemasState.load(true).subscribe();
 
-            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
+            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
-                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) },
-                { name: 'category3', upper: 'CATEGORY3', schemas: ImmutableArray.empty() }
+                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
+                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
+                { name: 'category3', upper: 'CATEGORY3', schemas: [] }
             ]);
 
             schemasService.verifyAll();
@@ -152,9 +151,9 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
-                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) },
-                { name: 'category3', upper: 'CATEGORY3', schemas: ImmutableArray.empty() }
+                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
+                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
+                { name: 'category3', upper: 'CATEGORY3', schemas: [] }
             ]);
         });
 
@@ -164,8 +163,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
-                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
+                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
         });
 
@@ -176,8 +175,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
-                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
+                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
         });
 
@@ -203,7 +202,7 @@ describe('SchemasState', () => {
 
             expect(selectedSchema!).toBe(schema);
             expect(schemasState.snapshot.selectedSchema).toBe(schema);
-            expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDetailsDto>schemasState.snapshot.schemas.at(0));
+            expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDetailsDto>schemasState.snapshot.schemas[0]);
         });
 
         it('should return schema on get and cache it', () => {
@@ -259,7 +258,7 @@ describe('SchemasState', () => {
 
             schemasState.publish(schema1).subscribe();
 
-            const schema1New = schemasState.snapshot.schemas.at(0);
+            const schema1New = schemasState.snapshot.schemas[0];
 
             expect(schema1New).toEqual(updated);
         });
@@ -272,7 +271,7 @@ describe('SchemasState', () => {
 
             schemasState.unpublish(schema1).subscribe();
 
-            const schema1New = schemasState.snapshot.schemas.at(0);
+            const schema1New = schemasState.snapshot.schemas[0];
 
             expect(schema1New).toEqual(updated);
         });
@@ -287,7 +286,7 @@ describe('SchemasState', () => {
 
             schemasState.changeCategory(schema1, category).subscribe();
 
-            const schema1New = schemasState.snapshot.schemas.at(0);
+            const schema1New = schemasState.snapshot.schemas[0];
 
             expect(schema1New).toEqual(updated);
         });
@@ -308,7 +307,7 @@ describe('SchemasState', () => {
 
                 schemasState.publish(schema1).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -324,7 +323,7 @@ describe('SchemasState', () => {
 
                 schemasState.changeCategory(schema1, category).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -340,7 +339,7 @@ describe('SchemasState', () => {
 
                 schemasState.update(schema1, request).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -356,7 +355,7 @@ describe('SchemasState', () => {
 
                 schemasState.synchronize(schema1, request).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -372,7 +371,7 @@ describe('SchemasState', () => {
 
                 schemasState.configureScripts(schema1, request).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -388,7 +387,7 @@ describe('SchemasState', () => {
 
                 schemasState.configurePreviewUrls(schema1, request).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -404,8 +403,8 @@ describe('SchemasState', () => {
 
                 schemasState.create(request).subscribe();
 
-                expect(schemasState.snapshot.schemas.values.length).toBe(3);
-                expect(schemasState.snapshot.schemas.at(2)).toEqual(updated);
+                expect(schemasState.snapshot.schemas.length).toBe(3);
+                expect(schemasState.snapshot.schemas[2]).toEqual(updated);
             });
 
             it('should remove schema from snapshot when deleted', () => {
@@ -414,7 +413,7 @@ describe('SchemasState', () => {
 
                 schemasState.delete(schema1).subscribe();
 
-                expect(schemasState.snapshot.schemas.values.length).toBe(1);
+                expect(schemasState.snapshot.schemas.length).toBe(1);
                 expect(schemasState.snapshot.selectedSchema).toBeNull();
             });
 
@@ -432,7 +431,7 @@ describe('SchemasState', () => {
                     newField = result;
                 });
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -453,7 +452,7 @@ describe('SchemasState', () => {
                     newField = result;
                 });
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -468,7 +467,7 @@ describe('SchemasState', () => {
 
                 schemasState.deleteField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -482,7 +481,7 @@ describe('SchemasState', () => {
 
                 schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -496,7 +495,7 @@ describe('SchemasState', () => {
 
                 schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -512,7 +511,7 @@ describe('SchemasState', () => {
 
                 schemasState.updateField(schema1, schema.fields[0], request).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -526,7 +525,7 @@ describe('SchemasState', () => {
 
                 schemasState.hideField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -540,7 +539,7 @@ describe('SchemasState', () => {
 
                 schemasState.disableField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -554,7 +553,7 @@ describe('SchemasState', () => {
 
                 schemasState.lockField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -568,7 +567,7 @@ describe('SchemasState', () => {
 
                 schemasState.showField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
@@ -582,7 +581,7 @@ describe('SchemasState', () => {
 
                 schemasState.enableField(schema1, schema.fields[0]).subscribe();
 
-                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);

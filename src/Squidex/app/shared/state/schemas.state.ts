@@ -10,10 +10,9 @@ import { empty, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import {
-    compareStringsAsc,
+    compareStrings,
     defined,
     DialogService,
-    ImmutableArray,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -54,7 +53,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-export type SchemasList = ImmutableArray<SchemaDto>;
+export type SchemasList = ReadonlyArray<SchemaDto>;
 export type SchemaCategory = { name: string; schemas: SchemasList; upper: string; };
 
 function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null): boolean {
@@ -96,7 +95,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.empty(), categories: [] });
+        super({ schemas: [], categories: [] });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -156,7 +155,7 @@ export class SchemasState extends State<Snapshot> {
                 }
 
                 return this.next(s => {
-                    const schemas = ImmutableArray.of(items).sortByStringAsc(x => x.displayName);
+                    const schemas = items.sortedByString(x => x.displayName);
 
                     return { ...s, schemas, isLoaded: true, canCreate };
                 });
@@ -168,7 +167,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.postSchema(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
-                    const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
+                    const schemas = [...s.schemas, created].sortedByString(x => x.displayName);
 
                     return { ...s, schemas };
                 });
@@ -199,7 +198,7 @@ export class SchemasState extends State<Snapshot> {
 
     public removeCategory(name: string) {
         this.next(s => {
-            const categories = s.categories.filter(x => x !== name);
+            const categories = s.categories.removed(name);
 
             return { ...s, categories: categories };
         });
@@ -335,7 +334,7 @@ export class SchemasState extends State<Snapshot> {
 
     private replaceSchema(schema: SchemaDto) {
         return this.next(s => {
-            const schemas = s.schemas.replaceBy('id', schema).sortByStringAsc(x => x.displayName);
+            const schemas = s.schemas.replaceBy('id', schema).sortedByString(x => x.displayName);
 
             const selectedSchema =
                 Types.is(schema, SchemaDetailsDto) &&
@@ -369,7 +368,7 @@ function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList
         uniqueCategories[category] = true;
     }
 
-    for (const schema of schemas.values) {
+    for (const schema of schemas) {
         uniqueCategories[getCategory(schema)] = true;
     }
 
@@ -381,7 +380,7 @@ function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList
         }
     }
 
-    result.sort((a, b) => compareStringsAsc(a.upper, b.upper));
+    result.sort((a, b) => compareStrings(a.upper, b.upper));
 
     return result;
 }

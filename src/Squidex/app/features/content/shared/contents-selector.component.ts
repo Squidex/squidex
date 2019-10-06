@@ -74,7 +74,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
                     this.updateModel();
                 }));
 
-        this.schemas = this.schemasState.snapshot.schemas.values;
+        this.schemas = this.schemasState.snapshot.schemas;
 
         if (this.schemaIds && this.schemaIds.length > 0) {
             this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
@@ -147,7 +147,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (const content of this.contentsState.snapshot.contents.values) {
+            for (const content of this.contentsState.snapshot.contents) {
                 if (!this.isItemAlreadySelected(content)) {
                     this.selectedItems[content.id] = content;
                 }

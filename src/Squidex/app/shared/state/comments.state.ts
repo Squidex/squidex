@@ -11,7 +11,6 @@ import { map, tap } from 'rxjs/operators';
 import {
     DateTime,
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -31,7 +30,7 @@ interface Snapshot {
     isLoaded?: boolean;
 }
 
-type CommentsList = ImmutableArray<CommentDto>;
+type CommentsList = ReadonlyArray<CommentDto>;
 
 export class CommentsState extends State<Snapshot> {
     public comments =
@@ -46,7 +45,7 @@ export class CommentsState extends State<Snapshot> {
         private readonly commentsService: CommentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ comments: ImmutableArray.empty(), version: new Version('-1') });
+        super({ comments: [], version: new Version('-1') });
     }
 
     public load(): Observable<any> {
@@ -57,7 +56,7 @@ export class CommentsState extends State<Snapshot> {
 
                     for (const created of payload.createdComments) {
                         if (!comments.find(x => x.id === created.id)) {
-                            comments = comments.push(created);
+                            comments = [...comments, created];
                         }
                     }
 
@@ -77,9 +76,9 @@ export class CommentsState extends State<Snapshot> {
 
     public create(text: string): Observable<CommentDto> {
         return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
-            tap(comment => {
+            tap(created => {
                 this.next(s => {
-                    const comments = s.comments.push(comment);
+                    const comments = [...s.comments, created];
 
                     return { ...s, comments };
                 });

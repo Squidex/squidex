@@ -25,7 +25,7 @@ export class SchemaTagConverter implements Converter, OnDestroy {
     ) {
         this.schemasSubscription =
             schemasState.schemas.subscribe(schemas => {
-                this.schemas = schemas.values;
+                this.schemas = schemas;
 
                 this.suggestions = this.schemas.map(x => new TagValue(x.id, x.name, x.id));
             });

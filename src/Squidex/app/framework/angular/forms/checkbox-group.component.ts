@@ -19,8 +19,7 @@ export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    // tslint:disable-next-line: readonly-array
-    checkedValues: string[];
+    checkedValues: ReadonlyArray<string>;
 }
 
 @Component({
@@ -55,12 +54,12 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
         if (isChecked) {
             checkedValues = [value, ...checkedValues];
         } else {
-            checkedValues = checkedValues.filter(x => x !== value);
+            checkedValues = checkedValues.removed(value);
         }
 
         this.next(s => ({ ...s, checkedValues }));
 
-        this.callChange(checkedValues);
+        this.callChange([...checkedValues]);
     }
 
     public isChecked(value: string) {

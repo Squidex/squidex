@@ -59,7 +59,7 @@ describe('ContributorsState', () => {
         it('should load contributors', () => {
             contributorsState.load().subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
+            expect(contributorsState.snapshot.contributors).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
@@ -73,7 +73,7 @@ describe('ContributorsState', () => {
             let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
-                contributors = result.values;
+                contributors = result;
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
@@ -87,7 +87,7 @@ describe('ContributorsState', () => {
             let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
-                contributors = result.values;
+                contributors = result;
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
@@ -102,7 +102,7 @@ describe('ContributorsState', () => {
             let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
-                contributors = result.values;
+                contributors = result;
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
@@ -116,7 +116,7 @@ describe('ContributorsState', () => {
             let contributors: ReadonlyArray<ContributorDto>;
 
             contributorsState.contributorsPaged.subscribe(result => {
-                contributors = result.values;
+                contributors = result;
             });
 
             expect(contributors!).toEqual(createContributors(4, 14).items);
@@ -162,7 +162,7 @@ describe('ContributorsState', () => {
         });
 
         function expectNewContributors(updated: ContributorsPayload) {
-            expect(contributorsState.snapshot.contributors.values).toEqual(updated.items);
+            expect(contributorsState.snapshot.contributors).toEqual(updated.items);
             expect(contributorsState.snapshot.maxContributors).toBe(updated.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(newVersion);
         }

@@ -8,7 +8,7 @@
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { compareStringsAsc, Types } from '@app/framework';
+import { compareStrings, Types } from '@app/framework';
 
 import { UIState } from './ui.state';
 
@@ -96,7 +96,7 @@ export class Queries {
 function parseQueries(settings: {}) {
     let queries = Object.keys(settings).map(name => parseStored(name, settings[name]));
 
-    return queries.sort((a, b) => compareStringsAsc(a.name, b.name));
+    return queries.sort((a, b) => compareStrings(a.name, b.name));
 }
 
 export function parseStored(name: string, raw?: string) {

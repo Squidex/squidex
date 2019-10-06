@@ -61,7 +61,7 @@ describe('PlansState', () => {
 
             plansState.load().subscribe();
 
-            expect(plansState.snapshot.plans.values).toEqual([
+            expect(plansState.snapshot.plans).toEqual([
                 { isSelected: true,  isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[1] }
             ]);
@@ -79,7 +79,7 @@ describe('PlansState', () => {
 
             plansState.load(false, 'id2_yearly').subscribe();
 
-            expect(plansState.snapshot.plans.values).toEqual([
+            expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: true,  plan: oldPlans.plans[1] }
             ]);
@@ -123,7 +123,7 @@ describe('PlansState', () => {
 
             plansState.change('free').pipe(onErrorResumeNext()).subscribe();
 
-            expect(plansState.snapshot.plans.values).toEqual([
+            expect(plansState.snapshot.plans).toEqual([
                 { isSelected: true,  isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[1] }
             ]);
@@ -137,7 +137,7 @@ describe('PlansState', () => {
 
             plansState.change('id2_yearly').pipe(onErrorResumeNext()).subscribe();
 
-            expect(plansState.snapshot.plans.values).toEqual([
+            expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: true,  plan: oldPlans.plans[1] }
             ]);

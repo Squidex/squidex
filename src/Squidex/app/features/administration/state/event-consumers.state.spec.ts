@@ -42,7 +42,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.load().subscribe();
 
-            expect(eventConsumersState.snapshot.eventConsumers.values).toEqual([eventConsumer1, eventConsumer2]);
+            expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, eventConsumer2]);
             expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -87,7 +87,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.start(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers.at(1);
+            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
 
             expect(newConsumer2).toEqual(updated);
         });
@@ -100,7 +100,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.stop(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers.at(1);
+            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
 
             expect(newConsumer2).toEqual(updated);
         });
@@ -113,7 +113,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.reset(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers.at(1);
+            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
 
             expect(newConsumer2).toEqual(updated);
         });

@@ -13,7 +13,6 @@ import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    ImmutableArray,
     Pager,
     shareSubscribed,
     State
@@ -46,7 +45,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-export type UsersList = ImmutableArray<UserDto>;
+export type UsersList = ReadonlyArray<UserDto>;
 export type UsersResult = { total: number, users: UsersList };
 
 @Injectable()
@@ -70,7 +69,7 @@ export class UsersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly usersService: UsersService
     ) {
-        super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
+        super({ users: [], usersPager: new Pager(0) });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
@@ -110,14 +109,13 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-            tap(({ total, items, canCreate }) => {
+            tap(({ total, items: users, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
 
                 this.next(s => {
                     const usersPager = s.usersPager.setCount(total);
-                    const users = ImmutableArray.of(items);
 
                     let selectedUser = s.selectedUser;
 
@@ -141,7 +139,7 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.postUser(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const users = s.users.pushFront(created);
+                    const users = [created, ...s.users];
                     const usersPager = s.usersPager.incrementCount();
 
                     return { ...s, users, usersPager };

@@ -47,7 +47,7 @@ describe('RuleEventsState', () => {
     });
 
     it('should load ruleEvents', () => {
-        expect(ruleEventsState.snapshot.ruleEvents.values).toEqual(oldRuleEvents);
+        expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
         expect(ruleEventsState.snapshot.ruleEventsPager.numberOfItems).toEqual(200);
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
 

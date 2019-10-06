@@ -18,7 +18,6 @@ import {
     FieldsValidators,
     getContentValue,
     HtmlValue,
-    ImmutableArray,
     LanguageDto,
     NestedFieldDto,
     PartitionConfig,
@@ -507,10 +506,10 @@ describe('GetContentValue', () => {
 });
 
 describe('ContentForm', () => {
-    const languages = ImmutableArray.of([
+    const languages = [
         new AppLanguageDto({}, 'en', 'English', true, false, []),
         new AppLanguageDto({}, 'de', 'English', false, true, [])
-    ]);
+    ];
 
     const complexSchema = createSchema({ fields: [
         createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
@@ -543,7 +542,7 @@ describe('ContentForm', () => {
         });
 
         it('should return partition for language', () => {
-            const result = partitions.get(languages.at(1));
+            const result = partitions.get(languages[1]);
 
             expect(result).toEqual({ key: 'de', isOptional: true });
         });

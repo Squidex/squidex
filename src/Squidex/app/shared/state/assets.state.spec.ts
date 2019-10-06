@@ -59,7 +59,7 @@ describe('AssetsState', () => {
 
             assetsState.load().subscribe();
 
-            expect(assetsState.snapshot.assets.values).toEqual([asset1, asset2]);
+            expect(assetsState.snapshot.assets).toEqual([asset1, asset2]);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
             expect(assetsState.snapshot.isLoaded).toBeTruthy();
 
@@ -155,7 +155,7 @@ describe('AssetsState', () => {
         it('should add asset to snapshot when created', () => {
             assetsState.add(newAsset);
 
-            expect(assetsState.snapshot.assets.values).toEqual([newAsset, asset1, asset2]);
+            expect(assetsState.snapshot.assets).toEqual([newAsset, asset1, asset2]);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(201);
         });
 
@@ -171,7 +171,7 @@ describe('AssetsState', () => {
 
             assetsState.update(update);
 
-            const newAsset1 = assetsState.snapshot.assets.at(0);
+            const newAsset1 = assetsState.snapshot.assets[0];
 
             expect(newAsset1).toEqual(update);
             expect(assetsState.snapshot.tags).toEqual({ tag2: 1, shared: 1, new: 1 });
@@ -183,7 +183,7 @@ describe('AssetsState', () => {
 
             assetsState.delete(asset1).subscribe();
 
-            expect(assetsState.snapshot.assets.values.length).toBe(1);
+            expect(assetsState.snapshot.assets.length).toBe(1);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);
             expect(assetsState.snapshot.tags).toEqual({ shared: 1, tag2: 1 });
         });

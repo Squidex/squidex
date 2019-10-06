@@ -9,7 +9,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import {
     fadeAnimation,
-    ImmutableArray,
     isSameCategory,
     LocalStoreService,
     SchemaCategory,
@@ -21,7 +20,7 @@ import {
 } from '@app/shared/internal';
 
 interface State {
-    filtered: ImmutableArray<SchemaDto>;
+    filtered: ReadonlyArray<SchemaDto>;
 
     isOpen?: boolean;
 }
@@ -56,7 +55,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
-        super(changeDetector, { filtered: ImmutableArray.empty(), isOpen: true });
+        super(changeDetector, { filtered: [], isOpen: true });
     }
 
     public ngOnInit() {

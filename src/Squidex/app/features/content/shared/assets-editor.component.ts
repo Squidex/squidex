@@ -13,7 +13,6 @@ import {
     AssetDto,
     AssetsService,
     DialogModel,
-    ImmutableArray,
     LocalStoreService,
     MessageBus,
     StatefulControlComponent,
@@ -33,9 +32,9 @@ class AssetUpdated {
 }
 
 interface State {
-    assetFiles: ImmutableArray<File>;
+    assetFiles: ReadonlyArray<File>;
 
-    assets: ImmutableArray<AssetDto>;
+    assets: ReadonlyArray<AssetDto>;
 
     isListView: boolean;
 }
@@ -61,30 +60,30 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         private readonly messageBus: MessageBus
     ) {
         super(changeDetector, {
-            assets: ImmutableArray.empty(),
-            assetFiles: ImmutableArray.empty(),
+            assets: [],
+            assetFiles: [],
             isListView: localStore.getBoolean('squidex.assets.list-view')
         });
     }
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.snapshot.assets.map(x => x.id).values)) {
+            if (!Types.isEquals(obj, this.snapshot.assets.map(x => x.id))) {
                 const assetIds: string[] = obj;
 
                 this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)
                     .subscribe(dtos => {
-                        this.setAssets(ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a)));
+                        this.setAssets(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a));
 
                         if (this.snapshot.assets.length !== assetIds.length) {
                             this.updateValue();
                         }
                     }, () => {
-                        this.setAssets(ImmutableArray.empty());
+                        this.setAssets([]);
                     });
             }
         } else {
-            this.setAssets(ImmutableArray.empty());
+            this.setAssets([]);
         }
     }
 
@@ -102,18 +101,18 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
                 }));
     }
 
-    public setAssets(assets: ImmutableArray<AssetDto>) {
+    public setAssets(assets: ReadonlyArray<AssetDto>) {
         this.next(s => ({ ...s, assets }));
     }
 
     public addFiles(files: ReadonlyArray<File>) {
         for (const file of files) {
-            this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
+            this.next(s => ({ ...s, assetFiles: [file, ...s.assetFiles] }));
         }
     }
 
     public selectAssets(assets: ReadonlyArray<AssetDto>) {
-        this.setAssets(this.snapshot.assets.push(...assets));
+        this.setAssets([...this.snapshot.assets, ...assets]);
 
         if (assets.length > 0) {
             this.updateValue();
@@ -126,8 +125,8 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         if (asset && file) {
             this.next(s => ({
                 ...s,
-                assetFiles: s.assetFiles.remove(file),
-                assets: s.assets.pushFront(asset)
+                assetFiles: s.assetFiles.removed(file),
+                assets: [asset, ...s.assets]
             }));
 
             this.updateValue();
@@ -136,7 +135,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
 
     public sortAssets(assets: ReadonlyArray<AssetDto>) {
         if (assets) {
-            this.setAssets(ImmutableArray.of(assets));
+            this.setAssets(assets);
 
             this.updateValue();
         }
@@ -144,14 +143,14 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
 
     public removeLoadedAsset(asset: AssetDto) {
         if (asset) {
-            this.setAssets(this.snapshot.assets.remove(asset));
+            this.setAssets(this.snapshot.assets.removed(asset));
 
             this.updateValue();
         }
     }
 
     public removeLoadingAsset(file: File) {
-        this.next(s => ({ ...s, assetFiles: s.assetFiles.remove(file) }));
+        this.next(s => ({ ...s, assetFiles: s.assetFiles.removed(file) }));
     }
 
     public changeView(isListView: boolean) {
@@ -161,7 +160,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
     }
 
     private updateValue() {
-        const ids = this.snapshot.assets.values.map(x => x.id);
+        const ids = this.snapshot.assets.map(x => x.id);
 
         if (ids.length === 0) {
             this.callChange(null);

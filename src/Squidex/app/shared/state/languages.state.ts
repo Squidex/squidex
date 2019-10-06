@@ -11,7 +11,6 @@ import { map, shareReplay, tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -59,9 +58,9 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type AppLanguagesList = ImmutableArray<AppLanguageDto>;
-type LanguageList = ImmutableArray<LanguageDto>;
-type LanguageResultList = ImmutableArray<SnapshotLanguage>;
+type AppLanguagesList = ReadonlyArray<AppLanguageDto>;
+type LanguageList = ReadonlyArray<LanguageDto>;
+type LanguageResultList = ReadonlyArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
@@ -86,9 +85,9 @@ export class LanguagesState extends State<Snapshot> {
         private readonly languagesService: LanguagesService
     ) {
         super({
-            allLanguages: ImmutableArray.empty(),
-            allLanguagesNew: ImmutableArray.empty(),
-            languages: ImmutableArray.empty(),
+            allLanguages: [],
+            allLanguagesNew: [],
+            languages: [],
             version: Version.EMPTY
         });
     }
@@ -107,7 +106,7 @@ export class LanguagesState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Languages reloaded.');
                 }
 
-                const sorted = ImmutableArray.of(allLanguages).sortByStringAsc(x => x.englishName);
+                const sorted = allLanguages.sortedByString(x => x.englishName);
 
                 this.replaceLanguages(languages.payload, languages.version, sorted);
             }),
@@ -142,9 +141,7 @@ export class LanguagesState extends State<Snapshot> {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
-            const { canCreate, items } = payload;
-
-            const languages = ImmutableArray.of(items);
+            const { canCreate, items: languages } = payload;
 
             return {
                 ...s,
@@ -184,16 +181,15 @@ export class LanguagesState extends State<Snapshot> {
         return {
             language,
             fallbackLanguages:
-                ImmutableArray.of(
-                    language.fallback
-                        .map(l => languages.find(x => x.iso2Code === l)).filter(x => !!x)
-                        .map(l => l!)),
+                language.fallback
+                    .map(l => languages.find(x => x.iso2Code === l)).filter(x => !!x)
+                    .map(l => l!),
             fallbackLanguagesNew:
                 languages
                     .filter(l =>
                         language.iso2Code !== l.iso2Code &&
                         language.fallback.indexOf(l.iso2Code) < 0)
-                    .sortByStringAsc(x => x.englishName)
+                    .sortedByString(x => x.englishName)
         };
     }
 }

@@ -13,7 +13,6 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import {
     ContributorsState,
     ErrorDto,
-    ImmutableArray,
     ImportContributorsForm,
     RoleDto
 } from '@app/shared';
@@ -37,7 +36,7 @@ export class ImportContributorsDialogComponent {
     public close = new EventEmitter();
 
     @Input()
-    public roles: ImmutableArray<RoleDto>;
+    public roles: ReadonlyArray<RoleDto>;
 
     public importForm = new ImportContributorsForm(this.formBuilder);
     public importStatus: ReadonlyArray<ImportStatus> = [];

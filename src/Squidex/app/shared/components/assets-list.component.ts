@@ -8,11 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
-import {
-    AssetDto,
-    AssetsState,
-    ImmutableArray
-} from '@app/shared/internal';
+import { AssetDto, AssetsState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-assets-list',
@@ -36,7 +32,7 @@ export class AssetsListComponent {
     @Input()
     public selectedIds: object;
 
-    public newFiles = ImmutableArray.empty<File>();
+    public newFiles: ReadonlyArray<File> = [];
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
@@ -46,12 +42,12 @@ export class AssetsListComponent {
     public add(file: File, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
-                this.newFiles = this.newFiles.remove(file);
+                this.newFiles = this.newFiles.removed(file);
 
                 this.changeDetector.detectChanges();
             }, 2000);
         } else {
-            this.newFiles = this.newFiles.remove(file);
+            this.newFiles = this.newFiles.removed(file);
 
             this.state.add(asset);
         }
@@ -86,13 +82,11 @@ export class AssetsListComponent {
     }
 
     public remove(file: File) {
-        this.newFiles = this.newFiles.remove(file);
+        this.newFiles = this.newFiles.removed(file);
     }
 
     public addFiles(files: ReadonlyArray<File>) {
-        for (const file of files) {
-            this.newFiles = this.newFiles.pushFront(file);
-        }
+        this.newFiles = [...files, ...this.newFiles];
 
         return true;
     }

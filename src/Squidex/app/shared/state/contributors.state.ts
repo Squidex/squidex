@@ -12,7 +12,6 @@ import { catchError, tap } from 'rxjs/operators';
 import {
     DialogService,
     ErrorDto,
-    ImmutableArray,
     Pager,
     shareMapSubscribed,
     shareSubscribed,
@@ -56,7 +55,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type ContributorsList = ImmutableArray<ContributorDto>;
+type ContributorsList = ReadonlyArray<ContributorDto>;
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
@@ -95,7 +94,7 @@ export class ContributorsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), page: 0, maxContributors: -1, version: Version.EMPTY });
+        super({ contributors: [], page: 0, maxContributors: -1, version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -151,9 +150,7 @@ export class ContributorsState extends State<Snapshot> {
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
         this.next(() => {
-            const { canCreate, items, maxContributors } = payload;
-
-            const contributors = ImmutableArray.of(items);
+            const { canCreate, items: contributors, maxContributors } = payload;
 
             return {
                 canCreate,
