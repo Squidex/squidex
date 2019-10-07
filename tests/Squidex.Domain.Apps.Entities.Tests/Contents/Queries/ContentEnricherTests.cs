@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             schema = Mocks.Schema(appId, schemaId);
 
-            A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(requestContext, schemaId.Id.ToString()))
+            A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>.Ignored, schemaId.Id.ToString()))
                 .Returns(schema);
 
             sut = new ContentEnricher(new Lazy<IContentQueryService>(() => contentQuery), contentWorkflow);
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_add_app_version_and_schema_as_dependency()
         {
-            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            var source = PublishedContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
@@ -55,23 +55,67 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_enrich_with_schema_names()
+        public async Task Should_enrich_with_reference_fields()
         {
-            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            var ctx = new Context(Mocks.FrontendUser(), requestContext.App);
+
+            var source = PublishedContent();
+
+            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+
+            var result = await sut.EnrichAsync(source, ctx);
+
+            Assert.NotNull(result.ReferenceFields);
+        }
+
+        [Fact]
+        public async Task Should_not_enrich_with_reference_fields_when_not_frontend()
+        {
+            var source = PublishedContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
             var result = await sut.EnrichAsync(source, requestContext);
 
+            Assert.Null(result.ReferenceFields);
+        }
+
+        [Fact]
+        public async Task Should_enrich_with_schema_names()
+        {
+            var ctx = new Context(Mocks.FrontendUser(), requestContext.App);
+
+            var source = PublishedContent();
+
+            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+
+            var result = await sut.EnrichAsync(source, ctx);
+
             Assert.Equal("my-schema", result.SchemaName);
             Assert.Equal("my-schema", result.SchemaDisplayName);
         }
 
         [Fact]
+        public async Task Should_not_enrich_with_schema_names_when_not_frontend()
+        {
+            var source = PublishedContent();
+
+            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+
+            var result = await sut.EnrichAsync(source, requestContext);
+
+            Assert.Null(result.SchemaName);
+            Assert.Null(result.SchemaDisplayName);
+        }
+
+        [Fact]
         public async Task Should_enrich_content_with_status_color()
         {
-            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            var source = PublishedContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
@@ -84,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_content_with_default_color_if_not_found()
         {
-            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            var source = PublishedContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(Task.FromResult<StatusInfo>(null));
@@ -127,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_multiple_contents_and_cache_color()
         {
-            var source1 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
-            var source2 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            var source1 = PublishedContent();
+            var source2 = PublishedContent();
 
             var source = new IContentEntity[]
             {
@@ -146,6 +190,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(A<IContentEntity>.Ignored))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        private ContentEntity PublishedContent()
+        {
+            return new ContentEntity { Status = Status.Published, SchemaId = schemaId };
         }
     }
 }
