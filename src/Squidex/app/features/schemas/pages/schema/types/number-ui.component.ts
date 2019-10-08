@@ -54,7 +54,7 @@ export class NumberUIComponent extends ResourceOwner implements OnInit {
             value$<string>(this.editForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 
         this.hideInlineEditable =
-            value$<string>(this.editForm.controls['editor']).pipe(map(x => !(x === 'Input' || x === 'Dropdown')));
+            value$<string>(this.editForm.controls['editor']).pipe(map(x => x === 'Radio'));
 
         this.own(
             this.hideAllowedValues.subscribe(isSelection => {

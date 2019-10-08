@@ -20,6 +20,9 @@ import { FieldDto } from '@app/shared';
                         <ng-container *ngSwitchCase="'Input'">
                             <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                         </ng-container>
+						<ng-container *ngSwitchCase="'Stars'">
+							<sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
+						</ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
                             <select class="form-control" [formControlName]="field.name">
                                 <option [ngValue]="null"></option>
