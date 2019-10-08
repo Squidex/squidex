@@ -25,7 +25,7 @@ import {
 
 export type ContributorsDto = Versioned<ContributorsPayload>;
 export type ContributorsPayload = {
-    readonly items: ContributorDto[];
+    readonly items: ReadonlyArray<ContributorDto>;
 
     readonly maxContributors: number;
 

@@ -10,7 +10,6 @@ import { FormGroup } from '@angular/forms';
 
 import {
     Form,
-    ImmutableArray,
     RuleDto,
     RuleElementDto,
     RulesState,
@@ -37,7 +36,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     public ruleTriggers: { [name: string]: RuleElementDto };
 
     @Input()
-    public schemas: ImmutableArray<SchemaDto>;
+    public schemas: ReadonlyArray<SchemaDto>;
 
     @Input()
     public rule: RuleDto;

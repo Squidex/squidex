@@ -36,7 +36,7 @@ export class UserDto {
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly permissions: string[] = [],
+        public readonly permissions: ReadonlyArray<string> = [],
         public readonly isLocked?: boolean
     ) {
         this._links = links;
@@ -50,14 +50,14 @@ export class UserDto {
 export interface CreateUserDto {
     readonly email: string;
     readonly displayName: string;
-    readonly permissions: string[];
+    readonly permissions: ReadonlyArray<string>;
     readonly password: string;
 }
 
 export interface UpdateUserDto {
     readonly email: string;
     readonly displayName: string;
-    readonly permissions: string[];
+    readonly permissions: ReadonlyArray<string>;
     readonly password?: string;
 }
 

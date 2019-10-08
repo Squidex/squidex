@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State
 } from '@app/shared';
@@ -26,7 +25,7 @@ interface Snapshot {
     isLoaded?: boolean;
 }
 
-type EventConsumersList = ImmutableArray<EventConsumerDto>;
+type EventConsumersList = ReadonlyArray<EventConsumerDto>;
 
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
@@ -40,7 +39,7 @@ export class EventConsumersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super({ eventConsumers: ImmutableArray.empty() });
+        super({ eventConsumers: [] });
     }
 
     public load(isReload = false, silent = false): Observable<any> {
@@ -49,12 +48,10 @@ export class EventConsumersState extends State<Snapshot> {
         }
 
         return this.eventConsumersService.getEventConsumers().pipe(
-            tap(({ items }) => {
+            tap(({ items: eventConsumers }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
-
-                const eventConsumers = ImmutableArray.of(items);
 
                 this.next(s => {
                     return { ...s, eventConsumers, isLoaded: true };

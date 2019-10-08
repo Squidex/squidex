@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -14,10 +14,6 @@ import {
     ContentDto,
     ContentsService,
     DialogModel,
-    ImmutableArray,
-    MathHelper,
-    SchemaDetailsDto,
-    SchemasService,
     StatefulControlComponent,
     Types
 } from '@app/shared';
@@ -27,10 +23,9 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    schema?: SchemaDetailsDto | null;
-    schemaInvalid: boolean;
+    contentItems: ReadonlyArray<ContentDto>;
 
-    contentItems: ImmutableArray<ContentDto>;
+    columnCount: number;
 }
 
 @Component({
@@ -40,15 +35,16 @@ interface State {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
+// tslint:disable-next-line: readonly-array
+export class ReferencesEditorComponent extends StatefulControlComponent<State, string[]> {
     @Input()
-    public schemaId: string;
+    public schemaIds: ReadonlyArray<string>;
 
     @Input()
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public isCompact = false;
@@ -56,63 +52,51 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     @Input()
     public allowDuplicates = true;
 
+    @Input()
+    public columnCount = 0;
+
     public selectorDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly schemasService: SchemasService
+        private readonly contentsService: ContentsService
     ) {
-        super(changeDetector, {
-            schemaInvalid: false,
-            schema: null,
-            contentItems: ImmutableArray.empty()
-        });
-    }
-
-    public ngOnInit() {
-        if (this.schemaId === MathHelper.EMPTY_GUID) {
-            this.next(s => ({ ...s, schemaInvalid: true }));
-            return;
-        }
-
-        this.schemasService.getSchema(this.appsState.appName, this.schemaId)
-            .subscribe(schema => {
-                this.next(s => ({ ...s, schema }));
-            }, () => {
-                this.next(s => ({ ...s, schemaInvalid: true }));
-            });
+        super(changeDetector, { contentItems: [], columnCount: 0 });
     }
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.snapshot.contentItems.map(x => x.id).values)) {
+            if (!Types.isEquals(obj, this.snapshot.contentItems.map(x => x.id))) {
                 const contentIds: string[] = obj;
 
-                this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
+                this.contentsService.getContentsByIds(this.appsState.appName, contentIds)
                     .subscribe(dtos => {
-                        this.setContentItems(ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r)));
+                        this.setContentItems(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r));
 
                         if (this.snapshot.contentItems.length !== contentIds.length) {
                             this.updateValue();
                         }
                     }, () => {
-                        this.setContentItems(ImmutableArray.empty());
+                        this.setContentItems([]);
                     });
             }
         } else {
-            this.setContentItems(ImmutableArray.empty());
+            this.setContentItems([]);
         }
     }
 
-    public setContentItems(contentItems: ImmutableArray<ContentDto>) {
-        this.next(s => ({ ...s, contentItems }));
+    public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
+        let columnCount = 1;
+
+        for (const content of contentItems) {
+            columnCount = Math.max(columnCount, content.referenceFields.length);
+        }
+
+        this.next(s => ({ ...s, contentItems, columnCount }));
     }
 
-    public select(contents: ContentDto[]) {
-        for (let content of contents) {
-            this.setContentItems(this.snapshot.contentItems.push(content));
-        }
+    public select(contents: ReadonlyArray<ContentDto>) {
+        this.setContentItems([...this.snapshot.contentItems, ...contents]);
 
         if (contents.length > 0) {
             this.updateValue();
@@ -123,29 +107,30 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
 
     public remove(content: ContentDto) {
         if (content) {
-            this.setContentItems(this.snapshot.contentItems.remove(content));
+            this.setContentItems(this.snapshot.contentItems.filter(x => x.id !== content.id));
 
             this.updateValue();
         }
     }
 
-    public sort(contents: ContentDto[]) {
+    public sort(contents: ReadonlyArray<ContentDto>) {
         if (contents) {
-            this.setContentItems(ImmutableArray.of(contents));
+            this.setContentItems(contents);
 
             this.updateValue();
         }
     }
 
     private updateValue() {
-        let ids: string[] | null = this.snapshot.contentItems.values.map(x => x.id);
+        const ids = this.snapshot.contentItems.map(x => x.id);
 
         if (ids.length === 0) {
-            ids = null;
+            this.callChange(null);
+        } else {
+            this.callChange(ids);
         }
 
         this.callTouched();
-        this.callChange(ids);
     }
 
     public trackByContent(index: number, content: ContentDto) {

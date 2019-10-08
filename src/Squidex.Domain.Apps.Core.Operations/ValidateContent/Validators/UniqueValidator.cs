@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var found = await context.GetContentIdsAsync(context.SchemaId, filter);
 
-                    if (found.Any(x => x != context.ContentId))
+                    if (found.Any(x => x.Id != context.ContentId))
                     {
                         addError(context.Path, "Another content with the same value exists.");
                     }

@@ -52,6 +52,7 @@ export class FilterLogicalComponent {
         return this.filterValue;
     }
 
+    // tslint:disable-next-line: readonly-array
     public filters: FilterNode[] = [];
 
     public addComparison() {

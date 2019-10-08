@@ -1,30 +1,23 @@
 <div class="references-container" [class.disabled]="snapshot.isDisabled">
-    <ng-container *ngIf="snapshot.schema; let schema">
+    <ng-container>
         <div class="drop-area-container">
             <div class="drop-area" (click)="selectorDialog.show()">
                 Click here to link content items.
             </div>
         </div>
         
-        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="schema && snapshot.contentItems && snapshot.contentItems.length > 0"
-            [sqxSortModel]="snapshot.contentItems.mutableValues" 
+        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0"
+            [sqxSortModel]="snapshot.contentItems" 
             (sqxSort)="sort($event)">
             <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
-                [sqxContent]="content"
+                [sqxReferenceItem]="content"
                 [language]="language"
-                [isReadOnly]="true"
-                [isReference]="true"
                 [isCompact]="isCompact"
-                [schema]="schema"
-                [schemaFields]="schema.referenceFields"
+                [columnCount]="snapshot.columnCount"
                 (delete)="remove(content)">
             </tbody>
         </table>
     </ng-container>
-
-    <div class="invalid" *ngIf="snapshot.schemaInvalid">
-        Schema not found or not configured yet.
-    </div>
 </div>
 
 <ng-container *sqxModal="selectorDialog;closeAuto:false">
@@ -33,7 +26,7 @@
         [alreadySelected]="snapshot.contentItems"
         [language]="language"
         [languages]="languages"
-        [schema]="snapshot.schema"
+        [schemaIds]="schemaIds"
         (select)="select($event)">
     </sqx-contents-selector>
 </ng-container>

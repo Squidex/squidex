@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties { IsUnique = true });
 
-            await sut.ValidateAsync(CreateValue(12.5), errors, ValidationTestExtensions.References(Guid.NewGuid()));
+            await sut.ValidateAsync(CreateValue(12.5), errors, ValidationTestExtensions.References((Guid.NewGuid(), Guid.NewGuid())));
 
             errors.Should().BeEquivalentTo(
                 new[] { "Another content with the same value exists." });

@@ -52,7 +52,7 @@ describe('Queries', () => {
     });
 
     it('should load merged queries', () => {
-        let converted: SavedQuery[];
+        let converted: ReadonlyArray<SavedQuery>;
 
         queries.queries.subscribe(x => {
             converted = x;
@@ -76,7 +76,7 @@ describe('Queries', () => {
     });
 
     it('should load shared queries', () => {
-        let converted: SavedQuery[];
+        let converted: ReadonlyArray<SavedQuery>;
 
         queries.queriesShared.subscribe(x => {
             converted = x;
@@ -92,7 +92,7 @@ describe('Queries', () => {
     });
 
     it('should load user queries', () => {
-        let converted: SavedQuery[];
+        let converted: ReadonlyArray<SavedQuery>;
 
         queries.queriesUser.subscribe(x => {
             converted = x;

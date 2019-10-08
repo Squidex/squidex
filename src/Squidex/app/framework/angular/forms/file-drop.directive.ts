@@ -11,7 +11,7 @@ import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Rende
 
 import { Types } from '@app/framework/internal';
 
-const ImageTypes = [
+const ImageTypes: ReadonlyArray<string> = [
     'image/jpeg',
     'image/png',
     'image/jpg',
@@ -25,7 +25,7 @@ export class FileDropDirective {
     private dragCounter = 0;
 
     @Input()
-    public allowedFiles: string[];
+    public allowedFiles: ReadonlyArray<string>;
 
     @Input()
     public onlyImages: boolean;
@@ -37,7 +37,7 @@ export class FileDropDirective {
     public disabled = false;
 
     @Output('sqxDropFile')
-    public drop = new EventEmitter<File[]>();
+    public drop = new EventEmitter<ReadonlyArray<File>>();
 
     constructor(
         private readonly element: ElementRef,
@@ -128,7 +128,7 @@ export class FileDropDirective {
             return null;
         }
 
-        let files: File[] = [];
+        const files: File[] = [];
 
         for (let i = 0; i < dataTransfer.files.length; i++) {
             const file = dataTransfer.files.item(i);

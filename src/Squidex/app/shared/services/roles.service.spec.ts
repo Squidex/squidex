@@ -43,7 +43,7 @@ describe('RolesService', () => {
     it('should make get request to get all permissions',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
-        let permissions: string[];
+        let permissions: ReadonlyArray<string>;
 
         roleService.getPermissions('my-app').subscribe(result => {
             permissions = result;
@@ -186,7 +186,7 @@ describe('RolesService', () => {
     }
 });
 
-export function createRoles(...ids: number[]): RolesPayload {
+export function createRoles(...ids: ReadonlyArray<number>): RolesPayload {
     return {
         items: ids.map(id => createRole(id)),
         _links: {

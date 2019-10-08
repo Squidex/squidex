@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -21,7 +23,22 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public ReferencesFieldEditor Editor { get; set; }
 
-        public Guid SchemaId { get; set; }
+        public ReadOnlyCollection<Guid> SchemaIds { get; set; }
+
+        public Guid SchemaId
+        {
+            set
+            {
+                if (value != default)
+                {
+                    SchemaIds = new ReadOnlyCollection<Guid>(new List<Guid> { value });
+                }
+                else
+                {
+                    SchemaIds = null;
+                }
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

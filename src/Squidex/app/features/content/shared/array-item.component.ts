@@ -67,11 +67,11 @@ export class ArrayItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public isInvalid: Observable<boolean>;
 
-    public fieldControls: { field: FieldDto, control: AbstractControl }[];
+    public fieldControls: ReadonlyArray<{ field: FieldDto, control: AbstractControl }>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['itemForm']) {

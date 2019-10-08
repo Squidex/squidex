@@ -116,11 +116,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 return await contents.QueryIdsAsync(await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
+            }
+        }
+
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contents.QueryIdsAsync(ids);
             }
         }
 

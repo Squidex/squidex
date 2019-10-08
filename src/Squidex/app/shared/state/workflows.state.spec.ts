@@ -52,7 +52,7 @@ describe('WorkflowsState', () => {
 
             workflowsState.load().subscribe();
 
-            expect(workflowsState.snapshot.workflows.values).toEqual(oldWorkflows.items);
+            expect(workflowsState.snapshot.workflows).toEqual(oldWorkflows.items);
             expect(workflowsState.snapshot.isLoaded).toBeTruthy();
             expect(workflowsState.snapshot.version).toEqual(version);
 
@@ -117,7 +117,7 @@ describe('WorkflowsState', () => {
         });
 
         function expectNewWorkflows(updated: WorkflowsPayload) {
-            expect(workflowsState.snapshot.workflows.values).toEqual(updated.items);
+            expect(workflowsState.snapshot.workflows).toEqual(updated.items);
             expect(workflowsState.snapshot.version).toEqual(newVersion);
         }
     });

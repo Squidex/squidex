@@ -27,7 +27,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
 };
 
-const ImageTypes = [
+const ImageTypes: ReadonlyArray<any> = [
     'image/jpeg',
     'image/png',
     'image/jpg',
@@ -188,10 +188,10 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         }
     }
 
-    public insertAssets(assets: AssetDto[]) {
+    public insertAssets(assets: ReadonlyArray<AssetDto>) {
         let content = '';
 
-        for (let asset of assets) {
+        for (const asset of assets) {
             content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
         }
 
@@ -202,8 +202,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.assetsDialog.hide();
     }
 
-    public insertFiles(files: File[]) {
-        for (let file of files) {
+    public insertFiles(files: ReadonlyArray<File>) {
+        for (const file of files) {
             this.uploadFile(file);
         }
     }

@@ -22,7 +22,7 @@ export class FeatureDto {
 
 export class FeaturesDto {
     constructor(
-        public readonly features: FeatureDto[],
+        public readonly features: ReadonlyArray<FeatureDto>,
         public readonly version: number
     ) {
     }

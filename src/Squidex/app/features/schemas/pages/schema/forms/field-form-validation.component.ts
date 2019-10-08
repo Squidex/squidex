@@ -8,11 +8,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import {
-    FieldDto,
-    ImmutableArray,
-    PatternDto
-} from '@app/shared';
+import { FieldDto, PatternDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-validation',
@@ -55,5 +51,5 @@ export class FieldFormValidationComponent {
     public field: FieldDto;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 }

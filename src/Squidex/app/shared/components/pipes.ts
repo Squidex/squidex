@@ -260,7 +260,8 @@ export class FileIconPipe implements PipeTransform {
         ];
 
         let mimeIcon: string;
-        let mimeParts = asset.mimeType.split('/');
+
+        const mimeParts = asset.mimeType.split('/');
 
         if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
             mimeIcon = 'video';

@@ -7,7 +7,10 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -57,6 +60,47 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The nested fields.
         /// </summary>
         public List<NestedFieldDto> Nested { get; set; }
+
+        public static NestedFieldDto FromField(NestedField field)
+        {
+            var properties = FieldPropertiesDtoFactory.Create(field.RawProperties);
+
+            var result =
+                SimpleMapper.Map(field,
+                    new NestedFieldDto
+                    {
+                        FieldId = field.Id,
+                        Properties = properties
+                    });
+
+            return result;
+        }
+
+        public static FieldDto FromField(RootField field)
+        {
+            var properties = FieldPropertiesDtoFactory.Create(field.RawProperties);
+
+            var result =
+                SimpleMapper.Map(field,
+                    new FieldDto
+                    {
+                        FieldId = field.Id,
+                        Properties = properties,
+                        Partitioning = field.Partitioning.Key
+                    });
+
+            if (field is IArrayField arrayField)
+            {
+                result.Nested = new List<NestedFieldDto>();
+
+                foreach (var nestedField in arrayField.Fields)
+                {
+                    result.Nested.Add(FromField(nestedField));
+                }
+            }
+
+            return result;
+        }
 
         public void CreateLinks(ApiController controller, string app, string schema, bool allowUpdate)
         {

@@ -70,7 +70,7 @@ export class RuleElementDto {
         public readonly iconImage: string,
         public readonly iconCode: string | null,
         public readonly readMore: string,
-        public readonly properties: RuleElementPropertyDto[]
+        public readonly properties: ReadonlyArray<RuleElementPropertyDto>
     ) {
     }
 }
@@ -96,7 +96,7 @@ export class RulesDto extends ResultSet<RuleDto> {
         return hasAnyLink(this._links, 'events');
     }
 
-    constructor(items: RuleDto[], links?: {}) {
+    constructor(items: ReadonlyArray<RuleDto>, links?: {}) {
         super(items.length, items, links);
     }
 }

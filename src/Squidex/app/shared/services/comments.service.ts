@@ -20,9 +20,9 @@ import {
 
 export class CommentsDto extends Model<CommentsDto> {
     constructor(
-        public readonly createdComments: CommentDto[],
-        public readonly updatedComments: CommentDto[],
-        public readonly deletedComments: string[],
+        public readonly createdComments: ReadonlyArray<CommentDto>,
+        public readonly updatedComments: ReadonlyArray<CommentDto>,
+        public readonly deletedComments: ReadonlyArray<string>,
         public readonly version: Version
     ) {
         super();

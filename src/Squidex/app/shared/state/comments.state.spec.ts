@@ -14,7 +14,6 @@ import {
     CommentsService,
     CommentsState,
     DialogService,
-    ImmutableArray,
     Version
 } from '@app/shared/internal';
 
@@ -68,10 +67,10 @@ describe('CommentsState', () => {
             commentsState.load().subscribe();
 
             expect(commentsState.snapshot.isLoaded).toBeTruthy();
-            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+            expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('2', modified, 'text2_2', creator),
                 new CommentDto('3', modified, 'text3', creator)
-            ]));
+            ]);
         });
     });
 
@@ -93,11 +92,11 @@ describe('CommentsState', () => {
 
             commentsState.create('text3').subscribe();
 
-            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+            expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', creator),
                 new CommentDto('2', modified, 'text2', creator),
                 new CommentDto('3', modified, 'text3', creator)
-            ]));
+            ]);
         });
 
         it('should update properties when updated', () => {
@@ -108,10 +107,10 @@ describe('CommentsState', () => {
 
             commentsState.update(oldComments.createdComments[1], 'text2_2', modified).subscribe();
 
-            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+            expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', creator),
                 new CommentDto('2', modified, 'text2_2', creator)
-            ]));
+            ]);
         });
 
         it('should remove comment from snapshot when deleted', () => {
@@ -120,9 +119,9 @@ describe('CommentsState', () => {
 
             commentsState.delete(oldComments.createdComments[1]).subscribe();
 
-            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+            expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', creator)
-            ]));
+            ]);
         });
     });
 });

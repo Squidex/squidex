@@ -42,7 +42,7 @@ describe('AppsState', () => {
     });
 
     it('should load apps', () => {
-        expect(appsState.snapshot.apps.values).toEqual([app1, app2]);
+        expect(appsState.snapshot.apps).toEqual([app1, app2]);
     });
 
     it('should select app', () => {
@@ -88,7 +88,7 @@ describe('AppsState', () => {
 
         appsState.create(request).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, app2, updated]);
+        expect(appsState.snapshot.apps).toEqual([app1, app2, updated]);
     });
 
     it('should update app in snapshot when updated', () => {
@@ -99,7 +99,7 @@ describe('AppsState', () => {
 
         appsState.update(app2, {}).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
+        expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
     it('should update selected app in snapshot when updated', () => {
@@ -111,7 +111,7 @@ describe('AppsState', () => {
         appsState.select(app1.name).subscribe();
         appsState.update(app1, {}).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([updated, app2]);
+        expect(appsState.snapshot.apps).toEqual([updated, app2]);
         expect(appsState.snapshot.selectedApp).toEqual(updated);
     });
 
@@ -125,7 +125,7 @@ describe('AppsState', () => {
 
         appsState.uploadImage(app2, file).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
+        expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
     it('should update app in snapshot when image removed', () => {
@@ -136,7 +136,7 @@ describe('AppsState', () => {
 
         appsState.removeImage(app2).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
+        expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
     it('should remove app from snapshot when archived', () => {
@@ -145,7 +145,7 @@ describe('AppsState', () => {
 
         appsState.delete(app2).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1]);
+        expect(appsState.snapshot.apps).toEqual([app1]);
     });
 
     it('should remove selected app from snapshot when archived', () => {

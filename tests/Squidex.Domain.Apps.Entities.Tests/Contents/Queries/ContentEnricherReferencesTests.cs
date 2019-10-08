@@ -79,10 +79,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_add_referenced_id_as_dependency()
         {
-            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13);
-            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17);
-            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23);
-            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29);
+            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13, refSchemaId1);
+            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17, refSchemaId1);
+            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23, refSchemaId2);
+            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29, refSchemaId2);
 
             var source = new IContentEntity[]
             {
@@ -98,20 +98,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var enriched1 = enriched.ElementAt(0);
             var enriched2 = enriched.ElementAt(1);
 
-            Assert.Contains(refSchemaId1.Id.ToString(), enriched1.CacheDependencies);
-            Assert.Contains(refSchemaId2.Id.ToString(), enriched1.CacheDependencies);
+            Assert.Contains(refSchemaId1.Id, enriched1.CacheDependencies);
+            Assert.Contains(refSchemaId2.Id, enriched1.CacheDependencies);
 
-            Assert.Contains(refSchemaId1.Id.ToString(), enriched2.CacheDependencies);
-            Assert.Contains(refSchemaId2.Id.ToString(), enriched2.CacheDependencies);
+            Assert.Contains(refSchemaId1.Id, enriched2.CacheDependencies);
+            Assert.Contains(refSchemaId2.Id, enriched2.CacheDependencies);
         }
 
         [Fact]
         public async Task Should_enrich_with_reference_data()
         {
-            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13);
-            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17);
-            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23);
-            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29);
+            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13, refSchemaId1);
+            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17, refSchemaId1);
+            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23, refSchemaId2);
+            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29, refSchemaId2);
 
             var source = new IContentEntity[]
             {
@@ -160,10 +160,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_enrich_when_content_has_more_items()
         {
-            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13);
-            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17);
-            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23);
-            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29);
+            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13, refSchemaId1);
+            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17, refSchemaId1);
+            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23, refSchemaId2);
+            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29, refSchemaId2);
 
             var source = new IContentEntity[]
             {
@@ -225,10 +225,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private static IEnrichedContentEntity CreateRefContent(Guid id, string name, int number)
+        private static IEnrichedContentEntity CreateRefContent(Guid id, string name, int number, NamedId<Guid> schemaId)
         {
             return new ContentEntity
             {
+                Id = id,
                 DataDraft =
                     new NamedContentData()
                         .AddField("name",
@@ -237,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("number",
                             new ContentFieldData()
                                 .AddValue("iv", number)),
-                Id = id
+                SchemaId = schemaId
             };
         }
     }

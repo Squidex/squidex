@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         public AssetGraphType(IGraphModel model)
         {
-            Name = "AssetDto";
+            Name = "Asset";
 
             AddField(new FieldType
             {

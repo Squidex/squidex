@@ -10,11 +10,12 @@ import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from 
 import { DialogService } from '@app/framework/internal';
 
 class DelayEventEmitter<T> extends EventEmitter<T> {
+    // tslint:disable-next-line: readonly-array
     private delayedNexts: any[] | null = [];
 
     public delayEmit() {
         if (this.delayedNexts) {
-            for (let callback of this.delayedNexts) {
+            for (const callback of this.delayedNexts) {
                 callback();
             }
         }
@@ -71,7 +72,7 @@ export class ConfirmClickDirective implements OnDestroy {
 
             this.isOpen = true;
 
-            let subscription =
+            const subscription =
                 this.dialogs.confirm(this.confirmTitle, this.confirmText)
                     .subscribe(result => {
                         this.isOpen = false;

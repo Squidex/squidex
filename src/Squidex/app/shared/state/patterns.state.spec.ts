@@ -52,7 +52,7 @@ describe('PatternsState', () => {
 
             patternsState.load().subscribe();
 
-            expect(patternsState.snapshot.patterns.values).toEqual(oldPatterns.items);
+            expect(patternsState.snapshot.patterns).toEqual(oldPatterns.items);
             expect(patternsState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -116,7 +116,7 @@ describe('PatternsState', () => {
         });
 
         function expectNewPatterns(updated: PatternsPayload) {
-            expect(patternsState.snapshot.patterns.values).toEqual(updated.items);
+            expect(patternsState.snapshot.patterns).toEqual(updated.items);
             expect(patternsState.snapshot.version).toEqual(newVersion);
         }
     });

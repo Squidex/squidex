@@ -9,7 +9,7 @@
 
 import { Types } from './types';
 
-interface IColorDefinition {
+interface ColorDefinition {
     regex: RegExp;
 
     process(bots: RegExpExecArray): Color;
@@ -22,7 +22,7 @@ export interface Color {
     a: number;
 }
 
-const ColorDefinitions: IColorDefinition[] = [
+const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
     {
         regex: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*([\d\.]{1,})\)$/,
         process: (bits) => {
@@ -62,9 +62,11 @@ const ColorDefinitions: IColorDefinition[] = [
 export module MathHelper {
     export const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
 
-    const CRC32_TABLE: number[] = [];
+    const CRC32_TABLE: ReadonlyArray<number> = createCrc32Table();
 
-    function ensureCrc32Table() {
+    function createCrc32Table() {
+        const crc: number[] = [];
+
         for (let n = 0; n < 256; n++) {
             let c = n;
 
@@ -72,11 +74,11 @@ export module MathHelper {
                 c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
             }
 
-            CRC32_TABLE[n] = c;
+            crc[n] = c;
         }
-    }
 
-    ensureCrc32Table();
+        return crc;
+    }
 
     export function crc32(str: string): number {
         let crc = 0 ^ (-1);
@@ -147,7 +149,7 @@ export module MathHelper {
 
         value = value.replace(/ /g, '').toLowerCase();
 
-        for (let colorDefinition of ColorDefinitions) {
+        for (const colorDefinition of ColorDefinitions) {
             const bits = colorDefinition.regex.exec(value);
 
             if (bits) {

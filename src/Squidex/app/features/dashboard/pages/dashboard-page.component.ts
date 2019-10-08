@@ -19,7 +19,7 @@ import {
     UsagesService
 } from '@app/shared';
 
-const COLORS = [
+const COLORS: ReadonlyArray<string> = [
     ' 51, 137, 213',
     '211,  50,  50',
     '131, 211,  50',
@@ -85,7 +85,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
         maintainAspectRatio: false
     };
 
-    public history: HistoryEventDto[] = [];
+    public history: ReadonlyArray<HistoryEventDto> = [];
 
     public assetsCurrent = 0;
     public assetsMax = 0;
@@ -207,10 +207,10 @@ function label(category: string) {
     return category === '*' ? 'anonymous' : category;
 }
 
-function createLabels(dtos: { date: DateTime }[]): string[] {
+function createLabels(dtos: ReadonlyArray<{ date: DateTime }>): ReadonlyArray<string> {
     return dtos.map(d => d.date.toStringFormat('M-DD'));
 }
 
-function createLabelsFromSet(dtos: { [category: string]: { date: DateTime }[] }): string[] {
+function createLabelsFromSet(dtos: { [category: string]: ReadonlyArray<{ date: DateTime }> }): ReadonlyArray<string> {
     return createLabels(dtos[Object.keys(dtos)[0]]);
 }

@@ -48,5 +48,5 @@ export class FieldLanguagesComponent {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ReadonlyArray<AppLanguageDto>;
 }

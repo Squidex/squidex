@@ -30,6 +30,15 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new ArrayFieldPropertiesDto());
         }
 
+        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
+        {
+            var result = SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
+
+            result.AllowedExtensions = properties.AllowedExtensions?.ToArray();
+
+            return result;
+        }
+
         public FieldPropertiesDto Visit(BooleanFieldProperties properties)
         {
             return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());
@@ -50,39 +59,20 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new JsonFieldPropertiesDto());
         }
 
-        public FieldPropertiesDto Visit(ReferencesFieldProperties properties)
-        {
-            return SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
-        }
-
-        public FieldPropertiesDto Visit(UIFieldProperties properties)
-        {
-            return SimpleMapper.Map(properties, new UIFieldPropertiesDto());
-        }
-
-        public FieldPropertiesDto Visit(TagsFieldProperties properties)
-        {
-            var result = SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
-        }
-
-        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
-        {
-            var result = SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
-
-            result.AllowedExtensions = properties.AllowedExtensions?.ToArray();
-
-            return result;
-        }
-
         public FieldPropertiesDto Visit(NumberFieldProperties properties)
         {
             var result = SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
 
             result.AllowedValues = properties.AllowedValues?.ToArray();
+
+            return result;
+        }
+
+        public FieldPropertiesDto Visit(ReferencesFieldProperties properties)
+        {
+            var result = SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
+
+            result.SchemaIds = properties.SchemaIds?.ToArray();
 
             return result;
         }
@@ -94,6 +84,20 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             result.AllowedValues = properties.AllowedValues?.ToArray();
 
             return result;
+        }
+
+        public FieldPropertiesDto Visit(TagsFieldProperties properties)
+        {
+            var result = SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
+
+            result.AllowedValues = properties.AllowedValues?.ToArray();
+
+            return result;
+        }
+
+        public FieldPropertiesDto Visit(UIFieldProperties properties)
+        {
+            return SimpleMapper.Map(properties, new UIFieldPropertiesDto());
         }
     }
 }

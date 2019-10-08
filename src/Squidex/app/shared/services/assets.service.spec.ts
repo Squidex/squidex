@@ -325,7 +325,7 @@ describe('AssetsService', () => {
     }
 });
 
-export function createAsset(id: number, tags?: string[], suffix = '') {
+export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '') {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/assets/${id}` }
     };

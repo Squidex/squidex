@@ -14,7 +14,6 @@ import {
     DialogService,
     EditFieldForm,
     fadeAnimation,
-    ImmutableArray,
     ModalModel,
     NestedFieldDto,
     PatternDto,
@@ -42,7 +41,7 @@ export class FieldComponent implements OnChanges {
     public parent: RootFieldDto;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 
     public dropdown = new ModalModel();
 
@@ -99,7 +98,7 @@ export class FieldComponent implements OnChanges {
         this.schemasState.hideField(this.schema, this.field);
     }
 
-    public sortFields(fields: NestedFieldDto[]) {
+    public sortFields(fields: ReadonlyArray<NestedFieldDto>) {
         this.schemasState.orderFields(this.schema, fields, <any>this.field).subscribe();
     }
 

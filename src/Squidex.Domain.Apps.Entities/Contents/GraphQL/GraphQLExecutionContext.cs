@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return dataLoader.LoadAsync(id);
         }
 
-        public override Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public Task<IContentEntity> FindContentAsync(Guid id)
         {
-            var dataLoader = GetContentsLoader(schemaId);
+            var dataLoader = GetContentsLoader();
 
             return dataLoader.LoadAsync(id);
         }
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await dataLoader.LoadManyAsync(ids);
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, IJsonValue value)
+        public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(IJsonValue value)
         {
             var ids = ParseIds(value);
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return EmptyContents;
             }
 
-            var dataLoader = GetContentsLoader(schemaId);
+            var dataLoader = GetContentsLoader();
 
             return await dataLoader.LoadManyAsync(ids);
         }
@@ -106,12 +106,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 });
         }
 
-        private IDataLoader<Guid, IContentEntity> GetContentsLoader(Guid schemaId)
+        private IDataLoader<Guid, IContentEntity> GetContentsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"Schema_{schemaId}",
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"References",
                 async batch =>
                 {
-                    var result = await GetReferencedContentsAsync(schemaId, new List<Guid>(batch));
+                    var result = await GetReferencedContentsAsync(new List<Guid>(batch));
 
                     return result.ToDictionary(x => x.Id);
                 });

@@ -29,7 +29,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public size: string;
 
     @Input()
-    public languages: Language[] = [];
+    public languages: ReadonlyArray<Language> = [];
 
     @Input()
     public selectedLanguage: Language;

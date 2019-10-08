@@ -17,6 +17,7 @@ import { State } from './../state';
 declare type UnsubscribeFunction = () => void;
 
 export class ResourceOwner implements OnDestroy {
+    // tslint:disable-next-line: readonly-array
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
     public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
@@ -37,7 +38,7 @@ export class ResourceOwner implements OnDestroy {
 
     public unsubscribeAll() {
         try {
-            for (let subscription of this.subscriptions) {
+            for (const subscription of this.subscriptions) {
                 if (Types.isFunction(subscription)) {
                     subscription();
                 } else {

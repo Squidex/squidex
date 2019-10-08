@@ -88,7 +88,7 @@ export class UsagesService {
             pretifyError('Failed to load todays storage size. Please reload.'));
     }
 
-    public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<{ [category: string]: CallsUsageDto[] }> {
+    public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<{ [category: string]: ReadonlyArray<CallsUsageDto> }> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return this.http.get<any>(url).pipe(
@@ -108,7 +108,7 @@ export class UsagesService {
             pretifyError('Failed to load calls usage. Please reload.'));
     }
 
-    public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<StorageUsageDto[]> {
+    public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<ReadonlyArray<StorageUsageDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return this.http.get<any[]>(url).pipe(

@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -41,7 +40,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type PatternsList = ImmutableArray<PatternDto>;
+type PatternsList = ReadonlyArray<PatternDto>;
 
 @Injectable()
 export class PatternsState extends State<Snapshot> {
@@ -59,7 +58,7 @@ export class PatternsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ patterns: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ patterns: [], version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -103,9 +102,7 @@ export class PatternsState extends State<Snapshot> {
     }
 
     private replacePatterns(payload: PatternsPayload, version: Version) {
-        const patterns = ImmutableArray.of(payload.items);
-
-        const { canCreate } = payload;
+        const { canCreate, items: patterns } = payload;
 
         this.next(s => {
             return { ...s, patterns, isLoaded: true, version, canCreate };

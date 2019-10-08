@@ -53,7 +53,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadFile(file).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Running');
         expect(upload.progress).toBe(1);
@@ -67,7 +67,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadFile(file).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Running');
         expect(upload.progress).toBe(20);
@@ -81,7 +81,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadFile(file).pipe(onErrorResumeNext()).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Failed');
         expect(upload.progress).toBe(1);
@@ -103,7 +103,7 @@ describe('AssetUploaderState', () => {
             cb();
         });
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Completed');
         expect(upload.progress).toBe(100);
@@ -118,7 +118,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadAsset(asset, file).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Running');
         expect(upload.progress).toBe(1);
@@ -132,7 +132,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadAsset(asset, file).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Running');
         expect(upload.progress).toBe(20);
@@ -146,7 +146,7 @@ describe('AssetUploaderState', () => {
 
         assetUploader.uploadAsset(asset, file).pipe(onErrorResumeNext()).subscribe();
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Failed');
         expect(upload.progress).toBe(1);
@@ -168,7 +168,7 @@ describe('AssetUploaderState', () => {
             }
         });
 
-        const upload = assetUploader.snapshot.uploads.at(0);
+        const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Completed');
         expect(upload.progress).toBe(100);

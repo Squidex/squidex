@@ -11,7 +11,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -31,7 +30,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type BackupsList = ImmutableArray<BackupDto>;
+type BackupsList = ReadonlyArray<BackupDto>;
 
 @Injectable()
 export class BackupsState extends State<Snapshot> {
@@ -52,7 +51,7 @@ export class BackupsState extends State<Snapshot> {
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService
     ) {
-        super({ backups: ImmutableArray.empty() });
+        super({ backups: [] });
     }
 
     public load(isReload = false, silent = false): Observable<any> {
@@ -61,14 +60,12 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(({ items, canCreate }) => {
+            tap(({ items: backups, canCreate }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
-                const backups = ImmutableArray.of(items);
 
                 this.next(s => {
-
                     return { ...s, backups, isLoaded: true, canCreate };
                 });
             }),

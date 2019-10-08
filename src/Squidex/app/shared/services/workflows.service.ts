@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -13,7 +15,7 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    compareStringsAsc,
+    compareStrings,
     hasAnyLink,
     HTTP,
     mapVersioned,
@@ -65,9 +67,9 @@ export class WorkflowDto extends Model<WorkflowDto> {
     }
 
     protected onCloned() {
-        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+        this.steps.sort((a, b) => compareStrings(a.name, b.name));
 
-        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
+        this.transitions.sort((a, b) => compareStrings(a.to, b.to));
     }
 
     public getOpenSteps(step: WorkflowStep) {

@@ -18,7 +18,7 @@ export type FieldType =
     'Tags' |
     'UI';
 
-export const fieldTypes: { type: FieldType, description: string }[] = [
+export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
     {
         type: 'String',
         description: 'Titles, names, paragraphs.'
@@ -174,7 +174,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
     public readonly allowDuplicates?: boolean;
-    public readonly allowedExtensions?: string[];
+    public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;
     public readonly maxHeight?: number;
@@ -267,7 +267,7 @@ export type NumberFieldEditor = 'Input' | 'Radio' | 'Dropdown' | 'Stars';
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Number';
 
-    public readonly allowedValues?: number[];
+    public readonly allowedValues?: ReadonlyArray<number>;
     public readonly defaultValue?: number;
     public readonly editor: NumberFieldEditor = 'Input';
     public readonly inlineEditable: boolean = false;
@@ -294,7 +294,11 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxItems?: number;
     public readonly minItems?: number;
     public readonly resolveReference?: boolean;
-    public readonly schemaId?: string;
+    public readonly schemaIds?: ReadonlyArray<string>;
+
+    public get singleId() {
+        return this.schemaIds && this.schemaIds.length === 1 ? this.schemaIds[0] : null;
+    }
 
     public get isSortable() {
         return false;
@@ -310,7 +314,7 @@ export type StringEditor = 'Color' | 'Dropdown' | 'Html' | 'Input' | 'Markdown' 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
-    public readonly allowedValues?: string[];
+    public readonly allowedValues?: ReadonlyArray<string>;
     public readonly defaultValue?: string;
     public readonly editor: StringEditor = 'Input';
     public readonly inlineEditable: boolean = false;
@@ -338,7 +342,7 @@ export type TagsFieldEditor = 'Tags' | 'Checkboxes' | 'Dropdown';
 export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Tags';
 
-    public readonly allowedValues?: string[];
+    public readonly allowedValues?: ReadonlyArray<string>;
     public readonly editor: TagsFieldEditor = 'Tags';
     public readonly maxItems?: number;
     public readonly minItems?: number;

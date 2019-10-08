@@ -110,6 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     (c, s) => null,
+                    (s) => null,
                     (c) => null);
 
             var validator = new ContentValidator(schema, x => InvariantPartitioning.Instance, validationContext);

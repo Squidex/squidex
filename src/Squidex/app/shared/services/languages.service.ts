@@ -28,7 +28,7 @@ export class LanguagesService {
     ) {
     }
 
-    public getLanguages(): Observable<LanguageDto[]> {
+    public getLanguages(): Observable<ReadonlyArray<LanguageDto>> {
         const url = this.apiUrl.buildUrl('api/languages');
 
         return this.http.get<any[]>(url).pipe(

@@ -56,7 +56,7 @@ describe('RulesState', () => {
 
             rulesState.load().subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule1, rule2]);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
             expect(rulesState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -91,7 +91,7 @@ describe('RulesState', () => {
 
             rulesState.create(request).subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule1, rule2, newRule]);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2, newRule]);
         });
 
         it('should update rule when updated action', () => {
@@ -104,7 +104,7 @@ describe('RulesState', () => {
 
             rulesState.updateAction(rule1, newAction).subscribe();
 
-            const newRule1 = rulesState.snapshot.rules.at(0);
+            const newRule1 = rulesState.snapshot.rules[0];
 
             expect(newRule1).toEqual(updated);
         });
@@ -119,7 +119,7 @@ describe('RulesState', () => {
 
             rulesState.updateTrigger(rule1, newTrigger).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
         });
@@ -132,7 +132,7 @@ describe('RulesState', () => {
 
             rulesState.enable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
         });
@@ -145,7 +145,7 @@ describe('RulesState', () => {
 
             rulesState.disable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
         });
@@ -156,7 +156,7 @@ describe('RulesState', () => {
 
             rulesState.delete(rule1).subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule2]);
+            expect(rulesState.snapshot.rules).toEqual([rule2]);
         });
     });
 });
