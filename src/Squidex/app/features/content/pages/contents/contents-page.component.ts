@@ -44,6 +44,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public nextStatuses: ReadonlyArray<string> = [];
 
     public language: AppLanguageDto;
+    public languageMaster: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
     public queryModel: QueryModel;
@@ -96,6 +97,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages[0];
+                    this.languageMaster = this.languages.find(x => x.isMaster)!;
 
                     this.updateModel();
                 }));

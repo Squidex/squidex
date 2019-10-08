@@ -103,7 +103,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     public ngOnInit() {
-        if (!this.schemaId) {
+        if (!this.schemaId || this.language) {
             this.selectionControl.disable();
             return;
         }
@@ -154,7 +154,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             const name =
                 content.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
-                    .map(v => v.formatted)
+                    .map(v => v.formatted || 'No value')
                     .filter(v => !!v)
                     .join(', ');
 

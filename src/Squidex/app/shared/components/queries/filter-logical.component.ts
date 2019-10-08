@@ -5,12 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+ // tslint:disable: readonly-array
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
     fadeAnimation,
     FilterLogical,
     FilterNode,
+    LanguageDto,
     QueryModel
 } from '@app/shared/internal';
 
@@ -33,6 +36,9 @@ export class FilterLogicalComponent {
     public remove = new EventEmitter();
 
     @Input()
+    public language: LanguageDto;
+
+    @Input()
     public level = 0;
 
     @Input()
@@ -52,7 +58,10 @@ export class FilterLogicalComponent {
         return this.filterValue;
     }
 
-    // tslint:disable-next-line: readonly-array
+    public get nestedLevel() {
+        return this.level + 1;
+    }
+
     public filters: FilterNode[] = [];
 
     public addComparison() {

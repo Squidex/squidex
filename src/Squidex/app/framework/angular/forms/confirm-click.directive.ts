@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
 
 import { DialogService } from '@app/framework/internal';
 
 class DelayEventEmitter<T> extends EventEmitter<T> {
-    // tslint:disable-next-line: readonly-array
     private delayedNexts: any[] | null = [];
 
     public delayEmit() {

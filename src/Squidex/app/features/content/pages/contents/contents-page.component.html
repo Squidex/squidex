@@ -19,7 +19,8 @@
                     [query]="contentsState.contentsQuery | async"
                     [queries]="queries"
                     [queryModel]="queryModel"
-                    (queryChange)="search($event)" 
+                    (queryChange)="search($event)"
+                    [language]="languageMaster"
                     enableShortcut="true">
                 </sqx-search-form>
             </div>

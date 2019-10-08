@@ -10,10 +10,11 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import {
     fadeAnimation,
     FilterComparison,
+    LanguageDto,
     QueryFieldModel,
-    QueryModel
+    QueryModel,
+    StatusInfo
 } from '@app/shared/internal';
-import { StatusInfo } from '@app/shared/services/contents.service';
 
  @Component({
     selector: 'sqx-filter-comparison',
@@ -30,6 +31,9 @@ export class FilterComparisonComponent implements OnChanges {
 
     @Output()
     public remove = new EventEmitter();
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public model: QueryModel;

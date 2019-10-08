@@ -13,6 +13,7 @@ import {
     DialogModel,
     fadeAnimation,
     hasFilter,
+    LanguageDto,
     Queries,
     Query,
     QueryModel,
@@ -36,6 +37,9 @@ export class SearchFormComponent implements OnChanges {
 
     @Input()
     public placeholder = '';
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public queryModel: QueryModel;

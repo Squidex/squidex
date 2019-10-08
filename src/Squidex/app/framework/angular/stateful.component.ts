@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -17,7 +19,6 @@ import { State } from './../state';
 declare type UnsubscribeFunction = () => void;
 
 export class ResourceOwner implements OnDestroy {
-    // tslint:disable-next-line: readonly-array
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
     public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
