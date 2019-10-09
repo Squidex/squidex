@@ -283,7 +283,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = await InvokeCommandAsync(command);
 
-            return CreatedAtAction(nameof(GetContent), new { app, id = command.ContentId }, response);
+            return CreatedAtAction(nameof(GetContent), new { app, name, id = command.ContentId }, response);
         }
 
         /// <summary>

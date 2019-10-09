@@ -9,20 +9,20 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FluentFTP" Version="27.1.2" />
+    <PackageReference Include="FluentFTP" Version="27.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.6.0" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.0.0-ci.20190926.19">
+    <PackageReference Include="Microsoft.OData.Core" Version="7.6.1" />
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.0.0-rc1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Core" Version="3.0.0-ci.20190926.19" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.0.0-ci.20190926.19" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.0.0-rc1" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.0.0-rc1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="NJsonSchema" Version="10.0.24" />
+    <PackageReference Include="NJsonSchema" Version="10.0.25" />
     <PackageReference Include="NodaTime" Version="2.4.7" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0004" />

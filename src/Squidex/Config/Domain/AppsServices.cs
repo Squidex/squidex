@@ -34,16 +34,19 @@ namespace Squidex.Config.Domain
 
             services.AddSingleton(c =>
             {
-                var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>();
+                var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>().Value;
 
                 var result = new InitialPatterns();
 
-                foreach (var (key, value) in uiOptions.Value.RegexSuggestions)
+                if (uiOptions.RegexSuggestions != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(key) &&
-                        !string.IsNullOrWhiteSpace(value))
+                    foreach (var (key, value) in uiOptions.RegexSuggestions)
                     {
-                        result[Guid.NewGuid()] = new AppPattern(key, value);
+                        if (!string.IsNullOrWhiteSpace(key) &&
+                            !string.IsNullOrWhiteSpace(value))
+                        {
+                            result[Guid.NewGuid()] = new AppPattern(key, value);
+                        }
                     }
                 }
 

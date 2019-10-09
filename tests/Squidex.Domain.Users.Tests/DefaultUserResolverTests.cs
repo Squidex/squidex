@@ -69,10 +69,10 @@ namespace Squidex.Domain.Users
 
             var result = await sut.FindByIdOrEmailAsync(user.Email);
 
-            Assert.Equal(user.Id, result.Id);
-            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
 
-            Assert.Equal(claims, result.Claims);
+            Assert.Equal(claims, result!.Claims);
         }
 
         [Fact]
@@ -86,12 +86,12 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.GetClaimsAsync(user))
                 .Returns(claims);
 
-            var result = await sut.FindByIdOrEmailAsync(user.Id);
+            var result = await sut.FindByIdOrEmailAsync(user.Id)!;
 
-            Assert.Equal(user.Id, result.Id);
-            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
 
-            Assert.Equal(claims, result.Claims);
+            Assert.Equal(claims, result!.Claims);
         }
 
         [Fact]

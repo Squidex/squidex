@@ -43,11 +43,6 @@ namespace Squidex.Config.Domain
             services.Configure<ExposedConfiguration>(
                 config.GetSection("exposedConfiguration"));
 
-            services.AddSingletonAs(c => new CachingUsageTracker(
-                    c.GetRequiredService<BackgroundUsageTracker>(),
-                    c.GetRequiredService<IMemoryCache>()))
-                .As<IUsageTracker>();
-
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
@@ -70,6 +65,11 @@ namespace Squidex.Config.Domain
         {
             services.Configure<UsageOptions>(
                 config.GetSection("usage"));
+
+            services.AddSingletonAs(c => new CachingUsageTracker(
+                    c.GetRequiredService<BackgroundUsageTracker>(),
+                    c.GetRequiredService<IMemoryCache>()))
+                .As<IUsageTracker>();
 
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();

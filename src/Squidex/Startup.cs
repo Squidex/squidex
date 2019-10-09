@@ -47,6 +47,7 @@ namespace Squidex
             services.AddSquidexCommands(config);
             services.AddSquidexComments();
             services.AddSquidexContents(config);
+            services.AddSquidexControllerServices(config);
             services.AddSquidexEventPublisher(config);
             services.AddSquidexEventSourcing(config);
             services.AddSquidexHealthChecks(config);
@@ -62,6 +63,7 @@ namespace Squidex
             services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
+            services.AddSquidexUsageTracking(config);
         }
 
         public void Configure(IApplicationBuilder app)
