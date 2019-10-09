@@ -51,7 +51,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.assetsState.search(query);
     }
 
-    public selectTags(tags: string[]) {
+    public selectTags(tags: ReadonlyArray<string>) {
         this.assetsState.selectTags(tags);
     }
 

@@ -13,7 +13,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -29,13 +28,13 @@ import {
 
 interface Snapshot {
     // The current workflow.
-    workflows: ImmutableArray<WorkflowDto>;
+    workflows: ReadonlyArray<WorkflowDto>;
 
     // The app version.
     version: Version;
 
     // The errors.
-    errors: string[];
+    errors: ReadonlyArray<string>;
 
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;
@@ -63,7 +62,7 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ errors: [], workflows: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ errors: [], workflows: [], version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -109,9 +108,7 @@ export class WorkflowsState extends State<Snapshot> {
     }
 
     private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
-        const { canCreate, errors, items } = payload;
-
-        const workflows = ImmutableArray.of(items);
+        const { canCreate, errors, items: workflows } = payload;
 
         this.next(s => {
             return { ...s, workflows, errors, isLoaded: true, version, canCreate };

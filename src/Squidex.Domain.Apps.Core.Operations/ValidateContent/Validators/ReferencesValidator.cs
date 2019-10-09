@@ -9,34 +9,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ReferencesValidator : IValidator
     {
-        private static readonly PropertyPath Path = "Id";
+        private readonly IEnumerable<Guid>? schemaIds;
 
-        private readonly Guid schemaId;
-
-        public ReferencesValidator(Guid schemaId)
+        public ReferencesValidator(IEnumerable<Guid>? schemaIds)
         {
-            this.schemaId = schemaId;
+            this.schemaIds = schemaIds;
         }
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is ICollection<Guid> contentIds)
             {
-                var filter = ClrFilter.In(Path, contentIds.ToList());
-
-                var foundIds = await context.GetContentIdsAsync(schemaId, filter);
+                var foundIds = await context.GetContentIdsAsync(contentIds.ToHashSet());
 
                 foreach (var id in contentIds)
                 {
-                    if (!foundIds.Contains(id))
+                    var (schemaId, _) = foundIds.FirstOrDefault(x => x.Id == id);
+
+                    if (schemaId == Guid.Empty)
                     {
                         addError(context.Path, $"Contains invalid reference '{id}'.");
+                    }
+                    else if (schemaIds?.Any() == true && !schemaIds.Contains(schemaId))
+                    {
+                        addError(context.Path, $"Contains reference '{id}' to invalid schema.");
                     }
                 }
             }

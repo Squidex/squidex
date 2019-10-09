@@ -7,3 +7,5 @@
 
 export * from './declarations';
 export * from './module';
+
+import './utils/array-extensions';

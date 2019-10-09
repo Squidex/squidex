@@ -13,17 +13,16 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import {
     ContributorsState,
     ErrorDto,
-    ImmutableArray,
     ImportContributorsForm,
     RoleDto
 } from '@app/shared';
 
-interface ImportStatus {
+type ImportStatus = {
     email: string;
     result: 'Pending' | 'Failed' | 'Success';
     resultText: string;
     role: string;
-}
+};
 
 @Component({
     selector: 'sqx-import-contributors-dialog',
@@ -37,10 +36,10 @@ export class ImportContributorsDialogComponent {
     public close = new EventEmitter();
 
     @Input()
-    public roles: ImmutableArray<RoleDto>;
+    public roles: ReadonlyArray<RoleDto>;
 
     public importForm = new ImportContributorsForm(this.formBuilder);
-    public importStatus: ImportStatus[] = [];
+    public importStatus: ReadonlyArray<ImportStatus> = [];
     public importStage: 'Start' | 'Change' | 'Wait' = 'Start';
 
     constructor(
@@ -54,15 +53,13 @@ export class ImportContributorsDialogComponent {
 
         const contributors = this.importForm.submit();
 
-        if (contributors && contributors.length > 0) {
-            for (let contributor of contributors) {
-                this.importStatus.push({
-                    email: contributor.contributorId,
-                    result: 'Pending',
-                    resultText: 'Pending',
-                    role: 'Developer'
-                });
-            }
+        if (contributors) {
+            this.importStatus = contributors.map(contributor => ({
+                email: contributor.contributorId,
+                result: 'Pending',
+                resultText: 'Pending',
+                role: 'Developer'
+            }));
         }
     }
 
@@ -73,7 +70,7 @@ export class ImportContributorsDialogComponent {
             mergeMap(s =>
                 this.contributorsState.assign(createRequest(s), { silent: true }).pipe(
                     tap(created => {
-                        let status = this.importStatus.find(x => x.email === s.email);
+                        const status = this.importStatus.find(x => x.email === s.email);
 
                         if (status) {
                             status.resultText = getSuccess(created);
@@ -81,7 +78,7 @@ export class ImportContributorsDialogComponent {
                         }
                     }),
                     catchError((error: ErrorDto) => {
-                        let status = this.importStatus.find(x => x.email === s.email);
+                        const status = this.importStatus.find(x => x.email === s.email);
 
                         if (status) {
                             status.resultText = getError(error);

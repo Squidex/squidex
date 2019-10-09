@@ -8,7 +8,7 @@
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { compareStringsAsc, Types } from '@app/framework';
+import { compareStrings, Types } from '@app/framework';
 
 import { UIState } from './ui.state';
 
@@ -32,11 +32,11 @@ const OLDEST_FIRST: Query = {
 };
 
 export class Queries {
-    public queries: Observable<SavedQuery[]>;
-    public queriesShared: Observable<SavedQuery[]>;
-    public queriesUser: Observable<SavedQuery[]>;
+    public queries: Observable<ReadonlyArray<SavedQuery>>;
+    public queriesShared: Observable<ReadonlyArray<SavedQuery>>;
+    public queriesUser: Observable<ReadonlyArray<SavedQuery>>;
 
-    public defaultQueries: SavedQuery[] = [
+    public defaultQueries: ReadonlyArray<SavedQuery> = [
         { name: 'All (newest first)', queryJson: '' },
         { name: 'All (oldest first)', queryJson: encodeQuery(OLDEST_FIRST), query: OLDEST_FIRST }
     ];
@@ -82,7 +82,7 @@ export class Queries {
 
         return this.queries.pipe(
             map(queries => {
-                for (let saved of queries) {
+                for (const saved of queries) {
                     if (saved.queryJson === json) {
                         return saved.name;
                     }
@@ -96,7 +96,7 @@ export class Queries {
 function parseQueries(settings: {}) {
     let queries = Object.keys(settings).map(name => parseStored(name, settings[name]));
 
-    return queries.sort((a, b) => compareStringsAsc(a.name, b.name));
+    return queries.sort((a, b) => compareStrings(a.name, b.name));
 }
 
 export function parseStored(name: string, raw?: string) {

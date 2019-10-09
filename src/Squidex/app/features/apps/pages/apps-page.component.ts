@@ -32,7 +32,7 @@ export class AppsPageComponent implements OnInit {
 
     public onboardingDialog = new DialogModel();
 
-    public newsFeatures: FeatureDto[];
+    public newsFeatures: ReadonlyArray<FeatureDto>;
     public newsDialog = new DialogModel();
 
     public info: string;

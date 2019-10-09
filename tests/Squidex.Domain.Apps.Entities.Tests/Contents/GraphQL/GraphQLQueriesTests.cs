@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -16,6 +18,95 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLQueriesTests : GraphQLTestBase
     {
+        [Fact]
+        public async Task Should_introspect()
+        {
+            const string query = @"              
+                query IntrospectionQuery {
+                  __schema {
+                    queryType { name }
+                    mutationType { name }
+                    subscriptionType { name }
+                    types {
+                      ...FullType
+                    }
+                    directives {
+                      name
+                      description
+                      args {
+                        ...InputValue
+                      }
+                      onOperation
+                      onFragment
+                      onField
+                    }
+                  }
+                }
+
+                fragment FullType on __Type {
+                  kind
+                  name
+                  description
+                  fields(includeDeprecated: true) {
+                    name
+                    description
+                    args {
+                      ...InputValue
+                    }
+                    type {
+                      ...TypeRef
+                    }
+                    isDeprecated
+                    deprecationReason
+                  }
+                  inputFields {
+                    ...InputValue
+                  }
+                  interfaces {
+                    ...TypeRef
+                  }
+                  enumValues(includeDeprecated: true) {
+                    name
+                    description
+                    isDeprecated
+                    deprecationReason
+                  }
+                  possibleTypes {
+                    ...TypeRef
+                  }
+                }
+
+                fragment InputValue on __InputValue {
+                  name
+                  description
+                  type { ...TypeRef }
+                  defaultValue
+                }
+
+                fragment TypeRef on __Type {
+                  kind
+                  name
+                  ofType {
+                    kind
+                    name
+                    ofType {
+                      kind
+                      name
+                      ofType {
+                        kind
+                        name
+                      }
+                    }
+                  }
+                }";
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, OperationName = "IntrospectionQuery" });
+
+            var json = serializer.Serialize(result.Response, true);
+
+            Assert.NotEmpty(json);
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -182,6 +273,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_null_single_asset()
+        {
+            var assetId = Guid.NewGuid();
+
+            var query = @"
+                query {
+                  findAsset(id: ""<ID>"") {
+                    id
+                  }
+                }".Replace("<ID>", assetId.ToString());
+
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
+                .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findAsset = (object?)null
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = Guid.NewGuid();
@@ -212,7 +331,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
                 .Returns(ResultList.CreateFrom(1, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -548,7 +667,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -587,6 +706,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             }
                         }
                     }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_single_content()
+        {
+            var contentId = Guid.NewGuid();
+
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
+                    id
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
+                .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = (object?)null
                 }
             };
 
@@ -640,7 +787,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -717,7 +864,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_also_fetch_referenced_contents_when_field_is_included_in_query()
         {
             var contentRefId = Guid.NewGuid();
-            var contentRef = CreateContent(contentRefId, Guid.Empty, Guid.Empty);
+            var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, contentRefId, Guid.Empty);
@@ -730,16 +877,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       myReferences {
                         iv {
                           id
+                          data {
+                            ref1Field {
+                              iv
+                            }
+                          }
                         }
                       }
                     }
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>.Ignored))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -759,7 +911,90 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 {
                                     new
                                     {
-                                        id = contentRefId
+                                        id = contentRefId,
+                                        data = new
+                                        {
+                                            ref1Field = new
+                                            {
+                                                iv = "ref1"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_union_contents_when_field_is_included_in_query()
+        {
+            var contentRefId = Guid.NewGuid();
+            var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
+
+            var contentId = Guid.NewGuid();
+            var content = CreateContent(contentId, contentRefId, Guid.Empty);
+
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
+                    id
+                    data {
+                      myUnion {
+                        iv {
+                          ... on Content {
+                            id
+                          }
+                          ... on MyRefSchema1 {
+                            data {
+                              ref1Field {
+                                iv
+                              }
+                            }
+                          }
+                          __typename
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>.Ignored))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        data = new
+                        {
+                            myUnion = new
+                            {
+                                iv = new[]
+                                {
+                                    new
+                                    {
+                                        id = contentRefId,
+                                        data = new
+                                        {
+                                            ref1Field = new
+                                            {
+                                                iv = "ref1"
+                                            }
+                                        },
+                                        __typename = "MyRefSchema1"
                                     }
                                 }
                             }
@@ -794,7 +1029,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.Ignored))
@@ -850,10 +1085,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId2.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId1)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId1)))
                 .Returns(ResultList.CreateFrom(0, asset1));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId2)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId2)))
                 .Returns(ResultList.CreateFrom(0, asset2));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query1 }, new GraphQLQuery { Query = query2 });
@@ -909,7 +1144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -947,7 +1182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -993,7 +1228,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), MatchId(contentId)))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1012,7 +1247,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
         }
 
-        private static Q MatchId(Guid contentId)
+        private static IReadOnlyList<Guid> MatchId(Guid contentId)
+        {
+            return A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 1 && x[0] == contentId);
+        }
+
+        private static Q MatchIdQuery(Guid contentId)
         {
             return A<Q>.That.Matches(x => x.Ids.Count == 1 && x.Ids[0] == contentId);
         }

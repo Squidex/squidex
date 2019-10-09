@@ -17,14 +17,14 @@ export type ResourceLink = { href: string; method: ResourceMethod; metadata?: st
 
 export type Metadata = { [rel: string]: string };
 
-export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: string[]) {
+export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: ReadonlyArray<string>) {
     if (!value) {
         return false;
     }
 
     const links = value._links || value;
 
-    for (let rel of rels) {
+    for (const rel of rels) {
         const link = links[rel];
 
         if (link && link.method && link.href) {
@@ -35,7 +35,7 @@ export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: string[]) 
     return undefined;
 }
 
-export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) {
+export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: ReadonlyArray<string>) {
     return !!getLinkUrl(value, ...rels);
 }
 

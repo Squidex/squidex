@@ -117,6 +117,7 @@ export class Model<T> {
 
     protected clone<V>(update: ((v: any) => V) | Partial<V>, validOnly = false): V {
         let values: Partial<V>;
+
         if (Types.isFunction(update)) {
             values = update(<any>this);
         } else {
@@ -125,7 +126,7 @@ export class Model<T> {
 
         const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 
-        for (let key in values) {
+        for (const key in values) {
             if (values.hasOwnProperty(key)) {
                 let value = values[key];
 
@@ -148,7 +149,7 @@ export class ResultSet<T> {
 
     constructor(
         public readonly total: number,
-        public readonly items: T[],
+        public readonly items: ReadonlyArray<T>,
         links?: ResourceLinks
     ) {
         this._links = links || {};

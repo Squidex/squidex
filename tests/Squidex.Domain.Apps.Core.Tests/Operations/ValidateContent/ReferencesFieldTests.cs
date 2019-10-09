@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References(ref1));
+            await sut.ValidateAsync(CreateValue(ref1), errors, Context());
 
             Assert.Empty(errors);
         }
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), errors, Context());
 
             Assert.Empty(errors);
         }
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { MinItems = 2, MaxItems = 2 });
 
-            await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, Context());
 
             Assert.Empty(errors);
         }
@@ -66,7 +67,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { MinItems = 2, MaxItems = 2, AllowDuplicates = true });
 
-            await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors, Context());
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_schemas_not_defined()
+        {
+            var sut = Field(new ReferencesFieldProperties());
+
+            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References((Guid.NewGuid(), ref1)));
 
             Assert.Empty(errors);
         }
@@ -76,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), errors, Context());
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -87,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(), errors);
+            await sut.ValidateAsync(CreateValue(), errors, Context());
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -98,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
+            await sut.ValidateAsync(JsonValue.Create("invalid"), errors, Context());
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
@@ -109,7 +120,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, ValidationTestExtensions.References(ref1, ref2));
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, Context());
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -120,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, ValidationTestExtensions.References(ref1, ref2));
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, Context());
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not have more than 1 item(s)." });
@@ -138,11 +149,24 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_add_error_if_reference_schema_is_not_valid()
+        {
+            var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
+
+            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References((Guid.NewGuid(), ref1)));
+
+            errors.Should().BeEquivalentTo(
+                new[] { $"Contains reference '{ref1}' to invalid schema." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_reference_contains_duplicate_values()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
 
-            await sut.ValidateAsync(CreateValue(ref1, ref1), errors, ValidationTestExtensions.References(ref1));
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors,
+                ValidationTestExtensions.References(
+                    (schemaId, ref1)));
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not contain duplicate values." });
@@ -151,6 +175,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private static IJsonValue CreateValue(params Guid[]? ids)
         {
             return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
+        }
+
+        private ValidationContext Context()
+        {
+            return ValidationTestExtensions.References(
+                (schemaId, ref1),
+                (schemaId, ref2));
         }
 
         private static RootField<ReferencesFieldProperties> Field(ReferencesFieldProperties properties)

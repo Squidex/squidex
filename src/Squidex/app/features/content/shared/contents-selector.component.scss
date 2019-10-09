@@ -11,6 +11,17 @@
     }
 }
 
+.col-selector {
+    position: relative;
+
+    .form-control {
+        @include absolute(-.4rem, auto, auto, 0);
+        max-width: 300px;
+        min-width: 300px;
+        color: $color-dark-foreground;
+    }
+}
+
 .table-container {
     display: inline-block;
     padding: 0;

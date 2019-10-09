@@ -9,7 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Log.Internal
         private const int MaxQueuedMessages = 1024;
         private readonly IConsole console;
         private readonly BlockingCollection<LogMessageEntry> messageQueue = new BlockingCollection<LogMessageEntry>(MaxQueuedMessages);
-        private readonly Task outputTask;
+        private readonly Thread outputThread;
 
         public ConsoleLogProcessor()
         {
@@ -31,7 +31,12 @@ namespace Squidex.Infrastructure.Log.Internal
                 console = new AnsiLogConsole(false);
             }
 
-            outputTask = Task.Factory.StartNew(ProcessLogQueue!, this, TaskCreationOptions.LongRunning);
+            outputThread = new Thread(ProcessLogQueue)
+            {
+                IsBackground = true, Name = "Logging"
+            };
+
+            outputThread.Start();
         }
 
         public void EnqueueMessage(LogMessageEntry message)
@@ -52,18 +57,25 @@ namespace Squidex.Infrastructure.Log.Internal
             WriteMessage(message);
         }
 
-        private static void ProcessLogQueue(object state)
-        {
-            var processor = (ConsoleLogProcessor)state;
-
-            processor.ProcessLogQueue();
-        }
-
         private void ProcessLogQueue()
         {
-            foreach (var entry in messageQueue.GetConsumingEnumerable())
+            try
             {
-                WriteMessage(entry);
+                foreach (var message in messageQueue.GetConsumingEnumerable())
+                {
+                    WriteMessage(message);
+                }
+            }
+            catch
+            {
+                try
+                {
+                    messageQueue.CompleteAdding();
+                }
+                catch
+                {
+                    return;
+                }
             }
         }
 
@@ -80,7 +92,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
                 try
                 {
-                    outputTask.Wait(1500);
+                    outputThread.Join(1500);
                 }
                 catch (Exception ex)
                 {

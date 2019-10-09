@@ -20,7 +20,7 @@ import {
 interface State {
     selectedName?: string;
 
-    alternativeNames: string[];
+    alternativeNames: ReadonlyArray<string>;
 }
 
 @Component({
@@ -77,9 +77,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
             const keys = Object.keys(this.schema.previewUrls);
 
             state.selectedName = selectedName;
-
-            state.alternativeNames = keys.filter(x => x !== s.selectedName);
-            state.alternativeNames.sort();
+            state.alternativeNames = keys.removed(s.selectedName).sorted();
 
             this.localStore.set(this.configKey(), selectedName);
 

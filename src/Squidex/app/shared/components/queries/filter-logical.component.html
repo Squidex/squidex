@@ -25,7 +25,7 @@
         <div class="filter mt-3" *ngFor="let filter of filters">
             <span class="filter-line-h"></span>
     
-            <sqx-filter-node [filter]="filter" [model]="model" [level]="level + 1"
+            <sqx-filter-node [filter]="filter" [language]="language" [level]="nestedLevel" [model]="model"
                 (remove)="removeFilter(filter)" (change)="emitChange()">
             </sqx-filter-node>
         </div>

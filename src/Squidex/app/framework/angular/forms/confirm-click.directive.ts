@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
 
 import { DialogService } from '@app/framework/internal';
@@ -14,7 +16,7 @@ class DelayEventEmitter<T> extends EventEmitter<T> {
 
     public delayEmit() {
         if (this.delayedNexts) {
-            for (let callback of this.delayedNexts) {
+            for (const callback of this.delayedNexts) {
                 callback();
             }
         }
@@ -71,7 +73,7 @@ export class ConfirmClickDirective implements OnDestroy {
 
             this.isOpen = true;
 
-            let subscription =
+            const subscription =
                 this.dialogs.confirm(this.confirmTitle, this.confirmText)
                     .subscribe(result => {
                         this.isOpen = false;

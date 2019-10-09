@@ -30,7 +30,7 @@ import { SavedQuery } from '../state/queries';
                 </ng-container>
 
                 <ng-template #noQuery>
-                    <div class="sidebar-item text-muted">
+                    <div class="sidebar-item inactive text-muted">
                         Search for {{types}} and use <i class="icon-star-empty"></i> icon in search form to save query for all contributors.
                     </div>
                 </ng-template>
@@ -56,7 +56,7 @@ import { SavedQuery } from '../state/queries';
                 </ng-container>
 
                 <ng-template #noQuery>
-                    <div class="sidebar-item text-muted">
+                    <div class="sidebar-item inactive text-muted">
                         Search for {{types}} and use <i class="icon-star-empty"></i> icon in search form to save query for yourself.
                     </div>
                 </ng-template>

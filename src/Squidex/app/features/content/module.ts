@@ -29,6 +29,7 @@ import {
     ContentFieldComponent,
     ContentHistoryPageComponent,
     ContentPageComponent,
+    ContentSelectorItemComponent,
     ContentsFiltersPageComponent,
     ContentsPageComponent,
     ContentsSelectorComponent,
@@ -39,6 +40,7 @@ import {
     FieldEditorComponent,
     FieldLanguagesComponent,
     PreviewButtonComponent,
+    ReferenceItemComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
@@ -110,10 +112,11 @@ const routes: Routes = [
         ArrayItemComponent,
         AssetsEditorComponent,
         CommentsPageComponent,
+        ContentComponent,
         ContentFieldComponent,
         ContentHistoryPageComponent,
-        ContentComponent,
         ContentPageComponent,
+        ContentSelectorItemComponent,
         ContentsFiltersPageComponent,
         ContentsPageComponent,
         ContentsSelectorComponent,
@@ -124,6 +127,7 @@ const routes: Routes = [
         FieldEditorComponent,
         FieldLanguagesComponent,
         PreviewButtonComponent,
+        ReferenceItemComponent,
         ReferencesEditorComponent,
         SchemasPageComponent
     ]

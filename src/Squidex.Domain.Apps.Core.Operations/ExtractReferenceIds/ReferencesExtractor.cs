@@ -62,9 +62,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             var ids = value.ToGuidSet();
 
-            if (strategy == Ids.All && field.Properties.SchemaId != Guid.Empty)
+            if (strategy == Ids.All && field.Properties.SchemaIds != null)
             {
-                ids.Add(field.Properties.SchemaId);
+                foreach (var schemaId in field.Properties.SchemaIds)
+                {
+                    ids.Add(schemaId);
+                }
             }
 
             return ids;

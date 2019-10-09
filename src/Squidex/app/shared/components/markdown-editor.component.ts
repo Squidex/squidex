@@ -203,10 +203,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         });
     }
 
-    public insertAssets(assets: AssetDto[]) {
+    public insertAssets(assets: ReadonlyArray<AssetDto>) {
         let content = '';
 
-        for (let asset of assets) {
+        for (const asset of assets) {
             content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
         }
 
@@ -217,10 +217,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetsDialog.hide();
     }
 
-    public insertFiles(files: File[]) {
+    public insertFiles(files: ReadonlyArray<File>) {
         const doc = this.simplemde.codemirror.getDoc();
 
-        for (let file of files) {
+        for (const file of files) {
             this.uploadFile(doc, file);
         }
     }

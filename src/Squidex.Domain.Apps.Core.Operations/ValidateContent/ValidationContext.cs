@@ -14,7 +14,9 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public delegate Task<IReadOnlyList<Guid>> CheckContents(Guid schemaId, FilterNode<ClrValue> filter);
+    public delegate Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> CheckContents(Guid schemaId, FilterNode<ClrValue> filter);
+
+    public delegate Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> CheckContentsByIds(HashSet<Guid> ids);
 
     public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<Guid> ids);
 
@@ -23,6 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly Guid contentId;
         private readonly Guid schemaId;
         private readonly CheckContents checkContent;
+        private readonly CheckContentsByIds checkContentByIds;
         private readonly CheckAssets checkAsset;
         private readonly ImmutableQueue<string> propertyPath;
 
@@ -47,8 +50,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             Guid contentId,
             Guid schemaId,
             CheckContents checkContent,
+            CheckContentsByIds checkContentsByIds,
             CheckAssets checkAsset)
-            : this(contentId, schemaId, checkContent, checkAsset, ImmutableQueue<string>.Empty, false)
+            : this(contentId, schemaId, checkContent, checkContentsByIds, checkAsset, ImmutableQueue<string>.Empty, false)
         {
         }
 
@@ -56,16 +60,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             Guid contentId,
             Guid schemaId,
             CheckContents checkContent,
+            CheckContentsByIds checkContentByIds,
             CheckAssets checkAsset,
             ImmutableQueue<string> propertyPath,
             bool isOptional)
         {
             Guard.NotNull(checkAsset);
             Guard.NotNull(checkContent);
+            Guard.NotNull(checkContentByIds);
 
             this.propertyPath = propertyPath;
 
             this.checkContent = checkContent;
+            this.checkContentByIds = checkContentByIds;
             this.checkAsset = checkAsset;
             this.contentId = contentId;
 
@@ -76,17 +83,40 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ValidationContext Optional(bool isOptional)
         {
-            return isOptional == IsOptional ? this : new ValidationContext(contentId, schemaId, checkContent, checkAsset, propertyPath, isOptional);
+            return isOptional == IsOptional ? this : OptionalCore(isOptional);
+        }
+
+        private ValidationContext OptionalCore(bool isOptional)
+        {
+            return new ValidationContext(
+                contentId,
+                schemaId,
+                checkContent,
+                checkContentByIds,
+                checkAsset,
+                propertyPath,
+                isOptional);
         }
 
         public ValidationContext Nested(string property)
         {
-            return new ValidationContext(contentId, schemaId, checkContent, checkAsset, propertyPath.Enqueue(property), IsOptional);
+            return new ValidationContext(
+                contentId, schemaId,
+                checkContent,
+                checkContentByIds,
+                checkAsset,
+                propertyPath.Enqueue(property),
+                IsOptional);
         }
 
-        public Task<IReadOnlyList<Guid>> GetContentIdsAsync(Guid validatedSchemaId, FilterNode<ClrValue> filter)
+        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> GetContentIdsAsync(HashSet<Guid> ids)
         {
-            return checkContent(validatedSchemaId, filter);
+            return checkContentByIds(ids);
+        }
+
+        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> GetContentIdsAsync(Guid schemaId, FilterNode<ClrValue> filter)
+        {
+            return checkContent(schemaId, filter);
         }
 
         public Task<IReadOnlyList<IAssetInfo>> GetAssetInfosAsync(IEnumerable<Guid> assetId)

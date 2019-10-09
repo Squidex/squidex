@@ -43,7 +43,7 @@ describe('AppsService', () => {
     it('should make get request to get apps',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
-        let apps: AppDto[];
+        let apps: ReadonlyArray<AppDto>;
 
         appsService.getApps().subscribe(result => {
             apps = result;

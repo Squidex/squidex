@@ -50,7 +50,7 @@ describe('UsersState', () => {
 
             usersState.load().subscribe();
 
-            expect(usersState.snapshot.users.values).toEqual([user1, user2]);
+            expect(usersState.snapshot.users).toEqual([user1, user2]);
             expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
             expect(usersState.snapshot.isLoaded).toBeTruthy();
 
@@ -178,7 +178,7 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.lock(user2).subscribe();
 
-            const user2New = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users[1];
 
             expect(user2New).toBe(usersState.snapshot.selectedUser!);
         });
@@ -192,7 +192,7 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.unlock(user2).subscribe();
 
-            const user2New = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users[1];
 
             expect(user2New).toEqual(updated);
             expect(user2New).toBe(usersState.snapshot.selectedUser!);
@@ -209,7 +209,7 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.update(user2, request).subscribe();
 
-            const user2New = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users[1];
 
             expect(user2New).toEqual(updated);
             expect(user2New).toBe(usersState.snapshot.selectedUser!);
@@ -223,7 +223,7 @@ describe('UsersState', () => {
 
             usersState.create(request).subscribe();
 
-            expect(usersState.snapshot.users.values).toEqual([newUser, user1, user2]);
+            expect(usersState.snapshot.users).toEqual([newUser, user1, user2]);
             expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
         });
     });

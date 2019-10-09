@@ -52,7 +52,7 @@ describe('ClientsState', () => {
 
             clientsState.load().subscribe();
 
-            expect(clientsState.snapshot.clients.values).toEqual(oldClients.items);
+            expect(clientsState.snapshot.clients).toEqual(oldClients.items);
             expect(clientsState.snapshot.version).toEqual(version);
             expect(clientsState.isLoaded).toBeTruthy();
 
@@ -130,7 +130,7 @@ describe('ClientsState', () => {
         });
 
         function expectNewClients(updated: ClientsPayload) {
-            expect(clientsState.snapshot.clients.values).toEqual(updated.items);
+            expect(clientsState.snapshot.clients).toEqual(updated.items);
             expect(clientsState.snapshot.version).toEqual(newVersion);
 
         }

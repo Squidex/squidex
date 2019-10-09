@@ -62,9 +62,9 @@ export function switchSafe<T, R>(project: (source: T) => Observable<R>) {
     };
 }
 
-export function ofForever<T>(...values: T[]) {
+export function ofForever<T>(...values: ReadonlyArray<T>) {
     return new Observable<T>(s => {
-        for (let value of values) {
+        for (const value of values) {
             s.next(value);
         }
     });

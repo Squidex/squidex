@@ -10,9 +10,8 @@ import { combineLatest, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import {
-    compareStringsAsc,
+    compareStrings,
     DialogService,
-    ImmutableArray,
     Pager,
     shareSubscribed,
     State
@@ -31,7 +30,7 @@ interface Snapshot {
     tagsSelected: { [name: string]: boolean };
 
     // The current assets.
-    assets: ImmutableArray<AssetDto>;
+    assets: ReadonlyArray<AssetDto>;
 
     // The pagination information.
     assetsPager: Pager;
@@ -86,7 +85,7 @@ export class AssetsState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), assetsQueryJson: '', tags: {}, tagsSelected: {} });
+        super({ assets: [], assetsPager: new Pager(0, 0, 30), assetsQueryJson: '', tags: {}, tagsSelected: {} });
     }
 
     public load(isReload = false): Observable<any> {
@@ -106,13 +105,12 @@ export class AssetsState extends State<Snapshot> {
                 Object.keys(this.snapshot.tagsSelected)),
             this.assetsService.getTags(this.appName)
         ).pipe(
-            tap(([ { items, total, canCreate }, tags ]) => {
+            tap(([ { items: assets, total, canCreate }, tags ]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
                 this.next(s => {
-                    const assets = ImmutableArray.of(items);
                     const assetsPager = s.assetsPager.setCount(total);
 
                     return { ...s, assets, assetsPager, isLoaded: true, tags, canCreate };
@@ -123,7 +121,7 @@ export class AssetsState extends State<Snapshot> {
 
     public add(asset: AssetDto) {
         this.next(s => {
-            const assets = s.assets.pushFront(asset);
+            const assets = [asset, ...s.assets];
             const assetsPager = s.assetsPager.incrementCount();
 
             const tags = { ...s.tags };
@@ -189,11 +187,11 @@ export class AssetsState extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public selectTags(tags: string[]): Observable<any> {
+    public selectTags(tags: ReadonlyArray<string>): Observable<any> {
         this.next(s => {
             const tagsSelected = {};
 
-            for (let tag of tags) {
+            for (const tag of tags) {
                 tagsSelected[tag] = true;
             }
 
@@ -245,7 +243,7 @@ export class AssetsState extends State<Snapshot> {
 }
 
 function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
-    for (let tag of asset.tags) {
+    for (const tag of asset.tags) {
         if (tags[tag]) {
             tags[tag]++;
         } else {
@@ -255,7 +253,7 @@ function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
 }
 
 function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSelected: { [x: string]: boolean; }) {
-    for (let tag of previous.tags) {
+    for (const tag of previous.tags) {
         if (tags[tag] === 1) {
             delete tags[tag];
             delete tagsSelected[tag];
@@ -266,7 +264,7 @@ function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSele
 }
 
 function sort(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort(compareStringsAsc).map(name => ({ name, count: tags[name] }));
+    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

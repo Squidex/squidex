@@ -13,7 +13,6 @@ import {
     fadeAnimation,
     FieldDto,
     hasNoValue$,
-    ImmutableArray,
     ModalModel,
     PatternDto,
     ResourceOwner,
@@ -41,7 +40,7 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
     public properties: StringFieldPropertiesDto;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: boolean;

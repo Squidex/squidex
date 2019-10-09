@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            if (oldReferences?.Contains(field.Properties.SchemaId) == true)
+            if (oldReferences?.Contains(field.Properties.SingleId()) == true)
             {
                 return JsonValue.Array();
             }

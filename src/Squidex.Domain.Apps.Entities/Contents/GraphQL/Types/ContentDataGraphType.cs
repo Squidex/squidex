@@ -18,11 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
     {
-        public void Initialize(IGraphModel model, ISchemaEntity schema)
+        public ContentDataGraphType(ISchemaEntity schema, string schemaName, string schemaType, IGraphModel model)
         {
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
-
             Name = $"{schemaType}DataDto";
 
             foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())

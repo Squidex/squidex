@@ -114,6 +114,38 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
+    it('should make get request to get contents by ids',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        let contents: ContentsDto;
+
+        contentsService.getContentsByIds('my-app', ['1', '2', '3']).subscribe(result => {
+            contents = result;
+        });
+
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app/?ids=1,2,3`);
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            total: 10,
+            items: [
+                contentResponse(12),
+                contentResponse(13)
+            ],
+            statuses: [{
+                status: 'Draft', color: 'Gray'
+            }]
+        });
+
+        expect(contents!).toEqual(
+            new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
+                createContent(12),
+                createContent(13)
+            ]));
+    }));
+
     it('should make get request to get content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
@@ -367,7 +399,10 @@ describe('ContentsService', () => {
             isPending: true,
             data: {},
             dataDraft: {},
+            schemaName: 'my-schema',
+            schemaDisplayName: 'MySchema',
             referenceData: {},
+            referenceFields: [],
             version: `${id}`,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` }
@@ -391,6 +426,9 @@ export function createContent(id: number, suffix = '') {
         true,
         {},
         {},
+        'my-schema',
+        'MySchema',
         {},
+        [],
         new Version(`${id}`));
 }

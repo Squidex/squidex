@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
-        private static readonly List<Guid> EmptyIds = new List<Guid>();
+        private static readonly List<(Guid SchemaId, Guid Id)> EmptyIds = new List<(Guid SchemaId, Guid Id)>();
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
         private readonly ITextIndexer indexer;
@@ -125,7 +125,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contents.QueryIdsAsync(ids);
+            }
+        }
+
+        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {

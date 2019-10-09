@@ -12,7 +12,6 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
-    ImmutableArray,
     LanguagesState
 } from '@app/shared';
 
@@ -29,10 +28,10 @@ export class LanguageComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public fallbackLanguages: ImmutableArray<AppLanguageDto>;
+    public fallbackLanguages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public fallbackLanguagesNew: ImmutableArray<AppLanguageDto>;
+    public fallbackLanguagesNew: ReadonlyArray<AppLanguageDto>;
 
     public otherLanguage: AppLanguageDto;
 
@@ -53,7 +52,7 @@ export class LanguageComponent implements OnChanges {
         this.editForm.load(this.language);
         this.editForm.setEnabled(this.isEditable);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public toggleEditing() {
@@ -72,7 +71,7 @@ export class LanguageComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code).values };
+            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {
@@ -86,17 +85,17 @@ export class LanguageComponent implements OnChanges {
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {
-        this.fallbackLanguages = this.fallbackLanguages.remove(language);
-        this.fallbackLanguagesNew = this.fallbackLanguagesNew.push(language).sortByStringAsc(x => x.iso2Code);
+        this.fallbackLanguages = this.fallbackLanguages.removed(language);
+        this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortedByString(x => x.iso2Code);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public addFallbackLanguage() {
-        this.fallbackLanguages = this.fallbackLanguages.push(this.otherLanguage);
-        this.fallbackLanguagesNew = this.fallbackLanguagesNew.remove(this.otherLanguage);
+        this.fallbackLanguages = [...this.fallbackLanguages, this.otherLanguage].sortedByString(x => x.iso2Code);
+        this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public trackByLanguage(index: number, language: AppLanguageDto) {

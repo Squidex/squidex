@@ -25,7 +25,7 @@ import {
 
 export type RolesDto = Versioned<RolesPayload>;
 export type RolesPayload = {
-    readonly items: RoleDto[];
+    readonly items: ReadonlyArray<RoleDto>;
 
     readonly canCreate: boolean;
 } & Resource;
@@ -41,7 +41,7 @@ export class RoleDto {
         public readonly name: string,
         public readonly numClients: number,
         public readonly numContributors: number,
-        public readonly permissions: string[],
+        public readonly permissions: ReadonlyArray<string>,
         public readonly isDefaultRole: boolean
     ) {
         this._links = links;
@@ -56,7 +56,7 @@ export interface CreateRoleDto {
 }
 
 export interface UpdateRoleDto {
-    readonly permissions: string[];
+    readonly permissions: ReadonlyArray<string>;
 }
 
 @Injectable()
@@ -121,7 +121,7 @@ export class RolesService {
             pretifyError('Failed to revoke role. Please reload.'));
     }
 
-    public getPermissions(appName: string): Observable<string[]> {
+    public getPermissions(appName: string): Observable<ReadonlyArray<string>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles/permissions`);
 
         return this.http.get<string[]>(url).pipe(

@@ -1,5 +1,27 @@
 # Changelog
 
+## 3.4.0-beta1 - 2019-10-08
+
+### Features
+
+* **Grain**: Fixed grain indices.
+* **Content**: Multiple schemas allowed for references.
+* **UI**: Inline stars editor.
+* **UI**: Get rid of immutable arrays.
+* **UI**: Hide date buttons based on settings.
+* **UI**: Updated several packages.
+* **UI**: Improvement to contributor page.
+* **Migration**: Better cancellation support for migration.
+* **Rules**: Custom payload for webhook and Algolia.
+
+### Bugfixes
+
+* **UI**: Fix references dropdown in query UI for localized values.
+* **UI**: Fixed the unique checkbox in schema editor.
+* **UI**: Fixed default date handling.
+* **App**: Fix plan settings.
+* **Logging**: Use explicit thread for logging to console.
+
 ## 3.3.0 - 2019-09-08
 
 ### Features

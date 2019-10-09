@@ -15,12 +15,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
-        public void Initialize(IGraphModel model, ISchemaEntity schema, IComplexGraphType contentDataType)
-        {
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
+        private readonly ISchemaEntity schema;
+        private readonly string schemaType;
+        private readonly string schemaName;
 
-            Name = $"{schemaType}Dto";
+        public ContentGraphType(ISchemaEntity schema)
+        {
+            this.schema = schema;
+
+            schemaType = schema.TypeName();
+            schemaName = schema.DisplayName();
+
+            Name = $"{schemaType}";
 
             AddField(new FieldType
             {
@@ -86,6 +92,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = $"The color status of the {schemaName} content."
             });
 
+            Interface<ContentInterfaceGraphType>();
+
+            Description = $"The structure of a {schemaName} content type.";
+
+            IsTypeOf = CheckType;
+        }
+
+        private bool CheckType(object value)
+        {
+           return value is IContentEntity content && content.SchemaId?.Id == schema.Id;
+        }
+
+        public void Initialize(IGraphModel model)
+        {
             AddField(new FieldType
             {
                 Name = "url",
@@ -93,6 +113,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Resolver = model.ResolveContentUrl(schema),
                 Description = $"The url to the the {schemaName} content."
             });
+
+            var contentDataType = new ContentDataGraphType(schema, schemaName, schemaType, model);
 
             if (contentDataType.Fields.Any())
             {
@@ -112,8 +134,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Description = $"The draft data of the {schemaName} content."
                 });
             }
-
-            Description = $"The structure of a {schemaName} content type.";
         }
 
         private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object?> action)

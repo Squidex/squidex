@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -14,6 +15,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         bool CanUpdate { get; }
 
         string StatusColor { get; }
+
+        string SchemaName { get; }
+
+        string SchemaDisplayName { get; }
+
+        RootField[]? ReferenceFields { get; }
 
         StatusInfo[]? Nexts { get; }
 

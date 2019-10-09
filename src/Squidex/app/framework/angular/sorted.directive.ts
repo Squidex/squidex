@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+// tslint:disable: readonly-array
 
-import * as Sortable from 'sortablejs';
+import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import Sortable from 'sortablejs';
 
 const DEFAULT_PROPS = { sort: true, animation: 150 };
 

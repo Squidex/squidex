@@ -8,11 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
-import {
-    ImmutableArray,
-    SchemaDto,
-    Types
-} from '@app/shared';
+import { SchemaDto, Types } from '@app/shared';
 
 export interface TriggerSchemaForm {
     schema: SchemaDto;
@@ -27,7 +23,7 @@ export interface TriggerSchemaForm {
 })
 export class ContentChangedTriggerComponent implements OnInit {
     @Input()
-    public schemas: ImmutableArray<SchemaDto>;
+    public schemas: ReadonlyArray<SchemaDto>;
 
     @Input()
     public trigger: any;
@@ -38,10 +34,10 @@ export class ContentChangedTriggerComponent implements OnInit {
     @Input()
     public triggerFormSubmitted = false;
 
-    public triggerSchemas: ImmutableArray<TriggerSchemaForm>;
+    public triggerSchemas: ReadonlyArray<TriggerSchemaForm>;
 
     public schemaToAdd: SchemaDto;
-    public schemasToAdd: ImmutableArray<SchemaDto>;
+    public schemasToAdd: ReadonlyArray<SchemaDto>;
 
     public get hasSchema() {
         return !!this.schemaToAdd;
@@ -57,7 +53,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         const schemas: TriggerSchemaForm[] = [];
 
         if (this.trigger.schemas) {
-            for (let triggerSchema of this.trigger.schemas) {
+            for (const triggerSchema of this.trigger.schemas) {
                 const schema = this.schemas.find(s => s.id === triggerSchema.schemaId);
 
                 if (schema) {
@@ -68,20 +64,20 @@ export class ContentChangedTriggerComponent implements OnInit {
             }
         }
 
-        this.triggerSchemas = ImmutableArray.of(schemas).sortByStringAsc(s => s.schema.name);
+        this.triggerSchemas = schemas.sortedByString(s => s.schema.name);
 
         this.updateSchemaToAdd();
     }
 
     public removeSchema(schemaForm: TriggerSchemaForm) {
-        this.triggerSchemas = this.triggerSchemas.remove(schemaForm);
+        this.triggerSchemas = this.triggerSchemas.removed(schemaForm);
 
         this.updateValue();
         this.updateSchemaToAdd();
     }
 
     public addSchema() {
-        this.triggerSchemas = this.triggerSchemas.push({ schema: this.schemaToAdd }).sortByStringAsc(x => x.schema.name);
+        this.triggerSchemas = [{ schema: this.schemaToAdd }, ...this.triggerSchemas].sortedByString(x => x.schema.name);
 
         this.updateValue();
         this.updateSchemaToAdd();
@@ -94,14 +90,14 @@ export class ContentChangedTriggerComponent implements OnInit {
     }
 
     public updateValue() {
-        const schemas = this.triggerSchemas.values.map(s => ({ schemaId: s.schema.id, condition: s.condition }));
+        const schemas = this.triggerSchemas.map(s => ({ schemaId: s.schema.id, condition: s.condition }));
 
         this.triggerForm.controls['schemas'].setValue(schemas);
     }
 
     private updateSchemaToAdd() {
-        this.schemasToAdd = this.schemas.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortByStringAsc(x => x.name);
-        this.schemaToAdd = this.schemasToAdd.at(0);
+        this.schemasToAdd = this.schemas.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortedByString(x => x.name);
+        this.schemaToAdd = this.schemasToAdd[0];
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

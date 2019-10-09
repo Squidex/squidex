@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The current plan id.
         /// </summary>
-        public string CurrentPlanId { get; set; }
+        public string? CurrentPlanId { get; set; }
 
         /// <summary>
         /// The plan owner.
@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
 
         public static AppPlansDto FromApp(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
         {
-            var planId = plans.GetPlanForApp(app).Id;
+            var planId = app.Plan?.PlanId;
 
             var response = new AppPlansDto
             {

@@ -29,7 +29,7 @@ export class WorkflowTransitionComponent {
     public transition: WorkflowTransitionView;
 
     @Input()
-    public roles: RoleDto[];
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public disabled: boolean;

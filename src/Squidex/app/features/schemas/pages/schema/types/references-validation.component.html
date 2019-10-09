@@ -1,11 +1,11 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">Schema</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">Schemas</label>
 
         <div class="col-6">
-            <select class="form-control" id="{{field.fieldId}}_fieldSchemaId" formControlName="schemaId">
-                <option *ngFor="let schema of schemasState.schemas | async" [ngValue]="schema.id">{{schema.displayName}}</option>
-            </select>
+            <sqx-tag-editor placeholder=", to add schema" formControlName="schemaIds"
+                [converter]="schemasSource" [suggestedValues]="schemasSource.suggestions">
+            </sqx-tag-editor>
         </div>
     </div>
 

@@ -26,17 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schema in schemas)
             {
+                var schemaId = schema.Id;
+                var schemaType = schema.TypeName();
+                var schemaName = schema.DisplayName();
+
                 var contentType = model.GetContentType(schema.Id);
 
-                if (contentType != null)
-                {
-                    var schemaId = schema.Id;
-                    var schemaType = schema.TypeName();
-                    var schemaName = schema.DisplayName();
-
-                    AddContentFind(schemaId, schemaType, schemaName, contentType);
-                    AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
-                }
+                AddContentFind(schemaType, schemaName, contentType);
+                AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
             }
 
             Description = "The app queries.";
@@ -59,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentFind(Guid schemaId, string schemaType, string schemaName, IGraphType contentType)
+        private void AddContentFind(string schemaType, string schemaName, IGraphType contentType)
         {
             AddField(new FieldType
             {
@@ -70,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    return e.FindContentAsync(schemaId, contentId);
+                    return e.FindContentAsync(contentId);
                 }),
                 Description = $"Find an {schemaName} content by id."
             });

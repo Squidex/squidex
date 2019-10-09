@@ -51,7 +51,7 @@ describe('BackupsState', () => {
 
             backupsState.load().subscribe();
 
-            expect(backupsState.snapshot.backups.values).toEqual([backup1, backup2]);
+            expect(backupsState.snapshot.backups).toEqual([backup1, backup2]);
             expect(backupsState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());

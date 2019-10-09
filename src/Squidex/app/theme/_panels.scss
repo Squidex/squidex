@@ -344,6 +344,10 @@
             background: $color-background;
         }
 
+        &.inactive {
+            background: none;
+        }
+
         &:hover {
             .sidebar-item-remove {
                 visibility: visible;

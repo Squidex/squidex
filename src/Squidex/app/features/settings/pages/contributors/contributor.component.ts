@@ -12,7 +12,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import {
     ContributorDto,
     ContributorsState,
-    ImmutableArray,
     RoleDto
 } from '@app/shared';
 
@@ -45,7 +44,7 @@ import {
 })
 export class ContributorComponent {
     @Input()
-    public roles: ImmutableArray<RoleDto>;
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public search: string;

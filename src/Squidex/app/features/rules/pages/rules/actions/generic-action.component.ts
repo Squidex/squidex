@@ -29,7 +29,7 @@ export class GenericActionComponent implements OnInit {
     public actionFormSubmitted = false;
 
     public ngOnInit() {
-        for (let property of this.definition.properties) {
+        for (const property of this.definition.properties) {
             const validators = [];
 
             if (property.isRequired) {

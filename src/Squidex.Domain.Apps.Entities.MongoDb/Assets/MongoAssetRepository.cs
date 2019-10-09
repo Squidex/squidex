@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public Task RemoveAsync(Guid appId)
+        public Task RemoveAsync(Guid key)
         {
-            return Collection.DeleteManyAsync(x => x.IndexedAppId == appId);
+            return Collection.DeleteOneAsync(x => x.Id == key);
         }
     }
 }

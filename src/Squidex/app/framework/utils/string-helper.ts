@@ -6,7 +6,7 @@
  */
 
 export module StringHelper {
-    export function firstNonEmpty(...values: (string | undefined | null)[]) {
+    export function firstNonEmpty(...values: ReadonlyArray<(string | undefined | null)>) {
         for (let value of values) {
             if (value) {
                 value = value.trim();

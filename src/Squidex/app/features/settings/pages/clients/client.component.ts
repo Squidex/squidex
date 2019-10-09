@@ -34,7 +34,7 @@ export class ClientComponent implements OnChanges {
     public client: ClientDto;
 
     @Input()
-    public clientRoles: RoleDto[];
+    public clientRoles: ReadonlyArray<RoleDto>;
 
     public connectToken: AccessTokenDto;
     public connectDialog = new DialogModel();

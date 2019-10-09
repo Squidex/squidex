@@ -8,11 +8,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import {
-    FieldDto,
-    ImmutableArray,
-    PatternDto
-} from '@app/shared';
+import { FieldDto, PatternDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form',
@@ -63,7 +59,7 @@ export class FieldFormComponent implements AfterViewInit {
     public editFormSubmitted: boolean;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 
     @Input()
     public field: FieldDto;

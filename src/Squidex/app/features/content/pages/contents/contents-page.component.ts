@@ -12,7 +12,6 @@ import {
     AppLanguageDto,
     ContentDto,
     ContentsState,
-    ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
@@ -42,10 +41,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectionCount = 0;
     public selectionCanDelete = false;
 
-    public nextStatuses: string[] = [];
+    public nextStatuses: ReadonlyArray<string> = [];
 
     public language: AppLanguageDto;
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languageMaster: AppLanguageDto;
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public queryModel: QueryModel;
     public queries: Queries;
@@ -96,7 +96,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
-                    this.language = this.languages.at(0);
+                    this.language = this.languages[0];
+                    this.languageMaster = this.languages.find(x => x.isMaster)!;
 
                     this.updateModel();
                 }));
@@ -126,7 +127,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.create(content.dataDraft, false);
     }
 
-    private changeContentItems(contents: ContentDto[], action: string) {
+    private changeContentItems(contents: ReadonlyArray<ContentDto>, action: string) {
         if (contents.length === 0) {
             return;
         }
@@ -161,7 +162,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
-        return this.contentsState.snapshot.contents.values.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
@@ -180,7 +181,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents.values) {
+            for (let content of this.contentsState.snapshot.contents) {
                 this.selectedItems[content.id] = true;
             }
         }
@@ -188,7 +189,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 
@@ -199,17 +200,17 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
         const allActions = {};
 
-        for (let content of this.contentsState.snapshot.contents.values) {
-            for (let info of content.statusUpdates) {
+        for (let content of this.contentsState.snapshot.contents) {
+            for (const info of content.statusUpdates) {
                 allActions[info.status] = info.color;
             }
         }
 
-        for (let content of this.contentsState.snapshot.contents.values) {
+        for (let content of this.contentsState.snapshot.contents) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                for (let action in allActions) {
+                for (const action in allActions) {
                     if (!content.statusUpdates) {
                         delete allActions[action];
                     }
@@ -234,7 +235,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateModel() {
         if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages.values, this.contentsState.snapshot.statuses);
+            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
         }
     }
 }

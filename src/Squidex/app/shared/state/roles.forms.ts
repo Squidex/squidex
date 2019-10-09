@@ -13,7 +13,7 @@ import {
     hasValue$
 } from '@app/framework';
 
-export class EditPermissionsForm extends Form<FormArray, string[]> {
+export class EditPermissionsForm extends Form<FormArray, ReadonlyArray<string>> {
     constructor() {
         super(new FormArray([]));
     }
@@ -26,7 +26,7 @@ export class EditPermissionsForm extends Form<FormArray, string[]> {
         this.form.removeAt(index);
     }
 
-    public load(permissions: string[]) {
+    public load(permissions: ReadonlyArray<string>) {
         while (this.form.controls.length < permissions.length) {
             this.add();
         }

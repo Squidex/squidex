@@ -196,9 +196,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.MaxValue));
             }
 
-            if (properties.InlineEditable && properties.Editor != NumberFieldEditor.Input && properties.Editor != NumberFieldEditor.Dropdown)
+            if (properties.InlineEditable && properties.Editor == NumberFieldEditor.Radio)
             {
-                yield return new ValidationError("Inline editing is only allowed for dropdowns and input fields.",
+                yield return new ValidationError("Inline editing is not allowed for Radio editor.",
                     nameof(properties.InlineEditable),
                     nameof(properties.Editor));
             }

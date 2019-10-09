@@ -13,7 +13,6 @@ $color-gold: #ffd700;
         border: 0;
         height: 2.4rem;
         line-height: 2.4rem;
-        vertical-align: middle;
     }
 
     &.disabled {
@@ -30,6 +29,7 @@ $color-gold: #ffd700;
         background: transparent;
         border: 0;
         line-height: 1px;
+        vertical-align: middle;
     }
 
     &::before {

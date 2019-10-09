@@ -138,7 +138,7 @@ describe('ContributorsService', () => {
     }
 });
 
-export function createContributors(...ids: number[]): ContributorsPayload {
+export function createContributors(...ids: ReadonlyArray<number>): ContributorsPayload {
     return {
         items: ids.map(id => createContributor(id)),
         maxContributors: ids.length * 13,

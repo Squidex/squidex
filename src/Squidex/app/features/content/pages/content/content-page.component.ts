@@ -25,7 +25,6 @@ import {
     EditContentForm,
     fadeAnimation,
     FieldDto,
-    ImmutableArray,
     LanguagesState,
     MessageBus,
     ModalModel,
@@ -61,7 +60,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public dropdown = new ModalModel();
 
     public language: AppLanguageDto;
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public trackByFieldFn: Function;
 
@@ -92,7 +91,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
-                    this.language = this.languages.at(0);
+                    this.language = this.languages[0];
                 }));
 
         this.own(

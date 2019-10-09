@@ -210,7 +210,7 @@ export class UIState extends State<Snapshot> {
 
         let current = setting;
 
-        for (let segment of segments) {
+        for (const segment of segments) {
             let temp = current[segment];
 
             if (temp) {

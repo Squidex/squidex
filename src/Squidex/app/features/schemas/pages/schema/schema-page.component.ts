@@ -79,7 +79,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.schemasState.unpublish(this.schema).subscribe();
     }
 
-    public sortFields(fields: FieldDto[]) {
+    public sortFields(fields: ReadonlyArray<FieldDto>) {
         this.schemasState.orderFields(this.schema, fields).subscribe();
     }
 

@@ -16,20 +16,23 @@ import { FieldDto } from '@app/shared';
         <div [formGroup]="form">
             <ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Number'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Input'">
                             <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                         </ng-container>
+						<ng-container *ngSwitchCase="'Stars'">
+							<sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
+						</ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
                             <select class="form-control" [formControlName]="field.name">
                                 <option [ngValue]="null"></option>
-                                <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                                <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                             </select>
                         </ng-container>
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'String'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Input'">
                             <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                         </ng-container>
@@ -39,13 +42,13 @@ import { FieldDto } from '@app/shared';
                         <ng-container *ngSwitchCase="'Dropdown'">
                             <select class="form-control" [formControlName]="field.name">
                                 <option [ngValue]="null"></option>
-                                <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                                <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                             </select>
                         </ng-container>
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Toggle'">
                             <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
                         </ng-container>

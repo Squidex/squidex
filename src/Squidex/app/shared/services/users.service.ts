@@ -40,7 +40,7 @@ export class UsersService {
     ) {
     }
 
-    public getUsers(query?: string): Observable<UserDto[]> {
+    public getUsers(query?: string): Observable<ReadonlyArray<UserDto>> {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.http.get<any[]>(url).pipe(

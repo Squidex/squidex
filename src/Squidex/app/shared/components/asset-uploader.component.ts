@@ -35,8 +35,8 @@ export class AssetUploaderComponent {
     ) {
     }
 
-    public addFiles(files: File[]) {
-        for (let file of files) {
+    public addFiles(files: ReadonlyArray<File>) {
+        for (const file of files) {
             this.assetUploader.uploadFile(file, this.assetsState);
         }
 

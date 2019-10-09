@@ -19,7 +19,7 @@ export class NewsDialogComponent {
     public close = new EventEmitter();
 
     @Input()
-    public features: FeatureDto[];
+    public features: ReadonlyArray<FeatureDto>;
 
     public emitClose() {
         this.close.emit();

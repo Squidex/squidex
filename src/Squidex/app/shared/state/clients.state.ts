@@ -13,7 +13,6 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -43,7 +42,7 @@ interface Snapshot {
     canCreate?: boolean;
 }
 
-type ClientsList = ImmutableArray<ClientDto>;
+type ClientsList = ReadonlyArray<ClientDto>;
 
 @Injectable()
 export class ClientsState extends State<Snapshot> {
@@ -61,7 +60,7 @@ export class ClientsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ clients: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ clients: [], version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -105,9 +104,7 @@ export class ClientsState extends State<Snapshot> {
     }
 
     private replaceClients(payload: ClientsPayload, version: Version) {
-        const { canCreate, items } = payload;
-
-        const clients = ImmutableArray.of(items);
+        const { canCreate, items: clients } = payload;
 
         this.next(s => {
             return {

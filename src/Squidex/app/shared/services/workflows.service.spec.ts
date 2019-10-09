@@ -189,7 +189,7 @@ describe('WorkflowsService', () => {
     }
 });
 
-export function createWorkflows(...names: string[]): WorkflowsPayload {
+export function createWorkflows(...names: ReadonlyArray<string>): WorkflowsPayload {
     return {
         errors: [
             'Error1',

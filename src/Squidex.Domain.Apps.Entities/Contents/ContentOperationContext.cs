@@ -124,7 +124,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private ValidationContext CreateValidationContext()
         {
-            return new ValidationContext(command.ContentId, schemaId, QueryContentsAsync, QueryAssetsAsync);
+            return new ValidationContext(command.ContentId, schemaId,
+                QueryContentsAsync,
+                QueryContentsAsync,
+                QueryAssetsAsync);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
@@ -132,9 +135,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return await assetRepository.QueryAsync(appEntity.Id, new HashSet<Guid>(assetIds));
         }
 
-        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid filterSchemaId, FilterNode<ClrValue> filterNode)
+        private async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryContentsAsync(Guid filterSchemaId, FilterNode<ClrValue> filterNode)
         {
             return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
+        }
+
+        private async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryContentsAsync(HashSet<Guid> ids)
+        {
+            return await contentRepository.QueryIdsAsync(appEntity.Id, ids);
         }
 
         private string GetScript(Func<SchemaScripts, string> script)

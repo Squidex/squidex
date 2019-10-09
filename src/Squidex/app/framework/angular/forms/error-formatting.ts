@@ -59,7 +59,7 @@ export function formatError(field: string, type: string, properties: any, value:
         return null;
     }
 
-    for (let property in properties) {
+    for (const property in properties) {
         if (properties.hasOwnProperty(property)) {
             message = message.replace(`{${property.toLowerCase()}}`, properties[property]);
         }
