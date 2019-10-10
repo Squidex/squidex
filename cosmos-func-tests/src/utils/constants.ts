@@ -4,7 +4,8 @@ export const constants = {
 
     loginTest: {
         editorWelcomeMessage: 'Hi Vega Test. Editor',
-        reviewerWelcomeMessage: 'Hi Vega Test. Reviewer'
+        reviewerWelcomeMessage: 'Hi Vega Test. Reviewer',
+        adminWelcomeMessage: 'Hi Vega Test. Admin'
     },
 
     refDataLocators: {
@@ -22,19 +23,20 @@ export const constants = {
     commentaryTest : {
         commodityValue: 'Styrene',
         // Temporary bug that fields are added to the UI even if they do not contain any value.
-        commentaryTypeValue: 'Price Commentary, ,',
+        commentaryTypeValue: 'Price Commentary',
         regionValue: 'Middle East',
+        periodValue: 'Settlement',
         contentBody: 'Commentary creation for test'
     },
 
     partialCommentaryTest: {
         commodityValue: 'Tolu',
-        commentaryTypeValue: 'Charts',
+        commentaryTypeValue: 'Deals',
         regionValue: 'Latin',
         periodValue: 'Settl',
-        contentBody: 'This is atext',
+        contentBody: 'This is a text',
         commodityValueFilteredByPartialText: 'Toluene',
-        commentaryTypeValueFilteredByPartialText: 'Charts Commentary, 200, Yes',
+        commentaryTypeValueFilteredByPartialText: 'Deals Commentary',
         regionValueFilteredByPartialText: 'Latin America'
     },
 
@@ -45,7 +47,7 @@ export const constants = {
         periodValue: 'Settlement',
         contentBody: 'This is commentary edit test',
         modifiedCommodityValue: 'Propylene',
-        modifiedCommentaryTypeValue: 'Deals Commentary, 100, No',
+        modifiedCommentaryTypeValue: 'Deals Commentary',
         modifiedRegionValue: 'CIS/Central Asia',
         modifiedContentBody: 'Editing existing commentary'
     },
@@ -60,7 +62,7 @@ export const constants = {
 
     savingAutoSavedCommentaryTest: {
         commodityValue: 'Benzene',
-        commentaryTypeValue: 'Deals Commentary, 100, No',
+        commentaryTypeValue: 'Deals Commentary',
         regionValue: 'Europe',
         contentBody: 'This is content creation test'
     },
@@ -76,7 +78,62 @@ export const constants = {
         numberedListContentBody: 'Numbered List Test'
     },
 
+    characterCountWithNoLimitTest: {
+        commodityValue: 'Benzene',
+        commentaryTypeValue: 'Price Commentary',
+        regionValue: 'Middle East',
+        periodValue: 'Settlement'
+    },
+
+    characterCountWithWordLimitTest: {
+        commentaryTypeValue: 'Deals Commentary',
+        commodityValue: 'Propylene',
+        regionValue: 'South East Asia & Pacific'
+    },
+
+    characterCountFailureTest: {
+        commodityValue: 'Toluene',
+        commentaryTypeValue: 'Overview',
+        regionValue: 'South East Asia & Pacific'
+    },
+
+    characterCountSuccessForEditComTest: {
+        commentaryTypeValue: 'Deals Commentary',
+        commodityValue: 'Polyols',
+        regionValue: 'Europe'
+    },
+
+    characterCountFailureForEditComTest: {
+        commentaryTypeValue: 'Overview',
+        commodityValue: 'Polyols',
+        periodValue: 'Settlement',
+        regionValue: 'Africa'
+    },
+
+    periodFieldSetAsNotRequiredTest: {
+        contentBody: 'ShortText',
+        commentaryTypeValue: 'Overview',
+        commodityValue: 'Propylene',
+        regionValue: 'South East Asia & Pacific'
+    },
+
+    periodFieldInvalidValueTest: {
+        contentBody: 'ShortText',
+        commentaryTypeValue: 'Charts Commentary',
+        commodityValue: 'Propylene',
+        regionValue: 'South East Asia & Pacific'
+    },
+
+    periodFieldSetAsRequiredTest: {
+        contentBody: 'ShortText',
+        commentaryTypeValue: 'Charts Commentary',
+        commodityValue: 'Propylene',
+        periodValue: 'Settlement',
+        regionValue: 'South East Asia & Pacific'
+    },
+
     labelAndDescVerificationTest: {
+        originalLabelValue: 'commentary',
         labelValue: 'Commentaries',
         DescValue: 'This is the app to update Commentaries for Commodities based on regions',
         labelValueWithoutSave: 'Commentaries - Save',
@@ -90,7 +147,9 @@ export const constants = {
         unsavedChangesPopUpMessage: 'You have unsaved changes, do you want to close the current content view and discard your changes?',
         commentaryCreationSuccessMessage: 'Contents created successfully.',
         commentaryEditSuccessMessage: 'Content updated successfully.',
-        commentaryCretaionFailureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).'
+        commentaryCreationFailureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).',
+        characterCountLimitErrorMessage: 'Failed to save commentary: Exceeded character limit of \'800\' characters for language \'en\'.',
+        observedPeriodNotSetErrorMessage: 'Failed to save commentary: Period is required.'
     }
 
 };

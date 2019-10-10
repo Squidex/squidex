@@ -179,7 +179,7 @@ namespace DeploymentApp.Entities
                             {
                                 Editor = NumberFieldEditor.Input,
                                 IsListField = true,
-                                IsReferenceField = true,
+                                IsReferenceField = false,
                                 Label = "Character Limit"
                             }
                         },
@@ -191,7 +191,7 @@ namespace DeploymentApp.Entities
                             {
                                 Editor = BooleanFieldEditor.Checkbox,
                                 IsListField = true,
-                                IsReferenceField = true,
+                                IsReferenceField = false,
                                 Label = "Required Period"
                             }
                         }

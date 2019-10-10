@@ -1,16 +1,21 @@
+import moment from 'moment';
 import { browser, by, element, ElementFinder, protractor } from 'protractor';
 import { constants } from './../utils/constants';
 
+let casual = require('casual');
 
 import { BrowserUtil } from './../utils';
 
 export class ContentPage extends BrowserUtil {
+
     // Create Commentary after Navigating to Commentary Page under Content
     public searchResult = element.all(by.xpath('//span[@class=\'truncate ng-star-inserted\']/b'));
 
-    public calendar = element(by.xpath('//div[@class=\'input-group\']/input'));
-
     public getRefData = element.all(by.xpath('//div[@class=\'control-dropdown-items\']/div/span'));
+
+    public calendar() {
+        return element(by.xpath('//input[contains(@class, \'form-date-only\')]'));
+    }
 
     public getCommentaryEditorFrame() {
         return element(by.xpath(`//iframe[@src=\'${constants.refDataLocators.editorUrl}\']`));
@@ -26,10 +31,6 @@ export class ContentPage extends BrowserUtil {
 
     public getContentTable() {
         return element.all(by.xpath('//div[@class=\'control-dropdown-items\']/div/span'));
-    }
-
-    public async selectTodaysDate() {
-        return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Today')));
     }
 
     public async autoSavePopUp() {
@@ -52,10 +53,6 @@ export class ContentPage extends BrowserUtil {
         return element(by.className(option));
     }
 
-    public async getCalender() {
-        return await element(by.xpath('//div[@class=\'input-group\']/input'));
-    }
-
     public async saveContent() {
         await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//button[text() = \' Save \']')));
 
@@ -73,6 +70,10 @@ export class ContentPage extends BrowserUtil {
 
     public $dateTodayButton() {
         return element(by.buttonText('Today'));
+    }
+
+    public $getFooter() {
+        return element(by.id('footer'));
     }
 
     public async captureContentValidationMessage() {
@@ -93,24 +94,23 @@ export class ContentPage extends BrowserUtil {
 
     public async selectContentValue(content: string) {
         await this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content);
+
         if (this.searchResult.isPresent() && (await this.searchResult.getText()).indexOf(content) !== -1) {
             await browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
         }
+
         await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
-    public getDateFromNow(addDays: number) {
-        const today = new Date();
+    public getDateFromNow(days: number) {
+        const formatedDate = moment().add(days, 'days').format('YYYY-MM-DD');
 
-        return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate() + addDays}`;
+        return formatedDate;
     }
 
-    public async selectDate(number: number) {
-        await this.waitForElementToBeVisibleAndClick(this.calendar);
-        await this.calendar.clear();
-        await this.calendar.sendKeys(this.getDateFromNow(number));
-
-        this.$dateLabel().click();
+    public async selectDate(days: number) {
+        await this.waitForElementToBePresentAndWrite(this.calendar(), this.getDateFromNow(days));
+        await this.mouseMoveAndClick(this.$dateLabel());
     }
 
     public async selectContentFromDropDown(contentType: string, value: string) {
@@ -120,45 +120,70 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
-        const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
-        try {
-            await browser.switchTo().frame(editorFrame);
+        return await this.forToastUI(async () => {
             return await contentEntryPlaceHolder.getText();
-        } finally {
-            await browser.switchTo().defaultContent();
-            await browser.waitForAngular();
-        }
+        });
     }
 
-    public async writeCommentary(commentaryText: string) {
-        const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
-        try {
-            await browser.switchTo().frame(editorFrame);
+    public async getCommentaryFooter() {
+        return await this.forToastUI(async () => {
+            const footer = await this.$getFooter();
+
+            return await this.scrollIntoViewAndGetText(footer);
+        });
+    }
+
+    public async writeCommentary(commentaryText: string, selectAll = false) {
+        return await this.forToastUI(async () => {
             const editor = await this.$commentaryInput();
+
             await this.waitForElementToBePresentAndWrite(editor, commentaryText);
-        } finally {
-            await browser.switchTo().defaultContent();
-            await browser.waitForAngular();
-        }
+
+            if (selectAll) {
+                this.selectAllContent();
+            }
+        });
     }
 
-    public async randomValueSelection(number: number) {
-        const itemsCount = await this.getRefData.count();
-        const itemIndex = Math.min(5, Math.floor(Math.random() * itemsCount + number));
+    public async appendCommentary(commentaryText: string) {
+        return await this.forToastUI(async () => {
+            const editor = await this.$commentaryInput();
 
-        const selected = await this.getRefData.get(itemIndex);
-
-        await this.scrollIntoViewAndClick(selected);
+            await this.waitForElementToBePresentAndAppendText(editor, commentaryText);
+        });
     }
 
-    public async selectRandomReferences() {
-        await this.selectDate(2);
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commodity));
-        await this.randomValueSelection(1);
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commentaryType));
-        await this.randomValueSelection(2);
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.region));
-        await this.randomValueSelection(3);
+    public async clickToastUIButton(editorToolBarOption: string) {
+        return await this.forToastUI(async () => {
+            const button = this.getEditorToolBarOptions(editorToolBarOption);
+
+            await this.waitForElementToBeVisibleAndClick(button);
+        });
+    }
+
+    public async randomValueSelection() {
+        const size = this.getRefData.length;
+        const refData = await this.getRefData;
+        const validRefData = refData.slice(1, size);
+
+        const item = casual.random_element(validRefData);
+        await this.scrollIntoViewAndClick(item);
+    }
+
+    public async selectRandomReferences(date: number) {
+        await this.selectDate(date);
+
+        await this.waitForElementToBeVisibleAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commodity));
+        await this.randomValueSelection();
+
+        await this.waitForElementToBeVisibleAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commentaryType));
+        await this.randomValueSelection();
+
+        await this.waitForElementToBeVisibleAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.region));
+        await this.randomValueSelection();
+
+        await this.waitForElementToBeVisibleAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.period));
+        await this.randomValueSelection();
     }
 
     public async createCommentary(commentary: string) {
@@ -166,25 +191,29 @@ export class ContentPage extends BrowserUtil {
         await this.saveContent();
     }
 
-    public async commentaryEditorTest(commentary: string) {
-        await this.selectRandomReferences();
-        await this.writeCommentary(commentary);
-        await this.selectAllContent();
+    public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string, date: number) {
+        await this.selectRandomReferences(date);
+
+        await this.writeCommentary(commentary, true);
+
+        await this.clickToastUIButton(editorToolBarOption);
+
+        await this.saveContent();
     }
 
-    public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string) {
-        await this.scrollIntoView(this.getCommentaryEditorFrame());
+    private async forToastUI<T>(action: () => Promise<T>) {
+        let result: T;
 
         const editorFrame = await this.getCommentaryEditorFrame().getWebElement();
-        await this.commentaryEditorTest(commentary);
         try {
             await browser.switchTo().frame(editorFrame);
-            const button = this.getEditorToolBarOptions(editorToolBarOption);
-            await this.waitForElementToBeVisibleAndClick(button);
+
+            result = await action();
         } finally {
             await browser.switchTo().defaultContent();
             await browser.waitForAngular();
         }
-        await this.saveContent();
+
+        return result;
     }
 }

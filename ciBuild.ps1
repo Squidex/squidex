@@ -37,10 +37,10 @@ try{
     }
 
     Write-Host "Pushing docker image $semanticDockerTag"
-    docker push $semanticDockerTag
+    sudo docker push $semanticDockerTag
 	
 	Write-Host "Pushing docker image $semanticDockerDeployAppTag"
-    docker push $semanticDockerDeployAppTag
+    sudo docker push $semanticDockerDeployAppTag
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to push docker image" -ForegroundColor Red

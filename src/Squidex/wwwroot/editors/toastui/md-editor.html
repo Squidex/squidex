@@ -7,12 +7,28 @@
         <link rel="stylesheet" href="tui-editor/tui-editor-contents.css"/>
 
         <script src="../../scripts/editor-sdk.js"></script>
-        <script src="tui-editor/tui-editor-Editor-full.js"></script>    
+        <script src="tui-editor/tui-editor-Editor-full.js"></script>
+        <script src="marked.js"></script>
+
+        <style>
+            .footer {
+                color: #555;
+                font-size: 90%;
+                font-weight: normal;
+                padding-top: 5px;
+            }
+
+            .error {
+                color: red;
+            }
+        </style>
     </head>
 
     <body>
-        <div style="height: 310px">
+        <div style="height: 330px">
             <div name="content" id="mdEditor"></div>
+
+            <div id="footer"></div>
         </div>
     </body>
 

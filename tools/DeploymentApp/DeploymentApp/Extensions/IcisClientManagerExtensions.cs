@@ -320,9 +320,9 @@ namespace DeploymentApp.Extensions
                     {
                         var content = new Object();
 
-                        if(isLocalized)
+                        if (isLocalized)
                         {
-                            content = new 
+                            content = new
                             {
                                 id = new
                                 {
@@ -336,7 +336,7 @@ namespace DeploymentApp.Extensions
                         }
                         else
                         {
-                            content = new 
+                            content = new
                             {
                                 id = new
                                 {

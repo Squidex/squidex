@@ -15,16 +15,17 @@ describe('User Login', () => {
     const loginPage = new LoginPage();
 
     beforeAll(async () => {
-        await loginPage.login(Users.find(u => u.name === 'vegaEditor'));
+        await loginPage.login(Users.find(u => u.name === 'vegaAdmin'));
     });
 
     afterAll(async () => {
         await homePage.logout();
     });
 
-    it('Login with Vega Editor credentials', async () => {
+    it('Verify logging into Cosmos with valid credentials', async () => {
+
         const welcomeText = await homePage.getWelcomeText();
-        expect(welcomeText).toEqual(constants.loginTest.editorWelcomeMessage);
+        expect(welcomeText).toEqual(constants.loginTest.adminWelcomeMessage);
 
         const currentUrl = await homePage.getCurrentURL();
         expect(currentUrl).toBe(`${browser.params.baseUrl}/app`);

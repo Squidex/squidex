@@ -15,6 +15,14 @@ namespace DeploymentApp.Entities
                 ["name"] = new
                 {
                     iv = "Overview"
+                },
+                ["character-limit"] = new
+                {
+                    iv = 800
+                },
+                ["requires-period"] = new
+                {
+                    iv = false
                 }
             }),
             ("2", new Dictionary<string, object>
@@ -30,8 +38,9 @@ namespace DeploymentApp.Entities
                 ["character-limit"] = new
                 {
                 },
-                ["requires-period"] =
+                ["requires-period"] = new
                 {
+                    iv = true
                 }
             }),
             ("3", new Dictionary<string, object>
@@ -46,7 +55,7 @@ namespace DeploymentApp.Entities
                 },
                 ["character-limit"] = new
                 {
-                    iv = 100
+                    iv = 1800
                 },
                 ["requires-period"] = new
                 {
@@ -65,7 +74,7 @@ namespace DeploymentApp.Entities
                 },
                 ["character-limit"] = new
                 {
-                    iv = 200
+                    iv = 1800
                 },
                 ["requires-period"] = new
                 {
@@ -84,7 +93,26 @@ namespace DeploymentApp.Entities
                 },
                 ["character-limit"] = new
                 {
-                    iv = 300
+                    iv = 1800
+                },
+                ["requires-period"] = new
+                {
+                    iv = false
+                }
+            }),
+            ("6", new Dictionary<string, object>
+            {
+                ["id"] = new
+                {
+                    iv = "6"
+                },
+                ["name"] = new
+                {
+                    iv = "Outlook"
+                },
+                ["character-limit"] = new
+                {
+                    iv = 800
                 },
                 ["requires-period"] = new
                 {
@@ -95,7 +123,13 @@ namespace DeploymentApp.Entities
 
         public static (string Id, string Name)[] Periods =
         {
-            ("http://iddn.icis.com/ref-data/period/9", "Settlement")
+            ("http://iddn.icis.com/ref-data/period/9", "Settlement"),
+            ("http://iddn.icis.com/ref-data/period/17", "Half Year"),
+            ("http://iddn.icis.com/ref-data/period/8", "n/a"),
+            ("http://iddn.icis.com/ref-data/period/20", "Variable"),
+            ("http://iddn.icis.com/ref-data/period/13", "Day"),
+            ("http://iddn.icis.com/ref-data/period/14", "Week"),
+            ("http://iddn.icis.com/ref-data/period/15", "Month")
         };
 
         public static (string Id, string Name)[] Regions =

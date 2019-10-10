@@ -38,20 +38,22 @@ export class BrowserUtil {
     }
 
     public async waitForElementToBeVisibleAndGetText(locator: ElementFinder, timeout = 5000) {
-        await this.waitForElementToBeClickable(locator, timeout);
+        await this.waitForElementToBeVisible(locator, timeout);
         return await locator.getText();
     }
 
     // waits for the element to be present and writes
     public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
-        await this.getWhenVisible(locator, timeout);
+        await this.waitForElementToBeVisible(locator, timeout);
         await locator.clear();
+        await locator.sendKeys('');
         await locator.sendKeys(text);
     }
 
-    public async waitForElementToBePresentClickAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
-        await this.getWhenVisible(locator, timeout);
-        await locator.click();
+    // waits for the input field to be present and appends text
+    public async waitForElementToBePresentAndAppendText(locator: ElementFinder, text: string, timeout = 20000) {
+        await this.waitForElementToBeVisible(locator, timeout);
+        await locator.sendKeys('');
         await locator.sendKeys(text);
     }
 
@@ -64,6 +66,8 @@ export class BrowserUtil {
     // brings the element to focus and writes
     public async mouseMoveAndWrite(locator: ElementFinder | WebElement, text: string) {
         await browser.actions().mouseMove(locator).click().perform();
+        await locator.clear();
+        await locator.sendKeys('');
         await locator.sendKeys(text);
     }
 
@@ -85,7 +89,13 @@ export class BrowserUtil {
     public async scrollIntoViewAndClick(webElement: ElementFinder) {
         await browser.executeScript('arguments[0].scrollIntoView()', webElement);
 
-        await new BrowserUtil().waitForElementToBeVisibleAndClick(webElement);
+        await this.waitForElementToBeVisibleAndClick(webElement);
+    }
+
+    public async scrollIntoViewAndGetText(webElement: ElementFinder) {
+        await browser.executeScript('arguments[0].scrollIntoView()', webElement);
+
+        return await this.waitForElementToBeVisibleAndGetText(webElement);
     }
 
     public async scrollIntoView(webElement: ElementFinder): Promise<ElementFinder | WebElement> {
@@ -132,6 +142,15 @@ export class BrowserUtil {
     // refresh the chrome instance
     public async browserRefresh() {
         await browser.refresh();
+    }
+
+    public async browserScriptToClick(locator: ElementFinder) {
+        await browser.executeScript('arguments[0].click();', locator);
+    }
+
+    public async browserScriptToClickAndSetValue(locator: ElementFinder | WebElement, text: string) {
+        const script = `arguments[0].value = '${text}';`;
+        await browser.executeScript(script, locator);
     }
 
 }

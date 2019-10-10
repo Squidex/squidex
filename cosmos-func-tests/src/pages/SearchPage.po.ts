@@ -7,6 +7,10 @@ export class SearchPage extends ContentPage {
         return element(by.xpath('//sqx-content-value/span'));
     }
 
+    public $getRefDataList(index: number) {
+        return element.all(by.xpath('//table[@class=\'table table-items table-fixed\']/tbody/tr[@ng-reflect-can-clone=\'true\']/td[' + index + ']/sqx-content-value/span'));
+    }
+
     public $contentItems() {
         return element.all(by.xpath('//sqx-content-value/span'));
     }
@@ -69,28 +73,64 @@ export class SearchPage extends ContentPage {
 
     public async verifyBoldCommentaryCreation() {
         await this.selectContentByText('Bold');
-        await this.getCommentaryEditorFrame();
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(this.$boldText());
     }
 
 
     public async verifyItalicCommentaryCreation() {
         await this.selectContentByText('Italic');
-        await this.getCommentaryEditorFrame();
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(this.$italicText());
     }
 
 
     public async verifyNumberedCommentaryCreation() {
         await this.selectContentByText('Numbered');
-        await this.getCommentaryEditorFrame();
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(await this.$numberedText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
         await this.selectContentByText('Bullet');
-        await this.getCommentaryEditorFrame();
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(await this.$bulletPointText());
+    }
+
+    public async searchContentByRefData(commodity: string, commentaryType: string, region: string) {
+        await this.waitForElementToBePresent(await this.$contentsItem());
+
+        const commodities = await this.$getRefDataList(5).getWebElements();
+        const commentaryTypes = await this.$getRefDataList(6).getWebElements();
+        const regions = await this.$getRefDataList(8).getWebElements();
+
+        expect(commodities.length).toBeGreaterThan(0);
+        expect(commentaryTypes.length).toBeGreaterThan(0);
+        expect(regions.length).toBeGreaterThan(0);
+
+        for (let commodityValue of commodities) {
+            const text = await commodityValue.getText();
+
+            if (text.includes(commodity)) {
+
+                const commodityIndex = commodities.indexOf(commodityValue);
+
+                    const commentaryTypetext = await commentaryTypes[commodityIndex].getText();
+
+                    if (commentaryTypetext.includes(commentaryType)) {
+
+                            const regiontext = await regions[commodityIndex].getText();
+
+                            if (regiontext.includes(region)) {
+
+                                await regions[commodityIndex].click();
+                                return;
+                        }
+                    }
+            }
+
+            throw `No Element with ${commodity}, ${commentaryType}, ${region} found`;
+        }
     }
 
     public async clickOnNewButton() {

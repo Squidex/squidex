@@ -8,6 +8,7 @@
 // tslint:disable:prefer-for-of
 
 import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs';
 
 import {
     DateTime,
@@ -15,8 +16,7 @@ import {
     formControls,
     ImmutableArray,
     Types,
-    ValidatorsEx,
-    value$
+    ValidatorsEx
 } from '@app/framework';
 
 import { ContentDto, ContentReferencesValue } from '../services/contents.service';
@@ -424,12 +424,16 @@ export class EditContentForm extends Form<FormGroup, any> {
     private readonly partitions: PartitionConfig;
     private initialData: any;
 
-    public value = value$(this.form);
+    public value = new BehaviorSubject<any>(this.form.value);
 
     constructor(languages: ImmutableArray<AppLanguageDto>,
         private readonly schema: SchemaDetailsDto
     ) {
         super(new FormGroup({}));
+
+        this.form.valueChanges.subscribe(value => {
+            this.value.next(value);
+        });
 
         this.partitions = new PartitionConfig(languages);
 
@@ -562,6 +566,10 @@ export class EditContentForm extends Form<FormGroup, any> {
         if (isInitial) {
             this.extractPrevData();
         }
+
+        this.value.subscribe(x => {
+            JSON.stringify(x);
+        });
     }
 
     public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {

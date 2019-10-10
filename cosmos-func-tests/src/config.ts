@@ -19,7 +19,6 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             baseDirectory: '_results-reports'
             , screenshotsSubfolder: '_images'
             , jsonsSubfolder: 'jsons'
-            , excludeSkippedSpecs: true
             , takeScreenShotsOnlyForFailedSpecs: true
             , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss Z')
             , docName: 'lastrunresults.html'
@@ -27,7 +26,12 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             , preserveDirectory: false
             , clientDefaults: {
                 showTotalDurationIn: 'header',
-                totalDurationFormat: 'hms'
+                totalDurationFormat: 'h:m:s',
+                columnSettings: {
+                    inlineScreenshots: true,
+                    warningTime: 1000,
+                    dangerTime: 2500
+                }
             }
         });
         jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
