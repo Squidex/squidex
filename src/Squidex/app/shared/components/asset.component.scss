@@ -107,7 +107,8 @@ $list-height: 2.375rem;
         background: $color-dark-black;
     }
 
-    &-name, &-info {
+    &-name,
+    &-info {
         @include truncate;
     }
 

@@ -26,11 +26,13 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-            [schemaCategory]="category"
-            [schemasFilter]="schemasFilter.valueChanges | async"
-            (remove)="removeCategory(category.name)">
-        </sqx-schema-category>
+        <div cdkDropListGroup>
+            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category"
+                [schemasFilter]="schemasFilter.valueChanges | async"
+                (remove)="removeCategory(category.name)">
+            </sqx-schema-category>
+        </div>
 
         <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
             <input class="form-control form-control-dark new-category-input" formControlName="name" placeholder="Create new category..." />

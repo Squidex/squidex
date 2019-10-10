@@ -67,7 +67,6 @@ export * from './angular/popup-link.directive';
 export * from './angular/safe-html.pipe';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
-export * from './angular/sorted.directive';
 export * from './angular/status-icon.component';
 export * from './angular/stop-click.directive';
 export * from './angular/sync-scrolling.directive';
