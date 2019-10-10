@@ -1,5 +1,8 @@
-<div *ngIf="!forContent || snapshot.filtered.length > 0" dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
-    <div class="drop-indicator"></div>
+<div *ngIf="!forContent || snapshot.filtered.length > 0" class="droppable category"
+    cdkDropList
+    cdkDropListSortingDisabled
+    [cdkDropListData]="schemaCategory.name"
+    (cdkDropListDropped)="changeCategory($event)">
 
     <div class="header clearfix">
         <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
@@ -13,10 +16,18 @@
         </button>
     </div>
 
-    <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
+    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" @fade>
         <ng-container *ngIf="!forContent; else simpleMode">
-            <li *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item" dnd-draggable [dragEnabled]="schema.canUpdateCategory" [dragData]="schema">
-                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
+            <div *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item"
+                routerLinkActive="active"
+                cdkDropList
+                cdkDrag
+                cdkDragLockAxis="y"
+                [cdkDragData]="schema">
+
+                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+
+                <a class="nav-link" [routerLink]="schemaRoute(schema)">
                     <div class="row">
                         <div class="col-4">
                             <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
@@ -33,9 +44,9 @@
                         </div>
                     </div>
                 </a>
-            </li>
+            </div>
         </ng-container>
-
+    
         <ng-template #simpleMode>
             <li *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item">
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
@@ -43,5 +54,7 @@
                 </a>
             </li>
         </ng-template>
-    </ul>
+    </div>
+
+    <div class="drop-indicator"></div>
 </div>

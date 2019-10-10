@@ -7,14 +7,20 @@
         </div>
         
         <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0"
-            [sqxSortModel]="snapshot.contentItems" 
-            (sqxSort)="sort($event)">
+            cdkDropList
+            [cdkDropListData]="snapshot.contentItems"
+            [cdkDropListDisabled]="snapshot.isDisabled"
+            (cdkDropListDropped)="sort($event)">
             <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
                 [sqxReferenceItem]="content"
+                class="table-drag"
+                cdkDrag
+                cdkDragLockAxis="y"
                 [language]="language"
                 [isCompact]="isCompact"
                 [columnCount]="snapshot.columnCount"
                 (delete)="remove(content)">
+                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
             </tbody>
         </table>
     </ng-container>

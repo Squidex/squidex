@@ -1,7 +1,9 @@
 <div class="card item" [class.invalid]="isInvalid | async">
     <div class="card-header drag-handle">
         <span class="pull-left">
-            <i class="icon-drag2 mr-1"></i>
+            <span class="mr-1">
+                <ng-content></ng-content>
+            </span>
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
 

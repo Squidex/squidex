@@ -1,7 +1,12 @@
 <div class="array-container" *ngIf="arrayControl.controls.length > 0" 
-    [sqxSortModel]="arrayControl.controls"
-    (sqxSort)="sort($event)">
-    <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
+    cdkDropList
+    [cdkDropListDisabled]="false"
+    [cdkDropListData]="arrayControl.controls"
+    (cdkDropListDropped)="sort($event)">
+    <div *ngFor="let itemForm of arrayControl.controls; let i = index"
+        class="table-drag item"
+        cdkDrag
+        cdkDragLockAxis="y">
         <sqx-array-item
             [form]="form"
             [formContext]="formContext"
@@ -18,6 +23,7 @@
             (move)="move(itemForm, $event)"
             (remove)="itemRemove(i)"
             (toggle)="hide($event)">
+            <i cdkDragHandle class="icon-drag2"></i>
         </sqx-array-item>
     </div>
 </div>

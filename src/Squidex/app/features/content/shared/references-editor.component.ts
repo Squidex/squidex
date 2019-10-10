@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -14,6 +15,7 @@ import {
     ContentDto,
     ContentsService,
     DialogModel,
+    sorted,
     StatefulControlComponent,
     Types
 } from '@app/shared';
@@ -113,9 +115,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
         }
     }
 
-    public sort(contents: ReadonlyArray<ContentDto>) {
-        if (contents) {
-            this.setContentItems(contents);
+    public sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
+        if (event) {
+            this.setContentItems(sorted(event));
 
             this.updateValue();
         }

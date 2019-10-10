@@ -1,6 +1,8 @@
 <div class="table-items-row table-items-row-expandable field"> 
-    <div class="table-items-row-summary">       
-        <i class="icon-drag2 drag-handle"></i>
+    <div class="table-items-row-summary">
+        <span class="drag-container">
+            <ng-content></ng-content>
+        </span>  
 
         <div class="row">
             <div class="col-6">
@@ -95,13 +97,20 @@
             <span class="nested-field-line-v"></span>
 
             <div
-                [sqxSortDisabled]="!isEditable"
-                [sqxSortModel]="nested"
-                (sqxSort)="sortFields($event)">
-                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByFieldFn">
+                cdkDropList
+                [cdkDropListDisabled]="!isEditable"
+                [cdkDropListData]="nested"
+                (cdkDropListDropped)="sortFields($event)">
+                <div *ngFor="let nested of nested; trackBy: trackByFieldFn"
+                    class="nested-field table-drag"
+                    cdkDrag
+                    cdkDragLockAxis="y">
+
                     <span class="nested-field-line-h"></span>
     
-                    <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns"></sqx-field>
+                    <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns">
+                        <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                    </sqx-field>
                 </div>
             </div>
             

@@ -76,11 +76,17 @@
 
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
             <div class="schemas"
-                [sqxSortDisabled]="!schema.canOrderFields"
-                [sqxSortModel]="schema.fields"
-                (sqxSort)="sortFields($event)">
-                <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn">
-                    <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
+                cdkDropList
+                [cdkDropListDisabled]="!schema.canOrderFields"
+                [cdkDropListData]="schema.fields"
+                (cdkDropListDropped)="sortFields($event)">
+                <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn"
+                    class="table-drag"
+                    cdkDrag
+                    cdkDragLockAxis="y">
+                    <sqx-field [field]="field" [schema]="schema" [patterns]="patterns">
+                        <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                    </sqx-field>
                 </div>
             </div>
     

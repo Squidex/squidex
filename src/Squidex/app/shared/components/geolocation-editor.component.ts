@@ -335,11 +335,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
         if (this.value) {
             if (!this.marker) {
                 this.marker =  new google.maps.Marker({
+                    map: this.map,
                     position: {
                         lat: 0,
                         lng: 0
                     },
-                    map: this.map,
                     draggable: true
                 });
 

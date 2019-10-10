@@ -22,8 +22,9 @@ $padding: 1rem;
     padding-left: 3rem;
 }
 
-.drag-handle {
+.drag-container {
     @include absolute(1.75rem, auto, auto, .75rem);
+    line-height: 1px;
 }
 
 .col {
@@ -35,6 +36,10 @@ $padding: 1rem;
     &-options {
         max-width: 140px;
     }
+}
+
+.field {
+    position: relative;
 }
 
 .nested-fields {

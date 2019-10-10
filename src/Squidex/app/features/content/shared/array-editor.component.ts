@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
@@ -12,6 +13,7 @@ import {
     AppLanguageDto,
     EditContentForm,
     RootFieldDto,
+    sorted,
     StatefulComponent
 } from '@app/shared';
 
@@ -62,10 +64,8 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
         this.form.arrayItemInsert(this.field, this.language, value);
     }
 
-    public sort(controls: ReadonlyArray<AbstractControl>) {
-        for (let i = 0; i < controls.length; i++) {
-            this.arrayControl.setControl(i, controls[i]);
-        }
+    public sort(event: CdkDragDrop<ReadonlyArray<AbstractControl>>) {
+        this.sortInternal(sorted(event));
     }
 
     public move(control: AbstractControl, index: number) {
@@ -74,6 +74,12 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
         controls.splice(controls.indexOf(control), 1);
         controls.splice(index, 0, control);
 
-        this.sort(controls);
+        this.sortInternal(controls);
+    }
+
+    private sortInternal(controls: ReadonlyArray<AbstractControl>) {
+        for (let i = 0; i < controls.length; i++) {
+            this.arrayControl.setControl(i, controls[i]);
+        }
     }
 }

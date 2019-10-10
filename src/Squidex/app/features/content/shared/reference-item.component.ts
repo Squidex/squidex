@@ -21,7 +21,7 @@ import {
     template: `
         <tr>
             <td class="cell-select">
-               <i class="icon-drag2 drag-handle"></i>
+                <ng-content></ng-content>
             </td>
 
             <td class="cell-user" *ngIf="!isCompact">

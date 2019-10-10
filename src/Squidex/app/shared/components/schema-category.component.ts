@@ -5,18 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import {
     fadeAnimation,
-    isSameCategory,
     LocalStoreService,
     SchemaCategory,
-    SchemaDetailsDto,
     SchemaDto,
     SchemasState,
-    StatefulComponent,
-    Types
+    StatefulComponent
 } from '@app/shared/internal';
 
 interface State {
@@ -46,10 +44,6 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
     @Input()
     public forContent: boolean;
-
-    public allowDrop = (schema: any) => {
-        return (Types.is(schema, SchemaDto) || Types.is(schema, SchemaDetailsDto)) && !isSameCategory(this.schemaCategory.name, schema);
-    }
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService,
@@ -98,8 +92,10 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
         }
     }
 
-    public changeCategory(schema: SchemaDto) {
-        this.schemasState.changeCategory(schema, this.schemaCategory.name);
+    public changeCategory(drag: CdkDragDrop<any>) {
+        if (drag.previousContainer !== drag.container) {
+            this.schemasState.changeCategory(drag.item.data, this.schemaCategory.name);
+        }
     }
 
     public emitRemove() {

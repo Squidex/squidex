@@ -7,6 +7,7 @@
 
 // tslint:disable:no-shadowed-variable
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -20,7 +21,8 @@ import {
     PatternsState,
     ResourceOwner,
     SchemaDetailsDto,
-    SchemasState
+    SchemasState,
+    sorted
 } from '@app/shared';
 
 import {
@@ -79,8 +81,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.schemasState.unpublish(this.schema).subscribe();
     }
 
-    public sortFields(fields: ReadonlyArray<FieldDto>) {
-        this.schemasState.orderFields(this.schema, fields).subscribe();
+    public sortFields(event: CdkDragDrop<ReadonlyArray<FieldDto>>) {
+        this.schemasState.orderFields(this.schema, sorted(event)).subscribe();
     }
 
     public trackByField(index: number, field: FieldDto) {

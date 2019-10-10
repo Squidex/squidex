@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -15,6 +16,7 @@ import {
     DialogModel,
     LocalStoreService,
     MessageBus,
+    sorted,
     StatefulControlComponent,
     Types
 } from '@app/shared';
@@ -133,9 +135,9 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         }
     }
 
-    public sortAssets(assets: ReadonlyArray<AssetDto>) {
-        if (assets) {
-            this.setAssets(assets);
+    public sortAssets(event: CdkDragDrop<ReadonlyArray<AssetDto>>) {
+        if (event) {
+            this.setAssets(sorted(event));
 
             this.updateValue();
         }

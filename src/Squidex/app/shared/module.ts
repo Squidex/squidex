@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import { SqxFrameworkModule } from '@app/framework';
 
@@ -109,7 +109,7 @@ import { SchemaTagConverter } from './state/schema-tag-converter';
 
 @NgModule({
     imports: [
-        DndModule,
+        DragDropModule,
         RouterModule,
         SqxFrameworkModule
     ],
@@ -162,6 +162,7 @@ import { SchemaTagConverter } from './state/schema-tag-converter';
         AssetUploaderComponent,
         CommentComponent,
         CommentsComponent,
+        DragDropModule,
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,

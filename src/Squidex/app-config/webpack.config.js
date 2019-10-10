@@ -25,7 +25,9 @@ const plugins = {
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
     OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
     // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('tslint-webpack-plugin')
+    TsLintPlugin: require('tslint-webpack-plugin'),
+    // https://www.npmjs.com/package/@angular-devkit/build-optimizer
+    BuildOptimizer: require('@angular-devkit/build-optimizer')
 };
 
 module.exports = function (env) {
@@ -333,6 +335,21 @@ module.exports = function (env) {
                 loader: plugins.NgToolsWebpack.NgToolsLoader
             }]
         })
+    }
+
+    // Optimization plugin for production build.
+    if (isProduction) {
+        config.module.rules.push({
+            test: /\.js$/,
+            use: [{
+                loader: '@angular-devkit/build-optimizer/webpack-loader?sourceMap=false',
+                options: {
+                    sourceMap: false
+                }
+            }]
+        });
+
+        config.plugins.push(new plugins.BuildOptimizer.BuildOptimizerWebpackPlugin());
     }
 
     if (isProduction) {
