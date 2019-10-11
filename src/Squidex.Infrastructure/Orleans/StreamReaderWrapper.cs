@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var bytesLeft = reader.CurrentPosition;
+            var bytesLeft = (int)(reader.Length - reader.CurrentPosition);
 
             if (bytesLeft < count)
             {
