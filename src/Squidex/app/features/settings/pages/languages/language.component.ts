@@ -13,6 +13,7 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
+    LanguageDto,
     LanguagesState,
     sorted
 } from '@app/shared';
@@ -30,12 +31,12 @@ export class LanguageComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public fallbackLanguages: ReadonlyArray<AppLanguageDto>;
+    public fallbackLanguages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public fallbackLanguagesNew: ReadonlyArray<AppLanguageDto>;
+    public fallbackLanguagesNew: ReadonlyArray<LanguageDto>;
 
-    public otherLanguage: AppLanguageDto;
+    public otherLanguage: LanguageDto;
 
     public isEditing = false;
     public isEditable = false;

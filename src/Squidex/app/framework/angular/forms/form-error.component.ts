@@ -17,5 +17,5 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class FormErrorComponent {
     @Input()
-    public error: string;
+    public error: string | null | undefined;
 }

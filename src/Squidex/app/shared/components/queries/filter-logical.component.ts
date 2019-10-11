@@ -58,6 +58,14 @@ export class FilterLogicalComponent {
         return this.filterValue;
     }
 
+    public get isAnd() {
+        return !!this.filter.and;
+    }
+
+    public get isOr() {
+        return !!this.filter.or;
+    }
+
     public get nestedLevel() {
         return this.level + 1;
     }

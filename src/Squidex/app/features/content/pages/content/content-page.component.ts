@@ -62,7 +62,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public trackByFieldFn: Function;
+    public get hasContent() {
+        return !!this.content;
+    }
+
+    public trackByFieldFn: (index: number, field: FieldDto) => any;
 
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;

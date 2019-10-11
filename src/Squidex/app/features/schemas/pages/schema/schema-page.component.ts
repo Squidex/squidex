@@ -49,7 +49,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public editSchemaDialog = new DialogModel();
     public exportDialog = new DialogModel();
 
-    public trackByFieldFn: Function;
+    public trackByFieldFn: (index: number, field: FieldDto) => any;
 
     constructor(
         public readonly schemasState: SchemasState,

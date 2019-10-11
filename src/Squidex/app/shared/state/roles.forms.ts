@@ -14,6 +14,10 @@ import {
 } from '@app/framework';
 
 export class EditPermissionsForm extends Form<FormArray, ReadonlyArray<string>> {
+    public get controls() {
+        return this.form.controls as FormControl[];
+    }
+
     constructor() {
         super(new FormArray([]));
     }

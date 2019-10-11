@@ -6,13 +6,14 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl } from '@angular/forms';
 
 import {
     AppLanguageDto,
     EditContentForm,
     FieldDto,
-    MathHelper
+    MathHelper,
+    RootFieldDto
 } from '@app/shared';
 
 @Component({
@@ -31,7 +32,7 @@ export class FieldEditorComponent {
     public field: FieldDto;
 
     @Input()
-    public control: FormControl;
+    public control: AbstractControl;
 
     @Input()
     public language: AppLanguageDto;
@@ -44,6 +45,18 @@ export class FieldEditorComponent {
 
     @Input()
     public displaySuffix: string;
+
+    public get arrayControl() {
+        return this.control as FormArray;
+    }
+
+    public get editorControl() {
+        return this.control as FormControl;
+    }
+
+    public get rootField() {
+        return this.field as RootFieldDto;
+    }
 
     public uniqueId = MathHelper.guid();
 }

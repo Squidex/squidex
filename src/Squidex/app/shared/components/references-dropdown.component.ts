@@ -9,11 +9,11 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Inpu
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
-    AppLanguageDto,
     AppsState,
     ContentDto,
     ContentsService,
     getContentValue,
+    LanguageDto,
     StatefulControlComponent,
     Types,
     UIOptions
@@ -49,7 +49,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnInit {
-    private languageField: AppLanguageDto;
+    private languageField: LanguageDto;
     private selectedId: string | undefined;
     private itemCount: number;
 
@@ -60,7 +60,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public mode: 'Array' | 'Single';
 
     @Input()
-    public set language(value: AppLanguageDto) {
+    public set language(value: LanguageDto) {
         this.languageField = value;
 
         this.next(s => ({ ...s, contentNames: this.createContentNames(s.contents) }));

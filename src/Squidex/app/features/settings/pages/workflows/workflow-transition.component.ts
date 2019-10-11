@@ -19,6 +19,8 @@ import {
     templateUrl: './workflow-transition.component.html'
 })
 export class WorkflowTransitionComponent {
+    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+
     @Output()
     public update = new EventEmitter<WorkflowTransitionValues>();
 
@@ -33,8 +35,6 @@ export class WorkflowTransitionComponent {
 
     @Input()
     public disabled: boolean;
-
-    public onBlur = { updateOn: 'blur' };
 
     public changeExpression(expression: string) {
         this.update.emit({ expression });

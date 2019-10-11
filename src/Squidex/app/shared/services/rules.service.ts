@@ -24,14 +24,14 @@ import {
     Version
 } from '@app/framework';
 
-export type TriggerDto = {
+export type RuleElementMetadataDto = {
     description: string;
     display: string;
     iconColor: string;
     iconCode: string;
 };
 
-export type TriggersDto = { [key: string]: TriggerDto };
+export type TriggersDto = { [key: string]: RuleElementMetadataDto };
 
 export const ALL_TRIGGERS: TriggersDto = {
     'ContentChanged': {

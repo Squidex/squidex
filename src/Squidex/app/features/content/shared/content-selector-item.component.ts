@@ -8,9 +8,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
-    AppLanguageDto,
     ContentDto,
     getContentValue,
+    LanguageDto,
     RootFieldDto
 } from '@app/shared';
 
@@ -62,7 +62,7 @@ export class ContentSelectorItemComponent implements OnChanges {
     public selectable = true;
 
     @Input()
-    public language: AppLanguageDto;
+    public language: LanguageDto;
 
     @Input()
     public fields: ReadonlyArray<RootFieldDto>;
