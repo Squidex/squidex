@@ -29,9 +29,23 @@
             </ng-container>
 
             <ng-template #notNew>
-                <div class="dropdown dropdown-options ml-1" *ngIf="content">
-                    <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
+                <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
+                <span class="btn-saving">
+                    <button type="button" class="btn btn-secondary ml-1" (click)="saveAsDraft()" *ngIf="content.canDraftPropose">
+                        Save as Draft
+                    </button>
+                        
+                    <ng-container *ngIf="content.canUpdate">
+                        <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
+                            Save
+                        </button>
+    
+                        <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    </ng-container>
+                </span>
+
+                <div class="dropdown dropdown-options ml-1">
                     <button type="button" class="btn btn-outline-secondary btn-status" (click)="dropdown.toggle()" [disabled]="schema.isSingleton && !content.isPending" 
                         [class.active]="dropdown.isOpen | async" #buttonOptions>
                         <sqx-content-status
@@ -76,18 +90,6 @@
                         </ng-container>
                     </ng-container>
                 </div>
-                
-                <button type="button" class="btn btn-secondary ml-1" (click)="saveAsDraft()" *ngIf="content.canDraftPropose">
-                    Save as Draft
-                </button>
-                    
-                <ng-container *ngIf="content.canUpdate">
-                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
-                        Save
-                    </button>
-
-                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
-                </ng-container>
             </ng-template>
         </ng-container>
 
