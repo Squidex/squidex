@@ -52,6 +52,10 @@ namespace Squidex.Config.Web
 
             services.AddSingletonAs<ApiPermissionUnifier>()
                 .AsOptional<IClaimsTransformation>();
+
+            services.AddSingletonAs<NullCustomLinkExtension>()
+                .AsOptional<ICustomLinkExtension>();
+
             services.TryAddSingleton<IClaimsTransformation, ApiPermissionUnifier>();
 
             services.AddMvc(options =>

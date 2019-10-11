@@ -38,8 +38,6 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
         await homePage.navigateTo();
 
         await homePage.selectCommentaryApp('commentary');
-        await appPage.selectContentMenuItem();
-        await appPage.selectCommentarySchema();
         await searchPage.clickOnNewButton();
     });
 

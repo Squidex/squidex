@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Logging;
 using Squidex.ICIS.Authentication;
 using Squidex.ICIS.Kafka;
+using Squidex.ICIS.UI;
 using Squidex.ICIS.Validation;
 
 namespace Squidex.ICIS.Extensions
@@ -27,6 +28,8 @@ namespace Squidex.ICIS.Extensions
             AuthenticationServiceExtensions.AddAuthenticationServices(services, config);
             KafkaServiceExtensions.AddKafkaServices(services, config);
             ValidationServiceExtensions.AddValidationServices(services);
+
+            services.AddUI();
         }
     }
 }

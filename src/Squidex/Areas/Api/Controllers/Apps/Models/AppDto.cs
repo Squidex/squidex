@@ -91,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string PlanUpgrade { get; set; }
 
-        public static AppDto FromApp(IAppEntity app, string userId, PermissionSet userPermissions, IAppPlansProvider plans, ApiController controller)
+        public static AppDto FromApp(IAppEntity app, string userId, PermissionSet userPermissions, IAppPlansProvider plans, ApiController controller, ICustomLinkExtension linkExtension)
         {
             var permissions = GetPermissions(app, userId, userPermissions);
 
@@ -111,6 +111,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             result.SetPlan(app, plans, controller);
             result.SetImage(app, controller);
+
+            linkExtension.AddLinks(result, app);
 
             return result.CreateLinks(controller, permissions);
         }

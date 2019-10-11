@@ -20,6 +20,10 @@ export const constants = {
         editorOptionsNumberedList: 'tui-ol tui-toolbar-icons'
     },
 
+    commentaryRedirectTest : {
+        commentaryUrl: `${browser.params.baseUrl}/app/commentary/content/commentary`
+    },
+
     commentaryTest : {
         commodityValue: 'Styrene',
         // Temporary bug that fields are added to the UI even if they do not contain any value.
@@ -75,7 +79,7 @@ export const constants = {
         boldCommentaryContentBody: 'Bold Letters Commentary Test',
         bulletPointsContentBody: 'Bullet Point Commentary Test',
         italicCommentaryContentBody: 'Italic Commentary Test',
-        numberedListContentBody: 'Numbered List Test'
+        numberedListContentBody: 'Numbered List Test.'
     },
 
     characterCountWithNoLimitTest: {

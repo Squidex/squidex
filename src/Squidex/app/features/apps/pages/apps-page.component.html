@@ -14,7 +14,7 @@
             <h3 class="empty-headline">You are not collaborating to any app yet</h3>
         </div>
 
-        <div class="card card-href card-app float-left" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
+        <a class="card card-href card-app float-left" *ngFor="let app of apps; trackBy: trackByApp" (click)="linkToShortcut($event, app)" [routerLink]="['/app', app.name]">
             <div class="card-body">
                 <div class="row no-gutters">
                     <div class="col-auto card-left">
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 </ng-container>
 

@@ -31,6 +31,11 @@ export class BrowserUtil {
         await browser.wait(until.presenceOf(locator), timeout, `Element ${locator.locator().toString()} not present`);
     }
 
+    public async waitForElementToBePresentAndGetText(locator: ElementFinder, timeout = 5000) {
+        await browser.wait(until.presenceOf(locator), timeout, `Element ${locator.locator().toString()} not present`);
+        return await locator.getText();
+    }
+
     // waits for the element to be clickable and clicks
     public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 5000) {
         await this.waitForElementToBeClickable(locator, timeout);
@@ -58,7 +63,7 @@ export class BrowserUtil {
     }
 
     // waits for the input field to be present and appends text
-    public async waitForElementToBePresentAndAppendText(locator: ElementFinder, text: string, timeout = 20000) {
+    public async waitForElementToBePresentAndAppend(locator: ElementFinder, text: string, timeout = 20000) {
         await this.getWhenVisible(locator, timeout);
         await locator.sendKeys(text);
     }
@@ -104,7 +109,7 @@ export class BrowserUtil {
         return await this.waitForElementToBeVisibleAndGetText(webElement);
     }
 
-    public async scrollIntoViewAndGetText(webElement: ElementFinder) {
+    public async scrollIntoViewAndGetTextAndInvokeBrowser(webElement: ElementFinder) {
         await browser.executeScript('arguments[0].scrollIntoView()', webElement);
 
         return await new BrowserUtil().waitForElementToBeVisibleAndGetText(webElement);

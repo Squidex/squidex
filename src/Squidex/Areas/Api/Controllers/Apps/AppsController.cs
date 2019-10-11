@@ -41,18 +41,21 @@ namespace Squidex.Areas.Api.Controllers.Apps
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
+        private readonly ICustomLinkExtension linkExtension;
 
         public AppsController(ICommandBus commandBus,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IAppProvider appProvider,
-            IAppPlansProvider appPlansProvider)
+            IAppPlansProvider appPlansProvider,
+            ICustomLinkExtension linkExtension)
             : base(commandBus)
         {
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
+            this.linkExtension = linkExtension;
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this, linkExtension)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -270,7 +273,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userPermissions = HttpContext.Permissions();
 
             var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
+            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this, linkExtension);
 
             return response;
         }

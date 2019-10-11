@@ -121,7 +121,7 @@ export class ContentPage extends BrowserUtil {
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
         return await this.forToastUI(async () => {
-            return await contentEntryPlaceHolder.getText();
+            return await this.waitForElementToBePresentAndGetText(contentEntryPlaceHolder);
         });
     }
 
@@ -129,18 +129,26 @@ export class ContentPage extends BrowserUtil {
         return await this.forToastUI(async () => {
             const footer = await this.$getFooter();
 
-            return await this.scrollIntoViewAndGetText(footer);
+            return await this.scrollIntoViewAndGetTextAndInvokeBrowser(footer);
         });
     }
 
-    public async writeCommentary(commentaryText: string, selectAll = false) {
+    public async writeCommentary(commentaryText: string) {
         return await this.forToastUI(async () => {
             const editor = await this.$commentaryInput();
 
             await this.waitForElementToBePresentAndWrite(editor, commentaryText);
+        });
+    }
+
+    public async writeCommentaryForToastUiTests(commentaryText: string, selectAll = false) {
+        return await this.forToastUI(async () => {
+            const editor = await this.$commentaryInput();
+
+            await this.waitForElementToBePresentAndAppend(editor, commentaryText);
 
             if (selectAll) {
-                this.selectAllContent();
+               this.selectAllContent();
             }
         });
     }
@@ -188,13 +196,14 @@ export class ContentPage extends BrowserUtil {
 
     public async createCommentary(commentary: string) {
         await this.writeCommentary(commentary);
+
         await this.saveContent();
     }
 
     public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string, date: number) {
         await this.selectRandomReferences(date);
 
-        await this.writeCommentary(commentary, true);
+        await this.writeCommentaryForToastUiTests(commentary, true);
 
         await this.clickToastUIButton(editorToolBarOption);
 

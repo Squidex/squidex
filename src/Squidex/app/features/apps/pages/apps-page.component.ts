@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 
 import {
@@ -44,6 +45,7 @@ export class AppsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService,
+        private readonly router: Router,
         private readonly uiOptions: UIOptions
     ) {
         if (uiOptions.get('showInfo')) {
@@ -80,6 +82,16 @@ export class AppsPageComponent implements OnInit {
     public createNewApp(template: string) {
         this.addAppTemplate = template;
         this.addAppDialog.show();
+    }
+
+    public linkToShortcut(event: Event, app: AppDto) {
+        const shortcut = app._links['shortcut'];
+
+        if (shortcut) {
+            this.router.navigateByUrl(shortcut.href);
+
+            return false;
+        }
     }
 
     public trackByApp(index: number, app: AppDto) {

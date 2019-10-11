@@ -36,8 +36,7 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
         // Then just reload to get the access token from the identity server.
         await homePage.navigateTo();
         await homePage.selectCommentaryApp('commentary');
-        await appPage.selectContentMenuItem();
-        await appPage.selectCommentarySchema();
+
         await searchPage.clickOnNewButton();
     });
 
