@@ -29,6 +29,7 @@ export type RuleElementMetadataDto = {
     display: string;
     iconColor: string;
     iconCode: string;
+    title?: string;
 };
 
 export type TriggersDto = { [key: string]: RuleElementMetadataDto };
@@ -38,25 +39,29 @@ export const ALL_TRIGGERS: TriggersDto = {
         description: 'For content changes like created, updated, published, unpublished...',
         display: 'Content changed',
         iconColor: '#3389ff',
-        iconCode: 'contents'
+        iconCode: 'contents',
+        title: 'Content changed'
     },
     'AssetChanged': {
         description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
         display: 'Asset changed',
         iconColor: '#3389ff',
-        iconCode: 'assets'
+        iconCode: 'assets',
+        title: 'Asset changed'
     },
     'SchemaChanged': {
         description: 'When a schema definition has been created, updated, published or deleted...',
         display: 'Schema changed',
         iconColor: '#3389ff',
-        iconCode: 'schemas'
+        iconCode: 'schemas',
+        title: 'Schema changed'
     },
     'Usage': {
         description: 'When monthly API calls exceed a specified limit for one time a month...',
         display: 'Usage exceeded',
         iconColor: '#3389ff',
-        iconCode: 'dashboard'
+        iconCode: 'dashboard',
+        title: 'Usage'
     }
 };
 
@@ -64,6 +69,7 @@ export type ActionsDto = { [name: string]: RuleElementDto };
 
 export class RuleElementDto {
     constructor(
+        public readonly title: string,
         public readonly display: string,
         public readonly description: string,
         public readonly iconColor: string,
@@ -202,6 +208,7 @@ export class RulesService {
                         ));
 
                     actions[key] = new RuleElementDto(
+                        value.title,
                         value.display,
                         value.description,
                         value.iconColor,

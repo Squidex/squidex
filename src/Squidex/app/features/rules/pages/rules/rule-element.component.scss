@@ -27,14 +27,6 @@
         font-weight: normal;
         padding: 0 .8rem;
     }
-
-    .icon {
-        font-size: 20px;
-    }
-
-    .svg-icon {
-        width: 20px;
-    }
 }
 
 .large {
@@ -67,24 +59,5 @@
         position: relative;
         padding: 1rem;
         line-height: 1px;
-    }
-
-    .icon {
-        font-size: 30px;
-    }
-
-    .svg-icon {
-        width: 30px;
-    }
-}
-
-.svg-icon {
-    display: inline-block;
-}
-
-::ng-deep {
-    svg {
-        fill: $color-dark-foreground;
-        display: block;
     }
 }

@@ -6,17 +6,8 @@
         <ng-container *ngIf="mode === 'EditAction'">
             Edit Action
         </ng-container>
-        <ng-container *ngIf="mode === 'Wizard' && step === 1">
-            Step 1 of 4: Select Trigger
-        </ng-container>
-        <ng-container *ngIf="mode === 'Wizard' && step === 2">
-            Step 2 of 4: Configure Trigger
-        </ng-container>
-        <ng-container *ngIf="mode === 'Wizard' && step === 3">
-            Step 3 of 4: Select Action
-        </ng-container>
-        <ng-container *ngIf="mode === 'Wizard' && step === 4">
-            Step 4 of 4: Configure Action
+        <ng-container *ngIf="mode === 'Wizard'">
+            {{titles[step - 1]}}
         </ng-container>
     </ng-container>
 
@@ -34,8 +25,12 @@
         </div>
         
         <ng-container *ngIf="step === 2 && schemas">
-            <form [formGroup]="triggerForm.form" (ngSubmit)="saveTrigger()">  
-                <h3 class="wizard-title">{{ruleTriggers[triggerType].display}}</h3>
+            <form [formGroup]="triggerForm.form" (ngSubmit)="saveTrigger()">
+                <h3 class="wizard-title" [style.background]="triggerElement.iconColor">
+                    <sqx-rule-icon size="sm" [element]="triggerElement"></sqx-rule-icon>
+                    
+                    <span class="ml-2">{{triggerElement.display}}</span>
+                </h3>
 
                 <ng-container [ngSwitch]="triggerType">
                     <ng-container *ngSwitchCase="'AssetChanged'">
@@ -85,10 +80,14 @@
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (ngSubmit)="saveAction()">
-                <h3 class="wizard-title">{{ruleActions[actionType].display}}</h3>
+                <h3 class="wizard-title" [style.background]="actionElement.iconColor">
+                    <sqx-rule-icon size="sm" [element]="actionElement"></sqx-rule-icon>
+                    
+                    <span class="ml-2">{{actionElement.display}}</span>
+                </h3>
 
                 <sqx-generic-action
-                    [definition]="ruleActions[actionType]"
+                    [definition]="actionElement"
                     [action]="action"
                     [actionForm]="actionForm.form"
                     [actionFormSubmitted]="actionForm.submitted | async">

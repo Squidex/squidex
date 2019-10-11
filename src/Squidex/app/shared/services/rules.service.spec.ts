@@ -60,6 +60,7 @@ describe('RulesService', () => {
 
         req.flush({
             'action2': {
+                title: 'title2',
                 display: 'display2',
                 description: 'description2',
                 iconColor: '#222',
@@ -82,6 +83,7 @@ describe('RulesService', () => {
                 }]
             },
             'action1': {
+                title: 'title1',
                 display: 'display1',
                 description: 'description1',
                 iconColor: '#111',
@@ -91,9 +93,9 @@ describe('RulesService', () => {
             }
         });
 
-        const action1 = new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
+        const action1 = new RuleElementDto('title1', 'display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
 
-        const action2 = new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
+        const action2 = new RuleElementDto('title2', 'display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
             new RuleElementPropertyDto('property1', 'Editor1', 'Display1', 'Description1', false, true),
             new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false)
         ]);
