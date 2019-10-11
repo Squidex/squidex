@@ -16,7 +16,16 @@ var editor = new tui.Editor({
             } else {
                 var data = editor.getMarkdown();
                 field.valueChanged(data);
-                updateFooter(data);
+                updaterFooter(data);
+            }
+        },
+        blur: function () {
+            if (isFirstCall) {
+                isFirstCall = false;
+            } else {
+                var data = editor.getMarkdown();
+                field.valueChanged(data);
+                updaterFooter(data);
             }
         }
     }
@@ -25,7 +34,7 @@ var editor = new tui.Editor({
 field.onValueChanged(function (value) {
     if (value) {
         editor.setValue(value);
-        updateFooter(value);
+        updaterFooter(value);
     }
 });
 
@@ -73,7 +82,7 @@ function fetchCommentaryCount() {
 
 var renderer = new PlainTextRenderer();
 
-function updateFooter(markdown) {
+function updaterFooter(markdown) {
     if (markdown) {
         var text = marked(markdown, { renderer: renderer });
 

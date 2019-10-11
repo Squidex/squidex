@@ -57,6 +57,12 @@ export class BrowserUtil {
         await locator.sendKeys(text);
     }
 
+    // waits for the input field to be present and appends text
+    public async waitForElementToBePresentAndAppendText(locator: ElementFinder, text: string, timeout = 20000) {
+        await this.getWhenVisible(locator, timeout);
+        await locator.sendKeys(text);
+    }
+
     // brings the element to focus and clicks
     public async mouseMoveAndClick(locator: ElementFinder) {
         await browser.actions().mouseMove(locator).perform();
@@ -96,6 +102,12 @@ export class BrowserUtil {
         await browser.executeScript('arguments[0].scrollIntoView()', webElement);
 
         return await this.waitForElementToBeVisibleAndGetText(webElement);
+    }
+
+    public async scrollIntoViewAndGetText(webElement: ElementFinder) {
+        await browser.executeScript('arguments[0].scrollIntoView()', webElement);
+
+        return await new BrowserUtil().waitForElementToBeVisibleAndGetText(webElement);
     }
 
     public async scrollIntoView(webElement: ElementFinder): Promise<ElementFinder | WebElement> {
