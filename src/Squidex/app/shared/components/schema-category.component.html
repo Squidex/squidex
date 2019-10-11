@@ -16,7 +16,7 @@
         </button>
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" @fade>
+    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
         <ng-container *ngIf="!forContent; else simpleMode">
             <div *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item"
                 routerLinkActive="active"
