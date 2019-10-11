@@ -11,7 +11,6 @@
             [form]="form"
             [formContext]="formContext"
             [field]="field"
-            [isHidden]="snapshot.isHidden"
             [isDisabled]="arrayControl.disabled"
             [isFirst]="i === 0"
             [isLast]="i === arrayControl.controls.length - 1"
@@ -21,16 +20,28 @@
             [languages]="languages"
             (clone)="itemAdd(itemForm)"
             (move)="move(itemForm, $event)"
-            (remove)="itemRemove(i)"
-            (toggle)="hide($event)">
+            (remove)="itemRemove(i)">
             <i cdkDragHandle class="icon-drag2"></i>
         </sqx-array-item>
     </div>
 </div>
 
-<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="itemAdd(undefined)">
-    Add Item
-</button>
+<div class="row">
+    <div class="col">
+        <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="itemAdd(undefined)">
+            Add Item
+        </button>
+    </div>
+
+    <div class="col-auto" *ngIf="arrayControl.controls.length > 0">
+        <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="Expand all items">
+            <i class="icon-plus-square"></i>
+        </button>
+        <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="Collapse all items">
+            <i class="icon-minus-square"></i>
+        </button>
+    </div>
+</div>
 
 <small class="text-muted ml-2" *ngIf="field.nested.length === 0">
     Add a nested field first to add items.

@@ -6,20 +6,17 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
 import {
     AppLanguageDto,
     EditContentForm,
     RootFieldDto,
-    sorted,
-    StatefulComponent
+    sorted
 } from '@app/shared';
 
-interface State {
-    isHidden: boolean;
-}
+import { ArrayItemComponent } from './array-item.component';
 
 @Component({
     selector: 'sqx-array-editor',
@@ -27,7 +24,7 @@ interface State {
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArrayEditorComponent extends StatefulComponent<State> {
+export class ArrayEditorComponent {
     @Input()
     public form: EditContentForm;
 
@@ -46,15 +43,8 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
     @Input()
     public arrayControl: FormArray;
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            isHidden: false
-        });
-    }
-
-    public hide(isHidden: boolean) {
-        this.next(s => ({ ...s, isHidden }));
-    }
+    @ViewChildren(ArrayItemComponent)
+    public children: QueryList<ArrayItemComponent>;
 
     public itemRemove(index: number) {
         this.form.arrayItemRemove(this.field, this.language, index);
@@ -66,6 +56,18 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
 
     public sort(event: CdkDragDrop<ReadonlyArray<AbstractControl>>) {
         this.sortInternal(sorted(event));
+    }
+
+    public collapseAll() {
+        this.children.forEach(component => {
+            component.collapse();
+        });
+    }
+
+    public expandAll() {
+        this.children.forEach(component => {
+            component.expand();
+        });
     }
 
     public move(control: AbstractControl, index: number) {
