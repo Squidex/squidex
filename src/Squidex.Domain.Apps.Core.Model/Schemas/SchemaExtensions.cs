@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             return schema.Fields.OfType<IField<AssetsFieldProperties>>()
                 .Where(x =>
-                    x.Properties.ResolveReference &&
+                    x.Properties.ResolveImage &&
                     x.IsListField(schema));
         }
 

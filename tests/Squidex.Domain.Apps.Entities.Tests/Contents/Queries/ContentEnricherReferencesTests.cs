@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoEnrichment()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoEnrichment()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -224,6 +224,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
                 enriched.ElementAt(1).ReferenceData);
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_query_service_if_no_assets_found()
+        {
+            var source = new IContentEntity[]
+            {
+                CreateContent(new Guid[0], new Guid[0])
+            };
+
+            await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_query_service_if_nothing_to_enrich()
+        {
+            var source = new IContentEntity[0];
+
+            await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         private IEnrichedContentEntity CreateContent(Guid[] ref1, Guid[] ref2)

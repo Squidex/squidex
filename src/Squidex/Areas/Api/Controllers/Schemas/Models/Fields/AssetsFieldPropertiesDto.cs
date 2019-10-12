@@ -69,9 +69,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool MustBeImage { get; set; }
 
         /// <summary>
-        /// True to resolve references in the content list.
+        /// True to resolve first image in the content list.
         /// </summary>
-        public bool ResolveReference { get; set; }
+        public bool ResolveImage { get; set; }
 
         /// <summary>
         /// The allowed file extensions.

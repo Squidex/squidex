@@ -40,14 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new Schema(schemaId.Name)
                     .AddAssets(1, "asset1", Partitioning.Invariant, new AssetsFieldProperties
                     {
-                        ResolveReference = true,
+                        ResolveImage = true,
                         MinItems = 2,
                         MaxItems = 3,
                         IsListField = true
                     })
                     .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
                     {
-                        ResolveReference = true,
+                        ResolveImage = true,
                         MinItems = 1,
                         MaxItems = 1,
                         IsListField = true,
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -147,6 +147,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                             .AddValue("en",
                                 $"url/to/{image2.Id}")),
                 enriched.ElementAt(1).ReferenceData);
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_query_service_if_no_assets_found()
+        {
+            var source = new IContentEntity[]
+            {
+                CreateContent(new Guid[0], new Guid[0])
+            };
+
+            await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_query_service_if_nothing_to_enrich()
+        {
+            var source = new IContentEntity[0];
+
+            await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+                .MustNotHaveHappened();
         }
 
         private IEnrichedContentEntity CreateContent(Guid[] assets1, Guid[] assets2)

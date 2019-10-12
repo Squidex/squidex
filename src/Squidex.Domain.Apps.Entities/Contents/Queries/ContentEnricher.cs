@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
+        private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyContents = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
+        private static readonly ILookup<Guid, IEnrichedAssetEntity> EmptyAssets = Enumerable.Empty<IEnrichedAssetEntity>().ToLookup(x => x.Id);
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly Lazy<IContentQueryService> contentQuery;
@@ -303,6 +305,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private async Task<ILookup<Guid, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<Guid> ids)
         {
+            if (ids.Count == 0)
+            {
+                return EmptyContents;
+            }
+
             var references = await ContentQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), ids.ToList());
 
             return references.ToLookup(x => x.Id);
@@ -310,7 +317,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private async Task<ILookup<Guid, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<Guid> ids)
         {
-            var assets = await assetQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), Q.Empty.WithIds(ids));
+            if (ids.Count == 0)
+            {
+                return EmptyAssets;
+            }
+
+            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }
