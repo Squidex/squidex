@@ -150,6 +150,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
+        public async Task Should_not_enrich_references_if_not_api_user()
+        {
+            var source = new IContentEntity[]
+            {
+                CreateContent(new Guid[] { Guid.NewGuid() }, new Guid[0])
+            };
+
+            var enriched = await sut.EnrichAsync(source, new Context(Mocks.ApiUser(), Mocks.App(appId)));
+
+            Assert.Null(enriched.ElementAt(0).ReferenceData);
+
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_enrich_references_if_disabled()
+        {
+            var source = new IContentEntity[]
+            {
+                CreateContent(new Guid[] { Guid.NewGuid() }, new Guid[0])
+            };
+
+            var enriched = await sut.EnrichAsync(source, new Context(Mocks.ApiUser(), Mocks.App(appId)));
+
+            Assert.Null(enriched.ElementAt(0).ReferenceData);
+
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_invoke_query_service_if_no_assets_found()
         {
             var source = new IContentEntity[]
@@ -157,7 +189,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new Guid[0], new Guid[0])
             };
 
-            await sut.EnrichAsync(source, requestContext);
+            var enriched = await sut.EnrichAsync(source, requestContext);
+
+            Assert.NotNull(enriched.ElementAt(0).ReferenceData);
 
             A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
                 .MustNotHaveHappened();
