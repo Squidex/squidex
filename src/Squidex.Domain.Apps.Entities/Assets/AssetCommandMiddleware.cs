@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        private readonly IContextProvider contextProvider;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
@@ -32,6 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IAssetQueryService assetQuery,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
+            IContextProvider contextProvider,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
@@ -39,12 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
             Guard.NotNull(tagGenerators, nameof(tagGenerators));
 
             this.assetStore = assetStore;
             this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
+            this.contextProvider = contextProvider;
             this.tagGenerators = tagGenerators;
         }
 
@@ -61,7 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var existings = await assetQuery.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
+                            var ctx = contextProvider.Context.Clone().WithNoAssetEnrichment();
+
+                            var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
 
                             foreach (var existing in existings)
                             {
@@ -127,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
             {
-                var enriched = await assetEnricher.EnrichAsync(asset);
+                var enriched = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
 
                 context.Complete(enriched);
             }

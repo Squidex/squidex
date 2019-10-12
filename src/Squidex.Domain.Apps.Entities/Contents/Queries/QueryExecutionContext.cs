@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (asset == null)
             {
-                asset = await assetQuery.FindAssetAsync(id);
+                asset = await assetQuery.FindAssetAsync(context, id);
 
                 if (asset != null)
                 {

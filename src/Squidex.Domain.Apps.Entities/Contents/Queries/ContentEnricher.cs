@@ -10,8 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -23,7 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
-        private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyReferences = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
+        private readonly IAssetQueryService assetQuery;
+        private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly Lazy<IContentQueryService> contentQuery;
         private readonly IContentWorkflow contentWorkflow;
 
@@ -32,11 +35,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             get { return contentQuery.Value; }
         }
 
-        public ContentEnricher(Lazy<IContentQueryService> contentQuery, IContentWorkflow contentWorkflow)
+        public ContentEnricher(IAssetQueryService assetQuery, IAssetUrlGenerator assetUrlGenerator, Lazy<IContentQueryService> contentQuery, IContentWorkflow contentWorkflow)
         {
+            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
 
+            this.assetQuery = assetQuery;
+            this.assetUrlGenerator = assetUrlGenerator;
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
         }
@@ -69,12 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         var result = SimpleMapper.Map(content, new ContentEntity());
 
-                        await ResolveColorAsync(content, result, cache);
+                        await EnrichColorAsync(content, result, cache);
 
                         if (ShouldEnrichWithStatuses(context))
                         {
-                            await ResolveNextsAsync(content, result, context);
-                            await ResolveCanUpdateAsync(content, result);
+                            await EnrichNextsAsync(content, result, context);
+                            await EnrichCanUpdateAsync(content, result);
                         }
 
                         results.Add(result);
@@ -107,11 +114,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 content.SchemaDisplayName = schemaDisplayName;
                             }
                         }
+                    }
 
-                        if (ShouldEnrich(context))
-                        {
-                            await ResolveReferencesAsync(schema, group, context);
-                        }
+                    if (ShouldEnrich(context))
+                    {
+                        await EnrichReferencesAsync(context, results);
+                        await EnrichAssetsAsync(context, results);
                     }
                 }
 
@@ -119,10 +127,50 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private async Task ResolveReferencesAsync(ISchemaEntity schema, IEnumerable<ContentEntity> contents, Context context)
+        private async Task EnrichAssetsAsync(Context context, List<ContentEntity> contents)
         {
-            var references = await GetReferencesAsync(schema, contents, context);
+            var ids = new HashSet<Guid>();
 
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
+
+                AddAssetIds(ids, schema, group);
+            }
+
+            var assets = await GetAssetsAsync(context, ids);
+
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
+
+                ResolveAssets(schema, group, assets);
+            }
+        }
+
+        private async Task EnrichReferencesAsync(Context context, List<ContentEntity> contents)
+        {
+            var ids = new HashSet<Guid>();
+
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
+
+                AddReferenceIds(ids, schema, group);
+            }
+
+            var references = await GetReferencesAsync(context, ids);
+
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
+
+                await ResolveReferencesAsync(context, schema, group, references);
+            }
+        }
+
+        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, IEnumerable<ContentEntity> contents, ILookup<Guid, IEnrichedContentEntity> references)
+        {
             var formatted = new Dictionary<IContentEntity, JsonObject>();
 
             foreach (var field in schema.SchemaDef.ResolvingReferences())
@@ -134,15 +182,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         content.ReferenceData = new NamedContentData();
                     }
 
-                    content.ReferenceData.GetOrAddNew(field.Name);
-                }
+                    var fieldReference = content.ReferenceData.GetOrAddNew(field.Name);
 
-                try
-                {
-                    foreach (var content in contents)
+                    try
                     {
-                        var fieldReference = content.ReferenceData[field.Name];
-
                         if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
                         {
                             foreach (var partitionValue in fieldData)
@@ -161,6 +204,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                                     content.CacheDependencies.Add(referencedSchema.Id);
                                     content.CacheDependencies.Add(referencedSchema.Version);
+                                    content.CacheDependencies.Add(reference.Id);
+                                    content.CacheDependencies.Add(reference.Version);
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
@@ -175,10 +220,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                             }
                         }
                     }
+                    catch (DomainObjectNotFoundException)
+                    {
+                        continue;
+                    }
                 }
-                catch (DomainObjectNotFoundException)
+            }
+        }
+
+        private void ResolveAssets(ISchemaEntity schema, IGrouping<Guid, ContentEntity> contents, ILookup<Guid, IEnrichedAssetEntity> assets)
+        {
+            foreach (var field in schema.SchemaDef.ResolvingAssets())
+            {
+                foreach (var content in contents)
                 {
-                    continue;
+                    if (content.ReferenceData == null)
+                    {
+                        content.ReferenceData = new NamedContentData();
+                    }
+
+                    var fieldReference = content.ReferenceData.GetOrAddNew(field.Name);
+
+                    if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
+                    {
+                        foreach (var partitionValue in fieldData)
+                        {
+                            var referencedImage =
+                                field.GetReferencedIds(partitionValue.Value, Ids.ContentOnly)
+                                    .Select(x => assets[x])
+                                    .SelectMany(x => x)
+                                    .FirstOrDefault(x => x.IsImage);
+
+                            if (referencedImage != null)
+                            {
+                                var url = assetUrlGenerator.GenerateUrl(referencedImage.Id.ToString());
+
+                                content.CacheDependencies.Add(referencedImage.Id);
+                                content.CacheDependencies.Add(referencedImage.Version);
+
+                                fieldReference.AddJsonValue(partitionValue.Key, JsonValue.Create(url));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -202,38 +285,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return value;
         }
 
-        private async Task<ILookup<Guid, IEnrichedContentEntity>> GetReferencesAsync(ISchemaEntity schema, IEnumerable<ContentEntity> contents, Context context)
+        private void AddReferenceIds(HashSet<Guid> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
         {
-            var ids = new HashSet<Guid>();
-
             foreach (var content in contents)
             {
                 ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef.ResolvingReferences(), Ids.ContentOnly));
             }
+        }
 
-            if (ids.Count > 0)
+        private void AddAssetIds(HashSet<Guid> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        {
+            foreach (var content in contents)
             {
-                var references = await ContentQuery.QueryAsync(context.Clone().WithNoEnrichment(true), ids.ToList());
-
-                return references.ToLookup(x => x.Id);
-            }
-            else
-            {
-                return EmptyReferences;
+                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef.ResolvingAssets(), Ids.ContentOnly));
             }
         }
 
-        private async Task ResolveCanUpdateAsync(IContentEntity content, ContentEntity result)
+        private async Task<ILookup<Guid, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<Guid> ids)
+        {
+            var references = await ContentQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), ids.ToList());
+
+            return references.ToLookup(x => x.Id);
+        }
+
+        private async Task<ILookup<Guid, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<Guid> ids)
+        {
+            var assets = await assetQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), Q.Empty.WithIds(ids));
+
+            return assets.ToLookup(x => x.Id);
+        }
+
+        private async Task EnrichCanUpdateAsync(IContentEntity content, ContentEntity result)
         {
             result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
         }
 
-        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result, Context context)
+        private async Task EnrichNextsAsync(IContentEntity content, ContentEntity result, Context context)
         {
             result.Nexts = await contentWorkflow.GetNextsAsync(content, context.User);
         }
 
-        private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
+        private async Task EnrichColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
         {
             result.StatusColor = await GetColorAsync(content, cache);
         }
