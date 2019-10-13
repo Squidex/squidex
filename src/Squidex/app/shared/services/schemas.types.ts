@@ -174,6 +174,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
     public readonly allowDuplicates?: boolean;
+    public readonly resolveImage: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;

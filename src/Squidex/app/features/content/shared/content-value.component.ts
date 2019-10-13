@@ -16,15 +16,27 @@ import { HtmlValue, Types } from '@app/shared';
             <span class="truncate">{{value}}</span>
         </ng-container>
         <ng-template #html>
-            <span class="truncate" [innerHTML]="value.html"></span>
+            <span class="html-value" [innerHTML]="value.html"></span>
         </ng-template>`,
+    styles: [`
+        .html-value {
+            position: relative;
+        }
+        ::ng-deep .html-value img {
+            position: absolute;
+            top: 50%;
+            min-height: 50px;
+            max-height: 50px;
+            margin-top: -25px;
+        }`
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentValueComponent {
+    @Input()
+    public value: any;
+
     public get isPlain() {
         return !Types.is(this.value, HtmlValue);
     }
-
-    @Input()
-    public value: any;
 }
