@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Events.Rules
 
         public RuleAction Action { get; set; }
 
+        public string Name { get; set; }
+
         public IEvent Migrate()
         {
             if (Trigger is IMigrated<RuleTrigger> migrated)

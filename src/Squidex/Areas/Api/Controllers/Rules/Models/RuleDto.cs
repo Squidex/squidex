@@ -59,6 +59,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public bool IsEnabled { get; set; }
 
         /// <summary>
+        /// Optional rule name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// The trigger properties.
         /// </summary>
         [Required]

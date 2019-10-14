@@ -46,15 +46,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             });
         }
 
-        public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider)
+        public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider, Rule rule)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot update rule.", async e =>
             {
-                if (command.Trigger == null && command.Action == null)
+                if (command.Trigger == null && command.Action == null && command.Name == null)
                 {
-                   e(Not.Defined("Either trigger or action"), nameof(command.Trigger), nameof(command.Action));
+                   e(Not.Defined("Either trigger, action or name"), nameof(command.Trigger), nameof(command.Action));
                 }
 
                 if (command.Trigger != null)
@@ -69,6 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                     var errors = command.Action.Validate();
 
                     errors.Foreach(x => x.AddTo(e));
+                }
+
+                if (command.Name != null && string.Equals(rule.Name, command.Name))
+                {
+                    e(Not.New("Rule", "name"), nameof(command.Name));
                 }
             });
         }

@@ -36,6 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
                 case RuleCreated e:
                     {
                         RuleDef = new Rule(e.Trigger, e.Action);
+                        RuleDef = RuleDef.Rename(e.Name);
 
                         AppId = e.AppId;
 
@@ -52,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
                         if (e.Action != null)
                         {
                             RuleDef = RuleDef.Update(e.Action);
+                        }
+
+                        if (e.Name != null)
+                        {
+                            RuleDef = RuleDef.Rename(e.Name);
                         }
 
                         break;
