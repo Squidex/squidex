@@ -6,12 +6,7 @@ namespace Squidex.ICIS.Validation
 {
     public static class ValidationServiceExtensions
     {
-        public static void AddValidationServices(IServiceCollection services)
-        {
-            AddValidationCommandMiddleware(services);
-        }
-
-        private static void AddValidationCommandMiddleware(IServiceCollection services)
+        public static void AddValidationServices(this IServiceCollection services)
         {
             services.AddSingleton<ICommentaryValidator, CommentaryUniquenessValidator>();
             services.AddSingleton<ICommentaryValidator, CommentaryPeriodValidator>();

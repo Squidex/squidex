@@ -9,13 +9,14 @@ namespace Squidex.ICIS.Authentication
 {
     public static class AuthenticationServiceExtensions
     {
-        public static void AddAuthenticationServices(IServiceCollection services, IConfiguration config)
+        public static void AddAuthenticationServices(this IServiceCollection services, IConfiguration config)
         {
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptionsExtension>();
-            services.AddGenesisAuthentication(identityOptions.IcisAuthServer);
+
+            services.AddICISAuthentication(identityOptions.IcisAuthServer);
         }
 
-        private static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
+        private static void AddICISAuthentication(this IServiceCollection services, string authServer)
         {
             services.AddSingleton<IClaimsTransformation, ClaimsTransformer>();
 

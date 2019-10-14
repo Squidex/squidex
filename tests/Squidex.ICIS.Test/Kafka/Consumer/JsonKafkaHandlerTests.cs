@@ -37,6 +37,11 @@ namespace Squidex.ICIS.Test.Kafka.Consumer
 
             public NamedContentData Data { get; } = new NamedContentData();
 
+            public IRefDataEntity CreateFake(int index)
+            {
+                return new FakeEntity();
+            }
+
             public NamedContentData ToData()
             {
                 return Data;

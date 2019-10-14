@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
-    public sealed class ConsumerService<T> : IHostedService
+    public sealed class ConsumerService<T> : IDisposable, IKafkaConsumerService
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly ConsumerOptions options;
@@ -44,7 +44,7 @@ namespace Squidex.ICIS.Kafka.Consumer
             actor = new RefToken(RefTokenType.Client, options.Value.ClientName);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default)
+        public void Start()
         {
             consumerTask = new Task(async () =>
             {
@@ -58,10 +58,13 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                         var context = contextProvider.Context;
 
-                        var user = (ClaimsIdentity)context.User.Identity;
-                        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+                        AddPermissions(context.User);
 
+                        //
+                        // Assign the app here and not in a method, otherwise it would not land in the context.
+                        // Read more:
                         // https://stackoverflow.com/a/37309427/1229622
+                        //
                         context.App = app;
                         context.UpdatePermissions();
 
@@ -81,8 +84,13 @@ namespace Squidex.ICIS.Kafka.Consumer
             }, TaskCreationOptions.LongRunning);
 
             consumerTask.Start();
+        }
 
-            return Task.CompletedTask;
+        private void AddPermissions(ClaimsPrincipal principal)
+        {
+            var user = (ClaimsIdentity)principal.Identity;
+
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
         }
 
         private async Task EnsureAppExistsAsync()
@@ -98,11 +106,12 @@ namespace Squidex.ICIS.Kafka.Consumer
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken = default)
+        public void Dispose()
         {
             cts.Cancel();
+            cts.Dispose();
 
-            return consumerTask;
+            consumerTask.Wait();
         }
     }
 }

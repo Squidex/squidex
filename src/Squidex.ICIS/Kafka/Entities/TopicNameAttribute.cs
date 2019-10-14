@@ -8,6 +8,8 @@ namespace Squidex.ICIS.Kafka.Entities
     {
         private readonly string name;
 
+        public string ConfigurationSource { get; set; }
+
         public TopicNameAttribute(string name)
         {
             this.name = name;
@@ -15,7 +17,19 @@ namespace Squidex.ICIS.Kafka.Entities
 
         public string GetName(ConsumerOptions options)
         {
-            return name.Replace("{environment}", options.Environment);
+            if (!string.IsNullOrWhiteSpace(ConfigurationSource) &&
+                options.TopicNames != null &&
+                options.TopicNames.TryGetValue(ConfigurationSource, out var topicName) &&
+                !string.IsNullOrWhiteSpace(topicName))
+            {
+                return topicName;
+            }
+
+            topicName =
+                name.Replace("{environment}", options.Environment)
+                    .Replace("{version}", options.Version.ToString());
+
+            return topicName;
         }
     }
 }

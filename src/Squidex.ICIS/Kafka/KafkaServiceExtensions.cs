@@ -1,9 +1,10 @@
-﻿using Avro.Specific;
+﻿#define FAKED_
+
+using Avro.Specific;
 using Confluent.SchemaRegistry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Squidex.ICIS.Kafka.Config;
 using Squidex.ICIS.Kafka.Consumer;
 using Squidex.ICIS.Kafka.Entities;
@@ -16,10 +17,10 @@ namespace Squidex.ICIS.Kafka
 {
     public static class KafkaServiceExtensions
     {
-        public static void AddKafkaServices(IServiceCollection services, IConfiguration config)
+        public static void AddKafkaServices(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<ICISKafkaOptions>
-                (config.GetSection("kafka"));
+            services.Configure<ICISKafkaOptions>(
+                config.GetSection("kafka"));
 
             AddKafkaRuleExtension(services, config);
             AddKafkaConsumers(services, config);
@@ -64,9 +65,13 @@ namespace Squidex.ICIS.Kafka
 
         private static void ConfigureConsumer(this IServiceCollection services, Type type)
         {
-            services.AddSingleton<IHostedService>(c =>
+            services.AddSingleton<IKafkaConsumerService>(c =>
             {
+#if FAKED
+                var consumer = new FakeConsumer(2000, type);
+#else
                 var consumer = ActivatorUtilities.CreateInstance<KafkaJsonConsumer>(c, type);
+#endif
                 var consumerHandler = (IKafkaHandler<IRefDataEntity>)c.GetService<JsonKafkaHandler>();
                 var consumerService = ActivatorUtilities.CreateInstance<ConsumerService<IRefDataEntity>>(c, consumer, consumerHandler);
 

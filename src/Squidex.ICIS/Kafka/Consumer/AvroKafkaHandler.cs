@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avro;
+using System.Collections.Concurrent;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
@@ -23,7 +24,7 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly ICommandBus commandBus;
         private readonly IAppProvider appProvider;
         private readonly IContentQueryService contentQuery;
-        private readonly Dictionary<string, Guid> contentIds = new Dictionary<string, Guid>();
+        private readonly ConcurrentDictionary<string, Guid> contentIds = new ConcurrentDictionary<string, Guid>();
         private NamedId<Guid> schemaId;
         private ISchemaEntity schema;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DeploymentApp.Utilities;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 
@@ -17,49 +16,60 @@ namespace DeploymentApp.Extensions
 
     public delegate (string Email, string Role) ContributorFactory();
 
-    public static class IcisClientManagerExtensions
+    public sealed class IcisClient
     {
-        public static async Task CreateApp(this SquidexClientManager clientManager)
+        public SquidexClientManager ClientManager { get; }
+
+        public ILogger Log { get; }
+
+        public IcisClient(ILogger logger, SquidexClientManager clientManager)
         {
-            var appsClient = clientManager.CreateAppsClient();
+            Log = logger;
+
+            ClientManager = clientManager;
+        }
+
+        public async Task CreateApp()
+        {
+            var appsClient = ClientManager.CreateAppsClient();
             try
             {
-                ConsoleHelper.Start($"Creating app {clientManager.App}");
+                Log.Start($"Creating app {ClientManager.App}");
 
                 await appsClient.PostAppAsync(new CreateAppDto
                 {
-                    Name = clientManager.App
+                    Name = ClientManager.App
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (SquidexManagementException ex)
             {
                 if (ex.StatusCode.Equals(400))
                 {
-                    ConsoleHelper.Skipped("already exists");
+                    Log.Skipped("already exists");
                 }
                 else
                 {
-                    ConsoleHelper.Failed(ex);
+                    Log.Failed(ex);
                     throw;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.Failed(ex);
+                Log.Failed(ex);
                 throw;
             }
         }
 
-        public static async Task UpsertSchema(this SquidexClientManager clientManager, SchemaFactory factory)
+        public async Task UpsertSchema(SchemaFactory factory)
         {
-            var (name, upsert) = factory(clientManager);
+            var (name, upsert) = factory(ClientManager);
 
-            var schemasClient = clientManager.CreateSchemasClient();
+            var schemasClient = ClientManager.CreateSchemasClient();
             try
             {
-                ConsoleHelper.Start($"Creating schema {name}");
+                Log.Start($"Creating schema {name}");
 
                 var create = new CreateSchemaDto
                 {
@@ -68,17 +78,17 @@ namespace DeploymentApp.Extensions
 
                 await upsert(create);
 
-                var response = await schemasClient.PostSchemaAsync(clientManager.App, create);
+                var response = await schemasClient.PostSchemaAsync(ClientManager.App, create);
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (SquidexManagementException ex)
             {
                 if (ex.StatusCode.Equals(400))
                 {
-                    ConsoleHelper.Skipped("already exists");
+                    Log.Skipped("already exists");
 
-                    ConsoleHelper.Start($"Syncing schema {name}");
+                    Log.Start($"Syncing schema {name}");
 
                     var sync = new SynchronizeSchemaDto 
                     {
@@ -88,167 +98,167 @@ namespace DeploymentApp.Extensions
 
                     await upsert(sync);
 
-                    await schemasClient.PutSchemaSyncAsync(clientManager.App, name, sync);
+                    await schemasClient.PutSchemaSyncAsync(ClientManager.App, name, sync);
 
-                    ConsoleHelper.Success();
+                    Log.Success();
                 }
                 else
                 {
-                    ConsoleHelper.Failed(ex);
+                    Log.Failed(ex);
                     throw;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.Failed(ex);
+                Log.Failed(ex);
                 throw;
             }
         }
 
-        public static async Task UpsertRole(this SquidexClientManager clientManager, RoleFactory factory)
+        public async Task UpsertRole(RoleFactory factory)
         {
             var (name, permissions) = factory();
 
-            var appsClient = clientManager.CreateAppsClient();
+            var appsClient = ClientManager.CreateAppsClient();
             try
             {
-                ConsoleHelper.Start($"Creating role {name}");
+                Log.Start($"Creating role {name}");
 
-                await appsClient.PostRoleAsync(clientManager.App, new AddRoleDto
+                await appsClient.PostRoleAsync(ClientManager.App, new AddRoleDto
                 {
                     Name = name
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (SquidexManagementException e)
             {
                 if (e.StatusCode.Equals(400))
                 {
-                    ConsoleHelper.Skipped("Role already exists");
+                    Log.Skipped("Role already exists");
                 }
                 else
                 {
-                    ConsoleHelper.Failed(e);
+                    Log.Failed(e);
                     throw;
                 }
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
 
             try
             {
-                ConsoleHelper.Start($"Adding permissions to role {name}");
+                Log.Start($"Adding permissions to role {name}");
 
-                await appsClient.PutRoleAsync(clientManager.App, name, new UpdateRoleDto
+                await appsClient.PutRoleAsync(ClientManager.App, name, new UpdateRoleDto
                 {
                     Permissions = permissions.ToArray()
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        public static async Task UpsertLanguage(this SquidexClientManager clientManager, string languageCode)
+        public async Task UpsertLanguage(string languageCode)
         {
-            var appsClient = clientManager.CreateAppsClient();
+            var appsClient = ClientManager.CreateAppsClient();
 
             try
             {
-                ConsoleHelper.Start($"Creating language {languageCode}");
+                Log.Start($"Creating language {languageCode}");
 
-                await appsClient.PostLanguageAsync(clientManager.App, new AddLanguageDto
+                await appsClient.PostLanguageAsync(ClientManager.App, new AddLanguageDto
                 {
                     Language = languageCode
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (SquidexManagementException e)
             {
                 if (e.StatusCode.Equals(400))
                 {
-                    ConsoleHelper.Skipped("Language already exists");
+                    Log.Skipped("Language already exists");
                 }
                 else
                 {
-                    ConsoleHelper.Failed(e);
+                    Log.Failed(e);
                     throw;
                 }
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
 
             try
             {
-                ConsoleHelper.Start($"Updating language {languageCode}");
+                Log.Start($"Updating language {languageCode}");
 
-                await appsClient.PutLanguageAsync(clientManager.App, languageCode, new UpdateLanguageDto
+                await appsClient.PutLanguageAsync(ClientManager.App, languageCode, new UpdateLanguageDto
                 {
                     IsOptional = true
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        public static async Task UpsertContributor(this SquidexClientManager clientManager, ContributorFactory factory)
+        public async Task UpsertContributor(ContributorFactory factory)
         {
             var (id, role) = factory();
 
-            var appsClient = clientManager.CreateAppsClient();
+            var appsClient = ClientManager.CreateAppsClient();
             try
             {
-                ConsoleHelper.Start($"Adding contributor {id} as {role}");
+                Log.Start($"Adding contributor {id} as {role}");
 
-                await appsClient.PostContributorAsync(clientManager.App, new AssignContributorDto()
+                await appsClient.PostContributorAsync(ClientManager.App, new AssignContributorDto()
                 {
                     ContributorId = id, Role = role, Invite = true
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (SquidexManagementException e)
             {
                 if (e.StatusCode.Equals(400))
                 {
-                    ConsoleHelper.Skipped($"Contributor {id} already added");
+                    Log.Skipped($"Contributor {id} already added");
                 }
                 else
                 {
-                    ConsoleHelper.Failed(e);
+                    Log.Failed(e);
                     throw;
                 }
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        public static async Task UpsertWorkflow(this SquidexClientManager clientManager, WorkflowFactory factory)
+        public async Task UpsertWorkflow(WorkflowFactory factory)
         {
-            var appsClient = clientManager.CreateAppsClient();
+            var appsClient = ClientManager.CreateAppsClient();
 
-            var workflows = await appsClient.GetWorkflowsAsync(clientManager.App);
-            var workflowDto = await factory(clientManager);
+            var workflows = await appsClient.GetWorkflowsAsync(ClientManager.App);
+            var workflowDto = await factory(ClientManager);
 
             var existingWorkflow = workflows.Items.FirstOrDefault(x => x.Name == workflowDto.Name);
 
@@ -256,29 +266,29 @@ namespace DeploymentApp.Extensions
             {
                 try
                 {
-                    ConsoleHelper.Start($"Adding workflow {workflowDto.Name}");
+                    Log.Start($"Adding workflow {workflowDto.Name}");
 
-                    workflows = await appsClient.PostWorkflowAsync(clientManager.App, new AddWorkflowDto()
+                    workflows = await appsClient.PostWorkflowAsync(ClientManager.App, new AddWorkflowDto()
                     {
                         Name = workflowDto.Name
                     });
 
                     existingWorkflow = workflows.Items.FirstOrDefault(x => x.Name == workflowDto.Name);
 
-                    ConsoleHelper.Success();
+                    Log.Success();
                 }
                 catch (Exception e)
                 {
-                    ConsoleHelper.Failed(e);
+                    Log.Failed(e);
                     throw;
                 }
             }
 
             try
             {
-                ConsoleHelper.Start($"Updating workflow {workflowDto.Name}");
+                Log.Start($"Updating workflow {workflowDto.Name}");
 
-                await appsClient.PutWorkflowAsync(clientManager.App, existingWorkflow.Id.ToString(), new UpdateWorkflowDto()
+                await appsClient.PutWorkflowAsync(ClientManager.App, existingWorkflow.Id.ToString(), new UpdateWorkflowDto()
                 {
                     Name = workflowDto.Name,
                     Initial = workflowDto.Initial,
@@ -288,22 +298,22 @@ namespace DeploymentApp.Extensions
 
                 existingWorkflow = workflows.Items.FirstOrDefault(x => x.Name == workflowDto.Name);
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        public static async Task CreateIdDataAsync(this SquidexClientManager clientManager, string schema, string id, object data, bool isLocalized)
+        public async Task CreateIdDataAsync(string schema, string id, object data, bool isLocalized)
         {
-            var client = clientManager.GetClient<TestData, object>(schema);
+            var client = ClientManager.GetClient<TestData, object>(schema);
 
             try
             {
-                ConsoleHelper.Start($"Creating item for {schema} with id '{id}'");
+                Log.Start($"Creating item for {schema} with id '{id}'");
 
                 var items = await client.GetAsync(new ODataQuery
                 {
@@ -312,7 +322,7 @@ namespace DeploymentApp.Extensions
 
                 if (items.Total > 0)
                 {
-                    ConsoleHelper.Skipped("Exists");
+                    Log.Skipped("Exists");
                 }
                 else
                 {
@@ -356,27 +366,27 @@ namespace DeploymentApp.Extensions
                         await client.CreateAsync(data);
                     }
 
-                    ConsoleHelper.Success();
+                    Log.Success();
                 }
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        public static async Task CreateCommentaryAsync(this SquidexClientManager clientManager, string createFor, string commodity, string commentaryType, string region, string body)
+        public async Task CreateCommentaryAsync(string createFor, string commodity, string commentaryType, string region, string body)
         {
-            var commentaries = clientManager.GetClient<TestData, object>("commentary");
+            var commentaries = ClientManager.GetClient<TestData, object>("commentary");
 
             try
             {
-                ConsoleHelper.Start($"Creating commentary");
+                Log.Start($"Creating commentary");
 
-                var commodityId = await GetReferenceAsync(clientManager, "commodity", commodity);
-                var commentaryTypeId = await GetReferenceAsync(clientManager, "commentary-type", commentaryType);
-                var regionId = await GetReferenceAsync(clientManager, "region", region);
+                var commodityId = await GetReferenceAsync("commodity", commodity);
+                var commentaryTypeId = await GetReferenceAsync("commentary-type", commentaryType);
+                var regionId = await GetReferenceAsync("region", region);
 
                 await commentaries.CreateAsync(new
                 {
@@ -402,18 +412,18 @@ namespace DeploymentApp.Extensions
                     }
                 });
 
-                ConsoleHelper.Success();
+                Log.Success();
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                Log.Failed(e);
                 throw;
             }
         }
 
-        private static async Task<string> GetReferenceAsync(this SquidexClientManager clientManager, string schema, string id)
+        private async Task<string> GetReferenceAsync(string schema, string id)
         {
-            using (var client = clientManager.GetClient<TestData, object>(schema))
+            using (var client = ClientManager.GetClient<TestData, object>(schema))
             {
                 var items = await client.GetAsync(new ODataQuery
                 {
@@ -430,7 +440,7 @@ namespace DeploymentApp.Extensions
             }
         }
 
-        class TestData : SquidexEntityBase<object>
+        private sealed class TestData : SquidexEntityBase<object>
         {
         }
     }

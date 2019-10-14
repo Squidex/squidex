@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DeploymentApp
 {
-    public sealed class AppOptions
+    public sealed class DeploymentOptions
     {
         public string App { get; set; } = "commentary";
 

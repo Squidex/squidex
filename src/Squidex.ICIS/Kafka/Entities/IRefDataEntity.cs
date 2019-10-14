@@ -10,6 +10,8 @@ namespace Squidex.ICIS.Kafka.Entities
 
         string Schema { get; }
 
+        IRefDataEntity CreateFake(int index);
+
         NamedContentData ToData();
     }
 }

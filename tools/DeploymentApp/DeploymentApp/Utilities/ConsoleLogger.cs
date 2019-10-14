@@ -2,24 +2,24 @@
 
 namespace DeploymentApp.Utilities
 {
-    public class ConsoleHelper
+    public class ConsoleLogger : ILogger
     {
-        public static void Start(string message)
+        public void Start(string message)
         {
             Console.Write((message + "...").PadRight(80));
         }
 
-        public static void Success()
+        public void Success()
         {
             Console.WriteLine("succeeded.");
         }
 
-        public static void Skipped(string reason)
+        public void Skipped(string reason)
         {
             Console.WriteLine($"skipped: {reason}");
         }
 
-        public static void Failed(Exception ex)
+        public void Failed(Exception ex)
         {
             Console.WriteLine($"failed with {ex.Message}.");
         }

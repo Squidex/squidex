@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.ClientLibrary.Management;
-using DeploymentApp.Utilities;
-using Squidex.ClientLibrary;
 
 namespace DeploymentApp.Extensions
 {
@@ -12,15 +10,15 @@ namespace DeploymentApp.Extensions
 
     public static class IcisClientWorkflowExtensions
     {
-        public static async Task UpsertKafkaRule(this SquidexClientManager clientManager, KafkaRuleFactory factory)
+        public static async Task UpsertKafkaRule(this IcisClient client, KafkaRuleFactory factory)
         {
             var (schemaName, topicName) = factory();
 
-            var rulesClient = new RulesClient(clientManager.CreateHttpClient());
-            var rulesList = await rulesClient.GetRulesAsync(clientManager.App);
+            var rulesClient = new RulesClient(client.ClientManager.CreateHttpClient());
+            var rulesList = await rulesClient.GetRulesAsync(client.ClientManager.App);
 
-            var schemasClient = clientManager.CreateSchemasClient();
-            var schemaId = schemasClient.GetSchemaAsync(clientManager.App, schemaName).Result.Id;
+            var schemasClient = client.ClientManager.CreateSchemasClient();
+            var schemaId = schemasClient.GetSchemaAsync(client.ClientManager.App, schemaName).Result.Id;
 
             var existingRule = rulesList.Items.FirstOrDefault(x =>
             {
@@ -44,7 +42,7 @@ namespace DeploymentApp.Extensions
             {
                 if (existingRule != null)
                 {
-                    ConsoleHelper.Start($"Updating rule for schema {schemaName}");
+                    client.Log.Start($"Updating rule for schema {schemaName}");
 
                     var command = new UpdateRuleDto()
                     {
@@ -55,13 +53,13 @@ namespace DeploymentApp.Extensions
                         Trigger = trigger
                     };
 
-                    await rulesClient.PutRuleAsync(clientManager.App, existingRule.Id.ToString(), command);
+                    await rulesClient.PutRuleAsync(client.ClientManager.App, existingRule.Id.ToString(), command);
 
-                    ConsoleHelper.Success();
+                    client.Log.Success();
                 }
                 else
                 {
-                    ConsoleHelper.Start($"Creating rule");
+                    client.Log.Start($"Creating rule");
 
                     var command = new CreateRuleDto
                     {
@@ -72,15 +70,15 @@ namespace DeploymentApp.Extensions
                         Trigger = trigger
                     };
 
-                    await rulesClient.PostRuleAsync(clientManager.App, command);
+                    await rulesClient.PostRuleAsync(client.ClientManager.App, command);
 
-                    ConsoleHelper.Success();
+                    client.Log.Success();
                 }
 
             }
             catch (Exception e)
             {
-                ConsoleHelper.Failed(e);
+                client.Log.Failed(e);
                 throw;
             }
         }

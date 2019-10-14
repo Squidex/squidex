@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DeploymentApp.Entities;
-using DeploymentApp.Extensions;
+using DeploymentApp.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Squidex.ClientLibrary;
 
 namespace DeploymentApp
 {
@@ -25,7 +22,7 @@ namespace DeploymentApp
                     .AddCommandLine(args)
                     .Build();
 
-            var options = configuration.Get<AppOptions>();
+            var options = configuration.Get<DeploymentOptions>();
 
             if (!options.Validate())
             {
@@ -34,78 +31,7 @@ namespace DeploymentApp
 
             try
             {
-                var authenticator =
-                    new CachingAuthenticator("TOKEN", new MemoryCache(Options.Create(new MemoryCacheOptions())),
-                        new IcisAuthenticatorExtensions(
-                            options.IdentityServer,
-                            options.ClientId,
-                            options.ClientSecret));
-
-                var clientManager = new SquidexClientManager(options.Url, options.App, authenticator, true);
-
-                await clientManager.CreateApp();
-
-                await clientManager.UpsertSchema(Schemas.Commodity);
-                await clientManager.UpsertSchema(Schemas.Region);
-                await clientManager.UpsertSchema(Schemas.Period);
-                await clientManager.UpsertSchema(Schemas.CommentaryType);
-                await clientManager.UpsertSchema(Schemas.Commentary(options.Url));
-
-                foreach (var role in Roles.All)
-                {
-                    await clientManager.UpsertRole(role);
-                }
-
-                foreach (var language in Languages.All)
-                {
-                    await clientManager.UpsertLanguage(language);
-                }
-
-                foreach (var contributor in Contributors.All)
-                {
-                    await clientManager.UpsertContributor(contributor);
-                }
-
-                foreach (var workflow in Workflows.All)
-                {
-                    await clientManager.UpsertWorkflow(workflow);
-                }
-
-                if (!options.SkipRules)
-                {
-                    foreach (var rule in Rules.AllKafkaRules)
-                    {
-                        await clientManager.UpsertKafkaRule(rule);
-                    }
-                }
-
-                if (options.GenerateTestData)
-                {
-                    foreach (var (id, name) in TestData.CommentaryTypes)
-                    {
-                        await clientManager.CreateIdDataAsync("commentary-type", id, name, false);
-                    }
-
-                    foreach (var (id, name) in TestData.Regions)
-                    {
-                        await clientManager.CreateIdDataAsync("region", id, name, true);
-                    }
-
-                    foreach (var (id, name) in TestData.Commodities)
-                    {
-                        await clientManager.CreateIdDataAsync("commodity", id, name, true);
-                    }
-
-                    foreach (var (id, name) in TestData.Periods)
-                    {
-                        await clientManager.CreateIdDataAsync("period", id, name, true);
-                    }
-
-                    foreach (var (createdFor, commentaryType, commodity, region, body) in TestData.Commentaries)
-                    {
-                        await clientManager.CreateCommentaryAsync(createdFor, commodity, commentaryType, region, body);
-                    }
-                }
+                await DeploymentRunner.RunAsync(options, new ConsoleLogger());
 
                 return 0;
             }

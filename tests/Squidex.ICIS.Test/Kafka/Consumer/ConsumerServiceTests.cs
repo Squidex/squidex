@@ -54,9 +54,9 @@ namespace Squidex.ICIS.Test.Kafka.Consumer
                     Message = new Message<string, string> {  Key = "key1", Value = "value1" }
                 });
 
-            await sut.StartAsync();
+            sut.Start();
             await Task.Delay(1000);
-            await sut.StopAsync();
+            sut.Dispose();
 
             A.CallTo(() => handler.HandleAsync(A<RefToken>.Ignored, context, "key1", "value1"))
                 .MustHaveHappened();
@@ -81,9 +81,9 @@ namespace Squidex.ICIS.Test.Kafka.Consumer
                     Message = new Message<string, string> { Key = "key1", Value = "value1" }
                 });
 
-            await sut.StartAsync();
+            sut.Start();
             await Task.Delay(1000);
-            await sut.StopAsync();
+            sut.Dispose();
 
             A.CallTo(() => handler.HandleAsync(A<RefToken>.Ignored, context, "key1", "value1"))
                 .MustNotHaveHappened();

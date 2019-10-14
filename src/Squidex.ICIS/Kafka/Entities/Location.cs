@@ -7,10 +7,11 @@
 
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Contents;
+using System.Collections.Generic;
 
 namespace Squidex.ICIS.Kafka.Entities
 {
-    [TopicName("{environment}_iddn_location_external_1")]
+    [TopicName("{environment}_iddn_location_external_{version}", ConfigurationSource = "location")]
     public sealed class Location : IRefDataEntity
     {
         [JsonProperty("id")]
@@ -22,6 +23,21 @@ namespace Squidex.ICIS.Kafka.Entities
         public string IdField => "id";
 
         public string Schema => "region";
+
+        public IRefDataEntity CreateFake(int index)
+        {
+            return new Location
+            {
+                Id = index.ToString(),
+                Name = new LocalizedValue
+                {
+                    Texts = new List<LocalizedValueText>
+                    {
+                        new LocalizedValueText { Language = "en", Text = $"location-text{index}" }
+                    }
+                }
+            };
+        }
 
         public NamedContentData ToData()
         {
