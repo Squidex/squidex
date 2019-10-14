@@ -19,7 +19,7 @@
         <div class="col">
             <sqx-editable-title 
                 [name]="step.name"
-                (nameChanged)="changeName($event)"
+                (nameChange)="changeName($event)"
                 [disabled]="step.isLocked || disabled">
             </sqx-editable-title>
         </div>

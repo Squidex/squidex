@@ -359,6 +359,7 @@ describe('RulesService', () => {
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10`,
             lastModifiedBy: `modifier${id}`,
+            name: `Name${id}${suffix}`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -416,5 +417,6 @@ export function createRule(id: number, suffix = '') {
             param4: 4,
             actionType: `Webhook${id}${suffix}`
         },
-        `Webhook${id}${suffix}`);
+        `Webhook${id}${suffix}`,
+        `Name${id}${suffix}`);
 }

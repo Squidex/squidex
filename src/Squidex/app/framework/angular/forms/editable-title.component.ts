@@ -17,16 +17,31 @@ const ESCAPE_KEY = 27;
 })
 export class EditableTitleComponent {
     @Output()
-    public nameChanged = new EventEmitter<string>();
+    public nameChange = new EventEmitter<string>();
 
     @Input()
     public disabled = false;
 
     @Input()
+    public fallback: string;
+
+    @Input()
     public name: string;
 
-    public isRenaming = false;
+    @Input()
+    public maxLength = 20;
 
+    @Input()
+    public set isRequired(value: boolean) {
+        const validator =
+            value ?
+            Validators.required :
+            Validators.nullValidator;
+
+        this.renameForm.controls['name'].setValidators(validator);
+    }
+
+    public renaming = false;
     public renameForm = this.formBuilder.group({
         name: ['',
             [
@@ -51,9 +66,8 @@ export class EditableTitleComponent {
             return;
         }
 
-        this.renameForm.setValue({ name: this.name });
-
-        this.isRenaming = !this.isRenaming;
+        this.renameForm.setValue({ name: this.name || '' });
+        this.renaming = !this.renaming;
     }
 
     public rename() {
@@ -64,9 +78,9 @@ export class EditableTitleComponent {
         if (this.renameForm.valid) {
             const value = this.renameForm.value;
 
-            this.nameChanged.emit(value.name);
+            this.nameChange.emit(value.name);
 
-            this.toggleRename();
+            this.renaming = false;
         }
     }
 }

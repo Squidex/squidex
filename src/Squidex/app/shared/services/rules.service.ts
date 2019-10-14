@@ -127,7 +127,8 @@ export class RuleDto {
         public readonly trigger: any,
         public readonly triggerType: string,
         public readonly action: any,
-        public readonly actionType: string
+        public readonly actionType: string,
+        public readonly name: string
     ) {
         this._links = links;
 
@@ -169,8 +170,9 @@ export class RuleEventDto extends Model<RuleEventDto> {
 }
 
 export interface UpsertRuleDto {
-    readonly trigger: RuleAction;
-    readonly action: RuleAction;
+    readonly trigger?: RuleTrigger;
+    readonly action?: RuleAction;
+    readonly name?: string;
 }
 
 export type RuleAction = { actionType: string } & any;
@@ -365,5 +367,6 @@ function parseRule(response: any) {
         response.trigger,
         response.trigger.triggerType,
         response.action,
-        response.action.actionType);
+        response.action.actionType,
+        response.name);
 }

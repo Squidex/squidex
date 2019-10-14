@@ -17,39 +17,9 @@ import {
 } from '@app/shared';
 
 @Component({
-    selector: '[sqxRule]',
-    template: `
-        <tr>
-            <td class="cell-separator">
-                <h3>If</h3>
-            </td>
-            <td class="cell-auto">
-                <span (click)="editTrigger.emit()">
-                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
-                </span>
-            </td>
-            <td class="cell-separator">
-                <h3>then</h3>
-            </td>
-            <td class="cell-auto">
-                <span (click)="editAction.emit()">
-                    <sqx-rule-element [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
-                </span>
-            </td>
-            <td class="cell-actions">
-                <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()"></sqx-toggle>
-            </td>
-            <td class="cell-actions">
-                <button type="button" class="btn btn-text-danger"
-                    [disabled]="!rule.canDelete"
-                    (sqxConfirmClick)="delete()"
-                    confirmTitle="Delete rule"
-                    confirmText="Do you really want to delete the rule?">
-                    <i class="icon-bin2"></i>
-                </button>
-            </td>
-        </tr>
-        <tr class="spacer"></tr>`,
+    selector: 'sqx-rule',
+    styleUrls: ['./rule.component.scss'],
+    templateUrl: './rule.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RuleComponent {
@@ -65,7 +35,7 @@ export class RuleComponent {
     @Input()
     public ruleActions: ActionsDto;
 
-    @Input('sqxRule')
+    @Input()
     public rule: RuleDto;
 
     constructor(
@@ -75,6 +45,10 @@ export class RuleComponent {
 
     public delete() {
         this.rulesState.delete(this.rule);
+    }
+
+    public rename(name: string) {
+        this.rulesState.rename(this.rule, name);
     }
 
     public toggle() {

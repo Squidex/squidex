@@ -124,6 +124,21 @@ describe('RulesState', () => {
             expect(rule1New).toEqual(updated);
         });
 
+        it('should update rule when renamed', () => {
+            const newName = 'NewName';
+
+            const updated = createRule(1, '_new');
+
+            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
+            .returns(() => of(updated)).verifiable();
+
+            rulesState.rename(rule1, newName).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(updated);
+        });
+
         it('should update rule when enabled', () => {
             const updated = createRule(1, '_new');
 
