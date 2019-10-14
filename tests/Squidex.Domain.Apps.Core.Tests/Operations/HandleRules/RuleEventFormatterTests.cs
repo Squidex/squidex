@@ -365,5 +365,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal("From client:android", result);
         }
+
+        [Fact]
+        public void Should_format_json()
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+
+            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+
+            Assert.Equal("{\"actor\":\"client:android\"}", result);
+        }
     }
 }
