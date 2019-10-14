@@ -9,9 +9,8 @@
         margin-bottom: .25rem;
     }
 
-    &-header {
-        & {
-            margin-bottom: .5rem;
-        }
+    &-header,
+    &-body {
+        padding: .75rem 1.25rem;
     }
 }
