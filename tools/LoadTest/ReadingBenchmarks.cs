@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LoadTest.Model;
 using Squidex.ClientLibrary;
 using Xunit;
 
@@ -35,11 +36,13 @@ namespace LoadTest
 
             int[] loads =
             {
+                1,
                 5,
                 10,
                 20,
                 50,
-                100
+                100,
+                1000
             };
 
             foreach (var user in users)
@@ -100,6 +103,16 @@ namespace LoadTest
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
                 await Fixture.Client.GetAsync(new ODataQuery { Filter = "data/value/iv gt 3 and data/value/iv lt 7", OrderBy = "data/value/iv asc" });
+            });
+        }
+
+        [Theory]
+        [MemberData(nameof(Loads))]
+        public async Task Should_return_clients(int numUsers, int numIterationsPerUser)
+        {
+            await Run.Parallel(numUsers, numIterationsPerUser, async () =>
+            {
+                await Fixture.AppsClient.GetClientsAsync(TestClient.TestAppName);
             });
         }
     }

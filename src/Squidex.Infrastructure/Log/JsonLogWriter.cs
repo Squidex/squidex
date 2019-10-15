@@ -207,12 +207,7 @@ namespace Squidex.Infrastructure.Log
 
         private static string Format(string property)
         {
-            if (ReferenceEquals(string.IsInterned(property), property))
-            {
-                return property;
-            }
-
-            return property.ToCamelCase();
+            return property;
         }
 
         public override string ToString()

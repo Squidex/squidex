@@ -86,7 +86,9 @@ namespace Squidex.Shared.Users
 
         public static bool HasClaimValue(this IUser user, string type, string value)
         {
-            return user.Claims.Any(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
+            return user.Claims.Any(x =>
+                string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
         }
 
         public static string PictureNormalizedUrl(this IUser user)
