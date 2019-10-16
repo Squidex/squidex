@@ -16,7 +16,6 @@ try{
     $tagName = $env:Version
 
     $semanticDockerTag = $repoPath + ":" + $tagName
-	$semanticDockerDeployAppTag = $deployAppRepoPath + ":" + $tagName
 
     Write-Host "Building docker image $semanticDockerTag"
     docker build . -t $semanticDockerTag --pull `
@@ -24,13 +23,6 @@ try{
         --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
 		--build-arg SQUIDEX__VERSION=$env:Version
 		
-	Write-Host "Building docker image $semanticDockerDeployAppTag"
-    docker build ./tools/DeploymentApp/DeploymentApp -t $semanticDockerDeployAppTag --pull `
-        --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
-        --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
-		--build-arg SQUIDEX__VERSION=$env:Version
-
-
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build docker image" -ForegroundColor Red
         exit 1
@@ -39,9 +31,6 @@ try{
     Write-Host "Pushing docker image $semanticDockerTag"
     sudo docker push $semanticDockerTag
 	
-	Write-Host "Pushing docker image $semanticDockerDeployAppTag"
-    sudo docker push $semanticDockerDeployAppTag
-
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to push docker image" -ForegroundColor Red
         exit 1
@@ -49,9 +38,6 @@ try{
 
     Write-Host "Removing Docker Image on Build Agent"
     docker rmi $semanticDockerTag 
-	
-	Write-Host "Removing Docker Image on Build Agent"
-    docker rmi $semanticDockerDeployAppTag 
 }
 catch{
     $result = $_.Exception.Response.GetResponseStream()
