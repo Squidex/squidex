@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
+using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public abstract class RuleEditCommand : RuleCommand
+    public interface IEnrichedRuleEntity : IRuleEntity, IEntityWithCacheDependencies
     {
-        public RuleTrigger Trigger { get; set; }
+        int NumSucceeded { get; }
 
-        public RuleAction Action { get; set; }
+        int NumFailed { get; }
 
-        public string Name { get; set; }
+        Instant? LastExecuted { get; set; }
     }
 }

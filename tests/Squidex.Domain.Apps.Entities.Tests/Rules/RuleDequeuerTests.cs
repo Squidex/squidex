@@ -56,16 +56,18 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
                 .Returns((Result.Create(requestDump, result), requestElapsed));
 
+            var now = clock.GetCurrentInstant();
+
             Instant? nextCall = null;
 
             if (minutes > 0)
             {
-                nextCall = clock.GetCurrentInstant().Plus(Duration.FromMinutes(minutes));
+                nextCall = now.Plus(Duration.FromMinutes(minutes));
             }
 
             await sut.HandleAsync(@event);
 
-            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
+            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Job, requestDump, result, jobResult, requestElapsed, now, nextCall))
                 .MustHaveHappened();
         }
 
@@ -75,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job = new RuleJob
             {
-                JobId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 ActionData = actionData,
                 ActionName = actionName,
                 Created = clock.GetCurrentInstant()

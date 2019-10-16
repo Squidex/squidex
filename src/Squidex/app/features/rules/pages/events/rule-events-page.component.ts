@@ -6,8 +6,10 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import {
+    ResourceOwner,
     RuleEventDto,
     RuleEventsState
 } from '@app/shared';
@@ -17,15 +19,23 @@ import {
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html'
 })
-export class RuleEventsPageComponent implements OnInit {
+export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     public selectedEventId: string | null = null;
 
     constructor(
-        public readonly ruleEventsState: RuleEventsState
+        public readonly ruleEventsState: RuleEventsState,
+        private readonly route: ActivatedRoute
     ) {
+        super();
     }
 
     public ngOnInit() {
+        this.own(
+            this.route.queryParams
+                .subscribe(x => {
+                    this.ruleEventsState.filterByRule(x.ruleId);
+                }));
+
         this.ruleEventsState.load();
     }
 

@@ -1,0 +1,74 @@
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col col-name">
+                <sqx-editable-title
+                    fallback="Unnamed Rule"
+                    [name]="rule.name"
+                    (nameChange)="rename($event)"
+                    [maxLength]="60"
+                    [isRequired]="false"
+                    [disabled]="!rule.canUpdate">
+                </sqx-editable-title>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-text-danger"
+                    [disabled]="!rule.canDelete"
+                    (sqxConfirmClick)="delete()"
+                    confirmTitle="Delete rule"
+                    confirmText="Do you really want to delete the rule?">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col col-auto">
+                <h3>If</h3>
+            </div>
+            <div class="col">
+                <span (click)="editTrigger.emit()">
+                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
+                </span>
+            </div>
+            <div class="col col-auto">
+                <h3>then</h3>
+            </div>
+            <div class="col">
+                <span (click)="editAction.emit()">
+                    <sqx-rule-element [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
+                </span>
+            </div>
+            <div class="col col-auto">
+                <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()"></sqx-toggle>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col-3">
+                Succeeded: <strong>{{rule.numSucceeded}}</strong>
+            </div>
+            <div class="col-3">
+                Failed: <strong>{{rule.numFailed}}</strong>
+            </div>
+            <div class="col">
+                Last Executed: 
+                
+                <ng-container *ngIf="rule.lastExecuted; else notExecuted">
+                    {{rule.lastExecuted | sqxFromNow}}
+                </ng-container>
+
+                <ng-template #notExecuted>
+                    -
+                </ng-template>
+            </div>
+            <div class="col-auto">
+                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
+                    Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

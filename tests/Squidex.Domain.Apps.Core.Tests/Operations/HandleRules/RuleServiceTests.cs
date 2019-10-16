@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal(enrichedEvent.AppId.Id, job.AppId);
 
-            Assert.NotEqual(Guid.Empty, job.JobId);
+            Assert.NotEqual(Guid.Empty, job.Id);
 
             A.CallTo(() => eventEnricher.EnrichAsync(enrichedEvent, A<Envelope<AppEvent>>.That.Matches(x => x.Payload == @event.Payload)))
                 .MustHaveHappened();

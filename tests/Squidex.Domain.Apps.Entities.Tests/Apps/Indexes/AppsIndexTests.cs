@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
 
-            var actual = await sut.GetAppAsync(appId.Name);
+            var actual = await sut.GetAppByNameAsync(appId.Name);
 
             Assert.Same(expected, actual);
         }

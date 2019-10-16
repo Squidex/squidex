@@ -1,0 +1,22 @@
+@import '_vars';
+@import '_mixins';
+
+.card {
+    & {
+        @include border-radius(0);
+        border-bottom-width: 2px;
+        border-top-width: 0;
+        margin-bottom: .25rem;
+    }
+
+    &-header,
+    &-body {
+        padding: .75rem 1.25rem;
+    }
+
+    &-footer {
+        background: $color-border;
+        font-weight: normal;
+        font-size: 90%;
+    }
+}

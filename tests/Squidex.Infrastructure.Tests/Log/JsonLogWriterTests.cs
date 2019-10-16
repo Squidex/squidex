@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
 using NodaTime;
 using Xunit;
 

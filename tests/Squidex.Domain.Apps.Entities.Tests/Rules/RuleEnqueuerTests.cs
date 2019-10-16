@@ -75,11 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job1 = new RuleJob { Created = now };
 
-            var ruleEntity1 = A.Fake<IRuleEntity>();
-            var ruleEntity2 = A.Fake<IRuleEntity>();
-
-            A.CallTo(() => ruleEntity1.RuleDef).Returns(rule1);
-            A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
+            var ruleEntity1 = new RuleEntity { RuleDef = rule1 };
+            var ruleEntity2 = new RuleEntity { RuleDef = rule2 };
 
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2 });

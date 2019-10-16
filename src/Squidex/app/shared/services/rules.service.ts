@@ -127,7 +127,11 @@ export class RuleDto {
         public readonly trigger: any,
         public readonly triggerType: string,
         public readonly action: any,
-        public readonly actionType: string
+        public readonly actionType: string,
+        public readonly name: string,
+        public readonly numSucceeded: number,
+        public readonly numFailed: number,
+        public readonly lastExecuted?: DateTime
     ) {
         this._links = links;
 
@@ -169,8 +173,9 @@ export class RuleEventDto extends Model<RuleEventDto> {
 }
 
 export interface UpsertRuleDto {
-    readonly trigger: RuleAction;
-    readonly action: RuleAction;
+    readonly trigger?: RuleTrigger;
+    readonly action?: RuleAction;
+    readonly name?: string;
 }
 
 export type RuleAction = { actionType: string } & any;
@@ -304,8 +309,8 @@ export class RulesService {
             pretifyError('Failed to delete rule. Please reload.'));
     }
 
-    public getEvents(appName: string, take: number, skip: number): Observable<RuleEventsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
+    public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
@@ -365,5 +370,9 @@ function parseRule(response: any) {
         response.trigger,
         response.trigger.triggerType,
         response.action,
-        response.action.actionType);
+        response.action.actionType,
+        response.name,
+        response.numSucceeded,
+        response.numFailed,
+        response.lastExecuted ? DateTime.parseISO_UTC(response.lastExecuted) : undefined);
 }

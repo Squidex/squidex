@@ -26,10 +26,8 @@
         
         <ng-container *ngIf="step === 2 && schemas">
             <form [formGroup]="triggerForm.form" (ngSubmit)="saveTrigger()">
-                <h3 class="wizard-title" [style.background]="triggerElement.iconColor">
-                    <sqx-rule-icon size="sm" [element]="triggerElement"></sqx-rule-icon>
-                    
-                    <span class="ml-2">{{triggerElement.display}}</span>
+                <h3 class="wizard-title">
+                    {{triggerElement.display}}
                 </h3>
 
                 <ng-container [ngSwitch]="triggerType">
@@ -80,10 +78,8 @@
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (ngSubmit)="saveAction()">
-                <h3 class="wizard-title" [style.background]="actionElement.iconColor">
-                    <sqx-rule-icon size="sm" [element]="actionElement"></sqx-rule-icon>
-                    
-                    <span class="ml-2">{{actionElement.display}}</span>
+                <h3 class="wizard-title">
+                    {{actionElement.display}}
                 </h3>
 
                 <sqx-generic-action

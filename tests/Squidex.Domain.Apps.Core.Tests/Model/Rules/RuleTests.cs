@@ -98,6 +98,14 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         }
 
         [Fact]
+        public void Should_replace_name_when_renaming()
+        {
+            var rule_1 = rule_0.Rename("MyName");
+
+            Assert.Equal("MyName", rule_1.Name);
+        }
+
+        [Fact]
         public void Should_replace_trigger_when_updating()
         {
             var newTrigger = new ContentChangedTriggerV2();

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
     public class GuardRuleTests
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
-        private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction()).Rename("MyName");
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
@@ -95,12 +95,24 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = new UpdateRule();
 
-            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider),
-                new ValidationError("Either trigger or action is required.", "Trigger", "Action"));
+            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider, rule_0),
+                new ValidationError("Either trigger, action or name is required.", "Trigger", "Action"));
         }
 
         [Fact]
-        public async Task CanUpdate_should_not_throw_exception_if_trigger_and_action_valid()
+        public async Task CanUpdate_should_throw_exception_if_rule_has_already_this_name()
+        {
+            var command = new UpdateRule
+            {
+                Name = "MyName"
+            };
+
+            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider, rule_0),
+                new ValidationError("Rule has already this name.", "Name"));
+        }
+
+        [Fact]
+        public async Task CanUpdate_should_not_throw_exception_if_trigger_action__and_name_are_valid()
         {
             var command = new UpdateRule
             {
@@ -111,10 +123,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 Action = new TestAction
                 {
                     Url = validUrl
-                }
+                },
+                Name = "NewName"
             };
 
-            await GuardRule.CanUpdate(command, appId.Id, appProvider);
+            await GuardRule.CanUpdate(command, appId.Id, appProvider, rule_0);
         }
 
         [Fact]

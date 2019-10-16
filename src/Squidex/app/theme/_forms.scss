@@ -32,7 +32,7 @@
 
     // Small triangle under the error tooltip with the border trick.
     &::after {
-        @include absolute(auto, auto, -.7rem, .625rem);
+        @include absolute(auto, auto, -.75rem, .625rem);
         content: '';
         height: 0;
         border-style: solid;
@@ -166,7 +166,7 @@ label {
 
     // Search icon that is placed within the form control.
     .icon-search {
-        @include absolute(.7rem, .7rem, auto, auto);
+        @include absolute(.75rem, .75rem, auto, auto);
         color: $color-dark2-focus-foreground;
         font-size: 1.1rem;
         font-weight: lighter;

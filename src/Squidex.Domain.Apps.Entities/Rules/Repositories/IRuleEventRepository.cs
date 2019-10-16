@@ -23,13 +23,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 
         Task CancelAsync(Guid id);
 
-        Task MarkSentAsync(Guid jobId, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextCall);
+        Task MarkSentAsync(RuleJob job, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant finished, Instant? nextCall);
 
         Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default);
 
         Task<int> CountByAppAsync(Guid appId);
 
-        Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20);
+        Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId);
+
+        Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20);
 
         Task<IRuleEventEntity> FindAsync(Guid id);
     }

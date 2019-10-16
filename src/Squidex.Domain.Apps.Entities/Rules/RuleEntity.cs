@@ -8,13 +8,12 @@
 using System;
 using System.Collections.Generic;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class ContentEntity : IEnrichedContentEntity
+    public sealed class RuleEntity : IEnrichedRuleEntity
     {
         public Guid Id { get; set; }
 
@@ -32,29 +31,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public ScheduleJob ScheduleJob { get; set; }
+        public Rule RuleDef { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public bool IsDeleted { get; set; }
 
-        public NamedContentData DataDraft { get; set; }
+        public int NumSucceeded { get; set; }
 
-        public NamedContentData ReferenceData { get; set; }
+        public int NumFailed { get; set; }
 
-        public Status Status { get; set; }
-
-        public StatusInfo[] Nexts { get; set; }
-
-        public string StatusColor { get; set; }
-
-        public string SchemaName { get; set; }
-
-        public string SchemaDisplayName { get; set; }
-
-        public RootField[] ReferenceFields { get; set; }
-
-        public bool CanUpdate { get; set; }
-
-        public bool IsPending { get; set; }
+        public Instant? LastExecuted { get; set; }
 
         public HashSet<object> CacheDependencies { get; set; }
     }

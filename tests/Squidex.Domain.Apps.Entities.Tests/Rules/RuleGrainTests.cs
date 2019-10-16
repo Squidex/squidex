@@ -87,9 +87,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
 
+            Assert.Equal(command.Name, sut.Snapshot.RuleDef.Name);
+
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action })
+                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action, Name = "NewName" })
                 );
         }
 
@@ -214,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Url = new Uri("https://squidex.io/v2")
             };
 
-            return new UpdateRule { Trigger = newTrigger, Action = newAction };
+            return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }
     }
 }
