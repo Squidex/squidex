@@ -18,6 +18,11 @@ namespace Squidex.Config
         {
             builder.AddFilter((category, level) =>
             {
+                if (level < LogLevel.Information)
+                {
+                    return false;
+                }
+
                 if (category.StartsWith("Orleans.", StringComparison.OrdinalIgnoreCase))
                 {
                     var subCategory = category.AsSpan().Slice(8);
@@ -55,7 +60,7 @@ namespace Squidex.Config
                     return true;
                 }
 #endif
-                return level >= LogLevel.Information;
+                return true;
             });
         }
     }

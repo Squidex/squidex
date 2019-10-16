@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -15,12 +15,13 @@ namespace Squidex.Infrastructure.Log
         private const int MaxPoolSize = 10;
         private const int MaxCapacity = 5000;
         private readonly ConcurrentStack<JsonLogWriter> pool = new ConcurrentStack<JsonLogWriter>();
-        private readonly Formatting formatting;
+        private readonly JsonWriterOptions formatting;
         private readonly bool formatLine;
 
-        public JsonLogWriterFactory(Formatting formatting = Formatting.None, bool formatLine = false)
+        public JsonLogWriterFactory(bool indended = false, bool formatLine = false)
         {
-            this.formatting = formatting;
+            formatting.Indented = indended;
+
             this.formatLine = formatLine;
         }
 
@@ -31,7 +32,7 @@ namespace Squidex.Infrastructure.Log
 
         public static JsonLogWriterFactory Readable()
         {
-            return new JsonLogWriterFactory(Formatting.Indented, true);
+            return new JsonLogWriterFactory(true, true);
         }
 
         public IObjectWriter Create()
