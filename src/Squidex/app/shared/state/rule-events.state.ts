@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { empty, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import {
@@ -29,6 +29,9 @@ interface Snapshot {
 
     // Indicates if the rule events are loaded.
     isLoaded?: boolean;
+
+    // The current rule id.
+    ruleId?: string;
 }
 
 @Injectable()
@@ -61,7 +64,8 @@ export class RuleEventsState extends State<Snapshot> {
     private loadInternal(isReload = false): Observable<any> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
-                this.snapshot.ruleEventsPager.skip).pipe(
+                this.snapshot.ruleEventsPager.skip,
+                this.snapshot.ruleId).pipe(
             tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
@@ -94,6 +98,16 @@ export class RuleEventsState extends State<Snapshot> {
                 });
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    public filterByRule(ruleId?: string) {
+        if (ruleId === this.snapshot.ruleId) {
+            return empty();
+        }
+
+        this.next(s => ({ ...s, ruleEventsPager: new Pager(0), ruleId }));
+
+        return this.loadInternal();
     }
 
     public goNext(): Observable<any> {

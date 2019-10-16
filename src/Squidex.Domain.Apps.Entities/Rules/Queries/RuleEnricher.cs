@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                     {
                         var statistic = statistics.FirstOrDefault(x => x.RuleId == rule.Id);
 
-                        if (statistics != null)
+                        if (statistic != null)
                         {
                             rule.LastExecuted = statistic.LastExecuted;
                             rule.NumFailed = statistic.NumFailed;

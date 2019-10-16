@@ -274,11 +274,11 @@ describe('RulesService', () => {
 
         let rules: RuleEventsDto;
 
-        rulesService.getEvents('my-app', 10, 20).subscribe(result => {
+        rulesService.getEvents('my-app', 10, 20, '12').subscribe(result => {
             rules = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events?take=10&skip=20');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events?take=10&skip=20&ruleId=12');
 
         expect(req.request.method).toEqual('GET');
 
@@ -360,6 +360,9 @@ describe('RulesService', () => {
             lastModified: `${id % 1000 + 2000}-11-11T10:10`,
             lastModifiedBy: `modifier${id}`,
             name: `Name${id}${suffix}`,
+            numSucceeded: id * 3,
+            numFailed: id * 4,
+            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -418,5 +421,8 @@ export function createRule(id: number, suffix = '') {
             actionType: `Webhook${id}${suffix}`
         },
         `Webhook${id}${suffix}`,
-        `Name${id}${suffix}`);
+        `Name${id}${suffix}`,
+        id * 3,
+        id * 4,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-10-10T10:10:00`));
 }

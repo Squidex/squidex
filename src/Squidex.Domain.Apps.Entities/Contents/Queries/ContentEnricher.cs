@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public sealed class ContentEnricher : IRuleEnricher
+    public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
         private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyContents = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);

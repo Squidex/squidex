@@ -79,6 +79,7 @@ export class EditableTitleComponent {
             const value = this.renameForm.value;
 
             this.nameChange.emit(value.name);
+            this.name = value.name;
 
             this.renaming = false;
         }

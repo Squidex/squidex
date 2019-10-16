@@ -19,18 +19,20 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
-    public sealed class MongoRuleStatisticsCollection : MongoRepositoryBase<MongoRuleStatistics>
+    public sealed class MongoRuleStatisticsCollection : MongoRepositoryBase<RuleStatistics>
     {
         static MongoRuleStatisticsCollection()
         {
             var guidSerializer = new GuidSerializer().WithRepresentation(BsonType.String);
 
-            BsonClassMap.RegisterClassMap<MongoRuleStatistics>(map =>
+            BsonClassMap.RegisterClassMap<RuleStatistics>(map =>
             {
                 map.AutoMap();
 
                 map.MapProperty(x => x.AppId).SetSerializer(guidSerializer);
                 map.MapProperty(x => x.RuleId).SetSerializer(guidSerializer);
+
+                map.SetIgnoreExtraElements(true);
             });
         }
 
@@ -44,10 +46,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return "RuleStatistics";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleStatistics> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<RuleStatistics> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoRuleStatistics>(
+                new CreateIndexModel<RuleStatistics>(
                     Index
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.RuleId)),

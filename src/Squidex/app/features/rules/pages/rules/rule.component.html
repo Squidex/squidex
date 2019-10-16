@@ -45,4 +45,30 @@
             </div>
         </div>
     </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col-3">
+                Succeeded: <strong>{{rule.numSucceeded}}</strong>
+            </div>
+            <div class="col-3">
+                Failed: <strong>{{rule.numFailed}}</strong>
+            </div>
+            <div class="col">
+                Last Executed: 
+                
+                <ng-container *ngIf="rule.lastExecuted; else notExecuted">
+                    {{rule.lastExecuted | sqxFromNow}}
+                </ng-container>
+
+                <ng-template #notExecuted>
+                    -
+                </ng-template>
+            </div>
+            <div class="col-auto">
+                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
+                    Logs
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

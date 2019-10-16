@@ -234,7 +234,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
         [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetEvents(string app, [FromQuery ] Guid? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<IActionResult> GetEvents(string app, [FromQuery] Guid? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
             var taskForItems = ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
             var taskForCount = ruleEventsRepository.CountByAppAsync(AppId);

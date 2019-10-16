@@ -16,10 +16,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentCommandMiddleware : GrainCommandMiddleware<ContentCommand, IContentGrain>
     {
-        private readonly IRuleEnricher contentEnricher;
+        private readonly IContentEnricher contentEnricher;
         private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IGrainFactory grainFactory, IRuleEnricher contentEnricher, IContextProvider contextProvider)
+        public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
             Guard.NotNull(contentEnricher, nameof(contentEnricher));

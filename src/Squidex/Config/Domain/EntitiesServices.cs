@@ -40,6 +40,7 @@ using Squidex.Domain.Apps.Entities.History.Notifications;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
+using Squidex.Domain.Apps.Entities.Rules.Queries;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -105,9 +106,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
 
-            services.AddSingletonAs<ContentEnricher>()
-                .As<IRuleEnricher>();
-
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
@@ -122,6 +120,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ContentQueryParser>()
                 .AsSelf();
+
+            services.AddSingletonAs<ContentEnricher>()
+                .As<IContentEnricher>();
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
@@ -161,6 +162,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
+
+            services.AddSingletonAs<RuleQueryService>()
+                .As<IRuleQueryService>();
+
+            services.AddSingletonAs<RuleEnricher>()
+                .As<IRuleEnricher>();
 
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();
@@ -269,7 +276,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<RuleCommand, IRuleGrain>>()
+            services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()

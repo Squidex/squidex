@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public interface IRuleEnricher
+    public interface IContentEnricher
     {
         Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context);
 
