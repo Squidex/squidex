@@ -159,7 +159,7 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_pretty_json()
         {
-            var prettySut = new JsonLogWriterFactory(Formatting.Indented).Create();
+            var prettySut = new JsonLogWriterFactory(true).Create();
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
 
@@ -169,7 +169,7 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_extra_line_after_object()
         {
-            var prettySut = new JsonLogWriterFactory(Formatting.None, true).Create();
+            var prettySut = new JsonLogWriterFactory(false, true).Create();
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
 

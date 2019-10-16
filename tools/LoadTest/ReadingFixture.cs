@@ -9,12 +9,15 @@ using System;
 using System.Threading.Tasks;
 using LoadTest.Model;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Management;
 
 namespace LoadTest
 {
     public sealed class ReadingFixture : IDisposable
     {
         public SquidexClient<TestEntity, TestEntityData> Client { get; private set; }
+
+        public IAppsClient AppsClient { get; private set; }
 
         public ReadingFixture()
         {
@@ -36,6 +39,8 @@ namespace LoadTest
                         await Client.CreateAsync(new TestEntityData { Value = i }, true);
                     }
                 }
+
+                AppsClient = TestClient.ClientManager.CreateAppsClient();
             }).Wait();
         }
 

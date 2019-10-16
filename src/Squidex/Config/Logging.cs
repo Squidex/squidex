@@ -18,23 +18,30 @@ namespace Squidex.Config
         {
             builder.AddFilter((category, level) =>
             {
-                if (category.StartsWith("Orleans.Runtime.NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
+                if (level < LogLevel.Information)
                 {
-                    return level >= LogLevel.Error;
-                }
-
-                if (category.StartsWith("Orleans.Runtime.SafeTimer", StringComparison.OrdinalIgnoreCase))
-                {
-                    return level >= LogLevel.Error;
-                }
-
-                if (category.StartsWith("Orleans.Runtime.Scheduler", StringComparison.OrdinalIgnoreCase))
-                {
-                    return level >= LogLevel.Warning;
+                    return false;
                 }
 
                 if (category.StartsWith("Orleans.", StringComparison.OrdinalIgnoreCase))
                 {
+                    var subCategory = category.AsSpan().Slice(8);
+
+                    if (subCategory.StartsWith("Runtime."))
+                    {
+                        var subCategory2 = subCategory.Slice(8);
+
+                        if (subCategory.StartsWith("NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return level >= LogLevel.Error;
+                        }
+
+                        if (subCategory.StartsWith("SafeTimer", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return level >= LogLevel.Error;
+                        }
+                    }
+
                     return level >= LogLevel.Warning;
                 }
 
@@ -53,7 +60,7 @@ namespace Squidex.Config
                     return true;
                 }
 #endif
-                return level >= LogLevel.Information;
+                return true;
             });
         }
     }

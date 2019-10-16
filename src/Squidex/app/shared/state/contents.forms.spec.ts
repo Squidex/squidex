@@ -413,6 +413,49 @@ describe('GetContentValue', () => {
     const language = new LanguageDto('en', 'English');
     const fieldInvariant = createField({ properties: createProperties('Number'), partitioning: 'invariant' });
     const fieldLocalized = createField({ properties: createProperties('Number') });
+    const fieldAssets = createField({ properties: createProperties('Assets') });
+
+    it('should resolve image url field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: '13'
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldAssets);
+
+        expect(result).toEqual({ value: '13', formatted: new HtmlValue('<img src="13?width=50&height=50" />') });
+    });
+
+    it('should not image url if not found', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: null
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldAssets);
+
+        expect(result).toEqual({ value: '- No Value -', formatted: '- No Value -' });
+    });
+
+    it('should resolve string field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    iv: '13'
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldInvariant);
+
+        expect(result).toEqual({ value: '13', formatted: '13' });
+    });
 
     it('should resolve invariant field from references value', () => {
         const content: any = {
