@@ -106,7 +106,7 @@ namespace Squidex.Config.Domain
                 .As<IAssetEnricher>();
 
             services.AddSingletonAs<ContentEnricher>()
-                .As<IContentEnricher>();
+                .As<IRuleEnricher>();
 
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();

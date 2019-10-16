@@ -31,17 +31,18 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
     {
-        private readonly IAppProvider appProvider;
+        private readonly IRuleQueryService ruleQuery;
         private readonly IRuleEventRepository ruleEventsRepository;
         private readonly RuleRegistry ruleRegistry;
 
-        public RulesController(ICommandBus commandBus, IAppProvider appProvider,
-            IRuleEventRepository ruleEventsRepository, RuleRegistry ruleRegistry)
+        public RulesController(ICommandBus commandBus,
+            IRuleEventRepository ruleEventsRepository,
+            IRuleQueryService ruleQuery,
+            RuleRegistry ruleRegistry)
             : base(commandBus)
         {
-            this.appProvider = appProvider;
-
             this.ruleEventsRepository = ruleEventsRepository;
+            this.ruleQuery = ruleQuery;
             this.ruleRegistry = ruleRegistry;
         }
 
@@ -85,7 +86,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await appProvider.GetRulesAsync(AppId);
+            var rules = await ruleQuery.QueryAsync(Context);
 
             var response = Deferred.Response(() =>
             {
@@ -221,6 +222,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Get rule events.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ruleId">The optional rule id to filter to events.</param>
         /// <param name="skip">The number of events to skip.</param>
         /// <param name="take">The number of events to take.</param>
         /// <returns>
@@ -232,9 +234,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
         [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetEvents(string app, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<IActionResult> GetEvents(string app, [FromQuery ] Guid? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var taskForItems = ruleEventsRepository.QueryByAppAsync(AppId, skip, take);
+            var taskForItems = ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
             var taskForCount = ruleEventsRepository.CountByAppAsync(AppId);
 
             await Task.WhenAll(taskForItems, taskForCount);
@@ -302,7 +304,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IRuleEntity>();
+            var result = context.Result<IEnrichedRuleEntity>();
             var response = RuleDto.FromRule(result, this, app);
 
             return response;

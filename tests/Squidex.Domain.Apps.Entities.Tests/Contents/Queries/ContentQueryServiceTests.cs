@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAssetUrlGenerator urlGenerator = A.Fake<IAssetUrlGenerator>();
-        private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
+        private readonly IRuleEnricher contentEnricher = A.Fake<IRuleEnricher>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
         private readonly ISchemaEntity schema;

@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private static readonly IResultList<IEnrichedContentEntity> EmptyContents = ResultList.CreateFrom<IEnrichedContentEntity>(0);
         private readonly IAppProvider appProvider;
         private readonly IAssetUrlGenerator assetUrlGenerator;
-        private readonly IContentEnricher contentEnricher;
+        private readonly IRuleEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
         private readonly IContentLoader contentVersionLoader;
         private readonly IScriptEngine scriptEngine;
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public ContentQueryService(
             IAppProvider appProvider,
             IAssetUrlGenerator assetUrlGenerator,
-            IContentEnricher contentEnricher,
+            IRuleEnricher contentEnricher,
             IContentRepository contentRepository,
             IContentLoader contentVersionLoader,
             IScriptEngine scriptEngine,

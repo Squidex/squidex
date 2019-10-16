@@ -76,7 +76,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
-        public static RuleDto FromRule(IRuleEntity rule, ApiController controller, string app)
+        /// <summary>
+        /// The number of completed executions.
+        /// </summary>
+        public int NumSucceeded { get; set; }
+
+        /// <summary>
+        /// The number of failed executions.
+        /// </summary>
+        public int NumFailed { get; set; }
+
+        /// <summary>
+        /// The date and time when the rule was executed the last time.
+        /// </summary>
+        public Instant? LastExecuted { get; set; }
+
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, ApiController controller, string app)
         {
             var result = new RuleDto();
 

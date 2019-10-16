@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentState>
     {
-        private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
+        private readonly IRuleEnricher contentEnricher = A.Fake<IRuleEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly Context requestContext = Context.Anonymous();
