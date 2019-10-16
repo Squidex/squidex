@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Algolia.Search;
@@ -72,9 +73,9 @@ namespace Squidex.Extensions.Actions.Algolia
 
                         json = JObject.Parse(jsonString);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        json = new JObject(new JProperty("error", "Invalid JSON"));
+                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
                     }
 
                     ruleJob.Content = json;
