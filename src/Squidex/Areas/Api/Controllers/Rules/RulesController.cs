@@ -14,7 +14,6 @@ using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;

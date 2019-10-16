@@ -38,7 +38,6 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Notifications;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Rules.Queries;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
