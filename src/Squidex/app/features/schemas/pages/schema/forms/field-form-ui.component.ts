@@ -14,6 +14,9 @@ import { FieldDto } from '@app/shared';
     selector: 'sqx-field-form-ui',
     template: `
         <ng-container [ngSwitch]="field.rawProperties.fieldType">
+            <ng-container *ngSwitchCase="'Assets'">
+                <sqx-assets-ui [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-assets-ui>
+            </ng-container>
             <ng-container *ngSwitchCase="'Boolean'">
                 <sqx-boolean-ui [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-boolean-ui>
             </ng-container>

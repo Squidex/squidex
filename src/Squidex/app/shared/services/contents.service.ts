@@ -59,7 +59,7 @@ export class ContentsDto extends ResultSet<ContentDto> {
     }
 }
 
-export type ContentReferencesValue = { [partition: string]: string };
+export type ContentReferencesValue = { [partition: string]: string } | string;
 export type ContentReferences = { [fieldName: string ]: ContentFieldData<ContentReferencesValue> };
 export type ContentFieldData<T = any> = { [partition: string]: T };
 export type ContentData = { [fieldName: string ]: ContentFieldData };

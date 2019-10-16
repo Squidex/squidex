@@ -64,7 +64,9 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
     if (content.referenceData) {
         const reference = content.referenceData[field.name];
 
-        if (reference) {
+        const isAssets = field.properties.fieldType === 'Assets';
+
+        if (reference && (!isAssets || allowHtml)) {
             let fieldValue: ContentReferencesValue;
 
             if (field.isLocalizable) {
@@ -73,14 +75,25 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                 fieldValue = reference[fieldInvariant];
             }
 
-            let value: string | undefined =
-                fieldValue ?
-                fieldValue[language.iso2Code] :
-                undefined;
+            let value: string | undefined = undefined;
 
-            value = value || '- No Value -';
+            if (Types.isObject(fieldValue)) {
+                value = fieldValue[language.iso2Code];
+            } else if (Types.isString(fieldValue)) {
+                value = fieldValue;
+            }
 
-            return { value, formatted: value };
+            let formatted: FieldValue = value!;
+
+            if (value) {
+                if (Types.isString(value) && isAssets) {
+                    formatted = new HtmlValue(`<img src="${value}?width=50&height=50" />`);
+                }
+            } else {
+                value = formatted = '- No Value -';
+            }
+
+            return { value, formatted };
         }
     }
 

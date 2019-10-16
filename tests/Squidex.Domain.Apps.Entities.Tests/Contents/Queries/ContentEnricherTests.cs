@@ -9,6 +9,8 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -20,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly ISchemaEntity schema;
         private readonly Context requestContext;
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -35,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>.Ignored, schemaId.Id.ToString()))
                 .Returns(schema);
 
-            sut = new ContentEnricher(new Lazy<IContentQueryService>(() => contentQuery), contentWorkflow);
+            sut = new ContentEnricher(assetQuery, assetUrlGenerator, new Lazy<IContentQueryService>(() => contentQuery), contentWorkflow);
         }
 
         [Fact]
