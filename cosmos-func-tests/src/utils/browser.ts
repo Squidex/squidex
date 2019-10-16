@@ -42,6 +42,11 @@ export class BrowserUtil {
         return await locator.click();
     }
 
+    public async waitForElementToBeNotVisible(locator: ElementFinder) {
+        await browser.wait(until.invisibilityOf(locator));
+        return true;
+    }
+
     public async waitForElementToBeVisibleAndGetText(locator: ElementFinder, timeout = 5000) {
         await this.waitForElementToBeVisible(locator, timeout);
         return await locator.getText();
@@ -69,10 +74,16 @@ export class BrowserUtil {
     }
 
     // brings the element to focus and clicks
-    public async mouseMoveAndClick(locator: ElementFinder) {
+    public async mouseMoveAndClick(locator: ElementFinder | WebElement) {
         await browser.actions().mouseMove(locator).perform();
         await locator.click();
     }
+
+    public async mouseMoveAndReturn(locator: ElementFinder | WebElement) {
+        await browser.actions().mouseMove(locator).perform();
+        return locator;
+    }
+
 
     // brings the element to focus and writes
     public async mouseMoveAndWrite(locator: ElementFinder | WebElement, text: string) {
@@ -154,6 +165,10 @@ export class BrowserUtil {
             .keyDown(protractor.Key.CONTROL)
             .sendKeys('a')
             .perform();
+    }
+
+    public async scrollToEndOfPage() {
+        await browser.actions().sendKeys(protractor.Key.END).perform();
     }
 
     // refresh the chrome instance

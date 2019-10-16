@@ -15,7 +15,6 @@ import { ContentVersionSelected } from './../messages';
 import {
     ApiUrlConfig,
     AppLanguageDto,
-    AppsState,
     AuthService,
     AutoSaveKey,
     AutoSaveService,
@@ -64,11 +63,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
+    public trackByFieldFn: Function;
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
-        public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
         private readonly dialogs: DialogService,
@@ -79,6 +79,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly schemasState: SchemasState
     ) {
         super();
+
+        this.trackByFieldFn = this.trackByField.bind(this);
 
         this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }
@@ -96,11 +98,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    if (schema) {
-                        this.schema = schema!;
+                    this.schema = schema;
 
-                        this.contentForm = new EditContentForm(this.languages, this.schema);
-                    }
+                    this.contentForm = new EditContentForm(this.languages, this.schema);
                 }));
 
         this.own(

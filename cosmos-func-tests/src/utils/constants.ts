@@ -20,11 +20,11 @@ export const constants = {
         editorOptionsNumberedList: 'tui-ol tui-toolbar-icons'
     },
 
-    commentaryRedirectTest : {
+    commentaryRedirectTest: {
         commentaryUrl: `${browser.params.baseUrl}/app/commentary/content/commentary`
     },
 
-    commentaryTest : {
+    commentaryTest: {
         commodityValue: 'Styrene',
         // Temporary bug that fields are added to the UI even if they do not contain any value.
         commentaryTypeValue: 'Price Commentary',
@@ -146,12 +146,29 @@ export const constants = {
         imagesrc: `${browser.params.baseUrl}/api/apps/commentary/image`
     },
 
+    contributorsTest: {
+        addContributor: 'hello@world.com',
+        role: 'CMS Managing Editor',
+        multipleContributors: ['test2@dummy.com;', 'test3@dummy.com;', 'test4@dummy.com;', 'test5@dummy.com;', 'test6@dummy.com;', 'test7@dummy.com;', 'test8@dummy.com;'],
+        contributorsOnListScreen: ['test2@dummy.com', 'test3@dummy.com', 'test4@dummy.com', 'test5@dummy.com', 'test6@dummy.com', 'test7@dummy.com', 'test8@dummy.com'],
+        deleteContributor: 'vegatestreviewer@cha.rbxd.ds',
+        editRole: 'Reader',
+        editContributor: 'vegatesteditor@cha.rbxd.ds',
+        importRole: 'Reader',
+        importingSameUser: 'test2@dummy.com'
+    },
+
     messages: {
         validationFailureErrorMessage: 'A content item with these values already exists.',
         unsavedChangesPopUpMessage: 'You have unsaved changes, do you want to close the current content view and discard your changes?',
-        commentaryCreationSuccessMessage: 'Contents created successfully.',
+        commentaryCreationSuccessMessage: 'Content created successfully.',
         commentaryEditSuccessMessage: 'Content updated successfully.',
         commentaryCreationFailureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).',
+        contributorSuccessMessage: 'User has been added as contributor.',
+        changeLogAssignmentMessage: 'Me assigned dummy@cha.rbxd.ds as Editor',
+        changeLogDeletionMessage: 'Me removed vegatestreviewer@cha.rbxd.ds from app',
+        chnageLogRoleEditMessage: 'Me assigned vegatesteditor@cha.rbxd.ds as Owner',
+        contributorAdditionFailureMessage: 'Cannot assign contributor: Role: Contributor has already this role.',
         characterCountLimitErrorMessage: 'Failed to save commentary: Exceeded character limit of \'800\' characters for language \'en\'.',
         observedPeriodNotSetErrorMessage: 'Failed to save commentary: Period is required.'
     }

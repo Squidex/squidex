@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Types } from './types';
+import { mergeInto, Types } from './types';
 
 describe('Types', () => {
     it('should calculate hash string', () => {
@@ -151,6 +151,39 @@ describe('Types', () => {
 
     it('should treat object of empty values as empty', () => {
         expect(Types.isEmpty({ a: null, b: null })).toBeTruthy();
+    });
+
+    it('should merge deeply', () => {
+        const source = {};
+
+        mergeInto(source, {
+            rootShared: 1,
+            rootA: 2,
+            nested: {
+                a: 3
+            },
+            array: [4]
+        });
+
+        mergeInto(source, {
+            rootShared: 5,
+            rootB: 6,
+            nested: {
+                b: 7
+            },
+            array: [8]
+        });
+
+        expect(source).toEqual({
+            rootShared: 5,
+            rootA: 2,
+            rootB: 6,
+            nested: {
+                a: 3,
+                b: 7
+            },
+            array: [4, 8]
+        });
     });
 });
 

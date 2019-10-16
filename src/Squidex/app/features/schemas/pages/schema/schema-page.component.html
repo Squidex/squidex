@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema}" parameter1="app" [value1]="appsState.appDisplayName" parameter2="schema" [value2]="schemasState.schemaName"></sqx-title>
+<sqx-title [message]="schemasState.schemaName"></sqx-title>
 
 <sqx-panel desiredWidth="60rem" [showSidebar]="true">
     <ng-container title>
@@ -7,7 +7,7 @@
 
     <ng-container menu>
         <button type="button" class="btn btn-text mr-1" (click)="exportDialog.show()">
-            JSON Preview
+            JSON View
         </button>
 
         <div class="btn-group mr-1" #buttonPublish>
@@ -79,7 +79,7 @@
                 [sqxSortDisabled]="!schema.canOrderFields"
                 [sqxSortModel]="schema.fields"
                 (sqxSort)="sortFields($event)">
-                <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
+                <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn">
                     <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
                 </div>
             </div>

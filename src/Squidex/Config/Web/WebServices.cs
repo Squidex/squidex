@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -57,6 +58,11 @@ namespace Squidex.Config.Web
                 .AsOptional<ICustomLinkExtension>();
 
             services.TryAddSingleton<IClaimsTransformation, ApiPermissionUnifier>();
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             services.AddMvc(options =>
             {

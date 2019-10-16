@@ -27,12 +27,12 @@ export class SchemaMustExistGuard implements CanActivate {
 
         const result =
             this.schemasState.select(schemaName).pipe(
-                tap(dto => {
-                    if (!dto) {
+                tap(schema => {
+                    if (!schema) {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(s => !!s));
+                map(schema => !!schema));
 
         return result;
     }

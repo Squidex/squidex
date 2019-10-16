@@ -8,7 +8,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppsState,
     PatternDto,
     PatternsState
 } from '@app/shared';
@@ -20,7 +19,6 @@ import {
 })
 export class PatternsPageComponent implements OnInit {
     constructor(
-        public readonly appsState: AppsState,
         public readonly patternsState: PatternsState
     ) {
     }

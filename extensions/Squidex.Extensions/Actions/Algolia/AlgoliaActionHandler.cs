@@ -56,9 +56,28 @@ namespace Squidex.Extensions.Actions.Algolia
                 {
                     ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                    var json = ToJson(contentEvent);
+                    JObject json;
+                    try
+                    {
+                        string jsonString;
 
-                    ruleJob.Content = JObject.Parse(json);
+                        if (!string.IsNullOrEmpty(action.Document))
+                        {
+                            jsonString = Format(action.Document, @event)?.Trim();
+                        }
+                        else
+                        {
+                            jsonString = ToJson(contentEvent);
+                        }
+
+                        json = JObject.Parse(jsonString);
+                    }
+                    catch
+                    {
+                        json = new JObject(new JProperty("error", "Invalid JSON"));
+                    }
+
+                    ruleJob.Content = json;
                     ruleJob.Content["objectID"] = contentId;
                 }
 

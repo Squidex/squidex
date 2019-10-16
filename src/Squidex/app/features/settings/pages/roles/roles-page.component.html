@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Roles | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
+<sqx-title message="Roles"></sqx-title>
 
 <sqx-panel desiredWidth="50rem" [showSidebar]="true">
     <ng-container title>
@@ -17,23 +17,7 @@
         <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
             <sqx-role *ngFor="let role of roles" [role]="role" [allPermissions]="allPermissions"></sqx-role>
 
-            <div class="table-items-footer" *ngIf="rolesState.canCreate | async">
-                <form [formGroup]="addRoleForm.form" (ngSubmit)="addRole()">
-                    <div class="row no-gutters">
-                        <div class="col">
-                            <sqx-control-errors for="name" [submitted]="addRoleForm.submitted | async"></sqx-control-errors>
-                                
-                            <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter role name" autocomplete="off" />
-                        </div>
-                        <div class="col-auto pl-1">
-                            <button type="submit" class="btn btn-success" [disabled]="addRoleForm.hasNoName | async">Add role</button>
-                        </div>
-                        <div class="col-auto pl-1">
-                            <button type="reset" class="btn btn-secondary" (click)="cancelAddRole()">Cancel</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
         </ng-container>
     </ng-container>
 

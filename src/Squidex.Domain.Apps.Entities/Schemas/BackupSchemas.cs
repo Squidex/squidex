@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -21,15 +20,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     public sealed class BackupSchemas : BackupHandler
     {
         private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
-        private readonly IGrainFactory grainFactory;
+        private readonly ISchemasIndex indexSchemas;
 
         public override string Name { get; } = "Schemas";
 
-        public BackupSchemas(IGrainFactory grainFactory)
+        public BackupSchemas(ISchemasIndex indexSchemas)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(indexSchemas, nameof(indexSchemas));
 
-            this.grainFactory = grainFactory;
+            this.indexSchemas = indexSchemas;
         }
 
         public override Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
@@ -47,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return TaskHelper.True;
         }
 
-        public override async Task RestoreAsync(Guid appId, BackupReader reader)
+        public override Task RestoreAsync(Guid appId, BackupReader reader)
         {
-            await grainFactory.GetGrain<ISchemasByAppIndex>(appId).RebuildAsync(schemasByName);
+            return indexSchemas.RebuildAsync(appId, schemasByName);
         }
     }
 }

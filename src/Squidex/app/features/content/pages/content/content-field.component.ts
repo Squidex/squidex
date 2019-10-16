@@ -30,6 +30,9 @@ import {
     templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements DoCheck, OnChanges {
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
+
     @Input()
     public form: EditContentForm;
 
@@ -53,9 +56,6 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
     @Input()
     public languages: AppLanguageDto[];
-
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
 
     public selectedFormControl: AbstractControl;
     public selectedFormControlCompare?: AbstractControl;
@@ -184,6 +184,10 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
+    public emitLanguageChange(language: AppLanguageDto) {
+        this.languageChange.emit(language);
+    }
+
     public prefix(language: AppLanguageDto) {
         return `(${language.iso2Code})`;
     }
@@ -196,4 +200,3 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         return `squidex.schemas.${this.schema.id}.fields.${this.field.fieldId}.show-all`;
     }
 }
-

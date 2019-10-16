@@ -1,3 +1,4 @@
+import { browser } from 'protractor';
 import {
     constants,
     Users
@@ -8,25 +9,32 @@ import {
     ContentPage,
     HomePage,
     LoginPage,
-    SearchPage
+    SearchPage,
 } from '../../pages';
-let randomWords = require('random-words');
 
+let randomWords = require('random-words');
 
 describe('VEGA-30 : ToastUI Editor Tests', () => {
     let hasRunBefore = false;
     const using = require('jasmine-data-provider');
-    const appPage = new AppPage();
-    const contentPage = new ContentPage();
-    const homePage = new HomePage();
-    const loginPage = new LoginPage();
-    const searchPage = new SearchPage();
+
+    let appPage: AppPage;
+    let contentPage: ContentPage;
+    let homePage: HomePage;
+    let loginPage: LoginPage;
+    let searchPage: SearchPage;
 
     beforeAll(async () => {
+        loginPage = new LoginPage();
         await loginPage.login(Users.find(u => u.name === 'vegaAdmin')!);
     });
 
     beforeEach(async () => {
+        appPage = new AppPage();
+        contentPage = new ContentPage();
+        homePage = new HomePage();
+        loginPage = new LoginPage();
+        searchPage = new SearchPage();
         if (hasRunBefore) {
             // Go back to the home page and reset local store to get rid of all autosaved content.
             await homePage.navigateTo();
@@ -48,6 +56,8 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
 
     afterAll(async () => {
         await homePage.logout();
+        // setting a timeout between logout and login of another spec for the test not to time out
+        await browser.sleep(1000);
     });
 
     describe('VEGA-30: Editor Options for creating commentary', () => {
@@ -78,40 +88,40 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
 
     describe('VEGA-31 & VEGA-322 : Character Count Validation - Frontend and Backend', () => {
         using([{ commodityValue: 'Propylene', commentaryTypeValue: 'Overview', regionValue: 'North America', periodValue: 'Settlement' },
-            { commodityValue: 'Toluene', commentaryTypeValue: 'Outlook', regionValue: 'Europe', periodValue: 'Settlement' }], (data: any) => {
-        it('Verify user is able to create Outlook and Overview commentaries with input upto 100 words', async () => {
-            const phrase = randomWords({exactly: 100, join: ' '});
-            const input = phrase.substr(0, 800);
+        { commodityValue: 'Toluene', commentaryTypeValue: 'Outlook', regionValue: 'Europe', periodValue: 'Settlement' }], (data: any) => {
+            it('Verify user is able to create Outlook and Overview commentaries with input upto 100 words', async () => {
+                const phrase = randomWords({ exactly: 100, join: ' ' });
+                const input = phrase.substr(0, 800);
 
-            // Arrange
-            await contentPage.selectDate(2);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, data.commodityValue);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, data.commentaryTypeValue);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.region, data.regionValue);
-            await contentPage.writeCommentary(input);
+                // Arrange
+                await contentPage.selectDate(2);
+                await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, data.commodityValue);
+                await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, data.commentaryTypeValue);
+                await contentPage.selectContentFromDropDown(constants.refDataLocators.region, data.regionValue);
+                await contentPage.writeCommentary(input);
 
-            // Act
-            await contentPage.saveContent();
+                // Act
+                await contentPage.saveContent();
 
-            // Assert
-            const alertMessage = await searchPage.getCommentaryCreationSuccessMessageText();
-            expect(alertMessage).toBe(constants.messages.commentaryCreationSuccessMessage);
+                // Assert
+                const alertMessage = await searchPage.getCommentaryCreationSuccessMessageText();
+                expect(alertMessage).toBe(constants.messages.commentaryCreationSuccessMessage);
 
-            await appPage.closeAlerts();
+                await appPage.closeAlerts();
 
-            await searchPage.searchContentByRefData(data.commodityValue, data.commentaryTypeValue, data.regionValue);
-            const charCountOnTextEditor = await searchPage.verifyCommentaryCreation();
-            const countOnEditor = charCountOnTextEditor.length.toString();
-            const getFooterText = await contentPage.getCommentaryFooter();
-            const num = getFooterText.replace(/^\D+/g, '');
-            const getCountFromFooterText = num.substring(0, 3);
+                await searchPage.searchContentByRefData(data.commodityValue, data.commentaryTypeValue, data.regionValue);
+                const charCountOnTextEditor = await searchPage.verifyCommentaryCreation();
+                const countOnEditor = charCountOnTextEditor.length.toString();
+                const getFooterText = await contentPage.getCommentaryFooter();
+                const num = getFooterText.replace(/^\D+/g, '');
+                const getCountFromFooterText = num.substring(0, 3);
 
-            expect(countOnEditor).toBe(getCountFromFooterText);
-        });
+                expect(countOnEditor).toBe(getCountFromFooterText);
+            });
         });
 
         it('Verify user is not allowed to create commentary if the input exceeds specified character count', async () => {
-            const phrase = randomWords({exactly: 150, join: ' '});
+            const phrase = randomWords({ exactly: 150, join: ' ' });
             const input = phrase.substr(0, 850);
 
             // Arrange
@@ -138,7 +148,7 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
         });
 
         it('Verify user is able to create commentaries other than Overview and Outlook with input upto 250 words', async () => {
-            const phrase = randomWords({exactly: 250, join: ' '});
+            const phrase = randomWords({ exactly: 250, join: ' ' });
             const input = phrase.substr(0, 1800);
 
             // Arrange
@@ -168,7 +178,7 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
         });
 
         it('Verify user is able to create commentary when character count limit is not set', async () => {
-            const phrase = randomWords({exactly: 500, join: ' '});
+            const phrase = randomWords({ exactly: 500, join: ' ' });
 
             // Arrange
             await contentPage.selectDate(3);
@@ -197,9 +207,9 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
         });
 
         it('Verify user is not allowed to exceed the word limit while editing existing commentary', async () => {
-            const phrase = randomWords({exactly: 150, join: ' '});
+            const phrase = randomWords({ exactly: 150, join: ' ' });
             const input = phrase.substr(0, 750);
-            const moreText = randomWords({exactly: 15, join: ' '});
+            const moreText = randomWords({ exactly: 15, join: ' ' });
 
             // Arrange
             await contentPage.selectDate(1);
@@ -235,9 +245,9 @@ describe('VEGA-30 : ToastUI Editor Tests', () => {
         });
 
         it('Verify when user edits and updates the commentary content word count is updated accordingly', async () => {
-            const phrase = randomWords({exactly: 150, join: ' '});
+            const phrase = randomWords({ exactly: 150, join: ' ' });
             const input = phrase.substr(0, 1500);
-            const moreText = randomWords({exactly: 10, join: ' '});
+            const moreText = randomWords({ exactly: 10, join: ' ' });
 
             // Arrange
             await contentPage.selectDate(3);

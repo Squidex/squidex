@@ -9,7 +9,6 @@ import { Component, OnInit } from '@angular/core';
 
 import {
     ALL_TRIGGERS,
-    AppsState,
     DialogModel,
     RuleDto,
     RuleElementDto,
@@ -33,7 +32,6 @@ export class RulesPageComponent implements OnInit {
     public ruleTriggers = ALL_TRIGGERS;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState

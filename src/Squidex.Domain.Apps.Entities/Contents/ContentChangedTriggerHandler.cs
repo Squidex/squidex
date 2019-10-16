@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -23,26 +22,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentChangedTriggerHandler : RuleTriggerHandler<ContentChangedTriggerV2, ContentEvent, EnrichedContentEvent>
     {
         private readonly IScriptEngine scriptEngine;
-        private readonly IGrainFactory grainFactory;
+        private readonly IContentLoader contentLoader;
 
-        public ContentChangedTriggerHandler(IScriptEngine scriptEngine, IGrainFactory grainFactory)
+        public ContentChangedTriggerHandler(IScriptEngine scriptEngine, IContentLoader contentLoader)
         {
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(contentLoader, nameof(contentLoader));
 
             this.scriptEngine = scriptEngine;
 
-            this.grainFactory = grainFactory;
+            this.contentLoader = contentLoader;
         }
 
         protected override async Task<EnrichedContentEvent> CreateEnrichedEventAsync(Envelope<ContentEvent> @event)
         {
             var result = new EnrichedContentEvent();
 
-            var content =
-                (await grainFactory
-                    .GetGrain<IContentGrain>(@event.Payload.ContentId)
-                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
+            var content = await contentLoader.GetAsync(@event.Headers.AggregateId(), @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(content, result);
 

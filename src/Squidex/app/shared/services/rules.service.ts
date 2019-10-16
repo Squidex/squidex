@@ -24,7 +24,16 @@ import {
     Version
 } from '@app/framework';
 
-export const ALL_TRIGGERS = {
+export type TriggerDto = {
+    description: string;
+    display: string;
+    iconColor: string;
+    iconCode: string;
+};
+
+export type TriggersDto = { [key: string]: TriggerDto };
+
+export const ALL_TRIGGERS: TriggersDto = {
     'ContentChanged': {
         description: 'For content changes like created, updated, published, unpublished...',
         display: 'Content changed',
@@ -50,6 +59,8 @@ export const ALL_TRIGGERS = {
         iconCode: 'dashboard'
     }
 };
+
+export type ActionsDto = { [name: string]: RuleElementDto };
 
 export class RuleElementDto {
     constructor(

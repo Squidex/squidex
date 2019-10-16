@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today });
 
-            Assert.Equal(JsonValue.Create("2017-10-12"), DefaultValueFactory.CreateDefaultValue(field, now));
+            Assert.Equal(JsonValue.Create("2017-10-12T00:00:00Z"), DefaultValueFactory.CreateDefaultValue(field, now));
         }
 
         [Fact]

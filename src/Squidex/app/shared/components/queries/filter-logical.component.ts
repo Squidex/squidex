@@ -26,8 +26,6 @@ import {
 export class FilterLogicalComponent {
     private filterValue: FilterLogical;
 
-    public filters: FilterNode[] = [];
-
     @Output()
     public change = new EventEmitter();
 
@@ -53,6 +51,8 @@ export class FilterLogicalComponent {
     public get filter() {
         return this.filterValue;
     }
+
+    public filters: FilterNode[] = [];
 
     public addComparison() {
         this.filters.push(<any>{ path: Object.keys(this.model.fields)[0] });
@@ -94,7 +94,11 @@ export class FilterLogicalComponent {
         }
     }
 
-    private emitChange() {
+    public emitRemove() {
+        this.remove.emit();
+    }
+
+    public emitChange() {
         this.change.emit();
     }
 }

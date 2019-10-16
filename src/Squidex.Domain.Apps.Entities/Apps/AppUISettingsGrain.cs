@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppUISettingsGrain : GrainOfGuid, IAppUISettingsGrain
+    public sealed class AppUISettingsGrain : GrainOfString, IAppUISettingsGrain
     {
         private readonly IGrainState<GrainState> state;
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public Task SetAsync(string path, J<IJsonValue> value)
         {
-            var container = GetContainer(path, out var key);
+            var container = GetContainer(path, true, out var key);
 
             if (container == null)
             {
@@ -58,19 +58,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return state.WriteAsync();
         }
 
-        public Task RemoveAsync(string path)
+        public async Task RemoveAsync(string path)
         {
-            var container = GetContainer(path, out var key);
+            var container = GetContainer(path, false, out var key);
 
-            if (container != null)
+            if (container?.ContainsKey(key) == true)
             {
                 container.Remove(key);
-            }
 
-            return state.WriteAsync();
+                await state.WriteAsync();
+            }
         }
 
-        private JsonObject GetContainer(string path, out string key)
+        private JsonObject GetContainer(string path, bool add, out string key)
         {
             Guard.NotNullOrEmpty(path, nameof(path));
 
@@ -86,9 +86,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     if (!current.TryGetValue(segment, out var temp))
                     {
-                        temp = JsonValue.Object();
+                        if (add)
+                        {
+                            temp = JsonValue.Object();
 
-                        current[segment] = temp;
+                            current[segment] = temp;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
 
                     if (temp is JsonObject next)

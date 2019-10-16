@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -21,7 +20,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -32,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IRuleTriggerHandler sut;
         private readonly Guid ruleId = Guid.NewGuid();
         private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
@@ -46,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
                 .Returns(false);
 
-            sut = new ContentChangedTriggerHandler(scriptEngine, grainFactory);
+            sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader);
         }
 
         public static IEnumerable<object[]> TestEvents = new[]
@@ -65,13 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var contentGrain = A.Fake<IContentGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IContentGrain>(@event.ContentId, null))
-                .Returns(contentGrain);
-
-            A.CallTo(() => contentGrain.GetStateAsync(12))
-                .Returns(J.Of<IContentEntity>(new ContentEntity { SchemaId = SchemaMatch }));
+            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
+                .Returns(new ContentEntity { SchemaId = SchemaMatch });
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 

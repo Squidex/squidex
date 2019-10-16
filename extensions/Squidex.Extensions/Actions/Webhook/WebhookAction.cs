@@ -29,5 +29,10 @@ namespace Squidex.Extensions.Actions.Webhook
         [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the signature.")]
         [DataType(DataType.Text)]
         public string SharedSecret { get; set; }
+
+        [Display(Name = "Payload", Description = "The optional custom request payload.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Payload { get; set; }
     }
 }

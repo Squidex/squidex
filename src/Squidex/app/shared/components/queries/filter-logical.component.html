@@ -13,7 +13,7 @@
 
         
         <div class="col-auto pl-2" *ngIf="!isRoot">
-            <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+            <button type="button" class="btn btn-text-danger" (click)="emitRemove()">
                 <i class="icon-bin2"></i>
             </button>
         </div>
@@ -26,7 +26,7 @@
             <span class="filter-line-h"></span>
     
             <sqx-filter-node [filter]="filter" [model]="model" [level]="level + 1"
-                (remove)="removeFilter(filter)" (change)="change.emit()">
+                (remove)="removeFilter(filter)" (change)="emitChange()">
             </sqx-filter-node>
         </div>
 

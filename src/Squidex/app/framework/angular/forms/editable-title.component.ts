@@ -16,14 +16,14 @@ const ESCAPE_KEY = 27;
     templateUrl: './editable-title.component.html'
 })
 export class EditableTitleComponent {
+    @Output()
+    public nameChanged = new EventEmitter<string>();
+
     @Input()
     public disabled = false;
 
     @Input()
     public name: string;
-
-    @Output()
-    public nameChanged = new EventEmitter<string>();
 
     public isRenaming = false;
 

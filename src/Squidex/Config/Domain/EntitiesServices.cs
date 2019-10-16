@@ -93,8 +93,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<TempFolderBackupArchiveLocation>()
                 .As<IBackupArchiveLocation>();
 
+            services.AddSingletonAs<CommentsLoader>()
+                .As<ICommentsLoader>();
+
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
+
+            services.AddSingletonAs<AppUISettings>()
+                .As<IAppUISettings>();
 
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
@@ -108,6 +114,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
+            services.AddSingletonAs<AssetLoader>()
+                .As<IAssetLoader>();
+
             services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
                 .AsSelf();
 
@@ -117,8 +126,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
-            services.AddSingletonAs<ContentVersionLoader>()
-                .As<IContentVersionLoader>();
+            services.AddSingletonAs<ContentLoader>()
+                .As<IContentLoader>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
@@ -236,34 +245,31 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<InviteUserCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<AppsIndex>()
+                .As<ICommandMiddleware>().As<IAppsIndex>();
+
+            services.AddSingletonAs<RulesIndex>()
+                .As<ICommandMiddleware>().As<IRulesIndex>();
+
+            services.AddSingletonAs<SchemasIndex>()
+                .As<ICommandMiddleware>().As<ISchemasIndex>();
+
+            services.AddSingletonAs<AppCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<AppsByNameIndexCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<AppCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentGrain>>()
+            services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentsGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<RuleCommand, IRuleGrain>>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<AppsByUserIndexCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<RulesByAppIndexCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<SchemasByAppIndexCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()

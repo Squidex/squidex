@@ -69,7 +69,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var stream = new MemoryStream();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = () => stream });
+            var file = new AssetFile("name.jpg", "image/jpg", 1024, () => stream);
+
+            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
             var context = CreateContextForCommand(command);
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
@@ -86,7 +88,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var stream = new MemoryStream();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = () => stream });
+            var file = new AssetFile("name.jpg", "image/jpg", 1024, () => stream);
+
+            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
             var context = CreateContextForCommand(command);
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))

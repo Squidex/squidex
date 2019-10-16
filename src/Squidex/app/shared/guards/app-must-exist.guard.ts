@@ -25,12 +25,12 @@ export class AppMustExistGuard implements CanActivate {
 
         const result =
             this.appsState.select(appName).pipe(
-                tap(dto => {
-                    if (!dto) {
+                tap(app => {
+                    if (!app) {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(a => !!a));
+                map(app => !!app));
 
         return result;
     }

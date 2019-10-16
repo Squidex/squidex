@@ -46,6 +46,8 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
+    public trackByFieldFn: Function;
+
     public isEditing = false;
     public isEditable = false;
 
@@ -58,6 +60,7 @@ export class FieldComponent implements OnChanges {
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
+        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -112,7 +115,7 @@ export class FieldComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const properties = createProperties(this.field.properties['fieldType'], value);
+            const properties = createProperties(this.field.properties.fieldType, value);
 
             this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {
@@ -129,4 +132,3 @@ export class FieldComponent implements OnChanges {
         return field.fieldId + this.schema.id;
     }
 }
-

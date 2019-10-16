@@ -1,7 +1,7 @@
 <div class="step">
     <div class="row no-gutters step-header">
         <div class="col-auto">
-            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()"
+            <button class="btn btn-initial mr-1" (click)="emitMakeInitial()"
                 [class.enabled]="step.name !== workflow.initial && !step.isLocked"
                 [class.active]="step.name === workflow.initial"
                 [disabled]="step.name === workflow.initial || step.isLocked || disabled">
@@ -29,7 +29,7 @@
             <small class="text-decent">(Cannot be removed)</small>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked && workflow.steps.length > 2" [disabled]="disabled">
+            <button type="button" class="btn btn-text-danger" (click)="emitRemove()" *ngIf="!step.isLocked && workflow.steps.length > 2" [disabled]="disabled">
                 <i class="icon-bin2"></i>
             </button>
         </div>
@@ -40,7 +40,7 @@
             [transition]="transition"
             [disabled]="disabled"
             [roles]="roles"
-            (remove)="transitionRemove.emit(transition)"
+            (remove)="emitTransitionRemove(transition)"
             (update)="changeTransition(transition, $event)">
         </sqx-workflow-transition>
             
@@ -56,7 +56,7 @@
                 </sqx-dropdown>
             </div>
             <div class="col pl-2">
-                <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
+                <button class="btn btn-outline-secondary" (click)="emitTransitionAdd(openStep)">
                     <i class="icon-plus"></i>
                 </button>
             </div>

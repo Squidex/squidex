@@ -1,18 +1,44 @@
-<form [formGroup]="importForm.form" (ngSubmit)="import()">  
+<form [formGroup]="importForm.form" (ngSubmit)="detect()">  
     <sqx-modal-dialog (close)="emitClose()">
         <ng-container title>
             Import contributors
         </ng-container>
 
         <ng-container content>
-            <div class="content">
-                <ng-container *ngIf="importStatus; else noStatus">
+            <ng-container [ngSwitch]="importStage">
+                <ng-container *ngSwitchCase="'Start'">
+                    <textarea class="form-control content" placeholder="user1@squidex.io;user2@squidex.io" formControlName="import"></textarea>
+                   
+                    <sqx-form-hint>
+                        <ng-container *ngIf="importForm.numberOfEmails | async; let emails">
+                            Emails detected: {{emails}}
+                        </ng-container>
+        
+                        &nbsp;
+                    </sqx-form-hint>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Change'">
                     <div class="row pb-2" *ngFor="let status of importStatus">
-                        <div class="col truncate">
+                        <div class="col truncate aligned">
                             {{status.email}}
                         </div>
 
-                        <div class="col-auto">
+                        <div class="col-5 pl-1">
+                            <select class="form-control" [(ngModel)]="status.role" [ngModelOptions]="standalone">
+                                <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Wait'">
+                    <div class="row pb-2" *ngFor="let status of importStatus">
+                        <div class="col truncate aligned">
+                            {{status.email}}
+                        </div>
+
+                        <div class="col-auto aligned">
                             <sqx-status-icon size="sm"
                                 [status]="status.result"
                                 [statusText]="status.resultText">
@@ -20,24 +46,21 @@
                         </div>
                     </div>
                 </ng-container>
-
-            <ng-template #noStatus>
-                    <textarea class="form-control content" placeholder="user1@squidex.io;user2.squidex.io" formControlName="import"></textarea>
-            </ng-template>
-        </div>
-
-            <sqx-form-hint>
-                <ng-container *ngIf="importForm.numberOfEmails | async; let emails">
-                    Emails detected: {{emails}}
-                </ng-container>
-
-                &nbsp;
-            </sqx-form-hint>
+            </ng-container>
         </ng-container>
 
         <ng-container footer>
             <button type="reset" class="float-left btn btn-secondary" (click)="emitClose()">Cancel</button>
-            <button type="submit" class="float-right btn btn-success" [disabled]="importStatus || (importForm.hasNoUser | async)">Add Contributors</button>
+
+            <ng-container [ngSwitch]="importStage">
+                <ng-container *ngSwitchCase="'Start'">
+                    <button type="submit" class="float-right btn btn-success" [disabled]="importForm.hasNoUser | async">Add Contributors</button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Change'">
+                    <button type="button" class="float-right btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">Import</button>
+                </ng-container>
+            </ng-container>
         </ng-container>
     </sqx-modal-dialog>
 </form>

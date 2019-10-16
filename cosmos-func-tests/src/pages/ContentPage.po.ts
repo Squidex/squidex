@@ -21,10 +21,6 @@ export class ContentPage extends BrowserUtil {
         return element(by.xpath(`//iframe[@src=\'${constants.refDataLocators.editorUrl}\']`));
     }
 
-    public commentaryEditor() {
-        return this.getWhenVisible(element(by.xpath(`//iframe[@src=\'${constants.refDataLocators.editorUrl}\']`)));
-    }
-
     public getSearchBar() {
         return element(by.xpath('//input[@placeholder=\'Search\']'));
     }
@@ -148,7 +144,7 @@ export class ContentPage extends BrowserUtil {
             await this.waitForElementToBePresentAndAppend(editor, commentaryText);
 
             if (selectAll) {
-               this.selectAllContent();
+                this.selectAllContent();
             }
         });
     }
@@ -165,7 +161,7 @@ export class ContentPage extends BrowserUtil {
         return await this.forToastUI(async () => {
             const button = this.getEditorToolBarOptions(editorToolBarOption);
 
-            await this.waitForElementToBeVisibleAndClick(button);
+            await this.browserScriptToClick(button);
         });
     }
 

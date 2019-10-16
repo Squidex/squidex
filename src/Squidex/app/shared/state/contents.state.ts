@@ -186,7 +186,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public create(request: any, publish: boolean): Observable<ContentDto> {
         return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(payload => {
-                this.dialogs.notifyInfo('Contents created successfully.');
+                this.dialogs.notifyInfo('Content created successfully.');
 
                 return this.next(s => {
                     const contents = s.contents.pushFront(payload);

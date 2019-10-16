@@ -29,7 +29,7 @@ describe('DialogService', () => {
     it('should create error notification', () => {
         const notification = Notification.error('MyError');
 
-        expect(notification.displayTime).toBe(5000);
+        expect(notification.displayTime).toBe(10000);
         expect(notification.message).toBe('MyError');
         expect(notification.messageType).toBe('danger');
     });
@@ -37,7 +37,7 @@ describe('DialogService', () => {
     it('should create info notification', () => {
         const notification = Notification.info('MyInfo');
 
-        expect(notification.displayTime).toBe(5000);
+        expect(notification.displayTime).toBe(10000);
         expect(notification.message).toBe('MyInfo');
         expect(notification.messageType).toBe('info');
     });

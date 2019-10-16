@@ -9,16 +9,15 @@
         <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="schema && snapshot.contentItems && snapshot.contentItems.length > 0"
             [sqxSortModel]="snapshot.contentItems.mutableValues" 
             (sqxSort)="sort($event)">
-            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent">
-                <tr [sqxContent]="content"
-                    [language]="language"
-                    [isReadOnly]="true"
-                    [isReference]="true"
-                    [isCompact]="isCompact"
-                    [schema]="schema"
-                    [schemaFields]="schema.referenceFields"
-                    (delete)="remove(content)"></tr>
-                <tr class="spacer"></tr>
+            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
+                [sqxContent]="content"
+                [language]="language"
+                [isReadOnly]="true"
+                [isReference]="true"
+                [isCompact]="isCompact"
+                [schema]="schema"
+                [schemaFields]="schema.referenceFields"
+                (delete)="remove(content)">
             </tbody>
         </table>
     </ng-container>

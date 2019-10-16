@@ -45,6 +45,7 @@
     "no-arg": true,
     "no-attribute-parameter-decorator": true,
     "no-bitwise": true,
+    "no-consecutive-blank-lines": true,
     "no-console": [
       true,
       "debug",

@@ -98,7 +98,7 @@
                 [sqxSortDisabled]="!isEditable"
                 [sqxSortModel]="nested"
                 (sqxSort)="sortFields($event)">
-                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
+                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByFieldFn">
                     <span class="nested-field-line-h"></span>
     
                     <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns"></sqx-field>

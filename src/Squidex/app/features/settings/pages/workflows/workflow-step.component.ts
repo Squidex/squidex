@@ -23,18 +23,6 @@ import {
     templateUrl: './workflow-step.component.html'
 })
 export class WorkflowStepComponent implements OnChanges {
-    @Input()
-    public workflow: WorkflowDto;
-
-    @Input()
-    public step: WorkflowStep;
-
-    @Input()
-    public roles: RoleDto[];
-
-    @Input()
-    public disabled: boolean;
-
     @Output()
     public makeInitial = new EventEmitter();
 
@@ -55,6 +43,18 @@ export class WorkflowStepComponent implements OnChanges {
 
     @Output()
     public remove = new EventEmitter();
+
+    @Input()
+    public workflow: WorkflowDto;
+
+    @Input()
+    public step: WorkflowStep;
+
+    @Input()
+    public roles: RoleDto[];
+
+    @Input()
+    public disabled: boolean;
 
     public onBlur = { updateOn: 'blur' };
 
@@ -88,8 +88,23 @@ export class WorkflowStepComponent implements OnChanges {
         this.update.emit({ noUpdate });
     }
 
+    public emitMakeInitial() {
+        this.makeInitial.emit();
+    }
+
+    public emitTransitionAdd(transition: WorkflowStep) {
+        this.transitionAdd.emit(transition);
+    }
+
+    public emitTransitionRemove(transition: WorkflowTransition) {
+        this.transitionRemove.emit(transition);
+    }
+
+    public emitRemove() {
+        this.remove.emit();
+    }
+
     public trackByTransition(index: number, transition: WorkflowTransition) {
         return transition.to;
     }
 }
-

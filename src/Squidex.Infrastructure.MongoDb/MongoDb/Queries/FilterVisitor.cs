@@ -49,10 +49,16 @@ namespace Squidex.Infrastructure.MongoDb.Queries
         {
             var propertyName = nodeIn.Path.ToString();
 
+            var value = nodeIn.Value.Value;
+
             switch (nodeIn.Operator)
             {
                 case CompareOperator.Empty:
-                    return Filter.Or(Filter.Exists(propertyName, false), Filter.Eq(propertyName, default(T)), Filter.Eq(propertyName, string.Empty), Filter.Eq(propertyName, new T[0]));
+                    return Filter.Or(
+                        Filter.Exists(propertyName, false),
+                        Filter.Eq(propertyName, default(T)),
+                        Filter.Eq(propertyName, string.Empty),
+                        Filter.Eq(propertyName, new T[0]));
                 case CompareOperator.StartsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
                 case CompareOperator.Contains:
@@ -60,19 +66,19 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 case CompareOperator.EndsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s + "$"));
                 case CompareOperator.Equals:
-                    return Filter.Eq(propertyName, nodeIn.Value.Value);
+                    return Filter.Eq(propertyName, value);
                 case CompareOperator.GreaterThan:
-                    return Filter.Gt(propertyName, nodeIn.Value.Value);
+                    return Filter.Gt(propertyName, value);
                 case CompareOperator.GreaterThanOrEqual:
-                    return Filter.Gte(propertyName, nodeIn.Value.Value);
+                    return Filter.Gte(propertyName, value);
                 case CompareOperator.LessThan:
-                    return Filter.Lt(propertyName, nodeIn.Value.Value);
+                    return Filter.Lt(propertyName, value);
                 case CompareOperator.LessThanOrEqual:
-                    return Filter.Lte(propertyName, nodeIn.Value.Value);
+                    return Filter.Lte(propertyName, value);
                 case CompareOperator.NotEquals:
-                    return Filter.Ne(propertyName, nodeIn.Value.Value);
+                    return Filter.Ne(propertyName, value);
                 case CompareOperator.In:
-                    return Filter.In(propertyName, ((IList)nodeIn.Value.Value).OfType<object>());
+                    return Filter.In(propertyName, ((IList)value).OfType<object>());
             }
 
             throw new NotSupportedException();

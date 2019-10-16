@@ -8,7 +8,7 @@ export class SearchPage extends ContentPage {
     }
 
     public $getRefDataList(index: number) {
-        return element.all(by.xpath('//table[@class=\'table table-items table-fixed\']/tbody/tr[@ng-reflect-can-clone=\'true\']/td[' + index + ']/sqx-content-value/span'));
+        return element.all(by.xpath('//table[@class=\'table table-items table-fixed\']/tbody//td[' + index + ']/sqx-content-value/span'));
     }
 
     public $contentItems() {
@@ -23,12 +23,12 @@ export class SearchPage extends ContentPage {
         return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/i'));
     }
 
-    public $bulletPointText() {
-        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ul/li'));
+    public async bulletPointText() {
+        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/ul/li'));
     }
 
-    public $numberedText() {
-        return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/ol/li'));
+    public async numberedText() {
+        return await element(by.xpath('//div[@class=\'tui-editor-contents\']/ol/li'));
     }
 
     public $commentaryInput() {
@@ -67,7 +67,7 @@ export class SearchPage extends ContentPage {
     }
 
     public async verifyCommentaryCreation() {
-        await this.commentaryEditor();
+        await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(this.$commentaryInput());
     }
 
@@ -87,14 +87,14 @@ export class SearchPage extends ContentPage {
 
     public async verifyNumberedCommentaryCreation() {
         await this.selectContentByText('Numbered');
-        await this.scrollIntoView(this.getCommentaryEditorFrame());
-        return await this.getCommentary(await this.$numberedText());
+        await this.scrollIntoView(await this.getCommentaryEditorFrame());
+        return await this.getCommentary(await this.numberedText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
         await this.selectContentByText('Bullet');
         await this.scrollIntoView(this.getCommentaryEditorFrame());
-        return await this.getCommentary(await this.$bulletPointText());
+        return await this.getCommentary(await this.bulletPointText());
     }
 
     public async searchContentByRefData(commodity: string, commentaryType: string, region: string) {
@@ -115,18 +115,18 @@ export class SearchPage extends ContentPage {
 
                 const commodityIndex = commodities.indexOf(commodityValue);
 
-                    const commentaryTypetext = await commentaryTypes[commodityIndex].getText();
+                const commentaryTypetext = await commentaryTypes[commodityIndex].getText();
 
-                    if (commentaryTypetext.includes(commentaryType)) {
+                if (commentaryTypetext.includes(commentaryType)) {
 
-                            const regiontext = await regions[commodityIndex].getText();
+                    const regiontext = await regions[commodityIndex].getText();
 
-                            if (regiontext.includes(region)) {
+                    if (regiontext.includes(region)) {
 
-                                await regions[commodityIndex].click();
-                                return;
-                        }
+                        await regions[commodityIndex].click();
+                        return;
                     }
+                }
             }
 
             throw `No Element with ${commodity}, ${commentaryType}, ${region} found`;

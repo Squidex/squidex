@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -78,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId();
             var userPermissions = HttpContext.Permissions();
 
-            var apps = await appProvider.GetUserApps(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
 
             var response = Deferred.Response(() =>
             {
@@ -287,7 +286,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            return new UploadAppImage { File = file[0].OpenReadStream, Image = new AppImage(file[0].ContentType) };
+            return new UploadAppImage { File = file[0].ToAssetFile() };
         }
 
         private static FileStream GetTempStream()

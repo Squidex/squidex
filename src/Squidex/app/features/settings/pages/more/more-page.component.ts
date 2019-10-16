@@ -35,7 +35,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     public updateForm = new UpdateAppForm(this.formBuilder);
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router
     ) {
@@ -46,16 +46,14 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.appsState.selectedApp
                 .subscribe(app => {
-                    if (app) {
-                        this.app = app;
+                    this.app = app;
 
-                        this.isDeletable = app.canDelete;
-                        this.isEditable = app.canUpdateGeneral;
-                        this.isImageEditable = app.canUpdateImage;
+                    this.isDeletable = app.canDelete;
+                    this.isEditable = app.canUpdateGeneral;
+                    this.isImageEditable = app.canUpdateImage;
 
-                        this.updateForm.load(app);
-                        this.updateForm.setEnabled(this.isEditable);
-                    }
+                    this.updateForm.load(app);
+                    this.updateForm.setEnabled(this.isEditable);
                 }));
     }
 
@@ -115,4 +113,3 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
             });
     }
 }
-

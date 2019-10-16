@@ -6,7 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map } from 'rxjs/operators';
+import { debounceTime, map, shareReplay } from 'rxjs/operators';
 
 import {
     Form,
@@ -28,23 +28,28 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
                 [
                     Validators.required
                 ]
+            ],
+            role: [null,
+                [
+                    Validators.required
+                ]
             ]
         }));
     }
 
-    protected transformSubmit(value: { user: string | UserDto }) {
+    protected transformSubmit(value: { user: string | UserDto, role: string }) {
         let contributorId = value.user;
 
         if (Types.is(contributorId, UserDto)) {
             contributorId = contributorId.id;
         }
 
-        return { contributorId, role: 'Editor', invite: true };
+        return { contributorId, role: value.role, invite: true };
     }
 }
 
 export class ImportContributorsForm extends Form<FormGroup, AssignContributorDto[]> {
-    public numberOfEmails = value$(this.form.controls['import']).pipe(map(v => extractEmails(v).length));
+    public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 
@@ -64,14 +69,20 @@ export class ImportContributorsForm extends Form<FormGroup, AssignContributorDto
 }
 
 function extractEmails(value: string) {
-    let result: AssignContributorDto[] = [];
+    const result: AssignContributorDto[] = [];
 
     if (value) {
-        let emails = value.match(EMAIL_REGEX);
+        const added: { [email: string]: boolean } = {};
+
+        const emails = value.match(EMAIL_REGEX);
 
         if (emails) {
             for (let match of emails) {
-                result.push({ contributorId: match, role: 'Editor', invite: true });
+                if (!added[match]) {
+                    result.push({ contributorId: match, role: 'Editor', invite: true });
+
+                    added[match] = true;
+                }
             }
         }
     }

@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(actionDescription, job.Description);
 
             Assert.Equal(now, job.Created);
-            Assert.Equal(now.Plus(Duration.FromDays(2)), job.Expires);
+            Assert.Equal(now.Plus(Duration.FromDays(30)), job.Expires);
 
             Assert.Equal(enrichedEvent.AppId.Id, job.AppId);
 

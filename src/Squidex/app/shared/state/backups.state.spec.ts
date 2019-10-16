@@ -47,7 +47,7 @@ describe('BackupsState', () => {
     describe('Loading', () => {
         it('should load backups', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
+                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
 
             backupsState.load().subscribe();
 
@@ -59,7 +59,7 @@ describe('BackupsState', () => {
 
         it('should show notification on load when reload is true', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
+                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
 
             backupsState.load(true, false).subscribe();
 
@@ -94,7 +94,7 @@ describe('BackupsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
+                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
 
             backupsState.load().subscribe();
         });

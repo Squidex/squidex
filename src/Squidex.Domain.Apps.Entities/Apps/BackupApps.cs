@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -25,26 +23,26 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
-        private readonly IGrainFactory grainFactory;
+        private readonly IAppUISettings appUISettings;
+        private readonly IAppsIndex appsIndex;
         private readonly IUserResolver userResolver;
-        private readonly IAppsByNameIndex appsByNameIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
-        private bool isReserved;
+        private string appReservation;
         private string appName;
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
+        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex, IUserResolver userResolver)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(appsIndex, nameof(appsIndex));
+            Guard.NotNull(appUISettings, nameof(appUISettings));
             Guard.NotNull(userResolver, nameof(userResolver));
 
-            this.grainFactory = grainFactory;
+            this.appsIndex = appsIndex;
+            this.appUISettings = appUISettings;
             this.userResolver = userResolver;
-
-            appsByNameIndex = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
         }
 
         public override async Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
@@ -125,7 +123,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReserveAppAsync(Guid appId)
         {
-            if (!(isReserved = await appsByNameIndex.ReserveAppAsync(appId, appName)))
+            appReservation = await appsIndex.ReserveAsync(appId, appName);
+
+            if (appReservation == null)
             {
                 throw new BackupRestoreException("The app id or name is not available.");
             }
@@ -133,10 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CleanupRestoreErrorAsync(Guid appId)
         {
-            if (isReserved)
-            {
-                await appsByNameIndex.RemoveReservationAsync(appId, appName);
-            }
+            await appsIndex.RemoveReservationAsync(appReservation);
         }
 
         private RefToken MapUser(string userId, RefToken fallback)
@@ -182,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
         {
-            var json = await grainFactory.GetGrain<IAppUISettingsGrain>(appId).GetAsync();
+            var json = await appUISettings.GetAsync(appId, null);
 
             await writer.WriteJsonAsync(SettingsFile, json);
         }
@@ -191,17 +188,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
 
-            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync(json);
+            await appUISettings.SetAsync(appId, null, json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await appsByNameIndex.AddAppAsync(appId, appName);
+            await appsIndex.AddAsync(appReservation);
 
-            foreach (var user in contributors)
-            {
-                await grainFactory.GetGrain<IAppsByUserIndex>(user).AddAppAsync(appId);
-            }
+            await appsIndex.RebuildByContributorsAsync(appId, contributors);
         }
     }
 }

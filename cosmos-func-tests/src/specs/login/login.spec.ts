@@ -11,15 +11,22 @@ import {
 } from './../../pages';
 
 describe('User Login', () => {
-    const homePage = new HomePage();
-    const loginPage = new LoginPage();
+    let homePage: HomePage;
+    let loginPage: LoginPage;
 
     beforeAll(async () => {
+        loginPage = new LoginPage();
         await loginPage.login(Users.find(u => u.name === 'vegaAdmin'));
     });
 
     afterAll(async () => {
         await homePage.logout();
+        // setting a timeout between logout and login of another spec for the test not to time out
+        await browser.sleep(1000);
+    });
+
+    beforeEach(async () => {
+        homePage = new HomePage();
     });
 
     it('Verify logging into Cosmos with valid credentials', async () => {

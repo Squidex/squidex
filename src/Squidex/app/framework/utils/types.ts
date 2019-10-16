@@ -128,3 +128,24 @@ export module Types {
         return Types.isUndefined(value) === true || Types.isNull(value) === true;
     }
 }
+
+export function mergeInto(target: object, source: object) {
+    if (!Types.isObject(target) || !Types.isObject(source)) {
+        return source;
+    }
+
+    Object.keys(source).forEach(key => {
+        const targetValue = target[key];
+        const sourceValue = source[key];
+
+        if (Types.isArray(targetValue) && Types.isArray(sourceValue)) {
+            target[key] = targetValue.concat(sourceValue);
+        } else if (Types.isObject(targetValue) && Types.isObject(sourceValue)) {
+            target[key] = mergeInto({ ...targetValue }, sourceValue);
+        } else {
+            target[key] = sourceValue;
+        }
+    });
+
+    return target;
+}

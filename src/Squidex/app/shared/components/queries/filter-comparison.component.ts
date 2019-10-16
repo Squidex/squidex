@@ -25,10 +25,6 @@ import { StatusInfo } from '@app/shared/services/contents.service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterComparisonComponent implements OnChanges {
-    public fieldModel: QueryFieldModel;
-
-    public noValue = false;
-
     @Output()
     public change = new EventEmitter();
 
@@ -40,6 +36,10 @@ export class FilterComparisonComponent implements OnChanges {
 
     @Input()
     public filter: FilterComparison;
+
+    public fieldModel: QueryFieldModel;
+
+    public noValue = false;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['filter']) {
@@ -100,7 +100,11 @@ export class FilterComparisonComponent implements OnChanges {
         this.fieldModel = newModel;
     }
 
-    private emitChange() {
+    public emitRemove() {
+        this.remove.emit();
+    }
+
+    public emitChange() {
         this.change.emit();
     }
 }

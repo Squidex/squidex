@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class UploadAppImage : AppCommand
     {
-        public AppImage Image { get; set; }
-
-        public Func<Stream> File { get; set; }
+        public AssetFile File { get; set; }
     }
 }

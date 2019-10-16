@@ -20,8 +20,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             , screenshotsSubfolder: '_images'
             , jsonsSubfolder: 'jsons'
             , takeScreenShotsOnlyForFailedSpecs: true
-            , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss Z')
-            , docName: 'lastrunresults.html'
+            , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss z')
+            , docName: 'cosmos_test_results.html'
             , gatherBrowserLogs: false
             , preserveDirectory: false
             , clientDefaults: {

@@ -31,6 +31,9 @@ import {
 export class SearchFormComponent implements OnChanges {
     public readonly standalone = { standalone: true };
 
+    @Output()
+    public queryChange = new EventEmitter<Query>();
+
     @Input()
     public placeholder = '';
 
@@ -39,9 +42,6 @@ export class SearchFormComponent implements OnChanges {
 
     @Input()
     public query: Query;
-
-    @Output()
-    public queryChange = new EventEmitter<Query>();
 
     @Input()
     public queries: Queries;
@@ -93,7 +93,7 @@ export class SearchFormComponent implements OnChanges {
 
         if (value) {
             if (this.queries && this.query) {
-                this.queries.add(value.name, this.query);
+                this.queries.add(value.name, this.query, value.user);
             }
 
             this.saveQueryForm.submitCompleted();

@@ -8,7 +8,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppsState,
     RuleEventDto,
     RuleEventsState
 } from '@app/shared';
@@ -22,7 +21,6 @@ export class RuleEventsPageComponent implements OnInit {
     public selectedEventId: string | null = null;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly ruleEventsState: RuleEventsState
     ) {
     }
@@ -59,4 +57,3 @@ export class RuleEventsPageComponent implements OnInit {
         return ruleEvent.id;
     }
 }
-

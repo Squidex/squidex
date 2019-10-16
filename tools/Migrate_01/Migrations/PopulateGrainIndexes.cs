@@ -8,38 +8,37 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
-using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
-using Squidex.Domain.Apps.Entities.Schemas.State;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Migrate_01.Migrations
 {
     public class PopulateGrainIndexes : IMigration
     {
-        private readonly IGrainFactory grainFactory;
-        private readonly ISnapshotStore<AppState, Guid> statesForApps;
-        private readonly ISnapshotStore<RuleState, Guid> statesForRules;
-        private readonly ISnapshotStore<SchemaState, Guid> statesForSchemas;
+        private readonly IAppsIndex indexApps;
+        private readonly IRulesIndex indexRules;
+        private readonly ISchemasIndex indexSchemas;
+        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventStore eventStore;
 
-        public PopulateGrainIndexes(
-            IGrainFactory grainFactory,
-            ISnapshotStore<AppState, Guid> statesForApps,
-            ISnapshotStore<RuleState, Guid> statesForRules,
-            ISnapshotStore<SchemaState, Guid> statesForSchemas)
+        public PopulateGrainIndexes(IAppsIndex indexApps, IRulesIndex indexRules, ISchemasIndex indexSchemas,
+            IEventDataFormatter eventDataFormatter,
+            IEventStore eventStore)
         {
-            this.grainFactory = grainFactory;
-            this.statesForApps = statesForApps;
-            this.statesForRules = statesForRules;
-            this.statesForSchemas = statesForSchemas;
+            this.indexApps = indexApps;
+            this.indexRules = indexRules;
+            this.indexSchemas = indexSchemas;
+            this.eventDataFormatter = eventDataFormatter;
+            this.eventStore = eventStore;
         }
 
         public Task UpdateAsync()
@@ -55,26 +54,69 @@ namespace Migrate_01.Migrations
             var appsByName = new Dictionary<string, Guid>();
             var appsByUser = new Dictionary<string, HashSet<Guid>>();
 
-            await statesForApps.ReadAllAsync((app, version) =>
+            bool HasApp(NamedId<Guid> appId, bool consistent, out Guid id)
             {
-                if (!app.IsArchived)
-                {
-                    appsByName[app.Name] = app.Id;
+                return appsByName.TryGetValue(appId.Name, out id) && (!consistent || id == appId.Id);
+            }
 
-                    foreach (var contributor in app.Contributors.Keys)
+            HashSet<Guid> Index(string contributorId)
+            {
+                return appsByUser.GetOrAddNew(contributorId);
+            }
+
+            void RemoveApp(NamedId<Guid> appId, bool consistent)
+            {
+                if (HasApp(appId, consistent, out var id))
+                {
+                    foreach (var apps in appsByUser.Values)
                     {
-                        appsByUser.GetOrAddNew(contributor).Add(app.Id);
+                        apps.Remove(id);
                     }
+
+                    appsByName.Remove(appId.Name);
+                }
+            }
+
+            await eventStore.QueryAsync(storedEvent =>
+            {
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                switch (@event.Payload)
+                {
+                    case AppCreated appCreated:
+                        {
+                            RemoveApp(appCreated.AppId, false);
+
+                            appsByName[appCreated.Name] = appCreated.AppId.Id;
+                            break;
+                        }
+
+                    case AppContributorAssigned appContributorAssigned:
+                        {
+                            if (HasApp(appContributorAssigned.AppId, true, out _))
+                            {
+                                Index(appContributorAssigned.ContributorId).Add(appContributorAssigned.AppId.Id);
+                            }
+
+                            break;
+                        }
+
+                    case AppContributorRemoved contributorRemoved:
+                        Index(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
+                        break;
+                    case AppArchived appArchived:
+                        RemoveApp(appArchived.AppId, true);
+                        break;
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^app\\-");
 
-            await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).RebuildAsync(appsByName);
+            await indexApps.RebuildAsync(appsByName);
 
             foreach (var kvp in appsByUser)
             {
-                await grainFactory.GetGrain<IAppsByUserIndex>(kvp.Key).RebuildAsync(kvp.Value);
+                await indexApps.RebuildByContributorsAsync(kvp.Key, kvp.Value);
             }
         }
 
@@ -82,19 +124,31 @@ namespace Migrate_01.Migrations
         {
             var rulesByApp = new Dictionary<Guid, HashSet<Guid>>();
 
-            await statesForRules.ReadAllAsync((rule, version) =>
+            HashSet<Guid> Index(RuleEvent @event)
             {
-                if (!rule.IsDeleted)
+                return rulesByApp.GetOrAddNew(@event.AppId.Id);
+            }
+
+            await eventStore.QueryAsync(storedEvent =>
+            {
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                switch (@event.Payload)
                 {
-                    rulesByApp.GetOrAddNew(rule.AppId.Id).Add(rule.Id);
+                    case RuleCreated ruleCreated:
+                        Index(ruleCreated).Add(ruleCreated.RuleId);
+                        break;
+                    case RuleDeleted ruleDeleted:
+                        Index(ruleDeleted).Remove(ruleDeleted.RuleId);
+                        break;
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^rule\\-");
 
             foreach (var kvp in rulesByApp)
             {
-                await grainFactory.GetGrain<IRulesByAppIndex>(kvp.Key).RebuildAsync(kvp.Value);
+                await indexRules.RebuildAsync(kvp.Key, kvp.Value);
             }
         }
 
@@ -102,19 +156,31 @@ namespace Migrate_01.Migrations
         {
             var schemasByApp = new Dictionary<Guid, Dictionary<string, Guid>>();
 
-            await statesForSchemas.ReadAllAsync((schema, version) =>
+            Dictionary<string, Guid> Index(SchemaEvent @event)
             {
-                if (!schema.IsDeleted)
+                return schemasByApp.GetOrAddNew(@event.AppId.Id);
+            }
+
+            await eventStore.QueryAsync(storedEvent =>
+            {
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                switch (@event.Payload)
                 {
-                    schemasByApp.GetOrAddNew(schema.AppId.Id)[schema.SchemaDef.Name] = schema.Id;
+                    case SchemaCreated schemaCreated:
+                        Index(schemaCreated)[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
+                        break;
+                    case SchemaDeleted schemaDeleted:
+                        Index(schemaDeleted).Remove(schemaDeleted.SchemaId.Name);
+                        break;
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^schema\\-");
 
             foreach (var kvp in schemasByApp)
             {
-                await grainFactory.GetGrain<ISchemasByAppIndex>(kvp.Key).RebuildAsync(kvp.Value);
+                await indexSchemas.RebuildAsync(kvp.Key, kvp.Value);
             }
         }
     }

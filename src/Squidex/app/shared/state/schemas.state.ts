@@ -11,6 +11,7 @@ import { catchError, tap } from 'rxjs/operators';
 
 import {
     compareStringsAsc,
+    defined,
     DialogService,
     ImmutableArray,
     shareMapSubscribed,
@@ -69,8 +70,11 @@ export class SchemasState extends State<Snapshot> {
     public categoriesPlain =
         this.project(x => x.categories);
 
-    public selectedSchema =
+    public selectedSchemaOrNull =
         this.project(x => x.selectedSchema, sameSchema);
+
+    public selectedSchema =
+        this.selectedSchemaOrNull.pipe(defined());
 
     public schemas =
         this.project(x => x.schemas);
@@ -209,6 +213,14 @@ export class SchemasState extends State<Snapshot> {
 
     public configureScripts(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putScripts(this.appName, schema, request, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+        return this.schemasService.putSchemaSync(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),

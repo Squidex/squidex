@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 import {
     AccessTokenDto,
@@ -16,13 +16,18 @@ import {
     ClientsState,
     DialogModel,
     DialogService,
+    fadeAnimation,
     RoleDto
 } from '@app/shared';
 
 @Component({
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
-    templateUrl: './client.component.html'
+    templateUrl: './client.component.html',
+    animations: [
+        fadeAnimation
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientComponent implements OnChanges {
     @Input()

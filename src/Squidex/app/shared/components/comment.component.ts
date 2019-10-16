@@ -17,7 +17,11 @@ import { CommentDto, UpsertCommentForm } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommentComponent {
-    public editForm = new UpsertCommentForm(this.formBuilder);
+    @Output()
+    public delete = new EventEmitter();
+
+    @Output()
+    public update = new EventEmitter<string>();
 
     @Input()
     public comment: CommentDto;
@@ -25,11 +29,7 @@ export class CommentComponent {
     @Input()
     public userId: string;
 
-    @Output()
-    public delete = new EventEmitter();
-
-    @Output()
-    public update = new EventEmitter<string>();
+    public editForm = new UpsertCommentForm(this.formBuilder);
 
     constructor(
         private readonly formBuilder: FormBuilder

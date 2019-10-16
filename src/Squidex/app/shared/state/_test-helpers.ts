@@ -28,10 +28,10 @@ const appsState = Mock.ofType<AppsState>();
 appsState.setup(x => x.appName)
     .returns(() => app);
 
-appsState.setup(x => x.selectedApp)
+appsState.setup(x => x.selectedAppOrNull)
     .returns(() => of(<any>{ name: app }));
 
-appsState.setup(x => x.selectedValidApp)
+appsState.setup(x => x.selectedApp)
     .returns(() => of(<any>{ name: app }));
 
 const authService = Mock.ofType<AuthService>();

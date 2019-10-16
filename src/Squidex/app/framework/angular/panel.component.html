@@ -16,9 +16,18 @@
                 </div>
             </div>
 
-            <a class="panel-close" sqxParentLink [isLazyLoaded]="isLazyLoaded" *ngIf="showClose">
-                <i class="icon-close"></i>
-            </a>
+            <ng-container  *ngIf="showClose">
+                <ng-container *ngIf="customClose; else defaultClose">
+                    <a class="panel-close" (click)="emitClose()">
+                        <i class="icon-close"></i>
+                    </a>
+                </ng-container>
+                <ng-template #defaultClose>
+                    <a class="panel-close" sqxParentLink [isLazyLoaded]="isLazyLoaded">
+                        <i class="icon-close"></i>
+                    </a>
+                </ng-template>
+            </ng-container>
 
             <div class="panel-header-row" *ngIf="showSecondHeader">
                 <ng-content select="[secondHeader]"></ng-content>

@@ -48,7 +48,7 @@ namespace Squidex.ICIS.Authentication
 
         private void AddClaims(ClaimsIdentity identity, UserInfo userInfo)
         {
-            var squidexClaims = userInfo.ToUserValues().ToClaims();
+            var squidexClaims = userInfo.ToUserValues().ToClaims(false);
             foreach (var squidexClaim in from squidexClaim in squidexClaims
                 let found = identity.HasClaim((claim) => AreClaimsEqual(claim, squidexClaim))
                 where !found

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -21,26 +20,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2, AssetEvent, EnrichedAssetEvent>
     {
         private readonly IScriptEngine scriptEngine;
-        private readonly IGrainFactory grainFactory;
+        private readonly IAssetLoader assetLoader;
 
-        public AssetChangedTriggerHandler(IScriptEngine scriptEngine, IGrainFactory grainFactory)
+        public AssetChangedTriggerHandler(IScriptEngine scriptEngine, IAssetLoader assetLoader)
         {
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(assetLoader, nameof(assetLoader));
 
             this.scriptEngine = scriptEngine;
 
-            this.grainFactory = grainFactory;
+            this.assetLoader = assetLoader;
         }
 
         protected override async Task<EnrichedAssetEvent> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
         {
             var result = new EnrichedAssetEvent();
 
-            var asset =
-                   (await grainFactory
-                       .GetGrain<IAssetGrain>(@event.Payload.AssetId)
-                       .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
+            var asset = await assetLoader.GetAsync(@event.Payload.AssetId, @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(asset, result);
 

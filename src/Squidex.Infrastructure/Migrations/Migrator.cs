@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 
@@ -32,7 +33,7 @@ namespace Squidex.Infrastructure.Migrations
             this.log = log;
         }
 
-        public async Task MigrateAsync()
+        public async Task MigrateAsync(CancellationToken ct = default)
         {
             var version = 0;
 
@@ -49,7 +50,7 @@ namespace Squidex.Infrastructure.Migrations
 
                 version = await migrationStatus.GetVersionAsync();
 
-                while (true)
+                while (!ct.IsCancellationRequested)
                 {
                     var (newVersion, migrations) = migrationPath.GetNext(version);
 

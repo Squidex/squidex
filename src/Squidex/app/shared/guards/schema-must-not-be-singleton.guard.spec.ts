@@ -51,23 +51,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should subscribe to schema and return false when not found', () => {
-        const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
-
-        schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(undefined));
-
-        let result: boolean;
-
-        schemaGuard.canActivate(route, state).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeFalsy();
-
-        router.verify(x => x.navigate(It.isAny()), Times.never());
-    });
-
     it('should redirect to content when singleton', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 

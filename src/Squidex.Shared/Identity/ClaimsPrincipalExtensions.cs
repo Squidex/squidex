@@ -29,8 +29,9 @@ namespace Squidex.Shared.Identity
         {
             return new PermissionSet(principal.Claims
                 .Where(x =>
-                    x.Type == SquidexClaimTypes.Permissions ||
-                    x.Type == SquidexClaimTypes.PermissionsClient)
+                   (x.Type == SquidexClaimTypes.Permissions ||
+                    x.Type == SquidexClaimTypes.PermissionsClient) &&
+                   !string.IsNullOrWhiteSpace(x.Value))
                 .Select(x => new Permission(x.Value)));
         }
 
@@ -38,8 +39,9 @@ namespace Squidex.Shared.Identity
         {
             return principal.Claims
                 .Where(x =>
-                    x.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal) ||
-                    x.Type.StartsWith(SquidexClaimTypes.PrefixClient, StringComparison.Ordinal));
+                   (x.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal) ||
+                    x.Type.StartsWith(SquidexClaimTypes.PrefixClient, StringComparison.Ordinal)) &&
+                   !string.IsNullOrWhiteSpace(x.Value));
         }
     }
 }

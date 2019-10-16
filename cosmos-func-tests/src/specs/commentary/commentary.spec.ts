@@ -15,19 +15,25 @@ import {
 
 describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
     let hasRunBefore = false;
-
-    const appPage = new AppPage();
-    const browserPage = new BrowserUtil();
-    const contentPage = new ContentPage();
-    const homePage = new HomePage();
-    const loginPage = new LoginPage();
-    const searchPage = new SearchPage();
+    let appPage: AppPage;
+    let browserPage: BrowserUtil;
+    let contentPage: ContentPage;
+    let homePage: HomePage;
+    let loginPage: LoginPage;
+    let searchPage: SearchPage;
 
     beforeAll(async () => {
+        loginPage = new LoginPage();
         await loginPage.login(Users.find(u => u.name === 'vegaAdmin')!);
     });
 
     beforeEach(async () => {
+        // initializing page objects before every test to see that no test is refering to stale elements.
+        appPage = new AppPage();
+        browserPage = new BrowserUtil();
+        contentPage = new ContentPage();
+        homePage = new HomePage();
+        searchPage = new SearchPage();
         if (hasRunBefore) {
             // Go back to the home page and reset local store to get rid of all autosaved content.
             await homePage.navigateTo();
@@ -49,6 +55,8 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
 
     afterAll(async () => {
         await homePage.logout();
+        // setting a timeout between logout and login of another spec for the test not to time out
+        await browser.sleep(1000);
     });
 
     describe('VEGA-135 : Commentary creation UI with search & filter options for ref data', () => {
@@ -343,7 +351,7 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
 
             // Act
             // The content is autosaved every 2seconds. Lets wait a little bit longer.
-            await browser.sleep(5000);
+            await browser.sleep(4000);
             await browserPage.browserRefresh();
 
             // Assert

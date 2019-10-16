@@ -26,22 +26,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
         {
             CompareFilter<ClrValue> result;
 
+            var path = pathConverter(nodeIn.Path);
+
             var value = nodeIn.Value.Value;
 
             if (value is Instant &&
-                !string.Equals(nodeIn.Path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(nodeIn.Path[0], "ct", StringComparison.OrdinalIgnoreCase))
+                !string.Equals(path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(path[0], "ct", StringComparison.OrdinalIgnoreCase))
             {
-                result = new CompareFilter<ClrValue>(pathConverter(nodeIn.Path), nodeIn.Operator, value.ToString());
+                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, value.ToString());
             }
             else
             {
-                result = new CompareFilter<ClrValue>(pathConverter(nodeIn.Path), nodeIn.Operator, nodeIn.Value);
+                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, nodeIn.Value);
             }
 
-            if (result.Path.Count == 1 && result.Path[0] == "_id" && result.Value.Value is List<Guid> guidList)
+            if (path.Count == 1 && path[0] == "_id" && result.Value.Value is List<Guid> guidList)
             {
-                result = new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
+                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
             }
 
             return result;
