@@ -169,7 +169,8 @@ export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: str
             ],
             editorUrl: null,
             isRequired: false,
-            isListField: false
+            isListField: false,
+            tags: []
         }));
     }
 }
@@ -186,7 +187,8 @@ export class EditSchemaForm extends Form<FormGroup, { label?: string, hints?: st
                 [
                     Validators.maxLength(1000)
                 ]
-            ]
+            ],
+            tags: []
         }));
     }
 }

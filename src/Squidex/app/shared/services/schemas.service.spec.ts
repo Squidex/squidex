@@ -575,7 +575,8 @@ describe('SchemasService', () => {
             lastModifiedBy: `modifier${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`
+                hints: `hints${id}${suffix}`,
+                tags: [`tags${id}${suffix}`]
             },
             version: `${id}`,
             _links: {
@@ -598,7 +599,8 @@ describe('SchemasService', () => {
             version: `${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`
+                hints: `hints${id}${suffix}`,
+                tags: [`tags${id}${suffix}`]
             },
             previewUrls: {
                 'Default': 'url'
@@ -772,7 +774,7 @@ export function createSchema(id: number, suffix = '') {
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
-        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
+        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`, [`tags${id}${suffix}`]),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
@@ -789,7 +791,7 @@ export function createSchemaDetails(id: number, suffix = '') {
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
-        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
+        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`, [`tags${id}${suffix}`]),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
