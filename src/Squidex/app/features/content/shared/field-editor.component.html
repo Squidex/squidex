@@ -50,7 +50,7 @@
 					<sqx-geolocation-editor [isCompact]="isCompact" [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-json-editor [formControl]="editorControl"></sqx-json-editor>
+					<sqx-json-editor height="350" [formControl]="editorControl"></sqx-json-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
@@ -112,7 +112,7 @@
 							<sqx-rich-editor [formControl]="editorControl"></sqx-rich-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Html'">
-							<sqx-code-editor [formControl]="editorControl" mode="ace/mode/html"></sqx-code-editor>
+							<sqx-code-editor height="350"  [formControl]="editorControl" mode="ace/mode/html"></sqx-code-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-markdown-editor [formControl]="editorControl"></sqx-markdown-editor>

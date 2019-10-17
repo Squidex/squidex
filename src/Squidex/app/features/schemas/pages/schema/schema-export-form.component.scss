@@ -1,6 +1,16 @@
 @import '_vars';
 @import '_mixins';
 
-.json {
-    min-height: 500px;
+:host ::ng-deep {
+    .modal-body {
+        padding: 0;
+    }
+
+    .modal-content {
+        height: 100%;
+    }
+
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
 }

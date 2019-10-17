@@ -39,7 +39,13 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
     public editor: ElementRef;
 
     @Input()
+    public noBorder = false;
+
+    @Input()
     public mode = 'ace/mode/javascript';
+
+    @Input()
+    public height = 0;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService

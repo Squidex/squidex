@@ -123,6 +123,8 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 
     public export(): any {
+        const fieldKeys = ['fieldId', '_links', 'parentFieldId'];
+
         const cleanup = (source: any, ...exclude: string[]): any => {
             const clone = {};
 
@@ -141,7 +143,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
         const result: any = {
             fields: this.fields.map(field => {
-                const copy = cleanup(field, 'fieldId', '_links');
+                const copy = cleanup(field, ...fieldKeys);
 
                 copy.properties = cleanup(field.properties);
 
@@ -150,7 +152,7 @@ export class SchemaDetailsDto extends SchemaDto {
                         delete copy['nested'];
                     } else {
                         copy.nested = field.nested.map(nestedField => {
-                            const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
+                            const nestedCopy = cleanup(nestedField, ...fieldKeys);
 
                             nestedCopy.properties = cleanup(nestedField.properties);
 

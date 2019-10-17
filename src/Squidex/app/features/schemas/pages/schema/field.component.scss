@@ -23,7 +23,7 @@ $padding: 1rem;
 }
 
 .drag-container {
-    @include absolute(1.75rem, auto, auto, .75rem);
+    @include absolute(1.6rem, auto, auto, .75rem);
     line-height: 1px;
 }
 
@@ -46,8 +46,9 @@ $padding: 1rem;
     padding: $padding;
     padding-left: 2 * $padding;
     position: relative;
-    border: 0;
-    background: $color-border;
+    border: 1px solid $color-border;
+    border-top-width: 0;
+    background: $color-table-footer;
 }
 
 .nested-field {
@@ -56,7 +57,7 @@ $padding: 1rem;
     }
 
     &-add {
-        border: 2px dashed $field-line;
+        border: 1px dashed $field-line;
         position: relative;
         padding: 1rem;
     }
@@ -64,14 +65,14 @@ $padding: 1rem;
     &-line-v {
         @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
         border: 0;
-        border-left: 2px dashed $field-line;
+        border-left: 1px dashed $field-line;
         width: 2px;
     }
 
     &-line-h {
         @include absolute(-2px, auto, 50%, -$padding);
         border: 0;
-        border-bottom: 2px dashed $field-line;
+        border-bottom: 1px dashed $field-line;
         width: $padding - .25rem;
     }
 }
