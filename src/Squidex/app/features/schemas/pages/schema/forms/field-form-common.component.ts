@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { FieldDto } from '@app/shared';
 
@@ -83,10 +83,22 @@ import { FieldDto } from '@app/shared';
                     </sqx-form-hint>
                 </div>
             </div>
+
+            <div class="form-group row" *ngIf="field.properties.isContentField">
+                 <label class="col-3 col-form-label">Tags</label>
+
+                <div class="col-9">
+                    <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
+
+                    <sqx-form-hint>
+                        Tags to annotate your field for automation processes.
+                    </sqx-form-hint>
+                </div>
+            </div>
         </div>
     `
 })
-export class FieldFormCommonComponent implements OnInit {
+export class FieldFormCommonComponent {
     public readonly standalone = { standalone: true };
 
     @Input()
@@ -97,27 +109,4 @@ export class FieldFormCommonComponent implements OnInit {
 
     @Input()
     public field: FieldDto;
-
-    public ngOnInit() {
-        this.editForm.setControl('isRequired',
-            new FormControl(this.field.properties.isRequired));
-
-        this.editForm.setControl('isListField',
-            new FormControl(this.field.properties.isListField));
-
-        this.editForm.setControl('isReferenceField',
-            new FormControl(this.field.properties.isReferenceField));
-
-        this.editForm.setControl('editorUrl',
-            new FormControl(this.field.properties.editorUrl));
-
-        this.editForm.setControl('hints',
-            new FormControl(this.field.properties.hints));
-
-        this.editForm.setControl('placeholder',
-            new FormControl(this.field.properties.placeholder));
-
-        this.editForm.setControl('label',
-            new FormControl(this.field.properties.label));
-    }
 }

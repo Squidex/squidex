@@ -260,7 +260,8 @@ export class NestedFieldDto extends FieldDto {
 export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
-        public readonly hints?: string
+        public readonly hints?: string,
+        public readonly tags?: ReadonlyArray<string>
     ) {
     }
 }
@@ -599,7 +600,7 @@ function parseSchemas(response: any) {
             item.id,
             item.name,
             item.category,
-            new SchemaPropertiesDto(item.properties.label, item.properties.hints),
+            new SchemaPropertiesDto(item.properties.label, item.properties.hints, item.properties.tags),
             item.isSingleton,
             item.isPublished,
             DateTime.parseISO_UTC(item.created), item.createdBy,
@@ -614,7 +615,7 @@ function parseSchemas(response: any) {
 function parseSchemaWithDetails(response: any) {
     const fields = response.fields.map((item: any) => parseField(item));
 
-    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
+    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints, response.properties.tags);
 
     return new SchemaDetailsDto(response._links,
         response.id,

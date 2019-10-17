@@ -139,6 +139,7 @@ export abstract class FieldPropertiesDto {
     public readonly isRequired: boolean = false;
     public readonly label?: string;
     public readonly placeholder?: string;
+    public readonly tags?: ReadonlyArray<string>;
 
     public get isTranslateable() {
         return false;

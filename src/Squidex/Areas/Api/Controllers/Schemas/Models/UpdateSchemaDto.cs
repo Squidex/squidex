@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -25,6 +26,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [StringLength(1000)]
         public string Hints { get; set; }
+
+        /// <summary>
+        /// Tags for automation processes.
+        /// </summary>
+        public ReadOnlyCollection<string> Tags { get; set; }
 
         public UpdateSchema ToCommand()
         {
