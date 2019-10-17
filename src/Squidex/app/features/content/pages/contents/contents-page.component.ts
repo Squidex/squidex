@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -131,13 +130,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             return;
         }
 
-        this.dueTimeSelector.selectDueTime(action).pipe(
-                tap(() => {
-                    this.resetSelection();
-                }),
-                switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
-                onErrorResumeNext())
-            .subscribe();
+        this.resetSelection();
+        this.contentsState.changeManyStatus(contents, action, null);
     }
 
     public goPrev() {

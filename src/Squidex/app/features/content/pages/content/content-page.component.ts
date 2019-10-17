@@ -8,7 +8,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
 
 import { ContentVersionSelected } from './../messages';
 
@@ -256,15 +256,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public publishChanges() {
-        this.dueTimeSelector.selectDueTime('Publish').pipe(
-                switchMap(d => this.contentsState.publishDraft(this.content, d)), onErrorResumeNext())
-            .subscribe();
+        this.contentsState.publishDraft(this.content, null);
     }
 
     public changeStatus(status: string) {
-        this.dueTimeSelector.selectDueTime(status).pipe(
-                switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
-            .subscribe();
+        this.contentsState.changeStatus(this.content, status, null);
     }
 
     private loadVersion(version: Version | null, compare: boolean) {
