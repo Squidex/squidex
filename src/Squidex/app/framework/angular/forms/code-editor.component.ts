@@ -75,6 +75,10 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
                 this.changeValue();
             });
 
+        if (this.height) {
+            this.editor.nativeElement.style.height = `${this.height}px`;
+        }
+
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
