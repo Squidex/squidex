@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(ScriptContext(data, null, Status.Draft, default), "<create-script>"))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.Execute(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>"))
+            A.CallTo(() => scriptEngine.Execute(ScriptContext(data, null, Status.Published, default), "<change-script>"))
                 .MustHaveHappened();
         }
 
