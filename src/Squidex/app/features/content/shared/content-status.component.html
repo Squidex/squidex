@@ -1,12 +1,12 @@
 <ng-container *ngIf="scheduledTo; else noSchedule">
     <span class="content-status pending mr-1"title="{{tooltipText}}" titlePosition="top">
-        <i class="icon-clock"></i>
+        <i class="icon-clock" [class.icon-sm]="small"></i>
     </span>
 </ng-container>
 
 <ng-template #noSchedule>
     <span class="content-status default mr-1" [style.color]="statusColor" title="{{tooltipText}}" titlePosition="top">
-        <i class="icon-circle"></i>
+        <i class="icon-circle" [class.icon-sm]="small"></i>
     </span>
 </ng-template>
 

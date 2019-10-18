@@ -14,7 +14,14 @@
             <ng-container *sqxModal="dropdown;closeAlways:true">
                 <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
                     <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
-                        Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
+                        Change to 
+
+                        <sqx-content-status
+                            [status]="info.status"
+                            [statusColor]="info.color"
+                            showLabel="true"
+                            small="true">
+                        </sqx-content-status>
                     </a>
                     <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
                         Clone

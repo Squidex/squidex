@@ -28,6 +28,10 @@
     font-size: .8rem;
 }
 
+.btn-status {
+    background: $color-dark-foreground;
+}
+
 .selection {
     background: $color-table-footer;
     border-bottom: 2px solid $color-border;

@@ -41,7 +41,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectionCount = 0;
     public selectionCanDelete = false;
 
-    public nextStatuses: ReadonlyArray<string> = [];
+    public nextStatuses: { [name: string]: string } = {};
 
     public language: AppLanguageDto;
     public languageMaster: AppLanguageDto;
@@ -197,12 +197,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedAll = this.contentsState.snapshot.contents.length > 0;
         this.selectionCount = 0;
         this.selectionCanDelete = true;
-
-        const allActions = {};
+        this.nextStatuses = {};
 
         for (let content of this.contentsState.snapshot.contents) {
             for (const info of content.statusUpdates) {
-                allActions[info.status] = info.color;
+                this.nextStatuses[info.status] = info.color;
             }
         }
 
@@ -210,9 +209,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                for (const action in allActions) {
+                for (const action in this.nextStatuses) {
                     if (!content.statusUpdates) {
-                        delete allActions[action];
+                        delete this.nextStatuses[action];
                     }
                 }
 
@@ -223,8 +222,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 this.selectedAll = false;
             }
         }
-
-        this.nextStatuses = Object.keys(allActions);
     }
 
     private updateQueries() {

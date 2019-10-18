@@ -2,10 +2,6 @@
 @import '_mixins';
 
 .content-status {
-    & {
-        vertical-align: middle;
-    }
-
     &.default {
         color: $color-text-decent;
     }
