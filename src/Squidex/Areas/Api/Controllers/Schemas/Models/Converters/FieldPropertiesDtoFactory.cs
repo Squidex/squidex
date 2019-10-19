@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
@@ -32,11 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 
         public FieldPropertiesDto Visit(AssetsFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
-
-            result.AllowedExtensions = properties.AllowedExtensions?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(BooleanFieldProperties properties)
@@ -61,38 +56,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 
         public FieldPropertiesDto Visit(NumberFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(ReferencesFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
-
-            result.SchemaIds = properties.SchemaIds?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(StringFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new StringFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new StringFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(TagsFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(UIFieldProperties properties)

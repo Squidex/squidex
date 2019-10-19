@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed file extensions.
         /// </summary>
-        public string[] AllowedExtensions { get; set; }
+        public ReadOnlyCollection<string> AllowedExtensions { get; set; }
 
         /// <summary>
         /// True, if duplicate values are allowed.
@@ -86,11 +86,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new AssetsFieldProperties());
-
-            if (AllowedExtensions != null)
-            {
-                result.AllowedExtensions = ReadOnlyCollection.Create(AllowedExtensions);
-            }
 
             return result;
         }
