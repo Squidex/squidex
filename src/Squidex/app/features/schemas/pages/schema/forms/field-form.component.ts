@@ -21,7 +21,7 @@ import { FieldDto, PatternDto } from '@app/shared';
                 <li class="nav-item" [class.hidden]="!field.properties.isContentField">
                     <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
                 </li>
-                <li class="nav-item" [class.hidden]="!field.properties.isContentField">
+                <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Array'">
                     <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
                 </li>
             </ul>

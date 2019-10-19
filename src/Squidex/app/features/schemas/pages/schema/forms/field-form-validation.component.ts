@@ -14,6 +14,9 @@ import { FieldDto, PatternDto } from '@app/shared';
     selector: 'sqx-field-form-validation',
     template: `
         <ng-container [ngSwitch]="field.rawProperties.fieldType">
+            <ng-container *ngSwitchCase="'Array'">
+                <sqx-array-validation [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-array-validation>
+            </ng-container>
             <ng-container *ngSwitchCase="'Assets'">
                 <sqx-assets-validation [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-assets-validation>
             </ng-container>

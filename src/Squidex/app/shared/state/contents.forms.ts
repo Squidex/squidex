@@ -137,20 +137,6 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         return field.properties.accept(new FieldFormatter(value, allowHtml));
     }
 
-    public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
-        try {
-            const parsed = DateTime.parseISO_UTC(this.value);
-
-            if (properties.editor === 'Date') {
-                return parsed.toUTCStringFormat('YYYY-MM-DD');
-            } else {
-                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
-            }
-        } catch (ex) {
-            return this.value;
-        }
-    }
-
     public visitArray(_: ArrayFieldPropertiesDto): string {
         if (this.value.length) {
             return `${this.value.length} Item(s)`;
@@ -167,24 +153,22 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
     }
 
-    public visitReferences(_: ReferencesFieldPropertiesDto): string {
-        if (this.value.length) {
-            return `${this.value.length} Reference(s)`;
-        } else {
-            return '0 References';
-        }
-    }
-
-    public visitTags(_: TagsFieldPropertiesDto): string {
-        if (this.value.length) {
-            return this.value.join(', ');
-        } else {
-            return '';
-        }
-    }
-
     public visitBoolean(_: BooleanFieldPropertiesDto): string {
         return this.value ? 'Yes' : 'No';
+    }
+
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
+        try {
+            const parsed = DateTime.parseISO_UTC(this.value);
+
+            if (properties.editor === 'Date') {
+                return parsed.toUTCStringFormat('YYYY-MM-DD');
+            } else {
+                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
+            }
+        } catch (ex) {
+            return this.value;
+        }
     }
 
     public visitGeolocation(_: GeolocationFieldPropertiesDto): string {
@@ -212,8 +196,24 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         return `${this.value}`;
     }
 
+    public visitReferences(_: ReferencesFieldPropertiesDto): string {
+        if (this.value.length) {
+            return `${this.value.length} Reference(s)`;
+        } else {
+            return '0 References';
+        }
+    }
+
     public visitString(_: StringFieldPropertiesDto): any {
         return this.value;
+    }
+
+    public visitTags(_: TagsFieldPropertiesDto): string {
+        if (this.value.length) {
+            return this.value.join(', ');
+        } else {
+            return '';
+        }
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {
@@ -237,6 +237,42 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
+    public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
+
+        return validators;
+    }
+
+    public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
+
+        if (!properties.allowDuplicates) {
+            validators.push(ValidatorsEx.uniqueStrings());
+        }
+
+        return validators;
+    }
+
+    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
     public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
             ValidatorsEx.between(properties.minValue, properties.maxValue)
@@ -250,6 +286,18 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
             } else {
                 validators.push(ValidatorsEx.validValues(values.concat([null])));
             }
+        }
+
+        return validators;
+    }
+
+    public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
+
+        if (!properties.allowDuplicates) {
+            validators.push(ValidatorsEx.uniqueStrings());
         }
 
         return validators;
@@ -277,38 +325,6 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        return validators;
-    }
-
-    public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        if (!properties.allowDuplicates) {
-            validators.push(ValidatorsEx.uniqueStrings());
-        }
-
-        return validators;
-    }
-
-    public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        if (!properties.allowDuplicates) {
-            validators.push(ValidatorsEx.uniqueStrings());
-        }
-
-        return validators;
-    }
-
     public visitTags(properties: TagsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
@@ -321,22 +337,6 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         }
 
         return validators;
-    }
-
-    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
     }
 
     public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {

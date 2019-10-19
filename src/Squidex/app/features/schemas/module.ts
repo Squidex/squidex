@@ -16,6 +16,7 @@ import {
 } from '@app/shared';
 
 import {
+    ArrayValidationComponent,
     AssetsUIComponent,
     AssetsValidationComponent,
     BooleanUIComponent,
@@ -81,6 +82,7 @@ const routes: Routes = [
         SchemaMustExistGuard
     ],
     declarations: [
+        ArrayValidationComponent,
         AssetsUIComponent,
         AssetsValidationComponent,
         BooleanUIComponent,
