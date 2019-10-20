@@ -148,6 +148,14 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public trigger(rule: RuleDto): Observable<any> {
+        return this.rulesService.triggerRule(this.appName, rule).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Rule has been added to the queue.');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     private replaceRule(rule: RuleDto) {
         this.next(s => {
             const rules = s.rules.replaceBy('id', rule);

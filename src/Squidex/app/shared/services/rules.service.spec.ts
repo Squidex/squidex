@@ -269,6 +269,25 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
+    it('should make put request to trigger rule',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                trigger: { method: 'PUT', href: '/api/apps/my-app/rules/123/trigger' }
+            }
+        };
+
+        rulesService.triggerRule('my-app', resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/trigger');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     it('should make get request to get app rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 

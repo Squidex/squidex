@@ -32,9 +32,23 @@ export type RuleElementMetadataDto = {
     title?: string;
 };
 
-export type TriggersDto = { [key: string]: RuleElementMetadataDto };
+export type TriggerType =
+    'AssetChanged' |
+    'ContentChanged' |
+    'Manual' |
+    'SchemaChanged' |
+    'Usage';
+
+export type TriggersDto = Record<TriggerType, RuleElementMetadataDto>;
 
 export const ALL_TRIGGERS: TriggersDto = {
+    'AssetChanged': {
+        description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
+        display: 'Asset changed',
+        iconColor: '#3389ff',
+        iconCode: 'assets',
+        title: 'Asset changed'
+    },
     'ContentChanged': {
         description: 'For content changes like created, updated, published, unpublished...',
         display: 'Content changed',
@@ -42,12 +56,12 @@ export const ALL_TRIGGERS: TriggersDto = {
         iconCode: 'contents',
         title: 'Content changed'
     },
-    'AssetChanged': {
-        description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
-        display: 'Asset changed',
+    'Manual': {
+        description: 'To invoke processes manually, for example to update your static site...',
+        display: 'Manually triggered',
         iconColor: '#3389ff',
-        iconCode: 'assets',
-        title: 'Asset changed'
+        iconCode: 'play-line',
+        title: 'Manually triggered'
     },
     'SchemaChanged': {
         description: 'When a schema definition has been created, updated, published or deleted...',
@@ -113,6 +127,7 @@ export class RuleDto {
     public readonly canDelete: boolean;
     public readonly canDisable: boolean;
     public readonly canEnable: boolean;
+    public readonly canTrigger: boolean;
     public readonly canUpdate: boolean;
 
     constructor(
@@ -138,6 +153,7 @@ export class RuleDto {
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
+        this.canTrigger = hasAnyLink(links, 'logs');
         this.canUpdate = hasAnyLink(links, 'update');
     }
 }
@@ -307,6 +323,18 @@ export class RulesService {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
             pretifyError('Failed to delete rule. Please reload.'));
+    }
+
+    public triggerRule(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['trigger'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url, {}).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'Triggered', appName);
+            }),
+            pretifyError('Failed to trigger rule. Please reload.'));
     }
 
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {

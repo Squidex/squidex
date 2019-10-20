@@ -115,7 +115,7 @@ describe('RulesState', () => {
             const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
-            .returns(() => of(updated)).verifiable();
+                .returns(() => of(updated)).verifiable();
 
             rulesState.updateTrigger(rule1, newTrigger).subscribe();
 
@@ -130,7 +130,7 @@ describe('RulesState', () => {
             const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
-            .returns(() => of(updated)).verifiable();
+                .returns(() => of(updated)).verifiable();
 
             rulesState.rename(rule1, newName).subscribe();
 
@@ -143,13 +143,24 @@ describe('RulesState', () => {
             const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.enableRule(app, rule1, version))
-            .returns(() => of(updated)).verifiable();
+                .returns(() => of(updated)).verifiable();
 
             rulesState.enable(rule1).subscribe();
 
             const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
+        });
+
+        it('should not update rule when triggered', () => {
+            rulesService.setup(x => x.triggerRule(app, rule1))
+                .returns(() => of()).verifiable();
+
+            rulesState.trigger(rule1).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(rule1);
         });
 
         it('should update rule when disabled', () => {

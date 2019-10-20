@@ -28,20 +28,32 @@
                 <h3>If</h3>
             </div>
             <div class="col">
-                <span (click)="editTrigger.emit()">
-                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
+                <span (click)="emitEditTrigger()">
+                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]" [disabled]="isManual"></sqx-rule-element>
                 </span>
             </div>
             <div class="col col-auto">
                 <h3>then</h3>
             </div>
             <div class="col">
-                <span (click)="editAction.emit()">
+                <span (click)="emitEditAction()">
                     <sqx-rule-element [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
                 </span>
             </div>
-            <div class="col col-auto">
-                <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()"></sqx-toggle>
+            <div class="col col-last text-right">
+                <ng-container *ngIf="isManual; else notManual">
+                    <button class="btn btn-secondary"
+                        [disabled]="!rule.canTrigger"
+                        (sqxConfirmClick)="trigger()"
+                        confirmTitle="Trigger rule"
+                        confirmText="Do you really want to trigger the rule?">
+                        <i class="icon-play-line"></i>
+                    </button>
+                </ng-container>
+
+                <ng-template #notManual>
+                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()"></sqx-toggle>
+                </ng-template>
             </div>
         </div>
     </div>
@@ -54,18 +66,10 @@
                 Failed: <strong>{{rule.numFailed}}</strong>
             </div>
             <div class="col">
-                Last Executed: 
-                
-                <ng-container *ngIf="rule.lastExecuted; else notExecuted">
-                    {{rule.lastExecuted | sqxFromNow}}
-                </ng-container>
-
-                <ng-template #notExecuted>
-                    -
-                </ng-template>
+                Executed: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
             </div>
             <div class="col-auto">
-                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
+                <a routerLink="events" [queryParams]="{ ruleId: rule.id }" *ngIf="rule.canTrigger">
                     Logs
                 </a>
             </div>
