@@ -153,7 +153,7 @@ export class RuleDto {
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
-        this.canTrigger = hasAnyLink(links, 'trigger');
+        this.canTrigger = hasAnyLink(links, 'logs');
         this.canUpdate = hasAnyLink(links, 'update');
     }
 }

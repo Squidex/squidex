@@ -26,5 +26,5 @@ export class RuleElementComponent {
     public isSmall = true;
 
     @Input()
-    public editable = true;
+    public disabled = false;
 }

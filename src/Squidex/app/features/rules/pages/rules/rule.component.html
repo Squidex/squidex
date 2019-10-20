@@ -29,7 +29,7 @@
             </div>
             <div class="col">
                 <span (click)="emitEditTrigger()">
-                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]" [editable]="!isManual"></sqx-rule-element>
+                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]" [disabled]="isManual"></sqx-rule-element>
                 </span>
             </div>
             <div class="col col-auto">
@@ -69,7 +69,7 @@
                 Executed: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
             </div>
             <div class="col-auto">
-                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
+                <a routerLink="events" [queryParams]="{ ruleId: rule.id }" *ngIf="rule.canTrigger">
                     Logs
                 </a>
             </div>
