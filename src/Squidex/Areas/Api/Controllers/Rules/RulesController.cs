@@ -198,6 +198,28 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Trigger a rule.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to disable.</param>
+        /// <returns>
+        /// 204 => Rule triggered.
+        /// 404 => Rule or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/rules/{id}/trigger/")]
+        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> TriggerRule(string app, Guid id)
+        {
+            var command = new TriggerRule { RuleId = id };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Delete a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>

@@ -14,7 +14,11 @@ import { DateTime, Duration } from '@app/framework/internal';
     pure: true
 })
 export class ShortDatePipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('DD. MMM');
     }
 }
@@ -24,7 +28,11 @@ export class ShortDatePipe implements PipeTransform {
     pure: true
 })
 export class ISODatePipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toISOString();
     }
 }
@@ -34,7 +42,11 @@ export class ISODatePipe implements PipeTransform {
     pure: true
 })
 export class DatePipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('DD. MMM YYYY');
     }
 }
@@ -44,7 +56,11 @@ export class DatePipe implements PipeTransform {
     pure: true
 })
 export class MonthPipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('MMMM');
     }
 }
@@ -54,7 +70,11 @@ export class MonthPipe implements PipeTransform {
     pure: true
 })
 export class FromNowPipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toFromNow();
     }
 }
@@ -64,7 +84,11 @@ export class FromNowPipe implements PipeTransform {
     pure: true
 })
 export class DayOfWeekPipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('dd');
     }
 }
@@ -74,7 +98,11 @@ export class DayOfWeekPipe implements PipeTransform {
     pure: true
 })
 export class DayPipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('DD');
     }
 }
@@ -84,7 +112,11 @@ export class DayPipe implements PipeTransform {
     pure: true
 })
 export class ShortTimePipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('HH:mm');
     }
 }
@@ -94,7 +126,11 @@ export class ShortTimePipe implements PipeTransform {
     pure: true
 })
 export class FullDateTimePipe implements PipeTransform {
-    public transform(value: DateTime): any {
+    public transform(value: DateTime | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toStringFormat('LLLL');
     }
 }
@@ -104,7 +140,11 @@ export class FullDateTimePipe implements PipeTransform {
     pure: true
 })
 export class DurationPipe implements PipeTransform {
-    public transform(value: Duration): any {
+    public transform(value: Duration | undefined | null, fallback = ''): string {
+        if (!value) {
+            return fallback;
+        }
+
         return value.toString();
     }
 }

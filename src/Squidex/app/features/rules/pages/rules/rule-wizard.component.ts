@@ -13,7 +13,8 @@ import {
     RuleDto,
     RuleElementDto,
     RulesState,
-    SchemaDto
+    SchemaDto,
+    TriggerType
 } from '@app/shared';
 
 const MODE_WIZARD = 'Wizard';
@@ -104,9 +105,15 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
         this.complete.emit();
     }
 
-    public selectTriggerType(type: string) {
+    public selectTriggerType(type: TriggerType) {
         this.triggerType = type;
-        this.step++;
+
+        if (type === 'Manual') {
+            this.trigger = { triggerType: type };
+            this.step += 2;
+        } else {
+            this.step++;
+        }
     }
 
     public selectActionType(type: string) {
