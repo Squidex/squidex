@@ -40,8 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var value = GetValue(forDraft, forPublished);
 
-            document.RemoveField(MetaFor);
-            document.AddBinaryDocValuesField(MetaFor, value);
+            document.SetBinaryDocValue(MetaFor, value);
 
             changes[(id, draft)] = value;
         }
