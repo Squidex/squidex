@@ -10,6 +10,7 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Commands;
 using Xunit;
@@ -46,6 +47,19 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
+        public async Task Should_do_nothing_if_command_has_etag_defined()
+        {
+            httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
+
+            var command = new CreateContent { ExpectedVersion = 1 };
+            var context = Ctx(command);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(1, context.Command.ExpectedVersion);
+        }
+
+        [Fact]
         public async Task Should_add_expected_version_to_command()
         {
             httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
@@ -72,12 +86,25 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_add_etag_header_to_response()
+        public async Task Should_add_version_from_result_as_etag_to_response()
         {
             var command = new CreateContent();
             var context = Ctx(command);
 
             context.Complete(new EntitySavedResult(17));
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
+        }
+
+        [Fact]
+        public async Task Should_add_version_from_entity_as_etag_to_response()
+        {
+            var command = new CreateContent();
+            var context = Ctx(command);
+
+            context.Complete(new ContentEntity { Version = 17 });
 
             await sut.HandleAsync(context);
 

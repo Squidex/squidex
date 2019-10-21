@@ -56,7 +56,7 @@ interface Snapshot {
 }
 
 function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
-    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version.eq(lhs.version));
+    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version.eq(rhs.version));
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {

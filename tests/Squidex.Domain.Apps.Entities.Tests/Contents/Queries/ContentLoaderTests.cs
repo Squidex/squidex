@@ -51,6 +51,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
+        public async Task Should_not_throw_exception_if_state_has_other_version_than_any()
+        {
+            var content = new ContentEntity { Version = 5 };
+
+            A.CallTo(() => grain.GetStateAsync(10))
+                .Returns(J.Of<IContentEntity>(content));
+
+            await sut.GetAsync(id, EtagVersion.Any);
+        }
+
+        [Fact]
         public async Task Should_return_content_from_state()
         {
             var content = new ContentEntity { Version = 10 };

@@ -7,6 +7,7 @@
 
 using System;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web
@@ -42,6 +43,24 @@ namespace Squidex.Web
             var subject = controller.User.OpenIdSubject();
 
             return string.Equals(subject, userId, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool TryGetHeaderString(this IHeaderDictionary headers, string header, out string result)
+        {
+            result = null;
+
+            if (headers.TryGetValue(header, out var value))
+            {
+                string valueString = value;
+
+                if (!string.IsNullOrWhiteSpace(valueString))
+                {
+                    result = valueString;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

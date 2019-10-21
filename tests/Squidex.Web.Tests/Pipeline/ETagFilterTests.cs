@@ -39,11 +39,21 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_not_convert_already_weak_tag()
+        {
+            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
+
+            await sut.OnActionExecutionAsync(executingContext, Next());
+
+            Assert.Equal("W/13", httpContext.Response.Headers[HeaderNames.ETag]);
+        }
+
+        [Fact]
         public async Task Should_convert_strong_to_weak_tag()
         {
             httpContext.Response.Headers[HeaderNames.ETag] = "13";
 
-            await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
+            await sut.OnActionExecutionAsync(executingContext, Next());
 
             Assert.Equal("W/13", httpContext.Response.Headers[HeaderNames.ETag]);
         }
@@ -53,7 +63,7 @@ namespace Squidex.Web.Pipeline
         {
             httpContext.Response.Headers[HeaderNames.ETag] = string.Empty;
 
-            await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
+            await sut.OnActionExecutionAsync(executingContext, Next());
 
             Assert.Null((string)httpContext.Response.Headers[HeaderNames.ETag]);
         }
@@ -66,7 +76,7 @@ namespace Squidex.Web.Pipeline
 
             httpContext.Response.Headers[HeaderNames.ETag] = "13";
 
-            await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
+            await sut.OnActionExecutionAsync(executingContext, Next());
 
             Assert.Equal(304, (executedContext.Result as StatusCodeResult).StatusCode);
         }
@@ -79,9 +89,14 @@ namespace Squidex.Web.Pipeline
 
             httpContext.Response.Headers[HeaderNames.ETag] = "13";
 
-            await sut.OnActionExecutionAsync(executingContext, () => Task.FromResult(executedContext));
+            await sut.OnActionExecutionAsync(executingContext, Next());
 
             Assert.Equal(200, (executedContext.Result as StatusCodeResult).StatusCode);
+        }
+
+        private ActionExecutionDelegate Next()
+        {
+            return () => Task.FromResult(executedContext);
         }
     }
 }
