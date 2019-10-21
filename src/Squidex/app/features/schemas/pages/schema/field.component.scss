@@ -38,10 +38,6 @@ $padding: 1rem;
     }
 }
 
-.field {
-    position: relative;
-}
-
 .nested-fields {
     padding: $padding;
     padding-left: 2 * $padding;
@@ -57,7 +53,7 @@ $padding: 1rem;
     }
 
     &-add {
-        border: 1px dashed $field-line;
+        border: 2px dashed $field-line;
         position: relative;
         padding: 1rem;
     }
@@ -65,19 +61,23 @@ $padding: 1rem;
     &-line-v {
         @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
         border: 0;
-        border-left: 1px dashed $field-line;
+        border-left: 2px dashed $field-line;
         width: 2px;
     }
 
     &-line-h {
         @include absolute(-2px, auto, 50%, -$padding);
         border: 0;
-        border-bottom: 1px dashed $field-line;
+        border-bottom: 2px dashed $field-line;
         width: $padding - .25rem;
     }
 }
 
 .field {
+    & {
+        position: relative;
+    }
+
     &-icon {
         margin-right: 1rem;
         color: $color-border-dark;

@@ -66,7 +66,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     public ngOnDestroy() {
         clearTimeout(this.tinyInitTimer);
 
-        if (tinymce && this.editor) {
+        if (this.tinyEditor) {
             tinymce.remove(this.editor);
         }
     }
@@ -74,7 +74,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     public ngAfterViewInit() {
         const self = this;
 
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.3/tinymce.min.js').then(() => {
+        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.4/tinymce.min.js').then(() => {
             tinymce.init(self.getEditorOptions());
         });
     }

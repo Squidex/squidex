@@ -84,4 +84,8 @@ export class ArrayEditorComponent {
             this.arrayControl.setControl(i, controls[i]);
         }
     }
+
+    public trackByControl(index: number, control: AbstractControl) {
+        return control;
+    }
 }

@@ -173,4 +173,8 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     public emitMoveBottom() {
         this.move.emit(99999);
     }
+
+    public trackByField(index: number, control: FieldControl) {
+        return control.field.name;
+    }
 }

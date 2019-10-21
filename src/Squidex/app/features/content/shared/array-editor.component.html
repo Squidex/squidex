@@ -3,7 +3,7 @@
     [cdkDropListDisabled]="false"
     [cdkDropListData]="arrayControl.controls"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of arrayControl.controls; let i = index"
+    <div *ngFor="let itemForm of arrayControl.controls; let i = index; trackBy:trackByControl"
         class="table-drag item"
         cdkDrag
         cdkDragLockAxis="y">

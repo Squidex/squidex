@@ -43,7 +43,7 @@
     </div>
     
     <div class="card-body" [class.hidden]="isHidden">
-        <div class="form-group" *ngFor="let fieldControl of fieldControls">
+        <div class="form-group" *ngFor="let fieldControl of fieldControls; trackBy: trackByField">
             <sqx-field-editor
                 [form]="form"
                 [formContext]="formContext"
