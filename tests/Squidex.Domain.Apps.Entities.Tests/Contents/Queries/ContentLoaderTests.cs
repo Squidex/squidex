@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { Version = 5 };
 
-            A.CallTo(() => grain.GetStateAsync(10))
+            A.CallTo(() => grain.GetStateAsync(EtagVersion.Any))
                 .Returns(J.Of<IContentEntity>(content));
 
             await sut.GetAsync(id, EtagVersion.Any);
