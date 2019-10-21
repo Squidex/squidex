@@ -43,7 +43,6 @@ const ImageTypes: ReadonlyArray<any> = [
 })
 export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
-    private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
 
@@ -64,8 +63,6 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public ngOnDestroy() {
-        clearTimeout(this.tinyInitTimer);
-
         if (this.tinyEditor) {
             tinymce.remove(this.editor);
         }
@@ -101,10 +98,10 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
             images_upload_handler: (blob: any, success: (url: string) => void, failed: () => void) => {
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
-                this.assetUploader.uploadFile(file)
+                self.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
-                            success(asset.fullUrl(this.apiUrl));
+                            success(asset.fullUrl(self.apiUrl));
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -115,13 +112,16 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
             setup: (editor: any) => {
                 self.tinyEditor = editor;
-                self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
-
                 self.tinyEditor.addButton('assets', {
-                    onclick: this.showSelector,
+                    onclick: self.showSelector,
                     icon: 'assets',
                     text: '',
                     tooltip: 'Insert Assets'
+                });
+
+                self.tinyEditor.on('init', () => {
+                    self.setContent();
+                    self.setReadOnly();
                 });
 
                 self.tinyEditor.on('change', () => {
@@ -162,13 +162,10 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     self.callTouched();
                 });
 
-                self.tinyInitTimer =
-                    setTimeout(() => {
-                        self.tinyEditor.setContent(this.value || '');
-                    }, 1000);
+                self.setReadOnly();
             },
 
-            target: this.editor.nativeElement
+            target: self.editor.nativeElement
         };
     }
 
@@ -176,7 +173,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.value = Types.isString(obj) ? obj : '';
 
         if (this.tinyEditor) {
-            this.tinyEditor.setContent(this.value);
+            this.setContent();
         }
     }
 
@@ -184,8 +181,16 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.isDisabled = isDisabled;
 
         if (this.tinyEditor) {
-            this.tinyEditor.setMode(isDisabled ? 'readonly' : 'design');
+            this.setReadOnly();
         }
+    }
+
+    private setContent() {
+        this.tinyEditor.setContent(this.value || '');
+    }
+
+    private setReadOnly() {
+        this.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
