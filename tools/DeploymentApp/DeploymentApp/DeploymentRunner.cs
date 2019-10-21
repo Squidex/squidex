@@ -28,7 +28,7 @@ namespace DeploymentApp
             await client.UpsertSchema(Schemas.Region);
             await client.UpsertSchema(Schemas.Period);
             await client.UpsertSchema(Schemas.CommentaryType);
-            await client.UpsertSchema(Schemas.Commentary(options.Url));
+            await client.UpsertSchema(Schemas.Commentary());
 
             foreach (var role in Roles.All)
             {

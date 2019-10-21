@@ -204,7 +204,7 @@ namespace DeploymentApp.Entities
             );
         }
 
-        public static SchemaFactory Commentary(string baseUrl)
+        public static SchemaFactory Commentary()
         {
             return (SquidexClientManager clientManager) =>
             {
@@ -308,7 +308,7 @@ namespace DeploymentApp.Entities
                                 Properties = new StringFieldPropertiesDto()
                                 {
                                     Editor = StringFieldEditor.Input,
-                                    EditorUrl = $"{baseUrl}/editors/toastui/md-editor.html",
+                                    EditorUrl = "/editors/toastui/md-editor.html",
                                     IsListField = true,
                                     IsRequired = false,
                                     IsUnique = false,
