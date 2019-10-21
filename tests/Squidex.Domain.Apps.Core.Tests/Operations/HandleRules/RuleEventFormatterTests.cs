@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
@@ -105,11 +106,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}, Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
         public void Should_replace_timestamp_information_from_event(string script)
         {
-            var now = SystemClock.Instance.GetCurrentInstant();
+            var @event = new EnrichedContentEvent { Timestamp = now };
 
-            var envelope = new EnrichedContentEvent { Timestamp = now };
-
-            var result = sut.Format(script, envelope);
+            var result = sut.Format(script, @event);
 
             Assert.Equal($"Date: {now:yyyy-MM-dd}, Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
         }
@@ -167,7 +166,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(`Go to ${contentUrl()}`)")]
         public void Should_format_content_url_when_not_found(string script)
         {
-            Assert.Equal("Go to null", sut.Format(script, new EnrichedAssetEvent()));
+            var @event = new EnrichedAssetEvent();
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Go to null", result);
         }
 
         [Theory]
@@ -175,7 +178,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(`${event.status}`)")]
         public void Should_format_content_status_when_found(string script)
         {
-            Assert.Equal("Published", sut.Format(script, new EnrichedContentEvent { Status = Status.Published }));
+            var @event = new EnrichedContentEvent { Status = Status.Published };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Published", result);
         }
 
         [Theory]
@@ -183,7 +190,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(contentAction())")]
         public void Should_null_when_content_status_not_found(string script)
         {
-            Assert.Equal("null", sut.Format(script, new EnrichedAssetEvent()));
+            var @event = new EnrichedAssetEvent();
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("null", result);
         }
 
         [Theory]
@@ -191,7 +202,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(`${event.type}`)")]
         public void Should_format_content_actions_when_found(string script)
         {
-            Assert.Equal("Created", sut.Format(script, new EnrichedContentEvent { Type = EnrichedContentEventType.Created }));
+            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Created", result);
         }
 
         [Theory]
@@ -199,7 +214,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(contentAction())")]
         public void Should_null_when_content_action_not_found(string script)
         {
-            Assert.Equal("null", sut.Format(script, new EnrichedAssetEvent()));
+            var @event = new EnrichedAssetEvent();
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("null", result);
         }
 
         [Theory]
@@ -384,6 +403,26 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
             Assert.Equal("{\"actor\":\"client:mobile\\\"android\"}", result);
+        }
+
+        [Fact]
+        public void Should_evaluate_script_if_starting_with_whitespace()
+        {
+            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+
+            var result = sut.Format(" Script(`${event.type}`)", @event);
+
+            Assert.Equal("Created", result);
+        }
+
+        [Fact]
+        public void Should_evaluate_script_if_ends_with_whitespace()
+        {
+            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+
+            var result = sut.Format("Script(`${event.type}`) ", @event);
+
+            Assert.Equal("Created", result);
         }
     }
 }
