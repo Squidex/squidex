@@ -4,9 +4,12 @@
 .small {
     & {
         @include transition(background-color .4s ease);
-        cursor: pointer;
         height: 3rem;
         position: relative;
+    }
+
+    &.editable {
+        cursor: pointer;
     }
 
     &-text {
@@ -31,9 +34,12 @@
 
 .large {
     & {
-        cursor: pointer;
         min-height: 100px;
         max-height: 100px;
+    }
+
+    &.editable {
+        cursor: pointer;
     }
 
     &-link {

@@ -33,60 +33,13 @@ describe('DurationPipe', () => {
 
         expect(actual).toBe(expected);
     });
-});
 
-describe('FullDateTimePipe', () => {
-    it('should format to nice string', () => {
-        const pipe = new FullDateTimePipe();
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new DurationPipe().transform(x, '-');
 
-        const actual = pipe.transform(dateTime);
-        const expected = 'Thursday, October 3, 2013 12:13 PM';
-
-        expect(actual).toBe(expected);
-    });
-});
-
-describe('DayPipe', () => {
-    it('should format to day numbers', () => {
-        const pipe = new DayPipe();
-
-        const actual = pipe.transform(dateTime);
-        const expected = '03';
-
-        expect(actual).toBe(expected);
-    });
-});
-
-describe('MonthPipe', () => {
-    it('should format to long month name', () => {
-        const pipe = new MonthPipe();
-
-        const actual = pipe.transform(dateTime);
-        const expected = 'October';
-
-        expect(actual).toBe(expected);
-    });
-});
-
-describe('FromNowPipe', () => {
-    it('should format to from now string', () => {
-        const pipe = new FromNowPipe();
-
-        const actual = pipe.transform(DateTime.now().addMinutes(-4));
-        const expected = '4 minutes ago';
-
-        expect(actual).toBe(expected);
-    });
-});
-
-describe('DayOfWeekPipe', () => {
-    it('should format to short week of day string', () => {
-        const pipe = new DayOfWeekPipe();
-
-        const actual = pipe.transform(dateTime);
-        const expected = 'Th';
-
-        expect(actual).toBe(expected);
+            expect(actual).toBe('-');
+        });
     });
 });
 
@@ -99,6 +52,109 @@ describe('DatePipe', () => {
 
         expect(actual).toBe(expected);
     });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new DatePipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
+});
+
+describe('DayPipe', () => {
+    it('should format to day numbers', () => {
+        const pipe = new DayPipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = '03';
+
+        expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new DayPipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
+});
+
+describe('DayOfWeekPipe', () => {
+    it('should format to short week of day string', () => {
+        const pipe = new DayOfWeekPipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = 'Th';
+
+        expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new DayOfWeekPipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
+});
+
+describe('FromNowPipe', () => {
+    it('should format to from now string', () => {
+        const pipe = new FromNowPipe();
+
+        const actual = pipe.transform(DateTime.now().addMinutes(-4));
+        const expected = '4 minutes ago';
+
+        expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new FromNowPipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
+});
+
+describe('FullDateTimePipe', () => {
+    it('should format to nice string', () => {
+        const pipe = new FullDateTimePipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = 'Thursday, October 3, 2013 12:13 PM';
+
+        expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new FullDateTimePipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
+});
+
+describe('MonthPipe', () => {
+    it('should format to long month name', () => {
+        const pipe = new MonthPipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = 'October';
+
+        expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new MonthPipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
 });
 
 describe('ShortDatePipe', () => {
@@ -109,6 +165,14 @@ describe('ShortDatePipe', () => {
         const expected = '03. Oct';
 
         expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new ShortDatePipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
     });
 });
 
@@ -121,6 +185,14 @@ describe('ShortTimePipe', () => {
 
         expect(actual).toBe(expected);
     });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new ShortTimePipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
+    });
 });
 
 describe('ISODatePipe', () => {
@@ -131,5 +203,13 @@ describe('ISODatePipe', () => {
         const expected = dateTime.toISOString();
 
         expect(actual).toBe(expected);
+    });
+
+    [null, undefined].map(x => {
+        it('should use fallback for non value', () => {
+            const actual = new ISODatePipe().transform(x, '-');
+
+            expect(actual).toBe('-');
+        });
     });
 });

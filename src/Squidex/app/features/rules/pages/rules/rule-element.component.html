@@ -1,5 +1,5 @@
 <ng-container *ngIf="isSmall; else large">
-    <div class="small" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
+    <div class="small" [class.editable]="!disabled" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
         <div class="small-icon" [style.background]="element.iconColor | sqxDarken:5">
             <sqx-rule-icon size="md" [element]="element"></sqx-rule-icon>
         </div>
@@ -10,7 +10,7 @@
 </ng-container>
 
 <ng-template #large>
-    <div class="row no-gutters large">
+    <div class="row no-gutters large" [class.editable]="!disabled">
         <div class="col-auto">
             <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
                 <sqx-rule-icon size="lg" [element]="element"></sqx-rule-icon>

@@ -127,9 +127,19 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
+            if (controller.HasPermission(Permissions.AppRulesRead))
+            {
+                AddPutLink("trigger", controller.Url<RulesController>(x => nameof(x.TriggerRule), values));
+            }
+
             if (controller.HasPermission(Permissions.AppRulesDelete))
             {
                 AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppRulesEvents))
+            {
+                AddGetLink("logs", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
             return this;

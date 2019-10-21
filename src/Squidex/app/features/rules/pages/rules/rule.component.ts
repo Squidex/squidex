@@ -38,6 +38,10 @@ export class RuleComponent {
     @Input()
     public rule: RuleDto;
 
+    public get isManual() {
+        return this.rule.triggerType === 'Manual';
+    }
+
     constructor(
         private readonly rulesState: RulesState
     ) {
@@ -49,6 +53,20 @@ export class RuleComponent {
 
     public rename(name: string) {
         this.rulesState.rename(this.rule, name);
+    }
+
+    public trigger() {
+        this.rulesState.trigger(this.rule);
+    }
+
+    public emitEditAction() {
+        this.editAction.emit();
+    }
+
+    public emitEditTrigger() {
+        if (!this.isManual) {
+            this.editTrigger.emit();
+        }
     }
 
     public toggle() {
