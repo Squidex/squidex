@@ -64,7 +64,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
     public ngOnDestroy() {
         if (this.tinyEditor) {
-            tinymce.remove(this.editor);
+            this.tinyEditor.destroy();
+            this.tinyEditor = null;
         }
     }
 
@@ -73,6 +74,14 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.4/tinymce.min.js').then(() => {
             tinymce.init(self.getEditorOptions());
+        });
+    }
+
+    public reset() {
+        this.ngOnDestroy();
+
+        setTimeout(() => {
+            this.ngAfterViewInit();
         });
     }
 
@@ -91,6 +100,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
             convert_fonts_to_spans: true,
             convert_urls: false,
             plugins: 'code image media link lists advlist paste',
+            min_height: 300,
+            max_height: 800,
             removed_menuitems: 'newdocument',
             resize: true,
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',

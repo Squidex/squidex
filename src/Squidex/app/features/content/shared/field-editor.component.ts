@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl } from '@angular/forms';
 
 import {
@@ -13,7 +13,8 @@ import {
     EditContentForm,
     FieldDto,
     MathHelper,
-    RootFieldDto
+    RootFieldDto,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -46,6 +47,9 @@ export class FieldEditorComponent {
     @Input()
     public displaySuffix: string;
 
+    @ViewChild('editor', { static: false })
+    public editor: ElementRef;
+
     public get arrayControl() {
         return this.control as FormArray;
     }
@@ -59,4 +63,14 @@ export class FieldEditorComponent {
     }
 
     public uniqueId = MathHelper.guid();
+
+    public reset() {
+        if (this.editor.nativeElement && Types.isFunction(this.editor.nativeElement['reset'])) {
+            this.editor.nativeElement['reset']();
+        }
+
+        if (this.editor && Types.isFunction(this.editor['reset'])) {
+            this.editor['reset']();
+        }
+    }
 }

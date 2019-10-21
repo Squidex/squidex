@@ -70,6 +70,12 @@ export class ArrayEditorComponent {
         });
     }
 
+    private reset() {
+        this.children.forEach(component => {
+            component.reset();
+        });
+    }
+
     public move(control: AbstractControl, index: number) {
         let controls = [...this.arrayControl.controls];
 
@@ -83,9 +89,7 @@ export class ArrayEditorComponent {
         for (let i = 0; i < controls.length; i++) {
             this.arrayControl.setControl(i, controls[i]);
         }
-    }
 
-    public trackByControl(index: number, control: AbstractControl) {
-        return control;
+        this.reset();
     }
 }

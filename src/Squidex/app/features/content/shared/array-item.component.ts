@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
@@ -18,6 +18,8 @@ import {
     invalid$,
     RootFieldDto
 } from '@app/shared';
+
+import { FieldEditorComponent } from './field-editor.component';
 
 type FieldControl = { field: FieldDto, control: AbstractControl };
 
@@ -68,6 +70,9 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
 
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
+
+    @ViewChildren(FieldEditorComponent)
+    public editors: QueryList<FieldEditorComponent>;
 
     public isHidden = false;
     public isInvalid: Observable<boolean>;
@@ -172,6 +177,12 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
 
     public emitMoveBottom() {
         this.move.emit(99999);
+    }
+
+    public reset() {
+        this.editors.forEach(editor => {
+            editor.reset();
+        });
     }
 
     public trackByField(index: number, control: FieldControl) {
