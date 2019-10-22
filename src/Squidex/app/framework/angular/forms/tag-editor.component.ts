@@ -169,6 +169,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public allowDuplicates = true;
 
     @Input()
+    public dashed = false;
+
+    @Input()
     public singleLine = false;
 
     @Input()

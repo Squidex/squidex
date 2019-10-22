@@ -31,27 +31,21 @@ export class WorkflowTransitionComponent {
     public transition: WorkflowTransitionView;
 
     @Input()
-    public roles: RoleDto[];
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public disabled: boolean;
-
-    @Input()
-    public dashed: boolean = false;
-
 
     public get roleSuggestions() {
         return this.roles.map(x => x.name);
     }
 
-    public onBlur = { updateOn: 'blur' };
-
     public changeExpression(expression: string) {
         this.update.emit({ expression });
     }
 
-    public changeRole(roles: string[]) {
-        this.update.emit({ roles: roles || [] });
+    public changeRole(roles: ReadonlyArray<string>) {
+        this.update.emit(({ roles: roles || [] }) as any);
     }
 
     public emitRemove() {
