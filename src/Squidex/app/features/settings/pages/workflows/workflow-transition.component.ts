@@ -36,6 +36,10 @@ export class WorkflowTransitionComponent {
     @Input()
     public disabled: boolean;
 
+    @Input()
+    public dashed: boolean = false;
+
+
     public get roleSuggestions() {
         return this.roles.map(x => x.name);
     }

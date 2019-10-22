@@ -22,11 +22,13 @@
         <span class="text-decent">for</span>
     </div>
     
-    <div class="col">
+    <div class="col" style="width: 70px">
         <sqx-tag-editor
             [disabled]="disabled"
+            [dashed]="true"
+            [allowDuplicates]="false"
             [suggestions]="roleSuggestions"
-            [singleLine]="true"
+            singleLine="true"
             [ngModelOptions]="onBlur"
             [ngModel]="transition.roles"
             (ngModelChange)="changeRole($event)"
