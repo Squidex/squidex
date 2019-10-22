@@ -13,7 +13,7 @@ import { Form, Types } from '@app/framework';
 
 import { AssetDto } from './../services/assets.service';
 
-export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug?: string, tags?: string[] }> {
+export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug?: string, tags?: ReadonlyArray<string> }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             fileName: ['',
@@ -38,7 +38,7 @@ export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug
         const result = super.submit();
 
         if (asset && result) {
-            let index = asset.fileName.lastIndexOf('.');
+            const index = asset.fileName.lastIndexOf('.');
 
             if (index > 0) {
                 result.fileName += asset.fileName.substr(index);
@@ -71,7 +71,7 @@ export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug
         if (fileName) {
             let slug = slugify(fileName, { lower: true });
 
-            let index = asset.fileName.lastIndexOf('.');
+            const index = asset.fileName.lastIndexOf('.');
 
             if (index > 0) {
                 slug += asset.fileName.substr(index);
@@ -84,7 +84,7 @@ export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug
     public load(asset: AssetDto) {
         let fileName = asset.fileName;
 
-        let index = fileName.lastIndexOf('.');
+        const index = fileName.lastIndexOf('.');
 
         if (index > 0) {
             fileName = fileName.substr(0, index);

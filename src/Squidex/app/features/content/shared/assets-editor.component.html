@@ -42,9 +42,14 @@
                 </sqx-asset>
                 
                 <div
-                    [sqxSortModel]="snapshot.assets.mutableValues"
-                    (sqxSort)="sortAssets($event)">
-                    <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset">
+                    cdkDropList
+                    [cdkDropListDisabled]="snapshot.isDisabled"
+                    [cdkDropListData]="snapshot.assets"
+                    (cdkDropListDropped)="sortAssets($event)">
+                    <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset"
+                        class="table-drag"
+                        cdkDrag
+                        cdkDragLockAxis="y">
                         <sqx-asset [asset]="asset" removeMode="true" 
                             [isListView]="true"
                             [isCompact]="isCompact"

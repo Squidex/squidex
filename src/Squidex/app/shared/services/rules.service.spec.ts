@@ -60,6 +60,7 @@ describe('RulesService', () => {
 
         req.flush({
             'action2': {
+                title: 'title2',
                 display: 'display2',
                 description: 'description2',
                 iconColor: '#222',
@@ -82,6 +83,7 @@ describe('RulesService', () => {
                 }]
             },
             'action1': {
+                title: 'title1',
                 display: 'display1',
                 description: 'description1',
                 iconColor: '#111',
@@ -91,9 +93,9 @@ describe('RulesService', () => {
             }
         });
 
-        const action1 = new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
+        const action1 = new RuleElementDto('title1', 'display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
 
-        const action2 = new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
+        const action2 = new RuleElementDto('title2', 'display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
             new RuleElementPropertyDto('property1', 'Editor1', 'Display1', 'Description1', false, true),
             new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false)
         ]);
@@ -267,16 +269,35 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
+    it('should make put request to trigger rule',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                trigger: { method: 'PUT', href: '/api/apps/my-app/rules/123/trigger' }
+            }
+        };
+
+        rulesService.triggerRule('my-app', resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/trigger');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     it('should make get request to get app rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
         let rules: RuleEventsDto;
 
-        rulesService.getEvents('my-app', 10, 20).subscribe(result => {
+        rulesService.getEvents('my-app', 10, 20, '12').subscribe(result => {
             rules = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events?take=10&skip=20');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events?take=10&skip=20&ruleId=12');
 
         expect(req.request.method).toEqual('GET');
 
@@ -357,6 +378,10 @@ describe('RulesService', () => {
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10`,
             lastModifiedBy: `modifier${id}`,
+            name: `Name${id}${suffix}`,
+            numSucceeded: id * 3,
+            numFailed: id * 4,
+            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -414,5 +439,9 @@ export function createRule(id: number, suffix = '') {
             param4: 4,
             actionType: `Webhook${id}${suffix}`
         },
-        `Webhook${id}${suffix}`);
+        `Webhook${id}${suffix}`,
+        `Name${id}${suffix}`,
+        id * 3,
+        id * 4,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-10-10T10:10:00`));
 }

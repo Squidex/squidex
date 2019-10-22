@@ -33,25 +33,25 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedAssetEntity> FindAssetAsync( Guid id)
+        public async Task<IEnrichedAssetEntity> FindAssetAsync(Context context, Guid id)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
             if (asset != null)
             {
-                return await assetEnricher.EnrichAsync(asset);
+                return await assetEnricher.EnrichAsync(asset, context);
             }
 
             return null;
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, Guid appId, string hash)
         {
             Guard.NotNull(hash, nameof(hash));
 
             var assets = await assetRepository.QueryByHashAsync(appId, hash);
 
-            return await assetEnricher.EnrichAsync(assets);
+            return await assetEnricher.EnrichAsync(assets, context);
         }
 
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Q query)
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 assets = await QueryByQueryAsync(context, query);
             }
 
-            var enriched = await assetEnricher.EnrichAsync(assets);
+            var enriched = await assetEnricher.EnrichAsync(assets, context);
 
             return ResultList.Create(assets.Total, enriched);
         }

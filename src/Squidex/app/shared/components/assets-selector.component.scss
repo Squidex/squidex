@@ -19,4 +19,12 @@
             }
         }
     }
+
+    .modal-body {
+        background: $color-background;
+    }
+
+    .modal-tabs {
+        background: $color-dark-foreground;
+    }
 }

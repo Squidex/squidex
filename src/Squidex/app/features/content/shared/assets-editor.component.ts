@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -13,9 +14,9 @@ import {
     AssetDto,
     AssetsService,
     DialogModel,
-    ImmutableArray,
     LocalStoreService,
     MessageBus,
+    sorted,
     StatefulControlComponent,
     Types
 } from '@app/shared';
@@ -33,9 +34,9 @@ class AssetUpdated {
 }
 
 interface State {
-    assetFiles: ImmutableArray<File>;
+    assetFiles: ReadonlyArray<File>;
 
-    assets: ImmutableArray<AssetDto>;
+    assets: ReadonlyArray<AssetDto>;
 
     isListView: boolean;
 }
@@ -47,6 +48,7 @@ interface State {
     providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
+// tslint:disable-next-line: readonly-array
 export class AssetsEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
     @Input()
     public isCompact = false;
@@ -60,30 +62,30 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         private readonly messageBus: MessageBus
     ) {
         super(changeDetector, {
-            assets: ImmutableArray.empty(),
-            assetFiles: ImmutableArray.empty(),
+            assets: [],
+            assetFiles: [],
             isListView: localStore.getBoolean('squidex.assets.list-view')
         });
     }
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.snapshot.assets.map(x => x.id).values)) {
+            if (!Types.isEquals(obj, this.snapshot.assets.map(x => x.id))) {
                 const assetIds: string[] = obj;
 
                 this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)
                     .subscribe(dtos => {
-                        this.setAssets(ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a)));
+                        this.setAssets(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a));
 
                         if (this.snapshot.assets.length !== assetIds.length) {
                             this.updateValue();
                         }
                     }, () => {
-                        this.setAssets(ImmutableArray.empty());
+                        this.setAssets([]);
                     });
             }
         } else {
-            this.setAssets(ImmutableArray.empty());
+            this.setAssets([]);
         }
     }
 
@@ -101,18 +103,18 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
                 }));
     }
 
-    public setAssets(assets: ImmutableArray<AssetDto>) {
+    public setAssets(assets: ReadonlyArray<AssetDto>) {
         this.next(s => ({ ...s, assets }));
     }
 
-    public addFiles(files: File[]) {
-        for (let file of files) {
-            this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
+    public addFiles(files: ReadonlyArray<File>) {
+        for (const file of files) {
+            this.next(s => ({ ...s, assetFiles: [file, ...s.assetFiles] }));
         }
     }
 
-    public selectAssets(assets: AssetDto[]) {
-        this.setAssets(this.snapshot.assets.push(...assets));
+    public selectAssets(assets: ReadonlyArray<AssetDto>) {
+        this.setAssets([...this.snapshot.assets, ...assets]);
 
         if (assets.length > 0) {
             this.updateValue();
@@ -125,17 +127,17 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         if (asset && file) {
             this.next(s => ({
                 ...s,
-                assetFiles: s.assetFiles.remove(file),
-                assets: s.assets.pushFront(asset)
+                assetFiles: s.assetFiles.removed(file),
+                assets: [asset, ...s.assets]
             }));
 
             this.updateValue();
         }
     }
 
-    public sortAssets(assets: AssetDto[]) {
-        if (assets) {
-            this.setAssets(ImmutableArray.of(assets));
+    public sortAssets(event: CdkDragDrop<ReadonlyArray<AssetDto>>) {
+        if (event) {
+            this.setAssets(sorted(event));
 
             this.updateValue();
         }
@@ -143,14 +145,14 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
 
     public removeLoadedAsset(asset: AssetDto) {
         if (asset) {
-            this.setAssets(this.snapshot.assets.remove(asset));
+            this.setAssets(this.snapshot.assets.removed(asset));
 
             this.updateValue();
         }
     }
 
     public removeLoadingAsset(file: File) {
-        this.next(s => ({ ...s, assetFiles: s.assetFiles.remove(file) }));
+        this.next(s => ({ ...s, assetFiles: s.assetFiles.removed(file) }));
     }
 
     public changeView(isListView: boolean) {
@@ -160,14 +162,15 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
     }
 
     private updateValue() {
-        let ids: string[] | null = this.snapshot.assets.values.map(x => x.id);
+        const ids = this.snapshot.assets.map(x => x.id);
 
         if (ids.length === 0) {
-            ids = null;
+            this.callChange(null);
+        } else {
+            this.callChange(ids);
         }
 
         this.callTouched();
-        this.callChange(ids);
     }
 
     public trackByAsset(index: number, asset: AssetDto) {

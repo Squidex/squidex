@@ -22,6 +22,7 @@ export const TitleServiceFactory = (titles: TitlesConfig) => {
 
 @Injectable()
 export class TitleService {
+    // tslint:disable-next-line: readonly-array
     private readonly stack: any[] = [];
 
     constructor(private readonly titles: TitlesConfig) {

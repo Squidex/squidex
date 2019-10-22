@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="3.9.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="3.11.0" />
   </ItemGroup>
 
 </Project>

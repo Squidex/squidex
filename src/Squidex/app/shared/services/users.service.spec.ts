@@ -35,7 +35,7 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[];
+        let users: ReadonlyArray<UserDto>;
 
         usersService.getUsers().subscribe(result => {
             users = result;
@@ -69,7 +69,7 @@ describe('UsersService', () => {
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[];
+        let users: ReadonlyArray<UserDto>;
 
         usersService.getUsers('my-query').subscribe(result => {
             users = result;

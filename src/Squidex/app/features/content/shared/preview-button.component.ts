@@ -18,9 +18,9 @@ import {
 } from '@app/shared';
 
 interface State {
-    selectedName?: string;
+    previewNameSelected?: string;
 
-    alternativeNames: string[];
+    previewNamesMore: ReadonlyArray<string>;
 }
 
 @Component({
@@ -45,7 +45,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
         private readonly localStore: LocalStoreService
     ) {
         super(changeDetector, {
-            alternativeNames: []
+            previewNamesMore: []
         });
     }
 
@@ -62,6 +62,12 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     public follow(name: string) {
         this.selectUrl(name);
 
+        this.navigateTo(name);
+
+        this.dropdown.hide();
+    }
+
+    private navigateTo(name: string) {
         const url = interpolate(this.schema.previewUrls[name], this.content, 'iv');
 
         window.open(url, '_blank');
@@ -69,17 +75,15 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
 
     private selectUrl(selectedName: string) {
         this.next(s => {
-            if (selectedName === s.selectedName) {
+            if (selectedName === s.previewNameSelected) {
                 return s;
             }
             const state = { ...s };
 
             const keys = Object.keys(this.schema.previewUrls);
 
-            state.selectedName = selectedName;
-
-            state.alternativeNames = keys.filter(x => x !== s.selectedName);
-            state.alternativeNames.sort();
+            state.previewNameSelected = selectedName;
+            state.previewNamesMore = keys.removed(selectedName).sorted();
 
             this.localStore.set(this.configKey(), selectedName);
 

@@ -140,7 +140,7 @@ export module ValidatorsEx {
         }
     }
 
-    export function validValues<T>(values: T[]): ValidatorFn {
+    export function validValues<T>(values: ReadonlyArray<T>): ValidatorFn {
         if (!values) {
             return Validators.nullValidator;
         }
@@ -156,7 +156,7 @@ export module ValidatorsEx {
         };
     }
 
-    export function validArrayValues<T>(values: T[]): ValidatorFn {
+    export function validArrayValues<T>(values: ReadonlyArray<T>): ValidatorFn {
         if (!values) {
             return Validators.nullValidator;
         }
@@ -165,7 +165,7 @@ export module ValidatorsEx {
             const ns: T[] = control.value;
 
             if (ns) {
-                for (let n of ns) {
+                for (const n of ns) {
                     if (values.indexOf(n) < 0) {
                         return { validarrayvalues: { invalidvalue: n } };
                     }
@@ -185,7 +185,7 @@ export module ValidatorsEx {
             const a: string[] = control.value;
             const unique: { [key: string]: boolean } = {};
 
-            for (let value of a) {
+            for (const value of a) {
                 if (unique[value]) {
                     return { uniquestrings: false };
                 } else {

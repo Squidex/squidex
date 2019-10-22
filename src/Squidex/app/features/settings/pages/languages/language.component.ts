@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
@@ -12,8 +13,9 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
-    ImmutableArray,
-    LanguagesState
+    LanguageDto,
+    LanguagesState,
+    sorted
 } from '@app/shared';
 
 @Component({
@@ -29,12 +31,12 @@ export class LanguageComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public fallbackLanguages: ImmutableArray<AppLanguageDto>;
+    public fallbackLanguages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public fallbackLanguagesNew: ImmutableArray<AppLanguageDto>;
+    public fallbackLanguagesNew: ReadonlyArray<LanguageDto>;
 
-    public otherLanguage: AppLanguageDto;
+    public otherLanguage: LanguageDto;
 
     public isEditing = false;
     public isEditable = false;
@@ -53,7 +55,7 @@ export class LanguageComponent implements OnChanges {
         this.editForm.load(this.language);
         this.editForm.setEnabled(this.isEditable);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public toggleEditing() {
@@ -64,6 +66,10 @@ export class LanguageComponent implements OnChanges {
         this.languagesState.remove(this.language);
     }
 
+    public sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
+        this.fallbackLanguages = sorted(event);
+    }
+
     public save() {
         if (!this.isEditable) {
             return;
@@ -72,7 +78,7 @@ export class LanguageComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code).values };
+            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {
@@ -86,17 +92,17 @@ export class LanguageComponent implements OnChanges {
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {
-        this.fallbackLanguages = this.fallbackLanguages.remove(language);
-        this.fallbackLanguagesNew = this.fallbackLanguagesNew.push(language).sortByStringAsc(x => x.iso2Code);
+        this.fallbackLanguages = this.fallbackLanguages.removed(language);
+        this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortedByString(x => x.iso2Code);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public addFallbackLanguage() {
-        this.fallbackLanguages = this.fallbackLanguages.push(this.otherLanguage);
-        this.fallbackLanguagesNew = this.fallbackLanguagesNew.remove(this.otherLanguage);
+        this.fallbackLanguages = [...this.fallbackLanguages, this.otherLanguage].sortedByString(x => x.iso2Code);
+        this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
 
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public trackByLanguage(index: number, language: AppLanguageDto) {

@@ -9,7 +9,10 @@ $editor-height: 30rem;
     .ace_editor {
         background: $color-dark-foreground;
         border: 1px solid $color-input;
-        height: $editor-height;
+
+        &.no-border {
+            border: 0;
+        }
     }
 
     .ace_active-line,
@@ -24,8 +27,4 @@ $editor-height: 30rem;
     .ace_gutter {
         background: $color-border !important;
     }
-}
-
-.editor {
-    height: $editor-height;
 }

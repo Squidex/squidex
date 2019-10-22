@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         [BsonRepresentation(BsonType.String)]
         public Guid AppId { get; set; }
 
+        [BsonIgnoreIfDefault]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public Guid RuleId { get; set; }
+
         [BsonRequired]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]

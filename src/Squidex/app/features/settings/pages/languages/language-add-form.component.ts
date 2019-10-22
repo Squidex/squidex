@@ -10,7 +10,6 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     AddLanguageForm,
-    ImmutableArray,
     LanguageDto,
     LanguagesState
 } from '@app/shared';
@@ -36,7 +35,7 @@ import {
 })
 export class LanguageAddFormComponent implements OnChanges {
     @Input()
-    public newLanguages: ImmutableArray<LanguageDto>;
+    public newLanguages: ReadonlyArray<LanguageDto>;
 
     public addLanguageForm = new AddLanguageForm(this.formBuilder);
 
@@ -48,7 +47,7 @@ export class LanguageAddFormComponent implements OnChanges {
 
     public ngOnChanges() {
         if (this.newLanguages.length > 0) {
-            const language = this.newLanguages.at(0);
+            const language = this.newLanguages[0];
 
             this.addLanguageForm.load({ language });
         }

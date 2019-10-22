@@ -11,7 +11,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AssetDto,
     AssetsState,
-    ImmutableArray
+    getFiles
 } from '@app/shared/internal';
 
 @Component({
@@ -36,7 +36,7 @@ export class AssetsListComponent {
     @Input()
     public selectedIds: object;
 
-    public newFiles = ImmutableArray.empty<File>();
+    public newFiles: ReadonlyArray<File> = [];
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
@@ -46,12 +46,12 @@ export class AssetsListComponent {
     public add(file: File, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
-                this.newFiles = this.newFiles.remove(file);
+                this.newFiles = this.newFiles.removed(file);
 
                 this.changeDetector.detectChanges();
             }, 2000);
         } else {
-            this.newFiles = this.newFiles.remove(file);
+            this.newFiles = this.newFiles.removed(file);
 
             this.state.add(asset);
         }
@@ -86,13 +86,11 @@ export class AssetsListComponent {
     }
 
     public remove(file: File) {
-        this.newFiles = this.newFiles.remove(file);
+        this.newFiles = this.newFiles.removed(file);
     }
 
-    public addFiles(files: File[]) {
-        for (let file of files) {
-            this.newFiles = this.newFiles.pushFront(file);
-        }
+    public addFiles(files: ReadonlyArray<File>) {
+        this.newFiles = [...getFiles(files), ...this.newFiles];
 
         return true;
     }

@@ -69,7 +69,7 @@ export class AssetDto {
         public readonly pixelWidth: number | null | undefined,
         public readonly pixelHeight: number | null | undefined,
         public readonly slug: string,
-        public readonly tags: string[],
+        public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
         this.canPreview = this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
@@ -91,7 +91,7 @@ export class AssetDto {
 export interface AnnotateAssetDto {
     readonly fileName?: string;
     readonly slug?: string;
-    readonly tags?: string[];
+    readonly tags?: ReadonlyArray<string>;
 }
 
 @Injectable()
@@ -109,7 +109,7 @@ export class AssetsService {
         return this.http.get<{ [name: string]: number }>(url);
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: string[], ids?: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: ReadonlyArray<string>, ids?: ReadonlyArray<string>): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {

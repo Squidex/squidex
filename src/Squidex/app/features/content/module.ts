@@ -7,7 +7,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
@@ -29,6 +28,7 @@ import {
     ContentFieldComponent,
     ContentHistoryPageComponent,
     ContentPageComponent,
+    ContentSelectorItemComponent,
     ContentsFiltersPageComponent,
     ContentsPageComponent,
     ContentsSelectorComponent,
@@ -39,6 +39,7 @@ import {
     FieldEditorComponent,
     FieldLanguagesComponent,
     PreviewButtonComponent,
+    ReferenceItemComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
@@ -100,7 +101,6 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        DndModule,
         SqxFrameworkModule,
         SqxSharedModule,
         RouterModule.forChild(routes)
@@ -110,10 +110,11 @@ const routes: Routes = [
         ArrayItemComponent,
         AssetsEditorComponent,
         CommentsPageComponent,
+        ContentComponent,
         ContentFieldComponent,
         ContentHistoryPageComponent,
-        ContentComponent,
         ContentPageComponent,
+        ContentSelectorItemComponent,
         ContentsFiltersPageComponent,
         ContentsPageComponent,
         ContentsSelectorComponent,
@@ -124,6 +125,7 @@ const routes: Routes = [
         FieldEditorComponent,
         FieldLanguagesComponent,
         PreviewButtonComponent,
+        ReferenceItemComponent,
         ReferencesEditorComponent,
         SchemasPageComponent
     ]

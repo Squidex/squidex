@@ -7,8 +7,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
@@ -54,36 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             foreach (var field in schema.SchemaDef.Fields)
             {
-                var fieldPropertiesDto = FieldPropertiesDtoFactory.Create(field.RawProperties);
-                var fieldDto =
-                    SimpleMapper.Map(field,
-                        new FieldDto
-                        {
-                            FieldId = field.Id,
-                            Properties = fieldPropertiesDto,
-                            Partitioning = field.Partitioning.Key
-                        });
-
-                if (field is IArrayField arrayField)
-                {
-                    fieldDto.Nested = new List<NestedFieldDto>();
-
-                    foreach (var nestedField in arrayField.Fields)
-                    {
-                        var nestedFieldPropertiesDto = FieldPropertiesDtoFactory.Create(nestedField.RawProperties);
-                        var nestedFieldDto =
-                            SimpleMapper.Map(nestedField,
-                                new NestedFieldDto
-                                {
-                                    FieldId = nestedField.Id,
-                                    Properties = nestedFieldPropertiesDto
-                                });
-
-                        fieldDto.Nested.Add(nestedFieldDto);
-                    }
-                }
-
-                result.Fields.Add(fieldDto);
+                result.Fields.Add(FieldDto.FromField(field));
             }
 
             result.CreateLinks(controller, app);

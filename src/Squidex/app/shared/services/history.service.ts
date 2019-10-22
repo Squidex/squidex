@@ -78,7 +78,7 @@ export class HistoryService {
     ) {
     }
 
-    public getHistory(appName: string, channel: string): Observable<HistoryEventDto[]> {
+    public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
         return this.http.get<any[]>(url).pipe(

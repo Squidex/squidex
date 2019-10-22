@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var currentVersion = await GetEventStreamOffsetAsync(streamName);
 
-                if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
+                if (expectedVersion > EtagVersion.Any && expectedVersion != currentVersion)
                 {
                     throw new WrongEventVersionException(currentVersion, expectedVersion);
                 }
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         {
                             currentVersion = await GetEventStreamOffsetAsync(streamName);
 
-                            if (expectedVersion != EtagVersion.Any)
+                            if (expectedVersion > EtagVersion.Any)
                             {
                                 throw new WrongEventVersionException(currentVersion, expectedVersion);
                             }

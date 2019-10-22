@@ -1,8 +1,10 @@
 @import '_mixins';
 @import '_vars';
 
+.drop-container {
+    min-height: 401px;
+}
+
 .editor {
-    background: $color-dark-foreground;
-    border: 1px solid $color-input;
-    height: 30rem;
+    height: 300px;
 }

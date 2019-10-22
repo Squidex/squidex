@@ -37,7 +37,8 @@
                         <sqx-references-dropdown [schemaId]="fieldModel.extra"
                             mode="Single"
                             [ngModel]="filter.value"
-                            (ngModelChange)="changeValue($event)">
+                            (ngModelChange)="changeValue($event)"
+                            [language]="language">
                         </sqx-references-dropdown>
                     </ng-container>
                     <ng-container *ngSwitchCase="'status'">

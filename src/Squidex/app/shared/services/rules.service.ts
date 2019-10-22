@@ -24,39 +24,58 @@ import {
     Version
 } from '@app/framework';
 
-export type TriggerDto = {
+export type RuleElementMetadataDto = {
     description: string;
     display: string;
     iconColor: string;
     iconCode: string;
+    title?: string;
 };
 
-export type TriggersDto = { [key: string]: TriggerDto };
+export type TriggerType =
+    'AssetChanged' |
+    'ContentChanged' |
+    'Manual' |
+    'SchemaChanged' |
+    'Usage';
+
+export type TriggersDto = Record<TriggerType, RuleElementMetadataDto>;
 
 export const ALL_TRIGGERS: TriggersDto = {
-    'ContentChanged': {
-        description: 'For content changes like created, updated, published, unpublished...',
-        display: 'Content changed',
-        iconColor: '#3389ff',
-        iconCode: 'contents'
-    },
     'AssetChanged': {
         description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
         display: 'Asset changed',
         iconColor: '#3389ff',
-        iconCode: 'assets'
+        iconCode: 'assets',
+        title: 'Asset changed'
+    },
+    'ContentChanged': {
+        description: 'For content changes like created, updated, published, unpublished...',
+        display: 'Content changed',
+        iconColor: '#3389ff',
+        iconCode: 'contents',
+        title: 'Content changed'
+    },
+    'Manual': {
+        description: 'To invoke processes manually, for example to update your static site...',
+        display: 'Manually triggered',
+        iconColor: '#3389ff',
+        iconCode: 'play-line',
+        title: 'Manually triggered'
     },
     'SchemaChanged': {
         description: 'When a schema definition has been created, updated, published or deleted...',
         display: 'Schema changed',
         iconColor: '#3389ff',
-        iconCode: 'schemas'
+        iconCode: 'schemas',
+        title: 'Schema changed'
     },
     'Usage': {
         description: 'When monthly API calls exceed a specified limit for one time a month...',
         display: 'Usage exceeded',
         iconColor: '#3389ff',
-        iconCode: 'dashboard'
+        iconCode: 'dashboard',
+        title: 'Usage'
     }
 };
 
@@ -64,13 +83,14 @@ export type ActionsDto = { [name: string]: RuleElementDto };
 
 export class RuleElementDto {
     constructor(
+        public readonly title: string,
         public readonly display: string,
         public readonly description: string,
         public readonly iconColor: string,
         public readonly iconImage: string,
         public readonly iconCode: string | null,
         public readonly readMore: string,
-        public readonly properties: RuleElementPropertyDto[]
+        public readonly properties: ReadonlyArray<RuleElementPropertyDto>
     ) {
     }
 }
@@ -96,7 +116,7 @@ export class RulesDto extends ResultSet<RuleDto> {
         return hasAnyLink(this._links, 'events');
     }
 
-    constructor(items: RuleDto[], links?: {}) {
+    constructor(items: ReadonlyArray<RuleDto>, links?: {}) {
         super(items.length, items, links);
     }
 }
@@ -107,6 +127,7 @@ export class RuleDto {
     public readonly canDelete: boolean;
     public readonly canDisable: boolean;
     public readonly canEnable: boolean;
+    public readonly canTrigger: boolean;
     public readonly canUpdate: boolean;
 
     constructor(
@@ -121,13 +142,18 @@ export class RuleDto {
         public readonly trigger: any,
         public readonly triggerType: string,
         public readonly action: any,
-        public readonly actionType: string
+        public readonly actionType: string,
+        public readonly name: string,
+        public readonly numSucceeded: number,
+        public readonly numFailed: number,
+        public readonly lastExecuted?: DateTime
     ) {
         this._links = links;
 
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
+        this.canTrigger = hasAnyLink(links, 'logs');
         this.canUpdate = hasAnyLink(links, 'update');
     }
 }
@@ -163,8 +189,9 @@ export class RuleEventDto extends Model<RuleEventDto> {
 }
 
 export interface UpsertRuleDto {
-    readonly trigger: RuleAction;
-    readonly action: RuleAction;
+    readonly trigger?: RuleTrigger;
+    readonly action?: RuleAction;
+    readonly name?: string;
 }
 
 export type RuleAction = { actionType: string } & any;
@@ -202,6 +229,7 @@ export class RulesService {
                         ));
 
                     actions[key] = new RuleElementDto(
+                        value.title,
                         value.display,
                         value.description,
                         value.iconColor,
@@ -297,8 +325,20 @@ export class RulesService {
             pretifyError('Failed to delete rule. Please reload.'));
     }
 
-    public getEvents(appName: string, take: number, skip: number): Observable<RuleEventsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
+    public triggerRule(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['trigger'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url, {}).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'Triggered', appName);
+            }),
+            pretifyError('Failed to trigger rule. Please reload.'));
+    }
+
+    public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
@@ -358,5 +398,9 @@ function parseRule(response: any) {
         response.trigger,
         response.trigger.triggerType,
         response.action,
-        response.action.actionType);
+        response.action.actionType,
+        response.name,
+        response.numSucceeded,
+        response.numFailed,
+        response.lastExecuted ? DateTime.parseISO_UTC(response.lastExecuted) : undefined);
 }

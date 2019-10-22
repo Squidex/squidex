@@ -27,6 +27,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public string Display { get; set; }
 
         /// <summary>
+        /// Optional title.
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
         /// The color for the icon.
         /// </summary>
         public string IconColor { get; set; }

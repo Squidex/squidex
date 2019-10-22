@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using DeploymentApp.Extensions;
 using Squidex.ClientLibrary;
@@ -246,7 +248,7 @@ namespace DeploymentApp.Entities
                                     MaxItems = 1,
                                     MinItems = 1,
                                     ResolveReference = true,
-                                    SchemaId = commoditySchema.Id
+                                    SchemaIds = new List<Guid>{commoditySchema.Id}
                                 }
                             },
 
@@ -263,7 +265,7 @@ namespace DeploymentApp.Entities
                                     MaxItems = 1,
                                     MinItems = 1,
                                     ResolveReference = true,
-                                    SchemaId = commentaryTypeSchema.Id
+                                    SchemaIds = new List<Guid>{commentaryTypeSchema.Id}
                                 }
                             },
 
@@ -280,7 +282,7 @@ namespace DeploymentApp.Entities
                                     MaxItems = 1,
                                     MinItems = 0,
                                     ResolveReference = true,
-                                    SchemaId = periodSchema.Id
+                                    SchemaIds = new List<Guid>{periodSchema.Id}
                                 }
                             },
 
@@ -297,7 +299,7 @@ namespace DeploymentApp.Entities
                                     MaxItems = 1,
                                     MinItems = 1,
                                     ResolveReference = true,
-                                    SchemaId = regionSchema.Id
+                                    SchemaIds = new List<Guid>{regionSchema.Id}
                                 }
                             },
 

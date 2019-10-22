@@ -18,7 +18,6 @@ import {
     FieldsValidators,
     getContentValue,
     HtmlValue,
-    ImmutableArray,
     LanguageDto,
     NestedFieldDto,
     PartitionConfig,
@@ -414,6 +413,49 @@ describe('GetContentValue', () => {
     const language = new LanguageDto('en', 'English');
     const fieldInvariant = createField({ properties: createProperties('Number'), partitioning: 'invariant' });
     const fieldLocalized = createField({ properties: createProperties('Number') });
+    const fieldAssets = createField({ properties: createProperties('Assets') });
+
+    it('should resolve image url field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: '13'
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldAssets);
+
+        expect(result).toEqual({ value: '13', formatted: new HtmlValue('<img src="13?width=50&height=50" />') });
+    });
+
+    it('should not image url if not found', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: null
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldAssets);
+
+        expect(result).toEqual({ value: '- No Value -', formatted: '- No Value -' });
+    });
+
+    it('should resolve string field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    iv: '13'
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldInvariant);
+
+        expect(result).toEqual({ value: '13', formatted: '13' });
+    });
 
     it('should resolve invariant field from references value', () => {
         const content: any = {
@@ -507,10 +549,10 @@ describe('GetContentValue', () => {
 });
 
 describe('ContentForm', () => {
-    const languages = ImmutableArray.of([
+    const languages = [
         new AppLanguageDto({}, 'en', 'English', true, false, []),
         new AppLanguageDto({}, 'de', 'English', false, true, [])
-    ]);
+    ];
 
     const complexSchema = createSchema({ fields: [
         createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
@@ -543,7 +585,7 @@ describe('ContentForm', () => {
         });
 
         it('should return partition for language', () => {
-            const result = partitions.get(languages.at(1));
+            const result = partitions.get(languages[1]);
 
             expect(result).toEqual({ key: 'de', isOptional: true });
         });
@@ -772,7 +814,7 @@ describe('ContentForm', () => {
     }
 });
 
-type SchemaValues = { properties?: SchemaPropertiesDto; id?: number; fields?: RootFieldDto[]; };
+type SchemaValues = { properties?: SchemaPropertiesDto; id?: number; fields?: ReadonlyArray<RootFieldDto>; };
 
 function createSchema({ properties, id, fields }: SchemaValues = {}) {
     id = id || 1;
@@ -790,7 +832,7 @@ function createSchema({ properties, id, fields }: SchemaValues = {}) {
         fields);
 }
 
-type FieldValues = { properties: FieldPropertiesDto; id?: number; partitioning?: string; isDisabled?: boolean, nested?: NestedFieldDto[] };
+type FieldValues = { properties: FieldPropertiesDto; id?: number; partitioning?: string; isDisabled?: boolean, nested?: ReadonlyArray<NestedFieldDto> };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
     id = id || 1;

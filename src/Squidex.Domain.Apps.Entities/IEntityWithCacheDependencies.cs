@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface IEntityWithCacheDependencies
     {
-        HashSet<string> CacheDependencies { get; }
+        HashSet<object> CacheDependencies { get; }
     }
 }

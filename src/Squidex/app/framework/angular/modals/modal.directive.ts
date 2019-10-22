@@ -27,7 +27,7 @@ export class ModalDirective implements OnDestroy {
     private readonly eventsModel = new ResourceOwner();
     private currentModel: DialogModel | ModalModel | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
-    private renderRoots: HTMLElement[] | null;
+    private renderRoots: ReadonlyArray<HTMLElement> | null;
     private isOpen: boolean;
 
     @Input('sqxModal')
@@ -102,7 +102,7 @@ export class ModalDirective implements OnDestroy {
 
     private setupStyles() {
         if (this.renderRoots) {
-            for (let node of this.renderRoots) {
+            for (const node of this.renderRoots) {
                 this.renderer.setStyle(node, 'display', 'block');
             }
         }
@@ -134,7 +134,7 @@ export class ModalDirective implements OnDestroy {
         }
 
         if (this.closeAlways && this.renderRoots) {
-            for (let node of this.renderRoots) {
+            for (const node of this.renderRoots) {
                 this.eventsView.own(this.renderer.listen(node, 'click', this.elementListener));
             }
         }
@@ -162,7 +162,7 @@ export class ModalDirective implements OnDestroy {
                 return false;
             }
 
-            for (let node of this.renderRoots) {
+            for (const node of this.renderRoots) {
                 if (node.contains(<Node>event.target)) {
                     return true;
                 }

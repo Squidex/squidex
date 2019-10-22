@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.ObjectModel;
+
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementPropertiesBase
@@ -18,6 +20,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string Placeholder { get; set; }
 
         public string EditorUrl { get; set; }
+
+        public ReadOnlyCollection<string> Tags { get; set; }
 
         public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
 

@@ -39,7 +39,7 @@ describe('RuleEventsState', () => {
 
         rulesService = Mock.ofType<RulesService>();
 
-        rulesService.setup(x => x.getEvents(app, 10, 0))
+        rulesService.setup(x => x.getEvents(app, 10, 0, undefined))
             .returns(() => of(new RuleEventsDto(200, oldRuleEvents)));
 
         ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
@@ -47,7 +47,7 @@ describe('RuleEventsState', () => {
     });
 
     it('should load ruleEvents', () => {
-        expect(ruleEventsState.snapshot.ruleEvents.values).toEqual(oldRuleEvents);
+        expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
         expect(ruleEventsState.snapshot.ruleEventsPager.numberOfItems).toEqual(200);
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
 
@@ -63,7 +63,7 @@ describe('RuleEventsState', () => {
     });
 
     it('should load next page and prev page when paging', () => {
-        rulesService.setup(x => x.getEvents(app, 10, 10))
+        rulesService.setup(x => x.getEvents(app, 10, 10, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
         ruleEventsState.goNext().subscribe();
@@ -71,8 +71,19 @@ describe('RuleEventsState', () => {
 
         expect().nothing();
 
-        rulesService.verify(x => x.getEvents(app, 10, 10), Times.once());
-        rulesService.verify(x => x.getEvents(app, 10, 0), Times.exactly(2));
+        rulesService.verify(x => x.getEvents(app, 10, 10, undefined), Times.once());
+        rulesService.verify(x => x.getEvents(app, 10, 0, undefined), Times.exactly(2));
+    });
+
+    it('should load with rule id when filtered', () => {
+        rulesService.setup(x => x.getEvents(app, 10, 0, '12'))
+            .returns(() => of(new RuleEventsDto(200, [])));
+
+        ruleEventsState.filterByRule('12').subscribe();
+
+        expect().nothing();
+
+        rulesService.verify(x => x.getEvents(app, 10, 0, '12'), Times.exactly(1));
     });
 
     it('should call service when enqueuing event', () => {

@@ -1,18 +1,11 @@
-<tr [routerLink]="link" routerLinkActive="active">
+<tr [routerLink]="link">
     <td class="cell-select" sqxStopClick>
-        <ng-container *ngIf="!isReference; else referenceTemplate">
-            <input type="checkbox" class="form-check"
-                [disabled]="!selectable"
-                [ngModel]="selected || !selectable" 
-                (ngModelChange)="emitSelectedChange($event)" />
-        </ng-container>
-        
-        <ng-template #referenceTemplate>
-            <i class="icon-drag2 drag-handle"></i>
-        </ng-template>
+        <input type="checkbox" class="form-check"
+            [ngModel]="selected" 
+            (ngModelChange)="emitSelectedChange($event)" />
     </td>
     
-    <td class="cell-actions cell-actions-left" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
+    <td class="cell-actions cell-actions-left" *ngIf="!isDirty" sqxStopClick>
         <div class="dropdown dropdown-options" *ngIf="content">
             <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
@@ -21,7 +14,14 @@
             <ng-container *sqxModal="dropdown;closeAlways:true">
                 <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
                     <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
-                        Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
+                        Change to 
+
+                        <sqx-content-status
+                            [status]="info.status"
+                            [statusColor]="info.color"
+                            showLabel="true"
+                            small="true">
+                        </sqx-content-status>
                     </a>
                     <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
                         Clone
@@ -78,24 +78,6 @@
         </sqx-content-status>
         
         <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
-    </td>
-    
-    <td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">
-        <div class="reference-edit">
-            <button type="button" class="btn btn-text-secondary">
-                <i class="icon-dots"></i>
-            </button>
-    
-            <div class="reference-menu">
-                <a class="btn btn-text-secondary" [routerLink]="['../..', schema.name, content.id]">
-                    <i class="icon-pencil"></i>
-                </a>
-    
-                <button type="button" class="btn btn-text-secondary" (click)="emitDelete()">
-                    <i class="icon-close"></i>
-                </button>
-            </div>
-        </div>
     </td>
 </tr>
 <tr class="spacer"></tr>

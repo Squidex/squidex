@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
 export * from './angular/animations';
 
@@ -19,13 +20,13 @@ export * from './services/resource-loader.service';
 export * from './services/shortcut.service';
 export * from './services/title.service';
 
+export * from './utils/array-helper';
 export * from './utils/date-helper';
 export * from './utils/date-time';
 export * from './utils/duration';
 export * from './utils/error';
 export * from './utils/hateos';
 export * from './utils/interpolator';
-export * from './utils/immutable-array';
 export * from './utils/keys';
 export * from './utils/math-helper';
 export * from './utils/modal-positioner';

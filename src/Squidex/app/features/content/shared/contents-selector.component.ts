@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     ContentDto,
@@ -15,7 +15,10 @@ import {
     QueryModel,
     queryModelFromSchema,
     ResourceOwner,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    SchemaDto,
+    SchemasState,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -28,22 +31,25 @@ import {
 })
 export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
-    public select = new EventEmitter<ContentDto[]>();
+    public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+
+    @Input()
+    public schemaIds: ReadonlyArray<string>;
 
     @Input()
     public language: LanguageDto;
 
     @Input()
-    public languages: LanguageDto[];
+    public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
     public allowDuplicates: boolean;
 
     @Input()
-    public alreadySelected: ContentDto[];
+    public alreadySelected: ReadonlyArray<ContentDto>;
 
-    @Input()
     public schema: SchemaDetailsDto;
+    public schemas: ReadonlyArray<SchemaDto> = [];
 
     public queryModel: QueryModel;
 
@@ -54,22 +60,51 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     public minWidth: string;
 
     constructor(
-        public readonly contentsState: ManualContentsState
+        public readonly contentsState: ManualContentsState,
+        public readonly schemasState: SchemasState,
+        private readonly changeDetector: ChangeDetectorRef
     ) {
         super();
     }
 
     public ngOnInit() {
-        this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
-
         this.own(
             this.contentsState.statuses
                 .subscribe(() => {
                     this.updateModel();
                 }));
 
-        this.contentsState.schema = this.schema;
-        this.contentsState.load();
+        this.schemas = this.schemasState.snapshot.schemas;
+
+        if (this.schemaIds && this.schemaIds.length > 0) {
+            this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
+        }
+
+        this.selectSchema(this.schemas[0]);
+
+        this.changeDetector.detectChanges();
+    }
+
+    public selectSchema(selected: string | SchemaDto) {
+        if (Types.is(selected, SchemaDto)) {
+            selected = selected.id;
+        }
+
+        this.schemasState.loadSchema(selected, true)
+            .subscribe(schema => {
+                if (schema) {
+                    this.schema = schema;
+
+                    this.minWidth = `${200 + (200 * schema.referenceFields.length)}px`;
+
+                    this.contentsState.schema = schema;
+                    this.contentsState.load();
+
+                    this.updateModel();
+
+                    this.changeDetector.detectChanges();
+                }
+            });
     }
 
     public reload() {
@@ -89,7 +124,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemSelected(content: ContentDto) {
-        return this.selectedItems[content.id];
+        return !!this.selectedItems[content.id];
     }
 
     public isItemAlreadySelected(content: ContentDto) {
@@ -112,8 +147,10 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents.values) {
-                this.selectedItems[content.id] = content;
+            for (const content of this.contentsState.snapshot.contents) {
+                if (!this.isItemAlreadySelected(content)) {
+                    this.selectedItems[content.id] = content;
+                }
             }
         }
 
@@ -136,10 +173,12 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     private updateModel() {
-        this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
+        if (this.schema) {
+            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
+        }
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 }

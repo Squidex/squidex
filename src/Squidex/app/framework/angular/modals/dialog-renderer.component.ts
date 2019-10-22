@@ -21,7 +21,7 @@ import {
 interface State {
     dialogRequest?: DialogRequest | null;
 
-    notifications: Notification[];
+    notifications: ReadonlyArray<Notification>;
 
     tooltip?: Tooltip | null;
 }

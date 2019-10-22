@@ -34,7 +34,7 @@ export class DateTimeValidationComponent implements OnInit {
     public showDefaultValues: Observable<boolean>;
     public showDefaultValue: Observable<boolean>;
 
-    public calculatedDefaultValues = ['Now', 'Today'];
+    public calculatedDefaultValues: ReadonlyArray<string> = ['Now', 'Today'];
 
     public ngOnInit() {
         this.editForm.setControl('calculatedDefaultValue',

@@ -134,10 +134,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new UniqueValuesValidator<Guid>();
             }
 
-            if (field.Properties.SchemaId != Guid.Empty)
-            {
-                yield return new ReferencesValidator(field.Properties.SchemaId);
-            }
+            yield return new ReferencesValidator(field.Properties.SchemaIds);
         }
 
         public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field)

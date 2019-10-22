@@ -10,16 +10,23 @@ import { FormGroup } from '@angular/forms';
 
 import {
     Form,
-    ImmutableArray,
     RuleDto,
     RuleElementDto,
     RulesState,
-    SchemaDto
+    SchemaDto,
+    TriggerType
 } from '@app/shared';
 
-export const MODE_WIZARD = 'Wizard';
-export const MODE_EDIT_TRIGGER = 'EditTrigger';
-export const MODE_EDIT_ACTION  = 'EditAction';
+const MODE_WIZARD = 'Wizard';
+const MODE_EDIT_TRIGGER = 'EditTrigger';
+const MODE_EDIT_ACTION  = 'EditAction';
+
+const TITLES: ReadonlyArray<string> = [
+    'Step 1 of 4: Select Trigger',
+    'Step 2 of 4: Configure Trigger',
+    'Step 3 of 4: Select Action',
+    'Step 4 of 4: Configure Action'
+];
 
 @Component({
     selector: 'sqx-rule-wizard',
@@ -37,7 +44,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     public ruleTriggers: { [name: string]: RuleElementDto };
 
     @Input()
-    public schemas: ImmutableArray<SchemaDto>;
+    public schemas: ReadonlyArray<SchemaDto>;
 
     @Input()
     public rule: RuleDto;
@@ -52,6 +59,16 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
     public triggerType: string;
     public trigger: any = {};
+
+    public titles = TITLES;
+
+    public get actionElement() {
+        return this.ruleActions[this.actionType];
+    }
+
+    public get triggerElement() {
+        return this.ruleTriggers[this.triggerType];
+    }
 
     public isEditable: boolean;
 
@@ -88,9 +105,15 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
         this.complete.emit();
     }
 
-    public selectTriggerType(type: string) {
+    public selectTriggerType(type: TriggerType) {
         this.triggerType = type;
-        this.step++;
+
+        if (type === 'Manual') {
+            this.trigger = { triggerType: type };
+            this.step += 2;
+        } else {
+            this.step++;
+        }
     }
 
     public selectActionType(type: string) {

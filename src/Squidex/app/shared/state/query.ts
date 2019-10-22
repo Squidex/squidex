@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Types } from '@app/framework';
 
 import { StatusInfo } from './../services/contents.service';
@@ -36,7 +38,7 @@ export interface QueryFieldModel {
     type: QueryValueType;
 
     // The allowed operator.
-    operators: FilterOperator[];
+    operators: ReadonlyArray<FilterOperator>;
 
     // Extra values.
     extra?: any;
@@ -80,7 +82,7 @@ export type SortMode = 'ascending' | 'descending';
 
 export interface Query {
     // The optional filter.
-    filter?: FilterNode;
+    filter?: FilterLogical;
 
     // The full text search.
     fullText?: string;
@@ -117,25 +119,25 @@ export function hasFilter(query?: Query) {
     return !!query && !Types.isEmpty(query.filter);
 }
 
-const EqualOperators: FilterOperator[] = [
+const EqualOperators: ReadonlyArray<FilterOperator> = [
     { name: '==', value: 'eq' },
     { name: '!=', value: 'ne' }
 ];
 
-const CompareOperator: FilterOperator[] = [
+const CompareOperator: ReadonlyArray<FilterOperator> = [
     { name: '<', value: 'lt' },
     { name: '<=', value: 'le' },
     { name: '>', value: 'gt' },
     { name: '>=', value: 'ge' }
 ];
 
-const StringOperators: FilterOperator[] = [
+const StringOperators: ReadonlyArray<FilterOperator> = [
     { name: 'T*', value: 'startsWith' },
     { name: '*T', value: 'endsWith' },
     { name: '*T*', value: 'contains' }
 ];
 
-const ArrayOperators: FilterOperator[] = [
+const ArrayOperators: ReadonlyArray<FilterOperator> = [
     { value: 'empty', noValue: true }
 ];
 
@@ -169,12 +171,12 @@ const TypeString: QueryFieldModel = {
     operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
 };
 
-export function queryModelFromSchema(schema: SchemaDetailsDto, languages: LanguageDto[], statuses: StatusInfo[] | undefined) {
-    let languagesCodes = languages.map(x => x.iso2Code);
+export function queryModelFromSchema(schema: SchemaDetailsDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
+    const languagesCodes = languages.map(x => x.iso2Code);
 
-    let invariantCodes = ['iv'];
+    const invariantCodes = ['iv'];
 
-    let model: QueryModel = {
+    const model: QueryModel = {
         fields: {}
     };
 
@@ -188,7 +190,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
         model.fields['status'] = { ...TypeStatus, extra: statuses };
     }
 
-    for (let field of schema.fields) {
+    for (const field of schema.fields) {
         let type: QueryFieldModel | null = null;
 
         if (field.properties.fieldType === 'Boolean') {
@@ -200,15 +202,15 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
         } else if (field.properties.fieldType === 'DateTime') {
             type = TypeDateTime;
         } else if (field.properties.fieldType === 'References') {
-            const extra = field.properties['schemaId'];
+            const extra = field.rawProperties.singleId;
 
             type = { ...TypeReference, extra };
         }
 
         if (type) {
-            let codes = field.isLocalizable ? languagesCodes : invariantCodes;
+            const codes = field.isLocalizable ? languagesCodes : invariantCodes;
 
-            for (let code of codes) {
+            for (const code of codes) {
                 model.fields[`data.${field.name}.${code}`] = type;
             }
         }

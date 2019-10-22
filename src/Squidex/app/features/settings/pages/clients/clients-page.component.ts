@@ -35,7 +35,7 @@ export class ClientsPageComponent implements OnInit {
         this.clientsState.load(true);
     }
 
-    public trackByClient(item: ClientDto) {
-        return item.id;
+    public trackByClient(index: number, client: ClientDto) {
+        return client.id;
     }
 }

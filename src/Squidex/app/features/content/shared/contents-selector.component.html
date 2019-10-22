@@ -1,84 +1,95 @@
 <sqx-modal-dialog (close)="emitComplete()" large="true" fullHeight="true" contentClass="grid">
     <ng-container title>
-        Select contents
+        <div class="row">
+            <div class="col-selector">
+                <select class="form-control form-control-dark"
+                    [ngModel]="schema?.id"
+                    (ngModelChange)="selectSchema($event)">
+                    <option *ngFor="let schema of schemas" [ngValue]="schema.id">
+                        Select {{schema.displayName}}
+                    </option>
+                </select>
+            </div>
+        </div>
     </ng-container>
 
     <ng-container tabs>
         <div class="row no-gutters">
-            <div class="col-auto offset-lg-4">
-                <button type="button" class="btn btn-text-secondary" (click)="reload()">
-                    <i class="icon-reset"></i> Refresh
-                </button>
-            </div>
-            <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="Search for content"
-                    [query]="contentsState.contentsQuery | async"
-                    [queryModel]="queryModel"
-                    (queryChange)="search($event)">
-                </sqx-search-form>
-            </div>
-                
-            <div class="-auto pl-1" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
-            </div>
+            <ng-container *ngIf="schema">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-text-secondary" (click)="reload()">
+                        <i class="icon-reset"></i> Refresh
+                    </button>
+                </div>
+                <div class="col pl-1">
+                    <sqx-search-form formClass="form" placeholder="Search for content"
+                        [query]="contentsState.contentsQuery | async"
+                        [queryModel]="queryModel"
+                        (queryChange)="search($event)">
+                    </sqx-search-form>
+                </div>
+                    
+                <div class="-auto pl-1" *ngIf="languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                </div>
+            </ng-container>
         </div>
     </ng-container>
 
     <ng-container content>
-        <div class="grid-header">
-            <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
-                <thead>
-                    <tr>
-                        <th class="cell-select">
-                            <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
-                        </th>
-                        <th class="cell-user">
-                            <sqx-table-header text="By"></sqx-table-header>
-                        </th>
-                        <th class="cell-content" *ngFor="let field of schema.referenceFields">
-                            <sqx-table-header [text]="field.displayName" 
-                                [sortable]="field.properties.isSortable"
-                                [field]="field"
-                                [query]="contentsState.contentsQuery | async"
-                                (queryChange)="search($event)"
-                                [language]="language">
-                            </sqx-table-header>
-                        </th>
-                        <th class="cell-time">
-                            <sqx-table-header text="Updated"
-                                [sortable]="true"
-                                [sortable]="field.properties.isSortable"
-                                [field]="'lastModified'"
-                                [query]="contentsState.contentsQuery | async"
-                                (queryChange)="search($event)"
-                                [language]="language">
-                            </sqx-table-header>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-
-        <div class="grid-content" [sqxSyncScrolling]="header">
-            <div class="table-container" sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" [style.minWidth]="minWidth" *ngIf="contentsState.contents | async; let contents">
-                    <tbody *ngFor="let content of contents; trackBy: trackByContent"
-                        [sqxContent]="content"
-                        [selectable]="!isItemAlreadySelected(content)"
-                        [selected]="isItemSelected(content)"
-                        (selectedChange)="selectContent(content)"
-                        [language]="language"
-                        [schema]="schema"
-                        [schemaFields]="schema.referenceFields"
-                        isReadOnly="true">
-                    </tbody>
+        <ng-container *ngIf="schema">
+            <div class="grid-header">
+                <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
+                    <thead>
+                        <tr>
+                            <th class="cell-select">
+                                <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
+                            </th>
+                            <th class="cell-user">
+                                <sqx-table-header text="By"></sqx-table-header>
+                            </th>
+                            <th class="cell-content" *ngFor="let field of schema.referenceFields">
+                                <sqx-table-header [text]="field.displayName" 
+                                    [sortable]="field.properties.isSortable"
+                                    [field]="field"
+                                    [query]="contentsState.contentsQuery | async"
+                                    (queryChange)="search($event)"
+                                    [language]="language">
+                                </sqx-table-header>
+                            </th>
+                            <th class="cell-time">
+                                <sqx-table-header text="Updated"
+                                    [sortable]="true"
+                                    [field]="'lastModified'"
+                                    [query]="contentsState.contentsQuery | async"
+                                    (queryChange)="search($event)"
+                                    [language]="language">
+                                </sqx-table-header>
+                            </th>
+                        </tr>
+                    </thead>
                 </table>
             </div>
-        </div>
 
-        <div class="grid-footer">
-            <sqx-pager [pager]="contentsState.contentsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
-        </div>
+            <div class="grid-content" [sqxSyncScrolling]="header">
+                <div class="table-container" sqxIgnoreScrollbar>
+                    <table class="table table-items table-fixed" [style.minWidth]="minWidth" *ngIf="contentsState.contents | async; let contents">
+                        <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                            [sqxContentSelectorItem]="content"
+                            [fields]="schema.referenceFields"
+                            [selectable]="!isItemAlreadySelected(content)"
+                            [selected]="isItemSelected(content)"
+                            (selectedChange)="selectContent(content)"
+                            [language]="language">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-footer">
+                <sqx-pager [pager]="contentsState.contentsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+            </div>
+        </ng-container>
     </ng-container>
 
     <ng-container footer>

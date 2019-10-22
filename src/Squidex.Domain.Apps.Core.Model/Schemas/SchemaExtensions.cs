@@ -54,14 +54,55 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.Properties.Label.WithFallback(schema.TypeName());
         }
 
+        public static string DisplayNameUnchanged(this Schema schema)
+        {
+            return schema.Properties.Label.WithFallback(schema.Name);
+        }
+
+        public static Guid SingleId(this ReferencesFieldProperties properties)
+        {
+            return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : Guid.Empty;
+        }
+
+        public static IEnumerable<RootField> ReferenceFields(this Schema schema)
+        {
+            var references = schema.Fields.Where(x => x.RawProperties.IsReferenceField);
+
+            if (references.Any())
+            {
+                return references;
+            }
+
+            references = schema.Fields.Where(x => x.RawProperties.IsListField);
+
+            if (references.Any())
+            {
+                return references;
+            }
+
+            return schema.Fields.Take(1);
+        }
+
         public static IEnumerable<IField<ReferencesFieldProperties>> ResolvingReferences(this Schema schema)
         {
             return schema.Fields.OfType<IField<ReferencesFieldProperties>>()
                 .Where(x =>
-                    x.Properties.SchemaId != Guid.Empty &&
                     x.Properties.ResolveReference &&
                     x.Properties.MaxItems == 1 &&
-                    (x.Properties.IsListField || schema.Fields.Count == 1));
+                    x.IsListField(schema));
+        }
+
+        public static IEnumerable<IField<AssetsFieldProperties>> ResolvingAssets(this Schema schema)
+        {
+            return schema.Fields.OfType<IField<AssetsFieldProperties>>()
+                .Where(x =>
+                    x.Properties.ResolveImage &&
+                    x.IsListField(schema));
+        }
+
+        private static bool IsListField(this IField field, Schema schema)
+        {
+            return field.RawProperties.IsListField || schema.Fields.Count == 1;
         }
     }
 }

@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -39,13 +41,15 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public ReferencesFieldEditor Editor { get; set; }
 
         /// <summary>
-        /// The id of the referenced schema.
+        /// The id of the referenced schemas.
         /// </summary>
-        public Guid SchemaId { get; set; }
+        public ReadOnlyCollection<Guid> SchemaIds { get; set; }
 
         public override FieldProperties ToProperties()
         {
-            return SimpleMapper.Map(this, new ReferencesFieldProperties());
+            var result = SimpleMapper.Map(this, new ReferencesFieldProperties());
+
+            return result;
         }
     }
 }

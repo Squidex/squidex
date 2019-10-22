@@ -48,7 +48,7 @@ describe('RolesState', () => {
 
             rolesState.load().subscribe();
 
-            expect(rolesState.snapshot.roles.values).toEqual(oldRoles.items);
+            expect(rolesState.snapshot.roles).toEqual(oldRoles.items);
             expect(rolesState.snapshot.isLoaded).toBeTruthy();
             expect(rolesState.snapshot.version).toEqual(version);
 
@@ -113,7 +113,7 @@ describe('RolesState', () => {
         });
 
         function expectNewRoles(updated: RolesPayload) {
-            expect(rolesState.snapshot.roles.values).toEqual(updated.items);
+            expect(rolesState.snapshot.roles).toEqual(updated.items);
             expect(rolesState.snapshot.version).toEqual(newVersion);
         }
     });

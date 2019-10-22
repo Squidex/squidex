@@ -48,25 +48,16 @@ export class ContentComponent implements OnChanges {
     public selected = false;
 
     @Input()
-    public selectable = true;
-
-    @Input()
     public language: AppLanguageDto;
 
     @Input()
     public schema: SchemaDetailsDto;
 
     @Input()
-    public schemaFields: RootFieldDto[];
+    public schemaFields: ReadonlyArray<RootFieldDto>;
 
     @Input()
     public canClone: boolean;
-
-    @Input()
-    public isReadOnly = false;
-
-    @Input()
-    public isReference = false;
 
     @Input()
     public isCompact = false;
@@ -77,14 +68,14 @@ export class ContentComponent implements OnChanges {
     @Input('sqxContent')
     public content: ContentDto;
 
-    public trackByFieldFn: Function;
+    public trackByFieldFn: (index: number, field: FieldDto) => any;
 
     public patchForm: PatchContentForm;
     public patchAllowed = false;
 
     public dropdown = new ModalModel();
 
-    public values: any[] = [];
+    public values: ReadonlyArray<any> = [];
 
     public get isDirty() {
         return this.patchForm && this.patchForm.form.dirty;
@@ -99,7 +90,7 @@ export class ContentComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['content']) {
-            this.patchAllowed = !this.isReadOnly && this.content.canUpdate;
+            this.patchAllowed = this.content.canUpdate;
         }
 
         if (changes['schema'] || changes['language']) {
@@ -157,12 +148,12 @@ export class ContentComponent implements OnChanges {
     }
 
     private updateValues() {
-        this.values = [];
+        const values = [];
 
-        for (let field of this.schemaFields) {
+        for (const field of this.schemaFields) {
             const { value, formatted } = getContentValue(this.content, this.language, field);
 
-            this.values.push(formatted);
+            values.push(formatted);
 
             if (this.patchForm) {
                 const formControl = this.patchForm.form.controls[field.name];
@@ -172,9 +163,11 @@ export class ContentComponent implements OnChanges {
                 }
             }
         }
+
+        this.values = values;
     }
 
-    public trackByField(field: FieldDto) {
+    public trackByField(index: number, field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

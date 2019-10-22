@@ -18,7 +18,7 @@ import {
 import { formatError } from './error-formatting';
 
 interface State {
-    errorMessages: string[];
+    errorMessages: ReadonlyArray<string>;
 }
 
 @Component({
@@ -123,7 +123,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         const errors: string[] = [];
 
         if (this.control && this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
-            for (let key in <any>this.control.errors) {
+            for (const key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
                     const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
 

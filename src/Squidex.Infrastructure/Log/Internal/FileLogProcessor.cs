@@ -7,9 +7,10 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using NodaTime;
 
 namespace Squidex.Infrastructure.Log.Internal
@@ -19,7 +20,7 @@ namespace Squidex.Infrastructure.Log.Internal
         private const int MaxQueuedMessages = 1024;
         private const int Retries = 10;
         private readonly BlockingCollection<LogMessageEntry> messageQueue = new BlockingCollection<LogMessageEntry>(MaxQueuedMessages);
-        private readonly Task outputTask;
+        private readonly Thread outputThread;
         private readonly string path;
         private StreamWriter writer;
 
@@ -27,31 +28,10 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             this.path = path;
 
-            outputTask = Task.Factory.StartNew(ProcessLogQueue, this, TaskCreationOptions.LongRunning);
-        }
-
-        protected override void DisposeObject(bool disposing)
-        {
-            if (disposing)
+            outputThread = new Thread(ProcessLogQueue)
             {
-                messageQueue.CompleteAdding();
-
-                try
-                {
-                    outputTask.Wait(1500);
-                }
-                catch (Exception ex)
-                {
-                    if (!ex.Is<OperationCanceledException>())
-                    {
-                        throw;
-                    }
-                }
-                finally
-                {
-                    writer.Dispose();
-                }
-            }
+                IsBackground = true, Name = "Logging"
+            };
         }
 
         public void Initialize()
@@ -72,6 +52,8 @@ namespace Squidex.Infrastructure.Log.Internal
                 };
 
                 writer.WriteLine($"--- Started Logging {SystemClock.Instance.GetCurrentInstant()} ---", 1);
+
+                outputThread.Start();
             }
             catch (Exception ex)
             {
@@ -84,35 +66,63 @@ namespace Squidex.Infrastructure.Log.Internal
             messageQueue.Add(message);
         }
 
-        private async Task ProcessLogQueue()
+        private void ProcessLogQueue()
         {
-            foreach (var entry in messageQueue.GetConsumingEnumerable())
+            try
             {
-                for (var i = 1; i <= Retries; i++)
+                foreach (var entry in messageQueue.GetConsumingEnumerable())
                 {
-                    try
+                    for (var i = 1; i <= Retries; i++)
                     {
-                        writer.WriteLine(entry.Message);
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        await Task.Delay(i * 10);
-
-                        if (i == Retries)
+                        try
                         {
-                            Console.WriteLine($"Failed to write to log file '{path}': {ex}");
+                            writer.WriteLine(entry.Message);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Thread.Sleep(i * 10);
+
+                            if (i == Retries)
+                            {
+                                Console.WriteLine($"Failed to write to log file '{path}': {ex}");
+                            }
                         }
                     }
                 }
             }
+            catch
+            {
+                try
+                {
+                    messageQueue.CompleteAdding();
+                }
+                catch
+                {
+                    return;
+                }
+            }
         }
 
-        private static Task ProcessLogQueue(object state)
+        protected override void DisposeObject(bool disposing)
         {
-            var processor = (FileLogProcessor)state;
+            if (disposing)
+            {
+                messageQueue.CompleteAdding();
 
-            return processor.ProcessLogQueue();
+                try
+                {
+                    outputThread.Join(1500);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to shutdown log queue grateful: {ex}.");
+                }
+                finally
+                {
+                    writer.Dispose();
+                }
+            }
         }
     }
 }

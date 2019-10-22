@@ -25,7 +25,7 @@ import {
 
 export type PatternsDto = Versioned<PatternsPayload>;
 export type PatternsPayload = {
-    readonly items: PatternDto[],
+    readonly items: ReadonlyArray<PatternDto>,
 
     readonly canCreate: boolean;
 } & Resource;

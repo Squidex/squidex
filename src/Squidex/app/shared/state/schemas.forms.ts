@@ -116,7 +116,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: 
                 this.remove(this.form.controls.length - 1);
             }
 
-            for (let key in value) {
+            for (const key in value) {
                 if (value.hasOwnProperty(key)) {
                     result.push({ name: key, url: value[key] });
                 }
@@ -126,10 +126,10 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: 
         return result;
     }
 
-    public transformSubmit(value: { name: string, url: string }[]): { [name: string]: string } {
+    public transformSubmit(value: ReadonlyArray<{ name: string, url: string }>): { [name: string]: string } {
         const result: { [name: string]: string } = {};
 
-        for (let item of value) {
+        for (const item of value) {
             result[item.name] = item.url;
         }
 
@@ -169,7 +169,9 @@ export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: str
             ],
             editorUrl: null,
             isRequired: false,
-            isListField: false
+            isListField: false,
+            isReferenceField: false,
+            tags: []
         }));
     }
 }
@@ -186,7 +188,8 @@ export class EditSchemaForm extends Form<FormGroup, { label?: string, hints?: st
                 [
                     Validators.maxLength(1000)
                 ]
-            ]
+            ],
+            tags: []
         }));
     }
 }

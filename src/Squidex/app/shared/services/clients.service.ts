@@ -25,7 +25,7 @@ import {
 
 export type ClientsDto = Versioned<ClientsPayload>;
 export type ClientsPayload = {
-    readonly items: ClientDto[];
+    readonly items: ReadonlyArray<ClientDto>;
 
     readonly canCreate: boolean;
 } & Resource;

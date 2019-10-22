@@ -25,7 +25,7 @@
         <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset"
             [isListView]="isListView"
             [isDisabled]="isDisabled"
-            [isSelectable]="selectedIds"
+            [isSelectable]="!!selectedIds"
             [isSelected]="isSelected(asset)"
             [allTags]="tags"
             (update)="update(asset)"

@@ -6,12 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { empty, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    ImmutableArray,
     Pager,
     shareSubscribed,
     State
@@ -23,13 +22,16 @@ import { RuleEventDto, RulesService } from './../services/rules.service';
 
 interface Snapshot {
     // The current rule events.
-    ruleEvents: ImmutableArray<RuleEventDto>;
+    ruleEvents: ReadonlyArray<RuleEventDto>;
 
     // The pagination information.
     ruleEventsPager: Pager;
 
     // Indicates if the rule events are loaded.
     isLoaded?: boolean;
+
+    // The current rule id.
+    ruleId?: string;
 }
 
 @Injectable()
@@ -48,7 +50,7 @@ export class RuleEventsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ ruleEvents: ImmutableArray.of(), ruleEventsPager: new Pager(0) });
+        super({ ruleEvents: [], ruleEventsPager: new Pager(0) });
     }
 
     public load(isReload = false): Observable<any> {
@@ -62,14 +64,14 @@ export class RuleEventsState extends State<Snapshot> {
     private loadInternal(isReload = false): Observable<any> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
-                this.snapshot.ruleEventsPager.skip).pipe(
-            tap(({ total, items }) => {
+                this.snapshot.ruleEventsPager.skip,
+                this.snapshot.ruleId).pipe(
+            tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
                 }
 
                 return this.next(s => {
-                    const ruleEvents = ImmutableArray.of(items);
                     const ruleEventsPager = s.ruleEventsPager.setCount(total);
 
                     return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
@@ -96,6 +98,16 @@ export class RuleEventsState extends State<Snapshot> {
                 });
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    public filterByRule(ruleId?: string) {
+        if (ruleId === this.snapshot.ruleId) {
+            return empty();
+        }
+
+        this.next(s => ({ ...s, ruleEventsPager: new Pager(0), ruleId }));
+
+        return this.loadInternal();
     }
 
     public goNext(): Observable<any> {

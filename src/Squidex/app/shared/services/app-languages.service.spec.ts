@@ -155,7 +155,7 @@ describe('AppLanguagesService', () => {
                 englishName: code,
                 isMaster: i === 0,
                 isOptional: i % 2 === 1,
-                fallback: codes.filter(x => x !== code),
+                fallback: codes.removed(code),
                 _links: {
                     update: { method: 'PUT', href: `/languages/${code}` }
                 }
@@ -167,7 +167,7 @@ describe('AppLanguagesService', () => {
     }
 });
 
-export function createLanguages(...codes: string[]): AppLanguagesPayload {
+export function createLanguages(...codes: ReadonlyArray<string>): AppLanguagesPayload {
     return {
         items: codes.map((code, i) => createLanguage(code, codes, i)),
         _links: {
@@ -176,10 +176,10 @@ export function createLanguages(...codes: string[]): AppLanguagesPayload {
         canCreate: true
     };
 }
-function createLanguage(code: string, codes: string[], i: number) {
+function createLanguage(code: string, codes: ReadonlyArray<string>, i: number) {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/languages/${code}` }
     };
 
-    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.filter(x => x !== code));
+    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.removed(code));
 }

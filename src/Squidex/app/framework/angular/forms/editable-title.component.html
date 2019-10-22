@@ -1,23 +1,30 @@
 <div class="title">
-    <form *ngIf="isRenaming; else noRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
-        <div class="form-group mr-1">
-            <sqx-control-errors for="name"></sqx-control-errors>
-            
-            <input type="text" class="form-control form-underlined" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" spellcheck="false" />
+    <form *ngIf="renaming; else noRenaming" [formGroup]="renameForm" (ngSubmit)="rename()">
+        <div class="row no-gutters">
+            <div class="col">
+                <div class="form-group mr-2">
+                    <sqx-control-errors for="name"></sqx-control-errors>
+                    
+                    <input type="text" class="form-control form-underlined" formControlName="name" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" spellcheck="false" />
+                </div>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">Save</button>
+        
+                <button type="button" class="btn btn-text-secondary btn-cancel mr-4" (click)="toggleRename()">
+                    <i class="icon-close"></i>
+                </button>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !renameForm.dirty">Save</button>
-
-        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="toggleRename()">
-            <i class="icon-close"></i>
-        </button>
     </form>
 
     <ng-template #noRenaming>
-        <h3 class="title-name" (dblclick)="toggleRename()">
-            {{name}}
-        </h3>
+        <div class="title-view">
+            <h3 class="title-name" [class.fallback]="!name" (dblclick)="toggleRename()">
+                {{name || fallback}}
+            </h3>
 
-        <i class="title-edit icon-pencil" *ngIf="!disabled" (click)="toggleRename()"></i>
+            <i class="title-edit icon-pencil" *ngIf="!disabled" (click)="toggleRename()"></i>
+        </div>
     </ng-template>
 </div>

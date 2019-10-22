@@ -17,7 +17,7 @@ import { HistoryEventDto } from '@app/shared/internal';
 })
 export class HistoryListComponent {
     @Input()
-    public events: HistoryEventDto;
+    public events: ReadonlyArray<HistoryEventDto>;
 
     public trackByEvent(index: number, event: HistoryEventDto) {
         return event.eventId;

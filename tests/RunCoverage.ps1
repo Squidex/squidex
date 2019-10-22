@@ -88,6 +88,6 @@ if ($all -Or $icis) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.2.15\tools\net47\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\4.2.17\tools\net47\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

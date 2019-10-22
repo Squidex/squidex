@@ -48,7 +48,7 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
     }
 }
 
-export class ImportContributorsForm extends Form<FormGroup, AssignContributorDto[]> {
+export class ImportContributorsForm extends Form<FormGroup, ReadonlyArray<AssignContributorDto>> {
     public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
@@ -77,7 +77,7 @@ function extractEmails(value: string) {
         const emails = value.match(EMAIL_REGEX);
 
         if (emails) {
-            for (let match of emails) {
+            for (const match of emails) {
                 if (!added[match]) {
                     result.push({ contributorId: match, role: 'Editor', invite: true });
 

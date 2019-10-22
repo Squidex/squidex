@@ -25,7 +25,7 @@ namespace CodeGeneration
 
             using (var client = new HttpClient(clientHandler))
             {
-                json = client.GetStringAsync("https://localhost:5000/api/swagger/v1/swagger.json").Result;
+                json = client.GetStringAsync("http://localhost:5000/api/swagger/v1/swagger.json").Result;
             }
             
             var document = OpenApiDocument.FromJsonAsync(json).Result;
@@ -44,7 +44,7 @@ namespace CodeGeneration
             code = code.Replace(" = new FieldPropertiesDto();", string.Empty);
             code = code.Replace(" = new RuleTriggerDto();", string.Empty);
 
-            File.WriteAllText(@"..\..\..\..\DeploymentApp\Management\Generated.cs", code);
+            File.WriteAllText(@"..\DeploymentApp\Management\Generated.cs", code);
         }
 
         public sealed class TagNameGenerator : MultipleClientsFromOperationIdOperationNameGenerator

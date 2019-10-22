@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var content = await grain.GetStateAsync(version);
 
-                if (content.Value == null || content.Value.Version != version)
+                if (content.Value == null || (version > EtagVersion.Any && content.Value.Version != version))
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }

@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         public Type Type { get; set; }
 
+        public string Title { get; set; }
+
         public string ReadMore { get; set; }
 
         public string IconImage { get; set; }

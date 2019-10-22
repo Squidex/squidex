@@ -12,7 +12,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import { AppComponent } from './app.component';
 
@@ -32,11 +31,12 @@ import { SqxShellModule } from './shell';
 import { routing } from './app.routes';
 
 export function configApiUrl() {
-    let bases = document.getElementsByTagName('base');
+    const baseElements = document.getElementsByTagName('base');
+
     let baseHref = null;
 
-    if (bases.length > 0) {
-        baseHref = bases[0].href;
+    if (baseElements.length > 0) {
+        baseHref = baseElements[0].href;
     }
 
     if (!baseHref) {
@@ -74,7 +74,6 @@ export function configCurrency() {
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
-        DndModule.forRoot(),
         HttpClientModule,
         FormsModule,
         CommonModule,

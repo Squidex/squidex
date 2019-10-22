@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -37,7 +39,7 @@ export class ResourceOwner implements OnDestroy {
 
     public unsubscribeAll() {
         try {
-            for (let subscription of this.subscriptions) {
+            for (const subscription of this.subscriptions) {
                 if (Types.isFunction(subscription)) {
                     subscription();
                 } else {

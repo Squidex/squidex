@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class RuleActionAttribute : Attribute
     {
+        public string Title { get; set; }
+
         public string ReadMore { get; set; }
 
         public string IconImage { get; set; }

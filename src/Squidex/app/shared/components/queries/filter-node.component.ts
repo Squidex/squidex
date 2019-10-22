@@ -11,6 +11,7 @@ import {
     FilterComparison,
     FilterLogical,
     FilterNode,
+    LanguageDto,
     QueryModel
 } from '@app/shared/internal';
 
@@ -18,13 +19,13 @@ import {
     selector: 'sqx-filter-node',
     template: `
         <ng-container *ngIf="logical">
-            <sqx-filter-logical [model]="model" [filter]="logical" [level]="level"
+            <sqx-filter-logical [model]="model" [filter]="logical" [language]="language" [level]="level"
                 (remove)="remove.emit()" (change)="change.emit()">
             </sqx-filter-logical>
         </ng-container>
 
         <ng-container *ngIf="comparison">
-            <sqx-filter-comparison [model]="model" [filter]="comparison"
+            <sqx-filter-comparison [model]="model" [filter]="comparison" [language]="language"
                 (remove)="remove.emit()" (change)="change.emit()">
             </sqx-filter-comparison>
         </ng-container>`,
@@ -38,6 +39,9 @@ export class FilterNodeComponent {
 
     @Output()
     public remove = new EventEmitter();
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public level: number;

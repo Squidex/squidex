@@ -8,11 +8,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import {
-    FieldDto,
-    ImmutableArray,
-    PatternDto
-} from '@app/shared';
+import { FieldDto, PatternDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form',
@@ -25,7 +21,7 @@ import {
                 <li class="nav-item" [class.hidden]="!field.properties.isContentField">
                     <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
                 </li>
-                <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Assets'">
+                <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Array'">
                     <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
                 </li>
             </ul>
@@ -63,7 +59,7 @@ export class FieldFormComponent implements AfterViewInit {
     public editFormSubmitted: boolean;
 
     @Input()
-    public patterns: ImmutableArray<PatternDto>;
+    public patterns: ReadonlyArray<PatternDto>;
 
     @Input()
     public field: FieldDto;

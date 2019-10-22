@@ -7,7 +7,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import {
     HelpComponent,
@@ -17,6 +16,8 @@ import {
 } from '@app/shared';
 
 import {
+    ArrayValidationComponent,
+    AssetsUIComponent,
     AssetsValidationComponent,
     BooleanUIComponent,
     BooleanValidationComponent,
@@ -75,13 +76,14 @@ const routes: Routes = [
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
-        DndModule,
         RouterModule.forChild(routes)
     ],
     providers: [
         SchemaMustExistGuard
     ],
     declarations: [
+        ArrayValidationComponent,
+        AssetsUIComponent,
         AssetsValidationComponent,
         BooleanUIComponent,
         BooleanValidationComponent,

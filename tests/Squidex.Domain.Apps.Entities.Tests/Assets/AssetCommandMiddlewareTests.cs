@@ -33,6 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<MemoryAssetStore>();
+        private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ITagGenerator<CreateAsset> tagGenerator = A.Fake<ITagGenerator<CreateAsset>>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
@@ -41,6 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly AssetGrain asset;
         private readonly AssetFile file;
+        private readonly Context requestContext = Context.Anonymous();
         private readonly AssetCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -59,10 +61,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset = new AssetGrain(Store, tagService, A.Fake<IActivationLimit>(), A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored))
+            A.CallTo(() => contextProvider.Context)
+                .Returns(requestContext);
+
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored, requestContext))
                 .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(AppId, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), AppId, A<string>.Ignored))
                 .Returns(new List<IEnrichedAssetEntity>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
@@ -75,7 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 assetEnricher,
                 assetQuery,
                 assetStore,
-                assetThumbnailGenerator, new[] { tagGenerator });
+                assetThumbnailGenerator,
+                contextProvider, new[] { tagGenerator });
         }
 
         [Fact]
@@ -88,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -106,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Same(result, context.Result<IEnrichedAssetEntity>());
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -122,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetEnricher.EnrichAsync(result))
+            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext))
                 .Returns(enriched);
 
             await sut.HandleAsync(context);
@@ -296,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Guid>.Ignored, A<string>.Ignored))
                 .Returns(new List<IEnrichedAssetEntity> { duplicate });
         }
 

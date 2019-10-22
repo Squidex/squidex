@@ -19,12 +19,13 @@
                     [query]="contentsState.contentsQuery | async"
                     [queries]="queries"
                     [queryModel]="queryModel"
-                    (queryChange)="search($event)" 
+                    (queryChange)="search($event)"
+                    [language]="languageMaster"
                     enableShortcut="true">
                 </sqx-search-form>
             </div>
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.mutableValues"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)" [disabled]="(contentsState.canCreateAny | async) === false">
@@ -76,8 +77,13 @@
         <div class="selection" *ngIf="selectionCount > 0">
             {{selectionCount}} items selected&nbsp;&nbsp;
 
-            <button type="button" class="btn btn-secondary mr-1" *ngFor="let status of nextStatuses" (click)="changeSelectedStatus(status)">
-                Status to {{status}}
+            <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                <sqx-content-status
+                    [status]="status"
+                    [statusColor]="nextStatuses[status]"
+                    showLabel="true"
+                    small="true">
+                </sqx-content-status>
             </button>
             
             <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"

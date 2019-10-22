@@ -32,15 +32,15 @@
             </div>
 
             <table class="table table-items table-fixed">
-                <tbody *ngFor="let rule of rules; trackBy: trackByRule"
-                    [sqxRule]="rule"
+                <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
+                    [rule]="rule"
                     [ruleActions]="ruleActions"
                     [ruleTriggers]="ruleTriggers"
                     (delete)="delete(rule)"
                     (editAction)="editAction(rule)"
                     (editTrigger)="editTrigger(rule)"
                     (toggle)="toggle(rule)">
-                </tbody>
+                </sqx-rule>
             </table>
 
             <ng-container *sqxModal="addRuleDialog">

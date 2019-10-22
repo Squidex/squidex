@@ -5,12 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Component, Input, OnChanges } from '@angular/core';
 
 import {
     ErrorDto,
     MathHelper,
     RoleDto,
+    SchemaTagConverter,
     WorkflowDto,
     WorkflowsState,
     WorkflowStep,
@@ -19,26 +22,24 @@ import {
     WorkflowTransitionValues
 } from '@app/shared';
 
-import { SchemaTagConverter } from './schema-tag-converter';
-
 @Component({
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html'
 })
 export class WorkflowComponent implements OnChanges {
+    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+
     @Input()
     public workflow: WorkflowDto;
 
     @Input()
-    public roles: RoleDto[];
+    public roles: ReadonlyArray<RoleDto>;
 
     @Input()
     public schemasSource: SchemaTagConverter;
 
     public error: string | null;
-
-    public onBlur = { updateOn: 'blur' };
 
     public isEditing = false;
     public isEditable = false;
@@ -74,7 +75,7 @@ export class WorkflowComponent implements OnChanges {
     }
 
     public addStep() {
-        let index = this.workflow.steps.length;
+        const index = this.workflow.steps.length;
 
         for (let i = index; i < index + 100; i++) {
             const name = `Step${i}`;
@@ -122,7 +123,7 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.removeStep(step.name);
     }
 
-    public trackByStep(step: WorkflowStep) {
+    public trackByStep(index: number, step: WorkflowStep) {
         return step.name;
     }
 }

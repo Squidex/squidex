@@ -94,6 +94,18 @@ module.exports = function (env) {
                 }],
                 include: [/node_modules/]
             }, {
+                test: /\.map$/,
+                use: [{
+                    loader: 'ignore-loader'
+                }],
+                include: [/node_modules/]
+            }, {
+                test: /\.d\.ts$/,
+                use: [{
+                    loader: 'ignore-loader'
+                }],
+                include: [/node_modules/]
+            }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
                     loader: 'file-loader?name=[name].[hash].[ext]',

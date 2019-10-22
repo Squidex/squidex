@@ -56,7 +56,7 @@ describe('RulesState', () => {
 
             rulesState.load().subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule1, rule2]);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
             expect(rulesState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -91,7 +91,7 @@ describe('RulesState', () => {
 
             rulesState.create(request).subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule1, rule2, newRule]);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2, newRule]);
         });
 
         it('should update rule when updated action', () => {
@@ -104,7 +104,7 @@ describe('RulesState', () => {
 
             rulesState.updateAction(rule1, newAction).subscribe();
 
-            const newRule1 = rulesState.snapshot.rules.at(0);
+            const newRule1 = rulesState.snapshot.rules[0];
 
             expect(newRule1).toEqual(updated);
         });
@@ -115,11 +115,26 @@ describe('RulesState', () => {
             const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
-            .returns(() => of(updated)).verifiable();
+                .returns(() => of(updated)).verifiable();
 
             rulesState.updateTrigger(rule1, newTrigger).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(updated);
+        });
+
+        it('should update rule when renamed', () => {
+            const newName = 'NewName';
+
+            const updated = createRule(1, '_new');
+
+            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
+                .returns(() => of(updated)).verifiable();
+
+            rulesState.rename(rule1, newName).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
         });
@@ -128,13 +143,24 @@ describe('RulesState', () => {
             const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.enableRule(app, rule1, version))
-            .returns(() => of(updated)).verifiable();
+                .returns(() => of(updated)).verifiable();
 
             rulesState.enable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
+        });
+
+        it('should not update rule when triggered', () => {
+            rulesService.setup(x => x.triggerRule(app, rule1))
+                .returns(() => of()).verifiable();
+
+            rulesState.trigger(rule1).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(rule1);
         });
 
         it('should update rule when disabled', () => {
@@ -145,7 +171,7 @@ describe('RulesState', () => {
 
             rulesState.disable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules.at(0);
+            const rule1New = rulesState.snapshot.rules[0];
 
             expect(rule1New).toEqual(updated);
         });
@@ -156,7 +182,7 @@ describe('RulesState', () => {
 
             rulesState.delete(rule1).subscribe();
 
-            expect(rulesState.snapshot.rules.values).toEqual([rule2]);
+            expect(rulesState.snapshot.rules).toEqual([rule2]);
         });
     });
 });

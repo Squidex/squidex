@@ -15,6 +15,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed class UpdateRuleDto
     {
         /// <summary>
+        /// Optional rule name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// The trigger properties.
         /// </summary>
         public RuleTriggerDto Trigger { get; set; }
@@ -27,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
         public UpdateRule ToCommand(Guid id)
         {
-            var command = new UpdateRule { RuleId = id, Action = Action };
+            var command = new UpdateRule { RuleId = id, Action = Action, Name = Name };
 
             if (Trigger != null)
             {

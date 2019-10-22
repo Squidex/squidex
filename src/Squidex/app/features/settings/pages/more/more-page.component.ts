@@ -74,7 +74,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public uploadImage(file: File[]) {
+    public uploadImage(file: ReadonlyArray<File>) {
         if (!this.isImageEditable) {
             return;
         }

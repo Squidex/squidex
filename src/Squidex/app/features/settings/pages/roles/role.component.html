@@ -29,7 +29,7 @@
     </div>
 
     <div class="table-items-row-details" *ngIf="isEditing">
-        <form [formGroup]="editForm.form" (ngSubmit)="save()">
+        <form (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
                     <button type="reset" class="btn btn-text" (click)="toggleEditing()">Cancel</button>
@@ -38,7 +38,7 @@
             </div>
 
             <div class="table-items-row-details-tab">
-                <div class="form-group row no-gutters" *ngFor="let control of editForm.form.controls; let i = index">
+                <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
                     <div class="col">
                         <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
 

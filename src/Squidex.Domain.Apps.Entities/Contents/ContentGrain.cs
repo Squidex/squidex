@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     Operation = "Published",
                                     Data = c.Data,
                                     Status = Status.Published,
-                                    StatusOld = status
+                                    StatusOld = default
                                 });
                         }
 

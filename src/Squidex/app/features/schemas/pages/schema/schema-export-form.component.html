@@ -5,27 +5,32 @@
         </ng-container>
 
         <ng-container content>
-            <sqx-json-editor formControlName="json"></sqx-json-editor>
+            <sqx-json-editor [noBorder]="true" formControlName="json"></sqx-json-editor>
         </ng-container>
 
         <ng-container footer *ngIf="schema.canSynchronize">
-            <div class="float-left form-inline">
-                <div class="form-check pr-4">
-                    <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete" />
-                    <label class="form-check-label" for="fieldsDelete">
-                        Delete fields
-                    </label>
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="form-inline">
+                        <div class="form-check pr-4">
+                            <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete" />
+                            <label class="form-check-label" for="fieldsDelete">
+                                Delete fields
+                            </label>
+                        </div>
+        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate" />
+                            <label class="form-check-label" for="fieldsRecreate">
+                                Recreate fields
+                            </label>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate" />
-                    <label class="form-check-label" for="fieldsRecreate">
-                        Recreate fields
-                    </label>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success" [disabled]="synchronizeForm.submitted | async">Synchronize</button>
                 </div>
             </div>
-
-            <button type="submit" class="float-right btn btn-success" [disabled]="synchronizeForm.submitted | async">Synchronize</button>
         </ng-container>
     </sqx-modal-dialog>  
 </form>

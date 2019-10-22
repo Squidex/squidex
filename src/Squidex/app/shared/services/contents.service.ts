@@ -27,6 +27,8 @@ import {
 
 import { encodeQuery, Query } from './../state/query';
 
+import { parseField, RootFieldDto } from './schemas.service';
+
 export class ScheduleDto {
     constructor(
         public readonly status: string,
@@ -40,9 +42,9 @@ export type StatusInfo = { status: string; color: string; };
 
 export class ContentsDto extends ResultSet<ContentDto> {
     constructor(
-        public readonly statuses: StatusInfo[],
+        public readonly statuses: ReadonlyArray<StatusInfo>,
         total: number,
-        items: ContentDto[],
+        items: ReadonlyArray<ContentDto>,
         links?: ResourceLinks
     ) {
         super(total, items, links);
@@ -57,7 +59,7 @@ export class ContentsDto extends ResultSet<ContentDto> {
     }
 }
 
-export type ContentReferencesValue = { [partition: string]: string };
+export type ContentReferencesValue = { [partition: string]: string } | string;
 export type ContentReferences = { [fieldName: string ]: ContentFieldData<ContentReferencesValue> };
 export type ContentFieldData<T = any> = { [partition: string]: T };
 export type ContentData = { [fieldName: string ]: ContentFieldData };
@@ -65,7 +67,7 @@ export type ContentData = { [fieldName: string ]: ContentFieldData };
 export class ContentDto {
     public readonly _links: ResourceLinks;
 
-    public readonly statusUpdates: StatusInfo[];
+    public readonly statusUpdates: ReadonlyArray<StatusInfo>;
 
     public readonly canDelete: boolean;
     public readonly canDraftDiscard: boolean;
@@ -86,7 +88,10 @@ export class ContentDto {
         public readonly isPending: boolean,
         public readonly data: ContentData | undefined,
         public readonly dataDraft: ContentData,
+        public readonly schemaName: string,
+        public readonly schemaDisplayName: string,
         public readonly referenceData: ContentReferences,
+        public readonly referenceFields: ReadonlyArray<RootFieldDto>,
         public readonly version: Version
     ) {
         this._links = links;
@@ -111,7 +116,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: string[]): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: ReadonlyArray<string>): Observable<ContentsDto> {
         const queryParts: string[] = [];
 
         if (ids && ids.length > 0) {
@@ -145,6 +150,18 @@ export class ContentsService {
         const fullQuery = queryParts.join('&');
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(x => parseContent(x));
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('Failed to load contents. Please reload.'));
+    }
+
+    public getContentsByIds(appName: string, ids: ReadonlyArray<string>): Observable<ContentsDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/?ids=${ids.join(',')}`);
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
             map(({ total, items, statuses, _links }) => {
@@ -307,6 +324,9 @@ function parseContent(response: any) {
         response.isPending === true,
         response.data,
         response.dataDraft,
+        response.schemaName,
+        response.schemaDisplayName,
         response.referenceData,
+        response.referenceFields.map((item: any) => parseField(item)),
         new Version(response.version.toString()));
 }

@@ -129,10 +129,10 @@ let CACHED_FONT: string;
 interface State {
     hasFocus: boolean;
 
-    suggestedItems: TagValue[];
+    suggestedItems: ReadonlyArray<TagValue>;
     suggestedIndex: number;
 
-    items: TagValue[];
+    items: ReadonlyArray<TagValue>;
 }
 
 @Component({
@@ -145,6 +145,7 @@ interface State {
         fadeAnimation
     ]
 })
+// tslint:disable-next-line: readonly-array
 export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
     @ViewChild('form', { static: false })
     public formElement: ElementRef<HTMLElement>;
@@ -153,7 +154,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Input()
-    public suggestedValues: TagValue[] = [];
+    public suggestedValues: ReadonlyArray<TagValue> = [];
 
     @Input()
     public converter: Converter = new StringConverter();
@@ -183,7 +184,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputName = 'tag-editor';
 
     @Input()
-    public set suggestions(value: string[]) {
+    public set suggestions(value: ReadonlyArray<string>) {
         if (value) {
             this.suggestedValues = value.map(x => new TagValue(x, x, x));
         } else {
@@ -254,7 +255,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         const items: any[] = [];
 
         if (this.converter && Types.isArray(obj)) {
-            for (let value of obj) {
+            for (const value of obj) {
                 if (Types.is(value, TagValue)) {
                     items.push(value);
                 } else {
@@ -466,7 +467,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
 
                 const values = [...this.snapshot.items];
 
-                for (let part of value.split(',')) {
+                for (const part of value.split(',')) {
                     const converted = this.converter.convertInput(part);
 
                     if (converted) {
@@ -488,7 +489,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         return s && e && (e - s) > 0;
     }
 
-    private updateItems(items: TagValue[]) {
+    private updateItems(items: ReadonlyArray<TagValue>) {
         this.next(s => ({ ...s, items }));
 
         if (items.length === 0 && this.undefinedWhenEmpty) {

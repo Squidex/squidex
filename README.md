@@ -39,7 +39,7 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 * [guohai](https://github.com/seamys): FTP asset store support, Email rule support, custom editors and bug fixes.
 * [pushrbx](https://pushrbx.net/): Azure Store support.
 * [razims](https://github.com/razims): GridFS support.
-* [sauravvijay](ttps://github.com/sauravvijay): Kafka Rule action.
+* [sauravvijay](https://github.com/sauravvijay): Kafka Rule action.
 
 ## Contributing
 

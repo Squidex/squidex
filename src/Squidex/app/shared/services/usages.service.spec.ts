@@ -38,7 +38,7 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: { [category: string]: CallsUsageDto[] };
+        let usages: { [category: string]: ReadonlyArray<CallsUsageDto> };
 
         usagesService.getCallsUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -94,7 +94,7 @@ describe('UsagesService', () => {
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: StorageUsageDto[];
+        let usages: ReadonlyArray<StorageUsageDto>;
 
         usagesService.getStorageUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;

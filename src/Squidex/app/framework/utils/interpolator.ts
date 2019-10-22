@@ -16,7 +16,7 @@ export function interpolate(pattern: string, value?: any, shortcut?: string, fal
 
         const path = match.substr(2, match.length - 3).split('.');
 
-        for (let segment of path) {
+        for (const segment of path) {
             if (!replaced) {
                 return false;
             }

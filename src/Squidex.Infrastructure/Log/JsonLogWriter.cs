@@ -7,137 +7,136 @@
 
 using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text;
+using System.Text.Json;
 using NodaTime;
 
 namespace Squidex.Infrastructure.Log
 {
     public sealed class JsonLogWriter : IObjectWriter, IArrayWriter
     {
-        private readonly Formatting formatting;
+        private readonly JsonWriterOptions formatting;
         private readonly bool formatLine;
-        private readonly StringWriter textWriter = new StringWriter();
-        private JsonWriter jsonWriter;
+        private readonly MemoryStream stream = new MemoryStream();
+        private readonly StreamReader streamReader;
+        private Utf8JsonWriter jsonWriter;
 
-        public int BufferSize
+        public long BufferSize
         {
-            get { return textWriter.GetStringBuilder().Capacity; }
+            get { return stream.Length; }
         }
 
-        internal JsonLogWriter(Formatting formatting, bool formatLine)
+        internal JsonLogWriter(JsonWriterOptions formatting, bool formatLine)
         {
             this.formatLine = formatLine;
             this.formatting = formatting;
+
+            streamReader = new StreamReader(stream, Encoding.UTF8);
 
             Start();
         }
 
         private void Start()
         {
-            jsonWriter = new JsonTextWriter(textWriter) { Formatting = formatting };
+            jsonWriter = new Utf8JsonWriter(stream, formatting);
             jsonWriter.WriteStartObject();
         }
 
         internal void Reset()
         {
-            textWriter.GetStringBuilder().Clear();
+            stream.Position = 0;
+            stream.SetLength(0);
 
             Start();
         }
 
         IArrayWriter IArrayWriter.WriteValue(string value)
         {
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteStringValue(value);
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(double value)
         {
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteNumberValue(value);
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(long value)
         {
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteNumberValue(value);
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(bool value)
         {
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteBooleanValue(value);
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(Instant value)
         {
-            jsonWriter.WriteValue(value.ToString());
+            jsonWriter.WriteStringValue(value.ToString());
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(TimeSpan value)
         {
-            jsonWriter.WriteValue(value.ToString());
+            jsonWriter.WriteStringValue(value.ToString());
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, string value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteString(property, value);
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, double value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteNumber(property, value);
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, long value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteNumber(property, value);
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, bool value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteBoolean(property, value);
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, Instant value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value.ToString());
+            jsonWriter.WriteString(property, value.ToString());
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteProperty(string property, TimeSpan value)
         {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value.ToString());
+            jsonWriter.WriteString(property, value.ToString());
 
             return this;
         }
 
         IObjectWriter IObjectWriter.WriteObject(string property, Action<IObjectWriter> objectWriter)
         {
-            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WritePropertyName(property);
             jsonWriter.WriteStartObject();
 
             objectWriter?.Invoke(this);
@@ -149,7 +148,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteObject<T>(string property, T context, Action<T, IObjectWriter> objectWriter)
         {
-            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WritePropertyName(property);
             jsonWriter.WriteStartObject();
 
             objectWriter?.Invoke(context, this);
@@ -161,7 +160,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteArray(string property, Action<IArrayWriter> arrayWriter)
         {
-            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WritePropertyName(property);
             jsonWriter.WriteStartArray();
 
             arrayWriter?.Invoke(this);
@@ -173,7 +172,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteArray<T>(string property, T context, Action<T, IArrayWriter> arrayWriter)
         {
-            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WritePropertyName(property);
             jsonWriter.WriteStartArray();
 
             arrayWriter?.Invoke(context, this);
@@ -205,26 +204,22 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
-        private static string Format(string property)
-        {
-            if (ReferenceEquals(string.IsInterned(property), property))
-            {
-                return property;
-            }
-
-            return property.ToCamelCase();
-        }
-
         public override string ToString()
         {
             jsonWriter.WriteEndObject();
+            jsonWriter.Flush();
+
+            stream.Position = 0;
+            streamReader.DiscardBufferedData();
+
+            var json = streamReader.ReadToEnd();
 
             if (formatLine)
             {
-                textWriter.WriteLine();
+                json += Environment.NewLine;
             }
 
-            return textWriter.ToString();
+            return json;
         }
     }
 }

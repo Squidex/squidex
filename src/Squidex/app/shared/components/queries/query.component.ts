@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
+    LanguageDto,
     Query,
     QueryModel,
     QuerySorting
@@ -12,7 +13,7 @@ import {
         <div>
             <h4>Filter</h4>
 
-            <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model"
+            <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
                 (change)="emitQueryChange()">
             </sqx-filter-logical>
 
@@ -33,6 +34,9 @@ import {
 export class QueryComponent {
     @Output()
     public queryChange = new EventEmitter<Query>();
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public model: QueryModel;

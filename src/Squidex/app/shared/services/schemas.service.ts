@@ -28,7 +28,7 @@ import {
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export type SchemasDto = {
-    readonly items: SchemaDto[];
+    readonly items: ReadonlyArray<SchemaDto>;
 
     readonly canCreate: boolean;
 } & Resource;
@@ -82,9 +82,9 @@ export class SchemaDto {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
-    public readonly listFields: RootFieldDto[];
-    public readonly listFieldsEditable: RootFieldDto[];
-    public readonly referenceFields: RootFieldDto[];
+    public readonly listFields: ReadonlyArray<RootFieldDto>;
+    public readonly listFieldsEditable: ReadonlyArray<RootFieldDto>;
+    public readonly referenceFields: ReadonlyArray<RootFieldDto>;
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
@@ -95,7 +95,7 @@ export class SchemaDetailsDto extends SchemaDto {
         lastModified: DateTime,
         lastModifiedBy: string,
         version: Version,
-        public readonly fields: RootFieldDto[] = [],
+        public readonly fields: ReadonlyArray<RootFieldDto> = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {
@@ -123,6 +123,8 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 
     public export(): any {
+        const fieldKeys = ['fieldId', '_links', 'parentFieldId'];
+
         const cleanup = (source: any, ...exclude: string[]): any => {
             const clone = {};
 
@@ -141,7 +143,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
         const result: any = {
             fields: this.fields.map(field => {
-                const copy = cleanup(field, 'fieldId', '_links');
+                const copy = cleanup(field, ...fieldKeys);
 
                 copy.properties = cleanup(field.properties);
 
@@ -150,7 +152,7 @@ export class SchemaDetailsDto extends SchemaDto {
                         delete copy['nested'];
                     } else {
                         copy.nested = field.nested.map(nestedField => {
-                            const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
+                            const nestedCopy = cleanup(nestedField, ...fieldKeys);
 
                             nestedCopy.properties = cleanup(nestedField.properties);
 
@@ -182,7 +184,7 @@ export class FieldDto {
     public readonly canUpdate: boolean;
 
     public get isInlineEditable(): boolean {
-        return !this.isDisabled && this.properties['inlineEditable'] === true;
+        return !this.isDisabled && this.rawProperties.inlineEditable === true;
     }
 
     public get displayName() {
@@ -191,6 +193,10 @@ export class FieldDto {
 
     public get displayPlaceholder() {
         return this.properties.placeholder || '';
+    }
+
+    public get rawProperties(): any {
+        return this.properties;
     }
 
     constructor(links: ResourceLinks,
@@ -233,14 +239,14 @@ export class RootFieldDto extends FieldDto {
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false,
-        public readonly nested: NestedFieldDto[] = []
+        public readonly nested: ReadonlyArray<NestedFieldDto> = []
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
 }
 
 const NONE_FIELD = new RootFieldDto({}, -1, '', createProperties('String'), 'invariant');
-const NONE_FIELDS = [NONE_FIELD];
+const NONE_FIELDS: ReadonlyArray<any> = [NONE_FIELD];
 
 export class NestedFieldDto extends FieldDto {
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
@@ -256,7 +262,8 @@ export class NestedFieldDto extends FieldDto {
 export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
-        public readonly hints?: string
+        public readonly hints?: string,
+        public readonly tags?: ReadonlyArray<string>
     ) {
     }
 }
@@ -269,7 +276,7 @@ export interface AddFieldDto {
 
 export interface CreateSchemaDto {
     readonly name: string;
-    readonly fields?: RootFieldDto[];
+    readonly fields?: ReadonlyArray<RootFieldDto>;
     readonly properties?: SchemaPropertiesDto;
     readonly isSingleton?: boolean;
 }
@@ -454,7 +461,7 @@ export class SchemasService {
             pretifyError('Failed to add field. Please reload.'));
     }
 
-    public putFieldOrdering(appName: string, resource: Resource, dto: number[], version: Version): Observable<SchemaDetailsDto> {
+    public putFieldOrdering(appName: string, resource: Resource, dto: ReadonlyArray<number>, version: Version): Observable<SchemaDetailsDto> {
         const link = resource._links['fields/order'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -595,7 +602,7 @@ function parseSchemas(response: any) {
             item.id,
             item.name,
             item.category,
-            new SchemaPropertiesDto(item.properties.label, item.properties.hints),
+            new SchemaPropertiesDto(item.properties.label, item.properties.hints, item.properties.tags),
             item.isSingleton,
             item.isPublished,
             DateTime.parseISO_UTC(item.created), item.createdBy,
@@ -608,44 +615,9 @@ function parseSchemas(response: any) {
 }
 
 function parseSchemaWithDetails(response: any) {
-    const fields = response.fields.map((item: any) => {
-        const propertiesDto =
-            createProperties(
-                item.properties.fieldType,
-                item.properties);
+    const fields = response.fields.map((item: any) => parseField(item));
 
-        let nested: NestedFieldDto[] | null = null;
-
-        if (item.nested && item.nested.length > 0) {
-            nested = item.nested.map((nestedItem: any) => {
-                const nestedPropertiesDto =
-                    createProperties(
-                        nestedItem.properties.fieldType,
-                        nestedItem.properties);
-
-                return new NestedFieldDto(nestedItem._links,
-                    nestedItem.fieldId,
-                    nestedItem.name,
-                    nestedPropertiesDto,
-                    item.fieldId,
-                    nestedItem.isLocked,
-                    nestedItem.isHidden,
-                    nestedItem.isDisabled);
-            });
-        }
-
-        return new RootFieldDto(item._links,
-            item.fieldId,
-            item.name,
-            propertiesDto,
-            item.partitioning,
-            item.isLocked,
-            item.isHidden,
-            item.isDisabled,
-            nested || []);
-    });
-
-    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
+    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints, response.properties.tags);
 
     return new SchemaDetailsDto(response._links,
         response.id,
@@ -660,4 +632,41 @@ function parseSchemaWithDetails(response: any) {
         fields,
         response.scripts || {},
         response.previewUrls || {});
+}
+
+export function parseField(item: any) {
+    const propertiesDto =
+        createProperties(
+            item.properties.fieldType,
+            item.properties);
+
+    let nested: NestedFieldDto[] | null = null;
+
+    if (item.nested && item.nested.length > 0) {
+        nested = item.nested.map((nestedItem: any) => {
+            const nestedPropertiesDto =
+                createProperties(
+                    nestedItem.properties.fieldType,
+                    nestedItem.properties);
+
+            return new NestedFieldDto(nestedItem._links,
+                nestedItem.fieldId,
+                nestedItem.name,
+                nestedPropertiesDto,
+                item.fieldId,
+                nestedItem.isLocked,
+                nestedItem.isHidden,
+                nestedItem.isDisabled);
+        });
+    }
+
+    return new RootFieldDto(item._links,
+        item.fieldId,
+        item.name,
+        propertiesDto,
+        item.partitioning,
+        item.isLocked,
+        item.isHidden,
+        item.isDisabled,
+        nested || []);
 }

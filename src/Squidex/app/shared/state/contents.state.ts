@@ -12,7 +12,6 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import {
     DialogService,
     ErrorDto,
-    ImmutableArray,
     Pager,
     shareSubscribed,
     State,
@@ -29,7 +28,7 @@ import { SchemasState } from './schemas.state';
 
 interface Snapshot {
     // The current comments.
-    contents: ImmutableArray<ContentDto>;
+    contents: ReadonlyArray<ContentDto>;
 
     // The pagination information.
     contentsPager: Pager;
@@ -44,7 +43,7 @@ interface Snapshot {
     isLoaded?: boolean;
 
     // The statuses.
-    statuses?: StatusInfo[];
+    statuses?: ReadonlyArray<StatusInfo>;
 
     // The selected content.
     selectedContent?: ContentDto | null;
@@ -57,7 +56,7 @@ interface Snapshot {
 }
 
 function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
-    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
+    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version.eq(rhs.version));
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
@@ -96,7 +95,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.empty(), contentsPager: new Pager(0), contentsQueryJson: '' });
+        super({ contents: [], contentsPager: new Pager(0), contentsQueryJson: '' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -144,17 +143,20 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private loadInternalCore(isReload = false) {
+        if (!this.appName) {
+            return empty();
+        }
+
         return this.contentsService.getContents(this.appName, this.schemaName,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined).pipe(
-            tap(({ total, items, canCreate, canCreateAndPublish, statuses }) => {
+            tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
 
                 return this.next(s => {
-                    const contents = ImmutableArray.of(items);
                     const contentsPager = s.contentsPager.setCount(total);
 
                     statuses = s.statuses || statuses;
@@ -189,7 +191,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('Content created successfully.');
 
                 return this.next(s => {
-                    const contents = s.contents.pushFront(payload);
+                    const contents = [payload, ...s.contents];
                     const contentsPager = s.contentsPager.incrementCount();
 
                     return { ...s, contents, contentsPager };
@@ -198,7 +200,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public changeManyStatus(contents: ContentDto[], status: string, dueTime: string | null): Observable<any> {
+    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
         return forkJoin(
             contents.map(c =>
                 this.contentsService.putStatus(this.appName, c, status, dueTime, c.version).pipe(
@@ -216,7 +218,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public deleteMany(contents: ContentDto[]): Observable<any> {
+    public deleteMany(contents: ReadonlyArray<ContentDto>): Observable<any> {
         return forkJoin(
             contents.map(c =>
                 this.contentsService.deleteContent(this.appName, c, c.version).pipe(
@@ -369,7 +371,7 @@ export class ManualContentsState extends ContentsStateBase {
 
 export type ContentQuery =  { color: string; } & SavedQuery;
 
-function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
+function buildQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<ContentQuery> {
     return statuses ? statuses.map(s => buildQuery(s)) : [];
 }
 

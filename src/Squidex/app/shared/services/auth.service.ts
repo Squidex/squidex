@@ -22,7 +22,7 @@ import {
 } from '@app/framework';
 
 export class Profile {
-    public readonly permissions: string[];
+    public permissions: ReadonlyArray<string>;
 
     public get id(): string {
         return this.user.profile['sub'];
@@ -70,11 +70,11 @@ export class Profile {
 
     }
 
-    private getPermission(): string[] {
+    private getPermission(): ReadonlyArray<string> {
         const group = this.decodedToken['group'];
 
         const adminUserGroup = ['ICIS_Darwin', 'ICIS_AppSupport', 'RBI-QHS-SECURITY-ICIS-APPLICATIONS-SUPPORT'];
-        const adminPermissions = ['squidex.*', 'squidex.admin.*', 'squidex.apps.commentary.*'];
+        const adminPermissions: ReadonlyArray<string> = ['squidex.*', 'squidex.admin.*', 'squidex.apps.commentary.*'];
 
         if (Types.isArrayOfString(group) && group.some(item => adminUserGroup.includes(item))) {
             return adminPermissions;

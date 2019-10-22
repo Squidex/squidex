@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -34,6 +34,12 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public noBorder = false;
+
+    @Input()
+    public height = 0;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
@@ -69,6 +75,10 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
             .subscribe(() => {
                 this.changeValue();
             });
+
+        if (this.height) {
+            this.editor.nativeElement.style.height = `${this.height}px`;
+        }
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

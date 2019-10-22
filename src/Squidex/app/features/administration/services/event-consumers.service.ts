@@ -22,7 +22,7 @@ export class EventConsumersDto {
     public readonly _links: ResourceLinks;
 
     constructor(
-        public readonly items: EventConsumerDto[], links?: ResourceLinks
+        public readonly items: ReadonlyArray<EventConsumerDto>, links?: ResourceLinks
     ) {
         this._links = links || {};
     }

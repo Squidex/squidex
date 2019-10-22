@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
@@ -30,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new ArrayFieldPropertiesDto());
         }
 
+        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
+        {
+            return SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
+        }
+
         public FieldPropertiesDto Visit(BooleanFieldProperties properties)
         {
             return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());
@@ -50,50 +54,29 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new JsonFieldPropertiesDto());
         }
 
+        public FieldPropertiesDto Visit(NumberFieldProperties properties)
+        {
+            return SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
+        }
+
         public FieldPropertiesDto Visit(ReferencesFieldProperties properties)
         {
             return SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
         }
 
-        public FieldPropertiesDto Visit(UIFieldProperties properties)
+        public FieldPropertiesDto Visit(StringFieldProperties properties)
         {
-            return SimpleMapper.Map(properties, new UIFieldPropertiesDto());
+            return SimpleMapper.Map(properties, new StringFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(TagsFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
         }
 
-        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
+        public FieldPropertiesDto Visit(UIFieldProperties properties)
         {
-            var result = SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
-
-            result.AllowedExtensions = properties.AllowedExtensions?.ToArray();
-
-            return result;
-        }
-
-        public FieldPropertiesDto Visit(NumberFieldProperties properties)
-        {
-            var result = SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
-        }
-
-        public FieldPropertiesDto Visit(StringFieldProperties properties)
-        {
-            var result = SimpleMapper.Map(properties, new StringFieldPropertiesDto());
-
-            result.AllowedValues = properties.AllowedValues?.ToArray();
-
-            return result;
+            return SimpleMapper.Map(properties, new UIFieldPropertiesDto());
         }
     }
 }

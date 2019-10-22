@@ -1,11 +1,11 @@
 {
+  "extends": ["tslint-immutable"],
   "rulesDirectory": [
     "node_modules/codelyzer",
     "node_modules/rxjs-tslint"
   ],
   "rules": {
     "angular-whitespace": false,
-    "banana-in-box": true,
     "class-name": true,
     "comment-format": [
       true,
@@ -43,7 +43,6 @@
     ],
     "no-access-missing-member": false,
     "no-arg": true,
-    "no-attribute-parameter-decorator": true,
     "no-bitwise": true,
     "no-consecutive-blank-lines": true,
     "no-console": [
@@ -99,6 +98,10 @@
       "single"
     ],
     "radix": true,
+    "readonly-array": [
+      true,
+      "ignore-local"
+    ],
     "rxjs-collapse-imports": true,
     "rxjs-proper-imports": true,
     "semicolon": [
@@ -128,12 +131,8 @@
         "variable-declaration": "nospace"
       }
     ],
-    "use-host-property-decorator": true,
-    "use-input-property-decorator": true,
     "use-life-cycle-interface": true,
-    "use-output-property-decorator": true,
     "use-pipe-transform-interface": true,
-    "use-view-encapsulation": true,
     "variable-name": false,
     "whitespace": [
       true,

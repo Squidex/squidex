@@ -1415,7 +1415,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostFieldAsync(string app, string name, AddFieldDto request);
+        System.Threading.Tasks.Task<SchemaDetailsDto> PostFieldAsync(string app, string name, AddFieldDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Add a schema field.</summary>
@@ -1424,7 +1424,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostFieldAsync(string app, string name, AddFieldDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SchemaDetailsDto> PostFieldAsync(string app, string name, AddFieldDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Add a nested schema field.</summary>
         /// <param name="app">The name of the app.</param>
@@ -1433,7 +1433,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request);
+        System.Threading.Tasks.Task<SchemaDetailsDto> PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Add a nested schema field.</summary>
@@ -1443,7 +1443,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SchemaDetailsDto> PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Reorders the fields.</summary>
         /// <param name="app">The name of the app.</param>
@@ -1942,7 +1942,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostFieldAsync(string app, string name, AddFieldDto request)
+        public System.Threading.Tasks.Task<SchemaDetailsDto> PostFieldAsync(string app, string name, AddFieldDto request)
         {
             return PostFieldAsync(app, name, request, System.Threading.CancellationToken.None);
         }
@@ -1954,7 +1954,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostFieldAsync(string app, string name, AddFieldDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<SchemaDetailsDto> PostFieldAsync(string app, string name, AddFieldDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -1976,6 +1976,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -1997,7 +1998,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<SchemaDetailsDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -2029,6 +2031,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(SchemaDetailsDto);
                     }
                     finally
                     {
@@ -2049,7 +2053,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request)
+        public System.Threading.Tasks.Task<SchemaDetailsDto> PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request)
         {
             return PostNestedFieldAsync(app, name, parentId, request, System.Threading.CancellationToken.None);
         }
@@ -2062,7 +2066,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>Schema field created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<SchemaDetailsDto> PostNestedFieldAsync(string app, string name, long parentId, AddFieldDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -2088,6 +2092,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -2109,7 +2114,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<SchemaDetailsDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -2141,6 +2147,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(SchemaDetailsDto);
                     }
                     finally
                     {
@@ -5116,7 +5124,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>Rule updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutRuleAsync(string app, string id, UpdateRuleDto request);
+        System.Threading.Tasks.Task<RuleDto> PutRuleAsync(string app, string id, UpdateRuleDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Update a rule.</summary>
@@ -5125,7 +5133,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>Rule updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutRuleAsync(string app, string id, UpdateRuleDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RuleDto> PutRuleAsync(string app, string id, UpdateRuleDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Delete a rule.</summary>
         /// <param name="app">The name of the app.</param>
@@ -5172,22 +5180,39 @@ namespace Cosmos.ClientLibrary.Management
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<RuleDto> DisableRuleAsync(string app, string id, System.Threading.CancellationToken cancellationToken);
     
+        /// <summary>Trigger a rule.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to disable.</param>
+        /// <returns>Rule triggered.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task TriggerRuleAsync(string app, string id);
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Trigger a rule.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to disable.</param>
+        /// <returns>Rule triggered.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task TriggerRuleAsync(string app, string id, System.Threading.CancellationToken cancellationToken);
+    
         /// <summary>Get rule events.</summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ruleId">The optional rule id to filter to events.</param>
         /// <param name="skip">The number of events to skip.</param>
         /// <param name="take">The number of events to take.</param>
         /// <returns>Rule events returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, int? skip, int? take);
+        System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, System.Guid? ruleId, int? skip, int? take);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get rule events.</summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ruleId">The optional rule id to filter to events.</param>
         /// <param name="skip">The number of events to skip.</param>
         /// <param name="take">The number of events to take.</param>
         /// <returns>Rule events returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, int? skip, int? take, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, System.Guid? ruleId, int? skip, int? take, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Retry the event immediately.</summary>
         /// <param name="app">The name of the app.</param>
@@ -5511,7 +5536,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>Rule updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PutRuleAsync(string app, string id, UpdateRuleDto request)
+        public System.Threading.Tasks.Task<RuleDto> PutRuleAsync(string app, string id, UpdateRuleDto request)
         {
             return PutRuleAsync(app, id, request, System.Threading.CancellationToken.None);
         }
@@ -5523,7 +5548,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>Rule updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PutRuleAsync(string app, string id, UpdateRuleDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RuleDto> PutRuleAsync(string app, string id, UpdateRuleDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -5545,6 +5570,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -5564,15 +5590,16 @@ namespace Cosmos.ClientLibrary.Management
                         ProcessResponse(client_, response_);
     
                         var status_ = ((int)response_.StatusCode).ToString();
-                        if (status_ == "400") 
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<RuleDto>(response_, headers_).ConfigureAwait(false);
-                            throw new CosmosManagementException<RuleDto>("Rule is not valid.", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
                         if (status_ == "200") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<RuleDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == "400") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Rule is not valid.", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == "404") 
@@ -5592,6 +5619,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(RuleDto);
                     }
                     finally
                     {
@@ -5894,25 +5923,117 @@ namespace Cosmos.ClientLibrary.Management
             }
         }
     
+        /// <summary>Trigger a rule.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to disable.</param>
+        /// <returns>Rule triggered.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task TriggerRuleAsync(string app, string id)
+        {
+            return TriggerRuleAsync(app, id, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Trigger a rule.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to disable.</param>
+        /// <returns>Rule triggered.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task TriggerRuleAsync(string app, string id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (app == null)
+                throw new System.ArgumentNullException("app");
+    
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("apps/{app}/rules/{id}/trigger");
+            urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "204") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == "404") 
+                        {
+                            string responseText_ = ( response_.Content == null ) ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new CosmosManagementException("Rule or app not found.", (int)response_.StatusCode, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == "500") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Operation failed", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
         /// <summary>Get rule events.</summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ruleId">The optional rule id to filter to events.</param>
         /// <param name="skip">The number of events to skip.</param>
         /// <param name="take">The number of events to take.</param>
         /// <returns>Rule events returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, int? skip, int? take)
+        public System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, System.Guid? ruleId, int? skip, int? take)
         {
-            return GetEventsAsync(app, skip, take, System.Threading.CancellationToken.None);
+            return GetEventsAsync(app, ruleId, skip, take, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get rule events.</summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ruleId">The optional rule id to filter to events.</param>
         /// <param name="skip">The number of events to skip.</param>
         /// <param name="take">The number of events to take.</param>
         /// <returns>Rule events returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, int? skip, int? take, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RuleEventsDto> GetEventsAsync(string app, System.Guid? ruleId, int? skip, int? take, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -5920,6 +6041,10 @@ namespace Cosmos.ClientLibrary.Management
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("apps/{app}/rules/events?");
             urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+            if (ruleId != null) 
+            {
+                urlBuilder_.Append("ruleId=").Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
             if (skip != null) 
             {
                 urlBuilder_.Append("skip=").Append(System.Uri.EscapeDataString(ConvertToString(skip, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -6607,13 +6732,13 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>Get general info status of the API.</summary>
         /// <returns>Infos returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> InfoAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> GetInfoAsync();
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get general info status of the API.</summary>
         /// <returns>Infos returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> InfoAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> GetInfoAsync(System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get ping status of the API.</summary>
         /// <returns>Service ping successful.</returns>
@@ -6668,16 +6793,16 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>Get general info status of the API.</summary>
         /// <returns>Infos returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> InfoAsync()
+        public System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> GetInfoAsync()
         {
-            return InfoAsync(System.Threading.CancellationToken.None);
+            return GetInfoAsync(System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get general info status of the API.</summary>
         /// <returns>Infos returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> InfoAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<string, string>> GetInfoAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("info");
@@ -8296,26 +8421,26 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>Get current restore status.</summary>
         /// <returns>Status returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RestoreJobDto> GetJobAsync();
+        System.Threading.Tasks.Task<RestoreJobDto> GetRestoreJobAsync();
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get current restore status.</summary>
         /// <returns>Status returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RestoreJobDto> GetJobAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RestoreJobDto> GetRestoreJobAsync(System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Restore a backup.</summary>
         /// <param name="request">The backup to restore.</param>
         /// <returns>Restore operation started.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostRestoreAsync(RestoreRequestDto request);
+        System.Threading.Tasks.Task PostRestoreJobAsync(RestoreRequestDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Restore a backup.</summary>
         /// <param name="request">The backup to restore.</param>
         /// <returns>Restore operation started.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostRestoreAsync(RestoreRequestDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task PostRestoreJobAsync(RestoreRequestDto request, System.Threading.CancellationToken cancellationToken);
     
     }
     
@@ -8701,16 +8826,16 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>Get current restore status.</summary>
         /// <returns>Status returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<RestoreJobDto> GetJobAsync()
+        public System.Threading.Tasks.Task<RestoreJobDto> GetRestoreJobAsync()
         {
-            return GetJobAsync(System.Threading.CancellationToken.None);
+            return GetRestoreJobAsync(System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get current restore status.</summary>
         /// <returns>Status returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<RestoreJobDto> GetJobAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RestoreJobDto> GetRestoreJobAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("apps/restore");
@@ -8777,9 +8902,9 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The backup to restore.</param>
         /// <returns>Restore operation started.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostRestoreAsync(RestoreRequestDto request)
+        public System.Threading.Tasks.Task PostRestoreJobAsync(RestoreRequestDto request)
         {
-            return PostRestoreAsync(request, System.Threading.CancellationToken.None);
+            return PostRestoreJobAsync(request, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -8787,7 +8912,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">The backup to restore.</param>
         /// <returns>Restore operation started.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostRestoreAsync(RestoreRequestDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task PostRestoreJobAsync(RestoreRequestDto request, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("apps/restore");
@@ -8950,14 +9075,15 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, int? dl, int? width, int? height, int? quality, string mode);
+        System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get the asset content.</summary>
@@ -8965,41 +9091,42 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, int? dl, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get the asset content.</summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, string more, long? version, int? dl, int? width, int? height, int? quality, string mode);
+        System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get the asset content.</summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, string more, long? version, int? dl, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get assets tags.</summary>
         /// <param name="app">The name of the app.</param>
@@ -9047,7 +9174,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="filter">Optional OData filter definition.</param>
         /// <returns>Asset created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostAssetAsync(string app, double? top, double? skip, string orderby, string filter);
+        System.Threading.Tasks.Task<AssetDto> PostAssetAsync(string app, double? top, double? skip, string orderby, string filter);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Upload a new asset.</summary>
@@ -9058,7 +9185,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="filter">Optional OData filter definition.</param>
         /// <returns>Asset created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostAssetAsync(string app, double? top, double? skip, string orderby, string filter, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<AssetDto> PostAssetAsync(string app, double? top, double? skip, string orderby, string filter, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get an asset by id.</summary>
         /// <param name="app">The name of the app.</param>
@@ -9153,16 +9280,17 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, int? dl, int? width, int? height, int? quality, string mode)
+        public System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode)
         {
-            return GetAssetContentBySlugAsync(app, idOrSlug, more, version, dl, width, height, quality, mode, System.Threading.CancellationToken.None);
+            return GetAssetContentBySlugAsync(app, idOrSlug, more, version, cache, download, width, height, quality, mode, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -9171,14 +9299,15 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, int? dl, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> GetAssetContentBySlugAsync(string app, string idOrSlug, string more, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -9198,9 +9327,13 @@ namespace Cosmos.ClientLibrary.Management
             {
                 urlBuilder_.Append("version=").Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (dl != null) 
+            if (cache != null) 
             {
-                urlBuilder_.Append("dl=").Append(System.Uri.EscapeDataString(ConvertToString(dl, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append("cache=").Append(System.Uri.EscapeDataString(ConvertToString(cache, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (download != null) 
+            {
+                urlBuilder_.Append("download=").Append(System.Uri.EscapeDataString(ConvertToString(download, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             if (width != null) 
             {
@@ -9288,51 +9421,51 @@ namespace Cosmos.ClientLibrary.Management
     
         /// <summary>Get the asset content.</summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, string more, long? version, int? dl, int? width, int? height, int? quality, string mode)
+        public System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode)
         {
-            return GetAssetContentAsync(id, more, version, dl, width, height, quality, mode, System.Threading.CancellationToken.None);
+            return GetAssetContentAsync(id, version, cache, download, width, height, quality, mode, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get the asset content.</summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
-        /// <param name="dl">Set it to 0 to prevent download.</param>
+        /// <param name="cache">The cache duration in seconds.</param>
+        /// <param name="download">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>Asset found and content or (resized) image returned.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, string more, long? version, int? dl, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> GetAssetContentAsync(string id, long? version, long? cache, int? download, int? width, int? height, int? quality, string mode, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
     
-            if (more == null)
-                throw new System.ArgumentNullException("more");
-    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("assets/{id}/{more}?");
+            urlBuilder_.Append("assets/{id}?");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-            urlBuilder_.Replace("{more}", System.Uri.EscapeDataString(ConvertToString(more, System.Globalization.CultureInfo.InvariantCulture)));
             if (version != null) 
             {
                 urlBuilder_.Append("version=").Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (dl != null) 
+            if (cache != null) 
             {
-                urlBuilder_.Append("dl=").Append(System.Uri.EscapeDataString(ConvertToString(dl, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append("cache=").Append(System.Uri.EscapeDataString(ConvertToString(cache, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (download != null) 
+            {
+                urlBuilder_.Append("download=").Append(System.Uri.EscapeDataString(ConvertToString(download, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             if (width != null) 
             {
@@ -9637,7 +9770,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="filter">Optional OData filter definition.</param>
         /// <returns>Asset created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostAssetAsync(string app, double? top, double? skip, string orderby, string filter)
+        public System.Threading.Tasks.Task<AssetDto> PostAssetAsync(string app, double? top, double? skip, string orderby, string filter)
         {
             return PostAssetAsync(app, top, skip, orderby, filter, System.Threading.CancellationToken.None);
         }
@@ -9651,7 +9784,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="filter">Optional OData filter definition.</param>
         /// <returns>Asset created.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostAssetAsync(string app, double? top, double? skip, string orderby, string filter, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<AssetDto> PostAssetAsync(string app, double? top, double? skip, string orderby, string filter, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -9684,6 +9817,7 @@ namespace Cosmos.ClientLibrary.Management
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -9705,7 +9839,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<AssetDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "404") 
@@ -9731,6 +9866,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(AssetDto);
                     }
                     finally
                     {
@@ -10244,7 +10381,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>Client generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostClientAsync(string app, CreateClientDto request);
+        System.Threading.Tasks.Task<ClientsDto> PostClientAsync(string app, CreateClientDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Create a new app client.</summary>
@@ -10252,7 +10389,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>Client generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostClientAsync(string app, CreateClientDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ClientsDto> PostClientAsync(string app, CreateClientDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Updates an app client.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10304,7 +10441,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostContributorAsync(string app, AssignContributorDto request);
+        System.Threading.Tasks.Task<ContributorsDto> PostContributorAsync(string app, AssignContributorDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Assign contributor to app.</summary>
@@ -10312,7 +10449,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostContributorAsync(string app, AssignContributorDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ContributorsDto> PostContributorAsync(string app, AssignContributorDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Remove contributor from app.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10407,7 +10544,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>Pattern generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostPatternAsync(string app, UpdatePatternDto request);
+        System.Threading.Tasks.Task<PatternsDto> PostPatternAsync(string app, UpdatePatternDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Create a new app pattern.</summary>
@@ -10415,7 +10552,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>Pattern generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostPatternAsync(string app, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PatternsDto> PostPatternAsync(string app, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Update an existing app pattern.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10423,7 +10560,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>Pattern updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PatternsDto> UpdatePatternAsync(string app, string id, UpdatePatternDto request);
+        System.Threading.Tasks.Task<PatternsDto> PutPatternAsync(string app, string id, UpdatePatternDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Update an existing app pattern.</summary>
@@ -10432,7 +10569,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>Pattern updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PatternsDto> UpdatePatternAsync(string app, string id, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PatternsDto> PutPatternAsync(string app, string id, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Delete an existing app pattern.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10467,7 +10604,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostRoleAsync(string app, AddRoleDto request);
+        System.Threading.Tasks.Task<RolesDto> PostRoleAsync(string app, AddRoleDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Add role to app.</summary>
@@ -10475,7 +10612,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostRoleAsync(string app, AddRoleDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RolesDto> PostRoleAsync(string app, AddRoleDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get app permissions.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10496,7 +10633,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role to be updated for the app.</param>
         /// <returns>Role updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RolesDto> UpdateRoleAsync(string app, string name, UpdateRoleDto request);
+        System.Threading.Tasks.Task<RolesDto> PutRoleAsync(string app, string name, UpdateRoleDto request);
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Update an existing app role.</summary>
@@ -10505,7 +10642,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role to be updated for the app.</param>
         /// <returns>Role updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RolesDto> UpdateRoleAsync(string app, string name, UpdateRoleDto request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RolesDto> PutRoleAsync(string app, string name, UpdateRoleDto request, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Remove role from app.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10546,6 +10683,21 @@ namespace Cosmos.ClientLibrary.Management
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AppDto> PostAppAsync(CreateAppDto request, System.Threading.CancellationToken cancellationToken);
     
+        /// <summary>Update the app.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The values to update.</param>
+        /// <returns>App updated.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AppDto> UpdateAppAsync(string app, UpdateAppDto request);
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Update the app.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The values to update.</param>
+        /// <returns>App updated.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AppDto> UpdateAppAsync(string app, UpdateAppDto request, System.Threading.CancellationToken cancellationToken);
+    
         /// <summary>Archive the app.</summary>
         /// <param name="app">The name of the app to archive.</param>
         /// <returns>App archived.</returns>
@@ -10558,6 +10710,45 @@ namespace Cosmos.ClientLibrary.Management
         /// <returns>App archived.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
         System.Threading.Tasks.Task DeleteAppAsync(string app, System.Threading.CancellationToken cancellationToken);
+    
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image uploaded.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task UploadImageAsync(string app);
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image uploaded.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task UploadImageAsync(string app, System.Threading.CancellationToken cancellationToken);
+    
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>App image found and content or (resized) image returned.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<FileResponse> GetImageAsync(string app);
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>App image found and content or (resized) image returned.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<FileResponse> GetImageAsync(string app, System.Threading.CancellationToken cancellationToken);
+    
+        /// <summary>Remove the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image removed.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DeleteImageAsync(string app);
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Remove the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image removed.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DeleteImageAsync(string app, System.Threading.CancellationToken cancellationToken);
     
         /// <summary>Get app workflow.</summary>
         /// <param name="app">The name of the app.</param>
@@ -10737,7 +10928,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>Client generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostClientAsync(string app, CreateClientDto request)
+        public System.Threading.Tasks.Task<ClientsDto> PostClientAsync(string app, CreateClientDto request)
         {
             return PostClientAsync(app, request, System.Threading.CancellationToken.None);
         }
@@ -10748,7 +10939,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>Client generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostClientAsync(string app, CreateClientDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<ClientsDto> PostClientAsync(string app, CreateClientDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -10766,6 +10957,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -10787,7 +10979,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ClientsDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -10813,6 +11006,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(ClientsDto);
                     }
                     finally
                     {
@@ -11115,7 +11310,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostContributorAsync(string app, AssignContributorDto request)
+        public System.Threading.Tasks.Task<ContributorsDto> PostContributorAsync(string app, AssignContributorDto request)
         {
             return PostContributorAsync(app, request, System.Threading.CancellationToken.None);
         }
@@ -11126,7 +11321,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostContributorAsync(string app, AssignContributorDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<ContributorsDto> PostContributorAsync(string app, AssignContributorDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -11144,6 +11339,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -11165,7 +11361,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ContributorsDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -11191,6 +11388,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(ContributorsDto);
                     }
                     finally
                     {
@@ -11777,7 +11976,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>Pattern generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostPatternAsync(string app, UpdatePatternDto request)
+        public System.Threading.Tasks.Task<PatternsDto> PostPatternAsync(string app, UpdatePatternDto request)
         {
             return PostPatternAsync(app, request, System.Threading.CancellationToken.None);
         }
@@ -11788,7 +11987,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>Pattern generated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostPatternAsync(string app, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<PatternsDto> PostPatternAsync(string app, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -11806,6 +12005,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -11827,7 +12027,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<PatternsDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -11853,6 +12054,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(PatternsDto);
                     }
                     finally
                     {
@@ -11872,9 +12075,9 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>Pattern updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<PatternsDto> UpdatePatternAsync(string app, string id, UpdatePatternDto request)
+        public System.Threading.Tasks.Task<PatternsDto> PutPatternAsync(string app, string id, UpdatePatternDto request)
         {
-            return UpdatePatternAsync(app, id, request, System.Threading.CancellationToken.None);
+            return PutPatternAsync(app, id, request, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -11884,7 +12087,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>Pattern updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<PatternsDto> UpdatePatternAsync(string app, string id, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<PatternsDto> PutPatternAsync(string app, string id, UpdatePatternDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -12155,7 +12358,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task PostRoleAsync(string app, AddRoleDto request)
+        public System.Threading.Tasks.Task<RolesDto> PostRoleAsync(string app, AddRoleDto request)
         {
             return PostRoleAsync(app, request, System.Threading.CancellationToken.None);
         }
@@ -12166,7 +12369,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role object that needs to be added to the app.</param>
         /// <returns>User assigned to app.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task PostRoleAsync(string app, AddRoleDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RolesDto> PostRoleAsync(string app, AddRoleDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -12184,6 +12387,7 @@ namespace Cosmos.ClientLibrary.Management
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -12205,7 +12409,8 @@ namespace Cosmos.ClientLibrary.Management
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "201") 
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<RolesDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == "400") 
@@ -12231,6 +12436,8 @@ namespace Cosmos.ClientLibrary.Management
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
+            
+                        return default(RolesDto);
                     }
                     finally
                     {
@@ -12337,9 +12544,9 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role to be updated for the app.</param>
         /// <returns>Role updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<RolesDto> UpdateRoleAsync(string app, string name, UpdateRoleDto request)
+        public System.Threading.Tasks.Task<RolesDto> PutRoleAsync(string app, string name, UpdateRoleDto request)
         {
-            return UpdateRoleAsync(app, name, request, System.Threading.CancellationToken.None);
+            return PutRoleAsync(app, name, request, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -12349,7 +12556,7 @@ namespace Cosmos.ClientLibrary.Management
         /// <param name="request">Role to be updated for the app.</param>
         /// <returns>Role updated.</returns>
         /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<RolesDto> UpdateRoleAsync(string app, string name, UpdateRoleDto request, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RolesDto> PutRoleAsync(string app, string name, UpdateRoleDto request, System.Threading.CancellationToken cancellationToken)
         {
             if (app == null)
                 throw new System.ArgumentNullException("app");
@@ -12701,6 +12908,98 @@ namespace Cosmos.ClientLibrary.Management
             }
         }
     
+        /// <summary>Update the app.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The values to update.</param>
+        /// <returns>App updated.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<AppDto> UpdateAppAsync(string app, UpdateAppDto request)
+        {
+            return UpdateAppAsync(app, request, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Update the app.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The values to update.</param>
+        /// <returns>App updated.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<AppDto> UpdateAppAsync(string app, UpdateAppDto request, System.Threading.CancellationToken cancellationToken)
+        {
+            if (app == null)
+                throw new System.ArgumentNullException("app");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("apps/{app}");
+            urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(request, _settings.Value));
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AppDto>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == "404") 
+                        {
+                            string responseText_ = ( response_.Content == null ) ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new CosmosManagementException("App not found.", (int)response_.StatusCode, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == "500") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Operation failed", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+            
+                        return default(AppDto);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
         /// <summary>Archive the app.</summary>
         /// <param name="app">The name of the app to archive.</param>
         /// <returns>App archived.</returns>
@@ -12750,6 +13049,262 @@ namespace Cosmos.ClientLibrary.Management
     
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "204") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == "404") 
+                        {
+                            string responseText_ = ( response_.Content == null ) ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new CosmosManagementException("App not found.", (int)response_.StatusCode, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == "500") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Operation failed", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image uploaded.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task UploadImageAsync(string app)
+        {
+            return UploadImageAsync(app, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image uploaded.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task UploadImageAsync(string app, System.Threading.CancellationToken cancellationToken)
+        {
+            if (app == null)
+                throw new System.ArgumentNullException("app");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("apps/{app}/image");
+            urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == "404") 
+                        {
+                            string responseText_ = ( response_.Content == null ) ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new CosmosManagementException("App not found.", (int)response_.StatusCode, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == "500") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Operation failed", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>App image found and content or (resized) image returned.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<FileResponse> GetImageAsync(string app)
+        {
+            return GetImageAsync(app, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Get the app image.</summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>App image found and content or (resized) image returned.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<FileResponse> GetImageAsync(string app, System.Threading.CancellationToken cancellationToken)
+        {
+            if (app == null)
+                throw new System.ArgumentNullException("app");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("apps/{app}/image");
+            urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200" || status_ == "206") 
+                        {
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse((int)response_.StatusCode, headers_, responseStream_, null, response_); 
+                            client_ = null; response_ = null; // response and client are disposed by FileResponse
+                            return fileResponse_;
+                        }
+                        else
+                        if (status_ == "404") 
+                        {
+                            string responseText_ = ( response_.Content == null ) ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new CosmosManagementException("App not found.", (int)response_.StatusCode, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == "500") 
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorDto>(response_, headers_).ConfigureAwait(false);
+                            throw new CosmosManagementException<ErrorDto>("Operation failed", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new CosmosManagementException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+            
+                        return default(FileResponse);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <summary>Remove the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image removed.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task DeleteImageAsync(string app)
+        {
+            return DeleteImageAsync(app, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Remove the app image.</summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>App image removed.</returns>
+        /// <exception cref="CosmosManagementException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task DeleteImageAsync(string app, System.Threading.CancellationToken cancellationToken)
+        {
+            if (app == null)
+                throw new System.ArgumentNullException("app");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("apps/{app}/image");
+            urlBuilder_.Replace("{app}", System.Uri.EscapeDataString(ConvertToString(app, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
                         {
                             return;
                         }
@@ -13562,6 +14117,18 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("statusColor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatusColor { get; set; }
     
+        /// <summary>The name of the schema.</summary>
+        [Newtonsoft.Json.JsonProperty("schemaName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SchemaName { get; set; }
+    
+        /// <summary>The display name of the schema.</summary>
+        [Newtonsoft.Json.JsonProperty("schemaDisplayName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SchemaDisplayName { get; set; }
+    
+        /// <summary>The reference fields.</summary>
+        [Newtonsoft.Json.JsonProperty("referenceFields", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<FieldDto> ReferenceFields { get; set; }
+    
         /// <summary>The version of the content.</summary>
         [Newtonsoft.Json.JsonProperty("version", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Version { get; set; }
@@ -13621,6 +14188,544 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("scheduledBy", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string ScheduledBy { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class FieldDto : Resource
+    {
+        /// <summary>The id of the field.</summary>
+        [Newtonsoft.Json.JsonProperty("fieldId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long FieldId { get; set; }
+    
+        /// <summary>The name of the field. Must be unique within the schema.</summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z0-9]+(\-[a-z0-9]+)*$")]
+        public string Name { get; set; }
+    
+        /// <summary>Defines if the field is hidden.</summary>
+        [Newtonsoft.Json.JsonProperty("isHidden", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsHidden { get; set; }
+    
+        /// <summary>Defines if the field is locked.</summary>
+        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsLocked { get; set; }
+    
+        /// <summary>Defines if the field is disabled.</summary>
+        [Newtonsoft.Json.JsonProperty("isDisabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsDisabled { get; set; }
+    
+        /// <summary>Defines the partitioning of the field.</summary>
+        [Newtonsoft.Json.JsonProperty("partitioning", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Partitioning { get; set; }
+    
+        /// <summary>The field properties.</summary>
+        [Newtonsoft.Json.JsonProperty("properties", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public FieldPropertiesDto Properties { get; set; }
+    
+        /// <summary>The nested fields.</summary>
+        [Newtonsoft.Json.JsonProperty("nested", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<NestedFieldDto> Nested { get; set; }
+    
+    
+    }
+    
+    [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
+    [JsonInheritanceAttribute("Array", typeof(ArrayFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Assets", typeof(AssetsFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Boolean", typeof(BooleanFieldPropertiesDto))]
+    [JsonInheritanceAttribute("DateTime", typeof(DateTimeFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Geolocation", typeof(GeolocationFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Json", typeof(JsonFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Number", typeof(NumberFieldPropertiesDto))]
+    [JsonInheritanceAttribute("References", typeof(ReferencesFieldPropertiesDto))]
+    [JsonInheritanceAttribute("String", typeof(StringFieldPropertiesDto))]
+    [JsonInheritanceAttribute("Tags", typeof(TagsFieldPropertiesDto))]
+    [JsonInheritanceAttribute("UI", typeof(UIFieldPropertiesDto))]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public abstract partial class FieldPropertiesDto 
+    {
+        /// <summary>Optional label for the editor.</summary>
+        [Newtonsoft.Json.JsonProperty("label", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(100)]
+        public string Label { get; set; }
+    
+        /// <summary>Hints to describe the schema.</summary>
+        [Newtonsoft.Json.JsonProperty("hints", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(1000)]
+        public string Hints { get; set; }
+    
+        /// <summary>Placeholder to show when no value has been entered.</summary>
+        [Newtonsoft.Json.JsonProperty("placeholder", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(100)]
+        public string Placeholder { get; set; }
+    
+        /// <summary>Indicates if the field is required.</summary>
+        [Newtonsoft.Json.JsonProperty("isRequired", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsRequired { get; set; }
+    
+        /// <summary>Determines if the field should be displayed in lists.</summary>
+        [Newtonsoft.Json.JsonProperty("isListField", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsListField { get; set; }
+    
+        /// <summary>Determines if the field should be displayed in reference lists.</summary>
+        [Newtonsoft.Json.JsonProperty("isReferenceField", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsReferenceField { get; set; }
+    
+        /// <summary>Optional url to the editor.</summary>
+        [Newtonsoft.Json.JsonProperty("editorUrl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EditorUrl { get; set; }
+    
+        /// <summary>Tags for automation processes.</summary>
+        [Newtonsoft.Json.JsonProperty("tags", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Tags { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class ArrayFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The minimum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinItems { get; set; }
+    
+        /// <summary>The maximum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxItems { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class AssetsFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The minimum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinItems { get; set; }
+    
+        /// <summary>The maximum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxItems { get; set; }
+    
+        /// <summary>The minimum file size in bytes.</summary>
+        [Newtonsoft.Json.JsonProperty("minSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinSize { get; set; }
+    
+        /// <summary>The maximum file size in bytes.</summary>
+        [Newtonsoft.Json.JsonProperty("maxSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxSize { get; set; }
+    
+        /// <summary>The minimum image width in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("minWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinWidth { get; set; }
+    
+        /// <summary>The maximum image width in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("maxWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxWidth { get; set; }
+    
+        /// <summary>The minimum image height in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("minHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinHeight { get; set; }
+    
+        /// <summary>The maximum image height in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("maxHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxHeight { get; set; }
+    
+        /// <summary>The image aspect width in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("aspectWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? AspectWidth { get; set; }
+    
+        /// <summary>The image aspect height in pixels.</summary>
+        [Newtonsoft.Json.JsonProperty("aspectHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? AspectHeight { get; set; }
+    
+        /// <summary>Defines if the asset must be an image.</summary>
+        [Newtonsoft.Json.JsonProperty("mustBeImage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool MustBeImage { get; set; }
+    
+        /// <summary>True to resolve first image in the content list.</summary>
+        [Newtonsoft.Json.JsonProperty("resolveImage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool ResolveImage { get; set; }
+    
+        /// <summary>The allowed file extensions.</summary>
+        [Newtonsoft.Json.JsonProperty("allowedExtensions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> AllowedExtensions { get; set; }
+    
+        /// <summary>True, if duplicate values are allowed.</summary>
+        [Newtonsoft.Json.JsonProperty("allowDuplicates", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool AllowDuplicates { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class BooleanFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? DefaultValue { get; set; }
+    
+        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
+        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool InlineEditable { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public BooleanFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum BooleanFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Checkbox")]
+        Checkbox = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Toggle")]
+        Toggle = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class DateTimeFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DefaultValue { get; set; }
+    
+        /// <summary>The maximum allowed value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? MaxValue { get; set; }
+    
+        /// <summary>The minimum allowed value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? MinValue { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public DateTimeFieldEditor Editor { get; set; }
+    
+        /// <summary>The calculated default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("calculatedDefaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum DateTimeFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Date")]
+        Date = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"DateTime")]
+        DateTime = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum DateTimeCalculatedDefaultValue
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Now")]
+        Now = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Today")]
+        Today = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class GeolocationFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? DefaultValue { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public GeolocationFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum GeolocationFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Map")]
+        Map = 0,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class JsonFieldPropertiesDto : FieldPropertiesDto
+    {
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class NumberFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? DefaultValue { get; set; }
+    
+        /// <summary>The maximum allowed value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MaxValue { get; set; }
+    
+        /// <summary>The minimum allowed value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MinValue { get; set; }
+    
+        /// <summary>The allowed values for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<double> AllowedValues { get; set; }
+    
+        /// <summary>Indicates if the field value must be unique. Ignored for nested fields and localized fields.</summary>
+        [Newtonsoft.Json.JsonProperty("isUnique", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsUnique { get; set; }
+    
+        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
+        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool InlineEditable { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public NumberFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum NumberFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Input")]
+        Input = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Radio")]
+        Radio = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
+        Dropdown = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Stars")]
+        Stars = 3,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class ReferencesFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The minimum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinItems { get; set; }
+    
+        /// <summary>The maximum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxItems { get; set; }
+    
+        /// <summary>True, if duplicate values are allowed.</summary>
+        [Newtonsoft.Json.JsonProperty("allowDuplicates", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool AllowDuplicates { get; set; }
+    
+        /// <summary>True to resolve references in the content list.</summary>
+        [Newtonsoft.Json.JsonProperty("resolveReference", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool ResolveReference { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public ReferencesFieldEditor Editor { get; set; }
+    
+        /// <summary>The id of the referenced schemas.</summary>
+        [Newtonsoft.Json.JsonProperty("schemaIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<System.Guid> SchemaIds { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum ReferencesFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"List")]
+        List = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
+        Dropdown = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class StringFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The default value for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DefaultValue { get; set; }
+    
+        /// <summary>The pattern to enforce a specific format for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("pattern", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Pattern { get; set; }
+    
+        /// <summary>The validation message for the pattern.</summary>
+        [Newtonsoft.Json.JsonProperty("patternMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PatternMessage { get; set; }
+    
+        /// <summary>The minimum allowed length for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minLength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinLength { get; set; }
+    
+        /// <summary>The maximum allowed length for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxLength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxLength { get; set; }
+    
+        /// <summary>The allowed values for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> AllowedValues { get; set; }
+    
+        /// <summary>Indicates if the field value must be unique. Ignored for nested fields and localized fields.</summary>
+        [Newtonsoft.Json.JsonProperty("isUnique", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsUnique { get; set; }
+    
+        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
+        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool InlineEditable { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public StringFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum StringFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Input")]
+        Input = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Color")]
+        Color = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Markdown")]
+        Markdown = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
+        Dropdown = 3,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Html")]
+        Html = 4,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Radio")]
+        Radio = 5,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"RichText")]
+        RichText = 6,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Slug")]
+        Slug = 7,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"TextArea")]
+        TextArea = 8,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class TagsFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The minimum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MinItems { get; set; }
+    
+        /// <summary>The maximum allowed items for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MaxItems { get; set; }
+    
+        /// <summary>The allowed values for the field value.</summary>
+        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> AllowedValues { get; set; }
+    
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public TagsFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum TagsFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Tags")]
+        Tags = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Checkboxes")]
+        Checkboxes = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
+        Dropdown = 2,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class UIFieldPropertiesDto : FieldPropertiesDto
+    {
+        /// <summary>The editor that is used to manage this field.</summary>
+        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public UIFieldEditor Editor { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public enum UIFieldEditor
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Separator")]
+        Separator = 0,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class NestedFieldDto : Resource
+    {
+        /// <summary>The id of the field.</summary>
+        [Newtonsoft.Json.JsonProperty("fieldId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long FieldId { get; set; }
+    
+        /// <summary>The name of the field. Must be unique within the schema.</summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z0-9]+(\-[a-z0-9]+)*$")]
+        public string Name { get; set; }
+    
+        /// <summary>Defines if the field is hidden.</summary>
+        [Newtonsoft.Json.JsonProperty("isHidden", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsHidden { get; set; }
+    
+        /// <summary>Defines if the field is locked.</summary>
+        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsLocked { get; set; }
+    
+        /// <summary>Defines if the field is disabled.</summary>
+        [Newtonsoft.Json.JsonProperty("isDisabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsDisabled { get; set; }
+    
+        /// <summary>The field properties.</summary>
+        [Newtonsoft.Json.JsonProperty("properties", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public FieldPropertiesDto Properties { get; set; }
     
     
     }
@@ -13837,540 +14942,6 @@ namespace Cosmos.ClientLibrary.Management
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class FieldDto : Resource
-    {
-        /// <summary>The id of the field.</summary>
-        [Newtonsoft.Json.JsonProperty("fieldId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long FieldId { get; set; }
-    
-        /// <summary>The name of the field. Must be unique within the schema.</summary>
-        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z0-9]+(\-[a-z0-9]+)*$")]
-        public string Name { get; set; }
-    
-        /// <summary>Defines if the field is hidden.</summary>
-        [Newtonsoft.Json.JsonProperty("isHidden", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsHidden { get; set; }
-    
-        /// <summary>Defines if the field is locked.</summary>
-        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsLocked { get; set; }
-    
-        /// <summary>Defines if the field is disabled.</summary>
-        [Newtonsoft.Json.JsonProperty("isDisabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsDisabled { get; set; }
-    
-        /// <summary>Defines the partitioning of the field.</summary>
-        [Newtonsoft.Json.JsonProperty("partitioning", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string Partitioning { get; set; }
-    
-        /// <summary>The field properties.</summary>
-        [Newtonsoft.Json.JsonProperty("properties", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public FieldPropertiesDto Properties { get; set; }
-    
-        /// <summary>The nested fields.</summary>
-        [Newtonsoft.Json.JsonProperty("nested", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<NestedFieldDto> Nested { get; set; }
-    
-    
-    }
-    
-    [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
-    [JsonInheritanceAttribute("Array", typeof(ArrayFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Assets", typeof(AssetsFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Boolean", typeof(BooleanFieldPropertiesDto))]
-    [JsonInheritanceAttribute("DateTime", typeof(DateTimeFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Geolocation", typeof(GeolocationFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Json", typeof(JsonFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Number", typeof(NumberFieldPropertiesDto))]
-    [JsonInheritanceAttribute("References", typeof(ReferencesFieldPropertiesDto))]
-    [JsonInheritanceAttribute("String", typeof(StringFieldPropertiesDto))]
-    [JsonInheritanceAttribute("Tags", typeof(TagsFieldPropertiesDto))]
-    [JsonInheritanceAttribute("UI", typeof(UIFieldPropertiesDto))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public abstract partial class FieldPropertiesDto 
-    {
-        /// <summary>Optional label for the editor.</summary>
-        [Newtonsoft.Json.JsonProperty("label", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string Label { get; set; }
-    
-        /// <summary>Hints to describe the schema.</summary>
-        [Newtonsoft.Json.JsonProperty("hints", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(1000)]
-        public string Hints { get; set; }
-    
-        /// <summary>Placeholder to show when no value has been entered.</summary>
-        [Newtonsoft.Json.JsonProperty("placeholder", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string Placeholder { get; set; }
-    
-        /// <summary>Indicates if the field is required.</summary>
-        [Newtonsoft.Json.JsonProperty("isRequired", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsRequired { get; set; }
-    
-        /// <summary>Determines if the field should be displayed in lists.</summary>
-        [Newtonsoft.Json.JsonProperty("isListField", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsListField { get; set; }
-    
-        /// <summary>Determines if the field should be displayed in reference lists.</summary>
-        [Newtonsoft.Json.JsonProperty("isReferenceField", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsReferenceField { get; set; }
-    
-        /// <summary>Optional url to the editor.</summary>
-        [Newtonsoft.Json.JsonProperty("editorUrl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EditorUrl { get; set; }
-    
-        /// <summary>Gets the partitioning of the language, e.g. invariant or language.</summary>
-        [Newtonsoft.Json.JsonProperty("partitioning", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Partitioning { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class ArrayFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The minimum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinItems { get; set; }
-    
-        /// <summary>The maximum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxItems { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class AssetsFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The minimum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinItems { get; set; }
-    
-        /// <summary>The maximum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxItems { get; set; }
-    
-        /// <summary>The minimum file size in bytes.</summary>
-        [Newtonsoft.Json.JsonProperty("minSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinSize { get; set; }
-    
-        /// <summary>The maximum file size in bytes.</summary>
-        [Newtonsoft.Json.JsonProperty("maxSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxSize { get; set; }
-    
-        /// <summary>The minimum image width in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("minWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinWidth { get; set; }
-    
-        /// <summary>The maximum image width in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("maxWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxWidth { get; set; }
-    
-        /// <summary>The minimum image height in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("minHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinHeight { get; set; }
-    
-        /// <summary>The maximum image height in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("maxHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxHeight { get; set; }
-    
-        /// <summary>The image aspect width in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("aspectWidth", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? AspectWidth { get; set; }
-    
-        /// <summary>The image aspect height in pixels.</summary>
-        [Newtonsoft.Json.JsonProperty("aspectHeight", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? AspectHeight { get; set; }
-    
-        /// <summary>Defines if the asset must be an image.</summary>
-        [Newtonsoft.Json.JsonProperty("mustBeImage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool MustBeImage { get; set; }
-    
-        /// <summary>The allowed file extensions.</summary>
-        [Newtonsoft.Json.JsonProperty("allowedExtensions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> AllowedExtensions { get; set; }
-    
-        /// <summary>True, if duplicate values are allowed.</summary>
-        [Newtonsoft.Json.JsonProperty("allowDuplicates", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool AllowDuplicates { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class BooleanFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? DefaultValue { get; set; }
-    
-        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
-        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool InlineEditable { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public BooleanFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum BooleanFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Checkbox")]
-        Checkbox = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Toggle")]
-        Toggle = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class DateTimeFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset? DefaultValue { get; set; }
-    
-        /// <summary>The maximum allowed value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset? MaxValue { get; set; }
-    
-        /// <summary>The minimum allowed value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset? MinValue { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public DateTimeFieldEditor Editor { get; set; }
-    
-        /// <summary>The calculated default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("calculatedDefaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum DateTimeFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Date")]
-        Date = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"DateTime")]
-        DateTime = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum DateTimeCalculatedDefaultValue
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Now")]
-        Now = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Today")]
-        Today = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class GeolocationFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? DefaultValue { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public GeolocationFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum GeolocationFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Map")]
-        Map = 0,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class JsonFieldPropertiesDto : FieldPropertiesDto
-    {
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class NumberFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? DefaultValue { get; set; }
-    
-        /// <summary>The maximum allowed value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? MaxValue { get; set; }
-    
-        /// <summary>The minimum allowed value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? MinValue { get; set; }
-    
-        /// <summary>The allowed values for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<double> AllowedValues { get; set; }
-    
-        /// <summary>Indicates if the field value must be unique. Ignored for nested fields and localized fields.</summary>
-        [Newtonsoft.Json.JsonProperty("isUnique", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsUnique { get; set; }
-    
-        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
-        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool InlineEditable { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public NumberFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum NumberFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Input")]
-        Input = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Radio")]
-        Radio = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
-        Dropdown = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Stars")]
-        Stars = 3,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class ReferencesFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The minimum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinItems { get; set; }
-    
-        /// <summary>The maximum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxItems { get; set; }
-    
-        /// <summary>True, if duplicate values are allowed.</summary>
-        [Newtonsoft.Json.JsonProperty("allowDuplicates", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool AllowDuplicates { get; set; }
-    
-        /// <summary>True to resolve references in the content list.</summary>
-        [Newtonsoft.Json.JsonProperty("resolveReference", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool ResolveReference { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public ReferencesFieldEditor Editor { get; set; }
-    
-        /// <summary>The id of the referenced schema.</summary>
-        [Newtonsoft.Json.JsonProperty("schemaId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid SchemaId { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum ReferencesFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"List")]
-        List = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
-        Dropdown = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class StringFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The default value for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("defaultValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string DefaultValue { get; set; }
-    
-        /// <summary>The pattern to enforce a specific format for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("pattern", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Pattern { get; set; }
-    
-        /// <summary>The validation message for the pattern.</summary>
-        [Newtonsoft.Json.JsonProperty("patternMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PatternMessage { get; set; }
-    
-        /// <summary>The minimum allowed length for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minLength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinLength { get; set; }
-    
-        /// <summary>The maximum allowed length for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxLength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxLength { get; set; }
-    
-        /// <summary>The allowed values for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> AllowedValues { get; set; }
-    
-        /// <summary>Indicates if the field value must be unique. Ignored for nested fields and localized fields.</summary>
-        [Newtonsoft.Json.JsonProperty("isUnique", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsUnique { get; set; }
-    
-        /// <summary>Indicates that the inline editor is enabled for this field.</summary>
-        [Newtonsoft.Json.JsonProperty("inlineEditable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool InlineEditable { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public StringFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum StringFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Input")]
-        Input = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Color")]
-        Color = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Markdown")]
-        Markdown = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
-        Dropdown = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Html")]
-        Html = 4,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Radio")]
-        Radio = 5,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"RichText")]
-        RichText = 6,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Slug")]
-        Slug = 7,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"TextArea")]
-        TextArea = 8,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class TagsFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The minimum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("minItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MinItems { get; set; }
-    
-        /// <summary>The maximum allowed items for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("maxItems", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? MaxItems { get; set; }
-    
-        /// <summary>The allowed values for the field value.</summary>
-        [Newtonsoft.Json.JsonProperty("allowedValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> AllowedValues { get; set; }
-    
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public TagsFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum TagsFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Tags")]
-        Tags = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Checkboxes")]
-        Checkboxes = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Dropdown")]
-        Dropdown = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class UIFieldPropertiesDto : FieldPropertiesDto
-    {
-        /// <summary>The editor that is used to manage this field.</summary>
-        [Newtonsoft.Json.JsonProperty("editor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public UIFieldEditor Editor { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public enum UIFieldEditor
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Separator")]
-        Separator = 0,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class NestedFieldDto : Resource
-    {
-        /// <summary>The id of the field.</summary>
-        [Newtonsoft.Json.JsonProperty("fieldId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long FieldId { get; set; }
-    
-        /// <summary>The name of the field. Must be unique within the schema.</summary>
-        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z0-9]+(\-[a-z0-9]+)*$")]
-        public string Name { get; set; }
-    
-        /// <summary>Defines if the field is hidden.</summary>
-        [Newtonsoft.Json.JsonProperty("isHidden", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsHidden { get; set; }
-    
-        /// <summary>Defines if the field is locked.</summary>
-        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsLocked { get; set; }
-    
-        /// <summary>Defines if the field is disabled.</summary>
-        [Newtonsoft.Json.JsonProperty("isDisabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsDisabled { get; set; }
-    
-        /// <summary>The field properties.</summary>
-        [Newtonsoft.Json.JsonProperty("properties", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public FieldPropertiesDto Properties { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class SchemaDto : Resource
     {
         /// <summary>The id of the schema.</summary>
@@ -14437,6 +15008,10 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("hints", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1000)]
         public string Hints { get; set; }
+    
+        /// <summary>Tags for automation processes.</summary>
+        [Newtonsoft.Json.JsonProperty("tags", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Tags { get; set; }
     
     
     }
@@ -14619,6 +15194,10 @@ namespace Cosmos.ClientLibrary.Management
         [System.ComponentModel.DataAnnotations.StringLength(1000)]
         public string Hints { get; set; }
     
+        /// <summary>Tags for automation processes.</summary>
+        [Newtonsoft.Json.JsonProperty("tags", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Tags { get; set; }
+    
     
     }
     
@@ -14664,6 +15243,10 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("display", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string Display { get; set; }
+    
+        /// <summary>Optional title.</summary>
+        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Title { get; set; }
     
         /// <summary>The color for the icon.</summary>
         [Newtonsoft.Json.JsonProperty("iconColor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -14789,6 +15372,10 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("isEnabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IsEnabled { get; set; }
     
+        /// <summary>Optional rule name.</summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+    
         /// <summary>The trigger properties.</summary>
         [Newtonsoft.Json.JsonProperty("trigger", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
@@ -14798,12 +15385,25 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("action", Required = Newtonsoft.Json.Required.Always)]
         public RuleAction Action { get; set; }
     
+        /// <summary>The number of completed executions.</summary>
+        [Newtonsoft.Json.JsonProperty("numSucceeded", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int NumSucceeded { get; set; }
+    
+        /// <summary>The number of failed executions.</summary>
+        [Newtonsoft.Json.JsonProperty("numFailed", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int NumFailed { get; set; }
+    
+        /// <summary>The date and time when the rule was executed the last time.</summary>
+        [Newtonsoft.Json.JsonProperty("lastExecuted", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? LastExecuted { get; set; }
+    
     
     }
     
     [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "triggerType")]
     [JsonInheritanceAttribute("AssetChanged", typeof(AssetChangedRuleTriggerDto))]
     [JsonInheritanceAttribute("ContentChanged", typeof(ContentChangedRuleTriggerDto))]
+    [JsonInheritanceAttribute("Manual", typeof(ManualRuleTriggerDto))]
     [JsonInheritanceAttribute("SchemaChanged", typeof(SchemaChangedRuleTriggerDto))]
     [JsonInheritanceAttribute("Usage", typeof(UsageRuleTriggerDto))]
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
@@ -14852,6 +15452,12 @@ namespace Cosmos.ClientLibrary.Management
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class ManualRuleTriggerDto : RuleTriggerDto
+    {
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class SchemaChangedRuleTriggerDto : RuleTriggerDto
     {
         /// <summary>Javascript condition when to trigger.</summary>
@@ -14877,7 +15483,6 @@ namespace Cosmos.ClientLibrary.Management
     }
     
     [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
-    [JsonInheritanceAttribute("ICISKafka", typeof(ICISKafkaRuleActionDto))]
     [JsonInheritanceAttribute("Webhook", typeof(WebhookRuleActionDto))]
     [JsonInheritanceAttribute("Tweet", typeof(TweetRuleActionDto))]
     [JsonInheritanceAttribute("Slack", typeof(SlackRuleActionDto))]
@@ -14889,6 +15494,7 @@ namespace Cosmos.ClientLibrary.Management
     [JsonInheritanceAttribute("Discourse", typeof(DiscourseRuleActionDto))]
     [JsonInheritanceAttribute("AzureQueue", typeof(AzureQueueRuleActionDto))]
     [JsonInheritanceAttribute("Algolia", typeof(AlgoliaRuleActionDto))]
+    [JsonInheritanceAttribute("ICISKafka", typeof(ICISKafkaRuleActionDto))]
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class RuleAction 
     {
@@ -14922,6 +15528,10 @@ namespace Cosmos.ClientLibrary.Management
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class UpdateRuleDto 
     {
+        /// <summary>Optional rule name.</summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+    
         /// <summary>The trigger properties.</summary>
         [Newtonsoft.Json.JsonProperty("trigger", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public RuleTriggerDto Trigger { get; set; }
@@ -15560,7 +16170,7 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("maxContributors", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int MaxContributors { get; set; }
     
-        /// <summary>The metadata.</summary>
+        /// <summary>The metadata to provide information about this request.</summary>
         [Newtonsoft.Json.JsonProperty("_meta", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ContributorsMetadata _meta { get; set; }
     
@@ -15574,6 +16184,11 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("contributorId", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string ContributorId { get; set; }
+    
+        /// <summary>The display name.</summary>
+        [Newtonsoft.Json.JsonProperty("contributorName", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public string ContributorName { get; set; }
     
         /// <summary>The role of the contributor.</summary>
         [Newtonsoft.Json.JsonProperty("role", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -15805,6 +16420,14 @@ namespace Cosmos.ClientLibrary.Management
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z0-9]+(\-[a-z0-9]+)*$")]
         public string Name { get; set; }
     
+        /// <summary>The optional label of the app.</summary>
+        [Newtonsoft.Json.JsonProperty("label", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Label { get; set; }
+    
+        /// <summary>The optional description of the app.</summary>
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
+    
         /// <summary>The version of the app.</summary>
         [Newtonsoft.Json.JsonProperty("version", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Version { get; set; }
@@ -15856,6 +16479,20 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>Initialize the app with the inbuilt template.</summary>
         [Newtonsoft.Json.JsonProperty("template", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Template { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class UpdateAppDto 
+    {
+        /// <summary>The optional label of your app.</summary>
+        [Newtonsoft.Json.JsonProperty("label", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Label { get; set; }
+    
+        /// <summary>The optional description of your app.</summary>
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
     
     
     }
@@ -15987,17 +16624,6 @@ namespace Cosmos.ClientLibrary.Management
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class ICISKafkaRuleActionDto : RuleAction
-    {
-        /// <summary>The name of the topic.</summary>
-        [Newtonsoft.Json.JsonProperty("topicName", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string TopicName { get; set; }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class WebhookRuleActionDto : RuleAction
     {
         /// <summary>The url to the webhook.</summary>
@@ -16008,6 +16634,10 @@ namespace Cosmos.ClientLibrary.Management
         /// <summary>The shared secret that is used to calculate the signature.</summary>
         [Newtonsoft.Json.JsonProperty("sharedSecret", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SharedSecret { get; set; }
+    
+        /// <summary>The optional custom request payload.</summary>
+        [Newtonsoft.Json.JsonProperty("payload", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Payload { get; set; }
     
     
     }
@@ -16267,6 +16897,21 @@ namespace Cosmos.ClientLibrary.Management
         [Newtonsoft.Json.JsonProperty("indexName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string IndexName { get; set; }
+    
+        /// <summary>The optional custom document.</summary>
+        [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Document { get; set; }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.21.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class ICISKafkaRuleActionDto : RuleAction
+    {
+        /// <summary>The name of the topic.</summary>
+        [Newtonsoft.Json.JsonProperty("topicName", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public string TopicName { get; set; }
     
     
     }
