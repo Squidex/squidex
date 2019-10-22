@@ -156,17 +156,18 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.hasChanged()) {
-            return of(true);
-        } else {
-            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?').pipe(
-                tap(confirmed => {
-                    if (confirmed) {
-                        this.autoSaveService.remove(this.autoSaveKey);
-                    }
-                })
-            );
-        }
+        const observable =
+            this.contentForm.hasChanged() ?
+                this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?') :
+                of(true);
+
+        return observable.pipe(
+            tap(confirmed => {
+                if (confirmed) {
+                    this.autoSaveService.remove(this.autoSaveKey);
+                }
+            })
+        );
     }
 
     public saveAndPublish() {
@@ -185,11 +186,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const value = this.contentForm.submit();
 
         if (value) {
-            this.autoSaveService.remove(this.autoSaveKey);
-
             if (this.content) {
                 if (asDraft) {
-                    if (this.content && !this.content.canDraftPropose) {
+                    if (!this.content.canDraftPropose) {
                         return;
                     }
 
@@ -200,7 +199,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentForm.submitFailed(error);
                         });
                 } else {
-                    if (this.content && !this.content.canUpdateAny) {
+                    if (!this.content.canUpdate) {
                         return;
                     }
 
@@ -212,7 +211,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         });
                 }
             } else {
-                if ((publish && !this.contentsState.snapshot.canCreate) || (!publish && !this.contentsState.snapshot.canCreateAndPublish)) {
+                if (!this.canCreate(publish)) {
                     return;
                 }
 
@@ -230,21 +229,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public back() {
-        this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
+    private canCreate(publish: boolean) {
+        if (publish) {
+            return this.contentsState.snapshot.canCreateAndPublish;
+        } else {
+            return this.contentsState.snapshot.canCreate;
+        }
     }
 
-    private loadContent(data: any, isInitial: boolean) {
-        this.isLoadingContent = true;
-
-        this.autoSaveService.remove(this.autoSaveKey);
-
-        try {
-            this.contentForm.load(data, isInitial);
-            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
-        } finally {
-            this.isLoadingContent = false;
-        }
+    public back() {
+        this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
     public discardChanges() {
@@ -268,6 +262,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.dueTimeSelector.selectDueTime(status).pipe(
                 switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
             .subscribe();
+    }
+
+    public showLatest() {
+        this.loadVersion(null, false);
     }
 
     private loadVersion(version: Version | null, compare: boolean) {
@@ -296,8 +294,17 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public showLatest() {
-        this.loadVersion(null, false);
+    private loadContent(data: any, isInitial: boolean) {
+        this.isLoadingContent = true;
+
+        this.autoSaveService.remove(this.autoSaveKey);
+
+        try {
+            this.contentForm.load(data, isInitial);
+            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
+        } finally {
+            this.isLoadingContent = false;
+        }
     }
 
     public trackByField(index: number, field: FieldDto) {

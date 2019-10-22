@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -59,15 +59,15 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     @Input()
     public mode: 'Array' | 'Single';
 
-    public get isValid() {
-        return !!this.schemaId && !!this.languageField;
-    }
-
     @Input()
     public set language(value: LanguageDto) {
         this.languageField = value;
 
         this.next(s => ({ ...s, contentNames: this.createContentNames(s.contents) }));
+    }
+
+    public get isValid() {
+        return !!this.schemaId && !!this.languageField;
     }
 
     public selectionControl = new FormControl('');
@@ -106,23 +106,26 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 }));
     }
 
-    public ngOnChanges() {
-        if (!this.isValid) {
-            this.selectionControl.disable();
-            return;
-        }
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['schemaId']) {
+            this.resetState();
 
-        this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
-            .subscribe(contents => {
-                const contentItems = contents.items;
-                const contentNames = this.createContentNames(contentItems);
+            if (this.isValid) {
+                this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
+                    .subscribe(contents => {
+                        const contentItems = contents.items;
+                        const contentNames = this.createContentNames(contentItems);
 
-                this.next(s => ({ ...s, contents: contentItems, contentNames }));
+                        this.next(s => ({ ...s, contents: contentItems, contentNames }));
 
-                this.selectContent();
-            }, () => {
+                        this.selectContent();
+                    }, () => {
+                        this.selectionControl.disable();
+                    });
+            } else {
                 this.selectionControl.disable();
-            });
+            }
+        }
     }
 
     public setDisabledState(isDisabled: boolean) {
