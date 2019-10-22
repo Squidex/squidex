@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition("data.field.iv === 2", "Editor")
+                            [Status.Published] = new WorkflowTransition("data.field.iv === 2", new[] { "Editor" })
                         },
                         StatusColors.Draft),
                 [Status.Published] =

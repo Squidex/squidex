@@ -64,7 +64,8 @@ namespace Squidex.Domain.Apps.Core
                     new SchemaConverter(),
                     new StatusConverter(),
                     new StringEnumConverter(),
-                    new WorkflowConverter()),
+                    new WorkflowConverter(),
+                    new WorkflowTransitionConverter()),
 
                 TypeNameHandling = typeNameHandling
             };
@@ -129,14 +130,7 @@ namespace Squidex.Domain.Apps.Core
 
         public static void TestFreeze(IFreezable sut)
         {
-            var properties =
-                sut.GetType().GetRuntimeProperties()
-                    .Where(x =>
-                        x.CanWrite &&
-                        x.CanRead &&
-                        x.Name != "IsFrozen");
-
-            foreach (var property in properties)
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
                     property.PropertyType.IsValueType ?
@@ -152,7 +146,7 @@ namespace Squidex.Domain.Apps.Core
 
             sut.Freeze();
 
-            foreach (var property in properties)
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
                     property.PropertyType.IsValueType ?

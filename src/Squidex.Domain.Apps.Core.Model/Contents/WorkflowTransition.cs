@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class WorkflowTransition
@@ -13,13 +15,13 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public string Expression { get; }
 
-        public string Role { get; }
+        public IReadOnlyList<string> Roles { get; }
 
-        public WorkflowTransition(string expression = null, string role = null)
+        public WorkflowTransition(string expression = null, IReadOnlyList<string> roles = null)
         {
             Expression = expression;
 
-            Role = role;
+            Roles = roles;
         }
     }
 }

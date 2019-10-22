@@ -168,7 +168,7 @@ describe('WorkflowsService', () => {
                 [`${name}1`]: {
                     transitions: {
                         [`${name}2`]: {
-                            expression: 'Expression1', role: 'Role1'
+                            expression: 'Expression1', roles: ['Role1']
                         }
                     },
                     color: `${name}1`, noUpdate: true
@@ -176,7 +176,7 @@ describe('WorkflowsService', () => {
                 [`${name}2`]: {
                     transitions: {
                         [`${name}1`]: {
-                            expression: 'Expression2', role: 'Role2'
+                            expression: 'Expression2', roles: ['Role2']
                         }
                     },
                     color: `${name}2`, noUpdate: true
@@ -189,7 +189,7 @@ describe('WorkflowsService', () => {
     }
 });
 
-export function createWorkflows(...names: ReadonlyArray<string>): WorkflowsPayload {
+export function createWorkflows(...names: string[]): WorkflowsPayload {
     return {
         errors: [
             'Error1',
@@ -217,8 +217,8 @@ export function createWorkflow(name: string): WorkflowDto {
             { name: `${name}2`, color: `${name}2`, noUpdate: true, isLocked: false }
         ],
         [
-            { from: `${name}1`, to: `${name}2`, expression: 'Expression1', role: 'Role1' },
-            { from: `${name}2`, to: `${name}1`, expression: 'Expression2', role: 'Role2' }
+            { from: `${name}1`, to: `${name}2`, expression: 'Expression1', roles: ['Role1'] },
+            { from: `${name}2`, to: `${name}1`, expression: 'Expression2', roles: ['Role2'] }
         ]);
 }
 
@@ -437,7 +437,7 @@ describe('Workflow', () => {
             new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
-                .setTransition('2', '1', { expression: '2 === 1', role: 'Role' })
+                .setTransition('2', '1', { expression: '2 === 1', roles: ['Role'] })
                 .setTransition('2', '1', { expression: '2 !== 1' });
 
         expect(workflow.serialize()).toEqual({
@@ -447,7 +447,7 @@ describe('Workflow', () => {
                 '1': { transitions: {} },
                 '2': {
                     transitions: {
-                        '1': { expression: '2 !== 1', role: 'Role' }
+                        '1': { expression: '2 !== 1', roles: ['Role'] }
                     }
                 }
             },
@@ -462,7 +462,7 @@ describe('Workflow', () => {
                 .setStep('2')
                 .setTransition('1', '2');
 
-        const updated = workflow.setTransition('3', '2', { role: 'Role' });
+        const updated = workflow.setTransition('3', '2', { roles: ['Role'] });
 
         expect(updated).toBe(workflow);
     });
@@ -474,7 +474,7 @@ describe('Workflow', () => {
                 .setStep('2')
                 .setTransition('1', '2');
 
-        const updated = workflow.setTransition('1', '3', { role: 'Role' });
+        const updated = workflow.setTransition('1', '3', { roles: ['Role'] });
 
         expect(updated).toBe(workflow);
     });

@@ -21,17 +21,19 @@
     <div class="col-auto col-label">
         <span class="text-decent">for</span>
     </div>
+    
     <div class="col">
-        <select class="form-control" [class.dashed]="!transition.role || transition.role === ''"
+        <sqx-tag-editor
             [disabled]="disabled"
-            [ngModel]="transition.role"
-            (ngModelChange)="changeRole($event)">
-            <option></option>
-            <option *ngFor="let role of roles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
-        </select>
-
-        <span class="select-placeholder" *ngIf="!transition.role || transition.role === ''">Add Role</span>
+            [suggestions]="roleSuggestions"
+            [singleLine]="true"
+            [ngModelOptions]="onBlur"
+            [ngModel]="transition.roles"
+            (ngModelChange)="changeRole($event)"
+            placeholder="Add Role">
+        </sqx-tag-editor>
     </div>
+
     <div class="col-auto pl-2">
         <button type="button" class="btn btn-text-danger" (click)="emitRemove()" [disabled]="disabled">
             <i class="icon-bin2"></i>

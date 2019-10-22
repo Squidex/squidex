@@ -1,7 +1,8 @@
 <div class="form-control tags" [class.blank]="styleBlank" [class.gray]="styleGray" #form (click)="input.focus()" 
     [class.single-line]="singleLine"
     [class.focus]="snapshot.hasFocus" 
-    [class.disabled]="addInput.disabled">
+    [class.disabled]="addInput.disabled"
+    [class.dashed]="!snapshot.items.length > 0">
     <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
         {{item}} <i class="icon-close" (click)="remove(i)"></i>
     </span>
