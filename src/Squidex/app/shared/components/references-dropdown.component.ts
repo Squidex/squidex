@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -48,7 +48,7 @@ const NO_EMIT = { emitEvent: false };
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnInit {
+export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
     private languageField: LanguageDto;
     private selectedId: string | undefined;
     private itemCount: number;
@@ -58,6 +58,10 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
     @Input()
     public mode: 'Array' | 'Single';
+
+    public get isValid() {
+        return !!this.schemaId && !!this.languageField;
+    }
 
     @Input()
     public set language(value: LanguageDto) {
@@ -102,8 +106,8 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 }));
     }
 
-    public ngOnInit() {
-        if (!this.schemaId || this.language) {
+    public ngOnChanges() {
+        if (!this.isValid) {
             this.selectionControl.disable();
             return;
         }
@@ -119,6 +123,16 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             }, () => {
                 this.selectionControl.disable();
             });
+    }
+
+    public setDisabledState(isDisabled: boolean) {
+        if (isDisabled) {
+            this.selectionControl.disable();
+        } else if (this.isValid) {
+            this.selectionControl.enable();
+        }
+
+        super.setDisabledState(isDisabled);
     }
 
     public writeValue(obj: any) {
