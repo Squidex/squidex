@@ -16,7 +16,7 @@
             [ngModelOptions]="onBlur"
             [ngModel]="transition.expression"
             (ngModelChange)="changeExpression($event)"
-            placeholder="Add Expression" /> 
+            placeholder="Expression" /> 
     </div>
     <div class="col-auto col-label">
         <span class="text-decent">for</span>
@@ -24,15 +24,15 @@
     
     <div class="col" style="width: 70px">
         <sqx-tag-editor
-            [disabled]="disabled"
-            [dashed]="true"
             [allowDuplicates]="false"
-            [suggestions]="roleSuggestions"
-            [singleLine]="true"
-            [ngModelOptions]="onBlur"
-            [ngModel]="transition.roles"
+            [dashed]="true"
+            [disabled]="disabled"
             (ngModelChange)="changeRole($event)"
-            placeholder="Add Role">
+            [ngModel]="transition.roles"
+            [ngModelOptions]="onBlur"
+            [singleLine]="true"
+            [suggestions]="roleSuggestions"
+            placeholder="Role">
         </sqx-tag-editor>
     </div>
 
