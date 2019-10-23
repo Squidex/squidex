@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (roles.ContainsKey(command.Name))
+                else if (roles.IsAny(command.Name))
                 {
                     e("A role with the same name already exists.");
                 }
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (Role.IsDefaultRole(command.Name))
+                else if (Roles.IsDefault(command.Name))
                 {
                     e("Cannot delete a default role.");
                 }
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (Role.IsDefaultRole(command.Name))
+                else if (Roles.IsDefault(command.Name))
                 {
                     e("Cannot update a default role.");
                 }
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 return null;
             }
 
-            if (!roles.TryGetValue(name, out var role))
+            if (!roles.TryGetCustom(name, out var role))
             {
                 throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
             }

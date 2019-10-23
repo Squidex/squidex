@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Security;
@@ -24,6 +25,14 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         public RolesTests()
         {
             roles_0 = Roles.Empty.Add(firstRole);
+        }
+
+        [Fact]
+        public void Should_create_roles_without_defaults()
+        {
+            var roles = new Roles(Roles.Defaults.ToArray());
+
+            Assert.Equal(0, roles.CustomCount);
         }
 
         [Fact]
@@ -63,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Remove(firstRole);
 
-            Assert.Empty(roles_1);
+            Assert.Equal(0, roles_1.CustomCount);
         }
 
         [Fact]
@@ -71,23 +80,102 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Remove(role);
 
-            Assert.NotEmpty(roles_1);
+            Assert.True(roles_1.CustomCount > 0);
         }
 
         [Fact]
-        public void Should_create_defaults()
+        public void Should_get_custom_roles()
         {
-            var sut = Roles.CreateDefaults("my-app");
+            var names = roles_0.Custom.Select(x => x.Name).ToArray();
 
-            Assert.Equal(4, sut.Count);
+            Assert.Equal(new[] { firstRole }, names);
+        }
 
-            foreach (var sutRole in sut)
+        [Fact]
+        public void Should_get_all_roles()
+        {
+            var names = roles_0.All.Select(x => x.Name).ToArray();
+
+            Assert.Equal(new[] { firstRole, "Owner", "Reader", "Editor", "Developer" }, names);
+        }
+
+        [Fact]
+        public void Should_check_for_custom_role()
+        {
+            Assert.True(roles_0.IsCustom(firstRole));
+        }
+
+        [Fact]
+        public void Should_check_for_non_custom_role()
+        {
+            Assert.False(roles_0.IsCustom(Role.Owner));
+        }
+
+        [Fact]
+        public void Should_check_for_default_role()
+        {
+            Assert.True(Roles.IsDefault(Role.Owner));
+        }
+
+        [Fact]
+        public void Should_check_for_non_default_role()
+        {
+            Assert.False(Roles.IsDefault(firstRole));
+        }
+
+        [Fact]
+        public void Should_get_role_without_prefix()
+        {
+            var roles_1 = roles_0.Update(firstRole, "P1", "P2");
+
+            var found = roles_1.TryGetCustom(firstRole, out var role);
+
+            Assert.True(found);
+
+            foreach (var permission in role.Permissions)
             {
-                foreach (var permission in sutRole.Value.Permissions)
-                {
-                    Assert.StartsWith("squidex.apps.my-app", permission.Id);
-                }
+                Assert.StartsWith("P", permission.Id);
             }
+        }
+
+        [InlineData("Developer")]
+        [InlineData("Editor")]
+        [InlineData("Owner")]
+        [InlineData("Reader")]
+        [Theory]
+        public void Should_not_get_default_roles(string name)
+        {
+            var found = roles_0.TryGetCustom(name, out var role);
+
+            Assert.False(found);
+        }
+
+        [InlineData("Developer")]
+        [InlineData("Editor")]
+        [InlineData("Owner")]
+        [InlineData("Reader")]
+        [Theory]
+        public void Should_get_default_roles(string name)
+        {
+            var found = roles_0.TryGet("app", name, out var role);
+
+            Assert.True(found);
+            Assert.True(role.IsDefault);
+            Assert.True(roles_0.IsAny(name));
+
+            foreach (var permission in role.Permissions)
+            {
+                Assert.StartsWith("squidex.apps.app.", permission.Id);
+            }
+        }
+
+        [Fact]
+        public void Should_return_null_if_role_not_found()
+        {
+            var found = roles_0.TryGet("app", "custom", out var role);
+
+            Assert.False(found);
+            Assert.Null(role);
         }
     }
 }

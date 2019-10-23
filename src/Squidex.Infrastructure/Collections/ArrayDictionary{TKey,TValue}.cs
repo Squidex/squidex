@@ -132,6 +132,8 @@ namespace Squidex.Infrastructure.Collections
 
         public bool TryGetValue(TKey key, out TValue value)
         {
+            value = default;
+
             for (var i = 0; i < items.Length; i++)
             {
                 if (keyComparer.Equals(items[i].Key, key))
@@ -141,7 +143,6 @@ namespace Squidex.Infrastructure.Collections
                 }
             }
 
-            value = default;
             return false;
         }
 

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     public class GuardAppClientsTests
     {
         private readonly AppClients clients_0 = AppClients.Empty;
-        private readonly Roles roles = Roles.CreateDefaults("my-app");
+        private readonly Roles roles = Roles.Empty;
 
         [Fact]
         public void CanAttach_should_throw_execption_if_client_id_is_null()

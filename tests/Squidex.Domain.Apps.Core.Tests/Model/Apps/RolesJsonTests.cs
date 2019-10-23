@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var sut = Roles.CreateDefaults("my-app");
+            var sut = Roles.Empty.Add("Custom").Update("Custom", "Permission1", "Permission2");
 
             var roles = sut.SerializeAndDeserialize();
 

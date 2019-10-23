@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             return Validate.It(() => "Cannot assign contributor.", async e =>
             {
-                if (!roles.ContainsKey(command.Role))
+                if (!roles.IsAny(command.Role))
                 {
                     e(Not.Valid("role"), nameof(command.Role));
                 }

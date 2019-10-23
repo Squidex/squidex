@@ -62,8 +62,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             {
                 case AppCreated e:
                     {
-                        Roles = Roles.CreateDefaults(e.Name);
-
                         SimpleMapper.Map(e, this);
 
                         break;
@@ -204,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
                 case AppRoleUpdated e:
                     {
-                        Roles = Roles.Update(e.Name, e.Permissions.Prefix(Name));
+                        Roles = Roles.Update(e.Name, e.Permissions);
 
                         break;
                     }

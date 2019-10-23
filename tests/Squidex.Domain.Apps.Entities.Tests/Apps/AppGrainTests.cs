@@ -487,7 +487,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(5, sut.Snapshot.Roles.Count);
+            Assert.Equal(1, sut.Snapshot.Roles.CustomCount);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -507,7 +507,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(4, sut.Snapshot.Roles.Count);
+            Assert.Equal(0, sut.Snapshot.Roles.CustomCount);
 
             LastEvents
                 .ShouldHaveSameEvents(

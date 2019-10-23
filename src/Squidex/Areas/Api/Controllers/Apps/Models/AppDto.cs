@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var permissions = new List<Permission>();
 
-            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
             {
                 permissions.AddRange(role.Permissions);
             }

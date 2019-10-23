@@ -8,9 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using P = Squidex.Shared.Permissions;
+using AllPermissions = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -21,15 +22,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Owner = "Owner";
         public const string Reader = "Reader";
 
-        private static readonly HashSet<string> DefaultRolesSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            Editor,
-            Developer,
-            Owner,
-            Reader
-        };
-
         public PermissionSet Permissions { get; }
+
+        public bool IsDefault
+        {
+            get { return Roles.IsDefault(this); }
+        }
 
         public Role(string name, PermissionSet permissions)
             : base(name)
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             Permissions = permissions;
         }
 
-        public Role(string name, params Permission[] permissions)
+        public Role(string name, params string[] permissions)
             : this(name, new PermissionSet(permissions))
         {
         }
@@ -50,52 +48,29 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new Role(Name, new PermissionSet(permissions));
         }
 
-        public static bool IsDefaultRole(string role)
+        public bool Equals(string name)
         {
-            return role != null && DefaultRolesSet.Contains(role);
+            return name != null && name.Equals(Name, StringComparison.Ordinal);
         }
 
-        public static bool IsRole(string name, string expected)
+        public Role ForApp(string app)
         {
-            return name != null && string.Equals(name, expected, StringComparison.OrdinalIgnoreCase);
-        }
+            var result = new HashSet<Permission>
+            {
+                AllPermissions.ForApp(AllPermissions.AppCommon, app)
+            };
 
-        public static Role CreateOwner(string app)
-        {
-            return new Role(Owner,
-                P.ForApp(P.App, app));
-        }
+            if (Permissions.Any())
+            {
+                var prefix = AllPermissions.ForApp(AllPermissions.App, app).Id;
 
-        public static Role CreateEditor(string app)
-        {
-            return new Role(Editor,
-                P.ForApp(P.AppAssets, app),
-                P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContents, app),
-                P.ForApp(P.AppRolesRead, app),
-                P.ForApp(P.AppWorkflowsRead, app));
-        }
+                foreach (var permission in Permissions)
+                {
+                    result.Add(new Permission(string.Concat(prefix, ".", permission.Id)));
+                }
+            }
 
-        public static Role CreateReader(string app)
-        {
-            return new Role(Reader,
-                P.ForApp(P.AppAssetsRead, app),
-                P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContentsRead, app));
-        }
-
-        public static Role CreateDeveloper(string app)
-        {
-            return new Role(Developer,
-                P.ForApp(P.AppApi, app),
-                P.ForApp(P.AppAssets, app),
-                P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContents, app),
-                P.ForApp(P.AppPatterns, app),
-                P.ForApp(P.AppRolesRead, app),
-                P.ForApp(P.AppRules, app),
-                P.ForApp(P.AppSchemas, app),
-                P.ForApp(P.AppWorkflows, app));
+            return new Role(Name, new PermissionSet(result));
         }
     }
 }
