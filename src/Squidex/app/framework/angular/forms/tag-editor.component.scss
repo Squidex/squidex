@@ -31,6 +31,11 @@ $focus-color: #b3d3ff;
         overflow-y: hidden;
         white-space: nowrap;
     }
+
+    &.dashed {
+        @include placeholder-color($color-theme-secondary);
+        border-style: dashed;
+    }
 }
 
 div {
