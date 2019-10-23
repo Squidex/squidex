@@ -102,13 +102,13 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_check_for_custom_role()
         {
-            Assert.True(roles_0.IsCustom(firstRole));
+            Assert.True(roles_0.ContainsCustom(firstRole));
         }
 
         [Fact]
         public void Should_check_for_non_custom_role()
         {
-            Assert.False(roles_0.IsCustom(Role.Owner));
+            Assert.False(roles_0.ContainsCustom(Role.Owner));
         }
 
         [Fact]
@@ -123,33 +123,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.False(Roles.IsDefault(firstRole));
         }
 
-        [Fact]
-        public void Should_get_role_without_prefix()
-        {
-            var roles_1 = roles_0.Update(firstRole, "P1", "P2");
-
-            var found = roles_1.TryGetCustom(firstRole, out var role);
-
-            Assert.True(found);
-
-            foreach (var permission in role.Permissions)
-            {
-                Assert.StartsWith("P", permission.Id);
-            }
-        }
-
-        [InlineData("Developer")]
-        [InlineData("Editor")]
-        [InlineData("Owner")]
-        [InlineData("Reader")]
-        [Theory]
-        public void Should_not_get_default_roles(string name)
-        {
-            var found = roles_0.TryGetCustom(name, out var role);
-
-            Assert.False(found);
-        }
-
         [InlineData("Developer")]
         [InlineData("Editor")]
         [InlineData("Owner")]
@@ -161,7 +134,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             Assert.True(found);
             Assert.True(role.IsDefault);
-            Assert.True(roles_0.IsAny(name));
+            Assert.True(roles_0.Contains(name));
 
             foreach (var permission in role.Permissions)
             {

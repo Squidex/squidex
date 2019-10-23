@@ -122,19 +122,14 @@ namespace Squidex.Domain.Apps.Core.Apps
             return role != null && Defaults.ContainsKey(role.Name);
         }
 
-        public bool IsCustom(string name)
+        public bool ContainsCustom(string name)
         {
             return inner.ContainsKey(name);
         }
 
-        public bool IsAny(string name)
+        public bool Contains(string name)
         {
             return inner.ContainsKey(name) || Defaults.ContainsKey(name);
-        }
-
-        public bool TryGetCustom(string name, out Role role)
-        {
-            return inner.TryGetValue(name, out role);
         }
 
         public bool TryGet(string app, string name, out Role value)

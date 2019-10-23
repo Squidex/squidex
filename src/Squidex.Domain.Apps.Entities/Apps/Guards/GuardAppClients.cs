@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e(Not.DefinedOr("name", "role"), nameof(command.Name), nameof(command.Role));
                 }
 
-                if (command.Role != null && !roles.IsAny(command.Role))
+                if (command.Role != null && !roles.Contains(command.Role))
                 {
                     e(Not.Valid("role"), nameof(command.Role));
                 }

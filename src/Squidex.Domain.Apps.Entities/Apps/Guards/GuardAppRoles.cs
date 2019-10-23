@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (roles.IsAny(command.Name))
+                else if (roles.Contains(command.Name))
                 {
                     e("A role with the same name already exists.");
                 }
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 return;
             }
 
-            if (!roles.IsCustom(name))
+            if (!roles.ContainsCustom(name))
             {
                 throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
             }
