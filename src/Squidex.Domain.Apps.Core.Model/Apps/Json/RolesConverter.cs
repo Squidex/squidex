@@ -32,6 +32,11 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<string, string[]>>(reader);
 
+            if (json.Count == 0)
+            {
+                return Roles.Empty;
+            }
+
             return new Roles(json.Select(Convert));
         }
 

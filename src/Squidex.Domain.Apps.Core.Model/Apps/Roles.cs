@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     Clean(Permissions.AppWorkflows)))
         };
 
-        public static readonly Roles Empty = new Roles();
+        public static readonly Roles Empty = new Roles(new ArrayDictionary<string, Role>());
 
         public int CustomCount
         {
@@ -69,14 +69,14 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return inner.Values.Union(Defaults.Values); }
         }
 
-        private Roles(ArrayDictionary<string, Role> roles = null)
+        private Roles(ArrayDictionary<string, Role> roles)
         {
-            inner = roles ?? new ArrayDictionary<string, Role>();
+            inner = roles;
         }
 
         public Roles(IEnumerable<KeyValuePair<string, Role>> items)
         {
-            inner = new ArrayDictionary<string, Role>(items.Where(x => !Defaults.ContainsKey(x.Key)).ToArray());
+            inner = new ArrayDictionary<string, Role>(Cleaned(items));
         }
 
         [Pure]
@@ -169,6 +169,11 @@ namespace Squidex.Domain.Apps.Core.Apps
             }
 
             return permission.Substring(1);
+        }
+
+        private static KeyValuePair<string, Role>[] Cleaned(IEnumerable<KeyValuePair<string, Role>> items)
+        {
+            return items.Where(x => !Defaults.ContainsKey(x.Key)).ToArray();
         }
     }
 }

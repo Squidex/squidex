@@ -22,5 +22,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             roles.Should().BeEquivalentTo(sut);
         }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_empty()
+        {
+            var sut = Roles.Empty;
+
+            var roles = sut.SerializeAndDeserialize();
+
+            Assert.Same(Roles.Empty, roles);
+        }
     }
 }
