@@ -7,6 +7,7 @@
 
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable} from '@angular/core';
+import { Router } from '@angular/router';
 import { empty, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 
@@ -19,7 +20,8 @@ export class AuthInterceptor implements HttpInterceptor {
     private baseUrl: string;
 
     constructor(apiUrlConfig: ApiUrlConfig,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly router: Router
     ) {
         this.baseUrl = apiUrlConfig.buildUrl('');
     }
@@ -58,7 +60,11 @@ export class AuthInterceptor implements HttpInterceptor {
                         switchMap(u => this.makeRequest(req, next, u)));
                 } else if (error.status === 401 || error.status === 403) {
                     if (req.method === 'GET') {
-                        this.authService.logoutRedirect();
+                        if (error.status === 401) {
+                            this.authService.logoutRedirect();
+                        } else {
+                            this.router.navigate(['/forbidden'], { replaceUrl: true });
+                        }
 
                         return empty();
                     } else {

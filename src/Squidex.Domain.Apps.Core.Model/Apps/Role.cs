@@ -72,6 +72,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 P.ForApp(P.AppAssets, app),
                 P.ForApp(P.AppCommon, app),
                 P.ForApp(P.AppContents, app),
+                P.ForApp(P.AppRolesRead, app),
                 P.ForApp(P.AppWorkflowsRead, app));
         }
 
@@ -91,9 +92,10 @@ namespace Squidex.Domain.Apps.Core.Apps
                 P.ForApp(P.AppCommon, app),
                 P.ForApp(P.AppContents, app),
                 P.ForApp(P.AppPatterns, app),
-                P.ForApp(P.AppWorkflows, app),
+                P.ForApp(P.AppRolesRead, app),
                 P.ForApp(P.AppRules, app),
-                P.ForApp(P.AppSchemas, app));
+                P.ForApp(P.AppSchemas, app),
+                P.ForApp(P.AppWorkflows, app));
         }
     }
 }
