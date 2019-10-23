@@ -104,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessApi = true;
             }
 
-            if (controller.Includes(AllPermissions.ForApp(AllPermissions.AppContents, app.Name, "*"), permissions))
+            if (controller.Includes(AllPermissions.ForApp(AllPermissions.AppContents, app.Name), permissions))
             {
                 result.CanAccessContent = true;
             }

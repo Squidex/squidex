@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         private static string Clean(string permission)
         {
-            permission = Permissions.ForApp(permission, "*", "*").Id;
+            permission = Permissions.ForApp(permission).Id;
 
             var prefix = Permissions.ForApp(Permissions.App);
 
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (permission.Length == 0)
             {
-                return "*";
+                return Permission.Any;
             }
 
             return permission.Substring(1);
