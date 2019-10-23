@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
@@ -20,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
         public string Role { get; set; }
 
         [JsonProperty]
-        public IReadOnlyList<string> Roles { get; }
+        public List<string> Roles { get; }
 
         public JsonWorkflowTransition()
         {
@@ -33,11 +35,18 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
         public WorkflowTransition ToTransition()
         {
-            var roles = Roles;
+            var rolesList = Roles;
 
             if (!string.IsNullOrEmpty(Role))
             {
-                roles = new List<string> { Role };
+                rolesList = new List<string> { Role };
+            }
+
+            ReadOnlyCollection<string> roles = null;
+
+            if (rolesList != null && rolesList.Count > 0)
+            {
+                roles = ReadOnlyCollection.Create(rolesList.ToArray());
             }
 
             return new WorkflowTransition(Expression, roles);

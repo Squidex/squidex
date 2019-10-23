@@ -130,12 +130,17 @@ namespace Squidex.Domain.Apps.Core
 
         public static void TestFreeze(IFreezable sut)
         {
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            var properties =
+                sut.GetType().GetRuntimeProperties()
+                    .Where(x =>
+                        x.CanWrite &&
+                        x.CanRead &&
+                        x.Name != "IsFrozen");
+
+            foreach (var property in properties)
             {
                 var value =
-                    property.PropertyType.IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
+                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
 
                 property.SetValue(sut, value);
 
@@ -146,12 +151,10 @@ namespace Squidex.Domain.Apps.Core
 
             sut.Freeze();
 
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            foreach (var property in properties)
             {
                 var value =
-                    property.PropertyType.IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
+                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
 
                 Assert.Throws<InvalidOperationException>(() =>
                 {

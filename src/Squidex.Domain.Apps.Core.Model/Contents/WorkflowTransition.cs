@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -15,9 +15,9 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public string Expression { get; }
 
-        public IReadOnlyList<string> Roles { get; }
+        public ReadOnlyCollection<string> Roles { get; }
 
-        public WorkflowTransition(string expression = null, IReadOnlyList<string> roles = null)
+        public WorkflowTransition(string expression = null, ReadOnlyCollection<string> roles = null)
         {
             Expression = expression;
 

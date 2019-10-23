@@ -28,7 +28,7 @@
             [dashed]="true"
             [allowDuplicates]="false"
             [suggestions]="roleSuggestions"
-            singleLine="true"
+            [singleLine]="true"
             [ngModelOptions]="onBlur"
             [ngModel]="transition.roles"
             (ngModelChange)="changeRole($event)"

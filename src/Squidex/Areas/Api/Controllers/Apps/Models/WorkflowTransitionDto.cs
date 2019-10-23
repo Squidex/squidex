@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The optional restricted role.
         /// </summary>
-        public IReadOnlyList<string> Roles { get; set; }
+        public ReadOnlyCollection<string> Roles { get; set; }
 
         public static WorkflowTransitionDto FromWorkflowTransition(WorkflowTransition transition)
         {

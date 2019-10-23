@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -21,8 +22,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Archived] = new WorkflowTransition("ToArchivedExpr", new[] { "ToArchivedRole" }),
-                            [Status.Published] = new WorkflowTransition("ToPublishedExpr", new[] { "ToPublishedRole" })
+                            [Status.Archived] = new WorkflowTransition("ToArchivedExpr", ReadOnlyCollection.Create("ToArchivedRole" )),
+                            [Status.Published] = new WorkflowTransition("ToPublishedExpr", ReadOnlyCollection.Create("ToPublishedRole" ))
                         },
                         StatusColors.Draft),
                 [Status.Archived] =
