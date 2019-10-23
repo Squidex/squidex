@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetRoleOrThrow(roles, command.Name);
+            CheckRoleExists(roles, command.Name);
 
             Validate.It(() => "Cannot delete role.", e =>
             {
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetRoleOrThrow(roles, command.Name);
+            CheckRoleExists(roles, command.Name);
 
             Validate.It(() => "Cannot delete role.", e =>
             {
@@ -86,19 +86,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        private static Role GetRoleOrThrow(Roles roles, string name)
+        private static void CheckRoleExists(Roles roles, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || Roles.IsDefault(name))
             {
-                return null;
+                return;
             }
 
-            if (!roles.TryGetCustom(name, out var role))
+            if (!roles.IsCustom(name))
             {
                 throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
             }
-
-            return role;
         }
     }
 }
