@@ -156,12 +156,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        const observable =
-            this.contentForm.hasChanged() ?
-                this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?') :
-                of(true);
-
-        return observable.pipe(
+        return this.checkPendingChanges('close current content view').pipe(
             tap(confirmed => {
                 if (confirmed) {
                     this.autoSaveService.remove(this.autoSaveKey);
@@ -225,7 +220,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.dialogs.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
@@ -253,15 +248,27 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public publishChanges() {
-        this.dueTimeSelector.selectDueTime('Publish').pipe(
-                switchMap(d => this.contentsState.publishDraft(this.content, d)), onErrorResumeNext())
+        this.checkPendingChanges('publish your changes').pipe(
+                filter(x => !!x),
+                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                switchMap(d => this.contentsState.publishDraft(this.content, d)),
+                onErrorResumeNext())
             .subscribe();
     }
 
     public changeStatus(status: string) {
-        this.dueTimeSelector.selectDueTime(status).pipe(
-                switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
+        this.checkPendingChanges('change the status').pipe(
+                filter(x => !!x),
+                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                switchMap(d => this.contentsState.changeStatus(this.content, status, d)),
+                onErrorResumeNext())
             .subscribe();
+    }
+
+    private checkPendingChanges(action: string) {
+        return this.contentForm.hasChanged() ?
+            this.dialogs.confirm('Unsaved changes', `You have unsaved changes. When you ${action} you will loose them.<br />Do you want to continue anyway?`) :
+            of(true);
     }
 
     public showLatest() {
