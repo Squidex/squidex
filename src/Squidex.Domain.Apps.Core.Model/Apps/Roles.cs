@@ -95,6 +95,11 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Name already exists.", nameof(name));
             }
 
+            if (IsDefault(name))
+            {
+                return this;
+            }
+
             return new Roles(inner.With(name, newRole));
         }
 

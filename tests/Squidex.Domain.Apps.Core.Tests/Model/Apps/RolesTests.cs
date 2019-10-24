@@ -52,6 +52,14 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_do_nothing_if_role_to_add_is_default()
+        {
+            var roles_1 = roles_0.Add(Role.Developer);
+
+            Assert.True(roles_1.CustomCount > 0);
+        }
+
+        [Fact]
         public void Should_update_role()
         {
             var roles_1 = roles_0.Update(firstRole, "P1", "P2");
