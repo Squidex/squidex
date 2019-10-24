@@ -23,10 +23,10 @@ describe('ErrorDto', () => {
     it('Should create simple message when detail has one item', () => {
         const error = new ErrorDto(500, 'Error Message.', ['Detail Message.']);
 
-        expect(error.displayMessage).toBe('Error Message: Detail Message.');
+        expect(error.displayMessage).toBe('Error Message.\n\n * Detail Message.\n');
     });
 
-    it('Should create append do to simple message when detail has one item', () => {
+    it('Should create simple message with appended dots when detail has one item', () => {
         const error = new ErrorDto(500, 'Error Message', ['Detail Message']);
 
         expect(error.displayMessage).toBe('Error Message.\n\n * Detail Message.\n');
