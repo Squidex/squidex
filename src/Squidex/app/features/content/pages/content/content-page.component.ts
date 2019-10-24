@@ -267,7 +267,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     private checkPendingChanges(action: string) {
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n*Do you want to continue anyway?*`) :
+            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n**Do you want to continue anyway?**`) :
             of(true);
     }
 
