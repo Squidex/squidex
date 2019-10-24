@@ -18,7 +18,7 @@ import { ErrorDto } from '@app/framework/internal';
                     <a class="form-alert-close" (click)="close()">
                         <i class="icon-close"></i>
                     </a>
-                    <div [innerHTML]="error?.displayMessage"></div>
+                    <div [innerHTML]="error?.displayMessage | sqxMarkdown"></div>
                 </div>
             </div>
         </ng-container>`,

@@ -156,7 +156,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        return this.checkPendingChanges('close current content view').pipe(
+        return this.checkPendingChanges('close the current content view').pipe(
             tap(confirmed => {
                 if (confirmed) {
                     this.autoSaveService.remove(this.autoSaveKey);
@@ -267,7 +267,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     private checkPendingChanges(action: string) {
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('Unsaved changes', `You have unsaved changes. When you ${action} you will loose them.<br />Do you want to continue anyway?`) :
+            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n*Do you want to continue anyway?*`) :
             of(true);
     }
 

@@ -7,7 +7,7 @@
         </ng-container>
     
         <ng-container content>
-            <span [innerHTML]="snapshot.dialogRequest?.text"></span>
+            <span [innerHTML]="snapshot.dialogRequest?.text | sqxMarkdown"></span>
         </ng-container>
     
         <ng-container footer>
@@ -21,7 +21,7 @@
     <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
         <button type="button" class="close" data-dismiss="alert" (close)="close(notification)">&times;</button>
 
-        <span [innerHTML]="notification.message"></span>
+        <span [innerHTML]="notification.message | sqxMarkdown"></span>
     </div>
 </div>
 

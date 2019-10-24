@@ -116,11 +116,11 @@
         @include absolute(.25rem, 0, auto, auto);
         padding: 1rem;
         min-width: 200px;
-        max-width: 400px;
+        max-width: 600px;
         font-size: 1rem;
         font-weight: normal;
         text-align: left;
-        z-index: 1000;
+        z-index: 2000;
 
         &::after {
             @include absolute(-.75rem, .625rem, auto, auto);
@@ -184,7 +184,7 @@
 
 label {
     & {
-        color: black;
+        color: $color-title;
     }
 
     .hint {
