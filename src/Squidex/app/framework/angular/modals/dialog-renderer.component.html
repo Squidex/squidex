@@ -1,6 +1,5 @@
 <ng-content></ng-content>
 
-
 <ng-container *sqxModal="dialogView">
     <sqx-modal-dialog showClose="false" (close)="cancel()">
         <ng-container title>
@@ -8,7 +7,7 @@
         </ng-container>
     
         <ng-container content>
-            {{snapshot.dialogRequest?.text}}
+            <span [innerHTML]="snapshot.dialogRequest?.text"></span>
         </ng-container>
     
         <ng-container footer>
