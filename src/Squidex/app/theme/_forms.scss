@@ -67,7 +67,7 @@
 
 //
 // Form alerts.
-//  
+//
 .form-alert {
     & {
         @include border-radius(4px);
@@ -77,6 +77,13 @@
         font-size: .9rem;
         font-weight: normal;
         padding: .5rem;
+        padding-right: 1.5rem;
+    }
+
+    &-close {
+        @include absolute(0, 0, auto, auto);
+        padding: .5rem;
+        display: none;
     }
 
     &-error {
@@ -87,8 +94,40 @@
         background: $color-theme-green-dark;
     }
 
+    &.closeable {
+        position: relative;
+
+        .form-alert-close {
+            display: inline-block;
+        }
+    }
+
     ul {
         margin: 0;
+    }
+}
+
+.form-bubble {
+    & {
+        position: relative;
+    }
+
+    .form-alert {
+        @include absolute(.25rem, 0, auto, auto);
+        min-width: 200px;
+        max-width: 400px;
+        z-index: 1000;
+        text-align: left;
+
+        &::after {
+            @include absolute(-.75rem, .625rem, auto, auto);
+            content: '';
+            height: 0;
+            border-style: solid;
+            border-width: .4rem;
+            border-color: transparent transparent $color-theme-error;
+            width: 0;
+        }
     }
 }
 
