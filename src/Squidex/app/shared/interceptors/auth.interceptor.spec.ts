@@ -8,6 +8,7 @@
 import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock, Times } from 'typemoq';
@@ -17,15 +18,19 @@ import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
     let authService: IMock<AuthService>;
+    let router: IMock<Router>;
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);
+
+        router = Mock.ofType<Router>();
 
         TestBed.configureTestingModule({
             imports: [
                 HttpClientTestingModule
             ],
             providers: [
+                { provide: Router, useFactory: () => router.object },
                 { provide: AuthService, useValue: authService.object },
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 {
@@ -103,7 +108,7 @@ describe('AuthInterceptor', () => {
     }));
 
     [403].forEach(statusCode => {
-        it(`should logout for ${statusCode} status code`,
+        it(`should redirect for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
             authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
@@ -116,7 +121,7 @@ describe('AuthInterceptor', () => {
 
             expect().nothing();
 
-            authService.verify(x => x.logoutRedirect(), Times.once());
+            router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
         }));
     });
 

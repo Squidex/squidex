@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var result = new RolesDto
             {
                 Items =
-                    app.Roles.Values
+                    app.Roles.All
                         .Select(x => RoleDto.FromRole(x, app))
                         .Select(x => x.WithLinks(controller, appName))
                         .OrderBy(x => x.Name)

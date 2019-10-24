@@ -18,11 +18,11 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     {
         protected override void WriteValue(JsonWriter writer, Roles value, JsonSerializer serializer)
         {
-            var json = new Dictionary<string, string[]>(value.Count);
+            var json = new Dictionary<string, string[]>(value.CustomCount);
 
-            foreach (var role in value)
+            foreach (var role in value.Custom)
             {
-                json.Add(role.Key, role.Value.Permissions.ToIds().ToArray());
+                json.Add(role.Name, role.Permissions.ToIds().ToArray());
             }
 
             serializer.Serialize(writer, json);
@@ -32,7 +32,12 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<string, string[]>>(reader);
 
-            return new Roles(json.Select(Convert).ToArray());
+            if (json.Count == 0)
+            {
+                return Roles.Empty;
+            }
+
+            return new Roles(json.Select(Convert));
         }
 
         private static KeyValuePair<string, Role> Convert(KeyValuePair<string, string[]> kvp)
