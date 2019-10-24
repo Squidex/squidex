@@ -1,4 +1,5 @@
-﻿// ==========================================================================
+﻿
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -33,8 +34,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_schema_deleted()
         {
-            var sourceSchema = new Schema("source");
-            var targetSchema = (Schema)null;
+            var sourceSchema =
+                new Schema("source");
+
+            var targetSchema =
+                (Schema)null;
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -46,8 +50,12 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_category_changed()
         {
-            var sourceSchema = new Schema("source");
-            var targetSchema = new Schema("target").ChangeCategory("Category");
+            var sourceSchema =
+                new Schema("source");
+
+            var targetSchema =
+                new Schema("target")
+                    .ChangeCategory("Category");
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -64,8 +72,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 Create = "<create-script>"
             };
 
-            var sourceSchema = new Schema("source");
-            var targetSchema = new Schema("target").ConfigureScripts(scripts);
+            var sourceSchema =
+                new Schema("source");
+
+            var targetSchema =
+                new Schema("target").ConfigureScripts(scripts);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -82,8 +93,12 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 ["web"] = "Url"
             };
 
-            var sourceSchema = new Schema("source");
-            var targetSchema = new Schema("target").ConfigurePreviewUrls(previewUrls);
+            var sourceSchema =
+                new Schema("source");
+
+            var targetSchema =
+                new Schema("target")
+                    .ConfigurePreviewUrls(previewUrls);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -95,8 +110,12 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_schema_published()
         {
-            var sourceSchema = new Schema("source");
-            var targetSchema = new Schema("target").Publish();
+            var sourceSchema =
+                new Schema("source");
+
+            var targetSchema =
+                new Schema("target")
+                    .Publish();
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -108,8 +127,12 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_schema_unpublished()
         {
-            var sourceSchema = new Schema("source").Publish();
-            var targetSchema = new Schema("target");
+            var sourceSchema =
+                new Schema("source")
+                    .Publish();
+
+            var targetSchema =
+                new Schema("target");
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -207,7 +230,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).LockField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .LockField(nestedId.Id, arrayId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -225,7 +249,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).LockField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .LockField(stringId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -245,7 +270,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).HideField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .HideField(nestedId.Id, arrayId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -263,7 +289,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).HideField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .HideField(stringId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -278,7 +305,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var sourceSchema =
                 new Schema("source")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).HideField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .HideField(nestedId.Id, arrayId.Id);
 
             var targetSchema =
                 new Schema("target")
@@ -297,7 +325,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).HideField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .HideField(stringId.Id);
 
             var targetSchema =
                 new Schema("target")
@@ -321,7 +350,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).DisableField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .DisableField(nestedId.Id, arrayId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -339,7 +369,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).DisableField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .DisableField(stringId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -354,7 +385,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var sourceSchema =
                 new Schema("source")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).DisableField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .DisableField(nestedId.Id, arrayId.Id);
 
             var targetSchema =
                 new Schema("target")
@@ -373,7 +405,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).DisableField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .DisableField(stringId.Id);
 
             var targetSchema =
                 new Schema("target")
@@ -394,7 +427,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant).HideField(stringId.Id);
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
+                        .HideField(stringId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -457,7 +491,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(nestedId.Id, nestedId.Name)).HideField(nestedId.Id, arrayId.Id);
+                        .AddString(nestedId.Id, nestedId.Name))
+                            .HideField(nestedId.Id, arrayId.Id);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
