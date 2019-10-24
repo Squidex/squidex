@@ -47,6 +47,8 @@ namespace Squidex.Extensions.Actions.Discourse
                 json.Add("category", action.Category.Value);
             }
 
+            json["raw"] = Format(action.Text, @event);
+
             var requestBody = ToJson(json);
 
             var ruleJob = new DiscourseJob
@@ -54,8 +56,6 @@ namespace Squidex.Extensions.Actions.Discourse
                 RequestUrl = url,
                 RequestBody = requestBody
             };
-
-            json["raw"] = Format(action.Text, @event);
 
             var description =
                 action.Topic.HasValue ?
