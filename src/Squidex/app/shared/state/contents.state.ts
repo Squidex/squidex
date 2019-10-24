@@ -197,7 +197,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     return { ...s, contents, contentsPager };
                 });
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, {silent: true}));
     }
 
     public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
@@ -263,7 +263,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 this.replaceContent(updated, content.version);
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, {silent: true}));
     }
 
     public proposeDraft(content: ContentDto, request: any): Observable<ContentDto> {
@@ -273,7 +273,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 this.replaceContent(updated, content.version);
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, {silent: true}));
     }
 
     public discardDraft(content: ContentDto): Observable<ContentDto> {

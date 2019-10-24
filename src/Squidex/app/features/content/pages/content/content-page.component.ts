@@ -220,7 +220,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.dialogs.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
