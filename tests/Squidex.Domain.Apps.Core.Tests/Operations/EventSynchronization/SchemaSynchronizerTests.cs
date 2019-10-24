@@ -486,8 +486,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
-                        .AddString(20, "f2")
-                        .AddString(15, "f1"));
+                        .AddString(1, "f2")
+                        .AddString(2, "f1"));
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -509,8 +509,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(20, "f2", Partitioning.Invariant)
-                    .AddString(15, "f1", Partitioning.Invariant);
+                    .AddString(1, "f2", Partitioning.Invariant)
+                    .AddString(2, "f1", Partitioning.Invariant);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -532,8 +532,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .AddString(25, "f3", Partitioning.Invariant)
-                    .AddString(20, "f1", Partitioning.Invariant);
+                    .AddString(1, "f3", Partitioning.Invariant)
+                    .AddString(2, "f1", Partitioning.Invariant);
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -541,6 +541,31 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new FieldDeleted { FieldId = NamedId.Of(11L, "f2") },
                 new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
                 new SchemaFieldsReordered { FieldIds = new List<long> { 50, 10 } }
+            );
+        }
+
+        [Fact]
+        public void Should_create_events_if_fields_reordered_after_sync2()
+        {
+            var id1 = NamedId.Of(1, "f1");
+            var id2 = NamedId.Of(2, "f1");
+
+            var sourceSchema =
+                new Schema("source")
+                    .AddString(10, "f1", Partitioning.Invariant)
+                    .AddString(11, "f2", Partitioning.Invariant);
+
+            var targetSchema =
+                new Schema("target")
+                    .AddString(1, "f1", Partitioning.Invariant)
+                    .AddString(2, "f3", Partitioning.Invariant)
+                    .AddString(3, "f2", Partitioning.Invariant);
+
+            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
+                new SchemaFieldsReordered { FieldIds = new List<long> { 10, 50, 11 } }
             );
         }
     }
