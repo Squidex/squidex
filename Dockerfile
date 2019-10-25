@@ -43,8 +43,7 @@ RUN cd /tmp && npm install --loglevel=error
 COPY frontend .
 
 # Build Frontend
-RUN cp -a /tmp/node_modules src/Squidex/ \
- && cd src/Squidex \
+RUN cp -a /tmp/node_modules . \
  && npm run test:coverage \
  && npm run build
 
