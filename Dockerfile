@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
+FROM squidex/dotnet:3.0-buster-chromium-phantomjs-node as builder
 
 ARG SQUIDEX__VERSION=1.0.0
 
@@ -37,27 +37,20 @@ RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.
  && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64 -p:version=$SQUIDEX__VERSION
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Release -p:version=$SQUIDEX__VERSION
 
 #
 # Stage 2, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/core/runtime-deps:2.2-alpine3.8
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim
 
 # Default AspNetCore directory
 WORKDIR /app
 
-# add libuv & curl
-RUN apk update \
- && apk add --no-cache libc6-compat \
- && apk add --no-cache libuv \
- && apk add --no-cache curl \
- && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
-
 # Copy from build stage
-COPY --from=builder /out/alpine .
+COPY --from=builder /out/ .
 
 EXPOSE 80
 EXPOSE 11111
 
-ENTRYPOINT ["./Squidex"]
+ENTRYPOINT ["dotnet", "Squidex.dll"]

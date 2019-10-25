@@ -39,7 +39,9 @@ namespace Squidex.Infrastructure.Diagnostics
 
             var status = allocated < threshold ? HealthStatus.Healthy : HealthStatus.Unhealthy;
 
-            return Task.FromResult(new HealthCheckResult(status, $"Application must consum less than {threshold.ToReadableSize()} memory.", data: data));
+            var message = $"Application must consume less than {threshold.ToReadableSize()} memory.";
+
+            return Task.FromResult(new HealthCheckResult(status, message, data: data));
         }
     }
 }

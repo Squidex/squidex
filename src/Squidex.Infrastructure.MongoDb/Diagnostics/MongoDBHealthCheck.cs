@@ -29,7 +29,9 @@ namespace Squidex.Infrastructure.Diagnostics
 
             var result = await collectionNames.AnyAsync(cancellationToken);
 
-            var status = result ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+            var status = result ?
+                HealthStatus.Healthy :
+                HealthStatus.Unhealthy;
 
             return new HealthCheckResult(status, "Application must query data from MongoDB");
         }
