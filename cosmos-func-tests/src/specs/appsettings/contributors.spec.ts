@@ -13,28 +13,31 @@ import {
 
 describe('VEGA-323 : Contributors Functionality', () => {
     let hasRunBefore = false;
-    let loginPage: LoginPage;
-    let homePage: HomePage;
     let appPage: AppPage;
     let contributorsPage: ContributorsPage;
+    let homePage: HomePage;
+    let loginPage: LoginPage;
+
 
     beforeAll(async () => {
+
         loginPage = new LoginPage();
         await loginPage.login(Users.find(u => u.name === 'vegaAdmin')!);
     });
 
     beforeEach(async () => {
+
         // initializing page object classes before every test so they don't refer to stale elements
         appPage = new AppPage();
-        homePage = new HomePage();
         contributorsPage = new ContributorsPage();
+        homePage = new HomePage();
+
         if (hasRunBefore) {
             // Go back to the home page and reset local store to get rid of all autosaved content.
             await homePage.navigateTo();
             await homePage.resetBrowserLocalStore();
 
         }
-
         await homePage.navigateTo();
         await homePage.selectCommentaryApp('commentary');
 

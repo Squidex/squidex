@@ -81,7 +81,7 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async navigateToContentsTable() {
-        return await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//i[@class=\'icon-angle-left\']')));
+        return await this.waitForElementToBeVisibleAndClick(element.all(by.css('.icon-close')).get(1));
     }
 
     public async createCommentaryWithoutSave(commentary: string) {

@@ -33,7 +33,9 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
         browserPage = new BrowserUtil();
         contentPage = new ContentPage();
         homePage = new HomePage();
+        loginPage = new LoginPage();
         searchPage = new SearchPage();
+
         if (hasRunBefore) {
             // Go back to the home page and reset local store to get rid of all autosaved content.
             await homePage.navigateTo();

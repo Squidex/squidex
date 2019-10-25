@@ -3,9 +3,6 @@ import { browser, by, element, ElementFinder } from 'protractor';
 import { BrowserUtil } from './../utils';
 
 export class HomePage extends BrowserUtil {
-    public getAppName(appName: string) {
-        return element(by.cssContainingText('.card-title', appName));
-    }
 
     public getProfileDropdown() {
         return element(by.css('.user'));
@@ -27,6 +24,10 @@ export class HomePage extends BrowserUtil {
         return element(by.tagName('img')).get(1);
     }
 
+    public async getAppName(appName: string) {
+        return await element(by.cssContainingText('.card-title', appName));
+    }
+
     public async getWelcomeText() {
         return await this.waitForElementToBeVisibleAndGetText(this.getWelcomeElement());
     }
@@ -40,11 +41,11 @@ export class HomePage extends BrowserUtil {
     }
 
     public async selectCommentaryApp(appName: string) {
-        return this.selectApp(appName);
+        return await this.selectApp(appName);
     }
 
     public async selectApp(appName: string) {
-        const card = this.getAppName(appName);
+        const card = await this.getAppName(appName);
 
         await this.waitForElementToBeVisibleAndClick(card);
     }

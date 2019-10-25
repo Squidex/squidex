@@ -23,6 +23,10 @@ import { PanelContainerDirective } from './panel-container.directive';
 export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     private styleWidth: string;
 
+    public renderWidth = 0;
+
+    public isViewInit = false;
+
     @Output()
     public close = new EventEmitter();
 
@@ -63,17 +67,14 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public contentClass = '';
 
     @Input()
-    public customClose = false;
-
-    @Input()
     public sidebarClass = '';
 
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;
 
-    public renderWidth = 0;
-
-    public isViewInit = false;
+    public get customClose() {
+        return this.close.observers.length > 0;
+    }
 
     constructor(
         private readonly container: PanelContainerDirective,

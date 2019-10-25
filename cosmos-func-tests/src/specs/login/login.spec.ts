@@ -26,7 +26,9 @@ describe('User Login', () => {
     });
 
     beforeEach(async () => {
+        // initializing page object classes before every test so they don't refer to stale elements
         homePage = new HomePage();
+        loginPage = new LoginPage();
     });
 
     it('Verify logging into Cosmos with valid credentials', async () => {
@@ -34,7 +36,7 @@ describe('User Login', () => {
         const welcomeText = await homePage.getWelcomeText();
         expect(welcomeText).toEqual(constants.loginTest.adminWelcomeMessage);
 
-        const currentUrl = await homePage.getCurrentURL();
-        expect(currentUrl).toBe(`${browser.params.baseUrl}/app`);
+        const currentUrl = await homePage.getCurrentURL(`${browser.params.baseUrl}/app`);
+        expect(currentUrl).toBe(true);
     });
 });

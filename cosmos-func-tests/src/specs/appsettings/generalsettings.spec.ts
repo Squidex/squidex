@@ -25,9 +25,12 @@ describe('VEGA-323 : App Settings', () => {
     });
 
     beforeEach(async () => {
+        // initializing page object classes before every test so they don't refer to stale elements
         appPage = new AppPage();
         homePage = new HomePage();
+        loginPage = new LoginPage();
         generalSettingsPage = new GeneralSettingsPage();
+
         if (hasRunBefore) {
             // Go back to the home page and reset local store to get rid of all autosaved content.
             await homePage.navigateTo();

@@ -145,8 +145,8 @@ export class BrowserUtil {
     }
 
     // get current url of the page
-    public async getCurrentURL() {
-        return await browser.getCurrentUrl();
+    public async getCurrentURL(myurl: string) {
+        return await browser.wait(until.urlContains(myurl), 5000);
     }
 
     // wait for angular enabled
@@ -177,7 +177,7 @@ export class BrowserUtil {
     }
 
     public async browserScriptToClick(locator: ElementFinder) {
-        await browser.executeScript('arguments[0].click();', locator);
+        return await browser.executeScript('arguments[0].click();', locator);
     }
 
     public async browserScriptToClickAndSetValue(locator: ElementFinder | WebElement, text: string) {

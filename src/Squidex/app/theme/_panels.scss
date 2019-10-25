@@ -2,7 +2,7 @@
 @import '_vars';
 
 @mixin panel-icon {
-    color: $color-panel-icon;
+    color: $color-panel-icon !important;
     font-size: 1.2rem;
     font-weight: 400;
     text-decoration: none;
