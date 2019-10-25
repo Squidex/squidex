@@ -5,13 +5,12 @@
   "license": "MIT",
   "repository": "https://github.com/SebastianStehle/Squidex",
   "scripts": {
-    "copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
-    "start": "npm run copy && webpack-dev-server --config app-config/webpack.config.js --inline --port 3000 --hot",
+    "start": "webpack-dev-server --config app-config/webpack.config.js --inline --port 3000 --hot",
     "test": "karma start",
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
     "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts",
-    "build": "npm run copy && node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env.production",
+    "build": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env.production",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {
@@ -64,7 +63,6 @@
     "caniuse-lite": "1.0.30000998",
     "circular-dependency-plugin": "5.2.0",
     "codelyzer": "5.1.2",
-    "cpx": "1.5.0",
     "css-loader": "3.2.0",
     "file-loader": "4.2.0",
     "html-loader": "0.5.5",

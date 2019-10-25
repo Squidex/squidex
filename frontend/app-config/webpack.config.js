@@ -1,5 +1,5 @@
 const webpack = require('webpack'),
-    path = require('path');
+         path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
 
@@ -210,7 +210,7 @@ module.exports = function (env) {
                  *
                  * See: https://webpack.js.org/configuration/output/#output-path
                  */
-                path: root('wwwroot/build/'),
+                path: root('/build/'),
 
                 publicPath: './build/',
 
@@ -244,13 +244,13 @@ module.exports = function (env) {
                 hash: true,
                 chunks: ['shims', 'app'],
                 chunksSortMode: 'manual',
-                template: 'wwwroot/index.html'
+                template: 'app/index.html'
             })
         );
 
         config.plugins.push(
             new plugins.HtmlWebpackPlugin({
-                template: 'wwwroot/_theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
+                template: 'app/_theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
             })
         );
 

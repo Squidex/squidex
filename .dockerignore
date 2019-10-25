@@ -8,19 +8,19 @@
 .git
 
 # Build results
-bin/
-build/
-obj/
-out/
-publish/
+**/bin
+**/build
+**/obj
+**/out
+**/publish
 
 # Test Output
-_test-output/
+**/_test-output
 
 # NodeJS 
-node_modules/
+**/node_modules
 
-src/Squidex/Assets/*.*
+backend/src/Squidex/Assets/*.*
 
 **/appsettings.Development.json
 **/appsettings.Production.json

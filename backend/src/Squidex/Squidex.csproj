@@ -13,12 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="dockerfile">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\extensions\Squidex.Extensions\Squidex.Extensions.csproj" />
     <ProjectReference Include="..\..\tools\Migrate_01\Migrate_01.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
@@ -108,16 +102,10 @@
 
   <ItemGroup>
     <Compile Remove="Assets\**" />
-    <Compile Remove="_test-output\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Assets\**" />
-    <Content Remove="package-lock.json" />
-    <Content Remove="package.json" />
-    <Content Remove="tsconfig.json" />
-    <Content Remove="tslint.json" />
-    <Content Remove="_test-output\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -134,11 +122,6 @@
 
   <ItemGroup>
     <None Remove="Assets\**" />
-    <None Include="package-lock.json" />
-    <None Include="package.json" />
-    <None Include="tsconfig.json" />
-    <None Include="tslint.json" />
-    <None Remove="_test-output\**" />
   </ItemGroup>
 
   <PropertyGroup>
