@@ -86,8 +86,8 @@ namespace Squidex.Infrastructure.Orleans
                 .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
-            // A.CallTo(() => reader.Length)
-            //    .ReturnsLazily(x => (int)buffer.Length);
+            A.CallTo(() => reader.Length)
+                .ReturnsLazily(x => (int)buffer.Length);
 
             return new DeserializationContext(null) { StreamReader = reader };
         }

@@ -95,7 +95,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
     <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\IdentityCert.pfx" />
-    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\IdentityCert.snk" />
     <EmbeddedResource Include="Docs\schemabody.md" />
     <EmbeddedResource Include="Docs\schemaquery.md" />
     <EmbeddedResource Include="Docs\security.md" />
@@ -124,7 +123,6 @@
   <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
     <None Remove="Areas\IdentityServer\Config\Cert\IdentityCert.pfx" />
-    <None Remove="Areas\IdentityServer\Config\Cert\IdentityCert.snk" />
     <None Remove="Docs\schemabody.md" />
     <None Remove="Docs\schemaquery.md" />
     <None Remove="Docs\security.md" />

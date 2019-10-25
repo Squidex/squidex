@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
@@ -57,12 +58,14 @@ namespace Squidex
             services.AddSquidexInfrastructure(config);
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);
+            services.AddSquidexOpenApiSettings();
             services.AddSquidexQueries(config);
             services.AddSquidexRules(config);
             services.AddSquidexSchemas();
             services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
+            services.AddSquidexTranslation(config);
             services.AddSquidexUsageTracking(config);
         }
 

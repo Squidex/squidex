@@ -8,8 +8,8 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -83,7 +83,7 @@ namespace Squidex.Web.Pipeline
 
         private static bool AllowAnonymous(ActionExecutingContext context)
         {
-            return context.ActionDescriptor.FilterDescriptors.Any(x => x.Filter is AllowAnonymousFilter);
+            return context.ActionDescriptor.EndpointMetadata.Any(x => x is AllowAnonymousAttribute);
         }
 
         private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)

@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Contents;
+using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Areas.Api.Controllers.UI;
@@ -106,6 +107,9 @@ namespace Squidex.Config.Domain
                 config.GetSection("news"));
 
             services.AddSingletonAs<FeaturesService>()
+                .AsSelf();
+
+            services.AddSingletonAs<SchemasOpenApiGenerator>()
                 .AsSelf();
         }
     }

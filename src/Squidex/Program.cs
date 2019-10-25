@@ -34,12 +34,6 @@ namespace Squidex
                 {
                     builder.ConfigureForSquidex(context.Configuration);
                 })
-                .ConfigureWebHostDefaults(builder =>
-                {
-                    builder.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
-
-                    builder.UseStartup<Startup>();
-                })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
                     builder.ConfigureForSquidex(hostContext.HostingEnvironment, args);
@@ -70,6 +64,12 @@ namespace Squidex
 
                     // Step 6: Start background processes.
                     services.AddHostedService<BackgroundHost>();
+                })
+                .ConfigureWebHostDefaults(builder =>
+                {
+                    builder.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
+
+                    builder.UseStartup<Startup>();
                 });
     }
 }

@@ -81,13 +81,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<RuleCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentsGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<GrainCommandMiddleware<RuleCommand, IRuleGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()

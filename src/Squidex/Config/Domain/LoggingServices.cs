@@ -93,12 +93,12 @@ namespace Squidex.Config.Domain
                     {
                         var subCategory2 = subCategory.Slice(8);
 
-                        if (subCategory.StartsWith("NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
+                        if (subCategory2.StartsWith("NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
                         {
                             return level >= LogLevel.Error;
                         }
 
-                        if (subCategory.StartsWith("SafeTimer", StringComparison.OrdinalIgnoreCase))
+                        if (subCategory2.StartsWith("SafeTimer", StringComparison.OrdinalIgnoreCase))
                         {
                             return level >= LogLevel.Error;
                         }
