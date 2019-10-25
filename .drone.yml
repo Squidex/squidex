@@ -63,9 +63,12 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build -t squidex-build-image -f Dockerfile.build --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
-      - docker create --name squidex-build-container squidex-build-image
-      - docker cp squidex-build-container:/out /build
+      - docker build -t squidex-backend-image -f Dockerfile.backend --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
+      - docker build -t squidex-frontend-image -f Dockerfile.fronend .
+      - docker create --name squidex-backend-container squidex-backend-image
+      - docker create --name squidex-frontend-container squidex-frontend-image
+      - docker cp squidex-backend-container:/build /build
+      - docker cp squidex-frontend-container:/build /build/wwwroot/build
     volumes:
       - name: build
         path: /build
@@ -117,8 +120,10 @@ steps:
   - name: cleanup-build
     image: docker
     commands:
-      - docker rm squidex-build-container
-      - docker rmi squidex-build-image
+      - docker rm squidex-backend-container
+      - docker rm squidex-frontend-container
+      - docker rmi squidex-backend-image
+      - docker rmi squidex-frontend-image
     volumes:
       - name: docker1
         path: /var/run/docker.sock
@@ -141,8 +146,10 @@ steps:
       - name: docker2
         path: /var/lib/docker
     when:
-      status:
-        - failure
+      event:
+        - push
+      branch:
+        - cleaned
       
 volumes:
   - name: build

@@ -27,6 +27,7 @@ RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION
 
+
 #
 # Stage 2, Build Frontend
 #
@@ -46,6 +47,9 @@ COPY frontend .
 RUN cp -a /tmp/node_modules . \
  && npm run test:coverage \
  && npm run build
+
+RUN cp -a build /build/
+
 
 #
 # Stage 3, Build runtime

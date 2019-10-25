@@ -7,7 +7,7 @@ docker build . -t squidex-build-backend-image -f dockerfile.backend
 docker create --name squidex-build-backend-container squidex-build-backend-image
 
 # Copy the output to the host file system
-docker cp squidex-build-backend-container:/out ./publish
+docker cp squidex-build-backend-container:/build/ ./publish
 
 # Cleanup
 docker rm squidex-build-backend-container
@@ -23,7 +23,7 @@ docker build . -t squidex-build-frontend-image -f dockerfile.frontend
 docker create --name squidex-build-frontend-container squidex-build-frontend-image
 
 # Copy the output to the host file system
-docker cp squidex-build-frontend-container:/out ./publish/wwwroot/build
+docker cp squidex-build-frontend-container:/build/ ./publish/wwwroot/build
 
 # Cleanup
 docker rm squidex-build-frontend-container

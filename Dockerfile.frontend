@@ -14,3 +14,5 @@ COPY frontend .
 RUN cp -a /tmp/node_modules . \
  && npm run test:coverage \
  && npm run build
+
+RUN cp -a build /build/
