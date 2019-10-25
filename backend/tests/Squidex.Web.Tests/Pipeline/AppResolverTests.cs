@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -43,7 +44,7 @@ namespace Squidex.Web.Pipeline
         {
             actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
             {
-                FilterDescriptors = new List<FilterDescriptor>()
+                EndpointMetadata = new List<object>()
             });
 
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
@@ -110,14 +111,14 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_resolve_app_if_anonymouse_but_not_permissions()
+        public async Task Should_resolve_app_if_anonymous_but_not_permissions()
         {
             var app = CreateApp(appName);
 
             user.AddClaim(new Claim(OpenIdClaims.ClientId, "client1"));
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            actionContext.ActionDescriptor.FilterDescriptors.Add(new FilterDescriptor(new AllowAnonymousFilter(), 1));
+            actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
             A.CallTo(() => appProvider.GetAppAsync(appName))
                 .Returns(app);
