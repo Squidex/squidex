@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.States
 
             UpdateVersion();
 
-            if (expectedVersion != EtagVersion.Any && expectedVersion != version)
+            if (expectedVersion > EtagVersion.Any && expectedVersion != version)
             {
                 if (version == EtagVersion.Empty)
                 {

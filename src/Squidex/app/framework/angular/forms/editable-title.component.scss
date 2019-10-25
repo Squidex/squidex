@@ -2,6 +2,10 @@
 @import '_mixins';
 
 .title {
+    & {
+        position: relative;
+    }
+
     &-edit {
         color: $color-border-dark;
         display: none;
@@ -14,20 +18,31 @@
     }
 
     &-name {
-        padding: .375rem 0;
         font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         font-size: 1.2rem;
         font-weight: normal;
-        line-height: 1.5rem;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-        display: inline-block;
+        display: inline;
         margin: 0;
+    }
+
+    &-view {
+        @include truncate;
+        padding: .375rem 0;
+        position: absolute;
+        border-top: 0;
+        border-bottom: 1px solid transparent;
+        line-height: 1.5rem;
     }
 
     &:hover {
         .title-edit {
-            display: inline-block;
+            display: inline;
         }
+    }
+}
+
+h3 {
+    &.fallback {
+        color: $color-text-decent;
     }
 }

@@ -80,9 +80,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return text;
             }
 
-            if (text.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) && text.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
+            var trimmed = text.Trim();
+
+            if (trimmed.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) && trimmed.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
             {
-                var script = text.Substring(ScriptPrefix.Length, text.Length - ScriptPrefix.Length - ScriptSuffix.Length);
+                var script = trimmed.Substring(ScriptPrefix.Length, trimmed.Length - ScriptPrefix.Length - ScriptSuffix.Length);
 
                 var customFunctions = new Dictionary<string, Func<string>>
                 {

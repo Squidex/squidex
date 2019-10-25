@@ -5,14 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormControl } from '@angular/forms';
 
 import {
     AppLanguageDto,
     EditContentForm,
     FieldDto,
-    MathHelper
+    MathHelper,
+    RootFieldDto,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -31,7 +33,7 @@ export class FieldEditorComponent {
     public field: FieldDto;
 
     @Input()
-    public control: FormControl;
+    public control: AbstractControl;
 
     @Input()
     public language: AppLanguageDto;
@@ -45,5 +47,30 @@ export class FieldEditorComponent {
     @Input()
     public displaySuffix: string;
 
+    @ViewChild('editor', { static: false })
+    public editor: ElementRef;
+
+    public get arrayControl() {
+        return this.control as FormArray;
+    }
+
+    public get editorControl() {
+        return this.control as FormControl;
+    }
+
+    public get rootField() {
+        return this.field as RootFieldDto;
+    }
+
     public uniqueId = MathHelper.guid();
+
+    public reset() {
+        if (this.editor.nativeElement && Types.isFunction(this.editor.nativeElement['reset'])) {
+            this.editor.nativeElement['reset']();
+        }
+
+        if (this.editor && Types.isFunction(this.editor['reset'])) {
+            this.editor['reset']();
+        }
+    }
 }

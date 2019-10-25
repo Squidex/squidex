@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasIndex(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {

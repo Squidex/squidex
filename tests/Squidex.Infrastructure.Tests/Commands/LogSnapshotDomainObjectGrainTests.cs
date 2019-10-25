@@ -94,6 +94,16 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_get_latestet_version_when_requesting_state_with_auto()
+        {
+            await SetupUpdatedAsync();
+
+            var result = sut.GetSnapshot(EtagVersion.Auto);
+
+            result.Should().BeEquivalentTo(new MyDomainState { Value = 8, Version = 1 });
+        }
+
+        [Fact]
         public async Task Should_get_empty_version_when_requesting_state_with_empty_version()
         {
             await SetupUpdatedAsync();
@@ -117,7 +127,7 @@ namespace Squidex.Infrastructure.Commands
         {
             await SetupUpdatedAsync();
 
-            Assert.Null(sut.GetSnapshot(-3));
+            Assert.Null(sut.GetSnapshot(-4));
             Assert.Null(sut.GetSnapshot(2));
         }
 

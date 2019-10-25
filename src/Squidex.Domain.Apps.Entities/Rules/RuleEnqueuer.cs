@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -18,7 +19,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleEnqueuer : IEventConsumer
+    public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(10);
         private readonly IRuleEventRepository ruleEventRepository;
@@ -62,6 +63,19 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return TaskHelper.Done;
         }
 
+        public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
+        {
+            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(@event, nameof(@event));
+
+            var job = await ruleService.CreateJobAsync(rule, ruleId, @event);
+
+            if (job != null)
+            {
+                await ruleEventRepository.EnqueueAsync(job, job.Created);
+            }
+        }
+
         public async Task On(Envelope<IEvent> @event)
         {
             if (@event.Payload is AppEvent appEvent)
@@ -70,12 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 foreach (var ruleEntity in rules)
                 {
-                    var job = await ruleService.CreateJobAsync(ruleEntity.RuleDef, ruleEntity.Id, @event);
-
-                    if (job != null)
-                    {
-                        await ruleEventRepository.EnqueueAsync(job, job.Created);
-                    }
+                    await Enqueue(ruleEntity.RuleDef, ruleEntity.Id, @event);
                 }
             }
         }

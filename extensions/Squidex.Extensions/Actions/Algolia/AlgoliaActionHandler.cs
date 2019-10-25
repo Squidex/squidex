@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Algolia.Search;
@@ -12,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using AlgoliaIndex = Algolia.Search.Index;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 
@@ -19,12 +21,12 @@ namespace Squidex.Extensions.Actions.Algolia
 {
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
     {
-        private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
+        private readonly ClientPool<(string AppId, string ApiKey, string IndexName), AlgoliaIndex> clients;
 
         public AlgoliaActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
-            clients = new ClientPool<(string AppId, string ApiKey, string IndexName), Index>(key =>
+            clients = new ClientPool<(string AppId, string ApiKey, string IndexName), AlgoliaIndex>(key =>
             {
                 var client = new AlgoliaClient(key.AppId, key.ApiKey);
 
@@ -72,9 +74,9 @@ namespace Squidex.Extensions.Actions.Algolia
 
                         json = JObject.Parse(jsonString);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        json = new JObject(new JProperty("error", "Invalid JSON"));
+                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
                     }
 
                     ruleJob.Content = json;

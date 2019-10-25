@@ -64,7 +64,8 @@ namespace Squidex.Domain.Apps.Core
                     new SchemaConverter(),
                     new StatusConverter(),
                     new StringEnumConverter(),
-                    new WorkflowConverter()),
+                    new WorkflowConverter(),
+                    new WorkflowTransitionConverter()),
 
                 TypeNameHandling = typeNameHandling
             };
@@ -139,9 +140,7 @@ namespace Squidex.Domain.Apps.Core
             foreach (var property in properties)
             {
                 var value =
-                    property.PropertyType.IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
+                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
 
                 property.SetValue(sut, value);
 
@@ -155,9 +154,7 @@ namespace Squidex.Domain.Apps.Core
             foreach (var property in properties)
             {
                 var value =
-                    property.PropertyType.IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
+                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
 
                 Assert.Throws<InvalidOperationException>(() =>
                 {

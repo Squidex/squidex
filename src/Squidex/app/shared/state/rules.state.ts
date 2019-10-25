@@ -124,6 +124,14 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public rename(rule: RuleDto, name: string): Observable<RuleDto> {
+        return this.rulesService.putRule(this.appName, rule, { name }, rule.version).pipe(
+            tap(updated => {
+                this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public enable(rule: RuleDto): Observable<any> {
         return this.rulesService.enableRule(this.appName, rule, rule.version).pipe(
             tap(updated => {
@@ -136,6 +144,14 @@ export class RulesState extends State<Snapshot> {
         return this.rulesService.disableRule(this.appName, rule, rule.version).pipe(
             tap(updated => {
                 this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public trigger(rule: RuleDto): Observable<any> {
+        return this.rulesService.triggerRule(this.appName, rule).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Rule has been added to the queue.');
             }),
             shareSubscribed(this.dialogs));
     }

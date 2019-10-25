@@ -19,11 +19,15 @@
         line-height: 2.2rem;
     }
 
-    .header-text {
+    .header-index {
         display: inline-block;
-        min-width: 70px;
-        max-width: 100px;
+        min-width: 3rem;
+        max-width: 3rem;
     }
+}
+
+.col {
+    overflow: hidden;
 }
 
 .btn-text-secondary {

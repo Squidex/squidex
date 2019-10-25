@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [Required]
         public RuleDto[] Items { get; set; }
 
-        public static RulesDto FromRules(IEnumerable<IRuleEntity> items, ApiController controller, string app)
+        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, ApiController controller, string app)
         {
             var result = new RulesDto
             {

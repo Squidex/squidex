@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
@@ -12,7 +13,9 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
-    LanguagesState
+    LanguageDto,
+    LanguagesState,
+    sorted
 } from '@app/shared';
 
 @Component({
@@ -28,12 +31,12 @@ export class LanguageComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public fallbackLanguages: ReadonlyArray<AppLanguageDto>;
+    public fallbackLanguages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public fallbackLanguagesNew: ReadonlyArray<AppLanguageDto>;
+    public fallbackLanguagesNew: ReadonlyArray<LanguageDto>;
 
-    public otherLanguage: AppLanguageDto;
+    public otherLanguage: LanguageDto;
 
     public isEditing = false;
     public isEditable = false;
@@ -61,6 +64,10 @@ export class LanguageComponent implements OnChanges {
 
     public remove() {
         this.languagesState.remove(this.language);
+    }
+
+    public sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
+        this.fallbackLanguages = sorted(event);
     }
 
     public save() {

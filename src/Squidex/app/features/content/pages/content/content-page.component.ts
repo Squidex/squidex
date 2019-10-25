@@ -62,7 +62,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public trackByFieldFn: Function;
+    public get hasContent() {
+        return !!this.content;
+    }
+
+    public trackByFieldFn: (index: number, field: FieldDto) => any;
 
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
@@ -152,17 +156,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.hasChanged()) {
-            return of(true);
-        } else {
-            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?').pipe(
-                tap(confirmed => {
-                    if (confirmed) {
-                        this.autoSaveService.remove(this.autoSaveKey);
-                    }
-                })
-            );
-        }
+        return this.checkPendingChanges('close the current content view').pipe(
+            tap(confirmed => {
+                if (confirmed) {
+                    this.autoSaveService.remove(this.autoSaveKey);
+                }
+            })
+        );
     }
 
     public saveAndPublish() {
@@ -181,11 +181,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const value = this.contentForm.submit();
 
         if (value) {
-            this.autoSaveService.remove(this.autoSaveKey);
-
             if (this.content) {
                 if (asDraft) {
-                    if (this.content && !this.content.canDraftPropose) {
+                    if (!this.content.canDraftPropose) {
                         return;
                     }
 
@@ -196,7 +194,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentForm.submitFailed(error);
                         });
                 } else {
-                    if (this.content && !this.content.canUpdateAny) {
+                    if (!this.content.canUpdate) {
                         return;
                     }
 
@@ -208,7 +206,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         });
                 }
             } else {
-                if ((publish && !this.contentsState.snapshot.canCreate) || (!publish && !this.contentsState.snapshot.canCreateAndPublish)) {
+                if (!this.canCreate(publish)) {
                     return;
                 }
 
@@ -222,25 +220,20 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.dialogs.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+        }
+    }
+
+    private canCreate(publish: boolean) {
+        if (publish) {
+            return this.contentsState.snapshot.canCreateAndPublish;
+        } else {
+            return this.contentsState.snapshot.canCreate;
         }
     }
 
     public back() {
         this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
-    }
-
-    private loadContent(data: any, isInitial: boolean) {
-        this.isLoadingContent = true;
-
-        this.autoSaveService.remove(this.autoSaveKey);
-
-        try {
-            this.contentForm.load(data, isInitial);
-            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
-        } finally {
-            this.isLoadingContent = false;
-        }
     }
 
     public discardChanges() {
@@ -255,15 +248,31 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public publishChanges() {
-        this.dueTimeSelector.selectDueTime('Publish').pipe(
-                switchMap(d => this.contentsState.publishDraft(this.content, d)), onErrorResumeNext())
+        this.checkPendingChanges('publish your changes').pipe(
+                filter(x => !!x),
+                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                switchMap(d => this.contentsState.publishDraft(this.content, d)),
+                onErrorResumeNext())
             .subscribe();
     }
 
     public changeStatus(status: string) {
-        this.dueTimeSelector.selectDueTime(status).pipe(
-                switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
+        this.checkPendingChanges('change the status').pipe(
+                filter(x => !!x),
+                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                switchMap(d => this.contentsState.changeStatus(this.content, status, d)),
+                onErrorResumeNext())
             .subscribe();
+    }
+
+    private checkPendingChanges(action: string) {
+        return this.contentForm.hasChanged() ?
+            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n**Do you want to continue anyway?**`) :
+            of(true);
+    }
+
+    public showLatest() {
+        this.loadVersion(null, false);
     }
 
     private loadVersion(version: Version | null, compare: boolean) {
@@ -292,8 +301,17 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public showLatest() {
-        this.loadVersion(null, false);
+    private loadContent(data: any, isInitial: boolean) {
+        this.isLoadingContent = true;
+
+        this.autoSaveService.remove(this.autoSaveKey);
+
+        try {
+            this.contentForm.load(data, isInitial);
+            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
+        } finally {
+            this.isLoadingContent = false;
+        }
     }
 
     public trackByField(index: number, field: FieldDto) {

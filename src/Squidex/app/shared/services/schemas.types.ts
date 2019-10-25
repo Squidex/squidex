@@ -139,6 +139,7 @@ export abstract class FieldPropertiesDto {
     public readonly isRequired: boolean = false;
     public readonly label?: string;
     public readonly placeholder?: string;
+    public readonly tags?: ReadonlyArray<string>;
 
     public get isTranslateable() {
         return false;
@@ -174,6 +175,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
     public readonly allowDuplicates?: boolean;
+    public readonly resolveImage: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;

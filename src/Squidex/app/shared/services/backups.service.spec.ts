@@ -198,7 +198,7 @@ describe('BackupsService', () => {
             stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00` : null,
             handledEvents: id * 17,
             handledAssets: id * 23,
-            status: id % 2 === 0 ? 'Status' : 'Failed',
+            status: id % 2 === 0 ? 'Success' : 'Failed',
             _links: {
                 download: { method: 'GET', href: '/api/backups/1' }
             }
@@ -217,5 +217,5 @@ export function createBackup(id: number) {
         id % 2 === 0 ? DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`) : null,
         id * 17,
         id * 23,
-        id % 2 === 0 ? 'Status' : 'Failed');
+        id % 2 === 0 ? 'Success' : 'Failed');
 }

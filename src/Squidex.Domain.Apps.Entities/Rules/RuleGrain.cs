@@ -25,13 +25,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
     {
         private readonly IAppProvider appProvider;
+        private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider)
+        public RuleGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
-            Guard.NotNull(appProvider);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
 
             this.appProvider = appProvider;
+
+            this.ruleEnqueuer = ruleEnqueuer;
         }
 
         protected override Task<object?> ExecuteAsync(IAggregateCommand command)
@@ -52,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case UpdateRule updateRule:
                     return UpdateReturnAsync(updateRule, async c =>
                     {
-                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
+                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider, Snapshot.RuleDef);
 
                         Update(c);
 
@@ -83,9 +87,20 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         Delete(c);
                     });
+                case TriggerRule triggerRule:
+                    return Trigger(triggerRule);
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private async Task<object?> Trigger(TriggerRule command)
+        {
+            var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
+
+            await ruleEnqueuer.Enqueue(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+
+            return null;
         }
 
         public void Create(CreateRule command)

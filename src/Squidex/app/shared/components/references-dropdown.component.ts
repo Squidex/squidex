@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
-    AppLanguageDto,
     AppsState,
     ContentDto,
     ContentsService,
     getContentValue,
+    LanguageDto,
     StatefulControlComponent,
     Types,
     UIOptions
@@ -48,8 +48,8 @@ const NO_EMIT = { emitEvent: false };
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnInit {
-    private languageField: AppLanguageDto;
+export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
+    private languageField: LanguageDto;
     private selectedId: string | undefined;
     private itemCount: number;
 
@@ -60,10 +60,14 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public mode: 'Array' | 'Single';
 
     @Input()
-    public set language(value: AppLanguageDto) {
+    public set language(value: LanguageDto) {
         this.languageField = value;
 
         this.next(s => ({ ...s, contentNames: this.createContentNames(s.contents) }));
+    }
+
+    public get isValid() {
+        return !!this.schemaId && !!this.languageField;
     }
 
     public selectionControl = new FormControl('');
@@ -102,23 +106,36 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 }));
     }
 
-    public ngOnInit() {
-        if (!this.schemaId || this.language) {
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['schemaId']) {
+            this.resetState();
+
+            if (this.isValid) {
+                this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
+                    .subscribe(contents => {
+                        const contentItems = contents.items;
+                        const contentNames = this.createContentNames(contentItems);
+
+                        this.next(s => ({ ...s, contents: contentItems, contentNames }));
+
+                        this.selectContent();
+                    }, () => {
+                        this.selectionControl.disable();
+                    });
+            } else {
+                this.selectionControl.disable();
+            }
+        }
+    }
+
+    public setDisabledState(isDisabled: boolean) {
+        if (isDisabled) {
             this.selectionControl.disable();
-            return;
+        } else if (this.isValid) {
+            this.selectionControl.enable();
         }
 
-        this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
-            .subscribe(contents => {
-                const contentItems = contents.items;
-                const contentNames = this.createContentNames(contentItems);
-
-                this.next(s => ({ ...s, contents: contentItems, contentNames }));
-
-                this.selectContent();
-            }, () => {
-                this.selectionControl.disable();
-            });
+        super.setDisabledState(isDisabled);
     }
 
     public writeValue(obj: any) {

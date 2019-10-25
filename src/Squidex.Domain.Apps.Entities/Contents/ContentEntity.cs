@@ -28,11 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Instant LastModified { get; set; }
 
-        public ScheduleJob ScheduleJob { get; set; }
-
         public RefToken CreatedBy { get; set; }
 
         public RefToken LastModifiedBy { get; set; }
+
+        public ScheduleJob ScheduleJob { get; set; }
 
         public NamedContentData? Data { get; set; }
 
@@ -56,6 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool IsPending { get; set; }
 
-        public HashSet<object> CacheDependencies { get; set; }
+        public HashSet<object?> CacheDependencies { get; set; }
     }
 }

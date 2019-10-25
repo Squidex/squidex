@@ -15,7 +15,13 @@ namespace Squidex.Domain.Apps.Core.Rules
     {
         private RuleTrigger trigger;
         private RuleAction action;
+        private string name;
         private bool isEnabled = true;
+
+        public string Name
+        {
+            get { return name; }
+        }
 
         public RuleTrigger Trigger
         {
@@ -42,6 +48,15 @@ namespace Squidex.Domain.Apps.Core.Rules
 
             this.action = action;
             this.action.Freeze();
+        }
+
+        [Pure]
+        public Rule Rename(string name)
+        {
+            return Clone(clone =>
+            {
+                clone.name = name;
+            });
         }
 
         [Pure]

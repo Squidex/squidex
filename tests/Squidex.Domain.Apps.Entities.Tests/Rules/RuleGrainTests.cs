@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleGrainTests : HandlerTestBase<RuleState>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
         private readonly Guid ruleId = Guid.NewGuid();
         private readonly RuleGrain sut;
 
@@ -40,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleGrainTests()
         {
-            sut = new RuleGrain(Store, A.Dummy<ISemanticLog>(), appProvider);
+            sut = new RuleGrain(Store, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
             sut.ActivateAsync(Id).Wait();
         }
 
@@ -87,9 +89,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
 
+            Assert.Equal(command.Name, sut.Snapshot.RuleDef.Name);
+
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action })
+                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action, Name = "NewName" })
                 );
         }
 
@@ -158,6 +162,22 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 );
         }
 
+        [Fact]
+        public async Task Trigger_should_invoke_rule_enqueue_but_not_change_snapshot()
+        {
+            var command = new TriggerRule();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+
+            Assert.Null(result.Value);
+
+            A.CallTo(() => ruleEnqueuer.Enqueue(sut.Snapshot.RuleDef, sut.Id,
+                A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
+                .MustHaveHappened();
+        }
+
         private Task ExecuteCreateAsync()
         {
             return sut.ExecuteAsync(CreateRuleCommand(MakeCreateCommand()));
@@ -214,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Url = new Uri("https://squidex.io/v2")
             };
 
-            return new UpdateRule { Trigger = newTrigger, Action = newAction };
+            return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }
     }
 }

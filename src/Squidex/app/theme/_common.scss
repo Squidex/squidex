@@ -47,6 +47,38 @@ body {
     }
 }
 
+.cdk-drag-preview {
+    @include opacity(.7);
+
+    &.table-drag {
+        background: $color-dark-foreground;
+        border: 2px dashed darken($color-border, 5%);
+        display: table;
+
+        * {
+            display: none;
+        }
+    }
+}
+
+.cdk-drag-placeholder {
+    @include opacity(0);
+}
+
+.cdk-drag-animating {
+    @include transition(transform 250ms cubic-bezier(0, 0, .2, 1));
+}
+
+.cdk-drop-list-dragging {
+    * {
+        @include transition(transform 250ms cubic-bezier(0, 0, .2, 1));
+    }
+
+    .cdk-drag-placeholder {
+        @include transition(none);
+    }
+}
+
 .icon-bold {
     font-weight: bold;
 }

@@ -1,11 +1,7 @@
 <ng-container *ngIf="isSmall; else large">
-    <div class="small" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
+    <div class="small" [class.editable]="!disabled" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
         <div class="small-icon" [style.background]="element.iconColor | sqxDarken:5">
-            <i *ngIf="element.iconCode; else svgIcon" class="icon icon-{{element.iconCode}}"></i>
-
-            <ng-template #svgIcon>
-                <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
-            </ng-template>
+            <sqx-rule-icon size="md" [element]="element"></sqx-rule-icon>
         </div>
         <div class="small-text">
             {{element.display}}
@@ -14,18 +10,14 @@
 </ng-container>
 
 <ng-template #large>
-    <div class="row no-gutters large">
+    <div class="row no-gutters large" [class.editable]="!disabled">
         <div class="col-auto">
             <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
-                <i *ngIf="element.iconCode; else svgIcon" class="icon icon-{{element.iconCode}}"></i>
-
-                <ng-template #svgIcon>
-                    <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
-                </ng-template>
+                <sqx-rule-icon size="lg" [element]="element"></sqx-rule-icon>
             </div>
         </div>
         <div class="col">
-            <div class="large-title">{{type}}</div>
+            <div class="large-title">{{element.title || type}}</div>
 
             <div class="large-text text-muted">
                 {{element.description}}

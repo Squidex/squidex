@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -56,6 +57,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Optional url to the editor.
         /// </summary>
         public string? EditorUrl { get; set; }
+
+        /// <summary>
+        /// Tags for automation processes.
+        /// </summary>
+        public ReadOnlyCollection<string> Tags { get; set; }
 
         public abstract FieldProperties ToProperties();
 

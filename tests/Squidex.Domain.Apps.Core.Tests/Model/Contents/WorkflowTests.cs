@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -21,8 +22,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Archived] = new WorkflowTransition("ToArchivedExpr", "ToArchivedRole"),
-                            [Status.Published] = new WorkflowTransition("ToPublishedExpr", "ToPublishedRole")
+                            [Status.Archived] = new WorkflowTransition("ToArchivedExpr", ReadOnlyCollection.Create("ToArchivedRole" )),
+                            [Status.Published] = new WorkflowTransition("ToPublishedExpr", ReadOnlyCollection.Create("ToPublishedRole" ))
                         },
                         StatusColors.Draft),
                 [Status.Archived] =
@@ -74,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.True(found);
             Assert.Equal("ToArchivedExpr", transition!.Expression);
-            Assert.Equal("ToArchivedRole", transition!.Role);
+            Assert.Equal(new[] { "ToArchivedRole" }, transition!.Roles);
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.True(found);
             Assert.Null(transition!.Expression);
-            Assert.Null(transition!.Role);
+            Assert.Null(transition!.Roles);
         }
 
         [Fact]
@@ -116,14 +117,15 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.Equal(Status.Archived, status1);
             Assert.Equal("ToArchivedExpr", transition1.Expression);
-            Assert.Equal("ToArchivedRole", transition1.Role);
+
+            Assert.Equal(new[] { "ToArchivedRole" }, transition1.Roles);
             Assert.Same(workflow.Steps[status1], step1);
 
             var (status2, step2, transition2) = transitions[1];
 
             Assert.Equal(Status.Published, status2);
             Assert.Equal("ToPublishedExpr", transition2.Expression);
-            Assert.Equal("ToPublishedRole", transition2.Role);
+            Assert.Equal(new[] { "ToPublishedRole" }, transition2.Roles);
             Assert.Same(workflow.Steps[status2], step2);
         }
 
@@ -138,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.Equal(Status.Draft, status1);
             Assert.Null(transition1.Expression);
-            Assert.Null(transition1.Role);
+            Assert.Null(transition1.Roles);
             Assert.Same(workflow.Steps[status1], step1);
         }
     }

@@ -185,7 +185,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static string GetCategory(string? category)
         {
-            return !string.IsNullOrWhiteSpace(category) ? category.Trim() : "*";
+            return !string.IsNullOrWhiteSpace(category) ? category.Trim() : FallbackCategory;
         }
 
         private static string GetKey(string key)

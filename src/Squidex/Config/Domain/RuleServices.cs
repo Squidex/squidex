@@ -35,6 +35,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
+            services.AddSingletonAs<ManualTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
             services.AddSingletonAs<SchemaChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
@@ -42,7 +45,7 @@ namespace Squidex.Config.Domain
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<RuleEnqueuer>()
-                .As<IEventConsumer>();
+                .As<IRuleEnqueuer>().As<IEventConsumer>();
 
             services.AddSingletonAs<RuleRegistry>()
                 .As<ITypeProvider>().AsSelf();

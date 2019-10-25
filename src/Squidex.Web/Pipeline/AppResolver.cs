@@ -90,7 +90,7 @@ namespace Squidex.Web.Pipeline
         {
             var clientId = user.GetClientId();
 
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGetValue(client.Role, out var role))
+            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
             {
                 return (client.Role, role.Permissions);
             }
@@ -102,7 +102,7 @@ namespace Squidex.Web.Pipeline
         {
             var subjectId = user.OpenIdSubject();
 
-            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
+            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
             {
                 return (roleName, role.Permissions);
             }

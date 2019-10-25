@@ -46,7 +46,7 @@ export class BackupDto {
         public readonly stopped: DateTime | null,
         public readonly handledEvents: number,
         public readonly handledAssets: number,
-        public readonly status: string
+        public readonly status: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending'
     ) {
         this._links = links;
 

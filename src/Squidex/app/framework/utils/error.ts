@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Types } from './types';
-
 export class ErrorDto {
     public readonly displayMessage: string;
 
@@ -24,50 +22,26 @@ export class ErrorDto {
     }
 }
 
-export function getDisplayMessage(error?: string | ErrorDto) {
-    if (!error) {
-        return null;
-    } else if (Types.is(error, ErrorDto)) {
-        return error.displayMessage;
-    } else {
-        return error;
-    }
-}
-
 function formatMessage(message: string, details?: ReadonlyArray<string>) {
-    const appendLast = (row: string, char: string) => {
-        const last = row[row.length - 1];
+    let result = appendLast(message, '.');
 
-        if (last !== char) {
-            return row + char;
-        } else {
-            return row;
-        }
-    };
-
-    const removeLast = (row: string, char: string) => {
-        const last = row[row.length - 1];
-
-        if (last === char) {
-            return row.substr(0, row.length - 1);
-        } else {
-            return row;
-        }
-    };
-
-    if (details && details.length > 1) {
-        let result = appendLast(message, '.') + '<ul>';
+    if (details && details.length > 0) {
+        result += '\n\n';
 
         for (const detail of details) {
-            result += `<li>${appendLast(detail, '.')}</li>`;
+            result += ` * ${appendLast(detail, '.')}\n`;
         }
+    }
 
-        result = result + '</ul>';
+    return result;
+}
 
-        return result;
-    } else if (details && details.length === 1) {
-        return `${appendLast(removeLast(message, '.'), ':')} ${appendLast(details[0], '.')}`;
+function appendLast(row: string, char: string) {
+    const last = row[row.length - 1];
+
+    if (last !== char) {
+        return row + char;
     } else {
-        return appendLast(message, '.');
+        return row;
     }
 }

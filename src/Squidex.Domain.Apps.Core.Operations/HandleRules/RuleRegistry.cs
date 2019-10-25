@@ -61,6 +61,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 new RuleActionDefinition
                 {
                     Type = actionType,
+                    Title = metadata.Title,
                     Display = metadata.Display,
                     Description = metadata.Description,
                     IconColor = metadata.IconColor,

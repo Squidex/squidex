@@ -29,7 +29,9 @@ namespace Squidex.Areas.Portal.Middlewares
 
                 if (userIdClaim != null)
                 {
-                    context.Response.RedirectToAbsoluteUrl(await appPlansBillingManager.GetPortalLinkAsync(userIdClaim.Value));
+                    var portalLink = await appPlansBillingManager.GetPortalLinkAsync(userIdClaim.Value);
+
+                    context.Response.Redirect(portalLink);
                 }
             }
         }

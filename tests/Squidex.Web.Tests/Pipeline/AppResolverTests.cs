@@ -185,8 +185,11 @@ namespace Squidex.Web.Pipeline
                     .Returns(AppClients.Empty);
             }
 
+            A.CallTo(() => appEntity.Name)
+                .Returns(name);
+
             A.CallTo(() => appEntity.Roles)
-                .Returns(Roles.CreateDefaults(name));
+                .Returns(Roles.Empty);
 
             return appEntity;
         }

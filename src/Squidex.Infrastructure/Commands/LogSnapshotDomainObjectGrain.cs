@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Commands
 
         public T GetSnapshot(long version)
         {
-            if (version == EtagVersion.Any)
+            if (version == EtagVersion.Any || version == EtagVersion.Auto)
             {
                 return Snapshot;
             }

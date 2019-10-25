@@ -60,7 +60,6 @@
                             <th class="cell-time">
                                 <sqx-table-header text="Updated"
                                     [sortable]="true"
-                                    [sortable]="field.properties.isSortable"
                                     [field]="'lastModified'"
                                     [query]="contentsState.contentsQuery | async"
                                     (queryChange)="search($event)"

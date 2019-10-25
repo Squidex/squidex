@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -35,22 +36,17 @@ namespace Squidex.Web.CommandMiddlewares
                 return;
             }
 
-            context.Command.ExpectedVersion = EtagVersion.Any;
+            var command = context.Command;
 
-            var headers = httpContext.Request.Headers;
-
-            if (headers.TryGetValue(HeaderNames.IfMatch, out var etag) && !string.IsNullOrWhiteSpace(etag))
+            if (command.ExpectedVersion == EtagVersion.Auto)
             {
-                var etagValue = etag.ToString();
-
-                if (etagValue.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                if (TryParseEtag(httpContext, out var expectedVersion))
                 {
-                    etagValue = etagValue.Substring(2);
+                    command.ExpectedVersion = expectedVersion;
                 }
-
-                if (long.TryParse(etagValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var expectedVersion))
+                else
                 {
-                    context.Command.ExpectedVersion = expectedVersion;
+                    command.ExpectedVersion = EtagVersion.Any;
                 }
             }
 
@@ -58,8 +54,37 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (context.PlainResult is EntitySavedResult result)
             {
-                httpContext.Response.Headers[HeaderNames.ETag] = result.Version.ToString();
+                SetResponsEtag(httpContext, result.Version);
             }
+            else if (context.PlainResult is IEntityWithVersion entity)
+            {
+                SetResponsEtag(httpContext, entity.Version);
+            }
+        }
+
+        private static void SetResponsEtag(HttpContext httpContext, long version)
+        {
+            httpContext.Response.Headers[HeaderNames.ETag] = version.ToString();
+        }
+
+        private static bool TryParseEtag(HttpContext httpContext, out long version)
+        {
+            version = default;
+
+            if (httpContext.Request.Headers.TryGetHeaderString(HeaderNames.IfMatch, out var etag))
+            {
+                if (etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                {
+                    etag = etag.Substring(2);
+                }
+
+                if (long.TryParse(etag, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

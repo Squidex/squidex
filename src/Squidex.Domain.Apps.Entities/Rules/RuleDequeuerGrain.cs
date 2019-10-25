@@ -103,7 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 var jobInvoke = ComputeJobInvoke(response.Status, @event, job);
                 var jobResult = ComputeJobResult(response.Status, jobInvoke);
 
-                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Status, jobResult, elapsed, jobInvoke);
+                var now = clock.GetCurrentInstant();
+
+                await ruleEventRepository.MarkSentAsync(@event.Job, response.Dump, response.Status, jobResult, elapsed, now, jobInvoke);
             }
             catch (Exception ex)
             {

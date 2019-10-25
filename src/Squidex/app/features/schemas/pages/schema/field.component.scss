@@ -22,8 +22,9 @@ $padding: 1rem;
     padding-left: 3rem;
 }
 
-.drag-handle {
-    @include absolute(1.75rem, auto, auto, .75rem);
+.drag-container {
+    @include absolute(1.6rem, auto, auto, .75rem);
+    line-height: 1px;
 }
 
 .col {
@@ -41,8 +42,9 @@ $padding: 1rem;
     padding: $padding;
     padding-left: 2 * $padding;
     position: relative;
-    border: 0;
-    background: $color-border;
+    border: 1px solid $color-border;
+    border-top-width: 0;
+    background: $color-table-footer;
 }
 
 .nested-field {
@@ -72,6 +74,10 @@ $padding: 1rem;
 }
 
 .field {
+    & {
+        position: relative;
+    }
+
     &-icon {
         margin-right: 1rem;
         color: $color-border-dark;

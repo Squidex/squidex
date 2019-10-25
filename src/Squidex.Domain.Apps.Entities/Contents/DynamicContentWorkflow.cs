@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private bool CanUse(WorkflowTransition transition, NamedContentData data, ClaimsPrincipal user)
         {
-            if (!string.IsNullOrWhiteSpace(transition.Role))
+            if (transition.Roles != null)
             {
-                if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == transition.Role))
+                if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && transition.Roles.Contains(x.Value)))
                 {
                     return false;
                 }

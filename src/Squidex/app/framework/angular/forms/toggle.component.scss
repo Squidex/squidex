@@ -22,6 +22,7 @@ $toggle-button-size: $toggle-height - .25rem;
             @include border-radius($toggle-height * .5);
             @include box-shadow-inner;
             @include transition(background-color .3s ease);
+            display: inline-block;
             position: relative;
             background: lighten($color-border, 6%);
             border: 0;

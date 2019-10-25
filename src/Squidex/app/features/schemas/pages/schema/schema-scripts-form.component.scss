@@ -4,3 +4,17 @@
 .nav-link {
     cursor: default;
 }
+
+:host ::ng-deep {
+    .modal-body {
+        padding: 0;
+    }
+
+    .modal-content {
+        height: 100%;
+    }
+
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
+}

@@ -82,7 +82,7 @@ export type SortMode = 'ascending' | 'descending';
 
 export interface Query {
     // The optional filter.
-    filter?: FilterNode;
+    filter?: FilterLogical;
 
     // The full text search.
     fullText?: string;

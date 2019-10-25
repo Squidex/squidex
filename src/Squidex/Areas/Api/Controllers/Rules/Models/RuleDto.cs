@@ -59,6 +59,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public bool IsEnabled { get; set; }
 
         /// <summary>
+        /// Optional rule name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// The trigger properties.
         /// </summary>
         [Required]
@@ -71,7 +76,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
-        public static RuleDto FromRule(IRuleEntity rule, ApiController controller, string app)
+        /// <summary>
+        /// The number of completed executions.
+        /// </summary>
+        public int NumSucceeded { get; set; }
+
+        /// <summary>
+        /// The number of failed executions.
+        /// </summary>
+        public int NumFailed { get; set; }
+
+        /// <summary>
+        /// The date and time when the rule was executed the last time.
+        /// </summary>
+        public Instant? LastExecuted { get; set; }
+
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, ApiController controller, string app)
         {
             var result = new RuleDto();
 
@@ -107,9 +127,19 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
+            if (controller.HasPermission(Permissions.AppRulesRead))
+            {
+                AddPutLink("trigger", controller.Url<RulesController>(x => nameof(x.TriggerRule), values));
+            }
+
             if (controller.HasPermission(Permissions.AppRulesDelete))
             {
                 AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppRulesEvents))
+            {
+                AddGetLink("logs", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
             return this;

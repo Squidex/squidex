@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
 
-            var actual = await sut.GetSchemaAsync(appId.Id, schema.SchemaDef.Name);
+            var actual = await sut.GetSchemaByNameAsync(appId.Id, schema.SchemaDef.Name);
 
             Assert.Same(actual, schema);
         }

@@ -39,7 +39,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                         html = html.AdjustHtml(context);
 
-                        await context.Response.WriteHtmlAsync(html);
+                        await context.Response.WriteAsync(html);
                     }
                 }
             }

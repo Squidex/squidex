@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
             {
-                return await indexForApps.GetAppAsync(appName);
+                return await indexForApps.GetAppByNameAsync(appName);
             });
         }
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
-                return await indexSchemas.GetSchemaAsync(appId, name);
+                return await indexSchemas.GetSchemaByNameAsync(appId, name);
             });
         }
 

@@ -23,20 +23,20 @@ namespace Squidex.Web.CommandMiddlewares
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly Context appContext = Context.Anonymous();
+        private readonly Context requestContext = Context.Anonymous();
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
         public EnrichWithAppIdCommandMiddlewareTests()
         {
             A.CallTo(() => contextProvider.Context)
-                .Returns(appContext);
+                .Returns(requestContext);
 
             var app = A.Fake<IAppEntity>();
 
             A.CallTo(() => app.Id).Returns(appId.Id);
             A.CallTo(() => app.Name).Returns(appId.Name);
 
-            appContext.App = app;
+            requestContext.App = app;
 
             sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
         }
@@ -44,7 +44,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
-            appContext.App = null!;
+            requestContext.App = null;
 
             var command = new CreateContent();
             var context = Ctx(command);

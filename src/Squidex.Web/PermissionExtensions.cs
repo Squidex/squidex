@@ -38,9 +38,9 @@ namespace Squidex.Web
             return controller.HttpContext.HasPermission(permission) || additional?.Allows(permission) == true;
         }
 
-        public static bool HasPermission(this ApiController controller, string id, string app = "*", string schema = "*", PermissionSet? additional = null)
+        public static bool HasPermission(this ApiController controller, string id, string app = Permission.Any, string schema = Permission.Any, PermissionSet? additional = null)
         {
-            if (app == "*")
+            if (app == Permission.Any)
             {
                 if (controller.RouteData.Values.TryGetValue("app", out var value) && value is string s)
                 {
@@ -48,7 +48,7 @@ namespace Squidex.Web
                 }
             }
 
-            if (schema == "*")
+            if (schema == Permission.Any)
             {
                 if (controller.RouteData.Values.TryGetValue("name", out var value) && value is string s)
                 {

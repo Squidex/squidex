@@ -142,9 +142,9 @@ namespace Squidex.Domain.Apps.Core.Apps
             return language != null && languages.ContainsKey(language);
         }
 
-        public bool TryGetConfig(Language language, out LanguageConfig config)
+        public bool TryGetConfig(Language language, [MaybeNullWhen(false)] out LanguageConfig config)
         {
-            return languages.TryGetValue(language, out config);
+            return languages.TryGetValue(language, out config!);
         }
 
         public bool TryGetItem(string key, [MaybeNullWhen(false)] out IFieldPartitionItem item)

@@ -10,8 +10,15 @@ import { Component } from '@angular/core';
 
 @Component({
     selector: 'sqx-not-found-page',
-    styleUrls: ['./not-found-page.component.scss'],
-    templateUrl: './not-found-page.component.html'
+    template: `
+        <sqx-title message="Not Found"></sqx-title>
+
+        <div class="landing-page">
+            <img class="splash-image" src="~/../squid.svg?title=Not Found&text=This%20is%20not%20the%20page%20you%20are%20looking%20for!&background=white&small" />
+
+            <a href="#" (click)="back()">Back to previous page.</a>
+        </div>
+    `
 })
 export class NotFoundPageComponent {
     constructor(

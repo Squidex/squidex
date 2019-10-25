@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Headers.ContainsKey(HeaderNoEnrichment);
         }
 
-        public static Context WithNoEnrichment(this Context context, bool value = true)
+        public static Context WithNoContentEnrichment(this Context context, bool value = true)
         {
             if (value)
             {

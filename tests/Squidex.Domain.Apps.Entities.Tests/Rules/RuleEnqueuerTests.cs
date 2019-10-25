@@ -66,34 +66,53 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Should_update_repositories_on_with_jobs_from_sender()
+        public async Task Should_update_repository_when_enqueing()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
-            var rule1 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
-            var rule2 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule = CreateRule();
+
+            var job = new RuleJob { Created = now };
+
+            A.CallTo(() => ruleService.CreateJobAsync(rule.RuleDef, rule.Id, @event))
+                .Returns(job);
+
+            await sut.Enqueue(rule.RuleDef, rule.Id, @event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_update_repositories_with_jobs_from_service()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+
+            var rule1 = CreateRule();
+            var rule2 = CreateRule();
 
             var job1 = new RuleJob { Created = now };
 
-            var ruleEntity1 = A.Fake<IRuleEntity>();
-            var ruleEntity2 = A.Fake<IRuleEntity>();
-
-            A.CallTo(() => ruleEntity1.RuleDef).Returns(rule1);
-            A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
-
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
-                .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2 });
+                .Returns(new List<IRuleEntity> { rule1, rule2 });
 
-            A.CallTo(() => ruleService.CreateJobAsync(rule1, ruleEntity1.Id, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule1.RuleDef, rule1.Id, @event))
                 .Returns(job1);
 
-            A.CallTo(() => ruleService.CreateJobAsync(rule2, ruleEntity2.Id, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule2.RuleDef, rule2.Id, @event))
                 .Returns(Task.FromResult<RuleJob?>(null));
 
             await sut.On(@event);
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, now))
                 .MustHaveHappened();
+        }
+
+        private static RuleEntity CreateRule()
+        {
+            var rule = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
+
+            return new RuleEntity { RuleDef = rule, Id = Guid.NewGuid() };
         }
     }
 }

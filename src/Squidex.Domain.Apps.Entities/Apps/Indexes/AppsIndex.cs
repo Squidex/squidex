@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity?> GetAppAsync(string name)
+        public async Task<IAppEntity?> GetAppByNameAsync(string name)
         {
             using (Profiler.TraceMethod<AppsIndex>())
             {

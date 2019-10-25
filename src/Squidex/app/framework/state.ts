@@ -9,18 +9,16 @@ import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 
-import { ErrorDto, getDisplayMessage } from './utils/error';
-
-import { ResourceLinks } from './utils/hateos';
-
-import { Types } from './utils/types';
-
 import { getRawValue } from './angular/forms/forms-helper';
+
+import { ErrorDto } from './utils/error';
+import { ResourceLinks } from './utils/hateos';
+import { Types } from './utils/types';
 
 export interface FormState {
     submitted: boolean;
 
-    error?: string | null;
+    error?: ErrorDto | null;
 }
 
 export class Form<T extends AbstractControl, V> {
@@ -104,7 +102,11 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next({ submitted: false, error: getDisplayMessage(error) });
+        if (Types.isString(error)) {
+            error = new ErrorDto(500, error);
+        }
+
+        this.state.next({ submitted: false, error });
 
         this.enable();
     }

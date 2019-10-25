@@ -8,7 +8,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
-import { AssetDto, AssetsState } from '@app/shared/internal';
+import {
+    AssetDto,
+    AssetsState,
+    getFiles
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-assets-list',
@@ -86,7 +90,7 @@ export class AssetsListComponent {
     }
 
     public addFiles(files: ReadonlyArray<File>) {
-        this.newFiles = [...files, ...this.newFiles];
+        this.newFiles = [...getFiles(files), ...this.newFiles];
 
         return true;
     }

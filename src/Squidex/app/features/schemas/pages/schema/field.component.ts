@@ -45,7 +45,7 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public trackByFieldFn: Function;
+    public trackByFieldFn: (index: number, field: NestedFieldDto) => any;
 
     public isEditing = false;
     public isEditable = false;

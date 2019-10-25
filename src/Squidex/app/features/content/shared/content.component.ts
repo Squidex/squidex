@@ -68,7 +68,7 @@ export class ContentComponent implements OnChanges {
     @Input('sqxContent')
     public content: ContentDto;
 
-    public trackByFieldFn: Function;
+    public trackByFieldFn: (index: number, field: FieldDto) => any;
 
     public patchForm: PatchContentForm;
     public patchAllowed = false;

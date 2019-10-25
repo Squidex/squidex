@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Squidex.Infrastructure.Collections
@@ -57,8 +58,8 @@ namespace Squidex.Infrastructure.Collections
 
         public ArrayDictionary(IEqualityComparer<TKey> keyComparer, KeyValuePair<TKey, TValue>[] items)
         {
-            Guard.NotNull(items);
-            Guard.NotNull(keyComparer);
+            Guard.NotNull(items, nameof(items));
+            Guard.NotNull(keyComparer, nameof(keyComparer));
 
             this.items = items;
 
@@ -130,7 +131,7 @@ namespace Squidex.Infrastructure.Collections
             return false;
         }
 
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             for (var i = 0; i < items.Length; i++)
             {

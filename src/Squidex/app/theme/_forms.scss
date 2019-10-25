@@ -32,7 +32,7 @@
 
     // Small triangle under the error tooltip with the border trick.
     &::after {
-        @include absolute(auto, auto, -.7rem, .625rem);
+        @include absolute(auto, auto, -.75rem, .625rem);
         content: '';
         height: 0;
         border-style: solid;
@@ -67,7 +67,7 @@
 
 //
 // Form alerts.
-//  
+//
 .form-alert {
     & {
         @include border-radius(4px);
@@ -77,6 +77,13 @@
         font-size: .9rem;
         font-weight: normal;
         padding: .5rem;
+        padding-right: 1.5rem;
+    }
+
+    &-close {
+        @include absolute(0, 0, auto, auto);
+        padding: .5rem;
+        display: none;
     }
 
     &-error {
@@ -87,8 +94,43 @@
         background: $color-theme-green-dark;
     }
 
+    &.closeable {
+        position: relative;
+
+        .form-alert-close {
+            display: inline-block;
+        }
+    }
+
     ul {
         margin: 0;
+    }
+}
+
+.form-bubble {
+    & {
+        position: relative;
+    }
+
+    .form-alert {
+        @include absolute(.25rem, 0, auto, auto);
+        padding: 1rem;
+        min-width: 200px;
+        max-width: 600px;
+        font-size: 1rem;
+        font-weight: normal;
+        text-align: left;
+        z-index: 2000;
+
+        &::after {
+            @include absolute(-.75rem, .625rem, auto, auto);
+            content: '';
+            height: 0;
+            border-style: solid;
+            border-width: .4rem;
+            border-color: transparent transparent $color-theme-error;
+            width: 0;
+        }
     }
 }
 
@@ -142,7 +184,7 @@
 
 label {
     & {
-        color: black;
+        color: $color-title;
     }
 
     .hint {
@@ -166,7 +208,7 @@ label {
 
     // Search icon that is placed within the form control.
     .icon-search {
-        @include absolute(.7rem, .7rem, auto, auto);
+        @include absolute(.75rem, .75rem, auto, auto);
         color: $color-dark2-focus-foreground;
         font-size: 1.1rem;
         font-weight: lighter;

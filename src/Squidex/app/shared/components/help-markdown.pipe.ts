@@ -10,12 +10,12 @@ import * as Marked from 'marked';
 
 const renderer = new Marked.Renderer();
 
-renderer.link = (href, title, text) => {
+renderer.link = (href, _, text) => {
     if (!href.startsWith('http')) {
         href = `https://docs.squidex.io/${href}`;
     }
 
-    return `<a href="${href}" title="${title}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
+    return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
 };
 
 @Pipe({
@@ -23,7 +23,7 @@ renderer.link = (href, title, text) => {
     pure: true
 })
 export class HelpMarkdownPipe implements PipeTransform {
-    public transform(text: string | null): string {
+    public transform(text: string | null | undefined): string {
         if (text) {
             return Marked(text, { renderer });
         } else {

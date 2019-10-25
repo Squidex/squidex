@@ -4,7 +4,7 @@
             <div class="col col-name">
                 <sqx-editable-title 
                     [name]="client.name"
-                    (nameChanged)="rename($event)"
+                    (nameChange)="rename($event)"
                     [disabled]="!client.canUpdate">
                 </sqx-editable-title>
             </div>

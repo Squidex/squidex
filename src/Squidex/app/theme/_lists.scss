@@ -13,7 +13,7 @@
     td {
         // Unified padding for all table cells.
         & {
-            padding: .7rem;
+            padding: .75rem;
         }
 
         // Additional padding for the first column.
@@ -95,7 +95,7 @@
     //
     &-row {
         & {
-            padding: 1rem 1.25rem;
+            padding: .75rem 1.25rem;
             background: $color-table-background;
             border: 1px solid $color-border;
             border-top: 0;
@@ -105,7 +105,7 @@
 
         // Summary row for expandable rows.
         &-summary {
-            padding: 1rem 1.25rem;
+            padding: .75rem 1.25rem;
             position: relative;
             line-height: 2.5rem;
         }
@@ -131,7 +131,7 @@
             }
 
             &-tab {
-                padding: 1rem 1.25rem 1.25rem;
+                padding: .75rem 1.25rem 1.25rem;
             }
 
             &-tabs {
@@ -146,9 +146,9 @@
     // Footer that typically contains an add-item-form.
     &-header,
     &-footer {
-        padding: 1rem 1.25rem;
+        padding: .75rem 1.25rem;
         background: $color-table-footer;
-        border: 1px solid $color-border;
+        border: 1px solid $color-input;
         border-bottom-width: 2px;
     }
 

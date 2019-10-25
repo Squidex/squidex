@@ -28,6 +28,8 @@ import {
     templateUrl: './workflow.component.html'
 })
 export class WorkflowComponent implements OnChanges {
+    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+
     @Input()
     public workflow: WorkflowDto;
 
@@ -38,8 +40,6 @@ export class WorkflowComponent implements OnChanges {
     public schemasSource: SchemaTagConverter;
 
     public error: string | null;
-
-    public onBlur = { updateOn: 'blur' };
 
     public isEditing = false;
     public isEditable = false;
@@ -123,7 +123,7 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.removeStep(step.name);
     }
 
-    public trackByStep(step: WorkflowStep) {
+    public trackByStep(index: number, step: WorkflowStep) {
         return step.name;
     }
 }

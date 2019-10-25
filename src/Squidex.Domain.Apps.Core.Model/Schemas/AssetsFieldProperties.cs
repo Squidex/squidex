@@ -35,6 +35,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool AllowDuplicates { get; set; }
 
+        public bool ResolveImage { get; set; }
+
         public ReadOnlyCollection<string>? AllowedExtensions { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)

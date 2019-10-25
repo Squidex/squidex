@@ -22,9 +22,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
     public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEventEntity>, IRuleEventRepository
     {
+        private readonly MongoRuleStatisticsCollection statisticsCollection;
+
         public MongoRuleEventRepository(IMongoDatabase database)
             : base(database)
         {
+            statisticsCollection = new MongoRuleStatisticsCollection(database);
         }
 
         protected override string CollectionName()
@@ -32,9 +35,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return "RuleEvents";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection, CancellationToken ct = default)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(new[]
+            await statisticsCollection.InitializeAsync(ct);
+
+            await collection.Indexes.CreateManyAsync(new[]
             {
                 new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.NextAttempt)),
                 new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.AppId).Descending(x => x.Created)),
@@ -53,10 +58,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
-        public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)
+        public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20)
         {
+            var filter = Filter.Eq(x => x.AppId, appId);
+
+            if (ruleId.HasValue)
+            {
+                filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId));
+            }
+
             var ruleEventEntities =
-                await Collection.Find(x => x.AppId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created)
+                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created)
                     .ToListAsync();
 
             return ruleEventEntities;
@@ -83,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task EnqueueAsync(RuleJob job, Instant nextAttempt)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Id = job.JobId, Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
 
             return Collection.InsertOneIfNotExistsAsync(entity);
         }
@@ -96,15 +108,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
         }
 
-        public Task MarkSentAsync(Guid jobId, string? dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextAttempt)
+        public async Task MarkSentAsync(RuleJob job, string? dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant finished, Instant? nextCall)
         {
-            return Collection.UpdateOneAsync(x => x.Id == jobId,
+            if (result == RuleResult.Success)
+            {
+                await statisticsCollection.IncrementSuccess(job.AppId, job.RuleId, finished);
+            }
+            else
+            {
+                await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, finished);
+            }
+
+            await Collection.UpdateOneAsync(x => x.Id == job.Id,
                 Update
                     .Set(x => x.Result, result)
                     .Set(x => x.LastDump, dump)
                     .Set(x => x.JobResult, jobResult)
-                    .Set(x => x.NextAttempt, nextAttempt)
+                    .Set(x => x.NextAttempt, nextCall)
                     .Inc(x => x.NumCalls, 1));
+        }
+
+        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId)
+        {
+            return statisticsCollection.QueryByAppAsync(appId);
         }
     }
 }

@@ -77,8 +77,13 @@
         <div class="selection" *ngIf="selectionCount > 0">
             {{selectionCount}} items selected&nbsp;&nbsp;
 
-            <button type="button" class="btn btn-secondary mr-1" *ngFor="let status of nextStatuses" (click)="changeSelectedStatus(status)">
-                Status to {{status}}
+            <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                <sqx-content-status
+                    [status]="status"
+                    [statusColor]="nextStatuses[status]"
+                    showLabel="true"
+                    small="true">
+                </sqx-content-status>
             </button>
             
             <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"

@@ -12,6 +12,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
+#pragma warning disable IDE0028 // Simplify collection initialization
+
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class RolePermissionsProvider

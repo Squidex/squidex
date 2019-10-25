@@ -39,7 +39,13 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
     public editor: ElementRef;
 
     @Input()
+    public noBorder = false;
+
+    @Input()
     public mode = 'ace/mode/javascript';
+
+    @Input()
+    public height = 0;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
@@ -68,6 +74,10 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
             .subscribe(() => {
                 this.changeValue();
             });
+
+        if (this.height) {
+            this.editor.nativeElement.style.height = `${this.height}px`;
+        }
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

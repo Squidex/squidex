@@ -116,23 +116,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private IRuleEntity SetupRule(long version, bool deleted)
         {
-            var ruleEntity = A.Fake<IRuleEntity>();
-
             var ruleId = Guid.NewGuid();
 
-            A.CallTo(() => ruleEntity.Id)
-                .Returns(ruleId);
-            A.CallTo(() => ruleEntity.AppId)
-                .Returns(appId);
-            A.CallTo(() => ruleEntity.Version)
-                .Returns(version);
-            A.CallTo(() => ruleEntity.IsDeleted)
-                .Returns(deleted);
-
+            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version, IsDeleted = deleted };
             var ruleGrain = A.Fake<IRuleGrain>();
 
             A.CallTo(() => ruleGrain.GetStateAsync())
-                .Returns(J.Of(ruleEntity));
+                .Returns(J.Of<IRuleEntity>(ruleEntity));
 
             A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(ruleId, null))
                 .Returns(ruleGrain);

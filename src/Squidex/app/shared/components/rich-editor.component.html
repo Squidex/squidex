@@ -1,5 +1,5 @@
-<div class="drop-container" (sqxDropFile)="insertFiles($event)" [onlyImages]="true">
-    <div class="editor" #editor>Loading editor...</div>
+<div class="drop-container" (sqxDropFile)="insertFiles($event)" [onlyImages]="true" #container>
+    <div class="editor" #editor></div>
 </div>
 
 <ng-container *sqxModal="assetsDialog">

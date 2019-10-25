@@ -213,6 +213,10 @@
 }
 
 @mixin placeholder-color($color) {
+    ::placeholder {
+        color: $color;
+    }
+
     &::-webkit-input-placeholder {
         color: $color;
     }

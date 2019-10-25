@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import {
     AppAreaComponent,
+    ForbiddenPageComponent,
     HomePageComponent,
     InternalAreaComponent,
     LoginPageComponent,
@@ -90,6 +91,10 @@ export const routes: Routes = [
     {
         path: 'login',
         component: LoginPageComponent
+    },
+    {
+        path: 'forbidden',
+        component: ForbiddenPageComponent
     },
     {
         path: '**',

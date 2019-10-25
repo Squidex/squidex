@@ -28,11 +28,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [RuleAction(
-           IconImage = "<svg></svg>",
-           IconColor = "#1e5470",
-           Display = "Action display",
-           Description = "Action description.",
-           ReadMore = "https://www.readmore.com/")]
+            Title = "Invalid",
+            IconImage = "<svg></svg>",
+            IconColor = "#1e5470",
+            Display = "Action display",
+            Description = "Action description.",
+            ReadMore = "https://www.readmore.com/")]
         public sealed class MyInvalidRuleAction : RuleAction
         {
             [DataType(DataType.Custom)]
@@ -40,11 +41,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [RuleAction(
-           IconImage = "<svg></svg>",
-           IconColor = "#1e5470",
-           Display = "Action display",
-           Description = "Action description.",
-           ReadMore = "https://www.readmore.com/")]
+            Title = "Action",
+            IconImage = "<svg></svg>",
+            IconColor = "#1e5470",
+            Display = "Action display",
+            Description = "Action description.",
+            ReadMore = "https://www.readmore.com/")]
         public sealed class MyRuleAction : RuleAction
         {
             [Required]
@@ -84,6 +86,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var expected = new RuleActionDefinition
             {
                 Type = typeof(MyRuleAction),
+                Title = "Action",
                 IconImage = "<svg></svg>",
                 IconColor = "#1e5470",
                 Display = "Action display",

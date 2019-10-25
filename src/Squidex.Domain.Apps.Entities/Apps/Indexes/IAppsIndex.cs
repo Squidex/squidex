@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions);
 
-        Task<IAppEntity?> GetAppAsync(string name);
+        Task<IAppEntity?> GetAppByNameAsync(string name);
 
         Task<IAppEntity?> GetAppAsync(Guid appId);
 

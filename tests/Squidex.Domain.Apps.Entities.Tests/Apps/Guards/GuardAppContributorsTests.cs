@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
         private readonly AppContributors contributors_0 = AppContributors.Empty;
-        private readonly Roles roles = Roles.CreateDefaults("my-app");
+        private readonly Roles roles = Roles.Empty;
 
         public GuardAppContributorsTests()
         {

@@ -153,7 +153,7 @@ namespace Squidex.Infrastructure.Commands
             Guard.NotNull(command);
             Guard.NotNull(handler);
 
-            if (command.ExpectedVersion != EtagVersion.Any && command.ExpectedVersion != Version)
+            if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
                 throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
             }

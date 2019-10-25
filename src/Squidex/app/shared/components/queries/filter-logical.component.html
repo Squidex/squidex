@@ -2,10 +2,10 @@
     <div class="row no-gutters">
         <div class="col">
             <div class="btn-group">
-                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="filter.and" [disabled]="filter.and" (click)="toggleType()">
+                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isAnd" [disabled]="isAnd" (click)="toggleType()">
                     AND
                 </button>
-                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="filter.or" [disabled]="filter.or" (click)="toggleType()">
+                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isOr" [disabled]="isOr" (click)="toggleType()">
                     OR
                 </button>
             </div>

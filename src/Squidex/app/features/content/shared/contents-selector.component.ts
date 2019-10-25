@@ -124,7 +124,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemSelected(content: ContentDto) {
-        return this.selectedItems[content.id];
+        return !!this.selectedItems[content.id];
     }
 
     public isItemAlreadySelected(content: ContentDto) {

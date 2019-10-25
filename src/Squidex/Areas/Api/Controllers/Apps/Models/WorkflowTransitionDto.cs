@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -19,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The optional restricted role.
         /// </summary>
-        public string? Role { get; set; }
+        public ReadOnlyCollection<string>? Roles { get; set; }
 
         public static WorkflowTransitionDto? FromWorkflowTransition(WorkflowTransition transition)
         {
@@ -28,12 +29,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 return null;
             }
 
-            return new WorkflowTransitionDto { Expression = transition.Expression, Role = transition.Role };
+            return new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles };
         }
 
         public WorkflowTransition ToTransition()
         {
-            return new WorkflowTransition(Expression, Role);
+            return new WorkflowTransition(Expression, Roles);
         }
     }
 }
