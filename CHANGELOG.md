@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.4.0 - 2019-10-26
+## 3.5.0 - 2019-10-26
 
 **NOTE**: This is the latest release with .NET Core 2.X. Next release will be 3.0 and above. Does not really matter when you use Docker.
 
