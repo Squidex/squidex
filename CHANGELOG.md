@@ -1,6 +1,8 @@
 # Changelog
 
-## 3.4.0-beta1 - 2019-10-08
+## 3.4.0 - 2019-10-26
+
+**NOTE**: This is the latest release with .NET Core 2.X. Next release will be 3.0 and above. Does not really matter when you use Docker.
 
 ### Features
 
@@ -11,16 +13,34 @@
 * **UI**: Hide date buttons based on settings.
 * **UI**: Updated several packages.
 * **UI**: Improvement to contributor page.
+* **UI**: Better error indicating when saving content.
+* **UI**: Warning when changing content status and you have pending changes.
+* **UI**: Markdown support for Alerts and Dialogs.
+* **UI**: Design improvements.
+* **UI**: Custom "Forbidden" page when users access a page he is not allowed to instead of automatic logout.
+* **UI**: Migration to angular CDK drag and drop to replace two drag and drop libraries.
+* **UI**: Collapse or expand all array items.
 * **Migration**: Better cancellation support for migration.
-* **Rules**: Custom payload for webhook and Algolia.
+* **Rules**: Custom payload for Webhook and Algolia action.
+* **Rules**: Optional names for rules when you have multiple rules with the same actions and triggers.
+* **Rules**: Basic statistic summary per rule.
+* **Rules**: Filter rule events by rule.
+* **Rules**: Added exception details for Algolia.
+* **Common**: New diacritic character for slug 
 
 ### Bugfixes
 
 * **UI**: Fix references dropdown in query UI for localized values.
 * **UI**: Fixed the unique checkbox in schema editor.
 * **UI**: Fixed default date handling.
+* **UI**: Fixed sorting of fields in schema synchronization endpoint.
+* **UI**: Fixed preview button when multiple preview targets where configured.
+* **UI**: Fixed TinymCE editor in arrays (Not recommended to use that!)
 * **App**: Fix plan settings.
+* **App**: Do not store default roles in the database so that we can change them later when new features are added.
 * **Logging**: Use explicit thread for logging to console.
+* **Logging**: Critical performance improvement.
+* **Rules**: Fixed discourse action.
 
 ## 3.3.0 - 2019-09-08
 
