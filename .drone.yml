@@ -117,10 +117,8 @@ steps:
   - name: cleanup-build
     image: docker
     commands:
-      - docker rm squidex-backend-container
-      - docker rm squidex-frontend-container
-      - docker rmi squidex-backend-image
-      - docker rmi squidex-frontend-image
+      - docker rm squidex-build-container
+      - docker rmi squidex-build-image
     volumes:
       - name: docker1
         path: /var/run/docker.sock
@@ -132,21 +130,6 @@ steps:
         - success
       event:
         - tag
-
-  - name: cleanup
-    image: docker
-    commands:
-      - docker system prune -f
-    volumes:
-      - name: docker1
-        path: /var/run/docker.sock
-      - name: docker2
-        path: /var/lib/docker
-    when:
-      event:
-        - push
-      branch:
-        - cleaned
       
 volumes:
   - name: build
