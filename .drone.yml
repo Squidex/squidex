@@ -63,12 +63,9 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build -t squidex-backend-image -f Dockerfile.backend --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
-      - docker build -t squidex-frontend-image -f Dockerfile.fronend .
-      - docker create --name squidex-backend-container squidex-backend-image
-      - docker create --name squidex-frontend-container squidex-frontend-image
-      - docker cp squidex-backend-container:/build /build
-      - docker cp squidex-frontend-container:/build /build/wwwroot/build
+      - docker build -t squidex-build-image -f Dockerfile --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
+      - docker create --name squidex-build-container squidex-build-image
+      - docker cp squidex-build-container:/app /build
     volumes:
       - name: build
         path: /build
