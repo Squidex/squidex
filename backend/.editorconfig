@@ -1,0 +1,16 @@
+﻿[*.cs]
+
+# CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
+dotnet_diagnostic.CS8618.severity = none
+
+# SA1011: Closing square brackets should be spaced correctly
+dotnet_diagnostic.SA1011.severity = none
+
+# IDE0066: Convert switch statement to expression
+csharp_style_prefer_switch_expression = false:suggestion
+
+# IDE0010: Add missing cases
+dotnet_diagnostic.IDE0010.severity = none
+
+# IDE0063: Use simple 'using' statement
+csharp_prefer_simple_using_statement = false:suggestion
