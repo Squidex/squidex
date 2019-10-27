@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,19 +23,14 @@ namespace Squidex
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            new HostBuilder()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseDefaultServiceProvider(options =>
-                {
-                    options.ValidateOnBuild = false;
-                })
+            Host.CreateDefaultBuilder(args)
                 .ConfigureLogging((context, builder) =>
                 {
                     builder.ConfigureForSquidex(context.Configuration);
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
-                    builder.ConfigureForSquidex(hostContext.HostingEnvironment, args);
+                    builder.ConfigureForSquidex();
                 })
                 .ConfigureServices(services =>
                 {
@@ -67,8 +61,6 @@ namespace Squidex
                 })
                 .ConfigureWebHostDefaults(builder =>
                 {
-                    builder.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
-
                     builder.UseStartup<Startup>();
                 });
     }

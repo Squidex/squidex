@@ -1,0 +1,29 @@
+version: '2.1'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    networks:
+      - internal
+    restart: always
+    
+  squidex:
+    image: "squidex"
+    ports:
+      - "80:80"
+    environment:
+      - URLS__BASEURL=http://localhost
+      - EVENTSTORE__CONSUME=true
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__TYPE=MongoDB
+    depends_on:
+      - mongo
+    networks:
+      - internal
+    restart: unless-stopped
+    
+networks:
+  internal:
+    driver: bridge
