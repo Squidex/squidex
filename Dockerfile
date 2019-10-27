@@ -56,9 +56,6 @@ RUN cp -a build /build/
 #
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim
 
-# Add curl
-RUN apt-get install curl
-
 # Default AspNetCore directory
 WORKDIR /app
 
