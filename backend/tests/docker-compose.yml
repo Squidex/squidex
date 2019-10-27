@@ -14,6 +14,7 @@ services:
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__TYPE=MongoDB
     networks:
       - internal
     depends_on:
@@ -28,6 +29,7 @@ services:
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__TYPE=MongoDB
     networks:
       - internal
     depends_on:
