@@ -56,9 +56,8 @@ RUN cp -a build /build/
 #
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim
 
-# add libuv & curl
-RUN apk update \
- && apk add --no-cache curl \
+# Add curl
+RUN apt install curl
 
 # Default AspNetCore directory
 WORKDIR /app
