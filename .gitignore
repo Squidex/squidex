@@ -22,7 +22,7 @@ _test-output/
 # NodeJS 
 node_modules/
 
-/src/Squidex/Assets/
+/backend/src/Squidex/Assets
 
 appsettings.Development.json
 appsettings.Production.json

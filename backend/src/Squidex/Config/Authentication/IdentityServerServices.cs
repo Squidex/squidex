@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -42,6 +43,7 @@ namespace Squidex.Config.Authentication
                     options.ApiName = apiScope;
                     options.ApiSecret = null;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                    options.SupportedTokens = SupportedTokens.Jwt;
                 });
 
                 authBuilder.AddOpenIdConnect(options =>

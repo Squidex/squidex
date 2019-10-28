@@ -521,8 +521,8 @@ a {
     }
 
     &-lg {
-        @media (min-width: 992px) {
-            max-width: 854px;
+        @media (max-width: 992px) {
+            max-width: 90%;
         }
     }
 
