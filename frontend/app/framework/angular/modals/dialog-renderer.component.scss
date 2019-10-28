@@ -14,6 +14,14 @@
 
     .alert {
         max-height: 20rem;
+
+        &::ng-deep {
+            p {
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
     }
 
     &-top-right {

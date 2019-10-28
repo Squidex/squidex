@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 import {
     AccessTokenDto,
@@ -48,6 +48,7 @@ export class ClientComponent implements OnChanges {
     constructor(
         public readonly appsState: AppsState,
         private readonly apiUrl: ApiUrlConfig,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
         private readonly clientsState: ClientsState,
         private readonly dialogs: DialogService
@@ -84,6 +85,8 @@ export class ClientComponent implements OnChanges {
         this.clientsService.createToken(this.appsState.appName, this.client)
             .subscribe(dto => {
                 this.connectToken = dto;
+
+                this.changeDetector.detectChanges();
             }, error => {
                 this.dialogs.notifyError(error);
             });
