@@ -36,12 +36,16 @@ export class WorkflowTransitionComponent {
     @Input()
     public disabled: boolean;
 
+    public get roleSuggestions() {
+        return this.roles.map(x => x.name);
+    }
+
     public changeExpression(expression: string) {
         this.update.emit({ expression });
     }
 
-    public changeRole(role: string) {
-        this.update.emit({ role: role || '' });
+    public changeRole(roles: ReadonlyArray<string>) {
+        this.update.emit(({ roles: roles || [] }) as any);
     }
 
     public emitRemove() {

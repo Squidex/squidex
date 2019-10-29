@@ -214,7 +214,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
 export type WorkflowStepValues = { color?: string; isLocked?: boolean; noUpdate?: boolean; };
 export type WorkflowStep = { name: string } & WorkflowStepValues;
 
-export type WorkflowTransitionValues = { expression?: string; role?: string; };
+export type WorkflowTransitionValues = { expression?: string; roles?: string[]; };
 export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;

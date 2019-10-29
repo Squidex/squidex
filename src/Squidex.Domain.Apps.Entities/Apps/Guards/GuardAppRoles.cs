@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (roles.ContainsKey(command.Name))
+                else if (roles.Contains(command.Name))
                 {
                     e("A role with the same name already exists.");
                 }
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetRoleOrThrow(roles, command.Name);
+            CheckRoleExists(roles, command.Name);
 
             Validate.It(() => "Cannot delete role.", e =>
             {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (Role.IsDefaultRole(command.Name))
+                else if (Roles.IsDefault(command.Name))
                 {
                     e("Cannot delete a default role.");
                 }
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetRoleOrThrow(roles, command.Name);
+            CheckRoleExists(roles, command.Name);
 
             Validate.It(() => "Cannot delete role.", e =>
             {
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                    e(Not.Defined("Name"), nameof(command.Name));
                 }
-                else if (Role.IsDefaultRole(command.Name))
+                else if (Roles.IsDefault(command.Name))
                 {
                     e("Cannot update a default role.");
                 }
@@ -86,19 +86,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        private static Role GetRoleOrThrow(Roles roles, string name)
+        private static void CheckRoleExists(Roles roles, string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name) || Roles.IsDefault(name))
             {
-                return null;
+                return;
             }
 
-            if (!roles.TryGetValue(name, out var role))
+            if (!roles.ContainsCustom(name))
             {
                 throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
             }
-
-            return role;
         }
     }
 }

@@ -104,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessApi = true;
             }
 
-            if (controller.Includes(AllPermissions.ForApp(AllPermissions.AppContents, app.Name, "*"), permissions))
+            if (controller.Includes(AllPermissions.ForApp(AllPermissions.AppContents, app.Name), permissions))
             {
                 result.CanAccessContent = true;
             }
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var permissions = new List<Permission>();
 
-            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
             {
                 permissions.AddRange(role.Permissions);
             }

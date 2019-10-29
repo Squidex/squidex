@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetWorkflowOrThrow(workflows, command.WorkflowId);
+            CheckWorkflowExists(workflows, command.WorkflowId);
 
             Validate.It(() => "Cannot update workflow.", e =>
             {
@@ -94,17 +94,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            GetWorkflowOrThrow(workflows, command.WorkflowId);
+            CheckWorkflowExists(workflows, command.WorkflowId);
         }
 
-        private static Workflow GetWorkflowOrThrow(Workflows workflows, Guid id)
+        private static void CheckWorkflowExists(Workflows workflows, Guid id)
         {
-            if (!workflows.TryGetValue(id, out var workflow))
+            if (!workflows.ContainsKey(id))
             {
                 throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
             }
-
-            return workflow;
         }
     }
 }

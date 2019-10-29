@@ -203,7 +203,9 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (sourceNames.Intersect(targetNames).Count() == target.Ordered.Count && !sourceNames.SequenceEqual(targetNames))
                 {
-                    yield return new SchemaFieldsReordered { FieldIds = sourceIds.Select(x => x.Id).ToList(), ParentFieldId = parentId };
+                    var fieldIds = targetNames.Select(x => sourceIds.FirstOrDefault(y => y.Name == x).Id).ToList();
+
+                    yield return new SchemaFieldsReordered { FieldIds = fieldIds, ParentFieldId = parentId };
                 }
             }
         }

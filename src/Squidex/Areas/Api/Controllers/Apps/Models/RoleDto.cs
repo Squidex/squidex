@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static RoleDto FromRole(Role role, IAppEntity app)
         {
-            var permissions = role.Permissions.WithoutApp(app.Name);
+            var permissions = role.Permissions;
 
             var result = new RoleDto
             {
@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 NumClients = GetNumClients(role, app),
                 NumContributors = GetNumContributors(role, app),
                 Permissions = permissions.ToIds(),
-                IsDefaultRole = Role.IsDefaultRole(role.Name)
+                IsDefaultRole = role.IsDefault
             };
 
             return result;
@@ -62,12 +62,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         private static int GetNumContributors(Role role, IAppEntity app)
         {
-            return app.Contributors.Count(x => Role.IsRole(x.Value, role.Name));
+            return app.Contributors.Count(x => role.Equals(x.Value));
         }
 
         private static int GetNumClients(Role role, IAppEntity app)
         {
-            return app.Clients.Count(x => Role.IsRole(x.Value.Role, role.Name));
+            return app.Clients.Count(x => role.Equals(x.Value.Role));
         }
 
         public RoleDto WithLinks(ApiController controller, string app)

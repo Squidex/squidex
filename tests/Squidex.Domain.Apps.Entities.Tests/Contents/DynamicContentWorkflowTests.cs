@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition("data.field.iv === 2", "Editor")
+                            [Status.Published] = new WorkflowTransition("data.field.iv === 2", ReadOnlyCollection.Create("Owner", "Editor"))
                         },
                         StatusColors.Draft),
                 [Status.Published] =
@@ -151,6 +152,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_allow_transition_if_role_is_allowed()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
+
+            Assert.True(result);
         }
 
         [Fact]

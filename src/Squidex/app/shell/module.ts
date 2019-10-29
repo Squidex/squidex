@@ -12,6 +12,7 @@ import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import {
     AppAreaComponent,
     AppsMenuComponent,
+    ForbiddenPageComponent,
     HomePageComponent,
     InternalAreaComponent,
     LeftMenuComponent,
@@ -29,12 +30,14 @@ import {
     exports: [
         AppAreaComponent,
         HomePageComponent,
+        ForbiddenPageComponent,
         InternalAreaComponent,
         NotFoundPageComponent
     ],
     declarations: [
         AppAreaComponent,
         AppsMenuComponent,
+        ForbiddenPageComponent,
         HomePageComponent,
         InternalAreaComponent,
         LeftMenuComponent,
