@@ -6,7 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.IO;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,12 @@ namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
+        private static readonly AssemblyName[] SharedAssemblies =
+            Assembly.GetEntryAssembly()!
+                .GetReferencedAssemblies()
+                    .Where(x => x.Name?.StartsWith("Squidex.", StringComparison.OrdinalIgnoreCase) == true)
+                    .ToArray();
+
         public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
         {
             var pluginManager = new PluginManager();
@@ -27,25 +34,11 @@ namespace Squidex.Pipeline.Plugins
             {
                 foreach (var path in options.Plugins)
                 {
-                    var plugin = PluginLoaders.LoadPlugin(path);
+                    var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
 
-                    if (plugin != null)
+                    if (pluginAssembly != null)
                     {
-                        try
-                        {
-                            var pluginAssembly = plugin.LoadDefaultAssembly();
-
-                            pluginAssembly.AddParts(mvcBuilder);
-                            pluginManager.Add(path, pluginAssembly);
-                        }
-                        catch (Exception ex)
-                        {
-                            pluginManager.LogException(path, "LoadingAssembly", ex);
-                        }
-                    }
-                    else
-                    {
-                        pluginManager.LogException(path, "LoadingPlugin", new FileNotFoundException($"Cannot find plugin at {path}"));
+                        pluginAssembly.AddParts(mvcBuilder);
                     }
                 }
             }
@@ -55,20 +48,6 @@ namespace Squidex.Pipeline.Plugins
             mvcBuilder.Services.AddSingleton(pluginManager);
 
             return mvcBuilder;
-        }
-
-        public static void UsePluginsBefore(this IApplicationBuilder app)
-        {
-            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
-
-            pluginManager.ConfigureBefore(app);
-        }
-
-        public static void UsePluginsAfter(this IApplicationBuilder app)
-        {
-            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
-
-            pluginManager.ConfigureAfter(app);
         }
 
         public static void UsePlugins(this IApplicationBuilder app)

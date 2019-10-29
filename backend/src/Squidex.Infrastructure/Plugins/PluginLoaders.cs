@@ -8,32 +8,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using McMaster.NETCore.Plugins;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Plugins;
-using Squidex.Web;
 
-namespace Squidex.Pipeline.Plugins
+namespace Squidex.Infrastructure.Plugins
 {
     public static class PluginLoaders
     {
-        private static readonly Type[] SharedTypes =
-        {
-            typeof(IPlugin),
-            typeof(SquidexCoreModel),
-            typeof(SquidexCoreOperations),
-            typeof(SquidexEntities),
-            typeof(SquidexEvents),
-            typeof(SquidexInfrastructure),
-            typeof(SquidexWeb)
-        };
-
-        public static PluginLoader? LoadPlugin(string pluginPath)
+        public static PluginLoader? LoadPlugin(string pluginPath, AssemblyName[] sharedAssemblies)
         {
             foreach (var candidate in GetPaths(pluginPath))
             {
@@ -43,7 +25,7 @@ namespace Squidex.Pipeline.Plugins
                     {
                         config.PreferSharedTypes = true;
 
-                        config.SharedAssemblies.AddRange(SharedTypes.Select(x => x.Assembly.GetName()));
+                        config.SharedAssemblies.AddRange(sharedAssemblies);
                     });
                 }
             }

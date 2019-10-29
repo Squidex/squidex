@@ -5,14 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
+using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.SamplePlugin
 {
-    public interface IWebPlugin : IPlugin
+    public sealed class SamplePlugin : IPlugin
     {
-        void ConfigureBefore(IApplicationBuilder app);
-
-        void ConfigureAfter(IApplicationBuilder app);
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

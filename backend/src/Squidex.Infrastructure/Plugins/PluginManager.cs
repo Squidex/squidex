@@ -7,29 +7,69 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
+using McMaster.NETCore.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.Plugins
 {
-    public sealed class PluginManager
+    public sealed class PluginManager : DisposableObjectBase
     {
+        private readonly HashSet<PluginLoader> pluginLoaders = new HashSet<PluginLoader>();
         private readonly HashSet<IPlugin> loadedPlugins = new HashSet<IPlugin>();
         private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
 
-        public IReadOnlyCollection<IPlugin> Plugins
+        protected override void DisposeObject(bool disposing)
         {
-            get { return loadedPlugins; }
+            if (disposing)
+            {
+                foreach (var loader in pluginLoaders)
+                {
+                    loader.Dispose();
+                }
+            }
         }
 
-        public void Add(string name, Assembly assembly)
+        public Assembly? Load(string path, AssemblyName[] sharedAssemblies)
         {
-            Guard.NotNull(assembly);
+            Guard.NotNullOrEmpty(path);
+            Guard.NotNull(sharedAssemblies);
 
+            Assembly? assembly = null;
+
+            var loader = PluginLoaders.LoadPlugin(path, sharedAssemblies);
+
+            if (loader != null)
+            {
+                try
+                {
+                    assembly = loader.LoadDefaultAssembly();
+
+                    Add(path, assembly);
+
+                    pluginLoaders.Add(loader);
+                }
+                catch (Exception ex)
+                {
+                    LogException(path, "LoadingAssembly", ex);
+
+                    loader.Dispose();
+                }
+            }
+            else
+            {
+                LogException(path, "LoadingPlugin", new FileNotFoundException($"Cannot find plugin at {path}"));
+            }
+
+            return assembly;
+        }
+
+        private void Add(string name, Assembly assembly)
+        {
             var pluginTypes =
                 assembly.GetTypes()
                     .Where(t => typeof(IPlugin).IsAssignableFrom(t))
@@ -50,12 +90,8 @@ namespace Squidex.Infrastructure.Plugins
             }
         }
 
-        public void LogException(string plugin, string action, Exception exception)
+        private void LogException(string plugin, string action, Exception exception)
         {
-            Guard.NotNull(plugin);
-            Guard.NotNull(action);
-            Guard.NotNull(exception);
-
             exceptions.Add((plugin, action, exception));
         }
 
@@ -67,26 +103,6 @@ namespace Squidex.Infrastructure.Plugins
             foreach (var plugin in loadedPlugins)
             {
                 plugin.ConfigureServices(services, config);
-            }
-        }
-
-        public void ConfigureBefore(IApplicationBuilder app)
-        {
-            Guard.NotNull(app);
-
-            foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
-            {
-                plugin.ConfigureBefore(app);
-            }
-        }
-
-        public void ConfigureAfter(IApplicationBuilder app)
-        {
-            Guard.NotNull(app);
-
-            foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
-            {
-                plugin.ConfigureAfter(app);
             }
         }
 

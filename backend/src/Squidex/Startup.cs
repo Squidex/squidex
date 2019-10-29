@@ -71,8 +71,6 @@ namespace Squidex
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UsePluginsBefore();
-
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
             app.UseSquidexTracking();
@@ -86,7 +84,6 @@ namespace Squidex
             app.ConfigureIdentityServer();
             app.ConfigureFrontend();
 
-            app.UsePluginsAfter();
             app.UsePlugins();
         }
     }
