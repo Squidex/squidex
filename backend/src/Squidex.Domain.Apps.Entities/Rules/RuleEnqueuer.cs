@@ -65,8 +65,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule, nameof(rule));
-            Guard.NotNull(@event, nameof(@event));
+            Guard.NotNull(rule);
+            Guard.NotNull(@event);
 
             var job = await ruleService.CreateJobAsync(rule, ruleId, @event);
 

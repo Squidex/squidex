@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleQueryService(IRulesIndex rulesIndex, IRuleEnricher ruleEnricher)
         {
-            Guard.NotNull(rulesIndex, nameof(rulesIndex));
-            Guard.NotNull(ruleEnricher, nameof(ruleEnricher));
+            Guard.NotNull(rulesIndex);
+            Guard.NotNull(ruleEnricher);
 
             this.rulesIndex = rulesIndex;
             this.ruleEnricher = ruleEnricher;

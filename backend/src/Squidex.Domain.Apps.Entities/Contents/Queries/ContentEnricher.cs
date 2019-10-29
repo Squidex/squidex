@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentEnricher(IAssetQueryService assetQuery, IAssetUrlGenerator assetUrlGenerator, Lazy<IContentQueryService> contentQuery, IContentWorkflow contentWorkflow)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
+            Guard.NotNull(assetQuery);
+            Guard.NotNull(assetUrlGenerator);
+            Guard.NotNull(contentQuery);
+            Guard.NotNull(contentWorkflow);
 
             this.assetQuery = assetQuery;
             this.assetUrlGenerator = assetUrlGenerator;
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context)
         {
-            Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content);
 
             var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), context);
 
@@ -61,8 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
-            Guard.NotNull(contents, nameof(contents));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contents);
+            Guard.NotNull(context);
 
             using (Profiler.TraceMethod<ContentEnricher>())
             {

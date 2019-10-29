@@ -22,10 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleCommandMiddleware(IGrainFactory grainFactory, IRuleEnricher ruleEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(ruleEnricher, nameof(ruleEnricher));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
+            Guard.NotNull(ruleEnricher);
+            Guard.NotNull(contextProvider);
 
             this.ruleEnricher = ruleEnricher;
+
             this.contextProvider = contextProvider;
         }
 

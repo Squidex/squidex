@@ -58,8 +58,8 @@ namespace Squidex.Infrastructure.Collections
 
         public ArrayDictionary(IEqualityComparer<TKey> keyComparer, KeyValuePair<TKey, TValue>[] items)
         {
-            Guard.NotNull(items, nameof(items));
-            Guard.NotNull(keyComparer, nameof(keyComparer));
+            Guard.NotNull(items);
+            Guard.NotNull(keyComparer);
 
             this.items = items;
 

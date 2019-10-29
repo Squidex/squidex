@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public bool TryGet(string app, string name, [MaybeNullWhen(false)] out Role value)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             if (Defaults.TryGetValue(name, out var role) || inner.TryGetValue(name, out role))
             {
