@@ -14,7 +14,6 @@ namespace Squidex.ICIS.Deployment
     {
         private readonly IEnumerable<IKafkaConsumerService> kafkaConsumers;
         private readonly DeploymentOptions options;
-        private readonly IApplicationLifetime lifetime;
         private readonly ISemanticLog log;
         private volatile int started;
 
@@ -74,11 +73,10 @@ namespace Squidex.ICIS.Deployment
             }
         }
 
-        public DeploymentService(IEnumerable<IKafkaConsumerService> kafkaConsumers, IOptions<DeploymentOptions> options, IApplicationLifetime lifetime, ISemanticLog log)
+        public DeploymentService(IEnumerable<IKafkaConsumerService> kafkaConsumers, IOptions<DeploymentOptions> options, ISemanticLog log)
         {
             this.kafkaConsumers = kafkaConsumers;
             this.options = options.Value;
-            this.lifetime = lifetime;
             this.log = log;
         }
 
@@ -91,14 +89,23 @@ namespace Squidex.ICIS.Deployment
 
             Task.Run(async () =>
             {
-                if (deploy)
+                try
                 {
-                    await RunDeployment();
-                }
+                    if (deploy)
+                    {
+                        await RunDeployment();
+                    }
 
-                if (kafka)
+                    if (kafka)
+                    {
+                        StartConsumers();
+                    }
+                }
+                catch (Exception ex)
                 {
-                    StartConsumers();
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "Deployment")
+                        .WriteProperty("status", "FailedUnexpected"));
                 }
             });
 
@@ -117,8 +124,6 @@ namespace Squidex.ICIS.Deployment
             }
             catch (Exception ex)
             {
-                lifetime.StopApplication();
-
                 logger.Log(log, ex);
             }
         }
