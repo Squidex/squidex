@@ -34,7 +34,11 @@ import {
                 </select>
             </td>
             <td class="cell-actions">
-                <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove()">
+                <button type="button" class="btn btn-text-danger"
+                    [disabled]="!contributor.canRevoke"
+                    (sqxConfirmClick)="remove()"
+                    confirmTitle="Remove contributor"
+                    confirmText="Do you really want to remove the contributor?">
                     <i class="icon-bin2"></i>
                 </button>
             </td>
