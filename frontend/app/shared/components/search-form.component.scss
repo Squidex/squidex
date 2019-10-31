@@ -13,21 +13,8 @@
     padding-right: 3rem;
 }
 
-.dropdown-menu {
-    max-height: 80%;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
 .form-horizontal {
-    padding: 1rem 1.5rem;
-    position: relative;
-    min-width: 60rem;
-    max-width: 60rem;
-}
-
-.submit {
-    @include absolute(.5rem, 1rem, auto, auto);
+    min-width: 35rem;
 }
 
 .buttons {

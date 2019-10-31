@@ -69,7 +69,7 @@
 </div>
 
 <ng-container *sqxModal="connectDialog">
-    <sqx-modal-dialog large="true" (close)="connectDialog.hide()">
+    <sqx-modal-dialog (close)="connectDialog.hide()" large="true">
         <ng-container title>
             Connect
         </ng-container>

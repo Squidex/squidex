@@ -41,29 +41,32 @@
 </sqx-onboarding-tooltip>
 
 <ng-container *sqxModal="searchDialog;closeAuto:false">
-    <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
-        <div class="form-horizontal">
-            <div class="submit">
-                <button type="button" class="btn btn-primary mr-2" (click)="search(true)">
+    <sqx-modal-dialog (close)="searchDialog.hide()" large="true">
+        <ng-container title>
+            Custom Query
+        </ng-container>
+        
+        <ng-container content>
+            <div class="form-horizontal">
+                <sqx-query
+                    [model]="queryModel" 
+                    [query]="query"
+                    (queryChange)="changeQuery($event)"
+                    [language]="language">
+                </sqx-query>
+
+                <div class="link">
+                    Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.
+                </div>
+            </div>
+        </ng-container>
+        
+        <ng-container footer>
+                <button type="button" class="float-right btn btn-primary mr-2" (click)="search(true)">
                     Submit
                 </button>
-
-                <button type="button" class="btn btn-text-secondary" (click)="searchDialog.hide()">
-                    <i class="icon-close"></i>
-                </button>
-            </div>
-            <sqx-query
-                [model]="queryModel" 
-                [query]="query"
-                (queryChange)="changeQuery($event)"
-                [language]="language">
-            </sqx-query>
-
-            <div class="link">
-                Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.
-            </div>
-        </div>
-    </div>        
+        </ng-container>
+    </sqx-modal-dialog>        
 </ng-container>
 
 <ng-container *sqxModal="saveQueryDialog">
