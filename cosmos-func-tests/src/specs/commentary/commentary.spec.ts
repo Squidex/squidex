@@ -50,15 +50,11 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
     });
 
     afterEach(async () => {
-        await appPage.closeAlerts();
-
         hasRunBefore = true;
     });
 
     afterAll(async () => {
         await homePage.logout();
-        // setting a timeout between logout and login of another spec for the test not to time out
-        await browser.sleep(1000);
     });
 
     describe('VEGA-135 : Commentary creation UI with search & filter options for ref data', () => {
@@ -296,6 +292,30 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
             expect(commentaryText).toBe(constants.commentaryTest.contentBody);
         });
 
+        it('Verify that if a user quits without saving the auto saved commentary, saving changes pop-up warning appears', async () => {
+
+            // Arrange
+            await contentPage.selectDate(4);
+            await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.commentaryTest.commodityValue);
+            await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.commentaryTest.commentaryTypeValue);
+            await contentPage.selectContentFromDropDown(constants.refDataLocators.region, constants.commentaryTest.regionValue);
+            await contentPage.writeCommentary(constants.commentaryTest.contentBody);
+
+            // Act
+            // The content is autosaved every 2seconds. Lets wait a little bit longer.
+            await browser.sleep(4000);
+            await browserPage.browserRefresh();
+
+            // Assert
+            expect(contentPage.autoSavePopUp()).toBeTruthy();
+            await contentPage.acceptAutoSave();
+
+            await contentPage.navigateToContentsTable();
+
+            const popUp = await contentPage.captureUnsavedChangesPopUpMessage();
+            expect<any>(popUp).toContain(constants.messages.unsavedChangesPopUpMessage);
+        });
+
         it('Verify user is able to save the auto saved commentary by accepting auto-save pop-up', async () => {
 
             // Arrange
@@ -342,28 +362,5 @@ describe('VEGA-134 : Create UI for entering Regional Commentary', () => {
             expect(commentaryAfterSave).toBe(constants.savingAutoSavedCommentaryTest.contentBody);
         });
 
-        it('Verify that if a user quits without saving the auto saved commentary, saving changes pop-up warning appears', async () => {
-
-            // Arrange
-            await contentPage.selectDate(4);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.commodity, constants.commentaryTest.commodityValue);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.commentaryType, constants.commentaryTest.commentaryTypeValue);
-            await contentPage.selectContentFromDropDown(constants.refDataLocators.region, constants.commentaryTest.regionValue);
-            await contentPage.writeCommentary(constants.commentaryTest.contentBody);
-
-            // Act
-            // The content is autosaved every 2seconds. Lets wait a little bit longer.
-            await browser.sleep(4000);
-            await browserPage.browserRefresh();
-
-            // Assert
-            expect(contentPage.autoSavePopUp()).toBeTruthy();
-            await contentPage.acceptAutoSave();
-
-            await contentPage.navigateToContentsTable();
-
-            const popUp = await contentPage.captureUnsavedChangesPopUpMessage();
-            expect<any>(popUp).toContain(constants.messages.unsavedChangesPopUpMessage);
-        });
     });
 });

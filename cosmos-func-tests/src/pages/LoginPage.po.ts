@@ -21,10 +21,10 @@ export class LoginPage extends BrowserUtil {
         await this.waitForAngularDisabledOnCurrentWindow();
         await this.navigateTo();
 
-        await this.$usernameInput().sendKeys(loginData.username);
-        await this.$passwordInput().sendKeys(loginData.password);
+        await this.waitForElementToBePresentClearAndWrite(this.$usernameInput(), loginData.username);
+        await this.waitForElementToBePresentClearAndWrite(this.$passwordInput(), loginData.password);
 
-        await this.$loginButton().click();
+        await this.waitForElementToBeVisibleAndClick(this.$loginButton());
     }
 
     public async navigateTo() {

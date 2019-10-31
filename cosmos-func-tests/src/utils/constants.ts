@@ -38,7 +38,7 @@ export const constants = {
         commentaryTypeValue: 'Deals',
         regionValue: 'Latin',
         periodValue: 'Settl',
-        contentBody: 'This is a text',
+        contentBody: 'This is a test',
         commodityValueFilteredByPartialText: 'Toluene',
         commentaryTypeValueFilteredByPartialText: 'Deals Commentary',
         regionValueFilteredByPartialText: 'Latin America'

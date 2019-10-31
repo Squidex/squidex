@@ -20,8 +20,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             , screenshotsSubfolder: '_images'
             , jsonsSubfolder: 'jsons'
             , takeScreenShotsOnlyForFailedSpecs: true
-            , docTitle: 'Cosmos - Last Run Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss z')
-            , docName: 'cosmos_test_results.html'
+            , docTitle: 'Cosmos - Test Execution Report' + ' - ' + moment().format('MMMM Do YYYY, hh:mm:ss z')
+            , docName: 'cosmos_test_report.html'
             , gatherBrowserLogs: false
             , preserveDirectory: false
             , clientDefaults: {
@@ -29,8 +29,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                 totalDurationFormat: 'h:m:s',
                 columnSettings: {
                     inlineScreenshots: true,
-                    warningTime: 1000,
-                    dangerTime: 2500
+                    warningTime: 100000,
+                    dangerTime: 250000
                 }
             }
         });
@@ -70,7 +70,10 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
 
         capabilities: {
             maxInstances: 1,
-            browserName: 'chrome'
+            browserName: 'chrome',
+            chromeOptions: {
+                'args': ['disable-extensions', 'start-maximized']
+            }
         },
 
         // options for Jasmine
@@ -110,19 +113,13 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
                 }
 
                 browser.manage().timeouts().implicitlyWait(5000);
-                browser.driver
-                    .manage()
-                    .window()
-                    .maximize();
             } catch (ex) {
                 browser.close();
-
                 if (options.setup) {
                     stopSquidex();
                     stopMongoDB();
                 }
                 cleanup();
-
                 throw ex;
             }
 

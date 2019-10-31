@@ -23,24 +23,20 @@ export class SearchPage extends ContentPage {
         return element(by.xpath('//div[@class=\'tui-editor-contents\']/div/i'));
     }
 
-    public async bulletPointText() {
+    public async $bulletPointText() {
         return await element(by.xpath('//div[@class=\'tui-editor-contents\']/ul/li'));
     }
 
-    public async numberedText() {
+    public async $numberedText() {
         return await element(by.xpath('//div[@class=\'tui-editor-contents\']/ol/li'));
     }
 
-    public $commentaryInput() {
-        return element(by.xpath('//div[@contenteditable=\'true\']/div'));
-    }
-
     public async getCommentaryCreationSuccessMessageText() {
-        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[@class=\'alert alert-dismissible alert-info ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[contains(@class, \'alert\')]/span')));
     }
 
     public async getCommentaryCreationFailureMessageText() {
-        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[contains(@class, \'alert\')]/span')));
     }
 
     public async getRefDataSelection(referenceName: string) {
@@ -50,7 +46,7 @@ export class SearchPage extends ContentPage {
     public async selectContentByText(contentBody: string) {
         await this.waitForElementToBePresent(this.$contentsItem());
 
-        const contents = await this.$contentItems().getWebElements();
+        const contents = await this.$contentItems();
 
         expect(contents.length).toBeGreaterThan(0);
 
@@ -58,7 +54,7 @@ export class SearchPage extends ContentPage {
             const text = await content.getText();
 
             if (text.indexOf(contentBody) >= 0) {
-                await content.click();
+                await this.waitForElementToBeVisibleAndClick(content);
                 return;
             }
         }
@@ -68,7 +64,7 @@ export class SearchPage extends ContentPage {
 
     public async verifyCommentaryCreation() {
         await this.scrollIntoView(this.getCommentaryEditorFrame());
-        return await this.getCommentary(this.$commentaryInput());
+        return await browser.wait(this.getCommentary(await this.$commentaryInput()), 5 * 1000, 'div should be visible in 5 seconds');
     }
 
     public async verifyBoldCommentaryCreation() {
@@ -77,32 +73,30 @@ export class SearchPage extends ContentPage {
         return await this.getCommentary(this.$boldText());
     }
 
-
     public async verifyItalicCommentaryCreation() {
         await this.selectContentByText('Italic');
         await this.scrollIntoView(this.getCommentaryEditorFrame());
         return await this.getCommentary(this.$italicText());
     }
 
-
     public async verifyNumberedCommentaryCreation() {
         await this.selectContentByText('Numbered');
         await this.scrollIntoView(await this.getCommentaryEditorFrame());
-        return await this.getCommentary(await this.numberedText());
+        return await this.getCommentary(await this.$numberedText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
         await this.selectContentByText('Bullet');
         await this.scrollIntoView(this.getCommentaryEditorFrame());
-        return await this.getCommentary(await this.bulletPointText());
+        return await this.getCommentary(await this.$bulletPointText());
     }
 
     public async searchContentByRefData(commodity: string, commentaryType: string, region: string) {
         await this.waitForElementToBePresent(await this.$contentsItem());
 
-        const commodities = await this.$getRefDataList(5).getWebElements();
-        const commentaryTypes = await this.$getRefDataList(6).getWebElements();
-        const regions = await this.$getRefDataList(8).getWebElements();
+        const commodities = await this.$getRefDataList(5);
+        const commentaryTypes = await this.$getRefDataList(6);
+        const regions = await this.$getRefDataList(8);
 
         expect(commodities.length).toBeGreaterThan(0);
         expect(commentaryTypes.length).toBeGreaterThan(0);
@@ -123,7 +117,7 @@ export class SearchPage extends ContentPage {
 
                     if (regiontext.includes(region)) {
 
-                        await regions[commodityIndex].click();
+                        await this.waitForElementToBeVisibleAndClick(regions[commodityIndex]);
                         return;
                     }
                 }
@@ -134,11 +128,6 @@ export class SearchPage extends ContentPage {
     }
 
     public async clickOnNewButton() {
-        await this.waitForElementToBeVisible(this.$newButton());
-
-        // Just wait a little bit for the animation to finish.
-        await browser.sleep(1000);
-
-        return this.$newButton().click();
+        return this.waitForElementToBeVisibleAndClick(this.$newButton());
     }
 }

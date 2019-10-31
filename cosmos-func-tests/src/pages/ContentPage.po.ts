@@ -89,7 +89,7 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async selectContentValue(content: string) {
-        await this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content);
+        await browser.wait(this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content), 5 * 1000, 'not able to search within 5 seconds');
 
         if (this.searchResult.isPresent() && (await this.searchResult.getText()).indexOf(content) !== -1) {
             await browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
@@ -117,7 +117,7 @@ export class ContentPage extends BrowserUtil {
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
         return await this.forToastUI(async () => {
-            return await this.waitForElementToBePresentAndGetText(contentEntryPlaceHolder);
+            return await browser.wait(this.waitForElementToBePresentAndGetText(contentEntryPlaceHolder), 5 * 1000, 'element not visible');
         });
     }
 
@@ -161,7 +161,7 @@ export class ContentPage extends BrowserUtil {
         return await this.forToastUI(async () => {
             const button = this.getEditorToolBarOptions(editorToolBarOption);
 
-            await this.browserScriptToClick(button);
+            await browser.wait(this.browserScriptToClick(button), 5 * 1000, 'not able to search within 5 seconds');
         });
     }
 
@@ -201,7 +201,7 @@ export class ContentPage extends BrowserUtil {
 
         await this.writeCommentaryForToastUiTests(commentary, true);
 
-        await this.clickToastUIButton(editorToolBarOption);
+        await browser.wait(this.clickToastUIButton(editorToolBarOption), 5 * 1000, 'option should be applied within 5 seconds');
 
         await this.saveContent();
     }

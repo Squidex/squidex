@@ -1,26 +1,26 @@
-import { browser, by, element, ElementFinder } from 'protractor';
+import { browser, by, element } from 'protractor';
 
 import { BrowserUtil } from './../utils';
 
 export class HomePage extends BrowserUtil {
 
-    public getProfileDropdown() {
+    public $getProfileDropdown() {
         return element(by.css('.user'));
     }
 
-    public getWelcomeElement() {
+    public $getWelcomeElement() {
         return element(by.className('apps-title'));
     }
 
-    public getProfileIcon(): ElementFinder {
+    public $getProfileIcon() {
         return element(by.className('user-picture'));
     }
 
-    public getLogoutButton() {
-        return this.getProfileDropdown().element(by.xpath('//a[contains(text(),\'Logout\')]'));
+    public $getLogoutButton() {
+        return element(by.xpath('//a[contains(text(),\'Logout\')]'));
     }
 
-    public getImage() {
+    public $getImage() {
         return element(by.tagName('img')).get(1);
     }
 
@@ -29,7 +29,7 @@ export class HomePage extends BrowserUtil {
     }
 
     public async getWelcomeText() {
-        return await this.waitForElementToBeVisibleAndGetText(this.getWelcomeElement());
+        return await this.waitForElementToBeVisibleAndGetText(this.$getWelcomeElement());
     }
 
     public async getDescription() {
@@ -54,13 +54,9 @@ export class HomePage extends BrowserUtil {
         await browser.get(`${browser.params.baseUrl}/app`);
     }
 
-    public async resetBrowserLocalStore() {
-        await browser.executeScript('localStorage.clear()');
-    }
-
     public async logout() {
-        await this.getProfileDropdown().click();
-        await this.getLogoutButton().click();
+        await this.waitForElementToBeVisibleAndClick(this.$getProfileDropdown());
+        await this.waitForElementToBeVisibleAndClick(this.$getLogoutButton());
     }
 
 }

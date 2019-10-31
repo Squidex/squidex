@@ -22,6 +22,7 @@
     "@types/wait-on": "^3.2.0",
     "casual": "^1.6.2",
     "fs": "0.0.1-security",
+    "https-proxy-agent": "^2.2.3",
     "jasmine": "^3.4.0",
     "jasmine-data-provider": "^2.2.0",
     "jasmine-expect": "^4.0.3",

@@ -21,8 +21,6 @@ describe('User Login', () => {
 
     afterAll(async () => {
         await homePage.logout();
-        // setting a timeout between logout and login of another spec for the test not to time out
-        await browser.sleep(1000);
     });
 
     beforeEach(async () => {

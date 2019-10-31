@@ -1,5 +1,3 @@
-import { browser } from 'protractor';
-
 import {
     constants,
     Users
@@ -12,7 +10,7 @@ import {
     LoginPage
 } from '../../pages';
 
-describe('VEGA-323 : App Settings', () => {
+describe('VEGA-316: App Settings', () => {
     let hasRunBefore = false;
     let appPage: AppPage;
     let loginPage: LoginPage;
@@ -43,15 +41,11 @@ describe('VEGA-323 : App Settings', () => {
     });
 
     afterEach(async () => {
-        await appPage.closeAlerts();
-
         hasRunBefore = true;
     });
 
     afterAll(async () => {
         await homePage.logout();
-        // setting a timeout between logout and login of another spec for the test not to time out
-        await browser.sleep(1000);
     });
 
     describe('VEGA-316 : Changes to Landing Page and General Settings', () => {

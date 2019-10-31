@@ -53,7 +53,14 @@ export class BrowserUtil {
     }
 
     // waits for the element to be present and writes
-    public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
+    public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 5000) {
+        await this.waitForElementToBeVisible(locator, timeout);
+        await locator.clear();
+        await locator.sendKeys('');
+        await locator.sendKeys(text);
+    }
+
+    public async waitForElementToBePresentClearAndWrite(locator: ElementFinder, text: string, timeout = 5000) {
         await this.waitForElementToBeVisible(locator, timeout);
         await locator.clear();
         await locator.sendKeys('');
@@ -150,8 +157,8 @@ export class BrowserUtil {
     }
 
     // wait for angular enabled
-    public async waitForAngularEnabledOnCurrentWindow(value: boolean) {
-        await browser.waitForAngularEnabled(value);
+    public async waitForAngularEnabledOnCurrentWindow() {
+        await browser.waitForAngularEnabled(true);
         return await browser.waitForAngular();
     }
 
@@ -162,8 +169,7 @@ export class BrowserUtil {
     public async selectAllContent() {
         await browser
             .actions()
-            .keyDown(protractor.Key.CONTROL)
-            .sendKeys('a')
+            .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, 'a'))
             .perform();
     }
 
@@ -183,6 +189,11 @@ export class BrowserUtil {
     public async browserScriptToClickAndSetValue(locator: ElementFinder | WebElement, text: string) {
         const script = `arguments[0].value = '${text}';`;
         await browser.executeScript(script, locator);
+    }
+
+    public async resetBrowserLocalStore() {
+        await browser.executeScript('window.sessionStorage.clear()');
+        await browser.executeScript('window.localStorage.clear();');
     }
 
 }

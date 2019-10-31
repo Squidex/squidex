@@ -56,8 +56,8 @@ export class ContributorsPage extends BrowserUtil {
         return element(by.css('.icon-time'));
     }
 
-    public $iconCheckMark() {
-        return element.all(by.xpath('//i[@class=\'icon-checkmark\']'));
+    public async iconCheckMark() {
+        return await element.all(by.xpath('//div[contains(@class, \'status-success\')]'));
     }
 
     public $iconError() {
@@ -199,28 +199,32 @@ export class ContributorsPage extends BrowserUtil {
             await this.waitForElementToBeVisibleAndClick(select);
             await this.waitForElementToBePresentAndAppend(select, role);
             await this.waitForElementToBeVisibleAndClick(select);
-            break;
         }
         await this.waitForElementToBeVisibleAndClick(await this.$importContributorsButton());
     }
 
     public async verifyTickMarkAfterSuccessFullUserAddition(): Promise<boolean> {
-        const userAdditionCheckMarkList = await this.$iconCheckMark();
+        const userAdditionCheckMarkList = await this.iconCheckMark();
         for (let userAdditionTick of userAdditionCheckMarkList) {
-            if (userAdditionTick.isPresent() === true) {
+            if (userAdditionTick.isPresent()) {
                 return true;
             }
         }
+        throw `Unable to add contributor successfully`;
     }
 
     public async verifyBulkImport(contributors: Array<string>): Promise<boolean> {
         await this.waitForElementToBeVisibleAndClick(await this.$closeIcon());
 
-        const users = await this.$userNameList().getText();
+        let users: any = await this.$userNameList().getText();
         expect(users.length).toBeGreaterThan(0);
 
-        if (expect(users).toEqual(jasmine.arrayContaining(contributors))) {
+        let match = contributors.every((val: string) => { return users.indexOf(val) >= 0; });
+
+        if (match) {
             return true;
+        } else {
+            throw `Unable to add contributor successfully`;
         }
 
     }

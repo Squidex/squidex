@@ -1,4 +1,3 @@
-import { browser } from 'protractor';
 import {
     BrowserUtil,
     constants,
@@ -13,7 +12,7 @@ import {
 } from '../../pages';
 
 
-describe('VEGA-358  : Re-direct to Landing Page From App View', () => {
+describe('VEGA-358 & VEGA-363 : Content page navigation changes', () => {
 
     let homePage: HomePage;
     let loginPage: LoginPage;
@@ -40,8 +39,6 @@ describe('VEGA-358  : Re-direct to Landing Page From App View', () => {
 
     afterAll(async () => {
         await homePage.logout();
-        // setting a timeout between logout and login of another spec for the test not to time out
-        await browser.sleep(1000);
     });
 
     describe('VEGA-358  : Re-direct to Landing Page From App View', () => {

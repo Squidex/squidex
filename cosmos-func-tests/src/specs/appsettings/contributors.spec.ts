@@ -1,4 +1,3 @@
-import { browser } from 'protractor';
 import {
     constants,
     Users
@@ -45,15 +44,11 @@ describe('VEGA-323 : Contributors Functionality', () => {
     });
 
     afterEach(async () => {
-        await appPage.closeAlerts();
-
         hasRunBefore = true;
     });
 
     afterAll(async () => {
         await homePage.logout();
-        // setting a timeout between logout and login of another spec for the test not to time out
-        await browser.sleep(1000);
     });
 
     describe('VEGA-343 : Extend the UI with a dropdown to select the role for new contributors', () => {
@@ -135,30 +130,30 @@ describe('VEGA-323 : Contributors Functionality', () => {
             expect(await contributorsPage.verifyBulkImport(constants.contributorsTest.contributorsOnListScreen)).toBe(true);
 
         });
-    });
 
-    it('Verify importing the same user with same role twice and capture the error message', async () => {
+        it('Verify importing the same user with same role twice and capture the error message', async () => {
 
-        // Arrange
-        await contributorsPage.navigateToContributorsTab();
+            // Arrange
+            await contributorsPage.navigateToContributorsTab();
 
-        // Act
-        await contributorsPage.importingContributorWithSameRole(constants.contributorsTest.importingSameUser, constants.contributorsTest.importRole);
+            // Act
+            await contributorsPage.importingContributorWithSameRole(constants.contributorsTest.importingSameUser, constants.contributorsTest.importRole);
 
-        // Assert
-        expect(await contributorsPage.verifyErrorIconDisplay()).toBe(true);
+            // Assert
+            expect(await contributorsPage.verifyErrorIconDisplay()).toBe(true);
 
-    });
+        });
 
-    it('Verify pagination appears only if there are more than 10 contributors', async () => {
+        it('Verify pagination appears only if there are more than 10 contributors', async () => {
 
-        // Act
-        await contributorsPage.navigateToContributorsTab();
+            // Act
+            await contributorsPage.navigateToContributorsTab();
 
-        // Assert
-        const paginationDisplay = await contributorsPage.pagination();
-        expect(await paginationDisplay.isDisplayed()).toBe(true);
+            // Assert
+            const paginationDisplay = await contributorsPage.pagination();
+            expect(await paginationDisplay.isDisplayed()).toBe(true);
 
+        });
     });
 
 });

@@ -44,7 +44,8 @@ export class AppPage extends BrowserUtil {
 
     public async closeAlerts() {
         const alerts = this.$alertCloseButtons();
-
-        await alerts.click();
+        alerts.each(async (alert) => {
+            await this.waitForElementToBeVisibleAndClick(alert);
+        });
     }
 }
