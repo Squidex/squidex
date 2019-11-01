@@ -4,7 +4,7 @@
     <ng-container header>
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab}}</a>
+                <a class="nav-link" [routerLink]="['./', tab.toLowerCase()]" routerLinkActive="active">{{tab}}</a>
             </li>
         </ul>
     </ng-container>
@@ -60,16 +60,16 @@
 
     <ng-container content>
         <ng-container [ngSwitch]="selectedTab">
-            <ng-container *ngSwitchCase="'Fields'">
+            <ng-container *ngSwitchCase="'fields'">
                 <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
             </ng-container>
-            <ng-container *ngSwitchCase="'Scripts'">
+            <ng-container *ngSwitchCase="'scripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'Json'">
+            <ng-container *ngSwitchCase="'json'">
                 <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'More'">
+            <ng-container *ngSwitchCase="'more'">
                 <div class="cards">
                     <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
                     <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
@@ -80,7 +80,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">        
-            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
+            <a class="panel-link" [routerLink]="[selectedTab, 'help']" routerLinkActive="active" title="Help" titlePosition="left">
                 <i class="icon-help"></i>
             </a>
         </div>

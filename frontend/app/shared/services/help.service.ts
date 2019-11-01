@@ -18,7 +18,7 @@ export class HelpService {
     }
 
     public getHelp(helpPage: string): Observable<string> {
-        const url = `https://raw.githubusercontent.com/Squidex/squidex-docs2/master/${helpPage}.md`;
+        const url = `https://raw.githubusercontent.com/squidex/squidex-docs2/master/${helpPage}.md`;
 
         return this.http.get(url, { responseType: 'text' }).pipe(
             catchError(() => of('')));

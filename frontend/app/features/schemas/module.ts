@@ -58,90 +58,60 @@ const routes: Routes = [
         children: [
             {
                 path: ':schemaName',
-                redirectTo: ':schemaName/fields'
-            },
-            {
-                path: ':schemaName/fields',
-                component: SchemaPageComponent,
                 canActivate: [SchemaMustExistGuard],
-                data: {
-                    tab: 'Fields'
-                },
+                component: SchemaPageComponent,
                 children: [
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/schemas'
-                        }
-                    }
-                ]
-            },
-            {
-                path: ':schemaName/fields',
-                component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard],
-                data: {
-                    tab: 'Fields'
-                },
-                children: [
+                        path: '',
+                        redirectTo: 'fields'
+                    },
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/schemas'
-                        }
-                    }
-                ]
-            },
-            {
-                path: ':schemaName/scripts',
-                component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard],
-                data: {
-                    tab: 'Scripts'
-                },
-                children: [
+                        path: 'fields',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/schemas'
+                                }
+                            }
+                        ]
+                    },
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/scripts'
-                        }
-                    }
-                ]
-            },
-            {
-                path: ':schemaName/json',
-                component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard],
-                data: {
-                    tab: 'Json'
-                },
-                children: [
+                        path: 'scripts',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/scripts'
+                                }
+                            }
+                        ]
+                    },
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/schemas-sync'
-                        }
-                    }
-                ]
-            },
-            {
-                path: ':schemaName/more',
-                component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard],
-                data: {
-                    tab: 'More'
-                },
-                children: [
+                        path: 'json',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/schema-json'
+                                }
+                            }
+                        ]
+                    },
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/preview'
-                        }
+                        path: 'more',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/preview'
+                                }
+                            }
+                        ]
                     }
                 ]
             }

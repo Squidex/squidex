@@ -8,7 +8,7 @@
 // tslint:disable:no-shadowed-variable
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import {
     DialogModel,
@@ -29,7 +29,7 @@ import {
         fadeAnimation
     ]
 })
-export class SchemaFieldsComponent {
+export class SchemaFieldsComponent implements OnInit {
     public fieldTypes = fieldTypes;
 
     @Input()
@@ -44,6 +44,10 @@ export class SchemaFieldsComponent {
         public readonly patternsState: PatternsState
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
+    }
+
+    public ngOnInit() {
+        this.patternsState.load();
     }
 
     public sortFields(event: CdkDragDrop<ReadonlyArray<FieldDto>>) {
