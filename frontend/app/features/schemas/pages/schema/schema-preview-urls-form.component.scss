@@ -1,13 +1,15 @@
 @import '_vars';
 @import '_mixins';
 
-.content {
-    min-height: 200px;
-    margin-top: 1rem;
+.inner-header,
+.inner-main {
+    position: relative;
+    padding: 1rem $panel-padding;
 }
 
-.btn-delete {
-    margin-left: 42px;
+.inner-header {
+    background: $color-table-background;
+    border-bottom: 1px solid $color-border;
 }
 
 .col-options {

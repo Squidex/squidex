@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    DialogService,
     SchemaDetailsDto,
     SchemasState,
     SynchronizeSchemaForm
@@ -20,25 +21,31 @@ import {
     templateUrl: './schema-export-form.component.html'
 })
 export class SchemaExportFormComponent implements OnChanges {
-    @Output()
-    public complete = new EventEmitter();
-
     @Input()
     public schema: SchemaDetailsDto;
 
     public synchronizeForm = new SynchronizeSchemaForm(this.formBuilder);
 
+    public isEditable = false;
+
     constructor(
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnChanges() {
+        this.isEditable = this.schema.canUpdateScripts;
+
         this.synchronizeForm.form.get('json')!.setValue(this.schema.export());
     }
 
-    public synchronizeSchema() {
+    public synchronize() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.synchronizeForm.submit();
 
         if (value) {
@@ -50,14 +57,12 @@ export class SchemaExportFormComponent implements OnChanges {
 
             this.schemasState.synchronize(this.schema, request)
                 .subscribe(() => {
-                    this.synchronizeForm.submitCompleted();
+                    this.dialogs.notifyInfo('Schema synchronized successfully.');
+
+                    this.synchronizeForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.synchronizeForm.submitFailed(error);
                 });
         }
-    }
-
-    public emitComplete() {
-        this.complete.emit();
     }
 }

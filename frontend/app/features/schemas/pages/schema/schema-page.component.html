@@ -1,15 +1,15 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-panel desiredWidth="60rem" [showSidebar]="true">
-    <ng-container title>
-        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> <span (dblclick)="editSchemaDialog.show()">{{schema.displayName}}</span> 
+<sqx-panel desiredWidth="60rem" contentClass="grid" [showSidebar]="true">
+    <ng-container header>
+        <ul class="nav nav-tabs2">
+            <li class="nav-item" *ngFor="let tab of selectableTabs">
+                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab}}</a>
+            </li>
+        </ul>
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text mr-1" (click)="exportDialog.show()">
-            JSON View
-        </button>
-
         <div class="btn-group mr-1" #buttonPublish>
             <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="!schema.canPublish" (click)="publish()">
                 Published
@@ -25,14 +25,7 @@
             </button>
 
             <ng-container *sqxModal="editOptionsDropdown;closeAlways:true">
-                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
-                    <a class="dropdown-item" (click)="configureScriptsDialog.show()">
-                        Scripts
-                    </a>
-                    <a class="dropdown-item" (click)="configurePreviewUrlsDialog.show()">
-                        Preview Urls
-                    </a>
-                    
+                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>                    
                     <ng-container *ngIf="schemasState.canCreate">
                         <div class="dropdown-divider"></div>
         
@@ -66,33 +59,22 @@
     </ng-container>
 
     <ng-container content>
-        <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
-            No field created yet.
-            
-            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
-                <i class="icon icon-plus"></i> Add Field
-            </button>
-        </div>
-
-        <ng-container *ngIf="patternsState.patterns | async; let patterns">
-            <div class="schemas"
-                cdkDropList
-                [cdkDropListDisabled]="!schema.canOrderFields"
-                [cdkDropListData]="schema.fields"
-                (cdkDropListDropped)="sortFields($event)">
-                <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn"
-                    class="table-drag"
-                    cdkDrag
-                    cdkDragLockAxis="y">
-                    <sqx-field [field]="field" [schema]="schema" [patterns]="patterns">
-                        <i cdkDragHandle class="icon-drag2 drag-handle"></i>
-                    </sqx-field>
-                </div>
-            </div>
-    
-            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
-                <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
-            </button>
+        <ng-container [ngSwitch]="selectedTab">
+            <ng-container *ngSwitchCase="'Fields'">
+                <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Scripts'">
+                <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Preview URL'">
+                <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Json'">
+                <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Common'">
+                <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+            </ng-container>
         </ng-container>
     </ng-container>
 
@@ -106,33 +88,3 @@
 </sqx-panel>
 
 <router-outlet></router-outlet>
-
-<ng-container *sqxModal="editSchemaDialog">
-    <sqx-schema-edit-form [schema]="schema" 
-        (complete)="editSchemaDialog.hide()">
-    </sqx-schema-edit-form>
-</ng-container>
-
-<ng-container *sqxModal="addFieldDialog">
-    <sqx-field-wizard [schema]="schema"
-        (complete)="addFieldDialog.hide()">
-    </sqx-field-wizard>
-</ng-container>
-
-<ng-container *sqxModal="configureScriptsDialog">
-    <sqx-schema-scripts-form [schema]="schema"
-        (complete)="configureScriptsDialog.hide()">
-    </sqx-schema-scripts-form> 
-</ng-container>
-
-<ng-container *sqxModal="configurePreviewUrlsDialog">
-    <sqx-schema-preview-urls-form [schema]="schema"
-        (complete)="configurePreviewUrlsDialog.hide()">
-    </sqx-schema-preview-urls-form>
-</ng-container>
-
-<ng-container *sqxModal="exportDialog">
-    <sqx-schema-export-form [schema]="schema"
-        (complete)="exportDialog.hide()">
-    </sqx-schema-export-form>
-</ng-container>

@@ -7,22 +7,17 @@
 
 // tslint:disable:no-shadowed-variable
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
-    DialogModel,
     fadeAnimation,
-    FieldDto,
-    fieldTypes,
     MessageBus,
     ModalModel,
     PatternsState,
     ResourceOwner,
     SchemaDetailsDto,
-    SchemasState,
-    sorted
+    SchemasState
 } from '@app/shared';
 
 import {
@@ -38,18 +33,12 @@ import {
     ]
 })
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
-    public fieldTypes = fieldTypes;
-
     public schema: SchemaDetailsDto;
 
-    public addFieldDialog = new DialogModel();
-    public configurePreviewUrlsDialog = new DialogModel();
-    public configureScriptsDialog = new DialogModel();
     public editOptionsDropdown = new ModalModel();
-    public editSchemaDialog = new DialogModel();
-    public exportDialog = new DialogModel();
 
-    public trackByFieldFn: (index: number, field: FieldDto) => any;
+    public selectedTab = 'Preview URL';
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Preview URL', 'Json', 'Common'];
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -59,8 +48,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         private readonly messageBus: MessageBus
     ) {
         super();
-
-        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnInit() {
@@ -73,20 +60,16 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
                 }));
     }
 
+    public selectTab(tab: string) {
+        this.selectedTab = tab;
+    }
+
     public publish() {
         this.schemasState.publish(this.schema).subscribe();
     }
 
     public unpublish() {
         this.schemasState.unpublish(this.schema).subscribe();
-    }
-
-    public sortFields(event: CdkDragDrop<ReadonlyArray<FieldDto>>) {
-        this.schemasState.orderFields(this.schema, sorted(event)).subscribe();
-    }
-
-    public trackByField(index: number, field: FieldDto) {
-        return field.fieldId + this.schema.id;
     }
 
     public deleteSchema() {

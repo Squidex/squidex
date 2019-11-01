@@ -1,19 +1,24 @@
 @import '_vars';
 @import '_mixins';
 
-.nav-link {
-    cursor: default;
+:host,
+.inner-form,
+.inner-main {
+    @include flex-box;
+    @include flex-grow(1);
+    @include flex-direction(column);
+}
+
+.inner-header,
+.inner-main {
+    position: relative;
+}
+
+.inner-header {
+    padding: 1rem $panel-padding;
 }
 
 :host ::ng-deep {
-    .modal-body {
-        padding: 0;
-    }
-
-    .modal-content {
-        height: 100%;
-    }
-
     .editor {
         @include absolute(0, 0, 0, 0);
     }

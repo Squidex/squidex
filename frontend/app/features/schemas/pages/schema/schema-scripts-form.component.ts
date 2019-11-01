@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    DialogService,
     EditScriptsForm,
     SchemaDetailsDto,
     SchemasState
@@ -19,10 +20,7 @@ import {
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html'
 })
-export class SchemaScriptsFormComponent implements OnInit {
-    @Output()
-    public complete = new EventEmitter();
-
+export class SchemaScriptsFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
@@ -33,20 +31,17 @@ export class SchemaScriptsFormComponent implements OnInit {
     public isEditable = false;
 
     constructor(
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.isEditable = this.schema.canUpdateScripts;
 
         this.editForm.load(this.schema.scripts);
         this.editForm.setEnabled(this.isEditable);
-    }
-
-    public emitComplete() {
-        this.complete.emit();
     }
 
     public selectField(field: string) {
@@ -63,7 +58,9 @@ export class SchemaScriptsFormComponent implements OnInit {
         if (value) {
             this.schemasState.configureScripts(this.schema, value)
                 .subscribe(() => {
-                    this.emitComplete();
+                    this.dialogs.notifyInfo('Scripts saved successfully.');
+
+                    this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

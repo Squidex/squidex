@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+.cards {
+    padding: $panel-padding;
+}
+
 textarea {
     resize: none;
 }

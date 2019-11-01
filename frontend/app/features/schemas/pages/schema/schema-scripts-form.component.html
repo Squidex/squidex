@@ -1,30 +1,19 @@
-<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <sqx-modal-dialog (close)="emitComplete()" large="true">
-        <ng-container title>
-            Scripts
-        </ng-container>
+<form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
+    <div class="inner-header">
+        <ul class="nav nav-tabs2">
+            <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
+                <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{script | titlecase}}</a>
+            </li>
+        </ul>
+        
+        <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+    </div>
 
-        <ng-container tabs>
-            <ul class="nav nav-tabs2">
-                <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
-                    <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{script | titlecase}}</a>
-                </li>
-            </ul>
+    <div class="inner-main">
+        <ng-container *ngFor="let script of editForm.form.controls | sqxKeys">
+            <ng-container *ngIf="selectedField === script">
+                <sqx-code-editor [noBorder]="true" [formControlName]="script"></sqx-code-editor>
+            </ng-container>
         </ng-container>
-
-        <ng-container content>
-            <div class="form-group">
-                <ng-container *ngFor="let script of editForm.form.controls | sqxKeys">
-                    <ng-container *ngIf="selectedField === script">
-                        <sqx-code-editor [noBorder]="true" [formControlName]="script"></sqx-code-editor>
-                    </ng-container>
-                </ng-container>
-            </div>
-        </ng-container>
-
-        <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()" [disabled]="editForm.submitted | async">Cancel</button>
-            <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">Save</button>
-        </ng-container>
-    </sqx-modal-dialog>
+    </div>
 </form>

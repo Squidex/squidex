@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
     AddPreviewUrlForm,
     ConfigurePreviewUrlsForm,
+    DialogService,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -20,10 +21,7 @@ import {
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html'
 })
-export class SchemaPreviewUrlsFormComponent implements OnInit {
-    @Output()
-    public complete = new EventEmitter();
-
+export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
@@ -34,20 +32,17 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     public isEditable = false;
 
     constructor(
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.isEditable = this.schema.canUpdateUrls;
 
         this.editForm.load(this.schema.previewUrls);
         this.editForm.setEnabled(this.isEditable);
-    }
-
-    public emitComplete() {
-        this.complete.emit();
     }
 
     public cancelAdd() {
@@ -78,7 +73,9 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
         if (value) {
             this.schemasState.configurePreviewUrls(this.schema, value)
                 .subscribe(() => {
-                    this.emitComplete();
+                    this.dialogs.notifyInfo('Preview URLs successfully.');
+
+                    this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);
                 });
