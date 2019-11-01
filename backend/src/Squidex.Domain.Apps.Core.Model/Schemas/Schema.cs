@@ -18,9 +18,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private readonly string name;
         private readonly bool isSingleton;
         private string category;
+        private FieldNames fieldsInLists = FieldNames.Empty;
+        private FieldNames fieldsInReferences = FieldNames.Empty;
         private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
         private IReadOnlyDictionary<string, string> previewUrls = EmptyPreviewUrls;
-        private SchemaScripts scripts = new SchemaScripts();
+        private SchemaScripts scripts = SchemaScripts.Empty;
         private SchemaProperties properties;
         private bool isPublished;
 
@@ -67,6 +69,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public FieldCollection<RootField> FieldCollection
         {
             get { return fields; }
+        }
+
+        public FieldNames FieldsInLists
+        {
+            get { return fieldsInLists; }
+        }
+
+        public FieldNames FieldsInReferences
+        {
+            get { return fieldsInReferences; }
         }
 
         public SchemaScripts Scripts
@@ -120,6 +132,42 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 clone.scripts = newScripts ?? new SchemaScripts();
                 clone.scripts.Freeze();
+            });
+        }
+
+        [Pure]
+        public Schema SetListFields(FieldNames names)
+        {
+            return Clone(clone =>
+            {
+                clone.fieldsInLists = names ?? FieldNames.Empty;
+            });
+        }
+
+        [Pure]
+        public Schema SetListFields(params string[] names)
+        {
+            return Clone(clone =>
+            {
+                clone.fieldsInLists = new FieldNames(names);
+            });
+        }
+
+        [Pure]
+        public Schema SetReferenceFields(FieldNames names)
+        {
+            return Clone(clone =>
+            {
+                clone.fieldsInReferences = names ?? FieldNames.Empty;
+            });
+        }
+
+        [Pure]
+        public Schema SetReferenceFields(params string[] names)
+        {
+            return Clone(clone =>
+            {
+                clone.fieldsInReferences = new FieldNames(names);
             });
         }
 

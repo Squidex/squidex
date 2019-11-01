@@ -254,24 +254,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
-        public void CanUpdate_should_throw_exception_if_marking_a_ui_field_as_list_field()
-        {
-            var command = new UpdateField { FieldId = 4, Properties = new UIFieldProperties { IsListField = true } };
-
-            ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
-                new ValidationError("UI field cannot be a list field.", "Properties.IsListField"));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_marking_a_ui_field_as_reference_field()
-        {
-            var command = new UpdateField { FieldId = 4, Properties = new UIFieldProperties { IsReferenceField = true } };
-
-            ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
-                new ValidationError("UI field cannot be a reference field.", "Properties.IsReferenceField"));
-        }
-
-        [Fact]
         public void CanUpdate_should_throw_exception_if_properties_null()
         {
             var command = new UpdateField { FieldId = 2, Properties = null! };
@@ -341,15 +323,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
                 new ValidationError("Partitioning is not a valid value.", "Partitioning"));
-        }
-
-        [Fact]
-        public void CanAdd_should_throw_exception_if_creating_a_ui_field_as_list_field()
-        {
-            var command = new AddField { Name = "field5", Properties = new UIFieldProperties { IsListField = true } };
-
-            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
-                new ValidationError("UI field cannot be a list field.", "Properties.IsListField"));
         }
 
         [Fact]

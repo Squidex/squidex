@@ -335,16 +335,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = new UIFieldProperties
-                        {
-                            IsListField = true,
-                            IsReferenceField = true
-                        },
+                        Properties = new UIFieldProperties(),
                         IsHidden = true,
                         IsDisabled = true,
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
+                FieldsInList = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field"),
                 Name = "new-schema"
             };
 
@@ -370,10 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = new StringFieldProperties
-                        {
-                            IsListField = true
-                        },
+                        Properties = new StringFieldProperties(),
                         IsHidden = true,
                         IsDisabled = true,
                         Partitioning = Partitioning.Invariant.Key
@@ -404,6 +399,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         }
                     }
                 },
+                FieldsInList = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 

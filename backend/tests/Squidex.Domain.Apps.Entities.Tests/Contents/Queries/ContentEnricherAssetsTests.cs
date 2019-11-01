@@ -42,16 +42,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         ResolveImage = true,
                         MinItems = 2,
-                        MaxItems = 3,
-                        IsListField = true
+                        MaxItems = 3
                     })
                     .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
                     {
                         ResolveImage = true,
                         MinItems = 1,
-                        MaxItems = 1,
-                        IsListField = true,
-                    });
+                        MaxItems = 1
+                    })
+                    .SetListFields(new FieldNames { "asset1", "asset2" });
 
             A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>.Ignored))
                 .ReturnsLazily(new Func<string, string>(id => $"url/to/{id}"));

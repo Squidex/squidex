@@ -11,8 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class JsonFieldBuilder : FieldBuilder
     {
-        public JsonFieldBuilder(UpsertSchemaField field)
-            : base(field)
+        public JsonFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+            : base(field, schema)
         {
         }
     }

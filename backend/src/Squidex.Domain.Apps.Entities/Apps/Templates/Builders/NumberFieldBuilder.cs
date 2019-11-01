@@ -11,8 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class NumberFieldBuilder : FieldBuilder
     {
-        public NumberFieldBuilder(UpsertSchemaField field)
-            : base(field)
+        public NumberFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+            : base(field, schema)
         {
         }
     }
