@@ -8,50 +8,15 @@
     }
 }
 
-.btn-group-sm {
-    margin-top: .25rem;
+.cards {
+    padding: $panel-padding;
+    overflow-y: auto;
 }
 
-.btn-sm {
-    margin-top: .25rem;
-}
+.nav-tabs2 {
+    @include absolute(auto, auto, 0, auto);
 
-.btn-success {
-    margin: 0;
-}
-
-.schemas {
-    padding-bottom: 7rem;
-}
-
-.schema {
-    &-edit {
-        color: $color-border-dark;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: .6rem .25rem;
-        border: 0;
-        background: transparent;
-        vertical-align: baseline;
-    }
-}
-
-.field-icon {
-    color: $color-border-dark;
-}
-
-.field-button {
-    & {
-        @include circle(5.25rem);
-        @include box-shadow(0, 8px, 16px, .3);
-        @include absolute(auto, 6rem, 1rem, auto);
-    }
-
-    &-icon {
-        font-weight: bold;
-    }
-
-    &-text {
-        font-size: .9rem;
+    a {
+        padding-bottom: 1.5rem;
     }
 }

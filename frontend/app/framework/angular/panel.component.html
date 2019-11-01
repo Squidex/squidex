@@ -29,6 +29,8 @@
                 </ng-template>
             </ng-container>
 
+            <ng-content select="[header]"></ng-content>
+
             <div class="panel-header-row" *ngIf="showSecondHeader">
                 <ng-content select="[secondHeader]"></ng-content>
             </div>

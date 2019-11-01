@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    DialogService,
     EditSchemaForm,
     SchemaDetailsDto,
     SchemasState
@@ -22,9 +23,6 @@ import {
 export class SchemaEditFormComponent implements OnInit {
     public readonly standalone = { standalone: true };
 
-    @Output()
-    public complete = new EventEmitter();
-
     @Input()
     public schema: SchemaDetailsDto;
 
@@ -33,6 +31,7 @@ export class SchemaEditFormComponent implements OnInit {
     public isEditable = false;
 
     constructor(
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
@@ -45,10 +44,6 @@ export class SchemaEditFormComponent implements OnInit {
         this.editForm.setEnabled(this.isEditable);
     }
 
-    public emitComplete() {
-        this.complete.emit();
-    }
-
     public saveSchema() {
         if (!this.isEditable) {
             return;
@@ -59,7 +54,9 @@ export class SchemaEditFormComponent implements OnInit {
         if (value) {
             this.schemasState.update(this.schema, value)
                 .subscribe(() => {
-                    this.emitComplete();
+                    this.dialogs.notifyInfo('Schema saved successfully.');
+
+                    this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

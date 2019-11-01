@@ -2,12 +2,12 @@
 @import '_mixins';
 
 .content {
-    min-height: 200px;
     margin-top: 1rem;
 }
 
-.btn-delete {
-    margin-left: 42px;
+.card-header,
+.card-footer {
+    padding: 1.25rem;
 }
 
 .col-options {

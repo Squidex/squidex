@@ -39,6 +39,7 @@ import {
     ReferencesValidationComponent,
     SchemaEditFormComponent,
     SchemaExportFormComponent,
+    SchemaFieldsComponent,
     SchemaFormComponent,
     SchemaPageComponent,
     SchemaPreviewUrlsFormComponent,
@@ -57,18 +58,64 @@ const routes: Routes = [
         children: [
             {
                 path: ':schemaName',
-                component: SchemaPageComponent,
                 canActivate: [SchemaMustExistGuard],
+                component: SchemaPageComponent,
                 children: [
                     {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/schemas'
-                        }
+                        path: '',
+                        redirectTo: 'fields'
+                    },
+                    {
+                        path: 'fields',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/schemas'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        path: 'scripts',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/scripts'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        path: 'json',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/schema-json'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        path: 'more',
+                        children: [
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/preview'
+                                }
+                            }
+                        ]
                     }
                 ]
-            }]
+            }
+        ]
     }
 ];
 
@@ -90,8 +137,8 @@ const routes: Routes = [
         DateTimeUIComponent,
         DateTimeValidationComponent,
         FieldComponent,
-        FieldFormComponent,
         FieldFormCommonComponent,
+        FieldFormComponent,
         FieldFormUIComponent,
         FieldFormValidationComponent,
         FieldWizardComponent,
@@ -105,6 +152,7 @@ const routes: Routes = [
         ReferencesValidationComponent,
         SchemaEditFormComponent,
         SchemaExportFormComponent,
+        SchemaFieldsComponent,
         SchemaFormComponent,
         SchemaPageComponent,
         SchemaPreviewUrlsFormComponent,

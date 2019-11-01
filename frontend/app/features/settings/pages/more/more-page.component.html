@@ -4,11 +4,11 @@
     </ng-container>
 
     <ng-container content>
-        <div class="card mb-4">
-            <h3 class="card-header">General</h3>
+        <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+            <div class="card mb-2">
+                <h3 class="card-header">General</h3>
 
-            <div class="card-body">
-                <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                <div class="card-body">
                     <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
 
                     <div class="form-group">
@@ -32,14 +32,15 @@
         
                         <input type="text" class="form-control" id="description" maxlength="100" formControlName="description" />
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
+                <div class="card-footer">
+                    <button type="submit" class="float-right btn btn-primary">Save</button>
+                </div>
             </div>
-        </div>
-        <div class="card mb-4">
+        </form>
+
+        <div class="card mb-2">
             <h3 class="card-header">Image</h3>
 
             <div class="card-body">

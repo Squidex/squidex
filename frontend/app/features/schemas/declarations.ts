@@ -34,6 +34,7 @@ export * from './pages/schema/field-wizard.component';
 export * from './pages/schema/field.component';
 export * from './pages/schema/schema-edit-form.component';
 export * from './pages/schema/schema-export-form.component';
+export * from './pages/schema/schema-fields.component';
 export * from './pages/schema/schema-page.component';
 export * from './pages/schema/schema-preview-urls-form.component';
 export * from './pages/schema/schema-scripts-form.component';

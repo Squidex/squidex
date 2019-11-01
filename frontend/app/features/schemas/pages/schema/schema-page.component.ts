@@ -7,22 +7,17 @@
 
 // tslint:disable:no-shadowed-variable
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 import {
-    DialogModel,
     fadeAnimation,
-    FieldDto,
-    fieldTypes,
     MessageBus,
     ModalModel,
-    PatternsState,
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
-    sorted
+    Types
 } from '@app/shared';
 
 import {
@@ -38,33 +33,30 @@ import {
     ]
 })
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
-    public fieldTypes = fieldTypes;
-
     public schema: SchemaDetailsDto;
 
-    public addFieldDialog = new DialogModel();
-    public configurePreviewUrlsDialog = new DialogModel();
-    public configureScriptsDialog = new DialogModel();
     public editOptionsDropdown = new ModalModel();
-    public editSchemaDialog = new DialogModel();
-    public exportDialog = new DialogModel();
 
-    public trackByFieldFn: (index: number, field: FieldDto) => any;
+    public selectedTab = 'fields';
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Json', 'More'];
 
     constructor(
         public readonly schemasState: SchemasState,
-        public readonly patternsState: PatternsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
         super();
-
-        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnInit() {
-        this.patternsState.load();
+        this.own(
+            this.router.events
+                .subscribe(event => {
+                    if (Types.is(event, NavigationEnd)) {
+                        this.selectedTab = this.route.firstChild!.snapshot.routeConfig!.path!;
+                    }
+                }));
 
         this.own(
             this.schemasState.selectedSchema
@@ -81,14 +73,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.schemasState.unpublish(this.schema).subscribe();
     }
 
-    public sortFields(event: CdkDragDrop<ReadonlyArray<FieldDto>>) {
-        this.schemasState.orderFields(this.schema, sorted(event)).subscribe();
-    }
-
-    public trackByField(index: number, field: FieldDto) {
-        return field.fieldId + this.schema.id;
-    }
-
     public deleteSchema() {
         this.schemasState.delete(this.schema)
             .subscribe(() => {
@@ -98,6 +82,10 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public cloneSchema() {
         this.messageBus.emit(new SchemaCloning(this.schema.export()));
+    }
+
+    public selectTab(tab: string) {
+        this.selectedTab = tab;
     }
 
     private back() {
