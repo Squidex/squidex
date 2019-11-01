@@ -11,18 +11,28 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
+using Squidex.Web;
 
 namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
-        private static readonly AssemblyName[] SharedAssemblies =
-            Assembly.GetEntryAssembly()!
-                .GetReferencedAssemblies()
-                    .Where(x => x.Name?.StartsWith("Squidex.", StringComparison.OrdinalIgnoreCase) == true)
-                    .ToArray();
+        private static readonly AssemblyName[] SharedAssemblies = new Type[]
+        {
+            typeof(IPlugin),
+            typeof(SquidexCoreModel),
+            typeof(SquidexCoreOperations),
+            typeof(SquidexEntities),
+            typeof(SquidexEvents),
+            typeof(SquidexInfrastructure),
+            typeof(SquidexWeb)
+        }.Select(x => x.Assembly.GetName()).ToArray();
 
         public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
         {
