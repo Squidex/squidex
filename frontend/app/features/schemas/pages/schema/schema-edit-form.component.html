@@ -1,42 +1,45 @@
-<div class="cards">
+
+<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
     <div class="card">
+        <div class="card-header">Common</div>
+
         <div class="card-body">
-            <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-                <div class="form-group">
-                    <label for="schemaName">Name</label>
-            
-                    <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="standalone" />
-                </div>
-            
-                <div class="form-group">
-                    <label for="schemaLabel">Label</label>
-                    
-                    <sqx-control-errors for="label" [submitted]="editForm.submitted | async"></sqx-control-errors>
-            
-                    <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
-                </div>
-            
-                <div class="form-group">
-                    <label for="schemaHints">Hints</label>
-                    
-                    <sqx-control-errors for="hints" [submitted]="editForm.submitted | async"></sqx-control-errors>
-            
-                    <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
-                </div>
-            
-                <div class="form-group">
-                    <label for="schemaTags">Tags</label>
-                    
-                    <sqx-control-errors for="tags" [submitted]="editForm.submitted | async"></sqx-control-errors>
-            
-                    <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
-            
-                    <sqx-form-hint>Tags to annotate your schema for automation processes.</sqx-form-hint>
-                </div>
-            </form>
+            <div class="form-group">
+                <label for="schemaName">Name</label>
+        
+                <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="standalone" />
+            </div>
+        
+            <div class="form-group">
+                <label for="schemaLabel">Label</label>
+                
+                <sqx-control-errors for="label" [submitted]="editForm.submitted | async"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
+
+                <sqx-form-hint>If the label is defined it will be shown in the UI instead of the schema name.</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="schemaHints">Hints</label>
+                
+                <sqx-control-errors for="hints" [submitted]="editForm.submitted | async"></sqx-control-errors>
+        
+                <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
+            </div>
+        
+            <div class="form-group">
+                <label for="schemaTags">Tags</label>
+                
+                <sqx-control-errors for="tags" [submitted]="editForm.submitted | async"></sqx-control-errors>
+        
+                <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
+        
+                <sqx-form-hint>Tags to annotate your schema for automation processes.</sqx-form-hint>
+            </div>
         </div>
         <div class="card-footer">
             <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">Save</button>
         </div>
     </div>
-</div>
+</form>

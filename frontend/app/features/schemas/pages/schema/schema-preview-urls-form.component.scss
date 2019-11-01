@@ -1,15 +1,13 @@
 @import '_vars';
 @import '_mixins';
 
-.inner-header,
-.inner-main {
-    position: relative;
-    padding: 1rem $panel-padding;
+.content {
+    margin-top: 1rem;
 }
 
-.inner-header {
-    background: $color-table-background;
-    border-bottom: 1px solid $color-border;
+.card-header,
+.card-footer {
+    padding: 1.25rem;
 }
 
 .col-options {

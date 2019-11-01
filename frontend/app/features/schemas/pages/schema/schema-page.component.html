@@ -1,6 +1,6 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-panel desiredWidth="60rem" contentClass="grid" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" contentClass="grid" [showSidebar]="true">
     <ng-container header>
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
@@ -66,14 +66,14 @@
             <ng-container *ngSwitchCase="'Scripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'Preview URL'">
-                <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
-            </ng-container>
             <ng-container *ngSwitchCase="'Json'">
                 <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'Common'">
-                <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+            <ng-container *ngSwitchCase="'More'">
+                <div class="cards">
+                    <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
+                    <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+                </div>
             </ng-container>
         </ng-container>
     </ng-container>

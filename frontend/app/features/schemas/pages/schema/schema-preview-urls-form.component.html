@@ -1,63 +1,68 @@
-<form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <div class="inner-main">
-        <div class="table-items-row table-items-row-empty" *ngIf="editForm.form.controls.length === 0">
-            No preview URL configured.
-        </div>
+<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
+    <div class="card mb-2">
+        <div class="card-header">Preview URLs</div>
 
-        <div class="table-items-row" *ngFor="let form of editForm.form.controls; let i = index">
-            <div class="form-group row no-gutters">
-                <div class="col col-name">
-                    <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
+        <div class="card-body">
+            <sqx-form-alert>
+                Checkout the integrated help page to learn more about preview URL's.
+            </sqx-form-alert>
 
-                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Web or Mobile" />
+            <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
+                    No preview urls configured.
                 </div>
 
-                <div class="col pl-1">
-                    <sqx-control-errors [for]="form.get('url')" fieldName="Url" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">
+                    <div class="col col-name pr-1">
+                        <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
+    
+                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Web or Mobile" />
+                    </div>
+    
+                    <div class="col pr-1">
+                        <sqx-control-errors [for]="form.get('url')" fieldName="Url" [submitted]="editForm.submitted | async"></sqx-control-errors>
+    
+                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('url')" placeholder="Url with variables" />
+                    </div>
 
-                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('url')" placeholder="Url with placeholders like ${id} or ${data.slug}" />
+                    <div class="col-auto col-options">
+                        <button type="button" class="btn btn-text-danger"
+                            [disabled]="!isEditable"
+                            (sqxConfirmClick)="editForm.remove(i)"
+                            confirmTitle="Remove url" 
+                            confirmText="Do you really want to remove this url?">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="col-auto pl-1 col-options">
-                    <button type="button" class="btn btn-text-danger"
-                        [disabled]="!isEditable"
-                        (sqxConfirmClick)="editForm.remove(i)"
-                        confirmTitle="Remove url" 
-                        confirmText="Do you really want to remove this url?">
-                        <i class="icon-bin2"></i>
-                    </button>
+                <div class="form-group row no-gutters" [formGroup]="addForm.form" *ngIf="isEditable">
+                    <div class="col col-name pr-1">
+                        <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Web or Mobile" />
+                    </div>
+
+                    <div class="col pr-1">
+                        <sqx-control-errors for="url" [submitted]="addForm.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url with variables" />
+                    </div>
+
+                    <div class="col-auto col-options">
+                        <button type="button" class="btn btn-success" (click)="add()">
+                            <i class="icon-add"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-text-secondary" (click)="cancelAdd()">
+                            <i class="icon-close"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="table-items-row table-items-footer">
-            <div class="form-group row no-gutters" [formGroup]="addForm.form" *ngIf="isEditable">
-                <div class="col col-name">
-                    <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
-    
-                    <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Web or Mobile" />
-                </div>
-    
-                <div class="col pl-1">
-                    <sqx-control-errors for="url" [submitted]="addForm.submitted | async"></sqx-control-errors>
-    
-                    <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url with placeholders like ${id} or ${data.slug}" />
-                </div>
-        
-                <div class="col-auto pl-1 col-options" *ngIf="!pattern">
-                    <button type="button" class="btn btn-success mr-1" (click)="add()">
-                        <i class="icon-add"></i>
-                    </button>
-    
-                    <button type="button" class="btn btn-text-secondary" (click)="cancelAdd()">
-                        <i class="icon-close"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="card-footer" *ngIf="isEditable">
+            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
         </div>
-    </div>
-
-    <div>
-        <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
     </div>
 </form>

@@ -1,8 +1,9 @@
 @import '_vars';
 @import '_mixins';
 
-.cards {
-    padding: $panel-padding;
+.card-header,
+.card-footer {
+    padding: 1.25rem;
 }
 
 textarea {

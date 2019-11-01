@@ -8,6 +8,11 @@
     }
 }
 
+.cards {
+    padding: $panel-padding;
+    overflow-y: auto;
+}
+
 .nav-tabs2 {
     @include absolute(auto, auto, 0, auto);
 

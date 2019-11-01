@@ -37,8 +37,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public editOptionsDropdown = new ModalModel();
 
-    public selectedTab = 'Preview URL';
-    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Preview URL', 'Json', 'Common'];
+    public selectedTab = 'More';
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Json', 'More'];
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -54,14 +54,16 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.patternsState.load();
 
         this.own(
+            this.route.data
+                .subscribe(data => {
+                    this.selectedTab = data['tab'];
+                }));
+
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     this.schema = schema;
                 }));
-    }
-
-    public selectTab(tab: string) {
-        this.selectedTab = tab;
     }
 
     public publish() {
@@ -81,6 +83,16 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public cloneSchema() {
         this.messageBus.emit(new SchemaCloning(this.schema.export()));
+    }
+
+    public selectTab(tab: string) {
+        const hasHelp = this.router.url.endsWith('/help');
+
+        if (hasHelp) {
+            this.router.navigate(['../', tab.toLowerCase(), 'help'], { relativeTo: this.route });
+        } else {
+            this.router.navigate(['../', tab.toLowerCase()], { relativeTo: this.route });
+        }
     }
 
     private back() {
