@@ -17,6 +17,7 @@ import {
     InternalAreaComponent,
     LeftMenuComponent,
     LoginPageComponent,
+    LogoComponent,
     LogoutPageComponent,
     NotFoundPageComponent,
     ProfileMenuComponent
@@ -42,6 +43,7 @@ import {
         InternalAreaComponent,
         LeftMenuComponent,
         LoginPageComponent,
+        LogoComponent,
         LogoutPageComponent,
         NotFoundPageComponent,
         ProfileMenuComponent
