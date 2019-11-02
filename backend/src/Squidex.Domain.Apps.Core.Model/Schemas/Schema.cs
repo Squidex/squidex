@@ -210,7 +210,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema DeleteField(long fieldId)
         {
-            return UpdateFields(f => f.Remove(fieldId));
+            if (!FieldsById.TryGetValue(fieldId, out var field))
+            {
+                return this;
+            }
+
+            return Clone(clone =>
+            {
+                clone.fields = fields.Remove(fieldId);
+                clone.fieldsInLists = fieldsInLists.Remove(field.Name);
+                clone.fieldsInReferences = fieldsInReferences.Remove(field.Name);
+            });
         }
 
         [Pure]

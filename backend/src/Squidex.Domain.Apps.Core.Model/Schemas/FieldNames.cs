@@ -35,5 +35,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return new FieldNames(list);
         }
+
+        public FieldNames Remove(string field)
+        {
+            var list = this.ToList();
+
+            list.Remove(field);
+
+            return new FieldNames(list);
+        }
     }
 }
