@@ -2,7 +2,7 @@
 @import '_vars';
 
 @mixin panel-icon {
-    color: $color-panel-icon;
+    color: $color-border-dark;
     font-size: 1.2rem;
     font-weight: 400;
     text-decoration: none;
@@ -13,7 +13,8 @@
     &:hover,
     &:focus {
         text-decoration: none;
-        color: darken($color-panel-icon, 10%);
+        cursor: pointer;
+        color: darken($color-border-dark, 10%);
     }
 
     &.active {
@@ -341,7 +342,7 @@
 
         &.active,
         &:hover {
-            background: $color-background;
+            background: $color-theme-secondary;
         }
 
         &.inactive {

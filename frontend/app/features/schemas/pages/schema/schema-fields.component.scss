@@ -1,8 +1,11 @@
 @import '_vars';
 @import '_mixins';
 
-.fields {
+:host {
     padding: $panel-padding;
+    padding-bottom: 8rem;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .field-button {

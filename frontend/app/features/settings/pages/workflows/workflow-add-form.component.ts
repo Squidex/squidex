@@ -25,7 +25,7 @@ import { AddWorkflowForm, WorkflowsState } from '@app/shared';
                         <button type="submit" class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async">Add Workflow</button>
                     </div>
                     <div class="col-auto pl-1">
-                        <button type="reset" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                        <button type="reset" class="btn btn-text-secondary" (click)="cancel()">Cancel</button>
                     </div>
                 </div>
             </form>

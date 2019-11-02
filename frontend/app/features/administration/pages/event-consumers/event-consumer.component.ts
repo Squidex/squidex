@@ -15,7 +15,7 @@ import { EventConsumerDto, EventConsumersState } from '@app/features/administrat
     selector: '[sqxEventConsumer]',
     template: `
         <tr [class.faulted]="eventConsumer.error && eventConsumer.error?.length > 0">
-            <td class="auto-auto">
+            <td class="cell-auto">
                 <span class="truncate">
                     <i class="faulted-icon icon icon-bug" (click)="error.emit()" [class.hidden]="!eventConsumer.error || eventConsumer.error?.length === 0"></i>
 

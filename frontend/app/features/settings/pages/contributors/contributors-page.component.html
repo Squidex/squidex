@@ -1,6 +1,6 @@
 <sqx-title message="Contributors"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" contentClass="grid" [showSidebar]="true">
     <ng-container title>
         Contributors
     </ng-container>
@@ -22,43 +22,45 @@
 
     <ng-container content>
         <ng-container *ngIf="contributorsState.isLoaded | async">
-            <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
-                <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
-                    Your plan allows up to {{maxContributors}} contributors.
-                </div>
-            </ng-container>
-            
             <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
                 <ng-container *ngIf="rolesState.roles | async; let roles">
+                    <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
+                        <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
+                            Your plan allows up to {{maxContributors}} contributors.
+                        </div>
+                    </ng-container>
                     <ng-container *ngIf="contributorsState.canCreate | async">
                         <sqx-contributor-add-form
                             [roles]="roles">
                         </sqx-contributor-add-form>
+                    </ng-container>
+                
+                    <div class="grid-content">
 
                         <div class="import-hint">
                             <sqx-form-hint class="text-right">
                                 Big team? <a class="force" (click)="importDialog.show()">Add many contributors at once</a>
                             </sqx-form-hint>
                         </div>
-                    </ng-container>
-                
-                    <ng-container *ngIf="contributors.length > 0; else noContributors">
-                        <table class="table table-items table-fixed">
-                            <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor"
-                                [sqxContributor]="contributor"
-                                [search]="contributorsState.snapshot.queryRegex"
-                                [roles]="roles">
-                            </tbody>
-                        </table>
+                        
+                        <ng-container *ngIf="contributors.length > 0; else noContributors">
+                            <table class="table table-items table-fixed">
+                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor"
+                                    [sqxContributor]="contributor"
+                                    [search]="contributorsState.snapshot.queryRegex"
+                                    [roles]="roles">
+                                </tbody>
+                            </table>
 
-                        <sqx-pager [pager]="contributorsState.contributorsPager | async" [autoHide]="true" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
-                    </ng-container>
+                            <sqx-pager [pager]="contributorsState.contributorsPager | async" [autoHide]="true" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+                        </ng-container>
 
-                    <ng-template #noContributors>
-                        <div class="table-items-row table-items-row-empty">
-                            No contributors found.
-                        </div>
-                    </ng-template>
+                        <ng-template #noContributors>
+                            <div class="table-items-row table-items-row-empty">
+                                No contributors found.
+                            </div>
+                        </ng-template>
+                    </div>
                 </ng-container>
             </ng-container>
         </ng-container>

@@ -6,17 +6,11 @@ $color-border-dark:         #b3bbbf;
 $color-title:               #000;
 $color-text:                #373a3c;
 $color-text-decent:         #8091a5;
-$color-text-decent2:        #a9b9c0;
 $color-tooltip:             #1a2129;
-$color-history:             #7f858c;
 
 $color-code-background:     #f5f7f9;
 $color-code-text:           #708090;
 
-$color-input:               #dbe4eb;
-$color-input-background:    #fff;
-$color-input-disabled:      #eef1f4;
-$color-input-border:        rgba(0, 0, 0, .15);
 $color-extern-google:           #d34836;
 $color-extern-google-icon:      #b02c1b;
 $color-extern-microsoft:        #004185;
@@ -31,7 +25,7 @@ $color-theme-blue-dark:     #297ff6;
 $color-theme-blue-lighter:  #65a6ff;
 $color-theme-blue-light:    #9ebeea;
 $color-theme-blue-lightest: #d9e8fc;
-$color-theme-secondary:     #e1e4e8;
+$color-theme-secondary:     #ecf2f6;
 
 $color-theme-green:         #4bb958;
 $color-theme-green-dark:    #47b353;
@@ -42,6 +36,11 @@ $color-theme-error:         #eb3142;
 $color-theme-error-dark:    #c00;
 
 $color-theme-info:          #5bc0de;
+
+$color-input:               #dbe4eb;
+$color-input-background:    #fff;
+$color-input-disabled:      $color-theme-secondary;
+$color-input-border:        rgba(0, 0, 0, .15);
 
 $color-dark1-background:        #2e3842;
 $color-dark1-foreground:        #6a7681;
@@ -62,8 +61,6 @@ $color-dark2-placeholder:       #757e8d;
 
 $color-dark-onboarding:         #273039;
 
-$color-panel-icon:              #a2b0b6;
-
 $color-badge-success-background:    #e4f6e6;
 $color-badge-success-foreground:    #4cc159;
 
@@ -83,7 +80,7 @@ $color-badge-secondary-background:  #e6e6e6;
 $color-badge-secondary-foreground:  #999;
 
 $color-table-background:    #fff;
-$color-table-footer:        #ecf2f6;
+$color-table-footer:        $color-theme-secondary;
 
 $color-table-border:        $color-border;
 $color-table-header:        $color-text-decent;
