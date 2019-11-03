@@ -17,7 +17,7 @@ import { FieldDto } from '@app/shared';
             <div class="form-group row">
                 <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">Name</label>
 
-                <div class="col-6">
+                <div class="col-7">
                     <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="standalone" />
 
                     <sqx-form-hint>
@@ -29,13 +29,13 @@ import { FieldDto } from '@app/shared';
             <div class="form-group row">
                 <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldLabel">Label</label>
 
-                <div class="col-6">
+                <div class="col-7">
                     <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
 
                     <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label" />
 
                     <sqx-form-hint>
-                        Define the display name for the field for documentation and user interfaces.
+                        Display name for documentation and user interfaces.
                     </sqx-form-hint>
                 </div>
             </div>
@@ -43,13 +43,13 @@ import { FieldDto } from '@app/shared';
             <div class="form-group row">
                 <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldHints">Hints</label>
 
-                <div class="col-6">
+                <div class="col-7">
                     <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
 
                     <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="100" formControlName="hints" />
 
                     <sqx-form-hint>
-                        Define some hints for the user and editor for the field for documentation and user interfaces.
+                        Describe this field for documentation and user interfaces.
                     </sqx-form-hint>
                 </div>
             </div>
@@ -87,7 +87,7 @@ import { FieldDto } from '@app/shared';
             <div class="form-group row" *ngIf="field.properties.isContentField">
                  <label class="col-3 col-form-label">Tags</label>
 
-                <div class="col-9">
+                <div class="col-7">
                     <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
 
                     <sqx-form-hint>

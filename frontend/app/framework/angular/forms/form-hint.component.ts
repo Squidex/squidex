@@ -13,6 +13,17 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
         <small class="text-muted form-text {{class}}">
             <ng-content></ng-content>
         </small>`,
+    styles: [`
+        :host {
+            display: block;
+            margin-top: 0;
+            margin-bottom: .5rem
+        }
+
+        :host::last-child {
+            margin-bottom: 0;
+        }`
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormHintComponent {

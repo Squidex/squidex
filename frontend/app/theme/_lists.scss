@@ -126,16 +126,16 @@
 
             // Caret that is placed next to the expand button.
             &::before {
-                @include caret-top($color-border);
+                @include caret-top($color-theme-secondary);
                 @include absolute(-1.1rem, 0, auto, auto);
             }
 
             &-tab {
-                padding: .75rem 1.25rem 1.25rem;
+                padding: 1.5rem;
             }
 
             &-tabs {
-                background: $color-border;
+                background: $color-table-footer;
                 position: relative;
                 padding: 1rem 1.25rem;
                 height: 70px;

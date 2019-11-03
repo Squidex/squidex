@@ -10,8 +10,6 @@ $h4-font-size:              $font-size-base * 1.1;
 $h5-font-size:              $font-size-base;
 $h6-font-size:              $font-size-base;
 
-$small-font-size:           90%;
-
 $body-bg:                   $color-background;
 
 $border-color:              $color-border;
@@ -22,12 +20,16 @@ $secondary:                 $color-theme-secondary;
 $success:                   $color-theme-green;
 $warning:                   $color-theme-orange;
 
+$text-muted:                $color-text-decent;
+
 $alert-bg-level:            0;
 $alert-color-level:         -12.5;
 
-$input-bg-disabled:         $color-input-disabled;
+$label-margin-bottom:       .25rem;
+
+$input-disabled-bg:         $color-input-disabled;
 $input-border-color:        $color-input;
-$input-placeholder-color:   $color-text-decent;
+$input-placeholder-color:   lighten($color-text-decent, 20%);
 
 $badge-bg-level: 2;
 

@@ -3,11 +3,11 @@
 
 :host ::ng-deep {
     .user-ref {
-        color: $color-title;
+        font-weight: 500;
     }
 
     .marker-ref {
-        color: $color-title;
+        font-weight: 500;
     }
 }
 
@@ -17,7 +17,6 @@
 
 .event {
     & {
-        color: $color-history;
         font-size: .9rem;
         font-weight: normal;
         margin-bottom: 1.5rem;

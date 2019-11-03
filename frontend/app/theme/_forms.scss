@@ -182,13 +182,28 @@
     }
 }
 
+.col-form-label {
+    font-size: 90%;
+}
+
 label {
     & {
         color: $color-title;
+        font-size: 90%;
+        font-weight: 500;
+    }
+
+    &.form-check-label {
+        font-size: 100%;
+        font-weight: normal;
     }
 
     .hint {
-        color: $color-text-decent2;
+        color: $color-text-decent;
+    }
+
+    .text-muted {
+        font-weight: normal;
     }
 }
 

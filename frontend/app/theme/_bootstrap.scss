@@ -444,7 +444,8 @@ a {
 
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-text {
-        & {
+        &,
+        &-primary {
             @include build-text-button($color-theme-blue);
         }
 
@@ -466,6 +467,10 @@ a {
 
         &-warning {
             @include build-text-button($color-theme-orange);
+        }
+
+        &-secondary2 {
+            @include build-text-button(#777c7b);
         }
     }
 }
@@ -534,7 +539,7 @@ a {
     }
 
     &-tabs {
-        background: $color-border;
+        background: $color-theme-secondary;
         position: relative;
         padding: .75rem 1.25rem;
         height: 70px;
@@ -545,6 +550,14 @@ a {
             width: 100%;
         }
     }
+}
+
+//
+// Cards
+//
+.card {
+    border-bottom-width: 2px;
+    border-top-width: 0;
 }
 
 // 

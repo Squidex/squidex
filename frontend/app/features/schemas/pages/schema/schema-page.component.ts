@@ -50,11 +50,13 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
+        this.updateTab();
+
         this.own(
             this.router.events
                 .subscribe(event => {
                     if (Types.is(event, NavigationEnd)) {
-                        this.selectedTab = this.route.firstChild!.snapshot.routeConfig!.path!;
+                        this.updateTab();
                     }
                 }));
 
@@ -63,6 +65,10 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(schema => {
                     this.schema = schema;
                 }));
+    }
+
+    private updateTab() {
+        this.selectedTab = this.route.firstChild!.snapshot.routeConfig!.path!;
     }
 
     public publish() {
