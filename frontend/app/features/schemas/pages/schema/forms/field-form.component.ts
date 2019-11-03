@@ -27,7 +27,7 @@ import { FieldDto, PatternDto } from '@app/shared';
             </ul>
 
             <div class="float-right" *ngIf="showButtons">
-                <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary" (click)="cancel.emit()">Cancel</button>
+                <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary2" (click)="cancel.emit()">Cancel</button>
                 <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">Save</button>
             </div>
         </div>
