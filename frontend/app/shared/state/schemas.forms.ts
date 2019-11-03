@@ -169,8 +169,6 @@ export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: str
             ],
             editorUrl: null,
             isRequired: false,
-            isListField: false,
-            isReferenceField: false,
             tags: []
         }));
     }

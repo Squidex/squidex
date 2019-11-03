@@ -2,7 +2,6 @@
 @import '_mixins';
 
 .dashed {
-    @include placeholder-color($color-theme-secondary);
     border-style: dashed;
     border-width: 1px;
 }

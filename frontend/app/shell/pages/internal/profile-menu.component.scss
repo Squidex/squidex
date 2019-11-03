@@ -13,13 +13,14 @@
             padding-bottom: 0;
         }
     }
-}
 
-.nav-item-help {
-    padding-right: 1rem;
-    font-size: 1.4rem;
-    font-weight: lighter;
-    vertical-align: middle;
+    &-item-help {
+        padding-top: 2px;
+        padding-right: 1rem;
+        font-size: 1.4rem;
+        font-weight: lighter;
+        vertical-align: middle;
+    }
 }
 
 .user-picture {

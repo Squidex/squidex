@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:no-shadowed-variable
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
@@ -37,8 +35,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public editOptionsDropdown = new ModalModel();
 
-    public selectedTab = 'fields';
-    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Json', 'More'];
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'UI', 'Scripts', 'Json', 'More'];
+    public selectedTab = this.selectableTabs[0].toLowerCase();
 
     constructor(
         public readonly schemasState: SchemasState,

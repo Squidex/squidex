@@ -63,6 +63,9 @@
             <ng-container *ngSwitchCase="'fields'">
                 <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
             </ng-container>
+            <ng-container *ngSwitchCase="'ui'">
+                <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
+            </ng-container>
             <ng-container *ngSwitchCase="'scripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>

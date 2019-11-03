@@ -33,7 +33,6 @@ $focus-color: #b3d3ff;
     }
 
     &.dashed {
-        @include placeholder-color($color-theme-secondary);
         border-style: dashed;
     }
 }
@@ -49,6 +48,7 @@ div {
 
 .blank {
     & {
+        @include placeholder-color($color-input-placeholder);
         padding: 0;
         border: 0;
         background: transparent;

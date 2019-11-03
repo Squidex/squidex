@@ -55,36 +55,6 @@ import { FieldDto } from '@app/shared';
             </div>
 
             <div class="form-group row" *ngIf="field.properties.isContentField">
-                <div class="col-9 offset-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldListfield" formControlName="isListField" />
-                        <label class="form-check-label" for="{{field.fieldId}}_fieldListfield">
-                            List Field
-                        </label>
-                    </div>
-
-                    <sqx-form-hint>
-                        List fields are shown as a column in the content list.<br />When no list field is defined, the first field is used.
-                    </sqx-form-hint>
-                </div>
-            </div>
-
-            <div class="form-group row" *ngIf="field.properties.isContentField">
-                <div class="col-9 offset-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldReferencefield" formControlName="isReferenceField" />
-                        <label class="form-check-label" for="{{field.fieldId}}_fieldReferencefield">
-                            Reference Field
-                        </label>
-                    </div>
-
-                    <sqx-form-hint>
-                        Reference fields are shown as a column in the content list when referenced by another content.<br />When no reference field is defined, the first field is used.
-                    </sqx-form-hint>
-                </div>
-            </div>
-
-            <div class="form-group row" *ngIf="field.properties.isContentField">
                  <label class="col-3 col-form-label">Tags</label>
 
                 <div class="col-7">
