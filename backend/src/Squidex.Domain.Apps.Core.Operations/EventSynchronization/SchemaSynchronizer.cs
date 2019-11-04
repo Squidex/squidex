@@ -75,12 +75,12 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (!source.FieldsInLists.SequenceEqual(target.FieldsInLists))
                 {
-                    yield return E(new SchemaUIFieldsSet { FieldsInLists = target.FieldsInLists });
+                    yield return E(new SchemaUIFieldsConfigured { FieldsInLists = target.FieldsInLists });
                 }
 
                 if (!source.FieldsInReferences.SequenceEqual(target.FieldsInReferences))
                 {
-                    yield return E(new SchemaUIFieldsSet { FieldsInReferences = target.FieldsInReferences });
+                    yield return E(new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences });
                 }
             }
         }

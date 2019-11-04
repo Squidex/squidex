@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public sealed class SchemaUIFieldsSet : SchemaEvent
+    public sealed class SchemaUIFieldsConfigured : SchemaEvent
     {
         public FieldNames FieldsInLists { get; set; }
 

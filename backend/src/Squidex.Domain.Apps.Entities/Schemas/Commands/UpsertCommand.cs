@@ -20,15 +20,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public SchemaFields Fields { get; set; }
 
-        public FieldNames FieldsInReferences { get; set; }
+        public FieldNames? FieldsInReferences { get; set; }
 
-        public FieldNames FieldsInList { get; set; }
+        public FieldNames? FieldsInLists { get; set; }
 
-        public SchemaScripts Scripts { get; set; }
+        public SchemaScripts? Scripts { get; set; }
 
         public SchemaProperties Properties { get; set; }
 
-        public Dictionary<string, string> PreviewUrls { get; set; }
+        public Dictionary<string, string>? PreviewUrls { get; set; }
 
         public Schema ToSchema(string name, bool isSingleton)
         {

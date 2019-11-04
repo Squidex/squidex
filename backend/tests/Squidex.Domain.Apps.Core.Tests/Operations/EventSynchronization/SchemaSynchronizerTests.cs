@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsSet { FieldsInLists = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInLists = new FieldNames("2", "1") }
             );
         }
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsSet { FieldsInReferences = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInReferences = new FieldNames("2", "1") }
             );
         }
 

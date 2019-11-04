@@ -106,6 +106,36 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
+        public static void CanConfigureUIFields(Schema schema, ConfigureUIFields command)
+        {
+            Guard.NotNull(command);
+
+            Validate.It(() => "Cannot configure UI fields.", error =>
+            {
+                if (command.FieldsInLists != null)
+                {
+                    foreach (var fieldName in command.FieldsInLists)
+                    {
+                        if (!schema.FieldsByName.ContainsKey(fieldName))
+                        {
+                            error($"List field '{fieldName}' is not part of the schema.", nameof(command.FieldsInLists));
+                        }
+                    }
+                }
+
+                if (command.FieldsInReferences != null)
+                {
+                    foreach (var fieldName in command.FieldsInReferences)
+                    {
+                        if (!schema.FieldsByName.ContainsKey(fieldName))
+                        {
+                            error($"Reference field '{fieldName}' is not part of the schema.", nameof(command.FieldsInReferences));
+                        }
+                    }
+                }
+            });
+        }
+
         public static void CanUpdate(Schema schema, UpdateSchema command)
         {
             Guard.NotNull(command);
@@ -138,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     fieldIndex++;
                     fieldPrefix = $"Fields[{fieldIndex}]";
 
-                    ValidateRootField(field, fieldPrefix, e);
+                    ValidateRootField(field, command, fieldPrefix, e);
                 }
 
                 if (command.Fields.Select(x => x?.Name).Distinct().Count() != command.Fields.Count)
@@ -146,9 +176,31 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     e("Fields cannot have duplicate names.", nameof(command.Fields));
                 }
             }
+
+            if (command.FieldsInLists != null)
+            {
+                foreach (var fieldName in command.FieldsInLists)
+                {
+                    if (command.Fields?.Any(x => x.Name == fieldName) != true)
+                    {
+                        e($"List field '{fieldName}' is not part of the request.", nameof(command.FieldsInLists));
+                    }
+                }
+            }
+
+            if (command.FieldsInReferences != null)
+            {
+                foreach (var fieldName in command.FieldsInReferences)
+                {
+                    if (command.Fields?.Any(x => x.Name == fieldName) != true)
+                    {
+                        e($"Reference field '{fieldName}' is not part of the request.", nameof(command.FieldsInReferences));
+                    }
+                }
+            }
         }
 
-        private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
+        private static void ValidateRootField(UpsertSchemaField field, UpsertCommand command, string prefix, AddValidation e)
         {
             if (field == null)
             {
@@ -161,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     e(Not.Valid("Partitioning"), $"{prefix}.{nameof(field.Partitioning)}");
                 }
 
-                ValidateField(field, prefix, e);
+                ValidateField(field, command, prefix, e);
 
                 if (field.Nested?.Count > 0)
                 {
@@ -204,11 +256,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     e("Nested field cannot be array fields.", $"{prefix}.{nameof(nestedField.Properties)}");
                 }
 
-                ValidateField(nestedField, prefix, e);
+                ValidateField(nestedField, null, prefix, e);
             }
         }
 
-        private static void ValidateField(UpsertSchemaFieldBase field, string prefix, AddValidation e)
+        private static void ValidateField(UpsertSchemaFieldBase field, UpsertCommand? command, string prefix, AddValidation e)
         {
             if (!field.Name.IsPropertyName())
             {
@@ -231,6 +283,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     if (field.IsDisabled)
                     {
                         e("UI field cannot be disabled.", $"{prefix}.{nameof(field.IsDisabled)}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(field.Name))
+                    {
+                        if (command?.FieldsInLists?.Contains(field.Name) == true)
+                        {
+                            e("UI field cannot be a list field.", prefix);
+                        }
+
+                        if (command?.FieldsInReferences?.Contains(field.Name) == true)
+                        {
+                            e("UI field cannot be a reference field.", prefix);
+                        }
                     }
                 }
 

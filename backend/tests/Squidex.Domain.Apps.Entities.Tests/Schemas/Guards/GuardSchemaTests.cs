@@ -341,20 +341,50 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
-                FieldsInList = new FieldNames("field1"),
-                FieldsInReferences = new FieldNames("field"),
+                FieldsInLists = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("UI field cannot be a list field.",
-                    "Fields[1].Properties.IsListField"),
+                    "Fields[1]"),
                 new ValidationError("UI field cannot be a reference field.",
-                    "Fields[1].Properties.IsReferenceField"),
+                    "Fields[1]"),
                 new ValidationError("UI field cannot be hidden.",
                     "Fields[1].IsHidden"),
                 new ValidationError("UI field cannot be disabled.",
                     "Fields[1].IsDisabled"));
+        }
+
+        [Fact]
+        public void CanCreate_should_throw_exception_if_invalid_list_field_is_used()
+        {
+            var command = new CreateSchema
+            {
+                FieldsInLists = new FieldNames("field2"),
+                FieldsInReferences = null,
+                Name = "new-schema"
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
+                new ValidationError("List field 'field2' is not part of the request.",
+                    "FieldsInLists"));
+        }
+
+        [Fact]
+        public void CanCreate_should_throw_exception_if_invalid_reference_field_is_used()
+        {
+            var command = new CreateSchema
+            {
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames("field2"),
+                Name = "new-schema"
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
+                new ValidationError("Reference field 'field2' is not part of the request.",
+                    "FieldsInReferences"));
         }
 
         [Fact]
@@ -399,12 +429,52 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         }
                     }
                 },
-                FieldsInList = new FieldNames("field1"),
+                FieldsInLists = new FieldNames("field1"),
                 FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 
             GuardSchema.CanCreate(command);
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_throw_exception_if_invalid_list_field_is_used()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = new FieldNames("field3"),
+                FieldsInReferences = null
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+                new ValidationError("List field 'field3' is not part of the schema.",
+                    "FieldsInLists"));
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_throw_exception_if_invalid_reference_field_is_used()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames("field3")
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+                new ValidationError("Reference field 'field3' is not part of the schema.",
+                    "FieldsInReferences"));
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_not_throw_exception_if_command_is_valid()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field2")
+            };
+
+            GuardSchema.CanConfigureUIFields(schema_0, command);
         }
 
         [Fact]
