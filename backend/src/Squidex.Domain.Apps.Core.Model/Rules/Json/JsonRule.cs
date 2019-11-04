@@ -22,6 +22,9 @@ namespace Squidex.Domain.Apps.Core.Rules.Json
         [JsonProperty]
         public bool IsEnabled { get; set; }
 
+        [JsonProperty]
+        public string Name { get; set; }
+
         public JsonRule()
         {
         }
@@ -45,6 +48,11 @@ namespace Squidex.Domain.Apps.Core.Rules.Json
             if (!IsEnabled)
             {
                 rule = rule.Disable();
+            }
+
+            if (Name != null)
+            {
+                rule = rule.Rename(Name);
             }
 
             return rule;
