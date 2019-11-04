@@ -13,7 +13,7 @@ export const constants = {
         commentaryType: ' Commentary Type  ',
         period: ' Period  ',
         region: ' Region  ',
-        editorUrl: `${browser.params.baseUrl}/editors/toastui/md-editor.html`,
+        editorUrl: '/editors/toastui/md-editor.html',
         editorOptionsBold: 'tui-bold tui-toolbar-icons',
         editorOptionsBulletPointList: 'tui-ul tui-toolbar-icons',
         editorOptionsItalic: 'tui-italic tui-toolbar-icons',
