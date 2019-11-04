@@ -1,0 +1,26 @@
+<form class="inner-form" (ngSubmit)="saveSchema()">
+    <div class="inner-header">
+        <ul class="nav nav-tabs2">
+            <li class="nav-item" *ngFor="let tab of selectableTabs">
+                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab}}</a>
+            </li>
+        </ul>
+
+        <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+    </div>
+
+    <div class="inner-main">
+        <sqx-field-list [class.hidden]="selectedTab !== 'List Fields'"
+            emptyText="Drop field here or reorder them to show the fields in the content list. When no list field is defined, the first field is used."
+            [schema]="schema"
+            [fieldNames]="state.fieldsInLists"
+            (fieldNamesChange)="setFieldsInLists($event)">
+        </sqx-field-list>
+        <sqx-field-list [class.hidden]="selectedTab !== 'Reference Fields'"
+            emptyText="Drop field here or reorder them to show the fields when referenced by another content. When no reference field is defined, the list fields are used instead."
+            [schema]="schema"
+            [fieldNames]="state.fieldsInReferences"
+            (fieldNamesChange)="setFieldsInReferences($event)">
+        </sqx-field-list>
+    </div>
+</form>
