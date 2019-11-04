@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var rule_1 = rule_0.Disable();
+            var rule_1 = rule_0.Disable().Rename("MyName");
 
             var serialized = rule_1.SerializeAndDeserialize();
 
