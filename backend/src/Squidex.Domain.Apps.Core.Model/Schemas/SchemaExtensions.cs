@@ -66,14 +66,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static IEnumerable<RootField> ReferenceFields(this Schema schema)
         {
-            var references = schema.Fields.Where(x => x.RawProperties.IsReferenceField);
+            var references = schema.FieldsInReferences.Select(x => schema.FieldsByName.GetOrDefault(x)).Where(x => x != null).ToList();
 
             if (references.Any())
             {
                 return references;
             }
 
-            references = schema.Fields.Where(x => x.RawProperties.IsListField);
+            references = schema.FieldsInLists.Select(x => schema.FieldsByName.GetOrDefault(x)).Where(x => x != null).ToList();
 
             if (references.Any())
             {
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private static bool IsListField(this IField field, Schema schema)
         {
-            return field.RawProperties.IsListField || schema.Fields.Count == 1;
+            return schema.FieldsInLists.Contains(field.Name) || schema.Fields.Count == 1;
         }
     }
 }

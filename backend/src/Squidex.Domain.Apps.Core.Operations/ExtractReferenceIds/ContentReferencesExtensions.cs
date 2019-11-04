@@ -122,12 +122,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 sb.Append(value);
             }
 
-            var referenceFields = schema.Fields.Where(x => x.RawProperties.IsReferenceField);
-
-            if (!referenceFields.Any())
-            {
-                referenceFields = schema.Fields.Take(1);
-            }
+            var referenceFields = schema.ReferenceFields();
 
             foreach (var referenceField in referenceFields)
             {

@@ -27,10 +27,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var schema =
                 new Schema("my-schema")
                     .AddString(1, "ref1", Partitioning.Invariant,
-                        new StringFieldProperties { IsReferenceField = true })
+                        new StringFieldProperties())
                     .AddString(2, "ref2", Partitioning.Invariant,
-                        new StringFieldProperties { IsReferenceField = true })
-                    .AddString(3, "non-ref", Partitioning.Invariant);
+                        new StringFieldProperties())
+                    .AddString(3, "non-ref", Partitioning.Invariant)
+                    .SetReferenceFields("ref1", "ref2");
 
             var formatted = data.FormatReferences(schema, languages);
 

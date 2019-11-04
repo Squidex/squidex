@@ -141,6 +141,42 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         }
 
         [Fact]
+        public void Should_create_events_if_list_fields_changed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .SetListFields("1", "2");
+
+            var targetSchema =
+                new Schema("target")
+                    .SetListFields("2", "1");
+
+            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new SchemaUIFieldsSet { FieldsInLists = new FieldNames("2", "1") }
+            );
+        }
+
+        [Fact]
+        public void Should_create_events_if_reference_fields_changed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .SetReferenceFields("1", "2");
+
+            var targetSchema =
+                new Schema("target")
+                    .SetReferenceFields("2", "1");
+
+            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new SchemaUIFieldsSet { FieldsInReferences = new FieldNames("2", "1") }
+            );
+        }
+
+        [Fact]
         public void Should_create_events_if_nested_field_deleted()
         {
             var sourceSchema =

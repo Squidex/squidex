@@ -13,6 +13,11 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool SetEquals<T>(this ICollection<T> source, ICollection<T> other)
+        {
+            return source.Intersect(other).Count() == other.Count;
+        }
+
         public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
         {
             return ResultList.Create(input.Total, SortList(input, idProvider, ids));
@@ -133,6 +138,11 @@ namespace Squidex.Infrastructure
             var comparer = new KeyValuePairComparer<TKey, TValue>(keyComparer, valueComparer);
 
             return other != null && dictionary.Count == other.Count && !dictionary.Except(other, comparer).Any();
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
+        {
+            return dictionary.ToDictionary(x => x.Key, x => x.Value);
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull

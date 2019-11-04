@@ -14,15 +14,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
     public abstract class FieldBuilder
     {
         private readonly UpsertSchemaField field;
+        private readonly UpsertCommand schema;
 
         protected T Properties<T>() where T : FieldProperties
         {
             return (T)field.Properties;
         }
 
-        protected FieldBuilder(UpsertSchemaField field)
+        protected FieldBuilder(UpsertSchemaField field, UpsertCommand schema)
         {
             this.field = field;
+            this.schema = schema;
         }
 
         public FieldBuilder Label(string? label)
@@ -62,14 +64,24 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder ShowInList()
         {
-            field.Properties.IsListField = true;
+            if (schema.FieldsInReferences == null)
+            {
+                schema.FieldsInReferences = new FieldNames();
+            }
+
+            schema.FieldsInReferences.Add(field.Name);
 
             return this;
         }
 
         public FieldBuilder ShowInReferences()
         {
-            field.Properties.IsReferenceField = true;
+            if (schema.FieldsInList == null)
+            {
+                schema.FieldsInList = new FieldNames();
+            }
+
+            schema.FieldsInList.Add(field.Name);
 
             return this;
         }
