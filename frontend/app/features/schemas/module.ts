@@ -64,68 +64,11 @@ const routes: Routes = [
                 component: SchemaPageComponent,
                 children: [
                     {
-                        path: '',
-                        redirectTo: 'fields'
-                    },
-                    {
-                        path: 'fields',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/schemas'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'ui',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/schemas'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'scripts',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/scripts'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'json',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/schema-json'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'more',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/preview'
-                                }
-                            }
-                        ]
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/schemas'
+                        }
                     }
                 ]
             }

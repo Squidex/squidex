@@ -4,7 +4,7 @@
     <ng-container header>
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [routerLink]="['./', tab.toLowerCase()]" routerLinkActive="active">{{tab}}</a>
+                <a class="nav-link" [class.active]="tab === selectedTab" (click)="selectTab(tab)">{{tab}}</a>
             </li>
         </ul>
     </ng-container>
@@ -60,19 +60,19 @@
 
     <ng-container content>
         <ng-container [ngSwitch]="selectedTab">
-            <ng-container *ngSwitchCase="'fields'">
+            <ng-container *ngSwitchCase="'Fields'">
                 <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
             </ng-container>
             <ng-container *ngSwitchCase="'ui'">
                 <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'scripts'">
+            <ng-container *ngSwitchCase="'Scripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'json'">
+            <ng-container *ngSwitchCase="'Json'">
                 <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'more'">
+            <ng-container *ngSwitchCase="'More'">
                 <div class="cards">
                     <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
                     <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
@@ -82,8 +82,8 @@
     </ng-container>
 
     <ng-container sidebar>
-        <div class="panel-nav">        
-            <a class="panel-link" [routerLink]="[selectedTab, 'help']" routerLinkActive="active" title="Help" titlePosition="left">
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
                 <i class="icon-help"></i>
             </a>
         </div>
