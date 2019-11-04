@@ -55,7 +55,7 @@ namespace Squidex.Domain.Users
             return await userManager.ResolveUserAsync(user);
         }
 
-        public static async Task<UserWithClaims?> FindByEmailWithClaimsAsyncAsync(this UserManager<IdentityUser> userManager, string email)
+        public static async Task<UserWithClaims?> FindByEmailWithClaimsAsync(this UserManager<IdentityUser> userManager, string email)
         {
             if (email == null)
             {

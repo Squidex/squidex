@@ -48,6 +48,20 @@ namespace Squidex.Infrastructure.Security
             display = new Lazy<string>(() => string.Join(";", this.permissions));
         }
 
+        public PermissionSet Add(string permission)
+        {
+            Guard.NotNullOrEmpty(permission);
+
+            return Add(new Permission(permission));
+        }
+
+        public PermissionSet Add(Permission permission)
+        {
+            Guard.NotNull(permission);
+
+            return new PermissionSet(permissions.Union(Enumerable.Repeat(permission, 1)).Distinct());
+        }
+
         public bool Allows(Permission? other)
         {
             if (other == null)
