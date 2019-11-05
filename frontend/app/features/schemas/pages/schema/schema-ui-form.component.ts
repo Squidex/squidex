@@ -7,7 +7,11 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 
-import { SchemaDetailsDto } from '@app/shared';
+import {
+    DialogService,
+    SchemaDetailsDto,
+    SchemasState
+} from '@app/shared';
 
 type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };
 
@@ -30,12 +34,18 @@ export class SchemaUIFormComponent implements OnChanges {
         fieldsInReferences: []
     };
 
+    constructor(
+        private readonly dialogs: DialogService,
+        private readonly schemasState: SchemasState
+    ) {
+    }
+
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdate;
 
         this.state = {
-            fieldsInLists: [],
-            fieldsInReferences: []
+            fieldsInLists: this.schema.fieldsInLists,
+            fieldsInReferences: this.schema.fieldsInReferences
         };
     }
 
@@ -56,6 +66,9 @@ export class SchemaUIFormComponent implements OnChanges {
             return;
         }
 
-        return 0;
+        this.schemasState.configureUIFields(this.schema, this.state)
+            .subscribe(() => {
+                this.dialogs.notifyInfo('UI fields updated successfully.');
+            });
     }
 }

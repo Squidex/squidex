@@ -119,14 +119,15 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (allowUpdate)
             {
+                AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
+
                 AddPutLink("fields/order", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
+                AddPutLink("fields/ui", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaUIFields), values));
 
                 AddPutLink("update", controller.Url<SchemasController>(x => nameof(x.PutSchema), values));
                 AddPutLink("update/category", controller.Url<SchemasController>(x => nameof(x.PutCategory), values));
                 AddPutLink("update/sync", controller.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
                 AddPutLink("update/urls", controller.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
-
-                AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
             }
 
             if (controller.HasPermission(Permissions.AppSchemasScripts, app, Name))

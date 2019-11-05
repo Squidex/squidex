@@ -115,6 +115,8 @@ namespace Squidex.Config.Domain
         {
             mvc.AddNewtonsoftJson(options =>
             {
+                options.AllowInputFormatterExceptionMessages = false;
+
                 ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
             });
 

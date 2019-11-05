@@ -31,7 +31,8 @@ import {
     SchemaDto,
     SchemasService,
     UpdateFieldDto,
-    UpdateSchemaDto
+    UpdateSchemaDto,
+    UpdateUIFields
 } from './../services/schemas.service';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
@@ -266,6 +267,14 @@ export class SchemasState extends State<Snapshot> {
                 this.replaceSchema(updated);
             }),
             shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
+    }
+
+    public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDetailsDto> {
+        return this.schemasService.putUIFields(this.appName, schema, request, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDetailsDto> {

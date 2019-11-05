@@ -70,6 +70,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                         break;
                     }
 
+                case SchemaUIFieldsConfigured e:
+                    {
+                        if (e.FieldsInLists != null)
+                        {
+                            SchemaDef = SchemaDef.ConfigureFieldsInLists(e.FieldsInLists);
+                        }
+
+                        if (e.FieldsInReferences != null)
+                        {
+                            SchemaDef = SchemaDef.ConfigureFieldsInReferences(e.FieldsInReferences);
+                        }
+
+                        break;
+                    }
+
                 case SchemaCategoryChanged e:
                     {
                         SchemaDef = SchemaDef.ChangeCategory(e.Name);

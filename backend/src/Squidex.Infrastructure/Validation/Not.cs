@@ -30,6 +30,12 @@ namespace Squidex.Infrastructure.Validation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ValidPropertyName(string property)
+        {
+            return $"{Upper(property)} is not a Javascript property name.";
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GreaterThan(string property, string other)
         {
             return $"{Upper(property)} must be greater than {Lower(other)}.";

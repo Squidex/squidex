@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetListFields(FieldNames names)
+        public Schema ConfigureFieldsInLists(FieldNames names)
         {
             return Clone(clone =>
             {
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetReferenceFields(FieldNames names)
+        public Schema ConfigureFieldsInReferences(FieldNames names)
         {
             return Clone(clone =>
             {

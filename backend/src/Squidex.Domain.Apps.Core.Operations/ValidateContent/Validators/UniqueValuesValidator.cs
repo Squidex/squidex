@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -20,9 +21,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 var itemsArray = items.ToArray();
 
-                if (itemsArray.Length != itemsArray.Distinct().Count())
+                foreach (var duplicate in itemsArray.Duplicates())
                 {
-                    addError(context.Path, "Must not contain duplicate values.");
+                    addError(context.Path, $"{duplicate} has been added more than once.");
                 }
             }
 

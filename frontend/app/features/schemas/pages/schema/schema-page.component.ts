@@ -34,7 +34,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public schema: SchemaDetailsDto;
 
-    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Json', 'More'];
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'UI', 'Scripts', 'Json', 'More'];
     public selectedTab = this.selectableTabs[0];
 
     public editOptionsDropdown = new ModalModel();

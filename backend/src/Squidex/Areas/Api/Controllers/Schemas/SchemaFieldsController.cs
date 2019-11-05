@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name = request.Name }, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
         }
 
         /// <summary>
@@ -77,7 +77,32 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name = request.Name }, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
+        }
+
+        /// <summary>
+        /// Configure UI fields.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The request that contains the field names.</param>
+        /// <returns>
+        /// 200 => Schema UI fields defined.
+        /// 400 => Schema field contains invalid field names.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/fields/ui/")]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutSchemaUIFields(string app, string name, [FromBody] ConfigureUIFieldsDto request)
+        {
+            var command = request.ToCommand();
+
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>

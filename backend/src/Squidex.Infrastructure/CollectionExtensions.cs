@@ -28,6 +28,16 @@ namespace Squidex.Infrastructure
             return ids.Select(id => input.FirstOrDefault(x => Equals(idProvider(x), id))).Where(x => x != null);
         }
 
+        public static IEnumerable<T> Duplicates<T>(this IEnumerable<T> input)
+        {
+            return input.GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key);
+        }
+
+        public static IEnumerable<TResult> Duplicates<TResult, T>(this IEnumerable<T> input, Func<T, TResult> selector)
+        {
+            return input.GroupBy(selector).Where(x => x.Count() > 1).Select(x => x.Key);
+        }
+
         public static void AddRange<T>(this ICollection<T> target, IEnumerable<T> source)
         {
             foreach (var value in source)

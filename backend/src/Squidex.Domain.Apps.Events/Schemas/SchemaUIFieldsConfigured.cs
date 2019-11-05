@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
+    [EventType(nameof(SchemaUIFieldsConfigured))]
     public sealed class SchemaUIFieldsConfigured : SchemaEvent
     {
         public FieldNames FieldsInLists { get; set; }

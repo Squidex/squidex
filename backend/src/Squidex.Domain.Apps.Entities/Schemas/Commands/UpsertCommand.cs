@@ -49,6 +49,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
                 schema = schema.ConfigurePreviewUrls(PreviewUrls);
             }
 
+            if (FieldsInLists != null)
+            {
+                schema = schema.ConfigureFieldsInLists(FieldsInLists);
+            }
+
+            if (FieldsInReferences != null)
+            {
+                schema = schema.ConfigureFieldsInLists(FieldsInReferences);
+            }
+
             if (!string.IsNullOrWhiteSpace(Category))
             {
                 schema = schema.ChangeCategory(Category);

@@ -35,8 +35,8 @@ export class FieldListComponent implements OnChanges {
     public fieldsNotAdded: FieldDto[];
 
     public ngOnChanges() {
-        this.fieldsAdded = this.fieldNames.map(x => this.schema.fields.find(y => y.name === x)!);
-        this.fieldsNotAdded = this.schema.fields.filter(x => this.fieldNames.indexOf(x.name) < 0);
+        this.fieldsAdded = this.fieldNames.map(n => this.schema.contentFields.find(y => y.name === n)!).filter(x => !!x);
+        this.fieldsNotAdded = this.schema.contentFields.filter(n => this.fieldNames.indexOf(n.name) < 0);
     }
 
     public drop(event: CdkDragDrop<FieldDto[]>) {
