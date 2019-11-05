@@ -351,6 +351,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource =
                 TestUtils.MixedSchema(true)
                     .ChangeCategory("Category")
+                    .ConfigureFieldsInLists(new FieldNames("field1"))
+                    .ConfigureFieldsInReferences(new FieldNames("field1"))
                     .ConfigurePreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"

@@ -32,13 +32,19 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public SchemaProperties Properties { get; set; }
 
         [JsonProperty]
-        public SchemaScripts Scripts { get; set; }
+        public SchemaScripts? Scripts { get; set; }
+
+        [JsonProperty]
+        public FieldNames? FieldsInLists { get; set; }
+
+        [JsonProperty]
+        public FieldNames? FieldsInReferences { get; set; }
 
         [JsonProperty]
         public JsonFieldModel[] Fields { get; set; }
 
         [JsonProperty]
-        public Dictionary<string, string> PreviewUrls { get; set; }
+        public Dictionary<string, string>? PreviewUrls { get; set; }
 
         public JsonSchemaModel()
         {
@@ -98,6 +104,16 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             if (Scripts != null)
             {
                 schema = schema.ConfigureScripts(Scripts);
+            }
+
+            if (FieldsInLists?.Count > 0)
+            {
+                schema = schema.ConfigureFieldsInLists(FieldsInLists);
+            }
+
+            if (FieldsInReferences?.Count > 0)
+            {
+                schema = schema.ConfigureFieldsInReferences(FieldsInReferences);
             }
 
             if (PreviewUrls?.Count > 0)
