@@ -149,7 +149,7 @@ export class EditScriptsForm extends Form<FormGroup, { query?: string, create?: 
     }
 }
 
-export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: string, placeholder?: string, editorUrl?: string, isRequired: boolean, isListField: boolean }> {
+export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: string, placeholder?: string, editorUrl?: string, isRequired: boolean }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',
@@ -169,8 +169,6 @@ export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: str
             ],
             editorUrl: null,
             isRequired: false,
-            isListField: false,
-            isReferenceField: false,
             tags: []
         }));
     }

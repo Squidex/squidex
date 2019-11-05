@@ -13,8 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class StringFieldBuilder : FieldBuilder
     {
-        public StringFieldBuilder(UpsertSchemaField field)
-            : base(field)
+        public StringFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+            : base(field, schema)
         {
         }
 

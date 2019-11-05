@@ -210,6 +210,22 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
+        public void Should_also_remove_deleted_fields_from_lists()
+        {
+            var field = CreateField(1);
+
+            var schema_1 = schema_0
+                .AddField(field)
+                .ConfigureFieldsInLists(field.Name)
+                .ConfigureFieldsInReferences(field.Name);
+            var schema_2 = schema_1.DeleteField(1);
+
+            Assert.Empty(schema_2.FieldsById);
+            Assert.Empty(schema_2.FieldsInLists);
+            Assert.Empty(schema_2.FieldsInReferences);
+        }
+
+        [Fact]
         public void Should_return_same_schema_if_field_to_delete_does_not_exist()
         {
             var schema_1 = schema_0.DeleteField(1);
@@ -284,6 +300,22 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
+        public void Should_set_list_fields()
+        {
+            var schema_1 = schema_0.ConfigureFieldsInLists("1");
+
+            Assert.Equal(new[] { "1" }, schema_1.FieldsInLists);
+        }
+
+        [Fact]
+        public void Should_set_reference_fields()
+        {
+            var schema_1 = schema_0.ConfigureFieldsInReferences("2");
+
+            Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
+        }
+
+        [Fact]
         public void Should_configure_scripts()
         {
             var scripts = new SchemaScripts
@@ -319,6 +351,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource =
                 TestUtils.MixedSchema(true)
                     .ChangeCategory("Category")
+                    .ConfigureFieldsInLists("field2")
+                    .ConfigureFieldsInReferences("field1")
                     .ConfigurePreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"

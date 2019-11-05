@@ -41,6 +41,7 @@ $color-input:               #dbe4eb;
 $color-input-background:    #fff;
 $color-input-disabled:      $color-theme-secondary;
 $color-input-border:        rgba(0, 0, 0, .15);
+$color-input-placeholder:   lighten($color-text-decent, 20%);
 
 $color-dark1-background:        #2e3842;
 $color-dark1-foreground:        #6a7681;

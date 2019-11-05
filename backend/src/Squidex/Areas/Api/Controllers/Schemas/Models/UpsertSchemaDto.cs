@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Optional fields.
         /// </summary>
-        public List<UpsertSchemaFieldDto?> Fields { get; set; }
+        public List<UpsertSchemaFieldDto?>? Fields { get; set; }
 
         /// <summary>
         /// The optional preview urls.

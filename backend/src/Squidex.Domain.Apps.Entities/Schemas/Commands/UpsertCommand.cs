@@ -20,11 +20,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public SchemaFields Fields { get; set; }
 
-        public SchemaScripts Scripts { get; set; }
+        public FieldNames? FieldsInReferences { get; set; }
+
+        public FieldNames? FieldsInLists { get; set; }
+
+        public SchemaScripts? Scripts { get; set; }
 
         public SchemaProperties Properties { get; set; }
 
-        public Dictionary<string, string> PreviewUrls { get; set; }
+        public Dictionary<string, string>? PreviewUrls { get; set; }
 
         public Schema ToSchema(string name, bool isSingleton)
         {
@@ -43,6 +47,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
             if (PreviewUrls != null)
             {
                 schema = schema.ConfigurePreviewUrls(PreviewUrls);
+            }
+
+            if (FieldsInLists != null)
+            {
+                schema = schema.ConfigureFieldsInLists(FieldsInLists);
+            }
+
+            if (FieldsInReferences != null)
+            {
+                schema = schema.ConfigureFieldsInLists(FieldsInReferences);
             }
 
             if (!string.IsNullOrWhiteSpace(Category))

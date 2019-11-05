@@ -13,6 +13,11 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool SetEquals<T>(this ICollection<T> source, ICollection<T> other)
+        {
+            return source.Intersect(other).Count() == other.Count;
+        }
+
         public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
         {
             return ResultList.Create(input.Total, SortList(input, idProvider, ids));
@@ -21,6 +26,16 @@ namespace Squidex.Infrastructure
         public static IEnumerable<T> SortList<T, TKey>(this IEnumerable<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
         {
             return ids.Select(id => input.FirstOrDefault(x => Equals(idProvider(x), id))).Where(x => x != null);
+        }
+
+        public static IEnumerable<T> Duplicates<T>(this IEnumerable<T> input)
+        {
+            return input.GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key);
+        }
+
+        public static IEnumerable<TResult> Duplicates<TResult, T>(this IEnumerable<T> input, Func<T, TResult> selector)
+        {
+            return input.GroupBy(selector).Where(x => x.Count() > 1).Select(x => x.Key);
         }
 
         public static void AddRange<T>(this ICollection<T> target, IEnumerable<T> source)
@@ -133,6 +148,11 @@ namespace Squidex.Infrastructure
             var comparer = new KeyValuePairComparer<TKey, TValue>(keyComparer, valueComparer);
 
             return other != null && dictionary.Count == other.Count && !dictionary.Except(other, comparer).Any();
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
+        {
+            return dictionary.ToDictionary(x => x.Key, x => x.Value);
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull

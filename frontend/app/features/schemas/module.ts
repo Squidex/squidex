@@ -28,6 +28,7 @@ import {
     FieldFormComponent,
     FieldFormUIComponent,
     FieldFormValidationComponent,
+    FieldListComponent,
     FieldWizardComponent,
     GeolocationUIComponent,
     GeolocationValidationComponent,
@@ -45,6 +46,7 @@ import {
     SchemaPreviewUrlsFormComponent,
     SchemaScriptsFormComponent,
     SchemasPageComponent,
+    SchemaUIFormComponent,
     StringUIComponent,
     StringValidationComponent,
     TagsUIComponent,
@@ -62,56 +64,11 @@ const routes: Routes = [
                 component: SchemaPageComponent,
                 children: [
                     {
-                        path: '',
-                        redirectTo: 'fields'
-                    },
-                    {
-                        path: 'fields',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/schemas'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'scripts',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/scripts'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'json',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/schema-json'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        path: 'more',
-                        children: [
-                            {
-                                path: 'help',
-                                component: HelpComponent,
-                                data: {
-                                    helpPage: '05-integrated/preview'
-                                }
-                            }
-                        ]
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/schemas'
+                        }
                     }
                 ]
             }
@@ -141,6 +98,7 @@ const routes: Routes = [
         FieldFormComponent,
         FieldFormUIComponent,
         FieldFormValidationComponent,
+        FieldListComponent,
         FieldWizardComponent,
         GeolocationUIComponent,
         GeolocationValidationComponent,
@@ -158,6 +116,7 @@ const routes: Routes = [
         SchemaPreviewUrlsFormComponent,
         SchemaScriptsFormComponent,
         SchemasPageComponent,
+        SchemaUIFormComponent,
         StringUIComponent,
         StringValidationComponent,
         TagsUIComponent,

@@ -1,12 +1,6 @@
-<nav class="navbar fixed-top navbar-dark bg-primary bg-faded">
+<nav class="navbar fixed-top navbar-dark bg-primary bg-faded navbar-expand">
     <span class="navbar-brand" routerLink="/app">
-        <ng-container *ngIf="loadingService.loading | async; else noLoading">
-            <img class="loader" src="./images/loader-white.gif" @fade />
-        </ng-container>
-
-        <ng-template #noLoading>
-            <i class="icon-logo" @fade></i>
-        </ng-template>
+        <sqx-logo [isLoading]="loadingService.loading | async"></sqx-logo>
     </span>
 
     <div class="float-left apps-menu">
@@ -25,13 +19,3 @@
 <div class="main">
     <router-outlet></router-outlet>
 </div>
-
-<a class="support-button row no-gutters" href="https://support.squidex.io" sqxExternalLink="noicon">
-    <div class="col-auto support-icon">
-        <i class="icon-support"></i>
-    </div>
-
-    <div class="col support-text">
-        Get help and support
-    </div>
-</a>

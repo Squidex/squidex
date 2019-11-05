@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<AssetsFieldProperties>(name);
 
-            configure(new AssetFieldBuilder(field));
+            configure(new AssetFieldBuilder(field, command));
 
             return this;
         }
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<BooleanFieldProperties>(name);
 
-            configure(new BooleanFieldBuilder(field));
+            configure(new BooleanFieldBuilder(field, command));
 
             return this;
         }
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<DateTimeFieldProperties>(name);
 
-            configure(new DateTimeFieldBuilder(field));
+            configure(new DateTimeFieldBuilder(field, command));
 
             return this;
         }
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<JsonFieldProperties>(name);
 
-            configure(new JsonFieldBuilder(field));
+            configure(new JsonFieldBuilder(field, command));
 
             return this;
         }
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<NumberFieldProperties>(name);
 
-            configure(new NumberFieldBuilder(field));
+            configure(new NumberFieldBuilder(field, command));
 
             return this;
         }
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<StringFieldProperties>(name);
 
-            configure(new StringFieldBuilder(field));
+            configure(new StringFieldBuilder(field, command));
 
             return this;
         }
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<TagsFieldProperties>(name);
 
-            configure(new TagsFieldBuilder(field));
+            configure(new TagsFieldBuilder(field, command));
 
             return this;
         }

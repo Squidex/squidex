@@ -5,18 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Plugins;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.SamplePlugin
+namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public sealed class SamplePlugin : IPlugin
+    [EventType(nameof(SchemaUIFieldsConfigured))]
+    public sealed class SchemaUIFieldsConfigured : SchemaEvent
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            throw new NotImplementedException();
-        }
+        public FieldNames FieldsInLists { get; set; }
+
+        public FieldNames FieldsInReferences { get; set; }
     }
 }

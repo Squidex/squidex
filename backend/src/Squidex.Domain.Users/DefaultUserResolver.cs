@@ -69,7 +69,7 @@ namespace Squidex.Domain.Users
                 }
                 else
                 {
-                    return await userManager.FindByEmailWithClaimsAsyncAsync(idOrEmail);
+                    return await userManager.FindByEmailWithClaimsAsync(idOrEmail);
                 }
             }
         }

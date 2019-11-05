@@ -113,5 +113,25 @@ namespace Squidex.Infrastructure.Security
 
             Assert.False(sut.Includes(null));
         }
+
+        [Fact]
+        public void Should_add_permission_by_string()
+        {
+            var sut =
+                new PermissionSet("app.contents")
+                    .Add("admin.*");
+
+            Assert.True(sut.Includes(new Permission("admin")));
+        }
+
+        [Fact]
+        public void Should_add_permission()
+        {
+            var sut =
+                new PermissionSet("app.contents")
+                    .Add(new Permission("admin.*"));
+
+            Assert.True(sut.Includes(new Permission("admin")));
+        }
     }
 }
