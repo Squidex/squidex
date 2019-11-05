@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         MinItems = 1,
                         MaxItems = 1
                     })
-                    .ConfigureFieldsInLists(new FieldNames { "asset1", "asset2" });
+                    .ConfigureFieldsInLists("asset1", "asset2");
 
             A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>.Ignored))
                 .ReturnsLazily(new Func<string, string>(id => $"url/to/{id}"));

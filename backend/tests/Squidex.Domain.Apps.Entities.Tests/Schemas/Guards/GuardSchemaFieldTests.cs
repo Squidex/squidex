@@ -295,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new AddField { Name = "INVALID_NAME", Properties = validProperties };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
-                new ValidationError("Name must be a valid javascript property name.", "Name"));
+                new ValidationError("Name is not a Javascript property name.", "Name"));
         }
 
         [Fact]

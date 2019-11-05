@@ -45,24 +45,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new StringFieldProperties())
                     .AddNumber(2, "number", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .SetReferenceFields("name", "number");
+                    .ConfigureFieldsInReferences("name", "number");
 
             var schemaDef =
                 new Schema(schemaId.Name)
                     .AddReferences(1, "ref1", Partitioning.Invariant, new ReferencesFieldProperties
                     {
+                        ResolveReference = true,
                         MinItems = 1,
                         MaxItems = 1,
                         SchemaId = refSchemaId1.Id
                     })
                     .AddReferences(2, "ref2", Partitioning.Invariant, new ReferencesFieldProperties
                     {
+                        ResolveReference = true,
                         MinItems = 1,
                         MaxItems = 1,
                         SchemaId = refSchemaId2.Id
                     })
-                    .SetListFields("ref1", "ref2")
-                    .SetReferenceFields("ref1", "ref2");
+                    .ConfigureFieldsInLists("ref1", "ref2");
 
             void SetupSchema(NamedId<Guid> id, Schema def)
             {

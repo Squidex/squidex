@@ -145,11 +145,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .SetListFields("1", "2");
+                    .ConfigureFieldsInLists("1", "2");
 
             var targetSchema =
                 new Schema("target")
-                    .SetListFields("2", "1");
+                    .ConfigureFieldsInLists("2", "1");
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 
@@ -163,11 +163,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .SetReferenceFields("1", "2");
+                    .ConfigureFieldsInReferences("1", "2");
 
             var targetSchema =
                 new Schema("target")
-                    .SetReferenceFields("2", "1");
+                    .ConfigureFieldsInReferences("2", "1");
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 

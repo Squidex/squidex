@@ -216,8 +216,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 
             var schema_1 = schema_0
                 .AddField(field)
-                .SetListFields(field.Name)
-                .SetReferenceFields(field.Name);
+                .ConfigureFieldsInLists(field.Name)
+                .ConfigureFieldsInReferences(field.Name);
             var schema_2 = schema_1.DeleteField(1);
 
             Assert.Empty(schema_2.FieldsById);
@@ -302,7 +302,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_set_list_fields()
         {
-            var schema_1 = schema_0.SetListFields("1");
+            var schema_1 = schema_0.ConfigureFieldsInLists("1");
 
             Assert.Equal(new[] { "1" }, schema_1.FieldsInLists);
         }
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_set_reference_fields()
         {
-            var schema_1 = schema_0.SetReferenceFields("2");
+            var schema_1 = schema_0.ConfigureFieldsInReferences("2");
 
             Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
         }
@@ -351,8 +351,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource =
                 TestUtils.MixedSchema(true)
                     .ChangeCategory("Category")
-                    .ConfigureFieldsInLists(new FieldNames("field1"))
-                    .ConfigureFieldsInReferences(new FieldNames("field1"))
+                    .ConfigureFieldsInLists("field2")
+                    .ConfigureFieldsInReferences("field1")
                     .ConfigurePreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"
