@@ -13,7 +13,6 @@ import {
     ErrorDto,
     MathHelper,
     SchemaTagConverter,
-    SchemaTagConverter,
     WorkflowDto,
     WorkflowsState,
     WorkflowStep,

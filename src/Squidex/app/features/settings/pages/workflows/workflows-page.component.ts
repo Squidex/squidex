@@ -28,6 +28,7 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
         public readonly schemasSource: SchemaTagConverter,
         public readonly workflowsState: WorkflowsState
     ) {
+        super();
     }
 
     public ngOnInit() {
