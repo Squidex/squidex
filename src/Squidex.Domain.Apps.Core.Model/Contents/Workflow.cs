@@ -54,23 +54,23 @@ namespace Squidex.Domain.Apps.Core.Contents
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Draft] = new WorkflowTransition()
+                                [Status.Draft] = WorkflowTransition.Always
                             },
-                            StatusColors.Archived, true),
+                            StatusColors.Archived, NoUpdate.Always),
                     [Status.Draft] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Archived] = new WorkflowTransition(),
-                                [Status.Published] = new WorkflowTransition()
+                                [Status.Archived] = WorkflowTransition.Always,
+                                [Status.Published] = WorkflowTransition.Always
                             },
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Archived] = new WorkflowTransition(),
-                                [Status.Draft] = new WorkflowTransition()
+                                [Status.Archived] = WorkflowTransition.Always,
+                                [Status.Draft] = WorkflowTransition.Always
                             },
                             StatusColors.Published)
                 }, null, name);
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
             else if (TryGetStep(Initial, out var initial))
             {
-                yield return (Initial, initial, WorkflowTransition.Default);
+                yield return (Initial, initial, WorkflowTransition.Always);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
             else if (to == Initial)
             {
-                transition = WorkflowTransition.Default;
+                transition = WorkflowTransition.Always;
 
                 return true;
             }

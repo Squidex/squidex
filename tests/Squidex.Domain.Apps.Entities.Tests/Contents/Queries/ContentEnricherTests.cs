@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(source))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(source, requestContext.User))
                 .Returns(true);
 
             var result = await sut.EnrichAsync(source, requestContext);
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.False(result.CanUpdate);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(source))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(source, requestContext.User))
                 .MustNotHaveHappened();
         }
 

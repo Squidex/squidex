@@ -2,25 +2,24 @@
     <div class="row no-gutters step-header">
         <div class="col-auto">
             <button class="btn btn-initial mr-1" (click)="emitMakeInitial()"
-                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
-                [class.active]="step.name === workflow.initial"
-                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
+                    [class.enabled]="step.name !== workflow.initial && !step.isLocked"
+                    [class.active]="step.name === workflow.initial"
+                    [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
             </button>
         </div>
         <div class="col-auto color pr-2">
             <sqx-color-picker mode="Circle"
-                [ngModelOptions]="onBlur"
-                [ngModel]="step.color"
-                (ngModelChange)="changeColor($event)"
-                [disabled]="disabled">
+                              [ngModelOptions]="onBlur"
+                              [ngModel]="step.color"
+                              (ngModelChange)="changeColor($event)"
+                              [disabled]="disabled">
             </sqx-color-picker>
         </div>
         <div class="col">
-            <sqx-editable-title 
-                [name]="step.name"
-                (nameChange)="changeName($event)"
-                [disabled]="step.isLocked || disabled">
+            <sqx-editable-title [name]="step.name"
+                                (nameChange)="changeName($event)"
+                                [disabled]="step.isLocked || disabled">
             </sqx-editable-title>
         </div>
         <div class="col">
@@ -34,16 +33,16 @@
             </button>
         </div>
     </div>
-        
+
     <div class="step-inner">
-        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition" 
-            [transition]="transition"
-            [disabled]="disabled"
-            [roles]="roles"
-            (remove)="emitTransitionRemove(transition)"
-            (update)="changeTransition(transition, $event)">
+        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition"
+                                 [transition]="transition"
+                                 [disabled]="disabled"
+                                 [roles]="roles"
+                                 (remove)="emitTransitionRemove(transition)"
+                                 (update)="changeTransition(transition, $event)">
         </sqx-workflow-transition>
-            
+
         <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
             <div class="col-auto">
                 <i class="icon-corner-down-right text-decent"></i>
@@ -62,15 +61,51 @@
             </div>
         </div>
 
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="preventUpdates_{{step.name}}"
-                [disabled]="disabled"
-                [ngModel]="step.noUpdate"
-                (ngModelChange)="changeNoUpdate($event)" />
+        <div class="row transition-prevent-updates no-guttersw">
+            <div class="col col-step" style="max-width: 12rem">
+                <div class="form-check">
+                    <input class="form-check-input" style="margin-top: 0.8rem;" type="checkbox" id="preventUpdates_{{step.name}}"
+                           [disabled]="disabled"
+                           [ngModel]="step.noUpdate"
+                           (ngModelChange)="changeNoUpdate($event)" />
 
-            <label class="form-check-label" for="preventUpdates_{{step.name}}">
-                Prevent updates
-            </label>
-        </div> 
+                    <label class="form-check-label" for="preventUpdates_{{step.name}}">
+                        Prevent updates
+                    </label>
+                </div>
+            </div>
+            <ng-container *ngIf="step.noUpdate">
+                <div class="col-auto col-label">
+                    <span class="text-decent">when</span>
+                </div>
+                <div class="col col-step-expression">
+                    <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false"
+                           [disabled]="disabled"
+                           [ngModelOptions]="onBlur"
+                           [ngModel]="step.noUpdateExpression"
+                           (ngModelChange)="changeNoUpdateExpression($event)"
+                           placeholder="Expression" />
+                </div>
+                <div class="col-auto col-label">
+                    <span class="text-decent">for</span>
+                </div>
+
+                <div class="col col-step-role">
+                    <sqx-tag-editor [allowDuplicates]="false"
+                                    [dashed]="true"
+                                    [disabled]="disabled"
+                                    (ngModelChange)="changeNoUpdateRoles($event)"
+                                    [ngModel]="step.noUpdateRoles"
+                                    [ngModelOptions]="onBlur"
+                                    [singleLine]="true"
+                                    [suggestions]="roles"
+                                    placeholder="Role">
+                    </sqx-tag-editor>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div class="col-auto col-div-line">
+        <hr class="col-line"/>
     </div>
 </div>

@@ -70,8 +70,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (contents.Any())
                 {
-                    var appVersion = context.App.Version;
-
                     var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
                     foreach (var content in contents)
@@ -83,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         if (ShouldEnrichWithStatuses(context))
                         {
                             await EnrichNextsAsync(content, result, context);
-                            await EnrichCanUpdateAsync(content, result);
+                            await EnrichCanUpdateAsync(content, result, context);
                         }
 
                         results.Add(result);
@@ -327,9 +325,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return assets.ToLookup(x => x.Id);
         }
 
-        private async Task EnrichCanUpdateAsync(IContentEntity content, ContentEntity result)
+        private async Task EnrichCanUpdateAsync(IContentEntity content, ContentEntity result, Context context)
         {
-            result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
+            result.CanUpdate = await contentWorkflow.CanUpdateAsync(content, context.User);
         }
 
         private async Task EnrichNextsAsync(IContentEntity content, ContentEntity result, Context context)

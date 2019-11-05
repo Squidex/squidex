@@ -43,23 +43,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content.DataDraft, user);
+            return workflow.TryGetTransition(content.Status, next, out var transition) && IsTrue(transition, content.DataDraft, user);
         }
 
         public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
-            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && CanUse(transition, data, user);
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
-        public async Task<bool> CanUpdateAsync(IContentEntity content)
+        public async Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             if (workflow.TryGetStep(content.Status, out var step))
             {
-                return !step.NoUpdate;
+                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.DataDraft, user);
             }
 
             return true;
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var (to, step, transition) in workflow.GetTransitions(content.Status))
             {
-                if (CanUse(transition, content.DataDraft, user))
+                if (IsTrue(transition, content.DataDraft, user))
                 {
                     result.Add(new StatusInfo(to, GetColor(step)));
                 }
@@ -103,19 +103,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool CanUse(WorkflowTransition transition, NamedContentData data, ClaimsPrincipal user)
+        private bool IsTrue(WorkflowCondition condition, NamedContentData data, ClaimsPrincipal user)
         {
-            if (transition.Roles != null)
+            if (condition?.Roles != null)
             {
-                if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && transition.Roles.Contains(x.Value)))
+                if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && condition.Roles.Contains(x.Value)))
                 {
                     return false;
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(transition.Expression))
+            if (!string.IsNullOrWhiteSpace(condition?.Expression))
             {
-                return scriptEngine.Evaluate("data", data, transition.Expression);
+                var result = false;
+                result = scriptEngine.Evaluate("data", data, condition.Expression);
+                return result;
             }
 
             return true;

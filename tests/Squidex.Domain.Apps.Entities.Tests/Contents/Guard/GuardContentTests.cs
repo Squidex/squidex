@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
-            var command = new UpdateContent { Data = new NamedContentData() };
+            var command = new UpdateContent { Data = new NamedContentData(), User = user };
 
             await GuardContent.CanUpdate(content, contentWorkflow, command, false);
         }
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
-            var command = new PatchContent { Data = new NamedContentData() };
+            var command = new PatchContent { Data = new NamedContentData(), User = user };
 
             await GuardContent.CanPatch(content, contentWorkflow, command, false);
         }
@@ -286,7 +286,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private void SetupCanUpdate(bool canUpdate)
         {
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored, user))
                 .Returns(canUpdate);
         }
 

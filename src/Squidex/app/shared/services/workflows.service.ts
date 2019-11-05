@@ -211,7 +211,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
     }
 }
 
-export type WorkflowStepValues = { color?: string; isLocked?: boolean; noUpdate?: boolean; };
+export type WorkflowStepValues = { color?: string; isLocked?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> };
 export type WorkflowStep = { name: string } & WorkflowStepValues;
 
 export type WorkflowTransitionValues = { expression?: string; roles?: string[]; };
@@ -307,7 +307,7 @@ function parseWorkflow(workflow: any) {
         if (workflow.steps.hasOwnProperty(stepName)) {
             const step = workflow.steps[stepName];
 
-            steps.push({ name: stepName, color: step.color, noUpdate: step.noUpdate, isLocked: stepName === 'Published' });
+            steps.push({ name: stepName, isLocked: stepName === 'Published', ...step });
 
             for (let to in step.transitions) {
                 if (step.transitions.hasOwnProperty(to)) {
