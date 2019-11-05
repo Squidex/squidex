@@ -11,6 +11,10 @@ namespace Squidex.Config
 {
     public sealed class MyIdentityOptions
     {
+        public string PrivacyUrl { get; set; }
+
+        public string AuthorityUrl { get; set; }
+
         public string AdminEmail { get; set; }
 
         public string AdminPassword { get; set; }
@@ -45,17 +49,15 @@ namespace Squidex.Config
 
         public Dictionary<string, string[]> OidcRoleMapping { get; set; }
 
-        public string AuthorityUrl { get; set; }
-
-        public string PrivacyUrl { get; set; }
-
-        public bool RequiresHttps { get; set; }
+        public bool AdminRecreate { get; set; }
 
         public bool AllowPasswordAuth { get; set; }
 
         public bool LockAutomatically { get; set; }
 
         public bool NoConsent { get; set; }
+
+        public bool RequiresHttps { get; set; }
 
         public bool ShowPII { get; set; }
 

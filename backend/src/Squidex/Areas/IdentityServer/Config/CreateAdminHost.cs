@@ -19,6 +19,7 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
+using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -49,19 +50,41 @@ namespace Squidex.Areas.IdentityServer.Config
                     var adminEmail = identityOptions.AdminEmail;
                     var adminPass = identityOptions.AdminPassword;
 
-                    if (userManager.SupportsQueryableUsers && !userManager.Users.Any())
+                    var isEmpty = IsEmpty(userManager);
+
+                    if (isEmpty || identityOptions.AdminRecreate)
                     {
                         try
                         {
-                            var values = new UserValues
-                            {
-                                Email = adminEmail,
-                                Password = adminPass,
-                                Permissions = new PermissionSet(Permissions.Admin),
-                                DisplayName = adminEmail
-                            };
+                            var user = await userManager.FindByEmailWithClaimsAsync(adminEmail);
 
-                            await userManager.CreateAsync(userFactory, values);
+                            if (user != null)
+                            {
+                                if (identityOptions.AdminRecreate)
+                                {
+                                    var permissions = user.Permissions().Add(Permissions.Admin);
+
+                                    var values = new UserValues
+                                    {
+                                        Password = adminPass,
+                                        Permissions = permissions
+                                    };
+
+                                    await userManager.UpdateAsync(user.Identity, values);
+                                }
+                            }
+                            else
+                            {
+                                var values = new UserValues
+                                {
+                                    Email = adminEmail,
+                                    Password = adminPass,
+                                    Permissions = new PermissionSet(Permissions.Admin),
+                                    DisplayName = adminEmail
+                                };
+
+                                await userManager.CreateAsync(userFactory, values);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -72,6 +95,11 @@ namespace Squidex.Areas.IdentityServer.Config
                     }
                 }
             }
+        }
+
+        private static bool IsEmpty(UserManager<IdentityUser> userManager)
+        {
+            return userManager.SupportsQueryableUsers && !userManager.Users.Any();
         }
     }
 }
