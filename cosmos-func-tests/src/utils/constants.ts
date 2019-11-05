@@ -160,7 +160,7 @@ export const constants = {
 
     messages: {
         validationFailureErrorMessage: 'A content item with these values already exists.',
-        unsavedChangesPopUpMessage: 'You have unsaved changes, do you want to close the current content view and discard your changes?',
+        unsavedChangesPopUpMessage: 'You have unsaved changes.\nWhen you close the current content view you will loose them.\nDo you want to continue anyway?',
         commentaryCreationSuccessMessage: 'Content created successfully.',
         commentaryEditSuccessMessage: 'Content updated successfully.',
         commentaryCreationFailureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).',
@@ -168,9 +168,10 @@ export const constants = {
         changeLogAssignmentMessage: 'Me assigned dummy@cha.rbxd.ds as Editor',
         changeLogDeletionMessage: 'Me removed vegatestreviewer@cha.rbxd.ds from app',
         chnageLogRoleEditMessage: 'Me assigned vegatesteditor@cha.rbxd.ds as Owner',
-        contributorAdditionFailureMessage: 'Cannot assign contributor: Role: Contributor has already this role.',
-        characterCountLimitErrorMessage: 'Failed to save commentary: Exceeded character limit of \'800\' characters for language \'en\'.',
-        observedPeriodNotSetErrorMessage: 'Failed to save commentary: Period is required.'
+        contributorAdditionFailureMessage: 'Cannot assign contributor.\nRole: Contributor has already this role.',
+        characterCountLimitErrorMessage: 'Failed to save commentary.\nExceeded character limit of \'800\' characters for language \'en\'.',
+        observedPeriodNotSetErrorMessage: 'Failed to save commentary.\nPeriod is required.'
+
     }
 
 };

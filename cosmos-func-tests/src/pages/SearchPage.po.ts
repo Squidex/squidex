@@ -36,7 +36,7 @@ export class SearchPage extends ContentPage {
     }
 
     public async getCommentaryCreationFailureMessageText() {
-        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[contains(@class, \'alert\')]/span')));
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[contains(@class, \'form-alert-error\')]')));
     }
 
     public async getRefDataSelection(referenceName: string) {
