@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, null);
 
             Assert.True(result);
         }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, null);
 
             Assert.True(result);
         }
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Archived };
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, null);
 
             Assert.False(result);
         }

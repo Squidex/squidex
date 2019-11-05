@@ -8,6 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+    ResourceOwner,
     RolesState,
     SchemaTagConverter,
     WorkflowDto,
@@ -19,7 +20,9 @@ import {
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html'
 })
-export class WorkflowsPageComponent implements OnInit {
+export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
+    public roles: ReadonlyArray<string> = [];
+
     constructor(
         public readonly rolesState: RolesState,
         public readonly schemasSource: SchemaTagConverter,
@@ -28,6 +31,12 @@ export class WorkflowsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.own(
+            this.rolesState.roles
+                .subscribe(roles => {
+                    this.roles = roles.map(x => x.name);
+                }));
+
         this.rolesState.load();
 
         this.workflowsState.load();
