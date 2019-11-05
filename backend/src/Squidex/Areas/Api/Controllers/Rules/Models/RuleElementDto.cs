@@ -29,22 +29,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// Optional title.
         /// </summary>
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// The color for the icon.
         /// </summary>
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// The image for the icon.
         /// </summary>
-        public string IconImage { get; set; }
+        public string? IconImage { get; set; }
 
         /// <summary>
         /// The optional link to the product that is integrated.
         /// </summary>
-        public string ReadMore { get; set; }
+        public string? ReadMore { get; set; }
 
         /// <summary>
         /// The properties.

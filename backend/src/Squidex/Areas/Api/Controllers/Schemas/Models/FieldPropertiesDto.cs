@@ -61,6 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
+        [Required]
         public ReadOnlyCollection<string> Tags { get; set; }
 
         public abstract FieldProperties ToProperties();

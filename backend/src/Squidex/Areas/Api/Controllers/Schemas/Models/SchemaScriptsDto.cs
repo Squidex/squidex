@@ -16,27 +16,27 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The script that is executed for each query when querying contents.
         /// </summary>
-        public string Query { get; set; }
+        public string? Query { get; set; }
 
         /// <summary>
         /// The script that is executed when creating a content.
         /// </summary>
-        public string Create { get; set; }
+        public string? Create { get; set; }
 
         /// <summary>
         /// The script that is executed when updating a content.
         /// </summary>
-        public string Update { get; set; }
+        public string? Update { get; set; }
 
         /// <summary>
         /// The script that is executed when deleting a content.
         /// </summary>
-        public string Delete { get; set; }
+        public string? Delete { get; set; }
 
         /// <summary>
         /// The script that is executed when change a content status.
         /// </summary>
-        public string Change { get; set; }
+        public string? Change { get; set; }
 
         public ConfigureScripts ToCommand()
         {

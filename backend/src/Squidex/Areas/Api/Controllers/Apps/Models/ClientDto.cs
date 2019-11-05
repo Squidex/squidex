@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The role of the client.
         /// </summary>
-        public string Role { get; set; }
+        public string? Role { get; set; }
 
         public static ClientDto FromClient(string id, AppClient client)
         {

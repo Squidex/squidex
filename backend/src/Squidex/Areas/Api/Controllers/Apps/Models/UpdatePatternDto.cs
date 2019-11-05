@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The regex message.
         /// </summary>
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public AddPattern ToAddCommand()
         {

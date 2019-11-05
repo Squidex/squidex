@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The nested fields.
         /// </summary>
-        public List<NestedFieldDto> Nested { get; set; }
+        public List<NestedFieldDto>? Nested { get; set; }
 
         public static NestedFieldDto FromField(NestedField field)
         {

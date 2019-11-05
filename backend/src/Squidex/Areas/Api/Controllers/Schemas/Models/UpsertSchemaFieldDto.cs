@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Determines the optional partitioning of the field.
         /// </summary>
-        public string Partitioning { get; set; }
+        public string? Partitioning { get; set; }
 
         /// <summary>
         /// The field properties.
@@ -48,6 +48,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The nested fields.
         /// </summary>
-        public List<UpsertSchemaNestedFieldDto> Nested { get; set; }
+        public List<UpsertSchemaNestedFieldDto>? Nested { get; set; }
     }
 }

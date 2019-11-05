@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The file hash.
         /// </summary>
-        public string FileHash { get; set; }
+        public string? FileHash { get; set; }
 
         /// <summary>
         /// The slug.

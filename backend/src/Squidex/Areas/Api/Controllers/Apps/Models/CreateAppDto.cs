@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Initialize the app with the inbuilt template.
         /// </summary>
-        public string Template { get; set; }
+        public string? Template { get; set; }
 
         public CreateApp ToCommand()
         {

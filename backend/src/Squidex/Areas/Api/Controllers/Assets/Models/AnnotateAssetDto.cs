@@ -17,12 +17,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The new name of the asset.
         /// </summary>
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         /// <summary>
         /// The new slug of the asset.
         /// </summary>
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         /// <summary>
         /// The new asset tags.

@@ -16,17 +16,18 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Optional label for the editor.
         /// </summary>
         [StringLength(100)]
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         /// <summary>
         /// Hints to describe the schema.
         /// </summary>
         [StringLength(1000)]
-        public string Hints { get; set; }
+        public string? Hints { get; set; }
 
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
+        [Required]
         public ReadOnlyCollection<string> Tags { get; set; }
     }
 }

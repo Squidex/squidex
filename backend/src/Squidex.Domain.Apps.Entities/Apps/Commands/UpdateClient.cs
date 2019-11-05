@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Name { get; set; }
 
-        public string Role { get; set; }
+        public string? Role { get; set; }
     }
 }

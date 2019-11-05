@@ -15,12 +15,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The optional label of your app.
         /// </summary>
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         /// <summary>
         /// The optional description of your app.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public UpdateApp ToCommand()
         {

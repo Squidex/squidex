@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The role of the contributor.
         /// </summary>
-        public string Role { get; set; }
+        public string? Role { get; set; }
 
         public static ContributorDto FromIdAndRole(string id, string role)
         {

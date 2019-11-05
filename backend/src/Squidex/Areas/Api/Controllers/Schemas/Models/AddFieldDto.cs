@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Determines the optional partitioning of the field.
         /// </summary>
-        public string Partitioning { get; set; }
+        public string? Partitioning { get; set; }
 
         /// <summary>
         /// The field properties.

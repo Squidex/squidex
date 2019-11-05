@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The regex message.
         /// </summary>
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public static PatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
         {

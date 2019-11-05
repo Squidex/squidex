@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The last dump.
         /// </summary>
-        public string LastDump { get; set; }
+        public string? LastDump { get; set; }
 
         /// <summary>
         /// The number of calls.

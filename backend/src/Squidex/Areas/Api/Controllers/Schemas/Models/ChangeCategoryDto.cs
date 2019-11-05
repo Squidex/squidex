@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The name of the category.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public ChangeCategory ToCommand()
         {

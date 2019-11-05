@@ -11,9 +11,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class AnnotateAsset : AssetCommand
     {
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         public HashSet<string> Tags { get; set; }
     }
