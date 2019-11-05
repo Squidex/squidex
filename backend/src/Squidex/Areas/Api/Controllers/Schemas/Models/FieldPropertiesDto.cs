@@ -44,16 +44,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public bool IsRequired { get; set; }
 
         /// <summary>
-        /// Determines if the field should be displayed in lists.
-        /// </summary>
-        public bool IsListField { get; set; }
-
-        /// <summary>
-        /// Determines if the field should be displayed in reference lists.
-        /// </summary>
-        public bool IsReferenceField { get; set; }
-
-        /// <summary>
         /// Optional url to the editor.
         /// </summary>
         public string? EditorUrl { get; set; }

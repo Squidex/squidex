@@ -366,6 +366,33 @@ describe('SchemasService', () => {
         expect(schema!).toEqual(createSchemaDetails(12));
     }));
 
+    it('should make put request to update ui fields',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = { fieldsInReferences: ['field1'] };
+
+        const resource: Resource = {
+            _links: {
+                ['fields/ui']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/ui' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putUIFields('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/ui');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12));
+
+        expect(schema!).toEqual(createSchemaDetails(12));
+    }));
+
     it('should make put request to update field ordering',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
@@ -751,6 +778,8 @@ describe('SchemasService', () => {
                     _links: {}
                 }
             ],
+            fieldsInLists: ['field1'],
+            fieldsInReferences: ['field1'],
             scripts: {
                 query: '<script-query>',
                 create: '<script-create>',
@@ -812,6 +841,8 @@ export function createSchemaDetails(id: number, suffix = '') {
             new RootFieldDto({}, 19, 'field19', createProperties('String'), 'language', true, true, true),
             new RootFieldDto({}, 20, 'field20', createProperties('Tags'), 'language', true, true, true)
         ],
+        ['field1'],
+        ['field1'],
         {
             query: '<script-query>',
             create: '<script-create>',

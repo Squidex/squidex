@@ -37,6 +37,10 @@ const {
 } = TestValues;
 
 describe('SchemaDetailsDto', () => {
+    const field1 = createField({ properties: createProperties('Array'), id: 1 });
+    const field2 = createField({ properties: createProperties('Array'), id: 2 });
+    const field3 = createField({ properties: createProperties('Array'), id: 3 });
+
     it('should return label as display name', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto('Label') });
 
@@ -55,24 +59,34 @@ describe('SchemaDetailsDto', () => {
         expect(schema.displayName).toBe('schema1');
     });
 
-    it('should return configured fields as list fields if no schema field are declared', () => {
-        const field1 = createField({ properties: createProperties('Array', { isListField: true }) });
-        const field2 = createField({ properties: createProperties('Array', { isListField: false }), id: 2 });
-        const field3 = createField({ properties: createProperties('Array', { isListField: true }), id: 3 });
-
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
+    it('should return configured fields as list fields if fields are declared', () => {
+        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInLists: ['field1', 'field3'] });
 
         expect(schema.listFields).toEqual([field1, field3]);
     });
 
-    it('should return first fields as list fields if no schema field is declared', () => {
-        const field1 = createField({ properties: createProperties('Array') });
-        const field2 = createField({ properties: createProperties('Array'), id: 2 });
-        const field3 = createField({ properties: createProperties('Array'), id: 3 });
-
+    it('should return first fields as list fields if no field is declared', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
         expect(schema.listFields).toEqual([field1]);
+    });
+
+    it('should return configured fields as references fields if fields are declared', () => {
+        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInReferences: ['field1', 'field3'] });
+
+        expect(schema.referenceFields).toEqual([field1, field3]);
+    });
+
+    it('should return lists fields as reference fields if no field is declared', () => {
+        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInLists: ['field2', 'field3'] });
+
+        expect(schema.referenceFields).toEqual([field2, field3]);
+    });
+
+    it('should return first field as reference fields if no field is declared', () => {
+        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
+
+        expect(schema.referenceFields).toEqual([field1]);
     });
 
     it('should return empty list fields if fields is empty', () => {
@@ -814,9 +828,15 @@ describe('ContentForm', () => {
     }
 });
 
-type SchemaValues = { properties?: SchemaPropertiesDto; id?: number; fields?: ReadonlyArray<RootFieldDto>; };
+type SchemaValues = {
+    id?: number;
+    fields?: ReadonlyArray<RootFieldDto>;
+    fieldsInLists?: ReadonlyArray<string>;
+    fieldsInReferences?: ReadonlyArray<string>;
+    properties?: SchemaPropertiesDto;
+};
 
-function createSchema({ properties, id, fields }: SchemaValues = {}) {
+function createSchema({ properties, id, fields, fieldsInLists, fieldsInReferences }: SchemaValues = {}) {
     id = id || 1;
 
     return new SchemaDetailsDto({},
@@ -829,7 +849,9 @@ function createSchema({ properties, id, fields }: SchemaValues = {}) {
         modified,
         modifier,
         new Version('1'),
-        fields);
+        fields,
+        fieldsInLists || [],
+        fieldsInReferences || []);
 }
 
 type FieldValues = { properties: FieldPropertiesDto; id?: number; partitioning?: string; isDisabled?: boolean, nested?: ReadonlyArray<NestedFieldDto> };

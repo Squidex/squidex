@@ -224,6 +224,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         return Snapshot;
                     });
 
+                case ConfigureUIFields configureUIFields:
+                    return UpdateReturn(configureUIFields, c =>
+                    {
+                        GuardSchema.CanConfigureUIFields(Snapshot.SchemaDef, c);
+
+                        ConfigureUIFields(c);
+
+                        return Snapshot;
+                    });
+
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
@@ -329,6 +339,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public void ConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
             RaiseEvent(command, new SchemaPreviewUrlsConfigured());
+        }
+
+        public void ConfigureUIFields(ConfigureUIFields command)
+        {
+            RaiseEvent(command, new SchemaUIFieldsConfigured());
         }
 
         public void Update(UpdateSchema command)

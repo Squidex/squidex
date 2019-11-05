@@ -473,13 +473,31 @@ describe('SchemasState', () => {
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update schema and selected schema when fields sorted', () => {
+            it('should update schema and selected schema when ui fields configured', () => {
+                const request = { fieldsInLists: [schema.fields[1].name] };
+
                 const updated = createSchemaDetails(1, '_new');
 
-                schemasService.setup(x => x.putFieldOrdering(app, schema1, [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
+                schemasService.setup(x => x.putUIFields(app, schema1, request, version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
+                schemasState.configureUIFields(schema1, request).subscribe();
+
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+            });
+
+            it('should update schema and selected schema when fields sorted', () => {
+                const request = [schema.fields[1], schema.fields[2]];
+
+                const updated = createSchemaDetails(1, '_new');
+
+                schemasService.setup(x => x.putFieldOrdering(app, schema1, request.map(f => f.fieldId), version))
+                    .returns(() => of(updated)).verifiable();
+
+                schemasState.orderFields(schema1, request).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 
@@ -488,12 +506,14 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when nested fields sorted', () => {
+                const request = [schema.fields[1], schema.fields[2]];
+
                 const updated = createSchemaDetails(1, '_new');
 
-                schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
+                schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], request.map(f => f.fieldId), version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
+                schemasState.orderFields(schema1, request, schema.fields[0]).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas[0];
 

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
@@ -19,7 +20,8 @@ import {
     PatternDto,
     RootFieldDto,
     SchemaDetailsDto,
-    SchemasState
+    SchemasState,
+    sorted
 } from '@app/shared';
 
 @Component({
@@ -98,8 +100,8 @@ export class FieldComponent implements OnChanges {
         this.schemasState.hideField(this.schema, this.field);
     }
 
-    public sortFields(fields: ReadonlyArray<NestedFieldDto>) {
-        this.schemasState.orderFields(this.schema, fields, <any>this.field).subscribe();
+    public sortFields(event: CdkDragDrop<ReadonlyArray<NestedFieldDto>>) {
+        this.schemasState.orderFields(this.schema, sorted(event), <any>this.field).subscribe();
     }
 
     public lockField() {

@@ -9,6 +9,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class SchemaScripts : Freezable
     {
+        public static readonly SchemaScripts Empty = new SchemaScripts();
+
+        static SchemaScripts()
+        {
+            Empty.Freeze();
+        }
+
         public string Change { get; set; }
 
         public string Create { get; set; }

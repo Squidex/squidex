@@ -33,6 +33,8 @@ export type SchemasDto = {
     readonly canCreate: boolean;
 } & Resource;
 
+type FieldNames = ReadonlyArray<string>;
+
 export class SchemaDto {
     public readonly _links: ResourceLinks;
 
@@ -46,6 +48,7 @@ export class SchemaDto {
     public readonly canUpdate: boolean;
     public readonly canUpdateCategory: boolean;
     public readonly canUpdateScripts: boolean;
+    public readonly canUpdateUIFields: boolean;
     public readonly canUpdateUrls: boolean;
 
     public readonly displayName: string;
@@ -75,6 +78,7 @@ export class SchemaDto {
         this.canUpdate = hasAnyLink(links, 'update');
         this.canUpdateCategory = hasAnyLink(links, 'update/category');
         this.canUpdateScripts = hasAnyLink(links, 'update/scripts');
+        this.canUpdateUIFields = hasAnyLink(links, 'fields/ui');
         this.canUpdateUrls = hasAnyLink(links, 'update/urls');
 
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
@@ -82,6 +86,7 @@ export class SchemaDto {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
+    public readonly contentFields: ReadonlyArray<RootFieldDto>;
     public readonly listFields: ReadonlyArray<RootFieldDto>;
     public readonly listFieldsEditable: ReadonlyArray<RootFieldDto>;
     public readonly referenceFields: ReadonlyArray<RootFieldDto>;
@@ -96,13 +101,17 @@ export class SchemaDetailsDto extends SchemaDto {
         lastModifiedBy: string,
         version: Version,
         public readonly fields: ReadonlyArray<RootFieldDto> = [],
+        public readonly fieldsInLists: FieldNames = [],
+        public readonly fieldsInReferences: FieldNames = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {
         super(links, id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         if (fields) {
-            this.listFields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
+            this.contentFields = fields.filter(x => x.properties.isContentField);
+
+            this.listFields = findFields(fieldsInLists, this.contentFields);
 
             if (this.listFields.length === 0 && this.fields.length > 0) {
                 this.listFields = [this.fields[0]];
@@ -114,7 +123,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
             this.listFieldsEditable = this.listFields.filter(x => x.isInlineEditable);
 
-            this.referenceFields = this.fields.filter(x => x.properties.isReferenceField && x.properties.isContentField);
+            this.referenceFields = findFields(fieldsInReferences, this.contentFields);
 
             if (this.referenceFields.length === 0) {
                 this.referenceFields = this.listFields;
@@ -168,6 +177,10 @@ export class SchemaDetailsDto extends SchemaDto {
 
         return result;
     }
+}
+
+function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>) {
+    return names.map(x => fields.find(f => f.name === x)!).filter(x => !!x);
 }
 
 export class FieldDto {
@@ -274,6 +287,11 @@ export interface AddFieldDto {
     readonly properties: FieldPropertiesDto;
 }
 
+export interface UpdateUIFields {
+    readonly fieldsInLists?: FieldNames;
+    readonly fieldsInReferences?: FieldNames;
+}
+
 export interface CreateSchemaDto {
     readonly name: string;
     readonly fields?: ReadonlyArray<RootFieldDto>;
@@ -290,8 +308,8 @@ export interface UpdateFieldDto {
 }
 
 export interface SynchronizeSchemaDto {
-    noFieldDeletiong?: boolean;
-    noFieldRecreation?: boolean;
+    readonly noFieldDeletiong?: boolean;
+    readonly noFieldRecreation?: boolean;
 }
 
 export interface UpdateSchemaDto {
@@ -459,6 +477,21 @@ export class SchemasService {
                 this.analytics.trackEvent('Schema', 'FieldCreated', appName);
             }),
             pretifyError('Failed to add field. Please reload.'));
+    }
+
+    public putUIFields(appName: string, resource: Resource, dto: UpdateUIFields, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['fields/ui'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'UIFieldsConfigured', appName);
+            }),
+            pretifyError('Failed to update UI fields. Please reload.'));
     }
 
     public putFieldOrdering(appName: string, resource: Resource, dto: ReadonlyArray<number>, version: Version): Observable<SchemaDetailsDto> {
@@ -630,6 +663,8 @@ function parseSchemaWithDetails(response: any) {
         DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
         new Version(response.version.toString()),
         fields,
+        response.fieldsInLists,
+        response.fieldsInReferences,
         response.scripts || {},
         response.previewUrls || {});
 }

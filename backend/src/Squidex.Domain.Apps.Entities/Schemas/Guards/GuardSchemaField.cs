@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!command.Name.IsPropertyName())
                 {
-                    e("Name must be a valid javascript property name.", nameof(command.Name));
+                    e(Not.ValidPropertyName("Name"), nameof(command.Name));
                 }
 
                 if (command.Properties == null)

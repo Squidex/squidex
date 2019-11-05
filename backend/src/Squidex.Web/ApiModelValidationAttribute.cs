@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Validation;
 
@@ -27,17 +28,27 @@ namespace Squidex.Web
             {
                 var errors = new List<ValidationError>();
 
-                foreach (var m in context.ModelState)
+                foreach (var (key, value) in context.ModelState)
                 {
-                    foreach (var e in m.Value.Errors)
+                    if (value.ValidationState == ModelValidationState.Invalid)
                     {
-                        if (!string.IsNullOrWhiteSpace(e.ErrorMessage) && (allErrors || e.Exception is JsonException))
+                        if (string.IsNullOrWhiteSpace(key))
                         {
-                            errors.Add(new ValidationError(e.ErrorMessage, m.Key));
+                            errors.Add(new ValidationError("Request body has an invalid format."));
                         }
-                        else if (e.Exception is JsonException jsonException)
+                        else
                         {
-                            errors.Add(new ValidationError(jsonException.Message));
+                            foreach (var error in value.Errors)
+                            {
+                                if (!string.IsNullOrWhiteSpace(error.ErrorMessage) && ShouldExpose(error))
+                                {
+                                    errors.Add(new ValidationError(error.ErrorMessage, key));
+                                }
+                                else if (error.Exception is JsonException jsonException)
+                                {
+                                    errors.Add(new ValidationError(jsonException.Message));
+                                }
+                            }
                         }
                     }
                 }
@@ -47,6 +58,11 @@ namespace Squidex.Web
                     throw new ValidationException("The model is not valid.", errors);
                 }
             }
+        }
+
+        private bool ShouldExpose(ModelError error)
+        {
+            return allErrors || error.Exception is JsonException;
         }
     }
 }

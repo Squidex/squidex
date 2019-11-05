@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
@@ -21,12 +22,26 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The scripts.
         /// </summary>
+        [Required]
         public SchemaScriptsDto Scripts { get; set; } = new SchemaScriptsDto();
 
         /// <summary>
         /// The preview Urls.
         /// </summary>
+        [Required]
         public Dictionary<string, string> PreviewUrls { get; set; } = EmptyPreviewUrls;
+
+        /// <summary>
+        /// The name of fields that are used in content lists.
+        /// </summary>
+        [Required]
+        public FieldNames FieldsInLists { get; set; }
+
+        /// <summary>
+        /// The name of fields that are used in content references.
+        /// </summary>
+        [Required]
+        public FieldNames FieldsInReferences { get; set; }
 
         /// <summary>
         /// The list of fields.

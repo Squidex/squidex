@@ -5,10 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:no-shadowed-variable
-
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     fadeAnimation,
@@ -16,8 +14,7 @@ import {
     ModalModel,
     ResourceOwner,
     SchemaDetailsDto,
-    SchemasState,
-    Types
+    SchemasState
 } from '@app/shared';
 
 import {
@@ -33,12 +30,14 @@ import {
     ]
 })
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
+    public readonly exact = { exact: true };
+
     public schema: SchemaDetailsDto;
 
-    public editOptionsDropdown = new ModalModel();
+    public selectableTabs: ReadonlyArray<string> = ['Fields', 'UI', 'Scripts', 'Json', 'More'];
+    public selectedTab = this.selectableTabs[0];
 
-    public selectedTab = 'fields';
-    public selectableTabs: ReadonlyArray<string> = ['Fields', 'Scripts', 'Json', 'More'];
+    public editOptionsDropdown = new ModalModel();
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -50,16 +49,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.updateTab();
-
-        this.own(
-            this.router.events
-                .subscribe(event => {
-                    if (Types.is(event, NavigationEnd)) {
-                        this.updateTab();
-                    }
-                }));
-
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
@@ -67,8 +56,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
                 }));
     }
 
-    private updateTab() {
-        this.selectedTab = this.route.firstChild!.snapshot.routeConfig!.path!;
+    public cloneSchema() {
+        this.messageBus.emit(new SchemaCloning(this.schema.export()));
     }
 
     public publish() {
@@ -84,10 +73,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
             .subscribe(() => {
                 this.back();
             });
-    }
-
-    public cloneSchema() {
-        this.messageBus.emit(new SchemaCloning(this.schema.export()));
     }
 
     public selectTab(tab: string) {

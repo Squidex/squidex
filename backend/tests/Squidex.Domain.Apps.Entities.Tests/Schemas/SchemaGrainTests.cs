@@ -155,6 +155,52 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
+        public async Task ConfigureUIFields_should_create_events_for_list_fields()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = new FieldNames(fieldName)
+            };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddFieldAsync(fieldName);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(command.FieldsInLists, sut.Snapshot.SchemaDef.FieldsInLists);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaUIFieldsConfigured { FieldsInLists = command.FieldsInLists })
+                );
+        }
+
+        [Fact]
+        public async Task ConfigureUIFields_should_create_events_for_reference_fields()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInReferences = new FieldNames(fieldName)
+            };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddFieldAsync(fieldName);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(command.FieldsInReferences, sut.Snapshot.SchemaDef.FieldsInReferences);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaUIFieldsConfigured { FieldsInReferences = command.FieldsInReferences })
+                );
+        }
+
+        [Fact]
         public async Task Publish_should_create_events_and_update_state()
         {
             var command = new PublishSchema();
@@ -630,18 +676,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var command = new SynchronizeSchema
             {
-                Scripts = new SchemaScripts
-                {
-                    Query = "<query-script"
-                },
-                PreviewUrls = new Dictionary<string, string>
-                {
-                    ["Web"] = "web-url"
-                },
-                Fields = new List<UpsertSchemaField>
-                {
-                    new UpsertSchemaField { Name = fieldId.Name, Properties = ValidProperties() }
-                },
                 Category = "My-Category"
             };
 
@@ -651,17 +685,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.NotNull(GetField(1));
             Assert.Equal(command.Category, sut.Snapshot.SchemaDef.Category);
-            Assert.Equal(command.Scripts, sut.Snapshot.SchemaDef.Scripts);
-            Assert.Equal(command.PreviewUrls, sut.Snapshot.SchemaDef.PreviewUrls);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCategoryChanged { Name = command.Category }),
-                    CreateEvent(new SchemaScriptsConfigured { Scripts = command.Scripts }),
-                    CreateEvent(new SchemaPreviewUrlsConfigured { PreviewUrls = command.PreviewUrls }),
-                    CreateEvent(new FieldAdded { FieldId = fieldId, Name = fieldId.Name, Properties = command.Fields[0].Properties, Partitioning = Partitioning.Invariant.Key })
+                    CreateEvent(new SchemaCategoryChanged { Name = command.Category })
                 );
         }
 

@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public class NumberFieldBuilder : FieldBuilder
+    public sealed class ConfigureUIFields : SchemaCommand
     {
-        public NumberFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
-            : base(field, schema)
-        {
-        }
+        public FieldNames? FieldsInLists { get; set; }
+
+        public FieldNames? FieldsInReferences { get; set; }
     }
 }

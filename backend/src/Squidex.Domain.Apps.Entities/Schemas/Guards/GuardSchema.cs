@@ -55,20 +55,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
             }
 
-            Validate.It(() => "Cannot reorder schema fields.", error =>
+            Validate.It(() => "Cannot reorder schema fields.", e =>
             {
                 if (command.FieldIds == null)
                 {
-                    error("Field ids is required.", nameof(command.FieldIds));
+                    e(Not.Defined("Field ids"), nameof(command.FieldIds));
                 }
 
                 if (arrayField == null)
                 {
-                    ValidateFieldIds(error, command, schema.FieldsById);
+                    ValidateFieldIds(command, schema.FieldsById, e);
                 }
                 else
                 {
-                    ValidateFieldIds(error, command, arrayField.FieldsById);
+                    ValidateFieldIds(command, arrayField.FieldsById, e);
                 }
             });
         }
@@ -77,11 +77,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command);
 
-            Validate.It(() => "Cannot configure preview urls.", error =>
+            Validate.It(() => "Cannot configure preview urls.", e =>
             {
                 if (command.PreviewUrls == null)
                 {
-                    error("Preview Urls is required.", nameof(command.PreviewUrls));
+                    e(Not.Defined("Preview Urls"), nameof(command.PreviewUrls));
                 }
             });
         }
@@ -104,6 +104,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 throw new DomainException("Schema is not published.");
             }
+        }
+
+        public static void CanConfigureUIFields(Schema schema, ConfigureUIFields command)
+        {
+            Guard.NotNull(command);
+
+            Validate.It(() => "Cannot configure UI fields.", e =>
+            {
+                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e);
+                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
+            });
         }
 
         public static void CanUpdate(Schema schema, UpdateSchema command)
@@ -138,17 +149,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     fieldIndex++;
                     fieldPrefix = $"Fields[{fieldIndex}]";
 
-                    ValidateRootField(field, fieldPrefix, e);
+                    ValidateRootField(field, command, fieldPrefix, e);
                 }
 
-                if (command.Fields.Select(x => x?.Name).Distinct().Count() != command.Fields.Count)
+                foreach (var fieldName in command.Fields.Duplicates(x => x.Name))
                 {
-                    e("Fields cannot have duplicate names.", nameof(command.Fields));
+                    if (fieldName.IsPropertyName())
+                    {
+                        e($"Field '{fieldName}' has been added twice.", nameof(command.Fields));
+                    }
                 }
             }
+
+            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e);
+            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
         }
 
-        private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
+        private static void ValidateRootField(UpsertSchemaField field, UpsertCommand command, string prefix, AddValidation e)
         {
             if (field == null)
             {
@@ -175,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                             nestedIndex++;
                             nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
 
-                            ValidateNestedField(nestedField, nestedPrefix, e);
+                            ValidateNestedField(nestedField, field.Nested, nestedPrefix, e);
                         }
                     }
                     else if (field.Nested.Count > 0)
@@ -183,15 +200,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         e("Only array fields can have nested fields.", $"{prefix}.{nameof(field.Partitioning)}");
                     }
 
-                    if (field.Nested.Select(x => x.Name).Distinct().Count() != field.Nested.Count)
+                    foreach (var fieldName in field.Nested.Duplicates(x => x.Name))
                     {
-                        e("Fields cannot have duplicate names.", $"{prefix}.Nested");
+                        if (fieldName.IsPropertyName())
+                        {
+                            e($"Field '{fieldName}' has been added twice.", $"{prefix}.Nested");
+                        }
                     }
                 }
             }
         }
 
-        private static void ValidateNestedField(UpsertSchemaNestedField nestedField, string prefix, AddValidation e)
+        private static void ValidateNestedField(UpsertSchemaNestedField nestedField, IEnumerable<UpsertSchemaFieldBase> fields, string prefix, AddValidation e)
         {
             if (nestedField == null)
             {
@@ -212,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!field.Name.IsPropertyName())
             {
-                e("Field name must be a valid javascript property name.", $"{prefix}.{nameof(field.Name)}");
+                e(Not.ValidPropertyName("Field name"), $"{prefix}.{nameof(field.Name)}");
             }
 
             if (field.Properties == null)
@@ -240,11 +260,85 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldIds<T>(AddValidation error, ReorderFields c, IReadOnlyDictionary<long, T> fields)
+        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e)
+        {
+            if (fields != null)
+            {
+                var fieldIndex = 0;
+                var fieldPrefix = string.Empty;
+
+                foreach (var fieldName in fields)
+                {
+                    fieldIndex++;
+                    fieldPrefix = $"{path}[{fieldIndex}]";
+
+                    if (string.IsNullOrWhiteSpace(fieldName))
+                    {
+                        e(Not.Defined("Field"), fieldPrefix);
+                    }
+                    else if (!schema.FieldsByName.TryGetValue(fieldName, out var field))
+                    {
+                        e($"Field is not part of the schema.", fieldPrefix);
+                    }
+                    else if (!field.IsForApi())
+                    {
+                        e($"Field cannot be an UI field.", fieldPrefix);
+                    }
+                }
+
+                foreach (var duplicate in fields.Duplicates())
+                {
+                    if (!string.IsNullOrWhiteSpace(duplicate))
+                    {
+                        e($"Field '{duplicate}' has been added twice.", path);
+                    }
+                }
+            }
+        }
+
+        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e)
+        {
+            if (fields != null)
+            {
+                var fieldIndex = 0;
+                var fieldPrefix = string.Empty;
+
+                foreach (var fieldName in fields)
+                {
+                    fieldIndex++;
+                    fieldPrefix = $"{path}[{fieldIndex}]";
+
+                    var field = command?.Fields?.Find(x => x.Name == fieldName);
+
+                    if (string.IsNullOrWhiteSpace(fieldName))
+                    {
+                        e(Not.Defined("Field"), fieldPrefix);
+                    }
+                    else if (field == null)
+                    {
+                        e($"Field is not part of the schema.", fieldPrefix);
+                    }
+                    else if (field?.Properties.IsForApi() != true)
+                    {
+                        e($"Field cannot be an UI field.", fieldPrefix);
+                    }
+                }
+
+                foreach (var duplicate in fields.Duplicates())
+                {
+                    if (!string.IsNullOrWhiteSpace(duplicate))
+                    {
+                        e($"Field '{duplicate}' has been added twice.", path);
+                    }
+                }
+            }
+        }
+
+        private static void ValidateFieldIds<T>(ReorderFields c, IReadOnlyDictionary<long, T> fields, AddValidation e)
         {
             if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
             {
-                error("Field ids do not cover all fields.", nameof(c.FieldIds));
+                e("Field ids do not cover all fields.", nameof(c.FieldIds));
             }
         }
     }

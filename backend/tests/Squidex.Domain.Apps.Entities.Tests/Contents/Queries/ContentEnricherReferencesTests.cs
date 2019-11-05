@@ -42,16 +42,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var refSchemaDef =
                 new Schema("my-ref")
                     .AddString(1, "name", Partitioning.Invariant,
-                        new StringFieldProperties { IsReferenceField = true })
+                        new StringFieldProperties())
                     .AddNumber(2, "number", Partitioning.Invariant,
-                        new NumberFieldProperties { IsReferenceField = true });
+                        new NumberFieldProperties())
+                    .ConfigureFieldsInReferences("name", "number");
 
             var schemaDef =
                 new Schema(schemaId.Name)
                     .AddReferences(1, "ref1", Partitioning.Invariant, new ReferencesFieldProperties
                     {
                         ResolveReference = true,
-                        IsListField = true,
                         MinItems = 1,
                         MaxItems = 1,
                         SchemaId = refSchemaId1.Id
@@ -59,11 +59,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     .AddReferences(2, "ref2", Partitioning.Invariant, new ReferencesFieldProperties
                     {
                         ResolveReference = true,
-                        IsListField = true,
                         MinItems = 1,
                         MaxItems = 1,
                         SchemaId = refSchemaId2.Id
-                    });
+                    })
+                    .ConfigureFieldsInLists("ref1", "ref2");
 
             void SetupSchema(NamedId<Guid> id, Schema def)
             {

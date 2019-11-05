@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
                 {
-                    yield return E(new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary(x => x.Key, x => x.Value) });
+                    yield return E(new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary() });
                 }
 
                 if (source.IsPublished != target.IsPublished)
@@ -71,6 +71,16 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 foreach (var @event in events)
                 {
                     yield return E(@event);
+                }
+
+                if (!source.FieldsInLists.SequenceEqual(target.FieldsInLists))
+                {
+                    yield return E(new SchemaUIFieldsConfigured { FieldsInLists = target.FieldsInLists });
+                }
+
+                if (!source.FieldsInReferences.SequenceEqual(target.FieldsInReferences))
+                {
+                    yield return E(new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences });
                 }
             }
         }
@@ -90,8 +100,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 return @event;
             }
 
-            var sourceIds = new List<NamedId<long>>(source.Ordered.Select(x => x.NamedId()));
-            var sourceNames = sourceIds.Select(x => x.Name).ToList();
+            var sourceIds = source.Ordered.Select(x => x.NamedId()).ToList();
 
             if (!options.NoFieldDeletion)
             {
@@ -102,7 +111,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                         var id = sourceField.NamedId();
 
                         sourceIds.Remove(id);
-                        sourceNames.Remove(id.Name);
 
                         yield return E(new FieldDeleted { FieldId = id });
                     }
@@ -133,7 +141,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                         canCreateField = true;
 
                         sourceIds.Remove(id);
-                        sourceNames.Remove(id.Name);
 
                         yield return E(new FieldDeleted { FieldId = id });
                     }
@@ -160,7 +167,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     };
 
                     sourceIds.Add(id);
-                    sourceNames.Add(id.Name);
                 }
 
                 if (id != null && (sourceField == null || CanUpdate(sourceField, targetField)))
@@ -198,13 +204,14 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 }
             }
 
-            if (sourceNames.Count > 1)
+            if (sourceIds.Count > 1)
             {
-                var targetNames = target.Ordered.Select(x => x.Name);
+                var sourceNames = sourceIds.Select(x => x.Name).ToList();
+                var targetNames = target.Ordered.Select(x => x.Name).ToList();
 
-                if (sourceNames.Intersect(targetNames).Count() == target.Ordered.Count && !sourceNames.SequenceEqual(targetNames))
+                if (sourceNames.SetEquals(targetNames) && !sourceNames.SequenceEqual(targetNames))
                 {
-                    var fieldIds = targetNames.Select(x => sourceIds.FirstOrDefault(y => y.Name == x).Id).ToList();
+                    var fieldIds = targetNames.Select(x => sourceIds.Find(y => y.Name == x)!.Id).ToList();
 
                     yield return new SchemaFieldsReordered { FieldIds = fieldIds, ParentFieldId = parentId };
                 }

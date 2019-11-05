@@ -29,7 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             schema_0 =
                 new Schema("my-schema")
                     .AddString(1, "field1", Partitioning.Invariant)
-                    .AddString(2, "field2", Partitioning.Invariant);
+                    .AddString(2, "field2", Partitioning.Invariant)
+                    .AddUI(4, "field4", Partitioning.Invariant);
         }
 
         [Fact]
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name must be a valid javascript property name.",
+                new ValidationError("Field name is not a Javascript property name.",
                     "Fields[1].Name"));
         }
 
@@ -159,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Fields cannot have duplicate names.",
+                new ValidationError("Field 'field1' has been added twice.",
                     "Fields"));
         }
 
@@ -190,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name must be a valid javascript property name.",
+                new ValidationError("Field name is not a Javascript property name.",
                     "Fields[1].Nested[1].Name"));
         }
 
@@ -320,7 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Fields cannot have duplicate names.",
+                new ValidationError("Field 'nested1' has been added twice.",
                     "Fields[1].Nested"));
         }
 
@@ -335,28 +336,102 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = new UIFieldProperties
-                        {
-                            IsListField = true,
-                            IsReferenceField = true
-                        },
+                        Properties = new UIFieldProperties(),
                         IsHidden = true,
                         IsDisabled = true,
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
+                FieldsInLists = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("UI field cannot be a list field.",
-                    "Fields[1].Properties.IsListField"),
-                new ValidationError("UI field cannot be a reference field.",
-                    "Fields[1].Properties.IsReferenceField"),
                 new ValidationError("UI field cannot be hidden.",
                     "Fields[1].IsHidden"),
                 new ValidationError("UI field cannot be disabled.",
-                    "Fields[1].IsDisabled"));
+                    "Fields[1].IsDisabled"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInLists[1]"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInReferences[1]"));
+        }
+
+        [Fact]
+        public void CanCreate_should_throw_exception_if_invalid_lists_field_are_used()
+        {
+            var command = new CreateSchema
+            {
+                Fields = new List<UpsertSchemaField>
+                {
+                    new UpsertSchemaField
+                    {
+                        Name = "field1",
+                        Properties = new StringFieldProperties(),
+                        Partitioning = Partitioning.Invariant.Key
+                    },
+                    new UpsertSchemaField
+                    {
+                        Name = "field4",
+                        Properties = new UIFieldProperties(),
+                        Partitioning = Partitioning.Invariant.Key
+                    }
+                },
+                FieldsInLists = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                FieldsInReferences = null,
+                Name = "new-schema"
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
+                new ValidationError("Field is required.",
+                    "FieldsInLists[1]"),
+                new ValidationError("Field is required.",
+                    "FieldsInLists[2]"),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInLists[3]"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInLists[6]"),
+                new ValidationError("Field 'field1' has been added twice.",
+                    "FieldsInLists"));
+        }
+
+        [Fact]
+        public void CanCreate_should_throw_exception_if_invalid_references_field_are_used()
+        {
+            var command = new CreateSchema
+            {
+                Fields = new List<UpsertSchemaField>
+                {
+                    new UpsertSchemaField
+                    {
+                        Name = "field1",
+                        Properties = new StringFieldProperties(),
+                        Partitioning = Partitioning.Invariant.Key
+                    },
+                    new UpsertSchemaField
+                    {
+                        Name = "field4",
+                        Properties = new UIFieldProperties(),
+                        Partitioning = Partitioning.Invariant.Key
+                    }
+                },
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                Name = "new-schema"
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
+                new ValidationError("Field is required.",
+                    "FieldsInReferences[1]"),
+                new ValidationError("Field is required.",
+                    "FieldsInReferences[2]"),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInReferences[3]"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInReferences[6]"),
+                new ValidationError("Field 'field1' has been added twice.",
+                    "FieldsInReferences"));
         }
 
         [Fact]
@@ -370,10 +445,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = new StringFieldProperties
-                        {
-                            IsListField = true
-                        },
+                        Properties = new StringFieldProperties(),
                         IsHidden = true,
                         IsDisabled = true,
                         Partitioning = Partitioning.Invariant.Key
@@ -404,10 +476,68 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         }
                     }
                 },
+                FieldsInLists = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 
             GuardSchema.CanCreate(command);
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_throw_exception_if_invalid_lists_field_are_used()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                FieldsInReferences = null
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+                new ValidationError("Field is required.",
+                    "FieldsInLists[1]"),
+                new ValidationError("Field is required.",
+                    "FieldsInLists[2]"),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInLists[3]"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInLists[6]"),
+                new ValidationError("Field 'field1' has been added twice.",
+                    "FieldsInLists"));
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_throw_exception_if_invalid_references_field_are_used()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4")
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+                new ValidationError("Field is required.",
+                    "FieldsInReferences[1]"),
+                new ValidationError("Field is required.",
+                    "FieldsInReferences[2]"),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInReferences[3]"),
+                new ValidationError("Field cannot be an UI field.",
+                    "FieldsInReferences[6]"),
+                new ValidationError("Field 'field1' has been added twice.",
+                    "FieldsInReferences"));
+        }
+
+        [Fact]
+        public void CanConfigureUIFields_should_not_throw_exception_if_command_is_valid()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = new FieldNames("field1"),
+                FieldsInReferences = new FieldNames("field2")
+            };
+
+            GuardSchema.CanConfigureUIFields(schema_0, command);
         }
 
         [Fact]
@@ -484,7 +614,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_not_throw_exception_if_field_ids_are_valid()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
+            var command = new ReorderFields { FieldIds = new List<long> { 1, 2, 4 } };
 
             GuardSchema.CanReorder(schema_0, command);
         }
