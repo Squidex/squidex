@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable CS0612 // Type or member is obsolete
+
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
@@ -106,9 +108,19 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                 schema = schema.ConfigureScripts(Scripts);
             }
 
+            if (FieldsInLists == null)
+            {
+                FieldsInLists = new FieldNames(Fields.Where(x => x.Properties.IsListField).Select(x => x.Name).ToArray());
+            }
+
             if (FieldsInLists?.Count > 0)
             {
                 schema = schema.ConfigureFieldsInLists(FieldsInLists);
+            }
+
+            if (FieldsInReferences == null)
+            {
+                FieldsInLists = new FieldNames(Fields.Where(x => x.Properties.IsReferenceField).Select(x => x.Name).ToArray());
             }
 
             if (FieldsInReferences?.Count > 0)
