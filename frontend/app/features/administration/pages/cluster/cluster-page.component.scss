@@ -1,0 +1,9 @@
+@import '_vars';
+@import '_mixins';
+
+iframe {
+    @include absolute(0, 0, 0, 0);
+    min-width: 100%;
+    min-height: 100%;
+    border: 0;
+}

@@ -37,6 +37,11 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
                 result.AddGetLink("admin/users", controller.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
 
+            if (controller.HasPermission(Permissions.AdminOrleans))
+            {
+                result.AddGetLink("admin/orleans", "/orleans");
+            }
+
             result.AddGetLink("languages", controller.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;

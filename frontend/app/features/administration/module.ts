@@ -15,6 +15,7 @@ import {
 
 import {
     AdministrationAreaComponent,
+    ClusterPageComponent,
     EventConsumerComponent,
     EventConsumersPageComponent,
     EventConsumersService,
@@ -40,6 +41,10 @@ const routes: Routes = [
                     {
                         path: 'event-consumers',
                         component: EventConsumersPageComponent
+                    },
+                    {
+                        path: 'cluster',
+                        component: ClusterPageComponent
                     },
                     {
                         path: 'restore',
@@ -75,6 +80,7 @@ const routes: Routes = [
     ],
     declarations: [
         AdministrationAreaComponent,
+        ClusterPageComponent,
         EventConsumerComponent,
         EventConsumersPageComponent,
         RestorePageComponent,
