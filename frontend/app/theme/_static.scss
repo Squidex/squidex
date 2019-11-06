@@ -92,6 +92,16 @@ noscript {
         }
     }
 
+    .card {
+        border-width: 1px;
+    }
+
+    label {
+        .card {
+            font-weight: normal;
+        }
+    }
+
     // External button and icon.
     .external {
         &-button {
