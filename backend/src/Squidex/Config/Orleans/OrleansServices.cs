@@ -70,18 +70,18 @@ namespace Squidex.Config.Orleans
             var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
             var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
 
-            var address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
-
-            builder.ConfigureEndpoints(
-                address,
-                orleansPortSilo,
-                orleansPortGateway,
-                true);
-
             config.ConfigureByOption("orleans:clustering", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
+                    var address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
+
+                    builder.ConfigureEndpoints(
+                        address,
+                        orleansPortSilo,
+                        orleansPortGateway,
+                        true);
+
                     builder.UseMongoDBClustering(options =>
                     {
                         options.Configure(config);
@@ -89,7 +89,7 @@ namespace Squidex.Config.Orleans
                 },
                 ["Development"] = () =>
                 {
-                    builder.UseDevelopmentClustering(new IPEndPoint(address, orleansPortSilo));
+                    builder.UseLocalhostClustering(orleansPortSilo, orleansPortGateway);
                 }
             });
 
