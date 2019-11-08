@@ -210,7 +210,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 this.selectionCount++;
 
                 for (const action in this.nextStatuses) {
-                    if (!content.statusUpdates) {
+                    if (!content.statusUpdates.find(x => x.status === action)) {
                         delete this.nextStatuses[action];
                     }
                 }
