@@ -12,6 +12,6 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The url to download the log.
         /// </summary>
-        public string DownloadUrl { get; set; }
+        public string? DownloadUrl { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// <summary>
         /// The password of the user.
         /// </summary>
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         /// <summary>
         /// Additional permissions for the user.

@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Optional fallback languages.
         /// </summary>
-        public List<Language> Fallback { get; set; }
+        public List<Language>? Fallback { get; set; }
 
         public UpdateLanguage ToCommand(Language language)
         {

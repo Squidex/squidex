@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The asset tags.
         /// </summary>
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string>? Tags { get; set; }
 
         /// <summary>
         /// The size of the file in bytes.

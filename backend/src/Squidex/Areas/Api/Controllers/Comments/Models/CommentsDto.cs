@@ -17,17 +17,17 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// <summary>
         /// The created comments including the updates.
         /// </summary>
-        public CommentDto[] CreatedComments { get; set; }
+        public CommentDto[]? CreatedComments { get; set; }
 
         /// <summary>
         /// The updates comments since the last version.
         /// </summary>
-        public CommentDto[] UpdatedComments { get; set; }
+        public CommentDto[]? UpdatedComments { get; set; }
 
         /// <summary>
         /// The deleted comments since the last version.
         /// </summary>
-        public List<Guid> DeletedComments { get; set; }
+        public List<Guid>? DeletedComments { get; set; }
 
         /// <summary>
         /// The current version.

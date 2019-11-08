@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The id of the referenced schemas.
         /// </summary>
-        public ReadOnlyCollection<Guid> SchemaIds { get; set; }
+        public ReadOnlyCollection<Guid>? SchemaIds { get; set; }
 
         public override FieldProperties ToProperties()
         {

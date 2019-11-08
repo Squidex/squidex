@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public List<Guid> SchemaIds { get; set; }
+        public List<Guid>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.

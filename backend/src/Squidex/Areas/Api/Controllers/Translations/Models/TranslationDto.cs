@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Translations.Models
         /// <summary>
         /// The translated text.
         /// </summary>
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         public static TranslationDto FromTranslation(Translation translation)
         {

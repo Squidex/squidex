@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public IReadOnlyList<Guid> SchemaIds { get; set; }
+        public IReadOnlyList<Guid>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
