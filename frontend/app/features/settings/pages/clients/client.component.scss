@@ -1,8 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-$color-editor: #eceeef;
-
 .card {
     & {
         @include border-radius(0);
@@ -37,12 +35,4 @@ $color-editor: #eceeef;
 
 .cell-input {
     padding-right: 0;
-}
-
-.access-token {
-    height: 10rem;
-    font-size: 1rem;
-    font-weight: normal;
-    font-family: monospace;
-    resize: none;
 }

@@ -127,15 +127,15 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
 
     public transform(userId: string, placeholder: string | null = 'Me') {
         return super.transformInternal(userId, users => {
-            const parts = userId.split(':');
+            const { type, id } = split(userId);
 
-            if (parts[0] === 'subject') {
-                return users.getUser(parts[1], placeholder).pipe(map(u => u.displayName));
+            if (type === 'subject') {
+                return users.getUser(id, placeholder).pipe(map(u => u.displayName));
             } else {
-                if (parts[1].endsWith('client')) {
-                    return of(parts[1]);
+                if (id.endsWith('client')) {
+                    return of(id);
                 } else {
-                    return of(`${parts[1]}-client`);
+                    return of(`${id} client`);
                 }
             }
         });
@@ -201,10 +201,10 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
 
     public transform(userId: string) {
         return super.transformInternal(userId, users => {
-            const parts = userId.split(':');
+            const { type, id } = split(userId);
 
-            if (parts[0] === 'subject') {
-                return users.getUser(parts[1]).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
+            if (type === 'subject') {
+                return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
                 return of('./images/client.png');
             }
@@ -271,4 +271,17 @@ export class FileIconPipe implements PipeTransform {
 
         return `./images/asset_${mimeIcon}.png`;
     }
+}
+
+function split(token: string) {
+    const index = token.indexOf(':');
+
+    if (index > 0 && index < token.length - 1) {
+        const type = token.substr(0, index);
+        const name = token.substr(index + 1);
+
+        return { type, id: name };
+    }
+
+    return { type: token, id: token };
 }
