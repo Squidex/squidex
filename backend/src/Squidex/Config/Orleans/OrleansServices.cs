@@ -14,6 +14,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
+using Orleans.Providers.MongoDB.Utils;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -30,10 +31,12 @@ namespace Squidex.Config.Orleans
         {
             builder.ConfigureServices(siloServices =>
             {
+                siloServices.AddSingleton<IMongoClientFactory, DefaultMongoClientFactory>();
+
                 siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
                 siloServices.AddScoped<IActivationLimit, ActivationLimit>();
 
-                siloServices.AddScoped(typeof(IGrainState<>), typeof(Squidex.Infrastructure.Orleans.GrainState<>));
+                siloServices.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
             });
 
             builder.ConfigureApplicationParts(parts =>
