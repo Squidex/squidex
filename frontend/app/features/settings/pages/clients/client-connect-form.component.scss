@@ -4,6 +4,8 @@
 .breadcrumb {
     & {
         margin-bottom: 2rem;
+        background: none;
+        border: 1px solid $color-border;
     }
 
     &-item {
@@ -11,8 +13,16 @@
             display: none;
         }
 
+        &::before {
+            color: darken($color-border, 10%);
+        }
+
         &-done {
             color: $color-theme-green;
+
+            a {
+                color: $color-theme-green !important;
+            }
 
             i {
                 display: inline-block;

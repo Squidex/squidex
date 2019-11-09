@@ -9,11 +9,20 @@
                 <li class="breadcrumb-item breadcrumb-item-done">
                     <i class="icon-checkmark"></i> Setup client
                 </li>
-                <li class="breadcrumb-item breadcrumb-item-active"
-                    [class.breadcrumb-item-active]="isStart"
-                    [class.breadcrumb-item-done]="!isStart">
-                    <i class="icon-checkmark"></i> Choose connection method
-                </li>
+                <ng-container *ngIf="isStart; else noStart">
+                    <li class="breadcrumb-item breadcrumb-item-active">
+                        <span>
+                            <i class="icon-checkmark"></i> Choose connection method
+                        </span>
+                    </li>
+                </ng-container>
+                <ng-template #noStart>
+                    <li class="breadcrumb-item breadcrumb-item-done">
+                        <a class="force" (click)="go('Start')">
+                            <i class="icon-checkmark"></i> Choose connection method
+                        </a>
+                    </li>
+                </ng-template>
                 <li class="breadcrumb-item"
                     [class.breadcrumb-item-active]="!isStart">
                     <i class="icon-checkmark"></i> Connect
