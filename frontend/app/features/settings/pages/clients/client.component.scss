@@ -3,25 +3,11 @@
 
 .card {
     & {
-        @include border-radius(0);
-        border-bottom-width: 2px;
-        border-top-width: 0;
         margin-bottom: .25rem;
     }
 
-    &-header,
-    &-body {
+    &-header {
         padding: .75rem 1.25rem;
-    }
-}
-
-.client {
-    &-info {
-        margin: 0;
-    }
-
-    &-delete {
-        vertical-align: top;
     }
 }
 

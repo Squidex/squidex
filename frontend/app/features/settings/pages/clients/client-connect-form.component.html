@@ -58,7 +58,7 @@
 
             <ng-container *ngSwitchCase="'HTTP'">
                 <div class="section">
-                    <h5><span class="badge badge-pill badge-dark">a</span> Get a token using curl</h5>
+                    <h5><span class="badge badge-pill badge-dark">1</span> Get a token using curl</h5>
 
                     <p>                 
                         <sqx-code>{{connectHttpText}}</sqx-code>
@@ -66,7 +66,7 @@
                 </div>
                 
                 <div class="section">
-                    <h5><span class="badge badge-pill badge-dark">b</span> Just use the following token</h5>
+                    <h5><span class="badge badge-pill badge-dark">2</span> Just use the following token</h5>
 
                     <p>              
                         <sqx-code>{{connectToken?.accessToken}}</sqx-code>
@@ -74,7 +74,7 @@
                 </div>
                 
                 <div class="section">
-                    <h5><span class="badge badge-pill badge-dark">2</span> Add the token as HTTP header to all requests</h5>
+                    <h5><span class="badge badge-pill badge-dark">3</span> Add the token as HTTP header to all requests</h5>
 
                     <p>              
                         <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>

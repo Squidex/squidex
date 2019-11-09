@@ -2,6 +2,10 @@
 @import '_mixins';
 
 .breadcrumb {
+    & {
+        margin-bottom: 2rem;
+    }
+
     &-item {
         i {
             display: none;
