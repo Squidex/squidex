@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         protected override Schema ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            return serializer.Deserialize<JsonSchemaModel>(reader).ToSchema();
+            return serializer.Deserialize<JsonSchemaModel>(reader)!.ToSchema();
         }
     }
 }

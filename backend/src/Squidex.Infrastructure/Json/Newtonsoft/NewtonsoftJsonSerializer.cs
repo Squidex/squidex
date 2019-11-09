@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         {
             private readonly Func<string, string> stringConverter;
 
-            public override object Value
+            public override object? Value
             {
                 get
                 {
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
                 using (var reader = GetReader(stringConverter, textReader))
                 {
-                    return (T)serializer.Deserialize(reader, actualType);
+                    return (T)serializer.Deserialize(reader, actualType)!;
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
                 using (var reader = GetReader(stringConverter, textReader))
                 {
-                    return (T)serializer.Deserialize(reader, actualType);
+                    return (T)serializer.Deserialize(reader, actualType)!;
                 }
             }
         }

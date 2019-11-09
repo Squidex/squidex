@@ -24,12 +24,12 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public sealed class TodayConverter : JsonConverter
         {
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             {
                 writer.WriteValue("TODAY");
             }
 
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
             {
                 throw new NotSupportedException();
             }
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             serializerSettings.Converters.Add(new TodayConverter());
 
             var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<Instant>>(result, serializerSettings);
+            var output = JsonConvert.DeserializeObject<Tuple<Instant>>(result, serializerSettings)!;
 
             Assert.Equal(value, output.Item1);
         }

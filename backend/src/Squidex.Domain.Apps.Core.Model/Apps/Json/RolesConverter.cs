@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override Roles ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<string, string[]>>(reader);
+            var json = serializer.Deserialize<Dictionary<string, string[]>>(reader)!;
 
             if (json.Count == 0)
             {

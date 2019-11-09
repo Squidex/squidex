@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override LanguagesConfig ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<JsonLanguagesConfig>(reader);
+            var json = serializer.Deserialize<JsonLanguagesConfig>(reader)!;
 
             return json.ToConfig();
         }

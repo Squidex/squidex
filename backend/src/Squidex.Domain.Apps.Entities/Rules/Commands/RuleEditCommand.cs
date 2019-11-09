@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Commands
 
         public RuleAction Action { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

@@ -63,9 +63,16 @@ namespace Squidex.Infrastructure.MongoDb
             bsonWriter.WriteUndefined();
         }
 
-        public override void WriteValue(string value)
+        public override void WriteValue(string? value)
         {
-            bsonWriter.WriteString(value);
+            if (value == null)
+            {
+                bsonWriter.WriteNull();
+            }
+            else
+            {
+                bsonWriter.WriteString(value);
+            }
         }
 
         public override void WriteValue(int value)
@@ -150,9 +157,28 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public override void WriteValue(byte[] value)
+        public override void WriteValue(byte[]? value)
         {
-            bsonWriter.WriteBytes(value);
+            if (value == null)
+            {
+                bsonWriter.WriteNull();
+            }
+            else
+            {
+                bsonWriter.WriteBytes(value);
+            }
+        }
+
+        public override void WriteValue(Uri? value)
+        {
+            if (value == null)
+            {
+                bsonWriter.WriteNull();
+            }
+            else
+            {
+                bsonWriter.WriteString(value.ToString());
+            }
         }
 
         public override void WriteValue(TimeSpan value)
@@ -161,11 +187,6 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         public override void WriteValue(Guid value)
-        {
-            bsonWriter.WriteString(value.ToString());
-        }
-
-        public override void WriteValue(Uri value)
         {
             bsonWriter.WriteString(value.ToString());
         }

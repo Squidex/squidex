@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
         protected override WorkflowTransition ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<JsonWorkflowTransition>(reader);
+            var json = serializer.Deserialize<JsonWorkflowTransition>(reader)!;
 
             return json.ToTransition();
         }

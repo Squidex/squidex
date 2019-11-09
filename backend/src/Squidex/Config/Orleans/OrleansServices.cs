@@ -84,6 +84,8 @@ namespace Squidex.Config.Orleans
 
                     builder.UseMongoDBClustering(options =>
                     {
+                        options.Strategy = MongoDBMembershipStrategy.SingleDocument;
+
                         options.Configure(config);
                     });
                 },
@@ -107,13 +109,9 @@ namespace Squidex.Config.Orleans
 
         private static void Configure(this MongoDBOptions options, IConfiguration config)
         {
-            var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-            var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-
-            options.ConnectionString = mongoConfiguration;
             options.CollectionPrefix = "Orleans_";
 
-            options.DatabaseName = mongoDatabaseName;
+            options.DatabaseName = config.GetRequiredValue("store:mongoDb:database");
         }
 
         private static void Configure(this ClusterOptions options)

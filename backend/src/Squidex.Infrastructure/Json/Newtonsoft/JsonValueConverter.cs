@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             get { return supportedTypes; }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             return ReadJson(reader);
         }
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                             switch (reader.TokenType)
                             {
                                 case JsonToken.PropertyName:
-                                    var propertyName = reader.Value.ToString()!;
+                                    var propertyName = reader.Value!.ToString()!;
 
                                     if (!reader.Read())
                                     {
@@ -97,15 +97,15 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     }
 
                 case JsonToken.Integer:
-                    return JsonValue.Create((long)reader.Value);
+                    return JsonValue.Create((long)reader.Value!);
                 case JsonToken.Float:
-                    return JsonValue.Create((double)reader.Value);
+                    return JsonValue.Create((double)reader.Value!);
                 case JsonToken.Boolean:
-                    return JsonValue.Create((bool)reader.Value);
+                    return JsonValue.Create((bool)reader.Value!);
                 case JsonToken.Date:
-                    return JsonValue.Create(((DateTime)reader.Value).ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
+                    return JsonValue.Create(((DateTime)reader.Value!).ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
                 case JsonToken.String:
-                    return JsonValue.Create(reader.Value.ToString());
+                    return JsonValue.Create(reader.Value!.ToString());
                 case JsonToken.Null:
                 case JsonToken.Undefined:
                     return JsonValue.Null;
@@ -114,7 +114,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value == null)
             {
