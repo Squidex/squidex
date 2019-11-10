@@ -33,6 +33,8 @@ interface Snapshot {
     isMapHidden?: boolean;
 }
 
+type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
+
 @Component({
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
@@ -101,7 +103,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
         }
 
         if (this.marker || (!this.marker && this.map && this.value)) {
-            this.updateMarker(true, false);
+            this.updateMarker({ reset: !this.marker });
         }
     }
 
@@ -124,8 +126,8 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
     private setDisabledStateOSM(isDisabled: boolean): void {
         const update: (t: any) => any =
             isDisabled ?
-            x => x.enable() :
-            x => x.disable();
+            x => x.disable() :
+            x => x.enable();
 
         if (this.map) {
             update(this.map.zoomControl);
@@ -159,7 +161,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
         this.updateValue(lat, lng);
 
         if (lat && lng) {
-            this.updateMarker(true, true);
+            this.updateMarker({ pan: true, fire: true });
         } else {
             this.callChange(this.value);
             this.callTouched();
@@ -177,9 +179,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
     private ngAfterViewInitOSM() {
         this.searchBoxInput.nativeElement.remove();
 
+        this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.css');
         this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css');
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js').then(
-            () => {
+
+        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js')
+            .then(() => {
                 this.map = L.map(this.editor.nativeElement).fitWorld();
 
                 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
@@ -187,17 +191,32 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(this.map);
 
-                this.map.on('click',
-                    (event: any) => {
-                        if (!this.marker && !this.snapshot.isDisabled) {
-                            const latlng = event.latlng.wrap();
+                this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.js')
+                    .then(() => {
+                        L.Control.geocoder({
+                            defaultMarkGeocode: false
+                        })
+                        .on('markgeocode', (event: any) => {
+                            const center = event.geocode.center;
 
-                            this.updateValue(latlng.lat, latlng.lng);
-                            this.updateMarker(false, true);
-                        }
+                            if (!this.snapshot.isDisabled) {
+                                this.updateValue(center.lat, center.lng);
+                                this.updateMarker({ reset: true, fire: true });
+                            }
+                          })
+                          .addTo(this.map);
                     });
 
-                this.updateMarker(true, false);
+                this.map.on('click', (event: any) => {
+                    if (!this.snapshot.isDisabled) {
+                        const latlng = event.latlng.wrap();
+
+                        this.updateValue(latlng.lat, latlng.lng);
+                        this.updateMarker({ fire: true });
+                    }
+                });
+
+                this.updateMarker({ reset: true });
 
                 if (this.snapshot.isDisabled) {
                     this.map.zoomControl.disable();
@@ -210,25 +229,28 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
     }
 
     private ngAfterViewInitGoogle(apiKey: string) {
-        this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`).then(
-            () => {
+        this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`)
+            .then(() => {
                 this.map = new google.maps.Map(this.editor.nativeElement,
                     {
                         zoom: 1,
+                        fullscreenControl: false,
                         mapTypeControl: false,
+                        mapTypeControlOptions: {},
                         streetViewControl: false,
                         center: { lat: 0, lng: 0 }
                     });
 
                 const searchBox = new google.maps.places.SearchBox(this.searchBoxInput.nativeElement);
 
-                this.map.addListener('click',
-                    (event: any) => {
-                        if (!this.snapshot.isDisabled) {
-                            this.updateValue(event.latLng.lat(), event.latLng.lng());
-                            this.updateMarker(false, true);
-                        }
-                    });
+                this.map.addListener('click', (event: any) => {
+                    if (!this.snapshot.isDisabled) {
+                        const latlng = event.latLng;
+
+                        this.updateValue(latlng.lat(), latlng.lng());
+                        this.updateMarker({ fire: true });
+                    }
+                });
 
                 this.map.addListener('bounds_changed', () => {
                     searchBox.setBounds(this.map.getBounds());
@@ -249,12 +271,12 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                             const lng = place.geometry.location.lng();
 
                             this.updateValue(lat, lng);
-                            this.updateMarker(false, true);
+                            this.updateMarker({ pan: true, fire: true });
                         }
                     }
                 });
 
-                this.updateMarker(true, false);
+                this.updateMarker({ reset: true });
 
                 if (this.snapshot.isDisabled) {
                     this.map.setOptions({ draggable: false, zoomControl: false });
@@ -264,20 +286,21 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
 
     public reset() {
         this.value = null;
-        this.searchBoxInput.nativeElement.value = '';
 
-        this.updateMarker(true, true);
+        this.updateMarker({ fire: true });
     }
 
-    private updateValue(lat: number, lng: number) {
-        this.value = { latitude: lat, longitude: lng };
+    private updateValue(latitude: number, longitude: number) {
+        this.value = { latitude, longitude };
+
+        this.detectChanges();
     }
 
-    private updateMarker(zoom: boolean, fireEvent: boolean) {
+    private updateMarker(opts?: UpdateOptions) {
         if (!this.isGoogleMaps) {
-            this.updateMarkerOSM(zoom);
+            this.updateMarkerOSM(opts);
         } else {
-            this.updateMarkerGoogle(zoom);
+            this.updateMarkerGoogle(opts);
         }
 
         if (this.value) {
@@ -286,25 +309,22 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
             this.geolocationForm.reset(undefined, { emitEvent: true, onlySelf: false });
         }
 
-        if (fireEvent) {
+        if (opts && opts.fire) {
             this.callChange(this.value);
             this.callTouched();
         }
     }
 
-    private updateMarkerOSM(zoom: boolean) {
+    private updateMarkerOSM(opts?: UpdateOptions) {
         if (this.value) {
             if (!this.marker) {
                 this.marker = L.marker([0, 90], { draggable: true }).addTo(this.map);
 
-                this.marker.on('drag', (event: any) => {
-                    const latlng = event.latlng.wrap();
+                this.marker.on('dragend', (event: any) => {
+                    const latlng = event.target.getLatLng().wrap();
 
                     this.updateValue(latlng.lat, latlng.lng);
-                });
-
-                this.marker.on('dragend', () => {
-                    this.updateMarker(false, true);
+                    this.updateMarker({ fire: true });
                 });
 
                 if (this.snapshot.isDisabled) {
@@ -314,9 +334,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
 
             const latLng = L.latLng(this.value.latitude, this.value.longitude);
 
-            if (zoom) {
-                this.map.setView(latLng, 8);
-            } else {
+            if (opts && opts.reset) {
+                this.map.setView(latLng, 15);
+            } else if (opts && opts.pan) {
                 this.map.panTo(latLng);
             }
 
@@ -326,12 +346,10 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                 this.marker.removeFrom(this.map);
                 this.marker = null;
             }
-
-            this.map.fitWorld();
         }
     }
 
-    private updateMarkerGoogle(zoom: boolean) {
+    private updateMarkerGoogle(opts?: UpdateOptions) {
         if (this.value) {
             if (!this.marker) {
                 this.marker =  new google.maps.Marker({
@@ -343,36 +361,31 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                     draggable: true
                 });
 
-                this.marker.addListener('drag', (event: any) => {
-                    if (!this.snapshot.isDisabled) {
-                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
-                    }
-                });
                 this.marker.addListener('dragend', (event: any) => {
                     if (!this.snapshot.isDisabled) {
-                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
-                        this.updateMarker(false, true);
+                        const latlng = event.latLng;
+
+                        this.updateValue(latlng.lat(), latlng.lng());
+                        this.updateMarker({ fire: true });
                     }
                 });
             }
 
-            const latLng = { lat: this.value.latitude, lng: this.value.longitude };
+            const latLng = new google.maps.LatLng(this.value.latitude, this.value.longitude);
 
-            if (zoom) {
+            if (opts && opts.reset) {
+                this.map.setZoom(12);
                 this.map.setCenter(latLng);
-            } else {
-                this.map.panTo(latLng);
+            } else if (opts && opts.pan) {
+                this.map.setCenter(latLng);
             }
 
             this.marker.setPosition(latLng);
-            this.map.setZoom(12);
         } else {
             if (this.marker) {
                 this.marker.setMap(null);
                 this.marker = null;
             }
-
-            this.map.setCenter({ lat: 0, lng: 0 });
         }
     }
 }
