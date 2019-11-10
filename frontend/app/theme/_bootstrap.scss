@@ -236,8 +236,8 @@ a {
             }
 
             &.done {
-                color: $color-theme-green;
-    
+                color: $color-theme-green !important;
+
                 a {
                     color: $color-theme-green !important;
                 }
