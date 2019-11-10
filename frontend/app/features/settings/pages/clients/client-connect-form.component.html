@@ -5,26 +5,25 @@
 
     <ng-container content>
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item breadcrumb-item-done">
+            <ol class="breadcrumb steps">
+                <li class="breadcrumb-item done">
                     <i class="icon-checkmark"></i> Setup client
                 </li>
                 <ng-container *ngIf="isStart; else noStart">
-                    <li class="breadcrumb-item breadcrumb-item-active">
+                    <li class="breadcrumb-item active">
                         <span>
                             <i class="icon-checkmark"></i> Choose connection method
                         </span>
                     </li>
                 </ng-container>
                 <ng-template #noStart>
-                    <li class="breadcrumb-item breadcrumb-item-done">
+                    <li class="breadcrumb-item done">
                         <a class="force" (click)="go('Start')">
                             <i class="icon-checkmark"></i> Choose connection method
                         </a>
                     </li>
                 </ng-template>
-                <li class="breadcrumb-item"
-                    [class.breadcrumb-item-active]="!isStart">
+                <li class="breadcrumb-item" [class.active]="!isStart">
                     <i class="icon-checkmark"></i> Connect
                 </li>
             </ol>

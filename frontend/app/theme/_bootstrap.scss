@@ -198,6 +198,84 @@ a {
     }
 }
 
+//
+// Breadcrump
+//
+.breadcrumb {
+    & {
+        margin-bottom: 2rem;
+        background: none;
+        border: 1px solid $color-border;
+    }
+
+    &.steps {
+        & {
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            & {
+                padding: .75rem 2rem .75rem 1rem;
+                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+                background-position-x: right;
+                background-repeat: no-repeat;
+                background-size: contain;
+                color: $color-text-decent;
+
+                a {
+                    color: $color-text-decent !important;
+                }
+            }
+
+            &.active {
+                color: $color-text;
+
+                a {
+                    color: $color-text !important;
+                }
+            }
+
+            &.done {
+                color: $color-theme-green;
+    
+                a {
+                    color: $color-theme-green !important;
+                }
+            }
+
+            &:last-child {
+                background: none;
+            }
+
+            &::before {
+                content: none;
+            }
+        }
+    }
+
+    &-item {
+        i {
+            display: none;
+        }
+
+        &::before {
+            color: darken($color-border, 10%);
+        }
+
+        &.done {
+            color: $color-theme-green;
+
+            a {
+                color: $color-theme-green !important;
+            }
+
+            i {
+                display: inline-block;
+            }
+        }
+    }
+}
+
 .dropdown-divider {
     &:first-child {
         display: none;
