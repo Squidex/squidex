@@ -369,6 +369,105 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_multiple_flat_contents_when_querying_contents()
+        {
+            const string query = @"
+                query {
+                  queryMySchemaContents(top: 30, skip: 5) {
+                    id
+                    version
+                    created
+                    createdBy
+                    lastModified
+                    lastModifiedBy
+                    status
+                    statusColor
+                    url
+                    flatData {
+                      myString
+                      myNumber
+                      myBoolean
+                      myDatetime
+                      myJson
+                      myGeolocation
+                      myTags
+                      myLocalized
+                      myArray {
+                        nestedNumber
+                        nestedBoolean
+                      }
+                    }
+                  }
+                }";
+
+            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+                .Returns(ResultList.CreateFrom(0, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    queryMySchemaContents = new dynamic[]
+                    {
+                        new
+                        {
+                            id = content.Id,
+                            version = 1,
+                            created = content.Created,
+                            createdBy = "subject:user1",
+                            lastModified = content.LastModified,
+                            lastModifiedBy = "subject:user2",
+                            status = "DRAFT",
+                            statusColor = "red",
+                            url = $"contents/my-schema/{content.Id}",
+                            flatData = new
+                            {
+                                myString = "value",
+                                myNumber = 1,
+                                myBoolean = true,
+                                myDatetime = content.LastModified,
+                                myJson = new
+                                {
+                                    value = 1
+                                },
+                                myGeolocation = new
+                                {
+                                    latitude = 10,
+                                    longitude = 20
+                                },
+                                myTags = new[]
+                                {
+                                    "tag1",
+                                    "tag2"
+                                },
+                                myLocalized = "de-DE",
+                                myArray = new[]
+                                {
+                                    new
+                                    {
+                                        nestedNumber = 10,
+                                        nestedBoolean = true
+                                    },
+                                    new
+                                    {
+                                        nestedNumber = 20,
+                                        nestedBoolean = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_return_multiple_contents_when_querying_contents()
         {
             const string query = @"

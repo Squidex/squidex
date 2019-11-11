@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IAssetQueryService assetQuery;
         private readonly Context context;
 
+        public Context Context
+        {
+            get { return context; }
+        }
+
         public QueryExecutionContext(Context context, IAssetQueryService assetQuery, IContentQueryService contentQuery)
         {
             Guard.NotNull(assetQuery);
