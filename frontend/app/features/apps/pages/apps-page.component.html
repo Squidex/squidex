@@ -111,7 +111,7 @@
     </div>
 </div>
 
-<div class="info">asdsadd</div>
+<div *ngIf="info" class="info">{{info}}</div>
 
 <ng-container *sqxModal="addAppDialog">
     <sqx-app-form [template]="addAppTemplate"
