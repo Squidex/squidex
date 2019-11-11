@@ -7,71 +7,75 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public static class ContentConverterFlat
     {
-        public static object ToFlatLanguageModel(this NamedContentData content, LanguagesConfig languagesConfig, IReadOnlyCollection<Language>? languagePreferences = null)
-        {
-            Guard.NotNull(languagesConfig);
-
-            if (languagePreferences == null || languagePreferences.Count == 0)
-            {
-                return content;
-            }
-
-            if (languagePreferences.Count == 1 && languagesConfig.TryGetConfig(languagePreferences.First(), out var languageConfig))
-            {
-                languagePreferences = languagePreferences.Union(languageConfig.LanguageFallbacks).ToList();
-            }
-
-            var result = new Dictionary<string, IJsonValue>();
-
-            foreach (var fieldValue in content)
-            {
-                var fieldData = fieldValue.Value;
-
-                if (fieldData != null)
-                {
-                    foreach (var language in languagePreferences)
-                    {
-                        if (fieldData.TryGetValue(language, out var value) && value.Type != JsonValueType.Null)
-                        {
-                            result[fieldValue.Key] = value;
-
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return result;
-        }
-
         public static Dictionary<string, object?> ToFlatten(this NamedContentData content)
         {
             var result = new Dictionary<string, object?>();
 
             foreach (var fieldValue in content)
             {
-                var fieldData = fieldValue.Value;
-
-                if (fieldData?.Count == 1)
-                {
-                    result[fieldValue.Key] = fieldData.Values.First();
-                }
-                else
-                {
-                    result[fieldValue.Key] = fieldData;
-                }
+                result[fieldValue.Key] = GetFirst(fieldValue.Value);
             }
 
             return result;
+        }
+
+        public static FlatContentData ToFlatten(this NamedContentData content, string fallback)
+        {
+            var result = new FlatContentData();
+
+            foreach (var fieldValue in content)
+            {
+                result[fieldValue.Key] = GetFirst(fieldValue.Value, fallback);
+            }
+
+            return result;
+        }
+
+        private static object? GetFirst(ContentFieldData? fieldData)
+        {
+            if (fieldData == null)
+            {
+                return null;
+            }
+
+            if (fieldData.Count == 1)
+            {
+                return fieldData.Values.First();
+            }
+
+            return fieldData;
+        }
+
+        private static IJsonValue? GetFirst(ContentFieldData? fieldData, string fallback)
+        {
+            if (fieldData == null)
+            {
+                return null;
+            }
+
+            if (fieldData.Count == 1)
+            {
+                return fieldData.Values.First();
+            }
+
+            if (fieldData.TryGetValue(fallback, out var value))
+            {
+                return value;
+            }
+
+            if (fieldData.Count > 1)
+            {
+                return fieldData.Values.First();
+            }
+
+            return null;
         }
     }
 }

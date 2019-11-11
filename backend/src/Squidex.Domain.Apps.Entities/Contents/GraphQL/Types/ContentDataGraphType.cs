@@ -62,14 +62,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
             }
 
-            Description = $"The structure of the {schemaName} content type.";
+            Description = $"The structure of the {schemaName} data type.";
         }
 
         private static FuncFieldResolver<object?> PartitionResolver(ValueResolver valueResolver, string key)
         {
             return new FuncFieldResolver<object?>(c =>
             {
-                if (((ContentFieldData)c.Source).TryGetValue(key, out var value) && value != null)
+                var source = (ContentFieldData)c.Source;
+
+                if (source.TryGetValue(key, out var value) && value != null)
                 {
                     return valueResolver(value, c);
                 }

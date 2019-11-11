@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Domain.Apps.Core.Contents
 {
-    public static class ConfigurationExtensions
+    public sealed class FlatContentData : Dictionary<string, IJsonValue?>
     {
-        public static void ConfigureForSquidex(this IConfigurationBuilder builder)
-        {
-            builder.AddJsonFile($"appsettings.Custom.json", true);
-        }
     }
 }

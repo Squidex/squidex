@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -134,11 +136,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Description = $"The draft data of the {schemaName} content."
                 });
             }
+
+            var contentDataTypeFlat = new ContentDataFlatGraphType(schema, schemaName, schemaType, model);
+
+            if (contentDataTypeFlat.Fields.Any())
+            {
+                AddField(new FieldType
+                {
+                    Name = "flatData",
+                    ResolvedType = new NonNullGraphType(contentDataTypeFlat),
+                    Resolver = ResolveFlat(x => x.Data),
+                    Description = $"The flat data of the {schemaName} content."
+                });
+
+                AddField(new FieldType
+                {
+                    Name = "flatDataDraft",
+                    ResolvedType = contentDataTypeFlat,
+                    Resolver = ResolveFlat(x => x.DataDraft),
+                    Description = $"The flat draft data of the {schemaName} content."
+                });
+            }
         }
 
         private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object?> action)
         {
             return new FuncFieldResolver<IEnrichedContentEntity, object?>(c => action(c.Source));
+        }
+
+        private static IFieldResolver ResolveFlat(Func<IEnrichedContentEntity, NamedContentData?> action)
+        {
+            return new FuncFieldResolver<IEnrichedContentEntity, FlatContentData?>(c =>
+            {
+                var context = (GraphQLExecutionContext)c.UserContext;
+
+                return action(c.Source)?.ToFlatten(context.Context.App.LanguagesConfig.Master.Language);
+            });
         }
     }
 }
