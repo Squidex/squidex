@@ -6,26 +6,17 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map } from 'rxjs/operators';
 
-import {
-    Form,
-    ValidatorsEx,
-    value$
-} from '@app/framework';
-
-const FALLBACK_NAME = 'my-app';
+import { Form, ValidatorsEx } from '@app/framework';
 
 export class CreateAppForm extends Form<FormGroup, { name: string }> {
-    public appName = value$(this.form.controls['name']).pipe(map(v => v || FALLBACK_NAME));
-
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes between.')
                 ]
             ]
         }));
@@ -35,7 +26,11 @@ export class CreateAppForm extends Form<FormGroup, { name: string }> {
 export class UpdateAppForm extends Form<FormGroup, { label?: string, description?: string }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            label: '',
+            label: ['',
+                [
+                    Validators.maxLength(40)
+                ]
+            ],
             description: ''
         }));
     }
