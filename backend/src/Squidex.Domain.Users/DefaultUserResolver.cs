@@ -29,6 +29,8 @@ namespace Squidex.Domain.Users
 
         public async Task<bool> CreateUserIfNotExists(string email, bool invited)
         {
+            Guard.NotNullOrEmpty(email);
+
             using (var scope = serviceProvider.CreateScope())
             {
                 var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
@@ -58,6 +60,8 @@ namespace Squidex.Domain.Users
 
         public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail)
         {
+            Guard.NotNullOrEmpty(idOrEmail);
+
             using (var scope = serviceProvider.CreateScope())
             {
                 var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
@@ -76,6 +80,8 @@ namespace Squidex.Domain.Users
 
         public async Task<List<IUser>> QueryByEmailAsync(string email)
         {
+            Guard.NotNullOrEmpty(email);
+
             using (var scope = serviceProvider.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
@@ -88,9 +94,14 @@ namespace Squidex.Domain.Users
 
         public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
         {
+            Guard.NotNull(ids);
+
             using (var scope = serviceProvider.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+
+                ids = ids.Where(x => userFactory.IsId(x)).ToArray();
 
                 var result = await userManager.QueryByIdsAync(ids);
 
