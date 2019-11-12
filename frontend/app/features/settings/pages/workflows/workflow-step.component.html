@@ -45,7 +45,7 @@
         </sqx-workflow-transition>
 
         <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
-            <div class="col-auto">
+            <div class="col col-arrow">
                 <i class="icon-corner-down-right text-decent"></i>
             </div>
             <div class="col col-step">
@@ -62,9 +62,10 @@
             </div>
         </div>
 
-        <div class="row transition-prevent-updates no-guttersw">
-            <div class="col col-step" style="max-width: 12rem">
-                <div class="form-check">
+        <div class="row transition-prevent-updates no-gutters">
+            <div class="col col-arrow"></div>
+            <div class="col col-step">
+                <div class="form-check float-right">
                     <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
                         [disabled]="disabled"
                         [ngModel]="step.noUpdate"
@@ -90,8 +91,7 @@
                 <div class="col-auto col-label">
                     <span class="text-decent">for</span>
                 </div>
-
-                <div class="col col-step-role">
+                <div class="col col-roles">
                     <sqx-tag-editor [allowDuplicates]="false"
                         [dashed]="true"
                         [disabled]="disabled"
@@ -103,10 +103,8 @@
                         placeholder="Role">
                     </sqx-tag-editor>
                 </div>
+                <div class="col col-button"></div>
             </ng-container>
         </div>
-    </div>
-    <div class="col-auto col-div-line">
-        <hr class="col-line"/>
     </div>
 </div>

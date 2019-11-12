@@ -11,12 +11,12 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public static readonly WorkflowTransition Always = new WorkflowTransition(null, null);
 
-        public WorkflowTransition(string expression, params string[] roles)
+        public WorkflowTransition(string? expression, params string[]? roles)
             : base(expression, roles)
         {
         }
 
-        public static WorkflowTransition When(string expression, params string[] roles)
+        public static WorkflowTransition When(string? expression, params string[]? roles)
         {
             return new WorkflowTransition(expression, roles);
         }

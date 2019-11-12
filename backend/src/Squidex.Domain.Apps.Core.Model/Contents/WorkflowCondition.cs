@@ -12,11 +12,11 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public abstract class WorkflowCondition
     {
-        public string Expression { get; }
+        public string? Expression { get; }
 
-        public ReadOnlyCollection<string> Roles { get; }
+        public ReadOnlyCollection<string>? Roles { get; }
 
-        protected WorkflowCondition(string expression, params string[] roles)
+        protected WorkflowCondition(string? expression, params string[]? roles)
         {
             Expression = expression;
 

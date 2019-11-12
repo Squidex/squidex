@@ -11,12 +11,12 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public static readonly NoUpdate Always = new NoUpdate(null, null);
 
-        public NoUpdate(string expression, params string[] roles)
+        public NoUpdate(string? expression, params string[]? roles)
             : base(expression, roles)
         {
         }
 
-        public static NoUpdate When(string expression, params string[] roles)
+        public static NoUpdate When(string? expression, params string[]? roles)
         {
             return new NoUpdate(expression, roles);
         }

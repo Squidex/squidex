@@ -15,20 +15,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The optional expression.
         /// </summary>
-        public string Expression { get; set; }
+        public string? Expression { get; set; }
 
         /// <summary>
         /// The optional restricted role.
         /// </summary>
-        public string[] Roles { get; set; }
+        public string[]? Roles { get; set; }
 
         public static WorkflowTransitionDto FromWorkflowTransition(WorkflowTransition transition)
         {
-            if (transition == null)
-            {
-                return null;
-            }
-
             return new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
         }
 

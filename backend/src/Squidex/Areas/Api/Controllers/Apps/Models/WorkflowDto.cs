@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
-                    x => WorkflowStepDto.FromWorkflowStep(x.Value)!),
+                    x => WorkflowStepDto.FromWorkflowStep(x.Value)),
                 Id = id
             });
 

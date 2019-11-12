@@ -35,20 +35,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Optional expression that must evaluate to true when you want to prevent updates.
         /// </summary>
-        public string NoUpdateExpression { get; set; }
+        public string? NoUpdateExpression { get; set; }
 
         /// <summary>
         /// Optional list of roles to restrict the updates for users with these roles.
         /// </summary>
-        public string[] NoUpdateRoles { get; set; }
+        public string[]? NoUpdateRoles { get; set; }
 
-        public static WorkflowStepDto? FromWorkflowStep(WorkflowStep step)
+        public static WorkflowStepDto FromWorkflowStep(WorkflowStep step)
         {
-            if (step == null)
-            {
-                return null;
-            }
-
             var response = SimpleMapper.Map(step, new WorkflowStepDto
             {
                 Transitions = step.Transitions.ToDictionary(
