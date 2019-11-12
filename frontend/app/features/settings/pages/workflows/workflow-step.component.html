@@ -64,16 +64,16 @@
 
         <div class="row transition-prevent-updates no-guttersw">
             <div class="col col-step" style="max-width: 12rem">
-        <div class="form-check">
-                    <input class="form-check-input" style="margin-top: 0.8rem;" type="checkbox" id="preventUpdates_{{step.name}}"
-                [disabled]="disabled"
-                [ngModel]="step.noUpdate"
-                (ngModelChange)="changeNoUpdate($event)" />
+                <div class="form-check">
+                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
+                        [disabled]="disabled"
+                        [ngModel]="step.noUpdate"
+                        (ngModelChange)="changeNoUpdate($event)" />
 
-            <label class="form-check-label" for="preventUpdates_{{step.name}}">
-                Prevent updates
-            </label>
-    </div>
+                    <label class="form-check-label" for="preventUpdates_{{step.name}}">
+                        Prevent updates
+                    </label>
+                </div>
             </div>
             <ng-container *ngIf="step.noUpdate">
                 <div class="col-auto col-label">
@@ -81,11 +81,11 @@
                 </div>
                 <div class="col col-step-expression">
                     <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false"
-                           [disabled]="disabled"
-                           [ngModelOptions]="onBlur"
-                           [ngModel]="step.noUpdateExpression"
-                           (ngModelChange)="changeNoUpdateExpression($event)"
-                           placeholder="Expression" />
+                        [disabled]="disabled"
+                        [ngModelOptions]="onBlur"
+                        [ngModel]="step.noUpdateExpression"
+                        (ngModelChange)="changeNoUpdateExpression($event)"
+                        placeholder="Expression" />
                 </div>
                 <div class="col-auto col-label">
                     <span class="text-decent">for</span>
@@ -93,14 +93,14 @@
 
                 <div class="col col-step-role">
                     <sqx-tag-editor [allowDuplicates]="false"
-                                    [dashed]="true"
-                                    [disabled]="disabled"
-                                    (ngModelChange)="changeNoUpdateRoles($event)"
-                                    [ngModel]="step.noUpdateRoles"
-                                    [ngModelOptions]="onBlur"
-                                    [singleLine]="true"
-                                    [suggestions]="roles"
-                                    placeholder="Role">
+                        [dashed]="true"
+                        [disabled]="disabled"
+                        (ngModelChange)="changeNoUpdateRoles($event)"
+                        [ngModel]="step.noUpdateRoles"
+                        [ngModelOptions]="onBlur"
+                        [singleLine]="true"
+                        [suggestions]="roles"
+                        placeholder="Role">
                     </sqx-tag-editor>
                 </div>
             </ng-container>
