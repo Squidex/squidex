@@ -476,8 +476,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         }
                     }
                 },
-                FieldsInLists = new FieldNames("field1"),
-                FieldsInReferences = new FieldNames("field1"),
+                FieldsInLists = new FieldNames("field1", "meta.id"),
+                FieldsInReferences = new FieldNames("field1", "meta.id"),
                 Name = "new-schema"
             };
 
@@ -533,8 +533,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames("field1"),
-                FieldsInReferences = new FieldNames("field2")
+                FieldsInLists = new FieldNames("field1", "meta.id"),
+                FieldsInReferences = new FieldNames("field2", "meta.id")
             };
 
             GuardSchema.CanConfigureUIFields(schema_0, command);

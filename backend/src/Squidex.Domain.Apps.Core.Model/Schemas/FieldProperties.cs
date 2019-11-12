@@ -5,19 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementPropertiesBase
     {
-        [Obsolete]
-        public bool IsListField { get; set; }
-
-        [Obsolete]
-        public bool IsReferenceField { get; set; }
-
         public bool IsRequired { get; set; }
 
         public string? Placeholder { get; set; }

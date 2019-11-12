@@ -57,8 +57,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     public selectionCount = 0;
     public selectedAll = false;
 
-    public minWidth: string;
-
     constructor(
         public readonly contentsState: ManualContentsState,
         public readonly schemasState: SchemasState,
@@ -94,8 +92,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
             .subscribe(schema => {
                 if (schema) {
                     this.schema = schema;
-
-                    this.minWidth = `${200 + (200 * schema.referenceFields.length)}px`;
 
                     this.contentsState.schema = schema;
                     this.contentsState.load();

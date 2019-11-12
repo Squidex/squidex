@@ -50,8 +50,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public queryModel: QueryModel;
     public queries: Queries;
 
-    public minWidth: string;
-
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
@@ -71,8 +69,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.resetSelection();
 
                     this.schema = schema;
-
-                    this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
 

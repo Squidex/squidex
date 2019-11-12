@@ -53,31 +53,15 @@
             </button>
         </td>
     </ng-container>
-    
-    <td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
-        <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
-    </td>
-    
-    <td class="cell-auto cell-content" *ngFor="let field of schemaFields; let i = index; trackBy: trackByFieldFn" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
-        <ng-container *ngIf="field.isInlineEditable && patchAllowed; else displayTemplate">
-            <sqx-content-value-editor [form]="patchForm.form" [field]="field"></sqx-content-value-editor>
-        </ng-container>
-    
-        <ng-template #displayTemplate>
-            <sqx-content-value [value]="values[i]"></sqx-content-value>
-        </ng-template>
-    </td>
-    
-    <td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty">
-        <sqx-content-status 
-            [status]="content.status"
-            [statusColor]="content.statusColor"
-            [scheduledTo]="content.scheduleJob?.status"
-            [scheduledAt]="content.scheduleJob?.dueTime"
-            [isPending]="content.isPending">
-        </sqx-content-status>
-        
-        <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
+
+    <td *ngFor="let field of schema.listFields" [sqxContentListCell]="field">
+        <sqx-content-list-field
+            [field]="field"
+            [patchForm]="patchForm.form"
+            [patchAllowed]="patchAllowed"
+            [content]="content"
+            [language]="language">
+        </sqx-content-list-field>
     </td>
 </tr>
 <tr class="spacer"></tr>

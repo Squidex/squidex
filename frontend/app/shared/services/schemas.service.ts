@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+ // tslint:disable: readonly-array
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -34,6 +36,19 @@ export type SchemasDto = {
 } & Resource;
 
 type FieldNames = ReadonlyArray<string>;
+
+export const MetaFields = {
+    id: 'meta.id',
+    created: 'meta.created',
+    createdByAvatar: 'meta.createdBy.avatar',
+    createdByName: 'meta.createdBy.name',
+    lastModified: 'meta.lastModified',
+    lastModifiedByAvatar: 'meta.lastModifiedBy.avatar',
+    lastModifiedByName: 'meta.lastModifiedBy.name',
+    status: 'meta.status',
+    statusColor: 'meta.status.color',
+    version: 'meta.version'
+};
 
 export class SchemaDto {
     public readonly _links: ResourceLinks;
@@ -87,9 +102,9 @@ export class SchemaDto {
 
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
-    public readonly listFields: ReadonlyArray<RootFieldDto>;
+    public readonly listFields: ReadonlyArray<RootFieldDto | string>;
     public readonly listFieldsEditable: ReadonlyArray<RootFieldDto>;
-    public readonly referenceFields: ReadonlyArray<RootFieldDto>;
+    public readonly referenceFields: ReadonlyArray<RootFieldDto | string>;
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
@@ -111,22 +126,28 @@ export class SchemaDetailsDto extends SchemaDto {
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField);
 
-            this.listFields = findFields(fieldsInLists, this.contentFields);
+            const listFields = findFields(fieldsInLists, this.contentFields);
 
-            if (this.listFields.length === 0 && this.fields.length > 0) {
-                this.listFields = [this.fields[0]];
+            if (listFields.length === 0) {
+                listFields.push(MetaFields.lastModifiedByAvatar);
+
+                if (fields.length > 0) {
+                    listFields.push(this.fields[0]);
+                } else {
+                    listFields.push('');
+                }
+
+                listFields.push(MetaFields.statusColor);
+                listFields.push(MetaFields.lastModified);
             }
 
-            if (this.listFields.length === 0) {
-                this.listFields = NONE_FIELDS;
-            }
-
-            this.listFieldsEditable = this.listFields.filter(x => x.isInlineEditable);
+            this.listFields = listFields;
+            this.listFieldsEditable = <any>this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable);
 
             this.referenceFields = findFields(fieldsInReferences, this.contentFields);
 
             if (this.referenceFields.length === 0) {
-                this.referenceFields = this.listFields;
+                this.referenceFields = <any>this.listFields;
             }
         }
     }
@@ -179,8 +200,22 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 }
 
-function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>) {
-    return names.map(x => fields.find(f => f.name === x)!).filter(x => !!x);
+function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): (RootFieldDto | string)[] {
+    let result: (RootFieldDto | string)[] = [];
+
+    for (let name of names) {
+        if (name.startsWith('meta.')) {
+            result.push(name);
+        } else {
+            const field = fields.find(x => x.name === name);
+
+            if (field) {
+                result.push(field);
+            }
+        }
+    }
+
+    return result;
 }
 
 export class FieldDto {
@@ -257,9 +292,6 @@ export class RootFieldDto extends FieldDto {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
 }
-
-const NONE_FIELD = new RootFieldDto({}, -1, '', createProperties('String'), 'invariant');
-const NONE_FIELDS: ReadonlyArray<any> = [NONE_FIELD];
 
 export class NestedFieldDto extends FieldDto {
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,

@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
     ContentDto,
-    getContentValue,
     LanguageDto,
-    RootFieldDto
+    SchemaDetailsDto
 } from '@app/shared';
 
 /* tslint:disable:component-selector */
@@ -27,31 +26,15 @@ import {
                     (ngModelChange)="emitSelectedChange($event)" />
             </td>
 
-            <td class="cell-user">
-                <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
-            </td>
-
-            <td class="cell-auto cell-content" *ngFor="let value of values">
-                <sqx-content-value [value]="value"></sqx-content-value>
-            </td>
-
-            <td class="cell-time">
-                <sqx-content-status
-                    [status]="content.status"
-                    [statusColor]="content.statusColor"
-                    [scheduledTo]="content.scheduleJob?.status"
-                    [scheduledAt]="content.scheduleJob?.dueTime"
-                    [isPending]="content.isPending">
-                </sqx-content-status>
-
-                <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
+            <td *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
+                <sqx-content-list-field [field]="field" [content]="content" [language]="language"></sqx-content-list-field>
             </td>
         </tr>
         <tr class="spacer"></tr>
         `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentSelectorItemComponent implements OnChanges {
+export class ContentSelectorItemComponent {
     @Output()
     public selectedChange = new EventEmitter<boolean>();
 
@@ -65,18 +48,10 @@ export class ContentSelectorItemComponent implements OnChanges {
     public language: LanguageDto;
 
     @Input()
-    public fields: ReadonlyArray<RootFieldDto>;
+    public schema: SchemaDetailsDto;
 
     @Input('sqxContentSelectorItem')
     public content: ContentDto;
-
-    public values: ReadonlyArray<any> = [];
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['content'] || changes['language']) {
-            this.updateValues();
-        }
-    }
 
     public toggle() {
         if (this.selectable) {
@@ -86,17 +61,5 @@ export class ContentSelectorItemComponent implements OnChanges {
 
     public emitSelectedChange(isSelected: boolean) {
         this.selectedChange.emit(isSelected);
-    }
-
-    private updateValues() {
-        const values = [];
-
-        for (const field of this.fields) {
-            const { formatted } = getContentValue(this.content, this.language, field);
-
-            values.push(formatted);
-        }
-
-        this.values = values;
     }
 }

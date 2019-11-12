@@ -21,14 +21,16 @@ type Field = string | RootFieldDto;
     selector: 'sqx-table-header',
     template: `
         <a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
-            <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
-            <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
+            <span class="truncate">
+                <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
+                <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
 
-            {{text}}
+                {{text}}
+            </span>
         </a>
 
         <ng-template #notSortable>
-            {{text}}
+            <span class="truncate">{{text}}</span>
         </ng-template>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

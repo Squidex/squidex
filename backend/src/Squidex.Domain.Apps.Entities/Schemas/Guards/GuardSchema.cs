@@ -277,11 +277,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (!schema.FieldsByName.TryGetValue(fieldName, out var field))
+                    else if (!schema.FieldsByName.TryGetValue(fieldName, out var field) && !MetaFields.All.Contains(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (!field.IsForApi())
+                    else if (field != null && !field.IsForApi())
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }
@@ -315,11 +315,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (field == null)
+                    else if (field == null && !MetaFields.All.Contains(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (field?.Properties.IsForApi() != true)
+                    else if (field != null && !field.Properties.IsForApi())
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }

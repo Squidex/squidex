@@ -12,7 +12,7 @@
     </div>
 
     <div *ngFor="let field of fieldsAdded" class="table-items-row" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> <span>{{field.displayName}}</span>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
     </div>
 </div>
 
@@ -27,6 +27,6 @@
     <label>Unassigned fields</label>
     
     <div *ngFor="let field of fieldsNotAdded" class="table-items-row" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> <span>{{field.displayName}}</span>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
     </div>
 </div>

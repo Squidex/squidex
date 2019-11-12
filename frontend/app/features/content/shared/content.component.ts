@@ -13,10 +13,8 @@ import {
     ContentsState,
     fadeAnimation,
     FieldDto,
-    getContentValue,
     ModalModel,
     PatchContentForm,
-    RootFieldDto,
     SchemaDetailsDto
 } from '@app/shared';
 
@@ -54,13 +52,7 @@ export class ContentComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
-    public schemaFields: ReadonlyArray<RootFieldDto>;
-
-    @Input()
     public canClone: boolean;
-
-    @Input()
-    public isCompact = false;
 
     @Input()
     public link: any = null;
@@ -74,8 +66,6 @@ export class ContentComponent implements OnChanges {
     public patchAllowed = false;
 
     public dropdown = new ModalModel();
-
-    public values: ReadonlyArray<any> = [];
 
     public get isDirty() {
         return this.patchForm && this.patchForm.form.dirty;
@@ -97,10 +87,6 @@ export class ContentComponent implements OnChanges {
             if (this.patchAllowed) {
                 this.patchForm = new PatchContentForm(this.schema, this.language);
             }
-        }
-
-        if (changes['content'] || changes['language']) {
-            this.updateValues();
         }
     }
 
@@ -127,8 +113,6 @@ export class ContentComponent implements OnChanges {
 
     public cancel() {
         this.patchForm.submitCompleted();
-
-        this.updateValues();
     }
 
     public emitSelectedChange(isSelected: boolean) {
@@ -145,26 +129,6 @@ export class ContentComponent implements OnChanges {
 
     public emitClone() {
         this.clone.emit();
-    }
-
-    private updateValues() {
-        const values = [];
-
-        for (const field of this.schemaFields) {
-            const { value, formatted } = getContentValue(this.content, this.language, field);
-
-            values.push(formatted);
-
-            if (this.patchForm) {
-                const formControl = this.patchForm.form.controls[field.name];
-
-                if (formControl) {
-                    formControl.setValue(value);
-                }
-            }
-        }
-
-        this.values = values;
     }
 
     public trackByField(index: number, field: FieldDto) {
