@@ -97,7 +97,7 @@ export class ContentListFieldComponent implements OnChanges {
 
     public value: any;
 
-    public ngOnChanges() {
+    public reset() {
         if (Types.is(this.field, RootFieldDto)) {
             const { value, formatted } = getContentValue(this.content, this.language, this.field);
 
@@ -111,6 +111,10 @@ export class ContentListFieldComponent implements OnChanges {
 
             this.value = formatted;
         }
+    }
+
+    public ngOnChanges() {
+        this.reset();
     }
 
     public get metaFields() {

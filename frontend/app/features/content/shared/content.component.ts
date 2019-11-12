@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 
 import {
     AppLanguageDto,
@@ -15,8 +15,12 @@ import {
     FieldDto,
     ModalModel,
     PatchContentForm,
-    SchemaDetailsDto
+    RootFieldDto,
+    SchemaDetailsDto,
+    Types
 } from '@app/shared';
+
+import { ContentListFieldComponent } from './content-list-field.component';
 
 /* tslint:disable:component-selector */
 
@@ -59,6 +63,9 @@ export class ContentComponent implements OnChanges {
 
     @Input('sqxContent')
     public content: ContentDto;
+
+    @ViewChildren(ContentListFieldComponent)
+    public fields: QueryList<ContentListFieldComponent>;
 
     public trackByFieldFn: (index: number, field: FieldDto) => any;
 
@@ -111,8 +118,18 @@ export class ContentComponent implements OnChanges {
         }
     }
 
+    public shouldStop(field: RootFieldDto | string) {
+        if (Types.is(field, RootFieldDto)) {
+            return this.isDirty || (field.isInlineEditable && this.patchAllowed);
+        } else {
+            return this.isDirty;
+        }
+    }
+
     public cancel() {
         this.patchForm.submitCompleted();
+
+        this.fields.forEach(x => x.reset());
     }
 
     public emitSelectedChange(isSelected: boolean) {

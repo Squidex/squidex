@@ -1,12 +1,24 @@
 <tr [routerLink]="link">
-    <td class="cell-select" sqxStopClick>
+    <td class="cell-select inline-edit" sqxStopClick>
         <input type="checkbox" class="form-check"
             [ngModel]="selected" 
             (ngModelChange)="emitSelectedChange($event)" />
+
+        <ng-container *ngIf="isDirty">
+            <div class="edit-menu">
+                <button type="button" class="btn btn-text-secondary btn-cancel mr-2" (click)="cancel()" sqxStopClick>
+                    <i class="icon-close"></i>
+                </button>
+
+                <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
+                    <i class="icon-checkmark"></i>
+                </button>
+            </div>
+        </ng-container>
     </td>
     
-    <td class="cell-actions cell-actions-left" *ngIf="!isDirty" sqxStopClick>
-        <div class="dropdown dropdown-options" *ngIf="content">
+    <td class="cell-actions cell-actions-left" sqxStopClick>
+        <div class="dropdown dropdown-options inline-edit" *ngIf="content">
             <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
             </button>
@@ -39,22 +51,8 @@
             </ng-container>
         </div>
     </td>
-    
-    <ng-container *ngIf="isDirty">
-        <td class="cell-actions" >
-            <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
-                <i class="icon-close"></i>
-            </button>
-        </td>
-    
-        <td class="cell-user" >
-            <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
-                <i class="icon-checkmark"></i>
-            </button>
-        </td>
-    </ng-container>
 
-    <td *ngFor="let field of schema.listFields" [sqxContentListCell]="field">
+    <td *ngFor="let field of schema.listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">
         <sqx-content-list-field
             [field]="field"
             [patchForm]="patchForm.form"
