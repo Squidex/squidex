@@ -26,7 +26,6 @@
         </ng-container>
 
         <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
-            <ng-container *ngIf="rolesState.roles | async; let roles">
                 <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
                     No workflows created yet.
                 </div>
@@ -36,7 +35,6 @@
                 </sqx-workflow>
 
                 <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
-            </ng-container>
         </ng-container>
     </ng-container>
 

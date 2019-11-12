@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(result);
         }
 
-        public Task<bool> CanUpdateAsync(IContentEntity content)
+        public Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user)
         {
             var result = content.Status != Status.Archived;
 

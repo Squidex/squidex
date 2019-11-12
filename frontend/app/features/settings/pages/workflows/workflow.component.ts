@@ -12,7 +12,6 @@ import { Component, Input, OnChanges } from '@angular/core';
 import {
     ErrorDto,
     MathHelper,
-    RoleDto,
     SchemaTagConverter,
     WorkflowDto,
     WorkflowsState,
@@ -34,7 +33,7 @@ export class WorkflowComponent implements OnChanges {
     public workflow: WorkflowDto;
 
     @Input()
-    public roles: ReadonlyArray<RoleDto>;
+    public roles: ReadonlyArray<string>;
 
     @Input()
     public schemasSource: SchemaTagConverter;

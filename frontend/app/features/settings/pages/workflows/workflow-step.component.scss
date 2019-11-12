@@ -2,6 +2,12 @@
 @import '_mixins';
 
 :host ::ng-deep {
+    .dashed {
+        @include placeholder-color($color-theme-secondary);
+        border-style: dashed;
+        border-width: 1px;
+    }
+
     .color {
         line-height: 2.8rem;
     }
@@ -66,4 +72,45 @@
     &.active {
         visibility: visible;
     }
+}
+
+.col-step-role {
+    width: 56px;
+    padding-left: 0rem;
+    padding-right: 4rem;
+}
+
+.col-step-expression {
+    padding-left: 0;
+    padding-right: 0
+}
+
+.transition-prevent-updates {
+    & {
+        margin-top: .25rem;
+        margin-bottom: .5rem;
+        line-height: 2.5rem;
+    }
+
+    &-to {
+        padding: .5rem .75rem;
+        padding-right: 0;
+        line-height: 1.2rem;
+    }
+}
+
+.col-line {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #e1e4e8;
+    margin: 1em 0;
+}
+
+.col-div-line {
+    padding-top: 0.5rem
+}
+
+.transition-prevent-updates-checkbox {
+    margin-top: 0.8rem;
 }

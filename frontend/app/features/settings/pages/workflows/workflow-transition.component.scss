@@ -1,11 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.dashed {
-    border-style: dashed;
-    border-width: 1px;
-}
-
 .select-placeholder {
     @include absolute(0, 0, 0, 0);
     color: $color-theme-secondary;
