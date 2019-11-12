@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             new WorkflowStep(
                                 new Dictionary<Status, WorkflowTransition>
                                 {
-                                    [Status.Archived] = new WorkflowTransition()
+                                    [Status.Archived] = WorkflowTransition.Always
                                 }),
                         [Status.Draft] = new WorkflowStep()
                     }),

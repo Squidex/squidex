@@ -8,7 +8,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
-    RoleDto,
     WorkflowDto,
     WorkflowStep,
     WorkflowStepValues,
@@ -53,7 +52,7 @@ export class WorkflowStepComponent implements OnChanges {
     public step: WorkflowStep;
 
     @Input()
-    public roles: ReadonlyArray<RoleDto>;
+    public roles: ReadonlyArray<string>;
 
     @Input()
     public disabled: boolean;
@@ -86,6 +85,14 @@ export class WorkflowStepComponent implements OnChanges {
 
     public changeNoUpdate(noUpdate: boolean) {
         this.update.emit({ noUpdate });
+    }
+
+    public changeNoUpdateExpression(noUpdateExpression?: string) {
+        this.update.emit({ noUpdateExpression });
+    }
+
+    public changeNoUpdateRoles(noUpdateRoles?: ReadonlyArray<string>) {
+        this.update.emit({ noUpdateRoles });
     }
 
     public emitMakeInitial() {

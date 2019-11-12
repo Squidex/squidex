@@ -1,11 +1,5 @@
 # Changelog
 
-## 4.0.0 Beta 1 - 2019-10-27
-
-Migration to .NET Core 3.0. This also includes some code changes such as cleanup of configuration and docke nullable support.
-
-This version does not use alpine image with self contained image any more. Therefore the final image is larger than before but the Squidex layer itself is smaller, which means a reduced disk size and download size when you update Squidex or have multiple versions installed or other .NET Core applications.
-
 ## 3.5.0 - 2019-10-26
 
 **NOTE**: This is the latest release with .NET Core 2.X. Next release will be 3.0 and above. Does not really matter when you use Docker.

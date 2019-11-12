@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user);
 
-        Task<bool> CanUpdateAsync(IContentEntity content);
+        Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user);
 
         Task<StatusInfo> GetInfoAsync(IContentEntity content);
 
