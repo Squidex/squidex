@@ -11,20 +11,20 @@ using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    public sealed class WorkflowTransitionConverter : JsonClassConverter<WorkflowTransition>
+    public sealed class WorkflowStepConverter : JsonClassConverter<WorkflowStep>
     {
-        protected override void WriteValue(JsonWriter writer, WorkflowTransition value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, WorkflowStep value, JsonSerializer serializer)
         {
-            var json = new JsonWorkflowTransition(value);
+            var json = new JsonWorkflowStep(value);
 
             serializer.Serialize(writer, json);
         }
 
-        protected override WorkflowTransition ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        protected override WorkflowStep ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<JsonWorkflowTransition>(reader)!;
+            var json = serializer.Deserialize<JsonWorkflowStep>(reader)!;
 
-            return json.ToTransition();
+            return json.ToStep();
         }
     }
 }

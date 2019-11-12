@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
         {
         }
 
-        public JsonWorkflowTransition(WorkflowTransition client)
+        public JsonWorkflowTransition(WorkflowTransition transition)
         {
-            SimpleMapper.Map(client, this);
+            SimpleMapper.Map(transition, this);
         }
 
         public WorkflowTransition ToTransition()

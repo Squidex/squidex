@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core
                     new StatusConverter(),
                     new StringEnumConverter(),
                     new WorkflowConverter(),
-                    new WorkflowTransitionConverter()),
+                    new WorkflowStepConverter()),
 
                 TypeNameHandling = typeNameHandling
             };
@@ -121,6 +121,11 @@ namespace Squidex.Domain.Apps.Core
                 .LockField(105);
 
             return schema;
+        }
+
+        public static T SerializeAndDeserialize<T>(this object value)
+        {
+            return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
         }
 
         public static T SerializeAndDeserialize<T>(this T value)
