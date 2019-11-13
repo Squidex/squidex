@@ -30,7 +30,7 @@ export function getCellWidth(field: RootFieldDto | string) {
     } else {
         switch (field) {
             case MetaFields.id:
-                return 150;
+                return 280;
             case MetaFields.created:
                 return 150;
             case MetaFields.createdByAvatar:

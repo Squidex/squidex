@@ -30,6 +30,9 @@ export class FieldListComponent implements OnChanges {
     @Input()
     public fieldNames: ReadonlyArray<string>;
 
+    @Input()
+    public withMetaFields = false;
+
     @Output()
     public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
 
@@ -37,7 +40,11 @@ export class FieldListComponent implements OnChanges {
     public fieldsNotAdded: string[];
 
     public ngOnChanges() {
-        const allFields = [...this.schema.contentFields.map(x => x.name), ...MetaFieldNames];
+        let allFields = this.schema.contentFields.map(x => x.name);
+
+        if (this.withMetaFields) {
+            allFields = [...allFields, ...MetaFieldNames]
+        }
 
         this.fieldsAdded = this.fieldNames.filter(n => allFields.indexOf(n) >= 0);
         this.fieldsNotAdded = allFields.filter(n => this.fieldNames.indexOf(n) < 0);
