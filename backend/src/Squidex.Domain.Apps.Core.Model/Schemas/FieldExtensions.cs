@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField
         {
-            return (withHidden || !field.IsHidden) && field.RawProperties.IsUIProperty();
+            return (withHidden || !field.IsHidden) && !field.RawProperties.IsUIProperty();
         }
 
         public static bool IsUI<T>(this T field) where T : IField
