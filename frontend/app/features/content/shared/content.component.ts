@@ -5,20 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 
 import {
     AppLanguageDto,
     ContentDto,
     ContentsState,
     fadeAnimation,
-    FieldDto,
-    getContentValue,
     ModalModel,
     PatchContentForm,
     RootFieldDto,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    TableField,
+    Types
 } from '@app/shared';
+
+import { ContentListFieldComponent } from './content-list-field.component';
 
 /* tslint:disable:component-selector */
 
@@ -54,13 +56,7 @@ export class ContentComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
-    public schemaFields: ReadonlyArray<RootFieldDto>;
-
-    @Input()
     public canClone: boolean;
-
-    @Input()
-    public isCompact = false;
 
     @Input()
     public link: any = null;
@@ -68,14 +64,13 @@ export class ContentComponent implements OnChanges {
     @Input('sqxContent')
     public content: ContentDto;
 
-    public trackByFieldFn: (index: number, field: FieldDto) => any;
+    @ViewChildren(ContentListFieldComponent)
+    public fields: QueryList<ContentListFieldComponent>;
 
     public patchForm: PatchContentForm;
     public patchAllowed = false;
 
     public dropdown = new ModalModel();
-
-    public values: ReadonlyArray<any> = [];
 
     public get isDirty() {
         return this.patchForm && this.patchForm.form.dirty;
@@ -85,7 +80,6 @@ export class ContentComponent implements OnChanges {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsState: ContentsState
     ) {
-        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -93,14 +87,8 @@ export class ContentComponent implements OnChanges {
             this.patchAllowed = this.content.canUpdate;
         }
 
-        if (changes['schema'] || changes['language']) {
-            if (this.patchAllowed) {
-                this.patchForm = new PatchContentForm(this.schema, this.language);
-            }
-        }
-
-        if (changes['content'] || changes['language']) {
-            this.updateValues();
+        if (this.patchAllowed && (changes['schema'] || changes['language'])) {
+            this.patchForm = new PatchContentForm(this.schema, this.language);
         }
     }
 
@@ -125,10 +113,18 @@ export class ContentComponent implements OnChanges {
         }
     }
 
+    public shouldStop(field: TableField) {
+        if (Types.is(field, RootFieldDto)) {
+            return this.isDirty || (field.isInlineEditable && this.patchAllowed);
+        } else {
+            return this.isDirty;
+        }
+    }
+
     public cancel() {
         this.patchForm.submitCompleted();
 
-        this.updateValues();
+        this.fields.forEach(x => x.reset());
     }
 
     public emitSelectedChange(isSelected: boolean) {
@@ -145,29 +141,5 @@ export class ContentComponent implements OnChanges {
 
     public emitClone() {
         this.clone.emit();
-    }
-
-    private updateValues() {
-        const values = [];
-
-        for (const field of this.schemaFields) {
-            const { value, formatted } = getContentValue(this.content, this.language, field);
-
-            values.push(formatted);
-
-            if (this.patchForm) {
-                const formControl = this.patchForm.form.controls[field.name];
-
-                if (formControl) {
-                    formControl.setValue(value);
-                }
-            }
-        }
-
-        this.values = values;
-    }
-
-    public trackByField(index: number, field: FieldDto) {
-        return field.fieldId + this.schema.id;
     }
 }

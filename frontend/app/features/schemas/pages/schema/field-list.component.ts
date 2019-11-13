@@ -10,7 +10,9 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
-import { FieldDto, SchemaDetailsDto } from '@app/shared';
+import { MetaFields, SchemaDetailsDto } from '@app/shared';
+
+const MetaFieldNames = Object.values(MetaFields);
 
 @Component({
     selector: 'sqx-field-list',
@@ -28,18 +30,27 @@ export class FieldListComponent implements OnChanges {
     @Input()
     public fieldNames: ReadonlyArray<string>;
 
+    @Input()
+    public withMetaFields = false;
+
     @Output()
     public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
 
-    public fieldsAdded: FieldDto[];
-    public fieldsNotAdded: FieldDto[];
+    public fieldsAdded: string[];
+    public fieldsNotAdded: string[];
 
     public ngOnChanges() {
-        this.fieldsAdded = this.fieldNames.map(n => this.schema.contentFields.find(y => y.name === n)!).filter(x => !!x);
-        this.fieldsNotAdded = this.schema.contentFields.filter(n => this.fieldNames.indexOf(n.name) < 0);
+        let allFields = this.schema.contentFields.map(x => x.name);
+
+        if (this.withMetaFields) {
+            allFields = [...allFields, ...MetaFieldNames];
+        }
+
+        this.fieldsAdded = this.fieldNames.filter(n => allFields.indexOf(n) >= 0);
+        this.fieldsNotAdded = allFields.filter(n => this.fieldNames.indexOf(n) < 0);
     }
 
-    public drop(event: CdkDragDrop<FieldDto[]>) {
+    public drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else {
@@ -50,7 +61,7 @@ export class FieldListComponent implements OnChanges {
                 event.currentIndex);
         }
 
-        const newNames = this.fieldsAdded.map(x => x.name);
+        const newNames = this.fieldsAdded;
 
         this.fieldNamesChange.emit(newNames);
     }

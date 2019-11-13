@@ -108,19 +108,9 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                 schema = schema.ConfigureScripts(Scripts);
             }
 
-            if (FieldsInLists == null)
-            {
-                FieldsInLists = new FieldNames(Fields.Where(x => x.Properties.IsListField).Select(x => x.Name).ToArray());
-            }
-
             if (FieldsInLists?.Count > 0)
             {
                 schema = schema.ConfigureFieldsInLists(FieldsInLists);
-            }
-
-            if (FieldsInReferences == null)
-            {
-                FieldsInLists = new FieldNames(Fields.Where(x => x.Properties.IsReferenceField).Select(x => x.Name).ToArray());
             }
 
             if (FieldsInReferences?.Count > 0)

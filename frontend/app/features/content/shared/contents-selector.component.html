@@ -39,32 +39,22 @@
     <ng-container content>
         <ng-container *ngIf="schema">
             <div class="grid-header">
-                <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
+                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" #header>
                     <thead>
                         <tr>
                             <th class="cell-select">
                                 <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
                             </th>
-                            <th class="cell-user">
-                                <sqx-table-header text="By"></sqx-table-header>
+                            <th sqxContentListCell="meta.lastModifiedBy.avatar">
+                                <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
                             </th>
-                            <th class="cell-content" *ngFor="let field of schema.referenceFields">
-                                <sqx-table-header [text]="field.displayName" 
-                                    [sortable]="field.properties.isSortable"
+                            <th *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
+                                <sqx-content-list-header
                                     [field]="field"
                                     [query]="contentsState.contentsQuery | async"
                                     (queryChange)="search($event)"
                                     [language]="language">
-                                </sqx-table-header>
-                            </th>
-                            <th class="cell-time">
-                                <sqx-table-header text="Updated"
-                                    [sortable]="true"
-                                    [field]="'lastModified'"
-                                    [query]="contentsState.contentsQuery | async"
-                                    (queryChange)="search($event)"
-                                    [language]="language">
-                                </sqx-table-header>
+                                </sqx-content-list-header>
                             </th>
                         </tr>
                     </thead>
@@ -73,10 +63,10 @@
 
             <div class="grid-content" [sqxSyncScrolling]="header">
                 <div class="table-container" sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed" [style.minWidth]="minWidth" *ngIf="contentsState.contents | async; let contents">
+                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" *ngIf="contentsState.contents | async; let contents">
                         <tbody *ngFor="let content of contents; trackBy: trackByContent"
                             [sqxContentSelectorItem]="content"
-                            [fields]="schema.referenceFields"
+                            [schema]="schema"
                             [selectable]="!isItemAlreadySelected(content)"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectContent(content)"

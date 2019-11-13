@@ -24,8 +24,8 @@ import {
                 <ng-content></ng-content>
             </td>
 
-            <td class="cell-user" *ngIf="!isCompact">
-                <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
+            <td sqxContentListCell="meta.lastModifiedBy.avatar">
+                <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
             </td>
 
             <td class="cell-auto cell-content" *ngFor="let value of values">

@@ -1,12 +1,24 @@
 <tr [routerLink]="link">
-    <td class="cell-select" sqxStopClick>
+    <td class="cell-select inline-edit" sqxStopClick>
         <input type="checkbox" class="form-check"
             [ngModel]="selected" 
             (ngModelChange)="emitSelectedChange($event)" />
+
+        <ng-container *ngIf="isDirty">
+            <div class="edit-menu">
+                <button type="button" class="btn btn-text-secondary btn-cancel mr-2" (click)="cancel()" sqxStopClick>
+                    <i class="icon-close"></i>
+                </button>
+
+                <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
+                    <i class="icon-checkmark"></i>
+                </button>
+            </div>
+        </ng-container>
     </td>
     
-    <td class="cell-actions cell-actions-left" *ngIf="!isDirty" sqxStopClick>
-        <div class="dropdown dropdown-options" *ngIf="content">
+    <td class="cell-actions cell-actions-left" sqxStopClick>
+        <div class="dropdown dropdown-options inline-edit" *ngIf="content">
             <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
             </button>
@@ -39,45 +51,15 @@
             </ng-container>
         </div>
     </td>
-    
-    <ng-container *ngIf="isDirty">
-        <td class="cell-actions" >
-            <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
-                <i class="icon-close"></i>
-            </button>
-        </td>
-    
-        <td class="cell-user" >
-            <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
-                <i class="icon-checkmark"></i>
-            </button>
-        </td>
-    </ng-container>
-    
-    <td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
-        <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
-    </td>
-    
-    <td class="cell-auto cell-content" *ngFor="let field of schemaFields; let i = index; trackBy: trackByFieldFn" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
-        <ng-container *ngIf="field.isInlineEditable && patchAllowed; else displayTemplate">
-            <sqx-content-value-editor [form]="patchForm.form" [field]="field"></sqx-content-value-editor>
-        </ng-container>
-    
-        <ng-template #displayTemplate>
-            <sqx-content-value [value]="values[i]"></sqx-content-value>
-        </ng-template>
-    </td>
-    
-    <td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty">
-        <sqx-content-status 
-            [status]="content.status"
-            [statusColor]="content.statusColor"
-            [scheduledTo]="content.scheduleJob?.status"
-            [scheduledAt]="content.scheduleJob?.dueTime"
-            [isPending]="content.isPending">
-        </sqx-content-status>
-        
-        <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
+
+    <td *ngFor="let field of schema.listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">
+        <sqx-content-list-field
+            [field]="field"
+            [patchForm]="patchForm.form"
+            [patchAllowed]="patchAllowed"
+            [content]="content"
+            [language]="language">
+        </sqx-content-list-field>
     </td>
 </tr>
 <tr class="spacer"></tr>
