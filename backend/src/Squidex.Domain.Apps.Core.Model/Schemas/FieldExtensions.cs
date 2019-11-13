@@ -19,11 +19,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return NamedIdStatic.Of(field.Id, field.Name);
         }
 
-        public static IEnumerable<T> NonHidden<T>(this FieldCollection<T> fields, bool withHidden = false) where T : IField
-        {
-            return fields.Ordered.ForApi(withHidden);
-        }
-
         public static IEnumerable<T> ForApi<T>(this IEnumerable<T> fields, bool withHidden = false) where T : IField
         {
             return fields.Where(x => IsForApi(x, withHidden));

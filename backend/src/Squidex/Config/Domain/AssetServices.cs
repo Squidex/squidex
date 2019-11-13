@@ -83,6 +83,19 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
                         .As<IAssetStore>();
                 },
+                ["AmazonS3"] = () =>
+                {
+                    var regionName = config.GetRequiredValue("assetStore:amazonS3:regionName");
+
+                    var bucketName = config.GetRequiredValue("assetStore:amazonS3:bucket");
+                    var bucketFolder = config.GetRequiredValue("assetStore:amazonS3:bucketFolder");
+
+                    var accessKey = config.GetRequiredValue("assetStore:amazonS3:accessKey");
+                    var secretKey = config.GetRequiredValue("assetStore:amazonS3:secretKey");
+
+                    services.AddSingletonAs(c => new AmazonS3AssetStore(regionName, bucketName, bucketFolder, accessKey, secretKey))
+                        .As<IAssetStore>();
+                },
                 ["MongoDb"] = () =>
                 {
                     var mongoConfiguration = config.GetRequiredValue("assetStore:mongoDb:configuration");

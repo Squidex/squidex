@@ -11,6 +11,7 @@
     <None Remove="Assets\Images\logo.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
