@@ -149,7 +149,11 @@ export class SchemaDetailsDto extends SchemaDto {
             this.referenceFields = findFields(fieldsInReferences, this.contentFields);
 
             if (this.referenceFields.length === 0) {
-                this.referenceFields = <any>this.listFields;
+                if (fields.length > 0) {
+                    this.referenceFields = [fields[0]];
+                } else {
+                    this.referenceFields = [''];
+                }
             }
         }
     }

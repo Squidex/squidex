@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                         if (ShouldEnrichWithSchema(context))
                         {
-                            var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
+                            var referenceFields = schema.SchemaDef.ReferencesFields().ToArray();
 
                             var schemaName = schema.SchemaDef.Name;
                             var schemaDisplayName = schema.SchemaDef.DisplayNameUnchanged();

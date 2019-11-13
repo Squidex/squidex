@@ -26,6 +26,10 @@ import {
                     (ngModelChange)="emitSelectedChange($event)" />
             </td>
 
+            <td sqxContentListCell="meta.lastModifiedBy.avatar">
+                <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
+            </td>
+
             <td *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
                 <sqx-content-list-field [field]="field" [content]="content" [language]="language"></sqx-content-list-field>
             </td>

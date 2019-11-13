@@ -43,7 +43,7 @@ export class FieldListComponent implements OnChanges {
         let allFields = this.schema.contentFields.map(x => x.name);
 
         if (this.withMetaFields) {
-            allFields = [...allFields, ...MetaFieldNames]
+            allFields = [...allFields, ...MetaFieldNames];
         }
 
         this.fieldsAdded = this.fieldNames.filter(n => allFields.indexOf(n) >= 0);

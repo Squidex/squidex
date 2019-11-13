@@ -64,23 +64,39 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : Guid.Empty;
         }
 
-        public static IEnumerable<RootField> ReferenceFields(this Schema schema)
+        public static IEnumerable<RootField> ReferencesFields(this Schema schema)
         {
-            var references = schema.FieldsInReferences.Select(x => schema.FieldsByName.GetOrDefault(x)).Where(x => x != null).ToList();
+            return schema.RootFields(schema.FieldsInReferences);
+        }
 
-            if (references.Any())
+        public static IEnumerable<RootField> ListsFields(this Schema schema)
+        {
+            return schema.RootFields(schema.FieldsInLists);
+        }
+
+        public static IEnumerable<RootField> RootFields(this Schema schema, FieldNames names)
+        {
+            var hasField = false;
+
+            foreach (var name in names)
             {
-                return references;
+                if (schema.FieldsByName.TryGetValue(name, out var field))
+                {
+                    hasField = true;
+
+                    yield return field;
+                }
             }
 
-            references = schema.FieldsInLists.Select(x => schema.FieldsByName.GetOrDefault(x)).Where(x => x != null).ToList();
-
-            if (references.Any())
+            if (!hasField)
             {
-                return references;
-            }
+                var first = schema.Fields.FirstOrDefault(x => !x.IsUI());
 
-            return schema.Fields.Take(1);
+                if (first != null)
+                {
+                    yield return first;
+                }
+            }
         }
 
         public static IEnumerable<IField<ReferencesFieldProperties>> ResolvingReferences(this Schema schema)

@@ -435,6 +435,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanCreate_should_throw_exception_if_references_contains_meta_field()
+        {
+            var command = new CreateSchema
+            {
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames("meta.id"),
+                Name = "new-schema"
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInReferences[1]"));
+        }
+
+        [Fact]
         public void CanCreate_should_not_throw_exception_if_command_is_valid()
         {
             var command = new CreateSchema
@@ -477,7 +492,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                 },
                 FieldsInLists = new FieldNames("field1", "meta.id"),
-                FieldsInReferences = new FieldNames("field1", "meta.id"),
+                FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
             };
 
@@ -529,12 +544,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanConfigureUIFields_should_throw_exception_if_references_contains_meta_field()
+        {
+            var command = new ConfigureUIFields
+            {
+                FieldsInLists = null,
+                FieldsInReferences = new FieldNames("meta.id")
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+                new ValidationError("Field is not part of the schema.",
+                    "FieldsInReferences[1]"));
+        }
+
+        [Fact]
         public void CanConfigureUIFields_should_not_throw_exception_if_command_is_valid()
         {
             var command = new ConfigureUIFields
             {
                 FieldsInLists = new FieldNames("field1", "meta.id"),
-                FieldsInReferences = new FieldNames("field2", "meta.id")
+                FieldsInReferences = new FieldNames("field2")
             };
 
             GuardSchema.CanConfigureUIFields(schema_0, command);

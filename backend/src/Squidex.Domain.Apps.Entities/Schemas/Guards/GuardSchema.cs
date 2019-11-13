@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             Validate.It(() => "Cannot configure UI fields.", e =>
             {
-                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e);
+                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, true);
                 ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
             });
         }
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 }
             }
 
-            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e);
+            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, true);
             ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
         }
 
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
             else
             {
-                if (!field.Properties.IsForApi())
+                if (field.Properties.IsUIProperty())
                 {
                     if (field.IsHidden)
                     {
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e)
+        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, bool withMeta = false)
         {
             if (fields != null)
             {
@@ -273,15 +273,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     fieldIndex++;
                     fieldPrefix = $"{path}[{fieldIndex}]";
 
+                    var field = schema.FieldsByName.GetOrDefault(fieldName ?? string.Empty);
+
                     if (string.IsNullOrWhiteSpace(fieldName))
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (!schema.FieldsByName.TryGetValue(fieldName, out var field) && !MetaFields.All.Contains(fieldName))
+                    else if (field == null && (!withMeta || !MetaFields.All.Contains(fieldName)))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (field != null && !field.IsForApi())
+                    else if (field?.IsUI() == true)
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }
@@ -297,7 +299,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e)
+        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, bool withMeta = false)
         {
             if (fields != null)
             {
@@ -315,11 +317,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (field == null && !MetaFields.All.Contains(fieldName))
+                    else if (field == null && (!withMeta || !MetaFields.All.Contains(fieldName)))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (field != null && !field.Properties.IsForApi())
+                    else if (field?.Properties?.IsUIProperty() == true)
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }

@@ -45,6 +45,9 @@
                             <th class="cell-select">
                                 <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
                             </th>
+                            <th sqxContentListCell="meta.lastModifiedBy.avatar">
+                                <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
+                            </th>
                             <th *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
                                 <sqx-content-list-header
                                     [field]="field"

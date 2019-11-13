@@ -31,12 +31,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField
         {
-            return (withHidden || !field.IsHidden) && field.RawProperties.IsForApi();
+            return (withHidden || !field.IsHidden) && field.RawProperties.IsUIProperty();
         }
 
-        public static bool IsForApi<T>(this T properties) where T : FieldProperties
+        public static bool IsUI<T>(this T field) where T : IField
         {
-            return !(properties is UIFieldProperties);
+            return field.RawProperties is UIFieldProperties;
+        }
+
+        public static bool IsUIProperty<T>(this T properties) where T : FieldProperties
+        {
+            return properties is UIFieldProperties;
         }
 
         public static Schema ReorderFields(this Schema schema, List<long> ids, long? parentId = null)
