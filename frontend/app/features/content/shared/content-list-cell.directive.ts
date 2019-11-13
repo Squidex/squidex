@@ -11,10 +11,11 @@ import {
     MetaFields,
     RootFieldDto,
     SchemaDetailsDto,
+    TableField,
     Types
 } from '@app/shared';
 
-export function getTableWidth(fields: ReadonlyArray<RootFieldDto | string>) {
+export function getTableWidth(fields: ReadonlyArray<TableField>) {
     let result = 0;
 
     for (let field of fields) {
@@ -24,7 +25,7 @@ export function getTableWidth(fields: ReadonlyArray<RootFieldDto | string>) {
     return result;
 }
 
-export function getCellWidth(field: RootFieldDto | string) {
+export function getCellWidth(field: TableField) {
     if (Types.is(field, RootFieldDto)) {
         return 220;
     } else {
@@ -88,7 +89,7 @@ export class ContentReferencesWidthPipe implements PipeTransform {
 })
 export class ContentListCellDirective implements OnChanges {
     @Input('sqxContentListCell')
-    public field: RootFieldDto | string;
+    public field: TableField;
 
     constructor(
         private readonly element: ElementRef,

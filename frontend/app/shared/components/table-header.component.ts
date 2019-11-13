@@ -10,12 +10,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import {
     LanguageDto,
     Query,
-    RootFieldDto,
-    SortMode,
-    Types
+    SortMode
 } from '@app/shared/internal';
-
-type Field = string | RootFieldDto;
 
 @Component({
     selector: 'sqx-table-header',
@@ -35,16 +31,17 @@ type Field = string | RootFieldDto;
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableHeaderComponent implements OnChanges {
-    private fieldPath: string;
-
     @Output()
     public queryChange = new EventEmitter<Query>();
+
+    @Input()
+    public query: Query;
 
     @Input()
     public text: string;
 
     @Input()
-    public field: Field;
+    public fieldPath: string;
 
     @Input()
     public language: LanguageDto;
@@ -52,19 +49,20 @@ export class TableHeaderComponent implements OnChanges {
     @Input()
     public sortable = false;
 
-    @Input()
-    public query: Query;
-
     public order: SortMode | null;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (this.sortable) {
-            if (changes['language'] || changes['field']) {
-                this.fieldPath = getFieldPath(this.language, this.field);
-            }
-
-            if (changes['query'] && this.fieldPath) {
-                this.order = getSortMode(this.query, this.fieldPath);
+            if (changes['query'] || changes['fieldPath']) {
+                if (this.fieldPath &&
+                    this.query &&
+                    this.query.sort &&
+                    this.query.sort.length === 1 &&
+                    this.query.sort[0].path === this.fieldPath) {
+                    this.order = this.query.sort[0].order;
+                } else {
+                    this.order = null;
+                }
             }
         }
     }
@@ -83,23 +81,5 @@ export class TableHeaderComponent implements OnChanges {
 
     private newQuery() {
         return {...this.query, sort: [{ path: this.fieldPath, order: this.order! }] };
-    }
-}
-
-function getSortMode(query: Query, path: string) {
-    if (path && query && query.sort && query.sort.length === 1 && query.sort[0].path === path) {
-        return query.sort[0].order;
-    }
-
-    return null;
-}
-
-function getFieldPath(language: LanguageDto | undefined, field: Field) {
-    if (Types.isString(field)) {
-        return field;
-    } else if (field.isLocalizable && language) {
-        return `data.${field.name}.${language.iso2Code}`;
-    } else {
-        return `data.${field.name}.iv`;
     }
 }

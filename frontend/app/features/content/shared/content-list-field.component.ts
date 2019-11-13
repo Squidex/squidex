@@ -14,6 +14,7 @@ import {
     LanguageDto,
     MetaFields,
     RootFieldDto,
+    TableField,
     Types
 } from '@app/shared';
 
@@ -81,7 +82,7 @@ import {
 })
 export class ContentListFieldComponent implements OnChanges {
     @Input()
-    public field: RootFieldDto | string;
+    public field: TableField;
 
     @Input()
     public content: ContentDto;
@@ -97,6 +98,10 @@ export class ContentListFieldComponent implements OnChanges {
 
     public value: any;
 
+    public ngOnChanges() {
+        this.reset();
+    }
+
     public reset() {
         if (Types.is(this.field, RootFieldDto)) {
             const { value, formatted } = getContentValue(this.content, this.language, this.field);
@@ -111,10 +116,6 @@ export class ContentListFieldComponent implements OnChanges {
 
             this.value = formatted;
         }
-    }
-
-    public ngOnChanges() {
-        this.reset();
     }
 
     public get metaFields() {

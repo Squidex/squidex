@@ -12,6 +12,7 @@ import {
     MetaFields,
     Query,
     RootFieldDto,
+    TableField,
     Types
 } from '@app/shared';
 
@@ -25,7 +26,7 @@ import {
             <ng-container *ngSwitchCase="metaFields.created">
                 <sqx-table-header text="Created"
                     [sortable]="true"
-                    [field]="'created'"
+                    [fieldPath]="'created'"
                     [query]="query"
                     (queryChange)="queryChange.emit($event)"
                     [language]="language">
@@ -40,7 +41,7 @@ import {
             <ng-container *ngSwitchCase="metaFields.lastModified">
                 <sqx-table-header text="Updated"
                     [sortable]="true"
-                    [field]="'lastModified'"
+                    [fieldPath]="'lastModified'"
                     [query]="query"
                     (queryChange)="queryChange.emit($event)"
                     [language]="language">
@@ -64,18 +65,18 @@ import {
             <ng-container *ngSwitchDefault>
                 <sqx-table-header [text]="fieldDisplayName"
                     [sortable]="isSortable"
-                    [field]="field"
+                    [fieldPath]="fieldPath"
                     [query]="query"
                     (queryChange)="queryChange.emit($event)"
                     [language]="language">
-            </sqx-table-header>
+                </sqx-table-header>
             </ng-container>
         </ng-container>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentListHeaderComponent {
     @Input()
-    public field: RootFieldDto | string;
+    public field: TableField;
 
     @Output()
     public queryChange = new EventEmitter<Query>();
@@ -100,5 +101,15 @@ export class ContentListHeaderComponent {
 
     public get fieldDisplayName() {
         return Types.is(this.field, RootFieldDto) ? this.field.displayName : '';
+    }
+
+    public get fieldPath() {
+        if (Types.isString(this.field)) {
+            return this.field;
+        } else if (this.field.isLocalizable && this.language) {
+            return `data.${this.field.name}.${this.language.iso2Code}`;
+        } else {
+            return `data.${this.field.name}.iv`;
+        }
     }
 }

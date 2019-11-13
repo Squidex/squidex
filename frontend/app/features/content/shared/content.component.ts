@@ -12,11 +12,11 @@ import {
     ContentDto,
     ContentsState,
     fadeAnimation,
-    FieldDto,
     ModalModel,
     PatchContentForm,
     RootFieldDto,
     SchemaDetailsDto,
+    TableField,
     Types
 } from '@app/shared';
 
@@ -67,8 +67,6 @@ export class ContentComponent implements OnChanges {
     @ViewChildren(ContentListFieldComponent)
     public fields: QueryList<ContentListFieldComponent>;
 
-    public trackByFieldFn: (index: number, field: FieldDto) => any;
-
     public patchForm: PatchContentForm;
     public patchAllowed = false;
 
@@ -82,7 +80,6 @@ export class ContentComponent implements OnChanges {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsState: ContentsState
     ) {
-        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -90,10 +87,8 @@ export class ContentComponent implements OnChanges {
             this.patchAllowed = this.content.canUpdate;
         }
 
-        if (changes['schema'] || changes['language']) {
-            if (this.patchAllowed) {
-                this.patchForm = new PatchContentForm(this.schema, this.language);
-            }
+        if (this.patchAllowed && (changes['schema'] || changes['language'])) {
+            this.patchForm = new PatchContentForm(this.schema, this.language);
         }
     }
 
@@ -118,7 +113,7 @@ export class ContentComponent implements OnChanges {
         }
     }
 
-    public shouldStop(field: RootFieldDto | string) {
+    public shouldStop(field: TableField) {
         if (Types.is(field, RootFieldDto)) {
             return this.isDirty || (field.isInlineEditable && this.patchAllowed);
         } else {
@@ -146,9 +141,5 @@ export class ContentComponent implements OnChanges {
 
     public emitClone() {
         this.clone.emit();
-    }
-
-    public trackByField(index: number, field: FieldDto) {
-        return field.fieldId + this.schema.id;
     }
 }

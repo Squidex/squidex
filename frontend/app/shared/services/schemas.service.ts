@@ -100,11 +100,13 @@ export class SchemaDto {
     }
 }
 
+export type TableField = RootFieldDto | string;
+
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
-    public readonly listFields: ReadonlyArray<RootFieldDto | string>;
+    public readonly listFields: ReadonlyArray<TableField>;
     public readonly listFieldsEditable: ReadonlyArray<RootFieldDto>;
-    public readonly referenceFields: ReadonlyArray<RootFieldDto | string>;
+    public readonly referenceFields: ReadonlyArray<TableField>;
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
@@ -200,8 +202,8 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 }
 
-function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): (RootFieldDto | string)[] {
-    let result: (RootFieldDto | string)[] = [];
+function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
+    let result: TableField[] = [];
 
     for (let name of names) {
         if (name.startsWith('meta.')) {
