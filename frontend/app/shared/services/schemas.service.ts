@@ -178,6 +178,10 @@ export class SchemaDetailsDto extends SchemaDto {
         };
 
         const result: any = {
+            properties: cleanup(this.properties),
+            category: this.category,
+            fieldsInLists: this.fieldsInLists,
+            fieldsInReferences: this.fieldsInReferences,
             fields: this.fields.map(field => {
                 const copy = cleanup(field, ...fieldKeys);
 
@@ -199,7 +203,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
                 return copy;
             }),
-            properties: cleanup(this.properties)
+            isPublished: this.isPublished
         };
 
         return result;
