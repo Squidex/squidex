@@ -16,8 +16,10 @@ using Squidex.Domain.Apps.Entities.Assets;
 namespace Squidex.Web
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class AssetRequestSizeLimitAttribute : Attribute, IAuthorizationFilter, IRequestSizePolicy
+    public sealed class AssetRequestSizeLimitAttribute : Attribute, IAuthorizationFilter, IRequestSizePolicy, IOrderedFilter
     {
+        public int Order { get; } = 900;
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var assetOptions = context.HttpContext.RequestServices.GetService<IOptions<AssetOptions>>();
@@ -34,6 +36,16 @@ namespace Squidex.Web
                 {
                     maxRequestBodySizeFeature.MaxRequestBodySize = null;
                 }
+            }
+
+            if (assetOptions?.Value.MaxSize > 0)
+            {
+                var options = new FormOptions
+                {
+                    MultipartBodyLengthLimit = assetOptions.Value.MaxSize
+                };
+
+                context.HttpContext.Features.Set<IFormFeature>(new FormFeature(context.HttpContext.Request, options));
             }
         }
     }
