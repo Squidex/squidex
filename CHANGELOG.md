@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.1 - 2019-11-14
+
+### Bugfixes
+
+* **UI**: Cancel button for new apps should not be disabled after submit.
+* **Schema**: Fixed synchronization for list fields and reference fields.
+
 ## 4.0.0 - 2019-11-13
 
 ### Breaking Changes
