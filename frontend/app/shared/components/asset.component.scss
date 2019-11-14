@@ -57,6 +57,8 @@ $list-height: 2.375rem;
     & {
         @include overlay-container;
         width: $asset-width;
+        border-top-width: 1px;
+        border-width: 1px;
     }
 
     &-body,

@@ -5,15 +5,19 @@
     (cdkDropListDropped)="changeCategory($event)">
 
     <div class="header clearfix">
-        <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
-            <i [class.icon-caret-right]="!snapshot.isOpen" [class.icon-caret-down]="snapshot.isOpen"></i> 
-        </button>
-
-        <h3>{{schemaCategory.name}} ({{snapshot.filtered.length}})</h3>
-        
-        <button type="button" class="btn btn-sm btn-text-secondary float-right" *ngIf="schemaCategory.schemas.length === 0 && !forContent" (click)="emitRemove()">
-            <i class="icon-bin2"></i> 
-        </button>
+        <div class="row no-gutters">
+            <div class="col-auto">
+                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
+                    <i [class.icon-caret-right]="!snapshot.isOpen" [class.icon-caret-down]="snapshot.isOpen"></i> 
+                </button>
+            </div>
+            <div class="col">
+                <h3 class="truncate">{{schemaCategory.name}} </h3>
+            </div>
+            <div class="col-auto">
+                ({{snapshot.filtered.length}})
+            </div>
+        </div>        
     </div>
 
     <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
