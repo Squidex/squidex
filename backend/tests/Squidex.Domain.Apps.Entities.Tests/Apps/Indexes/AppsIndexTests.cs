@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_not_app_to_user_index_if_app_created_by_client()
+        public async Task Should_also_app_to_user_index_if_app_created_by_client()
         {
             var token = RandomHash.Simple();
 
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         [Fact]

@@ -184,10 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         {
                             await index.AddAsync(token);
 
-                            if (createApp.Actor.IsSubject)
-                            {
-                                await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
-                            }
+                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
                         }
                         else
                         {
