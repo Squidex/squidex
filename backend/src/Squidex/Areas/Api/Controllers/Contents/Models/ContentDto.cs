@@ -89,17 +89,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The name of the schema.
         /// </summary>
-        public string SchemaName { get; set; }
+        public string? SchemaName { get; set; }
 
         /// <summary>
         /// The display name of the schema.
         /// </summary>
-        public string SchemaDisplayName { get; set; }
+        public string? SchemaDisplayName { get; set; }
 
         /// <summary>
         /// The reference fields.
         /// </summary>
-        public FieldDto[] ReferenceFields { get; set; }
+        public FieldDto[]? ReferenceFields { get; set; }
 
         /// <summary>
         /// The version of the content.

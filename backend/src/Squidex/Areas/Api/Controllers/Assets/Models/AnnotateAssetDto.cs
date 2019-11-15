@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The new asset tags.
         /// </summary>
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string>? Tags { get; set; }
 
         public AnnotateAsset ToCommand(Guid id)
         {

@@ -116,9 +116,7 @@
                     <h5><span class="badge badge-pill badge-dark">3</span> Add your app name the CLI config</h5>
 
                     <p>                 
-                        <sqx-code>
-                            sq config add {{appName}} {{appName}}:{{client.id}} ${{client.secret}} -u ${{apiUrl.value}}
-                        </sqx-code>
+                        <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}}</sqx-code>
                         
                         <sqx-form-hint>
                             You can manage configuration to multiple apps in the CLI and switch to an app.
@@ -130,9 +128,7 @@
                     <h5><span class="badge badge-pill badge-dark">4</span> Switch to your app in the CLI</h5>
             
                     <p>    
-                        <sqx-code>
-                            sq config use {{appName}}
-                        </sqx-code>
+                        <sqx-code>sq config use {{appName}}</sqx-code>
                     </p>
                 </div>
             </ng-container>

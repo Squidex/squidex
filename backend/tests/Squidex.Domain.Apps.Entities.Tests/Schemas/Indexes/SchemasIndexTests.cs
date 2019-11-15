@@ -18,6 +18,8 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable SA1133 // Do not combine attributes
+
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public class SchemasIndexTests
@@ -188,10 +190,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .MustNotHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_remove_schema_from_index_on_delete()
+        [Theory, InlineData(true), InlineData(false)]
+        public async Task Should_remove_schema_from_index_on_delete_when_existed_before(bool isDeleted)
         {
-            var schema = SetupSchema(0, false);
+            var schema = SetupSchema(0, isDeleted);
 
             var context =
                 new CommandContext(new DeleteSchema { SchemaId = schema.Id }, commandBus)

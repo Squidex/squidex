@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The resize mode when the width and height is defined.
         /// </summary>
         [FromQuery(Name = "mode")]
-        public string Mode { get; set; }
+        public string? Mode { get; set; }
 
         public bool ShouldResize()
         {
