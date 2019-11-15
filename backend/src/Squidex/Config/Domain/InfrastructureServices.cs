@@ -59,7 +59,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
 
-            services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
+            services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)

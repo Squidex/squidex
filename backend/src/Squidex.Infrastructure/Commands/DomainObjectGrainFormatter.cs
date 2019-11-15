@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class DomainObjectGrainFormatter
     {
-        public static string Format(IGrainCallContext context)
+        public static string Format(IIncomingGrainCallContext context)
         {
             if (context.InterfaceMethod == null)
             {
