@@ -55,7 +55,7 @@
     <td *ngFor="let field of schema.listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">
         <sqx-content-list-field
             [field]="field"
-            [patchForm]="patchForm.form"
+            [patchForm]="patchForm?.form"
             [patchAllowed]="patchAllowed"
             [content]="content"
             [language]="language">
