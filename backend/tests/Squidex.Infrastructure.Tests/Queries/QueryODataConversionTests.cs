@@ -19,15 +19,23 @@ namespace Squidex.Infrastructure.Queries
         {
             var entityType = new EdmEntityType("Squidex", "Users");
 
-            entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.Guid);
-            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty("isComicFigure", EdmPrimitiveTypeKind.Boolean);
-            entityType.AddStructuralProperty("firstName", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("lastName", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("birthday", EdmPrimitiveTypeKind.Date);
-            entityType.AddStructuralProperty("incomeCents", EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty("incomeMio", EdmPrimitiveTypeKind.Double);
-            entityType.AddStructuralProperty("age", EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.Guid, false);
+            entityType.AddStructuralProperty("idNullable", EdmPrimitiveTypeKind.Guid, true);
+            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset, false);
+            entityType.AddStructuralProperty("createdNullable", EdmPrimitiveTypeKind.DateTimeOffset, true);
+            entityType.AddStructuralProperty("isComicFigure", EdmPrimitiveTypeKind.Boolean, false);
+            entityType.AddStructuralProperty("isComicFigureNullable", EdmPrimitiveTypeKind.Boolean, true);
+            entityType.AddStructuralProperty("firstName", EdmPrimitiveTypeKind.String, true);
+            entityType.AddStructuralProperty("firstNameNullable", EdmPrimitiveTypeKind.String, false);
+            entityType.AddStructuralProperty("lastName", EdmPrimitiveTypeKind.String, true);
+            entityType.AddStructuralProperty("birthday", EdmPrimitiveTypeKind.Date, false);
+            entityType.AddStructuralProperty("birthdayNullable", EdmPrimitiveTypeKind.Date, true);
+            entityType.AddStructuralProperty("incomeCents", EdmPrimitiveTypeKind.Int64, false);
+            entityType.AddStructuralProperty("incomeCentsNullable", EdmPrimitiveTypeKind.Int64, true);
+            entityType.AddStructuralProperty("incomeMio", EdmPrimitiveTypeKind.Double, false);
+            entityType.AddStructuralProperty("incomeMioNullable", EdmPrimitiveTypeKind.Double, true);
+            entityType.AddStructuralProperty("age", EdmPrimitiveTypeKind.Int32, false);
+            entityType.AddStructuralProperty("ageNullable", EdmPrimitiveTypeKind.Int32, true);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 
@@ -49,11 +57,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.NotNull(parser);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_datetime()
+        [Theory]
+        [InlineData("created")]
+        [InlineData("createdNullable")]
+        public void Should_parse_filter_when_type_is_datetime(string field)
         {
-            var i = Q("$filter=created eq 1988-01-19T12:00:00Z");
-            var o = C("Filter: created == 1988-01-19T12:00:00Z");
+            var i = Q($"$filter={field} eq 1988-01-19T12:00:00Z");
+            var o = C($"Filter: {field} == 1988-01-19T12:00:00Z");
 
             Assert.Equal(o, i);
         }
@@ -68,7 +78,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_date()
+        public void Should_parse_filter_when_type_is_datetime_and_and_value_is_date()
         {
             var i = Q("$filter=created eq 1988-01-19");
             var o = C("Filter: created == 1988-01-19T00:00:00Z");
@@ -76,20 +86,33 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_date_list()
+        [Theory]
+        [InlineData("birthday")]
+        [InlineData("birthdayNullable")]
+        public void Should_parse_filter_when_type_is_date(string field)
         {
-            var i = Q("$filter=created in ('1988-01-19')");
-            var o = C("Filter: created in [1988-01-19T00:00:00Z]");
+            var i = Q($"$filter={field} eq 1988-01-19");
+            var o = C($"Filter: {field} == 1988-01-19T00:00:00Z");
 
             Assert.Equal(o, i);
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_guid()
+        public void Should_parse_filter_when_type_is_date_list()
         {
-            var i = Q("$filter=id eq B5FE25E3-B262-4B17-91EF-B3772A6B62BB");
-            var o = C("Filter: id == b5fe25e3-b262-4b17-91ef-b3772a6b62bb");
+            var i = Q("$filter=birthday in ('1988-01-19')");
+            var o = C("Filter: birthday in [1988-01-19T00:00:00Z]");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("id")]
+        [InlineData("idNullable")]
+        public void Should_parse_filter_when_type_is_guid(string field)
+        {
+            var i = Q($"$filter={field} eq B5FE25E3-B262-4B17-91EF-B3772A6B62BB");
+            var o = C($"Filter: {field} == b5fe25e3-b262-4b17-91ef-b3772a6b62bb");
 
             Assert.Equal(o, i);
         }
@@ -112,11 +135,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_string()
+        [Theory]
+        [InlineData("firstName")]
+        [InlineData("firstNameNullable")]
+        public void Should_parse_filter_when_type_is_string(string field)
         {
-            var i = Q("$filter=firstName eq 'Dagobert'");
-            var o = C("Filter: firstName == 'Dagobert'");
+            var i = Q($"$filter={field} eq 'Dagobert'");
+            var o = C($"Filter: {field} == 'Dagobert'");
 
             Assert.Equal(o, i);
         }
@@ -130,11 +155,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_boolean()
+        [Theory]
+        [InlineData("isComicFigure")]
+        [InlineData("isComicFigureNullable")]
+        public void Should_parse_filter_when_type_is_boolean(string field)
         {
-            var i = Q("$filter=isComicFigure eq true");
-            var o = C("Filter: isComicFigure == True");
+            var i = Q($"$filter={field} eq true");
+            var o = C($"Filter: {field} == True");
 
             Assert.Equal(o, i);
         }
@@ -148,11 +175,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_int32()
+        [Theory]
+        [InlineData("age")]
+        [InlineData("ageNullable")]
+        public void Should_parse_filter_when_type_is_int32(string field)
         {
-            var i = Q("$filter=age eq 60");
-            var o = C("Filter: age == 60");
+            var i = Q($"$filter={field} eq 60");
+            var o = C($"Filter: {field} == 60");
 
             Assert.Equal(o, i);
         }
@@ -166,11 +195,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_int64()
+        [Theory]
+        [InlineData("incomeCents")]
+        [InlineData("incomeCentsNullable")]
+        public void Should_parse_filter_when_type_is_int64(string field)
         {
-            var i = Q("$filter=incomeCents eq 31543143513456789");
-            var o = C("Filter: incomeCents == 31543143513456789");
+            var i = Q($"$filter={field} eq 31543143513456789");
+            var o = C($"Filter: {field} == 31543143513456789");
 
             Assert.Equal(o, i);
         }
@@ -184,11 +215,13 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
-        [Fact]
-        public void Should_parse_filter_when_type_is_double()
+        [Theory]
+        [InlineData("incomeMio")]
+        [InlineData("incomeMioNullable")]
+        public void Should_parse_filter_when_type_is_double(string field)
         {
-            var i = Q("$filter=incomeMio eq 5634474356.1233");
-            var o = C("Filter: incomeMio == 5634474356.1233");
+            var i = Q($"$filter={field} eq 5634474356.1233");
+            var o = C($"Filter: {field} == 5634474356.1233");
 
             Assert.Equal(o, i);
         }
