@@ -35,6 +35,8 @@ namespace Squidex.Config
 
         public string MicrosoftSecret { get; set; }
 
+        public string MicrosoftTenant { get; set; }
+
         public string OidcName { get; set; }
 
         public string OidcClient { get; set; }
