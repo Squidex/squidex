@@ -149,7 +149,7 @@
         @include border-radius(.25em);
         @include box-shadow;
         max-height: 15rem;
-        border: 1px solid $color-input-border;
+        border: 1px solid $color-input;
         background: $color-dark-foreground;
         padding: .25rem 0;
         overflow-y: auto;
@@ -257,10 +257,8 @@ input {
     &.form-underlined {
         & {
             @include border-radius(0);
-            padding-left: 0;
-            padding-right: 0;
             border: 0;
-            border-bottom: 1px solid $color-input-border;
+            border-bottom: 1px solid $color-input;
         }
 
         &:focus,
@@ -270,6 +268,14 @@ input {
             border-color: transparent;
             border-bottom-color: $color-theme-blue;
             outline: none;
+        }
+
+        &:disabled {
+            background: none;
+        }
+
+        &[readonly] {
+            background: none;
         }
 
         &.ng-invalid {

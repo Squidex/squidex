@@ -19,7 +19,6 @@
     "@angular/common": "8.2.9",
     "@angular/core": "8.2.9",
     "@angular/forms": "8.2.9",
-    "@angular/http": "7.2.15",
     "@angular/platform-browser": "8.2.9",
     "@angular/platform-browser-dynamic": "8.2.9",
     "@angular/platform-server": "8.2.9",

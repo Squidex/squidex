@@ -11,6 +11,14 @@
     }
 }
 
+.prefix {
+    border: 0;
+    border-bottom: 1px solid $color-input;
+    padding-left: 0;
+    padding-right: 0;
+    color: $color-text-decent;
+}
+
 .rule-name {
     @include truncate;
 }

@@ -55,6 +55,12 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     @Input()
     public placeholder = '';
 
+    @Input()
+    public autoFocus = false;
+
+    @Input()
+    public underlined = false;
+
     @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
 

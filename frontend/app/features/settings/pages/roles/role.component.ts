@@ -18,6 +18,13 @@ import {
     RolesState
 } from '@app/shared';
 
+const Descriptions = {
+    'Developer': 'Can use the API view, edit assets, contents, schemas, rules, workflows and patterns.',
+    'Editor': 'Can edit assets and contents and view workflows.',
+    'Owner': 'Can do everything, including deleting the app.',
+    'Reader': 'Can only read assets and contents.'
+};
+
 @Component({
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
@@ -36,6 +43,8 @@ export class RoleComponent implements OnChanges {
 
     @ViewChild('addInput', { static: false })
     public addPermissionInput: AutocompleteComponent;
+
+    public descriptions = Descriptions;
 
     public isEditing = false;
     public isEditable = false;

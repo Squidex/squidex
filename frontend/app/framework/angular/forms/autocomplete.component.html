@@ -1,5 +1,9 @@
 <span>
-    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="onKeyDown($event)" [attr.placeholder]="placeholder" #input
+    <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)"
+        [sqxFocusOnInit]="autoFocus"
+        [attr.name]="inputName"  
+        [attr.placeholder]="placeholder" #input
+        [class.form-underlined]="underlined"
         [formControl]="queryInput"
         autocomplete="off" 
         autocorrect="off"
