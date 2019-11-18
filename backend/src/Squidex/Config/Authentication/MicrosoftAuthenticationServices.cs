@@ -26,8 +26,9 @@ namespace Squidex.Config.Authentication
 
                     if (!string.IsNullOrEmpty(tenantId))
                     {
-                        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/authorize";
-                        options.TokenEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/token";
+                        var resource = "https://graph.microsoft.com";
+                        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/authorize?resource={resource}";
+                        options.TokenEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/token?resource={resource}";
                     }
                 });
             }
