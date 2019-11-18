@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core;
@@ -113,8 +114,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             Validate.It(() => "Cannot configure UI fields.", e =>
             {
-                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, true);
-                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
+                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
             });
         }
 
@@ -162,8 +163,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 }
             }
 
-            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, true);
-            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
+            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
         }
 
         private static void ValidateRootField(UpsertSchemaField field, UpsertCommand command, string prefix, AddValidation e)
@@ -261,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, bool withMeta = false)
+        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {
@@ -279,7 +280,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (field == null && (!withMeta || !MetaFields.All.Contains(fieldName)))
+                    else if (field == null && !isAllowed(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
@@ -299,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, bool withMeta = false)
+        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {
@@ -317,7 +318,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (field == null && (!withMeta || !MetaFields.All.Contains(fieldName)))
+                    else if (field == null && !isAllowed(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
@@ -335,6 +336,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                 }
             }
+        }
+
+        private static bool IsMetaField(string field)
+        {
+            return field.StartsWith("meta.", StringComparison.Ordinal);
+        }
+
+        private static bool IsNotAllowed(string field)
+        {
+            return false;
         }
 
         private static void ValidateFieldIds<T>(ReorderFields c, IReadOnlyDictionary<long, T> fields, AddValidation e)
