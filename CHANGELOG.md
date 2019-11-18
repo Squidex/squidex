@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.0.2 - 2019-11-18
+
+### Bugfixes
+
+* **API**: Fix parsing of OData queries with required fields.
+* **API**: Also add client to contributor index.
+* **API**: Fix Asset upload size limit.
+* **API**: Fixed required attribute for generated OpenAPI schema.
+* **UI**: Add scripts to schema export so that it does not get overwritten on sync.
+* **UI**: Field readonly fields in content lists.
+
 ## 4.0.1 - 2019-11-14
 
 ### Bugfixes
