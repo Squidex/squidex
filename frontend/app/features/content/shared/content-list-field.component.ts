@@ -56,6 +56,11 @@ import {
                     {{content.status}}
                 </span>
             </ng-container>
+            <ng-container *ngSwitchCase="metaFields.statusNext">
+                <span class="truncate" *ngIf="content.scheduleJob">
+                    {{content.scheduleJob.status}} at {{content.scheduleJob.dueTime | sqxShortDate}}
+                </span>
+            </ng-container>
             <ng-container *ngSwitchCase="metaFields.statusColor">
                 <sqx-content-status
                     [status]="content.status"

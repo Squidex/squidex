@@ -47,6 +47,7 @@ export const MetaFields = {
     lastModifiedByName: 'meta.lastModifiedBy.name',
     status: 'meta.status',
     statusColor: 'meta.status.color',
+    statusNext: 'meta.status.next',
     version: 'meta.version'
 };
 

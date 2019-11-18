@@ -56,6 +56,9 @@ import {
             <ng-container *ngSwitchCase="metaFields.status">
                 <sqx-table-header text="Status"></sqx-table-header>
             </ng-container>
+            <ng-container *ngSwitchCase="metaFields.statusNext">
+                <sqx-table-header text="Next Status"></sqx-table-header>
+            </ng-container>
             <ng-container *ngSwitchCase="metaFields.statusColor">
                 <sqx-table-header text="Status"></sqx-table-header>
             </ng-container>
