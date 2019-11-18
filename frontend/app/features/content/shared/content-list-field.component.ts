@@ -57,8 +57,8 @@ import {
                 </span>
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.statusNext">
-                <span class="truncate" *ngIf="content.scheduleJob">
-                    {{content.scheduleJob.status}} at {{content.scheduleJob.dueTime | sqxShortDate}}
+                <span class="truncate" *ngIf="content.scheduleJob; let job">
+                    {{job.status}} at {{job.dueTime | sqxShortDate}}
                 </span>
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.statusColor">
