@@ -60,6 +60,8 @@ function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
+    private previousId: string;
+
     public selectedContent =
         this.project(x => x.selectedContent, sameContent);
 
@@ -115,7 +117,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             of(this.snapshot.contents.find(x => x.id === id)).pipe(
                 switchMap(content => {
                     if (!content) {
-                        return this.contentsService.getContent(this.appName, this.schemaName, id).pipe(catchError(() => of(null)));
+                        return this.contentsService.getContent(this.appName, this.schemaId, id).pipe(catchError(() => of(null)));
                     } else {
                         return of(content);
                     }
@@ -123,7 +125,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
+        if (this.schemaId !== this.previousId) {
             this.resetState();
         }
 
@@ -143,11 +145,13 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private loadInternalCore(isReload = false) {
-        if (!this.appName) {
+        if (!this.appName || !this.schemaId) {
             return empty();
         }
 
-        return this.contentsService.getContents(this.appName, this.schemaName,
+        this.previousId = this.schemaId;
+
+        return this.contentsService.getContents(this.appName, this.schemaId,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined).pipe(
@@ -181,12 +185,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
+        return this.contentsService.getVersionData(this.appName, this.schemaId, content.id, version).pipe(
             shareSubscribed(this.dialogs));
     }
 
     public create(request: any, publish: boolean): Observable<ContentDto> {
-        return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
+        return this.contentsService.postContent(this.appName, this.schemaId, request, publish).pipe(
             tap(payload => {
                 this.dialogs.notifyInfo('Content created successfully.');
 
@@ -338,7 +342,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    protected abstract get schemaName(): string;
+    protected abstract get schemaId(): string;
 }
 
 @Injectable()
@@ -349,8 +353,8 @@ export class ContentsState extends ContentsStateBase {
         super(appsState, contentsService, dialogs);
     }
 
-    protected get schemaName() {
-        return this.schemasState.schemaName;
+    protected get schemaId() {
+        return this.schemasState.schemaId;
     }
 }
 
@@ -364,7 +368,7 @@ export class ManualContentsState extends ContentsStateBase {
         super(appsState, contentsService, dialogs);
     }
 
-    protected get schemaName() {
+    protected get schemaId() {
         return this.schema.name;
     }
 }

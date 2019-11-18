@@ -154,7 +154,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemSelected(content: ContentDto): boolean {
-        return !!this.selectedItems[content.id];
+        return this.selectedItems[content.id] === true;
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {

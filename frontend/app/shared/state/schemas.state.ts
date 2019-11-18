@@ -63,10 +63,6 @@ function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null)
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
-    public get schemaName() {
-        return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.name : '';
-    }
-
     public categoriesPlain =
         this.project(x => x.categories);
 
@@ -90,6 +86,14 @@ export class SchemasState extends State<Snapshot> {
 
     public categories =
         this.projectFrom2(this.schemas, this.categoriesPlain, (s, c) => buildCategories(c, s));
+
+    public get schemaId() {
+        return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.id : '';
+    }
+
+    public get schemaName() {
+        return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.name : '';
+    }
 
     constructor(
         private readonly appsState: AppsState,
