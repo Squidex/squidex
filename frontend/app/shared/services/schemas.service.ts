@@ -180,6 +180,7 @@ export class SchemaDetailsDto extends SchemaDto {
         const result: any = {
             properties: cleanup(this.properties),
             category: this.category,
+            scripts: this.scripts,
             fieldsInLists: this.fieldsInLists,
             fieldsInReferences: this.fieldsInReferences,
             fields: this.fields.map(field => {
