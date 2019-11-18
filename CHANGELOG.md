@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.3 - 2019-11-18
+
+### Features
+
+* **Login**: Support for Microsoft TenantId. Thanks to [mhilgersom](https://github.com/mhilgersom)
+
 ## 4.0.2 - 2019-11-18
 
 ### Bugfixes
