@@ -21,6 +21,15 @@ namespace Squidex.Config.Authentication
                     options.ClientId = identityOptions.MicrosoftClient;
                     options.ClientSecret = identityOptions.MicrosoftSecret;
                     options.Events = new MicrosoftHandler();
+
+                    var tenantId = identityOptions.MicrosoftTenant;
+
+                    if (!string.IsNullOrEmpty(tenantId))
+                    {
+                        var resource = "https://graph.microsoft.com";
+                        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/authorize?resource={resource}";
+                        options.TokenEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/token?resource={resource}";
+                    }
                 });
             }
 
