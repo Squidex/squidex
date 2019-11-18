@@ -125,8 +125,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (this.schemaId !== this.previousId) {
-            this.resetState();
+        if (!isReload) {
+            if (this.schemaId !== this.previousId) {
+                this.resetState();
+            } else {
+                const contentsPager = this.snapshot.contentsPager;
+                const contentsQuery = this.snapshot.contentsQuery;
+                const contentsQueryJson = this.snapshot.contentsQueryJson;
+
+                this.resetState({ contentsPager, contentsQuery, contentsQueryJson });
+            }
         }
 
         return this.loadInternal(isReload);
