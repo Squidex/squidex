@@ -20,7 +20,8 @@ export type QueryValueType =
     'number' |
     'reference' |
     'status' |
-    'string';
+    'string' |
+    'tags';
 
 export interface FilterOperator {
     // The optional display value.
@@ -171,6 +172,11 @@ const TypeString: QueryFieldModel = {
     operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
 };
 
+const TypeTags: QueryFieldModel = {
+    type: 'string',
+    operators: EqualOperators
+};
+
 export function queryModelFromSchema(schema: SchemaDetailsDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
     const languagesCodes = languages.map(x => x.iso2Code);
 
@@ -193,7 +199,9 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
     for (const field of schema.fields) {
         let type: QueryFieldModel | null = null;
 
-        if (field.properties.fieldType === 'Boolean') {
+        if (field.properties.fieldType === 'Tags') {
+            type = TypeTags;
+        } else if (field.properties.fieldType === 'Boolean') {
             type = TypeBoolean;
         } else if (field.properties.fieldType === 'Number') {
             type = TypeNumber;
