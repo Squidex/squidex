@@ -118,7 +118,7 @@ describe('AssetsState', () => {
             expect(assetsState.isTagSelectionEmpty()).toBeTruthy();
         });
 
-        it('should load next page and prev page when paging', () => {
+        it('should load with new pagination when paging', () => {
             assetsService.setup(x => x.getAssets(app, 30, 0, undefined, It.isValue([])))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 

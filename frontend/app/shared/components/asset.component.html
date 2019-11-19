@@ -9,12 +9,16 @@
                     {{asset.fileType}}
                 </span>
                 
-                <div *ngIf="asset.canPreview" class="file-image">
-                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
-                </div>
-                <div *ngIf="!asset.canPreview" class="file-icon">
-                    <img [attr.src]="asset | sqxFileIcon">
-                </div>
+                <ng-container *ngIf="asset.canPreview; else noPreview">
+                    <div class="file-image">
+                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
+                    </div>
+                </ng-container>
+                <ng-template #noPreview>
+                    <div class="file-icon">
+                        <img [attr.src]="asset | sqxFileIcon">
+                    </div>
+                </ng-template>
 
                 <div class="overlay">
                     <div class="overlay-background"></div>
@@ -50,15 +54,15 @@
                         </div>
                     </div>
                 </div>
+        
+                <div class="drop-overlay align-items-center justify-content-center">
+                    <div class="drop-overlay-background"></div>
+                    <div class="drop-overlay-text">Drop to update</div>
+                </div>
             </div>
 
             <div class="upload-progress" *ngIf="progress > 0">
                 <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
-            </div>
-        
-            <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
-                <div class="drop-overlay-background"></div>
-                <div class="drop-overlay-text">Drop to update</div>
             </div>
         </div>
         <div class="card-footer" (dblclick)="edit()">
@@ -86,52 +90,62 @@
         [noDrop]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
-        <div *ngIf="asset && asset.canPreview && progress === 0" class="image drag-handle" [class.image-left]="!isSelectable">
-            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
-        </div>
-        <div *ngIf="asset && !asset.canPreview && progress === 0" class="image drag-handle image-padded" [class.image-left]="!isSelectable">
-            <img class="icon" [attr.src]="asset | sqxFileIcon">
-        </div>
+        <ng-container *ngIf="asset && progress === 0">
+            <ng-container *ngIf="asset.canPreview; else noPreview">
+                <div class="image drag-handle" [class.image-left]="!isSelectable">
+                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
+                </div>
+            </ng-container>
+            <ng-template #noPreview>
+                <div class="image drag-handle image-padded" [class.image-left]="!isSelectable">
+                    <img class="icon" [attr.src]="asset | sqxFileIcon">
+                </div>
+            </ng-template>
+            
+            <table class="table-fixed">
+                <tr>
+                    <td class="col-name">
+                        <div class="file-name editable" (click)="edit()">
+                            {{asset.fileName}}
+                        </div>
+                    </td>
 
-        <table class="table-fixed" *ngIf="asset && progress === 0">
-            <tr>
-                <td class="col-name">
-                    <div class="file-name editable" (click)="edit()">
-                        {{asset.fileName}}
-                    </div>
-                </td>
-                <td class="col-info" *ngIf="!isCompact">
-                    <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
-                </td>
-                <td class="col-user" *ngIf="!isCompact">
-                    <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
-                </td>
-                <td class="col-actions text-right" *ngIf="!isCompact">
-                    <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
-                        <i class="icon-download"></i>
-                    </a>
-                </td>
-                <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
-                    <button type="button" class="btn btn-text-danger" *ngIf="!isDisabled && !removeMode && asset.canDelete"
-                        (sqxConfirmClick)="emitDelete()"
-                        confirmTitle="Delete asset" 
-                        confirmText="Do you really want to delete the asset?">
-                        <i class="icon-bin2"></i>
-                    </button>
-                    <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">
-                        <i class="icon-close"></i>
-                    </button>
-                </td>
-            </tr>
-        </table>
+                    <ng-container *ngIf="!isCompact">
+                        <td class="col-info">
+                            <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+                        </td>
+                        <td class="col-user">
+                            <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
+                        </td>
+                        <td class="col-actions text-right">
+                            <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
+                                <i class="icon-download"></i>
+                            </a>
+                        </td>
+                    </ng-container>
+
+                    <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
+                        <button type="button" class="btn btn-text-danger" *ngIf="!isDisabled && !removeMode && asset.canDelete"
+                            (sqxConfirmClick)="emitDelete()"
+                            confirmTitle="Delete asset" 
+                            confirmText="Do you really want to delete the asset?">
+                            <i class="icon-bin2"></i>
+                        </button>
+                        <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">
+                            <i class="icon-close"></i>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+
+        <div class="drop-overlay align-items-center justify-content-center">
+            <div class="drop-overlay-background"></div>
+            <div class="drop-overlay-text">Drop to update</div>
+        </div>
+        </ng-container>
 
         <div class="upload-progress" *ngIf="progress > 0">
             <sqx-progress-bar [value]="progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
-        </div>
-
-        <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
-            <div class="drop-overlay-background"></div>
-            <div class="drop-overlay-text">Drop to update</div>
         </div>
     </div>
 </ng-template>

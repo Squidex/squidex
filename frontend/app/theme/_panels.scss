@@ -403,10 +403,12 @@ a {
     }
 
     .grid-footer {
-        border-top: 2px solid $color-border;
-    }
+        & {
+            border-top: 2px solid $color-border;
+        }
 
-    .pagination {
-        margin: .25rem 0;
+        .pagination {
+            margin: .25rem 0;
+        }
     }
 }

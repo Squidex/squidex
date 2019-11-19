@@ -201,7 +201,7 @@ describe('Pager', () => {
         const pager_2 = pager_1.setPageSize(30);
 
         expect(Object.assign({}, pager_2)).toEqual(<any>{
-            page: 1,
+            page: 0,
             pageSize: 30,
             itemFirst: 1,
             itemLast: 21,

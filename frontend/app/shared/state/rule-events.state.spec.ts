@@ -63,7 +63,7 @@ describe('RuleEventsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should load next page and prev page when paging', () => {
+    it('should load with new pagination when paging', () => {
         rulesService.setup(x => x.getEvents(app, 10, 10, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
@@ -72,7 +72,7 @@ describe('RuleEventsState', () => {
         expect().nothing();
 
         rulesService.verify(x => x.getEvents(app, 10, 10, undefined), Times.once());
-        rulesService.verify(x => x.getEvents(app, 10, 0, undefined), Times.exactly(2));
+        rulesService.verify(x => x.getEvents(app, 10, 0, undefined), Times.once());
     });
 
     it('should load with rule id when filtered', () => {
@@ -83,7 +83,7 @@ describe('RuleEventsState', () => {
 
         expect().nothing();
 
-        rulesService.verify(x => x.getEvents(app, 10, 0, '12'), Times.exactly(1));
+        rulesService.verify(x => x.getEvents(app, 10, 0, '12'), Times.once());
     });
 
     it('should call service when enqueuing event', () => {

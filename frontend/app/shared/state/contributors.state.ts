@@ -110,8 +110,8 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public setPager(contentsPager: Pager) {
-        this.next(s => ({ ...s, contentsPager }));
+    public setPager(contributorsPager: Pager) {
+        this.next(s => ({ ...s, contributorsPager }));
     }
 
     public search(query: string) {
@@ -142,15 +142,17 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
-        this.next(() => {
+        this.next(s => {
             const { canCreate, items: contributors, maxContributors } = payload;
+
+            const contributorsPager = s.contributorsPager.setCount(contributors.length);
 
             return {
                 canCreate,
                 contributors,
+                contributorsPager,
                 isLoaded: true,
                 maxContributors,
-                page: 0,
                 version
             };
         });

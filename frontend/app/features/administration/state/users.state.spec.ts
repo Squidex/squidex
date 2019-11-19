@@ -89,7 +89,7 @@ describe('UsersState', () => {
 
         it('should load with new pagination when paging', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.exactly(1));
+                .returns(() => of(oldUsers)).verifiable(Times.once());
 
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();

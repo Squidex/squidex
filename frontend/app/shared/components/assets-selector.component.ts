@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, On
 import {
     AssetDto,
     AssetsState,
-    fadeAnimation,
     LocalStoreService,
     Query,
     StatefulComponent
