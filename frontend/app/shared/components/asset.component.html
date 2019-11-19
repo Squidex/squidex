@@ -16,7 +16,7 @@
                 </ng-container>
                 <ng-template #noPreview>
                     <div class="file-icon">
-                        <img [attr.src]="asset | sqxFileIcon">
+                        <img [src]="asset | sqxFileIcon">
                     </div>
                 </ng-template>
 
@@ -98,7 +98,7 @@
             </ng-container>
             <ng-template #noPreview>
                 <div class="image drag-handle image-padded" [class.image-left]="!isSelectable">
-                    <img class="icon" [attr.src]="asset | sqxFileIcon">
+                    <img class="icon" [src]="asset | sqxFileIcon">
                 </div>
             </ng-template>
             
@@ -115,7 +115,7 @@
                             <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
                         </td>
                         <td class="col-user">
-                            <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
+                            <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef" />
                         </td>
                         <td class="col-actions text-right">
                             <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">

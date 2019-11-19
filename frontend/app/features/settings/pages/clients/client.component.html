@@ -42,7 +42,7 @@
                     Client Secret
                 </label>
                 <div class="col cell-input">
-                    <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
+                    <input readonly class="form-control" [value]="client.secret" #inputSecret />
                 </div>
                 <div class="col-auto cell-actions no-padding">
                     <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">

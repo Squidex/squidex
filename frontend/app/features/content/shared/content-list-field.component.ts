@@ -29,7 +29,7 @@ import {
                 <small class="truncate">{{content.created | sqxFromNow}}</small>
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.createdByAvatar">
-                <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [attr.src]="content.createdBy | sqxUserPictureRef" />
+                <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [src]="content.createdBy | sqxUserPictureRef" />
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.createdByName">
                 <small class="truncate">{{content.createdBy | sqxUserNameRef}}</small>
@@ -38,7 +38,7 @@ import {
                 <small class="truncate">{{content.lastModified | sqxFromNow}}</small>
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.lastModifiedByAvatar">
-                <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
+                <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [src]="content.lastModifiedBy | sqxUserPictureRef" />
             </ng-container>
             <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
                 <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>

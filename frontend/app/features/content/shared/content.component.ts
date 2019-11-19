@@ -104,11 +104,11 @@ export class ContentComponent implements OnChanges {
                 .subscribe(() => {
                     this.patchForm.submitCompleted({ noReset: true});
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 }, error => {
                     this.patchForm.submitFailed(error);
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 });
         }
     }
