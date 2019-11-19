@@ -10,6 +10,7 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     DialogService,
+    Pager,
     RuleEventsDto,
     RuleEventsState,
     RulesService
@@ -66,8 +67,7 @@ describe('RuleEventsState', () => {
         rulesService.setup(x => x.getEvents(app, 10, 10, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
-        ruleEventsState.goNext().subscribe();
-        ruleEventsState.goPrev().subscribe();
+        ruleEventsState.setPager(new Pager(20, 1, 10));
 
         expect().nothing();
 

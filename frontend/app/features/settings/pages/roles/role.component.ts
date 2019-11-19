@@ -13,7 +13,6 @@ import {
     AutocompleteComponent,
     AutocompleteSource,
     EditPermissionsForm,
-    fadeAnimation,
     RoleDto,
     RolesState
 } from '@app/shared';
@@ -29,9 +28,6 @@ const Descriptions = {
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleComponent implements OnChanges {

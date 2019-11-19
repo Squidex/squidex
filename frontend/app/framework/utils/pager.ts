@@ -6,6 +6,8 @@
  */
 
 export class Pager {
+    public static readonly DEFAULT = new Pager(0);
+
     public canGoNext = false;
     public canGoPrev = false;
 
@@ -52,6 +54,10 @@ export class Pager {
 
     public reset(): Pager {
         return new Pager(0, 0, this.pageSize);
+    }
+
+    public setPageSize(pageSize: number): Pager {
+        return new Pager(this.numberOfItems, this.page, pageSize);
     }
 
     public setCount(numberOfItems: number): Pager {

@@ -111,14 +111,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         this.contentsState.search(query);
     }
 
-    public goNext() {
-        this.contentsState.goNext();
-    }
-
-    public goPrev() {
-        this.contentsState.goPrev();
-    }
-
     public isItemSelected(content: ContentDto) {
         return !!this.selectedItems[content.id];
     }

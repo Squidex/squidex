@@ -13,6 +13,7 @@ import {
     AssetsService,
     AssetsState,
     DialogService,
+    Pager,
     versioned
 } from '@app/shared/internal';
 
@@ -119,14 +120,13 @@ describe('AssetsState', () => {
 
         it('should load next page and prev page when paging', () => {
             assetsService.setup(x => x.getAssets(app, 30, 0, undefined, It.isValue([])))
-                .returns(() => of(new AssetsDto(200, []))).verifiable(Times.exactly(2));
+                .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, 30, 30, undefined, It.isValue([])))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.load().subscribe();
-            assetsState.goNext().subscribe();
-            assetsState.goPrev().subscribe();
+            assetsState.setPager(new Pager(60, 1, 30)).subscribe();
 
             expect().nothing();
         });

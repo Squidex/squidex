@@ -52,7 +52,7 @@
                                 </tbody>
                             </table>
 
-                            <sqx-pager [pager]="contributorsState.contributorsPager | async" [autoHide]="true" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+                            <sqx-pager [autoHide]="true" [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
                         </ng-container>
 
                         <ng-template #noContributors>

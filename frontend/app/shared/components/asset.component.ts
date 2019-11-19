@@ -12,26 +12,17 @@ import {
     AssetUploaderState,
     DialogModel,
     DialogService,
-    fadeAnimation,
-    StatefulComponent,
     Types,
     UploadCanceled
 } from '@app/shared/internal';
-
-interface State {
-    progress: number;
-}
 
 @Component({
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetComponent extends StatefulComponent<State> implements OnInit {
+export class AssetComponent implements OnInit {
     @Output()
     public load = new EventEmitter<AssetDto>();
 
@@ -77,15 +68,15 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public allTags: ReadonlyArray<string>;
 
+    public progress = 0;
+
     public editDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly assetUploader: AssetUploaderState,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
-        super(changeDetector, {
-            progress: 0
-        });
     }
 
     public ngOnInit() {
@@ -167,7 +158,9 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     }
 
     private setProgress(progress: number) {
-        this.next(s => ({ ...s, progress }));
+        this.progress = progress;
+
+        this.changeDetector.markForCheck();
     }
 
     public updateAsset(asset: AssetDto, emitEvent: boolean) {
@@ -177,7 +170,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
             this.emitUpdate();
         }
 
-        this.next(s => ({ ...s, progress: 0 }));
+        this.setProgress(0);
 
         this.cancelEdit();
     }

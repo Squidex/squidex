@@ -181,7 +181,9 @@ export class AssetsState extends State<Snapshot> {
                 tagsSelected[tag] = true;
             }
 
-            return { ...s, assetsPager: new Pager(0, 0, 30), tagsSelected };
+            const assetsPager = s.assetsPager.reset();
+
+            return { ...s, assetsPager, tagsSelected };
         });
 
         return this.loadInternal();
@@ -195,32 +197,28 @@ export class AssetsState extends State<Snapshot> {
                 tagsSelected[tag] = true;
             }
 
-            return { ...s, assetsPager: new Pager(0, 0, 30), tagsSelected };
+            const assetsPager = s.assetsPager.reset();
+
+            return { ...s, assetsPager: assetsPager, tagsSelected };
         });
 
         return this.loadInternal();
     }
 
     public resetTags(): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), tagsSelected: {} }));
+        this.next(s => ({ ...s, assetsPager: s.assetsPager.reset(), tagsSelected: {} }));
 
         return this.loadInternal();
     }
 
     public search(query?: Query): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query, assetsQueryJson: encodeQuery(query) }));
+        this.next(s => ({ ...s, assetsPager: s.assetsPager.reset(), assetsQuery: query, assetsQueryJson: encodeQuery(query) }));
 
         return this.loadInternal();
     }
 
-    public goNext(): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: s.assetsPager.goNext() }));
-
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: s.assetsPager.goPrev() }));
+    public setPager(assetsPager: Pager) {
+        this.next(s => ({ ...s, assetsPager }));
 
         return this.loadInternal();
     }

@@ -8,7 +8,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
-    fadeAnimation,
     FilterComparison,
     LanguageDto,
     QueryFieldModel,
@@ -20,9 +19,6 @@ import {
     selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterComparisonComponent implements OnChanges {

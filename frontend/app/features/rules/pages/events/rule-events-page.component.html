@@ -90,7 +90,7 @@
             </tbody>
         </table>
 
-        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async" (pagerChange)="ruleEventsState.setPager($event)"></sqx-pager>
     </ng-container>
 </sqx-panel>
 

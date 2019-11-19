@@ -50,7 +50,7 @@ export class RuleEventsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ ruleEvents: [], ruleEventsPager: new Pager(0) });
+        super({ ruleEvents: [], ruleEventsPager: Pager.DEFAULT });
     }
 
     public load(isReload = false): Observable<any> {
@@ -105,19 +105,13 @@ export class RuleEventsState extends State<Snapshot> {
             return empty();
         }
 
-        this.next(s => ({ ...s, ruleEventsPager: new Pager(0), ruleId }));
+        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
 
         return this.loadInternal();
     }
 
-    public goNext(): Observable<any> {
-        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goNext() }));
-
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<any> {
-        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goPrev() }));
+    public setPager(ruleEventsPager: Pager): Observable<any> {
+        this.next(s => ({ ...s, ruleEventsPager }));
 
         return this.loadInternal();
     }

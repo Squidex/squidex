@@ -12,7 +12,6 @@ import {
     ClientDto,
     ClientsState,
     DialogModel,
-    fadeAnimation,
     RoleDto
 } from '@app/shared';
 
@@ -20,9 +19,6 @@ import {
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientComponent {

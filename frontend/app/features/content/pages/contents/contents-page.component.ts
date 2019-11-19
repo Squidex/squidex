@@ -137,14 +137,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public goPrev() {
-        this.contentsState.goPrev();
-    }
-
-    public goNext() {
-        this.contentsState.goNext();
-    }
-
     public search(query: Query) {
         this.contentsState.search(query);
     }

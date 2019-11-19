@@ -195,4 +195,20 @@ describe('Pager', () => {
             canGoPrev: true
         });
     });
+
+    it('should update page size', () => {
+        const pager_1 = new Pager(21, 0, 10);
+        const pager_2 = pager_1.setPageSize(30);
+
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
+            page: 1,
+            pageSize: 30,
+            itemFirst: 1,
+            itemLast: 21,
+            skip: 0,
+            numberOfItems: 21,
+            canGoNext: false,
+            canGoPrev: false
+        });
+    });
 });

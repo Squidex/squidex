@@ -4,7 +4,7 @@
         [sqxDropDisabled]="!asset || !asset.canUpload"
         [noDrop]="true">
         <div class="card-body">
-            <div class="file-preview" *ngIf="asset && snapshot.progress === 0" @fade>
+            <div class="file-preview" *ngIf="asset && progress === 0">
                 <span class="file-type" *ngIf="asset.fileType">
                     {{asset.fileType}}
                 </span>
@@ -52,11 +52,11 @@
                 </div>
             </div>
 
-            <div class="upload-progress" *ngIf="snapshot.progress > 0">
-                <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
+            <div class="upload-progress" *ngIf="progress > 0">
+                <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
             </div>
         
-            <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && snapshot.progress === 0">
+            <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
                 <div class="drop-overlay-background"></div>
                 <div class="drop-overlay-text">Drop to update</div>
             </div>
@@ -86,14 +86,14 @@
         [noDrop]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
-        <div *ngIf="asset && asset.canPreview && snapshot.progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
+        <div *ngIf="asset && asset.canPreview && progress === 0" class="image drag-handle" [class.image-left]="!isSelectable">
             <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
         </div>
-        <div *ngIf="asset && !asset.canPreview && snapshot.progress === 0" class="image drag-handle image-padded" [class.image-left]="!isSelectable" @fade>
+        <div *ngIf="asset && !asset.canPreview && progress === 0" class="image drag-handle image-padded" [class.image-left]="!isSelectable">
             <img class="icon" [attr.src]="asset | sqxFileIcon">
         </div>
 
-        <table class="table-fixed" *ngIf="asset && snapshot.progress === 0" @fade>
+        <table class="table-fixed" *ngIf="asset && progress === 0">
             <tr>
                 <td class="col-name">
                     <div class="file-name editable" (click)="edit()">
@@ -125,11 +125,11 @@
             </tr>
         </table>
 
-        <div class="upload-progress" *ngIf="snapshot.progress > 0">
-            <sqx-progress-bar [value]="snapshot.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
+        <div class="upload-progress" *ngIf="progress > 0">
+            <sqx-progress-bar [value]="progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
         </div>
 
-        <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && snapshot.progress === 0">
+        <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
             <div class="drop-overlay-background"></div>
             <div class="drop-overlay-text">Drop to update</div>
         </div>

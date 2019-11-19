@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 
 import {
     DialogModel,
-    fadeAnimation,
     hasFilter,
     LanguageDto,
     Queries,
@@ -24,9 +23,6 @@ import {
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
