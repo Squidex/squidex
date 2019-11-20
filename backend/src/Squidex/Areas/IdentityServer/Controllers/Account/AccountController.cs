@@ -13,6 +13,9 @@ using System.Security;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using IdentityModel;
+using IdentityServer4;
+using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
@@ -145,9 +148,24 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/logout/")]
         public async Task<IActionResult> Logout(string logoutId)
         {
-            var context = await interactions.GetLogoutContextAsync(logoutId);
-
             await signInManager.SignOutAsync();
+
+            if (User?.Identity.IsAuthenticated == true)
+            {
+                var provider = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
+
+                if (provider != null && provider != IdentityServerConstants.LocalIdentityProvider)
+                {
+                    var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(provider);
+
+                    if (providerSupportsSignout)
+                    {
+                        return SignOut(provider);
+                    }
+                }
+            }
+
+            var context = await interactions.GetLogoutContextAsync(logoutId);
 
             return RedirectToLogoutUrl(context);
         }
