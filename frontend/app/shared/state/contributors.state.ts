@@ -12,6 +12,7 @@ import { catchError, tap } from 'rxjs/operators';
 import {
     DialogService,
     ErrorDto,
+    LocalStoreService,
     Pager,
     shareMapSubscribed,
     shareSubscribed,
@@ -87,11 +88,21 @@ export class ContributorsState extends State<Snapshot> {
         this.projectFrom2(this.contributorsPager, this.filtered, (p, c) => getPagedContributors(c, p));
 
     constructor(
-        private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly contributorsService: ContributorsService,
+        private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService
     ) {
-        super({ contributors: [], contributorsPager: Pager.DEFAULT, maxContributors: -1, version: Version.EMPTY });
+        super({
+            contributors: [],
+            contributorsPager: Pager.fromLocalStore('contributors', localStore),
+            maxContributors: -1,
+            version: Version.EMPTY
+        });
+
+        this.contributorsPager.subscribe(pager => {
+            pager.saveTo('contributors', this.localStore);
+        });
     }
 
     public load(isReload = false): Observable<any> {

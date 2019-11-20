@@ -12,6 +12,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import {
     DialogService,
     ErrorDto,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State,
@@ -95,9 +96,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService
     ) {
-        super({ contents: [], contentsPager: Pager.DEFAULT, contentsQueryJson: '' });
+        super({
+            contents: [],
+            contentsPager: Pager.fromLocalStore('contents', localStore),
+            contentsQueryJson: ''
+        });
+
+        this.contentsPager.subscribe(pager => {
+            pager.saveTo('contents', this.localStore);
+        });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -349,10 +359,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
 @Injectable()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
+    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs, localStore);
     }
 
     protected get schemaId() {
@@ -365,9 +375,9 @@ export class ManualContentsState extends ContentsStateBase {
     public schema: SchemaDto;
 
     constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService
     ) {
-        super(appsState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs, localStore);
     }
 
     protected get schemaId() {

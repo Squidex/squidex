@@ -38,7 +38,7 @@ describe('ClientsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         clientsService = Mock.ofType<ClientsService>();
-        clientsState = new ClientsState(clientsService.object, appsState.object, dialogs.object);
+        clientsState = new ClientsState(appsState.object, clientsService.object, dialogs.object);
     });
 
     afterEach(() => {

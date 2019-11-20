@@ -8,7 +8,11 @@
 import { of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { DialogService, Pager } from '@app/shared';
+import {
+    DialogService,
+    LocalStoreService,
+    Pager
+} from '@app/shared';
 
 import {
     UserDto,
@@ -29,14 +33,17 @@ describe('UsersState', () => {
     const newUser = createUser(3);
 
     let dialogs: IMock<DialogService>;
+    let localStore: IMock<LocalStoreService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
+        localStore = Mock.ofType<LocalStoreService>();
+
         usersService = Mock.ofType<UsersService>();
-        usersState = new UsersState(dialogs.object, usersService.object);
+        usersState = new UsersState(dialogs.object, localStore.object, usersService.object);
     });
 
     afterEach(() => {

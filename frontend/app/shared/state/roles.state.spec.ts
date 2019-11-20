@@ -38,7 +38,7 @@ describe('RolesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         rolesService = Mock.ofType<RolesService>();
-        rolesState = new RolesState(rolesService.object, appsState.object, dialogs.object);
+        rolesState = new RolesState(appsState.object, dialogs.object, rolesService.object);
     });
 
     describe('Loading', () => {

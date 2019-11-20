@@ -54,9 +54,9 @@ export class RolesState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly rolesService: RolesService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly rolesService: RolesService
     ) {
         super({ roles: [], version: Version.EMPTY });
     }

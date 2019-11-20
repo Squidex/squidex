@@ -56,9 +56,9 @@ export class WorkflowsState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly workflowsService: WorkflowsService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly workflowsService: WorkflowsService
     ) {
         super({ errors: [], workflows: [], version: Version.EMPTY });
     }

@@ -54,8 +54,8 @@ export class ClientsState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly clientsService: ClientsService,
         private readonly appsState: AppsState,
+        private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService
     ) {
         super({ clients: [], version: Version.EMPTY });

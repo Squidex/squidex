@@ -38,7 +38,7 @@ describe('PatternsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         patternsService = Mock.ofType<PatternsService>();
-        patternsState = new PatternsState(patternsService.object, appsState.object, dialogs.object);
+        patternsState = new PatternsState(appsState.object, dialogs.object, patternsService.object);
     });
 
     afterEach(() => {

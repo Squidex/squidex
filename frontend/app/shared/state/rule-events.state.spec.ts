@@ -10,6 +10,7 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     DialogService,
+    LocalStoreService,
     Pager,
     RuleEventsDto,
     RuleEventsState,
@@ -34,16 +35,18 @@ describe('RuleEventsState', () => {
     let dialogs: IMock<DialogService>;
     let rulesService: IMock<RulesService>;
     let ruleEventsState: RuleEventsState;
+    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        rulesService = Mock.ofType<RulesService>();
+        localStore = Mock.ofType<LocalStoreService>();
 
+        rulesService = Mock.ofType<RulesService>();
         rulesService.setup(x => x.getEvents(app, 10, 0, undefined))
             .returns(() => of(new RuleEventsDto(200, oldRuleEvents)));
 
-        ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
+        ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, localStore.object, rulesService.object);
         ruleEventsState.load().subscribe();
     });
 

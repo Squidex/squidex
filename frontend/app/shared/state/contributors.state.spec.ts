@@ -14,6 +14,7 @@ import {
     ContributorsService,
     ContributorsState,
     DialogService,
+    LocalStoreService,
     Pager,
     versioned
 } from '@app/shared/internal';
@@ -41,12 +42,15 @@ describe('ContributorsState', () => {
     let dialogs: IMock<DialogService>;
     let contributorsService: IMock<ContributorsService>;
     let contributorsState: ContributorsState;
+    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
+        localStore = Mock.ofType<LocalStoreService>();
+
         contributorsService = Mock.ofType<ContributorsService>();
-        contributorsState = new ContributorsState(contributorsService.object, appsState.object, dialogs.object);
+        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
 
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable();
