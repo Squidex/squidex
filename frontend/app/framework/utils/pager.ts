@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export class Pager {
-    public static readonly DEFAULT = new Pager(0);
+import { LocalStoreService } from './../services/local-store.service';
 
+export class Pager {
     public canGoNext = false;
     public canGoPrev = false;
 
@@ -34,6 +34,20 @@ export class Pager {
         this.canGoPrev = page > 0;
 
         this.skip = page * pageSize;
+    }
+
+    public static fromLocalStore(name: string, localStore: LocalStoreService, size = 10) {
+        let pageSize = localStore.getInt(`${name}.pageSize`, size);
+
+        if (pageSize < 0 || pageSize > 100) {
+            pageSize = size;
+        }
+
+        return new Pager(0, 0, pageSize);
+    }
+
+    public saveTo(name: string, localStore: LocalStoreService) {
+        localStore.setInt(`${name}.pageSize`, this.pageSize);
     }
 
     public goNext(): Pager {

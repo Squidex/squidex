@@ -54,9 +54,9 @@ export class PatternsState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly patternsService: PatternsService
     ) {
         super({ patterns: [], version: Version.EMPTY });
     }

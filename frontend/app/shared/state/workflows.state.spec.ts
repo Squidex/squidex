@@ -38,7 +38,7 @@ describe('WorkflowsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         workflowsService = Mock.ofType<WorkflowsService>();
-        workflowsState = new WorkflowsState(workflowsService.object, appsState.object, dialogs.object);
+        workflowsState = new WorkflowsState(appsState.object, dialogs.object, workflowsService.object);
     });
 
     afterEach(() => {

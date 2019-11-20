@@ -13,6 +13,7 @@ import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State
@@ -67,9 +68,17 @@ export class UsersState extends State<Snapshot> {
 
     constructor(
         private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService,
         private readonly usersService: UsersService
     ) {
-        super({ users: [], usersPager: Pager.DEFAULT });
+        super({
+            users: [],
+            usersPager: Pager.fromLocalStore('users', localStore)
+        });
+
+        this.usersPager.subscribe(pager => {
+            pager.saveTo('users', this.localStore);
+        });
     }
 
     public select(id: string | null): Observable<UserDto | null> {

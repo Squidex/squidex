@@ -11,6 +11,7 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State
@@ -48,9 +49,17 @@ export class RuleEventsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService,
         private readonly rulesService: RulesService
     ) {
-        super({ ruleEvents: [], ruleEventsPager: Pager.DEFAULT });
+        super({
+            ruleEvents: [],
+            ruleEventsPager: Pager.fromLocalStore('rule-events', localStore)
+        });
+
+        this.ruleEventsPager.subscribe(pager => {
+            pager.saveTo('rule-events', this.localStore);
+        });
     }
 
     public load(isReload = false): Observable<any> {
