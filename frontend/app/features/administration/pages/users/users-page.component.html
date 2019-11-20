@@ -59,7 +59,7 @@
         </div>
 
         <div class="grid-footer">
-            <sqx-pager [pager]="usersState.usersPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+            <sqx-pager [pager]="usersState.usersPager | async" (pagerChange)="usersState.setPager($event)"></sqx-pager>
         </div>
     </ng-container>
 </sqx-panel>

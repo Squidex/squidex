@@ -8,7 +8,7 @@
 import { of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { DialogService } from '@app/shared';
+import { DialogService, Pager } from '@app/shared';
 
 import {
     UserDto,
@@ -87,16 +87,15 @@ describe('UsersState', () => {
             expect(usersState.snapshot.selectedUser).toEqual(newUsers[0]);
         });
 
-        it('should load next page and prev page when paging', () => {
+        it('should load with new pagination when paging', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
+                .returns(() => of(oldUsers)).verifiable(Times.once());
 
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();
 
             usersState.load().subscribe();
-            usersState.goNext().subscribe();
-            usersState.goPrev().subscribe();
+            usersState.setPager(new Pager(20, 1, 10)).subscribe();
 
             expect().nothing();
         });

@@ -59,14 +59,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.assetsState.toggleTag(tag);
     }
 
-    public goNext() {
-        this.assetsState.goNext();
-    }
-
-    public goPrev() {
-        this.assetsState.goPrev();
-    }
-
     public changeView(isListView: boolean) {
         this.isListView = isListView;
 

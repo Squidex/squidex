@@ -1,2 +1,9 @@
 @import '_mixins';
 @import '_vars';
+
+.form-control {
+    display: inline-block;
+    margin-left: 2rem;
+    margin-top: .25rem;
+    width: auto;
+}

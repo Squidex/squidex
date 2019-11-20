@@ -146,13 +146,13 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     public collapse() {
         this.isHidden = true;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public expand() {
         this.isHidden = false;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public emitClone() {

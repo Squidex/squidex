@@ -2,11 +2,18 @@
     <div class="float-right pagination">
         <span *ngIf="pager.numberOfItems > 0" class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
 
-        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="emitPrev()">
+        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="goPrev()">
             <i class="icon-angle-left"></i>
         </button>
-        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="emitNext()">
+        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="goNext()">
             <i class="icon-angle-right"></i>
         </button>
+
+        <select class="form-control form-control-sm" [ngModel]="pager.pageSize" (ngModelChange)="setPageSize($event)">
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="30">30</option>
+            <option [ngValue]="50">50</option>
+        </select>
     </div>
 </div>

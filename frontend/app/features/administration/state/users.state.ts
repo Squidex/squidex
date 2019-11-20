@@ -69,7 +69,7 @@ export class UsersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly usersService: UsersService
     ) {
-        super({ users: [], usersPager: new Pager(0) });
+        super({ users: [], usersPager: Pager.DEFAULT });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
@@ -173,19 +173,13 @@ export class UsersState extends State<Snapshot> {
     }
 
     public search(query: string): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: new Pager(0), usersQuery: query }));
+        this.next(s => ({ ...s, usersPager: s.usersPager.reset(), usersQuery: query }));
 
         return this.loadInternal();
     }
 
-    public goNext(): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
-
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
+    public setPager(usersPager: Pager) {
+        this.next(s => ({ ...s, usersPager }));
 
         return this.loadInternal();
     }

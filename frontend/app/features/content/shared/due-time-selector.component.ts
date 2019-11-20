@@ -8,15 +8,12 @@
 import { Component } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import { DialogModel, fadeAnimation } from '@app/shared';
+import { DialogModel } from '@app/shared';
 
 @Component({
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
-    templateUrl: './due-time-selector.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './due-time-selector.component.html'
 })
 export class DueTimeSelectorComponent {
     public dueTimeDialog = new DialogModel();

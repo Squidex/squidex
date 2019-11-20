@@ -14,6 +14,7 @@ import {
     ContributorsService,
     ContributorsState,
     DialogService,
+    Pager,
     versioned
 } from '@app/shared/internal';
 
@@ -60,6 +61,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
 
             expect(contributorsState.snapshot.contributors).toEqual(oldContributors.items);
+            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
@@ -67,7 +69,7 @@ describe('ContributorsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should only current page of contributors', () => {
+        it('should only show current page of contributors', () => {
             contributorsState.load().subscribe();
 
             let contributors: ReadonlyArray<ContributorDto>;
@@ -77,12 +79,12 @@ describe('ContributorsState', () => {
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
-            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
         });
 
-        it('should show next of contributors when going next', () => {
+        it('should show with new pagination when paging', () => {
             contributorsState.load().subscribe();
-            contributorsState.goNext();
+            contributorsState.setPager(new Pager(20, 1, 10));
 
             let contributors: ReadonlyArray<ContributorDto>;
 
@@ -91,22 +93,7 @@ describe('ContributorsState', () => {
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
-            expect(contributorsState.snapshot.page).toEqual(1);
-        });
-
-        it('should show next of contributors when going prev', () => {
-            contributorsState.load().subscribe();
-            contributorsState.goNext();
-            contributorsState.goPrev();
-
-            let contributors: ReadonlyArray<ContributorDto>;
-
-            contributorsState.contributorsPaged.subscribe(result => {
-                contributors = result;
-            });
-
-            expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
-            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 1, 10));
         });
 
         it('should show filtered contributors when searching', () => {
@@ -120,7 +107,7 @@ describe('ContributorsState', () => {
             });
 
             expect(contributors!).toEqual(createContributors(4, 14).items);
-            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.snapshot.contributorsPager.page).toEqual(0);
         });
 
         it('should show notification on load when reload is true', () => {

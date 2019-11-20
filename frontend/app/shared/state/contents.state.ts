@@ -97,7 +97,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: [], contentsPager: new Pager(0), contentsQueryJson: '' });
+        super({ contents: [], contentsPager: Pager.DEFAULT, contentsQueryJson: '' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -309,19 +309,13 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(contentsQuery?: Query): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
+        this.next(s => ({ ...s, contentsPager: s.contentsPager.reset(), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
         return this.loadInternal();
     }
 
-    public goNext(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.goNext() }));
-
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.goPrev() }));
+    public setPager(contentsPager: Pager) {
+        this.next(s => ({ ...s, contentsPager }));
 
         return this.loadInternal();
     }

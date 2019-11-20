@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetDto,
@@ -48,7 +47,7 @@ export class AssetsListComponent {
             setTimeout(() => {
                 this.newFiles = this.newFiles.removed(file);
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             }, 2000);
         } else {
             this.newFiles = this.newFiles.removed(file);
@@ -58,19 +57,11 @@ export class AssetsListComponent {
     }
 
     public search() {
-        this.state.load().pipe(onErrorResumeNext()).subscribe();
+        this.state.load();
     }
 
     public delete(asset: AssetDto) {
-        this.state.delete(asset).pipe(onErrorResumeNext()).subscribe();
-    }
-
-    public goNext() {
-        this.state.goNext().pipe(onErrorResumeNext()).subscribe();
-    }
-
-    public goPrev() {
-        this.state.goPrev().pipe(onErrorResumeNext()).subscribe();
+        this.state.delete(asset);
     }
 
     public update(asset: AssetDto) {

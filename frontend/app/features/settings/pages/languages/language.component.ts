@@ -12,7 +12,6 @@ import { FormBuilder } from '@angular/forms';
 import {
     AppLanguageDto,
     EditLanguageForm,
-    fadeAnimation,
     LanguageDto,
     LanguagesState,
     sorted
@@ -21,10 +20,7 @@ import {
 @Component({
     selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
-    templateUrl: './language.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './language.component.html'
 })
 export class LanguageComponent implements OnChanges {
     @Input()

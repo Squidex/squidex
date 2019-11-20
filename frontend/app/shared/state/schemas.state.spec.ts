@@ -207,7 +207,7 @@ describe('SchemasState', () => {
 
         it('should return schema on get and cache it', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
-                .returns(() => of(schema)).verifiable(Times.exactly(1));
+                .returns(() => of(schema)).verifiable(Times.once());
 
             schemasState.loadSchema(schema1.name, true).subscribe();
             schemasState.loadSchema(schema1.name, true).subscribe();
@@ -217,7 +217,7 @@ describe('SchemasState', () => {
 
         it('should return schema on get and reuse it from select when caching', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
-                .returns(() => of(schema)).verifiable(Times.exactly(1));
+                .returns(() => of(schema)).verifiable(Times.once());
 
             schemasState.select(schema1.name).subscribe();
             schemasState.loadSchema(schema1.name, true).subscribe();

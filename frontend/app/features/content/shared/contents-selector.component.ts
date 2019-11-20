@@ -79,8 +79,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         }
 
         this.selectSchema(this.schemas[0]);
-
-        this.changeDetector.detectChanges();
     }
 
     public selectSchema(selected: string | SchemaDto) {
@@ -98,7 +96,7 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
 
                     this.updateModel();
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 }
             });
     }
@@ -109,14 +107,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
 
     public search(query: Query) {
         this.contentsState.search(query);
-    }
-
-    public goNext() {
-        this.contentsState.goNext();
-    }
-
-    public goPrev() {
-        this.contentsState.goPrev();
     }
 
     public isItemSelected(content: ContentDto) {

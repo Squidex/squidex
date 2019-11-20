@@ -33,14 +33,14 @@ interface Snapshot {
     // All loaded contributors.
     contributors: ContributorsList;
 
+    // The pagination information.
+    contributorsPager: Pager;
+
     // Indicates if the contributors are loaded.
     isLoaded?: boolean;
 
     // The maximum allowed users.
     maxContributors: number;
-
-    // The current page.
-    page: number;
 
     // The search query.
     query?: string;
@@ -62,9 +62,6 @@ export class ContributorsState extends State<Snapshot> {
     public contributors =
         this.project(x => x.contributors);
 
-    public page =
-        this.project(x => x.page);
-
     public query =
         this.project(x => x.query);
 
@@ -83,18 +80,18 @@ export class ContributorsState extends State<Snapshot> {
     public filtered =
         this.projectFrom2(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
 
-    public contributorsPaged =
-        this.projectFrom2(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
-
     public contributorsPager =
-        this.projectFrom2(this.page, this.filtered, (p, c) => new Pager(c.length, p, PAGE_SIZE));
+        this.project(x => x.contributorsPager);
+
+    public contributorsPaged =
+        this.projectFrom2(this.contributorsPager, this.filtered, (p, c) => getPagedContributors(c, p));
 
     constructor(
         private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: [], page: 0, maxContributors: -1, version: Version.EMPTY });
+        super({ contributors: [], contributorsPager: Pager.DEFAULT, maxContributors: -1, version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -113,12 +110,8 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public goNext() {
-        this.next(s => ({ ...s, page: s.page + 1 }));
-    }
-
-    public goPrev() {
-        this.next(s => ({ ...s, page: s.page - 1 }));
+    public setPager(contributorsPager: Pager) {
+        this.next(s => ({ ...s, contributorsPager }));
     }
 
     public search(query: string) {
@@ -149,15 +142,17 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
-        this.next(() => {
+        this.next(s => {
             const { canCreate, items: contributors, maxContributors } = payload;
+
+            const contributorsPager = s.contributorsPager.setCount(contributors.length);
 
             return {
                 canCreate,
                 contributors,
+                contributorsPager,
                 isLoaded: true,
                 maxContributors,
-                page: 0,
                 version
             };
         });
@@ -172,10 +167,8 @@ export class ContributorsState extends State<Snapshot> {
     }
 }
 
-const PAGE_SIZE = 10;
-
-function getPagedContributors(contributors: ContributorsList, page: number) {
-    return contributors.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+function getPagedContributors(contributors: ContributorsList, pager: Pager) {
+    return contributors.slice(pager.page * pager.pageSize, (pager.page + 1) * pager.pageSize);
 }
 
 function getFilteredContributors(contributors: ContributorsList, query?: RegExp) {

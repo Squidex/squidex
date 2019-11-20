@@ -25,7 +25,7 @@ export class FocusOnInitDirective implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        if (!this.enabled) {
+        if (this.enabled === false) {
             return;
         }
 

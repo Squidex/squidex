@@ -1,13 +1,12 @@
 <span>
-    <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)"
+    <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)" #input
         [sqxFocusOnInit]="autoFocus"
-        [attr.name]="inputName"  
-        [attr.placeholder]="placeholder" #input
-        [class.form-underlined]="underlined"
-        [formControl]="queryInput"
+        [name]="inputName" [placeholder]="placeholder"
         autocomplete="off" 
         autocorrect="off"
-        autocapitalize="off">
+        autocapitalize="off"
+        [class.form-underlined]="underlined"
+        [formControl]="queryInput">
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0" position="bottom-left">
         <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left" #container @fade>

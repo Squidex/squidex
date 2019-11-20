@@ -21,8 +21,8 @@ export class ExternalLinkDirective implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.renderer.setAttribute(this.element.nativeElement, 'target', '_blank');
-        this.renderer.setAttribute(this.element.nativeElement, 'rel', 'noopener');
+        this.renderer.setProperty(this.element.nativeElement, 'target', '_blank');
+        this.renderer.setProperty(this.element.nativeElement, 'rel', 'noopener');
 
         if (this.type !== 'noicon') {
             const icon = this.renderer.createElement('i');
