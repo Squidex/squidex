@@ -13,6 +13,7 @@ import {
     AssetsService,
     AssetsState,
     DialogService,
+    LocalStoreService,
     Pager,
     versioned
 } from '@app/shared/internal';
@@ -38,15 +39,20 @@ describe('AssetsState', () => {
     let dialogs: IMock<DialogService>;
     let assetsService: IMock<AssetsService>;
     let assetsState: AssetsState;
+    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
+
+        localStore = Mock.ofType<LocalStoreService>();
+        localStore.setup(x => x.getInt('assets.pageSize', 30))
+            .returns(() => 30);
 
         assetsService = Mock.ofType<AssetsService>();
         assetsService.setup(x => x.getTags(app))
             .returns(() => of({ tag1: 1, shared: 2, tag2: 1 })).verifiable(Times.atLeastOnce());
 
-        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
+        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object, localStore.object);
     });
 
     afterEach(() => {
@@ -119,14 +125,21 @@ describe('AssetsState', () => {
         });
 
         it('should load with new pagination when paging', () => {
-            assetsService.setup(x => x.getAssets(app, 30, 0, undefined, It.isValue([])))
-                .returns(() => of(new AssetsDto(200, []))).verifiable();
-
             assetsService.setup(x => x.getAssets(app, 30, 30, undefined, It.isValue([])))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
-            assetsState.load().subscribe();
-            assetsState.setPager(new Pager(60, 1, 30)).subscribe();
+            assetsState.setPager(new Pager(200, 1, 30)).subscribe();
+
+            expect().nothing();
+        });
+
+        it('should update page size in local store', () => {
+            assetsService.setup(x => x.getAssets(app, 50, 0, undefined, It.isValue([])))
+                .returns(() => of(new AssetsDto(200, []))).verifiable();
+
+            assetsState.setPager(new Pager(0, 0, 50));
+
+            localStore.verify(x => x.setInt('assets.pageSize', 50), Times.atLeastOnce());
 
             expect().nothing();
         });

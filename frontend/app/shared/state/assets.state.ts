@@ -12,6 +12,7 @@ import { tap } from 'rxjs/operators';
 import {
     compareStrings,
     DialogService,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State
@@ -83,9 +84,20 @@ export class AssetsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService
     ) {
-        super({ assets: [], assetsPager: new Pager(0, 0, 30), assetsQueryJson: '', tags: {}, tagsSelected: {} });
+        super({
+            assets: [],
+            assetsPager: Pager.fromLocalStore('assets', localStore, 30),
+            assetsQueryJson: '',
+            tags: {},
+            tagsSelected: {}
+        });
+
+        this.assetsPager.subscribe(pager => {
+            pager.saveTo('assets', this.localStore);
+        });
     }
 
     public load(isReload = false): Observable<any> {

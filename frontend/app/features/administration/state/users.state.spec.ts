@@ -64,6 +64,15 @@ describe('UsersState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
+        it('should load page size from local store', () => {
+            localStore.setup(x => x.getInt('users.pageSize', 10))
+                .returns(() => 25);
+
+            const state = new UsersState(dialogs.object, localStore.object, usersService.object);
+
+            expect(state.snapshot.usersPager.pageSize).toBe(25);
+        });
+
         it('should show notification on load when reload is true', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
                 .returns(() => of(oldUsers)).verifiable();
@@ -95,14 +104,21 @@ describe('UsersState', () => {
         });
 
         it('should load with new pagination when paging', () => {
-            usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.once());
-
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();
 
-            usersState.load().subscribe();
-            usersState.setPager(new Pager(20, 1, 10)).subscribe();
+            usersState.setPager(new Pager(200, 1, 10)).subscribe();
+
+            expect().nothing();
+        });
+
+        it('should update page size in local store', () => {
+            usersService.setup(x => x.getUsers(50, 0, undefined))
+                .returns(() => of(new UsersDto(200, []))).verifiable();
+
+            usersState.setPager(new Pager(0, 0, 50));
+
+            localStore.verify(x => x.setInt('users.pageSize', 50), Times.atLeastOnce());
 
             expect().nothing();
         });

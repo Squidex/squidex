@@ -70,7 +70,7 @@ describe('RuleEventsState', () => {
         rulesService.setup(x => x.getEvents(app, 10, 10, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
-        ruleEventsState.setPager(new Pager(20, 1, 10));
+        ruleEventsState.setPager(new Pager(200, 1, 10));
 
         expect().nothing();
 

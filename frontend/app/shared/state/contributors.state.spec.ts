@@ -100,6 +100,15 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 1, 10));
         });
 
+        it('should update page size in local store', () => {
+            contributorsState.load().subscribe();
+            contributorsState.setPager(new Pager(0, 0, 50));
+
+            localStore.verify(x => x.setInt('contributors.pageSize', 50), Times.atLeastOnce());
+
+            expect().nothing();
+        });
+
         it('should show filtered contributors when searching', () => {
             contributorsState.load().subscribe();
             contributorsState.search('4');
