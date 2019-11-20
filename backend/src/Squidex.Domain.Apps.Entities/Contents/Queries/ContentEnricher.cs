@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private const string DefaultColor = StatusColors.Draft;
         private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyContents = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
-        private static readonly ILookup<Guid, IEnrichedAssetEntity> EmptyAssets = Enumerable.Empty<IEnrichedAssetEntity>().ToLookup(x => x.Id);
+        private static readonly ILookup<Guid, IEnrichedAssetItemEntity> EmptyAssets = Enumerable.Empty<IEnrichedAssetItemEntity>().ToLookup(x => x.Id);
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly Lazy<IContentQueryService> contentQuery;
@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private void ResolveAssets(ISchemaEntity schema, IGrouping<Guid, ContentEntity> contents, ILookup<Guid, IEnrichedAssetEntity> assets)
+        private void ResolveAssets(ISchemaEntity schema, IGrouping<Guid, ContentEntity> contents, ILookup<Guid, IEnrichedAssetItemEntity> assets)
         {
             foreach (var field in schema.SchemaDef.ResolvingAssets())
             {
@@ -315,14 +315,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return references.ToLookup(x => x.Id);
         }
 
-        private async Task<ILookup<Guid, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<Guid> ids)
+        private async Task<ILookup<Guid, IEnrichedAssetItemEntity>> GetAssetsAsync(Context context, HashSet<Guid> ids)
         {
             if (ids.Count == 0)
             {
                 return EmptyAssets;
             }
 
-            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), Q.Empty.WithIds(ids));
+            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), null, Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }

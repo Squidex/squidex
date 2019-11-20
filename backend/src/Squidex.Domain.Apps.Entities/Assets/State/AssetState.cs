@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -18,10 +17,13 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
-    public class AssetState : DomainObjectState<AssetState>, IAssetEntity
+    public class AssetState : DomainObjectState<AssetState>, IAssetItemEntity
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
+
+        [DataMember]
+        public string FolderName { get; set; }
 
         [DataMember]
         public string FileName { get; set; }
@@ -54,20 +56,28 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public int? PixelHeight { get; set; }
 
         [DataMember]
+        public bool IsFolder { get; set; }
+
+        [DataMember]
         public bool IsDeleted { get; set; }
 
         [DataMember]
-        public HashSet<string> Tags { get; set; }
+        public Guid ParentId { get; set; }
 
-        Guid IAssetInfo.AssetId
-        {
-            get { return Id; }
-        }
+        [DataMember]
+        public HashSet<string> Tags { get; set; }
 
         public void ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
+                case AssetFolderCreated e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        break;
+                    }
+
                 case AssetCreated e:
                     {
                         SimpleMapper.Map(e, this);
@@ -117,7 +127,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         break;
                     }
 
-                case AssetDeleted _:
+                case AssetFolderRenamed e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        break;
+                    }
+
+                case AssetItemMoved e:
+                    {
+                        ParentId = e.ParentId;
+
+                        break;
+                    }
+
+                case AssetItemDeleted _:
                     {
                         IsDeleted = true;
 

@@ -1,22 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [EventType(nameof(AssetAnnotated))]
-    public sealed class AssetAnnotated : AssetItemEvent
+    [EventType(nameof(AssetFolderCreated))]
+    public sealed class AssetFolderCreated : AssetItemEvent
     {
-        public string FileName { get; set; }
+        public Guid ParentId { get; set; }
 
-        public string Slug { get; set; }
-
-        public HashSet<string>? Tags { get; set; }
+        public string FolderName { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [TypeName("AssetUpdated")]
-    public sealed class AssetUpdated : AssetEvent
+    public sealed class AssetUpdated : AssetItemEvent
     {
         public string MimeType { get; set; }
 

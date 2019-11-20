@@ -5,18 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [EventType(nameof(AssetAnnotated))]
-    public sealed class AssetAnnotated : AssetItemEvent
+    [EventType(nameof(AssetItemMoved))]
+    public sealed class AssetItemMoved : AssetItemEvent
     {
-        public string FileName { get; set; }
-
-        public string Slug { get; set; }
-
-        public HashSet<string>? Tags { get; set; }
+        public Guid ParentId { get; set; }
     }
 }

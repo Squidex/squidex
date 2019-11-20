@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             switch (@event.Payload)
             {
-                case AssetDeleted e:
+                case AssetItemDeleted e:
                     return contents.CleanupAsync(e.AssetId);
 
                 case ContentDeleted e:

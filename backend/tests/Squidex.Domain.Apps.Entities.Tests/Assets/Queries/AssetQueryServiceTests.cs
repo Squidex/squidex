@@ -40,9 +40,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_find_asset_by_id_and_enrich_it()
         {
-            var found = new AssetEntity { Id = Guid.NewGuid() };
+            var found = new AssetItemEntity { Id = Guid.NewGuid() };
 
-            var enriched = new AssetEntity();
+            var enriched = new AssetItemEntity();
 
             A.CallTo(() => assetRepository.FindAssetAsync(found.Id, false))
                 .Returns(found);
@@ -58,15 +58,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_find_assets_by_hash_and_and_enrich_it()
         {
-            var found = new AssetEntity { Id = Guid.NewGuid() };
+            var found = new AssetItemEntity { Id = Guid.NewGuid() };
 
-            var enriched = new AssetEntity();
+            var enriched = new AssetItemEntity();
 
             A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
-                .Returns(new List<IAssetEntity> { found });
+                .Returns(new List<IAssetItemEntity> { found });
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched });
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetItemEntity>>.That.IsSameSequenceAs(found), requestContext))
+                .Returns(new List<IEnrichedAssetItemEntity> { enriched });
 
             var result = await sut.QueryByHashAsync(requestContext, appId.Id, "hash");
 
@@ -76,19 +76,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_load_assets_from_ids_and_resolve_tags()
         {
-            var found1 = new AssetEntity { Id = Guid.NewGuid() };
-            var found2 = new AssetEntity { Id = Guid.NewGuid() };
+            var found1 = new AssetItemEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetItemEntity { Id = Guid.NewGuid() };
 
-            var enriched1 = new AssetEntity();
-            var enriched2 = new AssetEntity();
+            var enriched1 = new AssetItemEntity();
+            var enriched2 = new AssetItemEntity();
 
             var ids = HashSet.Of(found1.Id, found2.Id);
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetItemEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
+                .Returns(new List<IEnrichedAssetItemEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(requestContext, Q.Empty.WithIds(ids));
 
@@ -100,17 +100,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_load_assets_with_query_and_resolve_tags()
         {
-            var found1 = new AssetEntity { Id = Guid.NewGuid() };
-            var found2 = new AssetEntity { Id = Guid.NewGuid() };
+            var found1 = new AssetItemEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetItemEntity { Id = Guid.NewGuid() };
 
-            var enriched1 = new AssetEntity();
-            var enriched2 = new AssetEntity();
+            var enriched1 = new AssetItemEntity();
+            var enriched2 = new AssetItemEntity();
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetItemEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
+                .Returns(new List<IEnrichedAssetItemEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(requestContext, Q.Empty);
 

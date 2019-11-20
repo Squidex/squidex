@@ -31,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public AnnotateAsset ToCommand(Guid id)
         {
-            return SimpleMapper.Map(this, new AnnotateAsset { AssetId = id });
+            return SimpleMapper.Map(this, new AnnotateAsset { AssetItemId = id });
         }
     }
 }

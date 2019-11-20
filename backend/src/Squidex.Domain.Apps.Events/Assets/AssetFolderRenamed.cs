@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,9 +9,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [EventType(nameof(AssetDeleted))]
-    public sealed class AssetDeleted : AssetEvent
+    [EventType(nameof(AssetFolderRenamed))]
+    public sealed class AssetFolderRenamed : AssetItemEvent
     {
-        public long DeletedSize { get; set; }
+        public string FolderName { get; set; }
     }
 }

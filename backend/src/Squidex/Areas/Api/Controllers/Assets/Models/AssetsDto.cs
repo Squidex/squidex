@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public AssetDto[] Items { get; set; }
 
-        public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, ApiController controller, string app)
+        public static AssetsDto FromAssets(IResultList<IEnrichedAssetItemEntity> assets, ApiController controller, string app)
         {
             var response = new AssetsDto
             {

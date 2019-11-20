@@ -5,14 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [EventType(nameof(AssetCreated))]
-    public sealed class AssetCreated : AssetEvent
+    public sealed class AssetCreated : AssetItemEvent
     {
+        public Guid ParentId { get; set; }
+
         public string FileName { get; set; }
 
         public string FileHash { get; set; }

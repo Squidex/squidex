@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }".Replace("<ID>", assetId.ToString());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
-                .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
+                .Returns(ResultList.CreateFrom<IEnrichedAssetItemEntity>(1));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 

@@ -217,7 +217,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var assetFile = await CheckAssetFileAsync(file);
 
-            var command = new UpdateAsset { File = assetFile, AssetId = id };
+            var command = new UpdateAsset { File = assetFile, AssetItemId = id };
 
             var response = await InvokeCommandAsync(app, command);
 
@@ -265,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAsset(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
+            await CommandBus.PublishAsync(new DeleteAssetItem { AssetItemId = id });
 
             return NoContent();
         }
@@ -280,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             }
             else
             {
-                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), this, app);
+                return AssetDto.FromAsset(context.Result<IEnrichedAssetItemEntity>(), this, app);
             }
         }
 

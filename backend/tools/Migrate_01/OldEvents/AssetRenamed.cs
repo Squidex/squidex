@@ -15,7 +15,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(AssetRenamed))]
     [Obsolete]
-    public sealed class AssetRenamed : AssetEvent, IMigrated<IEvent>
+    public sealed class AssetRenamed : AssetItemEvent, IMigrated<IEvent>
     {
         public string FileName { get; set; }
 

@@ -17,7 +17,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed class MongoAssetEntity :
-        IAssetEntity,
+        IAssetItemEntity,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,
         IUpdateableEntityWithLastModifiedBy

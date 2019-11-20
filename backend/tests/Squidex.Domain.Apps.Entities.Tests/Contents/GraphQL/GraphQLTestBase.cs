@@ -210,11 +210,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        protected static IEnrichedAssetEntity CreateAsset(Guid id)
+        protected static IEnrichedAssetItemEntity CreateAsset(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var asset = new AssetEntity
+            var asset = new AssetItemEntity
             {
                 Id = id,
                 Version = 1,

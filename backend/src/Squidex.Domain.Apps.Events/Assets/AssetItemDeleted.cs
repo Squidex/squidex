@@ -5,18 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Events.Assets
 {
-    public abstract class AssetCommand : SquidexCommand, IAggregateCommand
+    [EventType(nameof(AssetItemDeleted))]
+    public sealed class AssetItemDeleted : AssetItemEvent
     {
-        public Guid AssetId { get; set; }
-
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AssetId; }
-        }
+        public long DeletedSize { get; set; }
     }
 }

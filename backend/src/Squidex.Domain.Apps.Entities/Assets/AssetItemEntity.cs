@@ -12,13 +12,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetEntity : IEnrichedAssetEntity
+    public sealed class AssetItemEntity : IEnrichedAssetItemEntity
     {
         public NamedId<Guid> AppId { get; set; }
 
         public Guid Id { get; set; }
 
-        public Guid AssetId { get; set; }
+        public Guid ParentId { get; set; }
 
         public Instant Created { get; set; }
 
@@ -34,11 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public long Version { get; set; }
 
-        public string MimeType { get; set; }
+        public string FolderName { get; set; }
 
         public string FileName { get; set; }
 
         public string FileHash { get; set; }
+
+        public string MimeType { get; set; }
 
         public string Slug { get; set; }
 
@@ -47,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public long FileVersion { get; set; }
 
         public bool IsImage { get; set; }
+
+        public bool IsFolder { get; set; }
 
         public bool IsDeleted { get; set; }
 

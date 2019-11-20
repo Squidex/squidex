@@ -16,7 +16,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(AssetTagged))]
     [Obsolete]
-    public sealed class AssetTagged : AssetEvent, IMigrated<IEvent>
+    public sealed class AssetTagged : AssetItemEvent, IMigrated<IEvent>
     {
         public HashSet<string> Tags { get; set; }
 

@@ -5,18 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetAnnotated))]
-    public sealed class AssetAnnotated : AssetItemEvent
+    public sealed class DeleteAssetItem : AssetItemCommand
     {
-        public string FileName { get; set; }
-
-        public string Slug { get; set; }
-
-        public HashSet<string>? Tags { get; set; }
     }
 }

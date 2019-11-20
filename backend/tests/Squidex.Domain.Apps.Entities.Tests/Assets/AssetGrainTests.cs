@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Delete_should_create_events_with_total_file_size()
         {
-            var command = new DeleteAsset();
+            var command = new DeleteAssetItem();
 
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
+                    CreateAssetEvent(new AssetItemDeleted { DeletedSize = 2048 })
                 );
         }
 
@@ -210,19 +210,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new DeleteAsset()));
+            return sut.ExecuteAsync(CreateAssetCommand(new DeleteAssetItem()));
         }
 
-        protected T CreateAssetEvent<T>(T @event) where T : AssetEvent
+        protected T CreateAssetEvent<T>(T @event) where T : AssetItemEvent
         {
             @event.AssetId = assetId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateAssetCommand<T>(T command) where T : AssetCommand
+        protected T CreateAssetCommand<T>(T command) where T : AssetItemCommand
         {
-            command.AssetId = assetId;
+            command.AssetItemId = assetId;
 
             return CreateCommand(command);
         }

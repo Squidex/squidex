@@ -45,17 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
             new object[] { new AssetCreated(), EnrichedAssetEventType.Created },
             new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated },
             new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated },
-            new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted }
+            new object[] { new AssetItemDeleted(), EnrichedAssetEventType.Deleted }
         };
 
         [Theory]
         [MemberData(nameof(TestEvents))]
-        public async Task Should_enrich_events(AssetEvent @event, EnrichedAssetEventType type)
+        public async Task Should_enrich_events(AssetItemEvent @event, EnrichedAssetEventType type)
         {
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
             A.CallTo(() => assetLoader.GetAsync(@event.AssetId, 12))
-                .Returns(new AssetEntity());
+                .Returns(new AssetItemEntity());
 
             var result = await sut.CreateEnrichedEventAsync(envelope) as EnrichedAssetEvent;
 

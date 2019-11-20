@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
+using System;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public interface IAssetGrain : IDomainObjectGrain
+    public sealed class CreateAssetFolder : AssetItemCommand
     {
-        Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any);
+        public string Name { get; set; }
+
+        public Guid ParentId { get; set; }
     }
 }

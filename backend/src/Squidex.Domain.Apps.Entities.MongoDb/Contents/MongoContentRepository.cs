@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.indexer = indexer;
             this.serializer = serializer;
 
-            typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
+            typeAssetDeleted = typeNameRegistry.GetName<AssetItemDeleted>();
             typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
 
             contents = new MongoContentCollection(database, serializer, appProvider);

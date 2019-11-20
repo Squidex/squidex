@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public override FilterNode<ClrValue>? Visit(CompareFilter<ClrValue> nodeIn)
         {
-            if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
+            if (string.Equals(nodeIn.Path[0], nameof(IAssetItemEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
             {
                 var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(stringValue))).Result;
 

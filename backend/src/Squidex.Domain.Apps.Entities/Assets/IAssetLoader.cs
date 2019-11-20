@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetLoader
     {
-        Task<IAssetEntity> GetAsync(Guid id, long version = EtagVersion.Any);
+        Task<IAssetItemEntity> GetAsync(Guid id, long version = EtagVersion.Any);
     }
 }

@@ -5,19 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets
+using System;
+
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class AssetCreatedResult
+    public sealed class MoveAssetItem : AssetItemCommand
     {
-        public IEnrichedAssetItemEntity Asset { get; }
-
-        public bool IsDuplicate { get; }
-
-        public AssetCreatedResult(IEnrichedAssetItemEntity asset, bool isDuplicate)
-        {
-            Asset = asset;
-
-            IsDuplicate = isDuplicate;
-        }
+        public Guid ParentId { get; set; }
     }
 }
