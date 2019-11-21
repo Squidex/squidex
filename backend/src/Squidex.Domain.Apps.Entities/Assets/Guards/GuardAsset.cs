@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             Guard.NotNull(command);
         }
 
-        public static void CanDelete(DeleteAssetItem command)
+        public static void CanDelete(DeleteAsset command)
         {
             Guard.NotNull(command);
         }

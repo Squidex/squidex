@@ -7,8 +7,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class RenameAssetFolder : AssetItemCommand
+    public sealed class RenameAssetFolder : AssetFolderCommand
     {
-        public string Name { get; set; }
+        public string FolderName { get; set; }
     }
 }

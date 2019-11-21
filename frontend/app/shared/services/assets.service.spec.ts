@@ -12,6 +12,8 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     AssetDto,
+    AssetFolderDto,
+    AssetFoldersDto,
     AssetsDto,
     AssetsService,
     DateTime,
@@ -20,6 +22,7 @@ import {
     ResourceLinks,
     Version
 } from '@app/shared/internal';
+
 import { encodeQuery } from '../state/query';
 
 describe('AssetsService', () => {
@@ -86,6 +89,10 @@ describe('AssetsService', () => {
             items: [
                 assetResponse(12),
                 assetResponse(13)
+            ],
+            folders: [
+                assetFolderResponse(22),
+                assetFolderResponse(23)
             ]
         });
 
@@ -93,6 +100,35 @@ describe('AssetsService', () => {
             new AssetsDto(10, [
                 createAsset(12),
                 createAsset(13)
+            ]));
+    }));
+
+    it('should make get request to get asset folders',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let assets: AssetFoldersDto;
+
+        assetsService.getAssetFolders('my-app', '1234').subscribe(result => {
+            assets = result;
+        });
+
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?parentId=1234`);
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            total: 10,
+            items: [
+                assetFolderResponse(22),
+                assetFolderResponse(23)
+            ]
+        });
+
+        expect(assets!).toEqual(
+            new AssetFoldersDto(10, [
+                createAssetFolder(12),
+                createAssetFolder(13)
             ]));
     }));
 
@@ -296,6 +332,27 @@ describe('AssetsService', () => {
         req.flush({});
     }));
 
+    it('should make post request to create asset folder',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        const dto = { folderName: 'My Folder' };
+
+        let assetFolder: AssetFolderDto;
+
+        assetsService.postAssetFolder('my-app', dto).subscribe(result => {
+            assetFolder = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/folders');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(assetResponse(22));
+
+        expect(assetFolder!).toEqual(createAssetFolder(22));
+    }));
+
     function assetResponse(id: number, suffix = '') {
         return {
             id: `id${id}`,
@@ -322,6 +379,18 @@ describe('AssetsService', () => {
                 isDuplicate: 'true'
             }
         };
+    }
+
+    function assetFolderResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            folderName: `My Folder${id}${suffix}`,
+            version: id,
+            _links: {
+                update: { method: 'PUT', href: `/assets/folders/${id}` }
+            }
+        };
+
     }
 });
 
@@ -350,4 +419,12 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         `my-name${id}${suffix}.png`,
         tags || ['tag1', 'tag2'],
         new Version(`${id}`));
+}
+
+export function createAssetFolder(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/assets/folders/${id}` }
+    };
+
+    return new AssetFolderDto(links, `id${id}`, `My Name${id}${suffix}`, new Version(`${id}`));
 }

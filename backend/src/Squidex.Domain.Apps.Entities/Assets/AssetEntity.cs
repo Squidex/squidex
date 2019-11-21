@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetItemEntity : IEnrichedAssetItemEntity
+    public sealed class AssetEntity : IEnrichedAssetEntity
     {
         public NamedId<Guid> AppId { get; set; }
 
@@ -34,8 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public long Version { get; set; }
 
-        public string FolderName { get; set; }
-
         public string FileName { get; set; }
 
         public string FileHash { get; set; }
@@ -50,12 +48,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public bool IsImage { get; set; }
 
-        public bool IsFolder { get; set; }
-
         public bool IsDeleted { get; set; }
 
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
+
+        public Guid AssetId
+        {
+            get { return Id; }
+        }
     }
 }

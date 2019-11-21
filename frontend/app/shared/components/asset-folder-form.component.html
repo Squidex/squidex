@@ -1,0 +1,30 @@
+<form [formGroup]="createForm.form" (ngSubmit)="createAssetFolder()">
+    <sqx-modal-dialog (close)="emitComplete()">
+        <ng-container title>
+            Create Folder
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
+        
+            <div class="form-group">
+                <label for="folderName">Name <small class="hint">(required)</small></label>
+                
+                <sqx-control-errors for="folderName" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="folderName" formControlName="folderName" autocomplete="off" sqxFocusOnInit />
+            </div>
+
+            <div class="form-group">
+                <sqx-form-alert marginTop="2" marginBottom="0">
+                    The folder name is used as display name and must not be unique.
+                </sqx-form-alert>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="submit" class="float-right btn btn-success">Create</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

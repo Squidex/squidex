@@ -14,12 +14,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetQueryService
     {
-        Task<IReadOnlyList<IEnrichedAssetItemEntity>> QueryByHashAsync(Context context, Guid appId, string hash);
+        Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, Guid appId, string hash);
 
-        Task<IResultList<IEnrichedAssetItemEntity>> QueryAsync(Context context, Guid? parentId, Q query);
+        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Guid? parentId, Q query);
 
-        Task<IEnrichedAssetItemEntity?> FindAssetAsync(Context context, Guid id);
+        Task<IResultList<IAssetFolderEntity>> QueryFoldersAsync(Context context, Guid parentId);
 
-        Task<IEnrichedAssetItemEntity?> FindFolderAsync(Context context, Guid id);
+        Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, Guid id);
+
+        Task<IAssetFolderEntity?> FindAssetFolderAsync(Context context, Guid id);
     }
 }

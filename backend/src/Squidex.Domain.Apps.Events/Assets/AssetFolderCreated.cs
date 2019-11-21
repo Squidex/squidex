@@ -11,7 +11,7 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [EventType(nameof(AssetFolderCreated))]
-    public sealed class AssetFolderCreated : AssetItemEvent
+    public sealed class AssetFolderCreated : AssetFolderEvent
     {
         public Guid ParentId { get; set; }
 

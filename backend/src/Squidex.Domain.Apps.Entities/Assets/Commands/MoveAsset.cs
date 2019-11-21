@@ -1,22 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public abstract class AssetItemCommand : SquidexCommand, IAggregateCommand
+    public sealed class MoveAsset : AssetCommand
     {
-        public Guid AssetItemId { get; set; }
-
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AssetItemId; }
-        }
+        public Guid ParentId { get; set; }
     }
 }

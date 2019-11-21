@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IAssetItemEntity :
+    public interface IAssetEntity :
         IEntity,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
@@ -23,11 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Guid ParentId { get; }
 
-        string FolderName { get; }
-
         string MimeType { get; }
-
-        bool IsFolder { get; }
 
         long FileVersion { get; }
     }

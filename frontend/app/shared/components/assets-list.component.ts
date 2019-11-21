@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import {
     AssetDto,
+    AssetFolderDto,
     AssetsState,
     getFiles
 } from '@app/shared/internal';
@@ -86,7 +87,7 @@ export class AssetsListComponent {
         return true;
     }
 
-    public trackByAsset(index: number, asset: AssetDto) {
+    public trackByAssetItem(index: number, asset: AssetDto | AssetFolderDto) {
         return asset.id;
     }
 }

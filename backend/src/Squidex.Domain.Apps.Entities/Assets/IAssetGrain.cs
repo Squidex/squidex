@@ -12,8 +12,8 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IAssetItemGrain : IDomainObjectGrain
+    public interface IAssetGrain : IDomainObjectGrain
     {
-        Task<J<IAssetItemEntity>> GetStateAsync(long version = EtagVersion.Any);
+        Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any);
     }
 }

@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public abstract class UploadAssetCommand : AssetItemCommand
+    public abstract class UploadAssetCommand : AssetCommand
     {
         public AssetFile File { get; set; }
 

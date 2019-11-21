@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public CreateAsset()
         {
-            AssetItemId = Guid.NewGuid();
+            AssetId = Guid.NewGuid();
         }
     }
 }

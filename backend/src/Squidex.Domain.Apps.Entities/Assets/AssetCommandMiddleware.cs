@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetItemCommand, IAssetItemGrain>
+    public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
         private readonly IAssetEnricher assetEnricher;
@@ -86,11 +86,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             await HandleCoreAsync(context, next);
 
-                            var asset = context.Result<IEnrichedAssetItemEntity>();
+                            var asset = context.Result<IEnrichedAssetEntity>();
 
                             context.Complete(new AssetCreatedResult(asset, false));
 
-                            await assetStore.CopyAsync(tempFile, createAsset.AssetItemId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, createAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -109,9 +109,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         {
                             await HandleCoreAsync(context, next);
 
-                            var asset = context.Result<IEnrichedAssetItemEntity>();
+                            var asset = context.Result<IEnrichedAssetEntity>();
 
-                            await assetStore.CopyAsync(tempFile, updateAsset.AssetItemId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, updateAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await base.HandleAsync(context, next);
 
-            if (context.PlainResult is IAssetItemEntity asset && !(context.PlainResult is IEnrichedAssetItemEntity))
+            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
             {
                 var enriched = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
 
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private static bool IsDuplicate(IAssetItemEntity asset, AssetFile file)
+        private static bool IsDuplicate(IAssetEntity asset, AssetFile file)
         {
             return asset?.FileName == file.FileName && asset.FileSize == file.FileSize;
         }

@@ -88,10 +88,47 @@ export class AssetDto {
     }
 }
 
+export class AssetFoldersDto extends ResultSet<AssetFolderDto> {
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
+}
+
+export class AssetFolderDto {
+    public readonly _links: ResourceLinks;
+
+    public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
+
+    constructor(links: ResourceLinks,
+        public readonly id: string,
+        public readonly folderName: string,
+        public readonly version: Version
+    ) {
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
+    }
+}
+
 export interface AnnotateAssetDto {
     readonly fileName?: string;
     readonly slug?: string;
     readonly tags?: ReadonlyArray<string>;
+}
+
+export interface CreateAssetFolderDto {
+    readonly parentId?: string;
+    readonly folderName: string;
+}
+
+export interface RenameAssetFolderDto {
+    readonly folderName: string;
+}
+
+export interface MoveAssetItemDto {
+    readonly parentId?: string;
 }
 
 @Injectable()
@@ -109,7 +146,7 @@ export class AssetsService {
         return this.http.get<{ [name: string]: number }>(url);
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: ReadonlyArray<string>, ids?: ReadonlyArray<string>): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: ReadonlyArray<string>, ids?: ReadonlyArray<string>, parentId?: string): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
@@ -144,15 +181,43 @@ export class AssetsService {
             }
 
             fullQuery = `q=${encodeQuery(queryObj)}`;
+
+            if (parentId) {
+                fullQuery += `&parentId=${parentId}`;
+            }
         }
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
+        return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
             map(({ total, items, _links }) => {
                 const assets = items.map(item => parseAsset(item));
 
                 return new AssetsDto(total, assets, _links);
+            }),
+            pretifyError('Failed to load assets. Please reload.'));
+    }
+
+    public getAssetFolders(appName: string, parentId?: string): Observable<AssetFoldersDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}`);
+
+        return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
+            map(({ total, items, _links }) => {
+                const assetFolders = items.map(item => parseAssetFolder(item));
+
+                return new AssetFoldersDto(total, assetFolders, _links);
+            }),
+            pretifyError('Failed to load asset folders. Please reload.'));
+    }
+
+    public getAsset(appName: string, id: string): Observable<AssetDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+
+        return HTTP.getVersioned(this.http, url).pipe(
+            map(({ payload }) => {
+                const body = payload.body;
+
+                return parseAsset(body);
             }),
             pretifyError('Failed to load assets. Please reload.'));
     }
@@ -188,18 +253,6 @@ export class AssetsService {
                 }
             }),
             pretifyError('Failed to upload asset. Please reload.'));
-    }
-
-    public getAsset(appName: string, id: string): Observable<AssetDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
-
-        return HTTP.getVersioned(this.http, url).pipe(
-            map(({ payload }) => {
-                const body = payload.body;
-
-                return parseAsset(body);
-            }),
-            pretifyError('Failed to load assets. Please reload.'));
     }
 
     public putAssetFile(appName: string, resource: Resource, file: File, version: Version): Observable<number | AssetDto> {
@@ -247,7 +300,7 @@ export class AssetsService {
                 return parseAsset(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('Analytics', 'Updated', appName);
+                this.analytics.trackEvent('Asset', 'Updated', appName);
             }),
             pretifyError('Failed to update asset. Please reload.'));
     }
@@ -259,9 +312,22 @@ export class AssetsService {
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {
-                this.analytics.trackEvent('Analytics', 'Deleted', appName);
+                this.analytics.trackEvent('Asset', 'Deleted', appName);
             }),
             pretifyError('Failed to delete asset. Please reload.'));
+    }
+
+    public postAssetFolder(appName: string, dto: CreateAssetFolderDto): Observable<AssetFolderDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders`);
+
+        return HTTP.postVersioned(this.http, url, dto).pipe(
+            map(({ payload }) => {
+                return parseAssetFolder(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('AssetFolder', 'Updated', appName);
+            }),
+            pretifyError('Failed to create asset folder. Please reload.'));
     }
 }
 
@@ -281,5 +347,12 @@ function parseAsset(response: any) {
         response.pixelHeight,
         response.slug,
         response.tags || [],
+        new Version(response.version.toString()));
+}
+
+function parseAssetFolder(response: any) {
+    return new AssetFolderDto(response._links,
+        response.id,
+        response.folderName,
         new Version(response.version.toString()));
 }

@@ -11,7 +11,7 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [EventType(nameof(AssetAnnotated))]
-    public sealed class AssetAnnotated : AssetItemEvent
+    public sealed class AssetAnnotated : AssetEvent
     {
         public string FileName { get; set; }
 

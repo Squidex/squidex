@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     compareStrings,
@@ -18,20 +18,35 @@ import {
     State
 } from '@app/framework';
 
-import { AssetDto, AssetsService} from './../services/assets.service';
+import {
+    AssetDto,
+    AssetFolderDto,
+    AssetsService
+} from './../services/assets.service';
+
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { encodeQuery, Query } from './query';
 
+export type AssetPathItem = { id?: string, folderName: string };
+
+type TagsAvailable = { [name: string]: number };
+type TagsSelected = { [name: string]: boolean };
+
+const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ folderName: 'Assets' }];
+
 interface Snapshot {
     // All assets tags.
-    tags: { [name: string]: number };
+    tags: TagsAvailable;
 
     // The selected asset tags.
-    tagsSelected: { [name: string]: boolean };
+    tagsSelected: TagsSelected;
 
     // The current assets.
     assets: ReadonlyArray<AssetDto>;
+
+    // The current asset folders.
+    assetFolders: ReadonlyArray<AssetFolderDto>;
 
     // The pagination information.
     assetsPager: Pager;
@@ -42,11 +57,17 @@ interface Snapshot {
     // The json of the assets query.
     assetsQueryJson: string;
 
+    // The folder path.
+    path: ReadonlyArray<AssetPathItem>;
+
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
 
     // Indicates if the user can create assets.
     canCreate?: boolean;
+
+    // Indicates if the user can create asset folders.
+    canCreateFolders?: boolean;
 }
 
 @Injectable()
@@ -69,6 +90,9 @@ export class AssetsState extends State<Snapshot> {
     public assets =
         this.project(x => x.assets);
 
+    public assetFolders =
+        this.project(x => x.assetFolders);
+
     public assetsQuery =
         this.project(x => x.assetsQuery);
 
@@ -78,8 +102,23 @@ export class AssetsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public path =
+        this.project(x => x.path);
+
+    public parent =
+        this.project(x => getParent(x.path));
+
+    public hasPath =
+        this.project(x => x.path.length > 0);
+
+    public root =
+        this.project(x => x.path[x.path.length - 1]);
+
     public canCreate =
         this.project(x => x.canCreate === true);
+
+    public canCreateFolders =
+        this.project(x => x.canCreateFolders === true);
 
     constructor(
         private readonly appsState: AppsState,
@@ -88,7 +127,9 @@ export class AssetsState extends State<Snapshot> {
         private readonly localStore: LocalStoreService
     ) {
         super({
+            path: ROOT_PATH,
             assets: [],
+            assetFolders: [],
             assetsPager: Pager.fromLocalStore('assets', localStore, 30),
             assetsQueryJson: '',
             tags: {},
@@ -109,23 +150,55 @@ export class AssetsState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        return combineLatest(
+        const path = this.snapshot.path;
+        const parentId = getParentId(path);
+
+        const searchTags = Object.keys(this.snapshot.tagsSelected);
+
+        const observables: Observable<any>[] = [
             this.assetsService.getAssets(this.appName,
                 this.snapshot.assetsPager.pageSize,
                 this.snapshot.assetsPager.skip,
                 this.snapshot.assetsQuery,
-                Object.keys(this.snapshot.tagsSelected)),
-            this.assetsService.getTags(this.appName)
-        ).pipe(
-            tap(([ { items: assets, total, canCreate }, tags ]) => {
+                searchTags, undefined, parentId).pipe(
+                tap(({ items: assets, total, canCreate }) => {
+
+                    this.next(s => {
+                        const assetsPager = s.assetsPager.setCount(total);
+
+                        return { ...s, assets, assetsPager, canCreate };
+                    });
+                }))
+        ];
+
+        if (path.length === 1) {
+            observables.push(
+                this.assetsService.getTags(this.appName).pipe(
+                    tap(tags => {
+                        this.next(s => {
+                            return { ...s, tags };
+                        });
+                    })));
+        }
+
+        if (path.length > 0) {
+            observables.push(
+                this.assetsService.getAssetFolders(this.appName, parentId).pipe(
+                    tap(({ items: assetFolders, canCreate: canCreateFolders }) => {
+                        this.next(s => {
+                            return { ...s, assetFolders, canCreateFolders };
+                        });
+                    })));
+        }
+
+        return forkJoin(observables).pipe(
+            finalize(() => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
                 this.next(s => {
-                    const assetsPager = s.assetsPager.setCount(total);
-
-                    return { ...s, assets, assetsPager, isLoaded: true, tags, canCreate };
+                    return { ...s, isLoaded: true };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -144,10 +217,24 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
+    public createFolder(folderName: string) {
+        const parentId = getParentId(this.snapshot.path);
+
+        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId }).pipe(
+            tap(folder => {
+                this.next(s => {
+                    const assetFolders = [...s.assetFolders, folder].sortedByString(x => x.folderName);
+
+                    return { ...s, assetFolders };
+                });
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public delete(asset: AssetDto): Observable<any> {
         return this.assetsService.deleteAsset(this.appName, asset, asset.version).pipe(
             tap(() => {
-                return this.next(s => {
+                this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
                     const assetsPager = s.assetsPager.decrementCount();
 
@@ -183,56 +270,88 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public toggleTag(tag: string): Observable<any> {
-        this.next(s => {
-            const tagsSelected = { ...s.tagsSelected };
+    public setPager(assetsPager: Pager) {
+        this.next(s => ({ ...s, assetsPager }));
 
-            if (tagsSelected[tag]) {
-                delete tagsSelected[tag];
-            } else {
-                tagsSelected[tag] = true;
+        return this.loadInternal();
+    }
+
+    public searchInternal(query?: Query | null, tags?: TagsSelected) {
+        this.next(s => {
+            const newState = { ...s, assetsPager: s.assetsPager.reset() };
+
+            if (query !== null) {
+                newState.assetsQuery = query;
+                newState.assetsQueryJson = encodeQuery(query);
             }
 
-            const assetsPager = s.assetsPager.reset();
+            if (tags) {
+                newState.tagsSelected = tags;
+            }
 
-            return { ...s, assetsPager, tagsSelected };
+            if (Object.keys(this.tagsSelected).length > 0 || (newState.assetsQuery && newState.assetsQuery.fullText)) {
+                newState.path = [];
+                newState.assetFolders = [];
+            } else if (newState.path.length === 0) {
+                newState.path = ROOT_PATH;
+            }
+
+            return newState;
         });
 
         return this.loadInternal();
     }
 
-    public selectTags(tags: ReadonlyArray<string>): Observable<any> {
-        this.next(s => {
-            const tagsSelected = {};
+    public toggleTag(tag: string): Observable<any> {
+        const tagsSelected = { ...this.snapshot.tagsSelected };
 
-            for (const tag of tags) {
-                tagsSelected[tag] = true;
+        if (tagsSelected[tag]) {
+            delete tagsSelected[tag];
+        } else {
+            tagsSelected[tag] = true;
+        }
+
+        return this.searchInternal(null, tagsSelected);
+    }
+
+    public selectTags(tags: ReadonlyArray<string>): Observable<any> {
+        const tagsSelected = {};
+
+        for (const tag of tags) {
+            tagsSelected[tag] = true;
+        }
+
+        return this.searchInternal(null, tagsSelected);
+    }
+
+    public navigate(folder: AssetPathItem) {
+        this.next(s => {
+            let path = s.path;
+
+            if (!folder.id) {
+                path = ROOT_PATH;
+            } else {
+                const index = path.findIndex(x => x.id === folder.id);
+
+                if (index >= 0) {
+                    path = path.slice(0, index);
+                } else {
+                    path = [...path, folder];
+                }
             }
 
-            const assetsPager = s.assetsPager.reset();
-
-            return { ...s, assetsPager: assetsPager, tagsSelected };
+            return { ...s, path };
         });
 
         return this.loadInternal();
     }
 
     public resetTags(): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: s.assetsPager.reset(), tagsSelected: {} }));
-
-        return this.loadInternal();
+        return this.searchInternal(null, {});
     }
 
     public search(query?: Query): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: s.assetsPager.reset(), assetsQuery: query, assetsQueryJson: encodeQuery(query) }));
-
-        return this.loadInternal();
-    }
-
-    public setPager(assetsPager: Pager) {
-        this.next(s => ({ ...s, assetsPager }));
-
-        return this.loadInternal();
+        return this.searchInternal(query);
     }
 
     public isQueryUsed(saved: SavedQuery) {
@@ -275,6 +394,14 @@ function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSele
 
 function sort(tags: { [name: string]: number }) {
     return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
+}
+
+function getParent(path: ReadonlyArray<AssetPathItem>) {
+    return path.length > 1 ? { folderName: '...', id: path[path.length - 1].id } : undefined;
+}
+
+function getParentId(path: ReadonlyArray<AssetPathItem>) {
+    return path.length > 1 ? path[path.length - 1].id : undefined;
 }
 
 @Injectable()

@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using System;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public interface IAssetInfo : IWithId
+    public interface IAssetInfo
     {
+        Guid AssetId { get; }
+
         long FileSize { get; }
 
         bool IsImage { get; }

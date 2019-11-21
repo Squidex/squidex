@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Domain.Apps.Events.Assets
 {
-    public interface IWithId
+    public abstract class AssetEvent : AppEvent
     {
-        Guid Id { get; }
+        public Guid AssetId { get; set; }
     }
 }

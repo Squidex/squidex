@@ -17,13 +17,13 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
-    public class AssetState : DomainObjectState<AssetState>, IAssetItemEntity
+    public class AssetState : DomainObjectState<AssetState>, IAssetEntity
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
         [DataMember]
-        public string FolderName { get; set; }
+        public Guid ParentId { get; set; }
 
         [DataMember]
         public string FileName { get; set; }
@@ -56,28 +56,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public int? PixelHeight { get; set; }
 
         [DataMember]
-        public bool IsFolder { get; set; }
-
-        [DataMember]
         public bool IsDeleted { get; set; }
 
         [DataMember]
-        public Guid ParentId { get; set; }
-
-        [DataMember]
         public HashSet<string> Tags { get; set; }
+
+        public Guid AssetId
+        {
+            get { return Id; }
+        }
 
         public void ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
-                case AssetFolderCreated e:
-                    {
-                        SimpleMapper.Map(e, this);
-
-                        break;
-                    }
-
                 case AssetCreated e:
                     {
                         SimpleMapper.Map(e, this);
@@ -127,21 +119,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         break;
                     }
 
-                case AssetFolderRenamed e:
-                    {
-                        SimpleMapper.Map(e, this);
-
-                        break;
-                    }
-
-                case AssetItemMoved e:
+                case AssetMoved e:
                     {
                         ParentId = e.ParentId;
 
                         break;
                     }
 
-                case AssetItemDeleted _:
+                case AssetDeleted _:
                     {
                         IsDeleted = true;
 

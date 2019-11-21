@@ -7,12 +7,13 @@
 
 using System;
 using NodaTime;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public interface IEntity : IWithId
+    public interface IEntity
     {
+        Guid Id { get;  }
+
         Instant Created { get; }
 
         Instant LastModified { get; }

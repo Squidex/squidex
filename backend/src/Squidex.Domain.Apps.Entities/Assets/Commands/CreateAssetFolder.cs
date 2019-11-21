@@ -6,13 +6,21 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class CreateAssetFolder : AssetItemCommand
+    public sealed class CreateAssetFolder : AssetFolderCommand, IAppCommand
     {
-        public string Name { get; set; }
+        public NamedId<Guid> AppId { get; set; }
+
+        public string FolderName { get; set; }
 
         public Guid ParentId { get; set; }
+
+        public CreateAssetFolder()
+        {
+            AssetFolderId = Guid.NewGuid();
+        }
     }
 }

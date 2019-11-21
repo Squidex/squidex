@@ -35,7 +35,7 @@ namespace Squidex.Web.Services
             CanGenerateAssetSourceUrl = allowAssetSourceUrl;
         }
 
-        public string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetItemEntity asset)
+        public string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
         {
             if (!asset.IsImage)
             {
@@ -50,7 +50,7 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"api/assets/{assetId}");
         }
 
-        public string GenerateAssetUrl(IAppEntity app, IAssetItemEntity asset)
+        public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)
         {
             return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}");
         }
@@ -70,7 +70,7 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl("app/");
         }
 
-        public string? GenerateAssetSourceUrl(IAppEntity app, IAssetItemEntity asset)
+        public string? GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)
         {
             return assetStore.GeneratePublicUrl(asset.Id.ToString(), asset.FileVersion, null);
         }

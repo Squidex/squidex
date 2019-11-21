@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class AnnotateAsset : AssetItemCommand
+    public sealed class AnnotateAsset : AssetCommand
     {
         public string? FileName { get; set; }
 

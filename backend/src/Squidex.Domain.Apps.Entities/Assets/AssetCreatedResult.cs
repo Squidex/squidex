@@ -9,11 +9,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetCreatedResult
     {
-        public IEnrichedAssetItemEntity Asset { get; }
+        public IEnrichedAssetEntity Asset { get; }
 
         public bool IsDuplicate { get; }
 
-        public AssetCreatedResult(IEnrichedAssetItemEntity asset, bool isDuplicate)
+        public AssetCreatedResult(IEnrichedAssetEntity asset, bool isDuplicate)
         {
             Asset = asset;
 

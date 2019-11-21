@@ -6,13 +6,17 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetItemMoved))]
-    public sealed class AssetItemMoved : AssetItemEvent
+    public abstract class AssetCommand : SquidexCommand, IAggregateCommand
     {
-        public Guid ParentId { get; set; }
+        public Guid AssetId { get; set; }
+
+        Guid IAggregateCommand.AggregateId
+        {
+            get { return AssetId; }
+        }
     }
 }

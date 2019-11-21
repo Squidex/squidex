@@ -1,0 +1,24 @@
+@import '_vars';
+@import '_mixins';
+
+:host {
+    padding-bottom: 1rem;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.card {
+    & {
+        width: $asset-width;
+    }
+
+    &-body {
+        font-size: 1.1rem;
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+    }
+}
+
+i {
+    color: $color-dark1-border1;
+}

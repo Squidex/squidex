@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetGrain : LogSnapshotDomainObjectGrain<AssetState>, IAssetItemGrain
+    public sealed class AssetGrain : LogSnapshotDomainObjectGrain<AssetState>, IAssetGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
-                case DeleteAssetItem deleteAsset:
+                case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
                     {
                         GuardAsset.CanDelete(c);
@@ -152,14 +152,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(@event);
         }
 
-        public void Move(MoveAssetItem command)
+        public void Move(MoveAsset command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetItemMoved()));
+            RaiseEvent(SimpleMapper.Map(command, new AssetMoved()));
         }
 
-        public void Delete(DeleteAssetItem command)
+        public void Delete(DeleteAsset command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetItemDeleted { DeletedSize = Snapshot.TotalSize }));
+            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
         }
 
         private void RaiseEvent(AppEvent @event)
@@ -180,9 +180,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public Task<J<IAssetItemEntity>> GetStateAsync(long version = EtagVersion.Any)
+        public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
-            return J.AsTask<IAssetItemEntity>(GetSnapshot(version));
+            return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_not_enrich_if_asset_contains_null_tags()
         {
-            var source = new AssetItemEntity { AppId = appId };
+            var source = new AssetEntity { AppId = appId };
 
             var result = await sut.EnrichAsync(source, requestContext);
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_enrich_asset_with_tag_names()
         {
-            var source = new AssetItemEntity
+            var source = new AssetEntity
             {
                 Tags = new HashSet<string>
                 {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_not_enrich_asset_with_tag_names_if_disabled()
         {
-            var source = new AssetItemEntity
+            var source = new AssetEntity
             {
                 Tags = new HashSet<string>
                 {
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_enrich_multiple_assets_with_tag_names()
         {
-            var source1 = new AssetItemEntity
+            var source1 = new AssetEntity
             {
                 Tags = new HashSet<string>
                 {
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var source2 = new AssetItemEntity
+            var source2 = new AssetEntity
             {
                 Tags = new HashSet<string>
                 {

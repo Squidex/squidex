@@ -1,13 +1,21 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+using System;
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class DeleteAssetItem : AssetItemCommand
+    public interface IAssetFolderEntity : IEntity, IEntityWithVersion
     {
+        NamedId<Guid> AppId { get; set; }
+
+        string FolderName { get; set; }
+
+        Guid ParentId { get; set; }
     }
 }

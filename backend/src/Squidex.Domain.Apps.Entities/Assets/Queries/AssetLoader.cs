@@ -24,17 +24,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IAssetItemEntity> GetAsync(Guid id, long version)
+        public async Task<IAssetEntity> GetAsync(Guid id, long version)
         {
             using (Profiler.TraceMethod<AssetLoader>())
             {
-                var grain = grainFactory.GetGrain<IAssetItemGrain>(id);
+                var grain = grainFactory.GetGrain<IAssetGrain>(id);
 
                 var content = await grain.GetStateAsync(version);
 
                 if (content.Value == null || content.Value.Version != version)
                 {
-                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IAssetItemEntity));
+                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IAssetEntity));
                 }
 
                 return content.Value;

@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -228,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -284,8 +284,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
-                .Returns(ResultList.CreateFrom<IEnrichedAssetItemEntity>(1));
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId)))
+                .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 
@@ -331,7 +331,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId)))
                 .Returns(ResultList.CreateFrom(1, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1131,7 +1131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.Ignored))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1184,10 +1184,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId2.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId1)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId1)))
                 .Returns(ResultList.CreateFrom(0, asset1));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId2)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId2)))
                 .Returns(ResultList.CreateFrom(0, asset2));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query1 }, new GraphQLQuery { Query = query2 });

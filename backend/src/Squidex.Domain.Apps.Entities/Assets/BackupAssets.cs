@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private const string TagsFile = "AssetTags.json";
         private readonly HashSet<Guid> assetIds = new HashSet<Guid>();
+        private readonly HashSet<Guid> assetFolderIds = new HashSet<Guid>();
         private readonly IAssetStore assetStore;
         private readonly ITagService tagService;
 
@@ -62,6 +63,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             switch (@event.Payload)
             {
+                case AssetFolderCreated assetFolderCreated:
+                    assetFolderIds.Add(assetFolderCreated.AssetFolderId);
+                    break;
                 case AssetCreated assetCreated:
                     await ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, reader);
                     break;
@@ -78,6 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await RestoreTagsAsync(appId, reader);
 
             await RebuildManyAsync(assetIds, RebuildAsync<AssetState, AssetGrain>);
+            await RebuildManyAsync(assetFolderIds, RebuildAsync<AssetFolderState, AssetFolderGrain>);
         }
 
         private async Task RestoreTagsAsync(Guid appId, BackupReader reader)

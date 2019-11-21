@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         [Fact]
         public void CanDelete_should_not_throw_exception()
         {
-            var command = new DeleteAssetItem();
+            var command = new DeleteAssetcs();
 
             GuardAsset.CanDelete(command);
         }

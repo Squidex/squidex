@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -22,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetFolderGrain : DomainObjectGrain<AssetState>, IAssetItemGrain
+    public sealed class AssetFolderGrain : DomainObjectGrain<AssetFolderState>, IAssetFolderGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
 
@@ -52,8 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
-                case MoveAssetItem moveAssetItem:
-                    return UpdateReturn(moveAssetItem, c =>
+                case MoveAssetFolder moveAssetFolder:
+                    return UpdateReturn(moveAssetFolder, c =>
                     {
                         Move(c);
 
@@ -66,11 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
-                case DeleteAssetItem deleteAsset:
-                    return Update(deleteAsset, c =>
+                case DeleteAssetFolder deleteAssetFolder:
+                    return Update(deleteAssetFolder, c =>
                     {
-                        GuardAsset.CanDelete(c);
-
                         Delete(c);
                     });
                 default:
@@ -83,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(SimpleMapper.Map(command, new AssetFolderCreated()));
         }
 
-        public void Move(MoveAssetItem command)
+        public void Move(MoveAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetItemMoved()));
+            RaiseEvent(SimpleMapper.Map(command, new AssetFolderMoved()));
         }
 
         public void Rename(RenameAssetFolder command)
@@ -93,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(SimpleMapper.Map(command, new AssetFolderRenamed()));
         }
 
-        public void Delete(DeleteAssetItem command)
+        public void Delete(DeleteAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetItemDeleted { DeletedSize = Snapshot.TotalSize }));
+            RaiseEvent(SimpleMapper.Map(command, new AssetFolderDeleted()));
         }
 
         private void RaiseEvent(AppEvent @event)
@@ -114,11 +111,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 throw new DomainException("Asset folder has already been deleted");
             }
-        }
-
-        public Task<J<IAssetItemEntity>> GetStateAsync(long version = EtagVersion.Any)
-        {
-            return J.AsTask<IAssetItemEntity>(Snapshot);
         }
     }
 }

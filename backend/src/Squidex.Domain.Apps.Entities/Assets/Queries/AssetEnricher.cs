@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.tagService = tagService;
         }
 
-        public async Task<IEnrichedAssetItemEntity> EnrichAsync(IAssetItemEntity asset, Context context)
+        public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context)
         {
             Guard.NotNull(asset);
             Guard.NotNull(context);
@@ -36,14 +36,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetItemEntity>> EnrichAsync(IEnumerable<IAssetItemEntity> assets, Context context)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context)
         {
             Guard.NotNull(assets);
             Guard.NotNull(context);
 
             using (Profiler.TraceMethod<AssetEnricher>())
             {
-                var results = assets.Select(x => SimpleMapper.Map(x, new AssetItemEntity())).ToList();
+                var results = assets.Select(x => SimpleMapper.Map(x, new AssetEntity())).ToList();
 
                 if (ShouldEnrich(context))
                 {
@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task EnrichTagsAsync(List<AssetItemEntity> assets)
+        private async Task EnrichTagsAsync(List<AssetEntity> assets)
         {
-            foreach (var group in assets.Where(x => !x.IsFolder).GroupBy(x => x.AppId.Id))
+            foreach (var group in assets.GroupBy(x => x.AppId.Id))
             {
                 var tagsById = await CalculateTags(group);
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task<Dictionary<string, string>> CalculateTags(IGrouping<System.Guid, IAssetItemEntity> group)
+        private async Task<Dictionary<string, string>> CalculateTags(IGrouping<System.Guid, IAssetEntity> group)
         {
             var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
 

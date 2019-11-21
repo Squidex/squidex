@@ -57,8 +57,9 @@
 
         &-row {
             @include flex-box;
-            @include flex-flow(row);
+            @include flex-flow(column);
             margin-top: 1.2rem;
+            margin-bottom: 0;
             position: relative;
         }
 

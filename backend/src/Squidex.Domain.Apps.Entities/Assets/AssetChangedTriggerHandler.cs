@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2, AssetItemEvent, EnrichedAssetEvent>
+    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2, AssetEvent, EnrichedAssetEvent>
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IAssetLoader assetLoader;
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetLoader = assetLoader;
         }
 
-        protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetItemEvent> @event)
+        protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
         {
             var result = new EnrichedAssetEvent();
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case AssetUpdated _:
                     result.Type = EnrichedAssetEventType.Updated;
                     break;
-                case AssetItemDeleted _:
+                case AssetDeleted _:
                     result.Type = EnrichedAssetEventType.Deleted;
                     break;
             }

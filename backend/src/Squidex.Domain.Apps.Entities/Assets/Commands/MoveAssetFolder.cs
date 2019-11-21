@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using System;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetItemDeleted))]
-    public sealed class AssetItemDeleted : AssetItemEvent
+    public sealed class MoveAssetFolder : AssetFolderCommand
     {
-        public long DeletedSize { get; set; }
+        public Guid ParentId { get; set; }
     }
 }

@@ -223,9 +223,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private static IEnrichedAssetItemEntity CreateAsset(Guid id, int version, bool isImage)
+        private static IEnrichedAssetEntity CreateAsset(Guid id, int version, bool isImage)
         {
-            return new AssetItemEntity { Id = id, IsImage = isImage, Version = version };
+            return new AssetEntity { Id = id, IsImage = isImage, Version = version };
         }
     }
 }

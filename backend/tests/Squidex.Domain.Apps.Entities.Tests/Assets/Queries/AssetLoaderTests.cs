@@ -18,13 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public class AssetLoaderTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IAssetItemGrain grain = A.Fake<IAssetItemGrain>();
+        private readonly IAssetGrain grain = A.Fake<IAssetGrain>();
         private readonly Guid id = Guid.NewGuid();
         private readonly AssetLoader sut;
 
         public AssetLoaderTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IAssetItemGrain>(id, null))
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(id, null))
                 .Returns(grain);
 
             sut = new AssetLoader(grainFactory);
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task Should_throw_exception_if_no_state_returned()
         {
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetItemEntity>(null!));
+                .Returns(J.Of<IAssetEntity>(null!));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
         }
@@ -42,10 +42,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_throw_exception_if_state_has_other_version()
         {
-            var content = new AssetItemEntity { Version = 5 };
+            var content = new AssetEntity { Version = 5 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetItemEntity>(content));
+                .Returns(J.Of<IAssetEntity>(content));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
         }
@@ -53,10 +53,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_return_content_from_state()
         {
-            var content = new AssetItemEntity { Version = 10 };
+            var content = new AssetEntity { Version = 10 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetItemEntity>(content));
+                .Returns(J.Of<IAssetEntity>(content));
 
             var result = await sut.GetAsync(id, 10);
 

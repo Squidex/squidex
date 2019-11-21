@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     var path = context.Path.Enqueue($"[{index}]");
 
-                    var asset = assets.FirstOrDefault(x => x.Id == assetId);
+                    var asset = assets.FirstOrDefault(x => x.AssetId == assetId);
 
                     if (asset == null)
                     {

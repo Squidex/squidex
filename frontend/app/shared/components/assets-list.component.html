@@ -14,15 +14,33 @@
     <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
 </div>
 
-<div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)">
-    <sqx-asset *ngFor="let file of newFiles" [initFile]="file"
-        [isListView]="isListView"
-        (loadError)="remove(file)" 
-        (load)="add(file, $event)">
-    </sqx-asset>
+<ng-container *ngIf="state.hasPath | async">
+    <h5>Folders</h5>
 
-    <ng-container *ngIf="state.assets | async; let assets">
-        <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset"
+    <div class="row assets">
+        <sqx-asset-folder *ngIf="state.parent | async; let parent" [assetFolder]="parent"
+            (navigate)="state.navigate($event)">
+        </sqx-asset-folder>
+    
+        <sqx-asset-folder *ngFor="let assetFolder of state.assetFolders | async; trackBy: trackByAssetItem" [assetFolder]="assetFolder"
+            (navigate)="state.navigate($event)">
+        </sqx-asset-folder>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="state.assets | async; let assets">
+    <ng-container *ngIf="assets.length > 0 || newFiles.length > 0">
+        <h5>Files</h5>
+    </ng-container>
+    
+    <div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)">
+        <sqx-asset *ngFor="let file of newFiles" [initFile]="file"
+            [isListView]="isListView"
+            (loadError)="remove(file)" 
+            (load)="add(file, $event)">
+        </sqx-asset>
+
+        <sqx-asset *ngFor="let asset of assets; trackBy: trackByAssetItem" [asset]="asset"
             [isListView]="isListView"
             [isDisabled]="isDisabled"
             [isSelectable]="!!selectedIds"
@@ -32,7 +50,7 @@
             (select)="emitSelect(asset)"
             (delete)="delete(asset)">
         </sqx-asset>
-    </ng-container>
-</div>
+    </div>
+</ng-container>
 
 <sqx-pager [autoHide]="true" [pager]="state.assetsPager | async"  (pagerChange)="state.setPager($event)"></sqx-pager>
