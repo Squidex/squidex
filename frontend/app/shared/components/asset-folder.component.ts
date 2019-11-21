@@ -7,12 +7,22 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { AssetFolderDto, AssetPathItem } from '@app/shared/internal';
+import {
+    AssetFolderDto,
+    AssetPathItem,
+    DialogModel,
+    fadeAnimation,
+    ModalModel,
+    Types
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
+    animations: [
+        fadeAnimation
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetFolderComponent {
@@ -24,6 +34,18 @@ export class AssetFolderComponent {
 
     @Input()
     public assetFolder: AssetFolderDto | AssetPathItem;
+
+    public dropdown = new ModalModel();
+
+    public editDialog = new DialogModel();
+
+    public get canUpdate() {
+        return Types.is(this.assetFolder, AssetFolderDto) && this.assetFolder.canUpdate;
+    }
+
+    public get canDelete() {
+        return Types.is(this.assetFolder, AssetFolderDto) && this.assetFolder.canDelete;
+    }
 
     public preventSelection(mouseEvent: MouseEvent) {
         if (mouseEvent.detail > 1) {

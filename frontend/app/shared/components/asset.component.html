@@ -152,11 +152,8 @@
 
 <ng-container *ngIf="asset">
     <ng-container *sqxModal="editDialog">
-        <sqx-asset-dialog
-            [allTags]="allTags"
-            [asset]="asset"
-            (cancel)="cancelEdit()"
-            (complete)="updateAsset($event, true)">
+        <sqx-asset-dialog [allTags]="allTags" [asset]="asset"
+            (complete)="editDialog.hide()">
         </sqx-asset-dialog>
     </ng-container>
 </ng-container>

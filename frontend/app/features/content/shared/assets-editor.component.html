@@ -22,7 +22,7 @@
     <div class="body">
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file" 
+                <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file" 
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
@@ -35,7 +35,7 @@
     
         <ng-template #listTemplate>
             <div class="list-view">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file"
+                <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file"
                     [isListView]="true" 
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">

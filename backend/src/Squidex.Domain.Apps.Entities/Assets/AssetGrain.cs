@@ -83,6 +83,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
+                case MoveAsset moveAsset:
+                    return UpdateReturn(moveAsset,  c =>
+                    {
+                        Move(c);
+
+                        return Snapshot;
+                    });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
                     {

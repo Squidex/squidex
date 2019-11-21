@@ -14,6 +14,35 @@ h5 {
     margin-bottom: .5rem;
 }
 
+.cdk-drag-placeholder {
+    @include absolute(0, auto, auto, auto);
+}
+
+.folder-container {
+    & {
+        width: $asset-width;
+        position: relative;
+        margin-bottom: 1rem;
+        margin-left: 8px;
+        margin-right: 8px;
+        height: $asset-folder-height;
+    }
+
+    &-over {
+        @include absolute(-6px, -6px, -6px, -6px);
+        @include opacity(0);
+        border: 2px solid $color-theme-blue;
+    }
+
+    &.cdk-drop-list-dragging {
+        &:hover {
+            .folder-container-over {
+                @include opacity(1);
+            }
+        }
+    }
+}
+
 .file-drop {
     & {
         @include transition(border-color .4s ease);

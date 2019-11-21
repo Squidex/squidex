@@ -191,7 +191,7 @@ export class State<T extends {}> {
         this.state = new BehaviorSubject(state);
     }
 
-    public resetState(update?: ((v: T) => Readonly<T>) | object) {
+    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
         this.state.next(this.initialState);
 
         if (update) {
@@ -199,7 +199,7 @@ export class State<T extends {}> {
         }
     }
 
-    public next(update: ((v: T) => Readonly<T>) | object) {
+    public next(update: ((v: T) => Readonly<T>) | Partial<T>) {
         if (Types.isFunction(update)) {
             this.state.next(update(this.state.value));
         } else {

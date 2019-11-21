@@ -322,7 +322,7 @@ describe('AssetsService', () => {
             }
         };
 
-        assetsService.deleteAsset('my-app', resource, version).subscribe();
+        assetsService.deleteAssetItem('my-app', resource, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
@@ -365,6 +365,7 @@ describe('AssetsService', () => {
             fileType: 'png',
             fileSize: id * 2,
             fileVersion: id * 4,
+            parentId: `parent-${id}`,
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: id * 3,
@@ -385,6 +386,7 @@ describe('AssetsService', () => {
         return {
             id: `id${id}`,
             folderName: `My Folder${id}${suffix}`,
+            parentId: `parent-${id}`,
             version: id,
             _links: {
                 update: { method: 'PUT', href: `/assets/folders/${id}` }
@@ -412,6 +414,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         'png',
         id * 2,
         id * 4,
+        `parent-${id}`,
         'image/png',
         true,
         id * 3,
@@ -426,5 +429,5 @@ export function createAssetFolder(id: number, suffix = '') {
         update: { method: 'PUT', href: `/assets/folders/${id}` }
     };
 
-    return new AssetFolderDto(links, `id${id}`, `My Name${id}${suffix}`, new Version(`${id}`));
+    return new AssetFolderDto(links, `id${id}`, `My Name${id}${suffix}`, `parent-${id}`, new Version(`${id}`));
 }

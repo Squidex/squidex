@@ -1,5 +1,46 @@
 <div class="card" (dblclick)="emitNavigate($event)" (mousedown)="preventSelection($event)">
     <div class="card-body">
-        <i class="icon-folder"></i> {{assetFolder.folderName}}
+        <div class="row no-gutters">
+            <div class="col-auto">
+                <i class="icon-folder"></i> 
+            </div>
+            <div class="col truncate">
+                {{assetFolder.folderName}}
+            </div>
+            <div class="col-auto">
+                <div class="dropdown dropdown-options" *ngIf="canDelete || canUpdate">
+                    <button type="button" class="btn btn-sm btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                        <i class="icon-dots"></i>
+                    </button>
+    
+                    <ng-container *sqxModal="dropdown;closeAlways:true">
+                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>  
+                            <ng-container *ngIf="canUpdate">
+                                <a class="dropdown-item" (click)="editDialog.show()">
+                                    Rename
+                                </a>
+                        
+                                <div class="dropdown-divider"></div>
+                            </ng-container>
+    
+                            <a class="dropdown-item dropdown-item-delete"
+                                [class.disabled]="!canDelete"
+                                (sqxConfirmClick)="emitDelete()"
+                                confirmTitle="Delete folder" 
+                                confirmText="Do you really want to delete the folder and all assets?">
+                                Delete
+                            </a>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>            
     </div>
 </div>
+
+
+<ng-container *sqxModal="editDialog">
+    <sqx-asset-folder-form [assetFolder]="assetFolder"
+        (complete)="editDialog.hide()">
+    </sqx-asset-folder-form>
+</ng-container>

@@ -104,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetFolder(string app, Guid id, [FromBody] AnnotateAssetDto request)
+        public async Task<IActionResult> PutAssetFolder(string app, Guid id, [FromBody] RenameAssetFolderDto request)
         {
             var command = request.ToCommand(id);
 
@@ -129,9 +129,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetFolderParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
         {
-            var command = request.ToCommand(id);
+            var command = request.ToFolderCommand(id);
 
             var response = await InvokeCommandAsync(app, command);
 

@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { AssetFolderForm, AssetsState } from '@app/shared/internal';
+import {
+    AssetFolderDto,
+    AssetFolderForm,
+    AssetsState
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder-form',
@@ -16,11 +20,14 @@ import { AssetFolderForm, AssetsState } from '@app/shared/internal';
     templateUrl: './asset-folder-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetFolderFormComponent {
+export class AssetFolderFormComponent implements OnInit {
     @Output()
     public complete = new EventEmitter();
 
-    public createForm = new AssetFolderForm(this.formBuilder);
+    @Input()
+    public assetFolder: AssetFolderDto;
+
+    public editForm = new AssetFolderForm(this.formBuilder);
 
     constructor(
         private readonly assetsState: AssetsState,
@@ -28,20 +35,35 @@ export class AssetFolderFormComponent {
     ) {
     }
 
+    public ngOnInit() {
+        if (this.assetFolder) {
+            this.editForm.load({ folderName: this.assetFolder.folderName });
+        }
+    }
+
     public emitComplete() {
         this.complete.emit();
     }
 
     public createAssetFolder() {
-        const value = this.createForm.submit();
+        const value = this.editForm.submit();
 
         if (value) {
-            this.assetsState.createFolder(value.folderName)
-                .subscribe(() => {
-                    this.emitComplete();
-                }, error => {
-                    this.createForm.submitFailed(error);
-                });
+            if (this.assetFolder) {
+                this.assetsState.updateAssetFolder(this.assetFolder, value)
+                    .subscribe(() => {
+                        this.emitComplete();
+                    }, error => {
+                        this.editForm.submitFailed(error);
+                    });
+            } else {
+                this.assetsState.createFolderFolder(value.folderName)
+                    .subscribe(() => {
+                        this.emitComplete();
+                    }, error => {
+                        this.editForm.submitFailed(error);
+                    });
+            }
         }
     }
 }

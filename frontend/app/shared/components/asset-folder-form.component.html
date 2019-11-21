@@ -1,16 +1,21 @@
-<form [formGroup]="createForm.form" (ngSubmit)="createAssetFolder()">
+<form [formGroup]="editForm.form" (ngSubmit)="createAssetFolder()">
     <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
-            Create Folder
+            <ng-container *ngIf="assetFolder; else noAssetFolder">
+                Rename Folder
+            </ng-container>
+            <ng-template #noAssetFolder>
+                Create Folder
+            </ng-template>
         </ng-container>
 
         <ng-container content>
-            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
+            <sqx-form-error [error]="editForm.error | async"></sqx-form-error>
         
             <div class="form-group">
                 <label for="folderName">Name <small class="hint">(required)</small></label>
                 
-                <sqx-control-errors for="folderName" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="folderName" submitOnly="true" [submitted]="editForm.submitted | async"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="folderName" formControlName="folderName" autocomplete="off" sqxFocusOnInit />
             </div>
@@ -24,7 +29,15 @@
 
         <ng-container footer>
             <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-            <button type="submit" class="float-right btn btn-success">Create</button>
+            
+            <button type="submit" class="float-right btn btn-success">
+                <ng-container *ngIf="assetFolder; else noAssetFolder">
+                    Rename
+                </ng-container>
+                <ng-template #noAssetFolder>
+                    Create
+                </ng-template>
+            </button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

@@ -169,6 +169,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Upload a new asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="parentId">The optional parent folder id.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 201 => Asset created.
@@ -184,11 +185,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [OpenApiIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] Guid parentId, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
-            var command = new CreateAsset { File = assetFile };
+            var command = new CreateAsset { File = assetFile, ParentId = parentId };
 
             var response = await InvokeCommandAsync(app, command);
 

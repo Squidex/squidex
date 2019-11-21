@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { forkJoin, Observable, throwError } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
     compareStrings,
@@ -19,25 +19,27 @@ import {
 } from '@app/framework';
 
 import {
+    AnnotateAssetDto,
     AssetDto,
     AssetFolderDto,
-    AssetsService
+    AssetsService,
+    RenameAssetFolderDto
 } from './../services/assets.service';
 
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { encodeQuery, Query } from './query';
 
-export type AssetPathItem = { id?: string, folderName: string };
+export type AssetPathItem = { id: string, folderName: string };
 
 type TagsAvailable = { [name: string]: number };
 type TagsSelected = { [name: string]: boolean };
 
-const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ folderName: 'Assets' }];
+const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ id: '00000000-0000-0000-0000-000000000000', folderName: 'Assets' }];
 
 interface Snapshot {
     // All assets tags.
-    tags: TagsAvailable;
+    tagsAvailable: TagsAvailable;
 
     // The selected asset tags.
     tagsSelected: TagsSelected;
@@ -73,7 +75,7 @@ interface Snapshot {
 @Injectable()
 export class AssetsState extends State<Snapshot> {
     public tagsUnsorted =
-        this.project(x => x.tags);
+        this.project(x => x.tagsAvailable);
 
     public tagsSelected =
         this.project(x => x.tagsSelected);
@@ -105,13 +107,13 @@ export class AssetsState extends State<Snapshot> {
     public path =
         this.project(x => x.path);
 
-    public parent =
+    public pathParent =
         this.project(x => getParent(x.path));
 
-    public hasPath =
+    public pathAvailable =
         this.project(x => x.path.length > 0);
 
-    public root =
+    public pathRoot =
         this.project(x => x.path[x.path.length - 1]);
 
     public canCreate =
@@ -127,12 +129,12 @@ export class AssetsState extends State<Snapshot> {
         private readonly localStore: LocalStoreService
     ) {
         super({
-            path: ROOT_PATH,
-            assets: [],
             assetFolders: [],
+            assets: [],
             assetsPager: Pager.fromLocalStore('assets', localStore, 30),
             assetsQueryJson: '',
-            tags: {},
+            path: ROOT_PATH,
+            tagsAvailable: {},
             tagsSelected: {}
         });
 
@@ -150,8 +152,17 @@ export class AssetsState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
+        if (isReload) {
+            this.next({ isLoaded: false });
+        } else {
+            this.next({
+                assetFolders: [],
+                assets: [],
+                isLoaded: false
+            });
+        }
+
         const path = this.snapshot.path;
-        const parentId = getParentId(path);
 
         const searchTags = Object.keys(this.snapshot.tagsSelected);
 
@@ -160,9 +171,8 @@ export class AssetsState extends State<Snapshot> {
                 this.snapshot.assetsPager.pageSize,
                 this.snapshot.assetsPager.skip,
                 this.snapshot.assetsQuery,
-                searchTags, undefined, parentId).pipe(
+                searchTags, undefined, this.parentId).pipe(
                 tap(({ items: assets, total, canCreate }) => {
-
                     this.next(s => {
                         const assetsPager = s.assetsPager.setCount(total);
 
@@ -174,56 +184,55 @@ export class AssetsState extends State<Snapshot> {
         if (path.length === 1) {
             observables.push(
                 this.assetsService.getTags(this.appName).pipe(
-                    tap(tags => {
-                        this.next(s => {
-                            return { ...s, tags };
-                        });
+                    tap(tagsAvailable => {
+                        this.next({ tagsAvailable });
                     })));
         }
 
         if (path.length > 0) {
             observables.push(
-                this.assetsService.getAssetFolders(this.appName, parentId).pipe(
+                this.assetsService.getAssetFolders(this.appName, this.parentId).pipe(
                     tap(({ items: assetFolders, canCreate: canCreateFolders }) => {
-                        this.next(s => {
-                            return { ...s, assetFolders, canCreateFolders };
-                        });
+                        this.next({ assetFolders, canCreateFolders });
                     })));
         }
 
         return forkJoin(observables).pipe(
-            finalize(() => {
+            tap(() => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
-
-                this.next(s => {
-                    return { ...s, isLoaded: true };
-                });
+            }),
+            finalize(() => {
+                this.next({ isLoaded: true });
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public add(asset: AssetDto) {
+    public addAsset(asset: AssetDto) {
+        if (asset.parentId !== this.parentId) {
+            return;
+        }
+
         this.next(s => {
             const assets = [asset, ...s.assets];
             const assetsPager = s.assetsPager.incrementCount();
 
-            const tags = { ...s.tags };
+            const tags = updateTags(s, asset);
 
-            addTags(asset, tags);
-
-            return { ...s, assets, assetsPager, tags };
+            return { ...s, assets, assetsPager, ...tags };
         });
     }
 
-    public createFolder(folderName: string) {
-        const parentId = getParentId(this.snapshot.path);
+    public createFolderFolder(folderName: string) {
+        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.parentId }).pipe(
+            tap(assetFolder => {
+                if (assetFolder.parentId !== this.parentId) {
+                    return;
+                }
 
-        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId }).pipe(
-            tap(folder => {
                 this.next(s => {
-                    const assetFolders = [...s.assetFolders, folder].sortedByString(x => x.folderName);
+                    const assetFolders = [...s.assetFolders, assetFolder].sortedByString(x => x.folderName);
 
                     return { ...s, assetFolders };
                 });
@@ -231,47 +240,111 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public delete(asset: AssetDto): Observable<any> {
-        return this.assetsService.deleteAsset(this.appName, asset, asset.version).pipe(
+    public updateAsset(asset: AssetDto, request: AnnotateAssetDto) {
+        return this.assetsService.putAsset(this.appName, asset, request, asset.version).pipe(
+            tap(updated => {
+                this.next(s => {
+                    const tags = updateTags(s, updated);
+
+                    const assets = s.assets.replaceBy('id', updated);
+
+                    return { ...s, assets, ...tags };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public updateAssetFolder(assetFolder: AssetFolderDto, request: RenameAssetFolderDto) {
+        return this.assetsService.putAssetFolder(this.appName, assetFolder, request, assetFolder.version).pipe(
+            tap(updated => {
+                this.next(s => {
+                    const assetFolders = s.assetFolders.replaceBy('id', updated);
+
+                    return { ...s, assetFolders };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public moveAsset(asset: AssetDto, parentId?: string) {
+        if (asset.id === parentId) {
+            return;
+        }
+
+        this.next(s => {
+            const assets = s.assets.filter(x => x.id !== asset.id);
+            const assetsPager = s.assetsPager.decrementCount();
+
+            return { ...s, assets, assetsPager };
+        });
+
+        return this.assetsService.putAssetItemParent(this.appName, asset, { parentId }, asset.version).pipe(
+            catchError(error => {
+                this.next(s => {
+                    const assets = [asset, ...s.assets];
+                    const assetsPager = s.assetsPager.incrementCount();
+
+                    return { ...s, assets, assetsPager };
+                });
+
+                return throwError(error);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public moveAssetFolder(assetFolder: AssetFolderDto, parentId?: string) {
+        if (assetFolder.id === parentId) {
+            return;
+        }
+
+        this.next(s => {
+            const assetFolders = s.assetFolders.filter(x => x.id !== assetFolder.id);
+
+            return { ...s, assetFolders };
+        });
+
+        return this.assetsService.putAssetItemParent(this.appName, assetFolder, { parentId }, assetFolder.version).pipe(
+            catchError(error => {
+                this.next(s => {
+                    const assetFolders = [...s.assetFolders, assetFolder].sortedByString(x => x.folderName);
+
+                    return { ...s, assetFolders };
+                });
+
+                return throwError(error);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public deleteAsset(asset: AssetDto): Observable<any> {
+        return this.assetsService.deleteAssetItem(this.appName, asset, asset.version).pipe(
             tap(() => {
                 this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
                     const assetsPager = s.assetsPager.decrementCount();
 
-                    const tags = { ...s.tags };
-                    const tagsSelected = { ...s.tagsSelected };
+                    const tags = updateTags(s, undefined, asset);
 
-                    removeTags(asset, tags, tagsSelected);
-
-                    return { ...s, assets, assetsPager, tags, tagsSelected };
+                    return { ...s, assets, assetsPager, ...tags };
                 });
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(asset: AssetDto) {
-        this.next(s => {
-            const previous = s.assets.find(x => x.id === asset.id);
+    public deleteAssetFolder(assetFolder: AssetFolderDto): Observable<any> {
+        return this.assetsService.deleteAssetItem(this.appName, assetFolder, assetFolder.version).pipe(
+            tap(() => {
+                this.next(s => {
+                    const assetFolders = s.assetFolders.filter(x => x.id !== assetFolder.id);
 
-            const tags = { ...s.tags };
-            const tagsSelected = { ...s.tagsSelected };
-
-            if (previous) {
-                removeTags(previous, tags, tagsSelected);
-            }
-
-            if (asset) {
-                addTags(asset, tags);
-            }
-
-            const assets = s.assets.replaceBy('id', asset);
-
-            return { ...s, assets, tags, tagsSelected };
-        });
+                    return { ...s, assetFolders };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public setPager(assetsPager: Pager) {
-        this.next(s => ({ ...s, assetsPager }));
+        this.next({ assetsPager });
 
         return this.loadInternal();
     }
@@ -328,16 +401,12 @@ export class AssetsState extends State<Snapshot> {
         this.next(s => {
             let path = s.path;
 
-            if (!folder.id) {
-                path = ROOT_PATH;
-            } else {
-                const index = path.findIndex(x => x.id === folder.id);
+            const index = path.findIndex(x => x.id === folder.id);
 
-                if (index >= 0) {
-                    path = path.slice(0, index);
-                } else {
-                    path = [...path, folder];
-                }
+            if (index >= 0) {
+                path = path.slice(0, index + 1);
+            } else {
+                path = [...path, folder];
             }
 
             return { ...s, path };
@@ -366,30 +435,45 @@ export class AssetsState extends State<Snapshot> {
         return Object.keys(this.snapshot.tagsSelected).length === 0;
     }
 
+    public get parentId() {
+        return this.snapshot.path.length > 0 ? this.snapshot.path[this.snapshot.path.length - 1].id : undefined;
+    }
+
     private get appName() {
         return this.appsState.appName;
     }
 }
 
-function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
-    for (const tag of asset.tags) {
-        if (tags[tag]) {
-            tags[tag]++;
-        } else {
-            tags[tag] = 1;
-        }
+function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto) {
+    if (!oldAsset && newAsset) {
+        oldAsset = snapshot.assets.find(x => x.id === newAsset.id);
     }
-}
 
-function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSelected: { [x: string]: boolean; }) {
-    for (const tag of previous.tags) {
-        if (tags[tag] === 1) {
-            delete tags[tag];
-            delete tagsSelected[tag];
-        } else {
-            tags[tag]--;
+    const tagsAvailable = { ...snapshot.tagsAvailable };
+    const tagsSelected = { ...snapshot.tagsSelected };
+
+    if (oldAsset) {
+        for (const tag of oldAsset.tags) {
+            if (tagsAvailable[tag] === 1) {
+                delete tagsAvailable[tag];
+                delete tagsSelected[tag];
+            } else {
+                tagsAvailable[tag]--;
+            }
         }
     }
+
+    if (newAsset) {
+        for (const tag of newAsset.tags) {
+            if (tagsAvailable[tag]) {
+                tagsAvailable[tag]++;
+            } else {
+                tagsAvailable[tag] = 1;
+            }
+        }
+    }
+
+    return { tagsAvailable, tagsSelected };
 }
 
 function sort(tags: { [name: string]: number }) {
@@ -397,11 +481,7 @@ function sort(tags: { [name: string]: number }) {
 }
 
 function getParent(path: ReadonlyArray<AssetPathItem>) {
-    return path.length > 1 ? { folderName: '...', id: path[path.length - 1].id } : undefined;
-}
-
-function getParentId(path: ReadonlyArray<AssetPathItem>) {
-    return path.length > 1 ? path[path.length - 1].id : undefined;
+    return path.length > 1 ? { folderName: '<Parent>', id: path[path.length - 2].id } : undefined;
 }
 
 @Injectable()
