@@ -362,7 +362,7 @@ export class AssetsState extends State<Snapshot> {
                 newState.tagsSelected = tags;
             }
 
-            if (Object.keys(this.tagsSelected).length > 0 || (newState.assetsQuery && newState.assetsQuery.fullText)) {
+            if (Object.keys(newState.tagsSelected).length > 0 || (newState.assetsQuery && newState.assetsQuery.fullText)) {
                 newState.path = [];
                 newState.assetFolders = [];
             } else if (newState.path.length === 0) {

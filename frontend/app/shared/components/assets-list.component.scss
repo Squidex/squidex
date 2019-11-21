@@ -14,8 +14,10 @@ h5 {
     margin-bottom: .5rem;
 }
 
-.cdk-drag-placeholder {
-    @include absolute(0, auto, auto, auto);
+.folders {
+    .cdk-drag-placeholder {
+        @include absolute(0, auto, auto, auto);
+    }
 }
 
 .folder-container {
