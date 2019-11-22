@@ -40,6 +40,9 @@ interface Snapshot {
     // Indicates if the contributors are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the contributors are loading.
+    isLoading?: boolean;
+
     // The maximum allowed users.
     maxContributors: number;
 
@@ -75,6 +78,9 @@ export class ContributorsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -106,9 +112,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.contributorsService.getContributors(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -163,6 +167,7 @@ export class ContributorsState extends State<Snapshot> {
                 contributors,
                 contributorsPager,
                 isLoaded: true,
+                isLoading: false,
                 maxContributors,
                 version
             };

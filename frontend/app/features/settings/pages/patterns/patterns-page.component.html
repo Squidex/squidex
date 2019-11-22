@@ -1,6 +1,6 @@
 ﻿<sqx-title message="Patterns"></sqx-title>
 
-<sqx-panel desiredWidth="63rem" [showSidebar]="true">
+<sqx-panel desiredWidth="63rem" showSidebar="true" grid="true">
     <ng-container title>
         Patterns
     </ng-container>
@@ -14,17 +14,21 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="(patternsState.isLoaded | async) && (patternsState.patterns | async); let patterns">
-            <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
-                No pattern created yet.
-            </div>
-            
-            <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" 
-                [pattern]="pattern">
-            </sqx-pattern>
-            
-            <sqx-pattern *ngIf="patternsState.canCreate | async"></sqx-pattern>
-        </ng-container>
+        <sqx-list-view [isLoading]="patternsState.isLoading | async">
+            <ng-container content>
+                <ng-container *ngIf="(patternsState.isLoaded | async) && (patternsState.patterns | async); let patterns">
+                    <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
+                        No pattern created yet.
+                    </div>
+                    
+                    <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" 
+                        [pattern]="pattern">
+                    </sqx-pattern>
+                    
+                    <sqx-pattern *ngIf="patternsState.canCreate | async"></sqx-pattern>
+                </ng-container>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

@@ -41,6 +41,9 @@ interface Snapshot {
     // Indicates if the plans are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the plans are loading.
+    isLoading?: boolean;
+
     // Indicates if there is a billing portal for the current Squidex instance.
     hasPortal?: boolean;
 
@@ -58,6 +61,9 @@ export class PlansState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public isDisabled =
         this.project(x => !x.isOwner);
@@ -77,9 +83,7 @@ export class PlansState extends State<Snapshot> {
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.plansService.getPlans(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -87,18 +91,16 @@ export class PlansState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
 
-                this.next(s => {
-                    const planId = overridePlanId || payload.currentPlanId;
-                    const plans = payload.plans.map(x => this.createPlan(x, planId));
+                const planId = overridePlanId || payload.currentPlanId;
+                const plans = payload.plans.map(x => this.createPlan(x, planId));
 
-                    return {
-                        ...s,
-                        plans: plans,
-                        isOwner: !payload.planOwner || payload.planOwner === this.userId,
-                        isLoaded: true,
-                        version,
-                        hasPortal: payload.hasPortal
-                    };
+                this.next({
+                    hasPortal: payload.hasPortal,
+                    isLoaded: true,
+                    isLoading: false,
+                    isOwner: !payload.planOwner || payload.planOwner === this.userId,
+                    plans: plans,
+                    version
                 });
             }),
             shareSubscribed(this.dialogs));

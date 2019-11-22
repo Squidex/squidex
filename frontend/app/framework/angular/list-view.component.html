@@ -1,3 +1,7 @@
+<div class="top-header">
+    <ng-content select="[topHeader]"></ng-content>
+</div>
+
 <div class="grid-header" *ngIf="showHeader" [class.loading-indicator]="isLoadingValue" #headerElement>
     <ng-content select="[header]"></ng-content>
 </div>

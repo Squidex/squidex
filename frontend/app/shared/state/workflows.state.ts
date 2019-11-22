@@ -37,6 +37,9 @@ interface Snapshot {
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the workflows are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create new workflow.
     canCreate?: boolean;
 }
@@ -52,6 +55,9 @@ export class WorkflowsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -64,9 +70,7 @@ export class WorkflowsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.workflowsService.getWorkflows(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -108,8 +112,13 @@ export class WorkflowsState extends State<Snapshot> {
     private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
         const { canCreate, errors, items: workflows } = payload;
 
-        this.next(s => {
-            return { ...s, workflows, errors, isLoaded: true, version, canCreate };
+        this.next({
+            canCreate,
+            errors,
+            isLoaded: true,
+            isLoading: false,
+            version,
+            workflows
         });
     }
 

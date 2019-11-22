@@ -1,6 +1,6 @@
 <sqx-title message="Contributors"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" grid="true" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Contributors
     </ng-container>
@@ -21,8 +21,8 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="contributorsState.isLoaded | async">
-            <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
+        <sqx-list-view [isLoading]="contributorsState.isLoading | async">
+            <ng-container topHeader>
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
                         <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
@@ -34,15 +34,16 @@
                             [roles]="roles">
                         </sqx-contributor-add-form>
                     </ng-container>
-                
-                    <div class="grid-content">
-
-                        <div class="import-hint">
-                            <sqx-form-hint class="text-right">
-                                Big team? <a class="force" (click)="importDialog.show()">Add many contributors at once</a>
-                            </sqx-form-hint>
-                        </div>
-                        
+                    <div class="import-hint">
+                        <sqx-form-hint class="text-right">
+                            Big team? <a class="force" (click)="importDialog.show()">Add many contributors at once</a>
+                        </sqx-form-hint>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-container content>
+                <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
+                    <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
                             <table class="table table-items table-fixed">
                                 <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor"
@@ -51,18 +52,21 @@
                                     [roles]="roles">
                                 </tbody>
                             </table>
-
+    
                             <sqx-pager [autoHide]="true" [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
                         </ng-container>
-
+    
                         <ng-template #noContributors>
                             <div class="table-items-row table-items-row-empty">
                                 No contributors found.
                             </div>
                         </ng-template>
-                    </div>
+                    </ng-container>
                 </ng-container>
             </ng-container>
+        </sqx-list-view>
+        <ng-container *ngIf="contributorsState.isLoaded | async">
+            
         </ng-container>
     </ng-container>
 

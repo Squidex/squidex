@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the clients are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the clients are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create new clients.
     canCreate?: boolean;
 }
@@ -50,6 +53,9 @@ export class ClientsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -62,9 +68,7 @@ export class ClientsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.clientsService.getClients(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -104,14 +108,12 @@ export class ClientsState extends State<Snapshot> {
     private replaceClients(payload: ClientsPayload, version: Version) {
         const { canCreate, items: clients } = payload;
 
-        this.next(s => {
-            return {
-                ...s,
-                canCreate,
-                clients,
-                isLoaded: true,
-                version
-            };
+        this.next({
+            canCreate,
+            clients,
+            isLoaded: true,
+            isLoading: false,
+            version
         });
     }
 

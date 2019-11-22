@@ -1,6 +1,6 @@
 <sqx-title message="Roles"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Roles
     </ng-container>
@@ -14,11 +14,15 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
-            <sqx-role *ngFor="let role of roles" [role]="role" [allPermissions]="allPermissions"></sqx-role>
-
-            <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
-        </ng-container>
+        <sqx-list-view [isLoading]="rolesState.isLoading | async">
+            <ng-container content>
+                <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
+                    <sqx-role *ngFor="let role of roles" [role]="role" [allPermissions]="allPermissions"></sqx-role>
+        
+                    <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
+                </ng-container>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

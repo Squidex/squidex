@@ -1,6 +1,6 @@
 <sqx-title message="Workflows"></sqx-title>
 
-<sqx-panel desiredWidth="70rem" [showSidebar]="true" [isLazyLoaded]="false">
+<sqx-panel desiredWidth="70rem" showSidebar="true" grid="true">
     <ng-container title>
         Workflows
     </ng-container>
@@ -14,28 +14,34 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="workflowsState.errors | async; let errors">
-            <div class="panel-alert panel-alert-danger" *ngIf="errors.length > 1">
-                <ul>
-                    <li *ngFor="let error of errors">{{error}}</li>
-                </ul>
-            </div>
-            <div class="panel-alert panel-alert-danger" *ngIf="errors.length === 1">
-                {{errors[0]}}
-            </div>
-        </ng-container>
+        <sqx-list-view [isLoading]="workflowsState.isLoading | async">
+            <ng-container topHeader>
+                <ng-container *ngIf="workflowsState.errors | async; let errors">
+                    <div class="panel-alert panel-alert-danger" *ngIf="errors.length > 1">
+                        <ul>
+                            <li *ngFor="let error of errors">{{error}}</li>
+                        </ul>
+                    </div>
+                    <div class="panel-alert panel-alert-danger" *ngIf="errors.length === 1">
+                        {{errors[0]}}
+                    </div>
+                </ng-container>
+            </ng-container>
 
-        <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
-                <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
-                    No workflows created yet.
-                </div>
+            <ng-container content>
+                <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
+                    <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
+                        No workflows created yet.
+                    </div>
 
-                <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow"
-                    [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
-                </sqx-workflow>
+                    <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow"
+                        [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
+                    </sqx-workflow>
 
-                <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
-        </ng-container>
+                    <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
+                </ng-container>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

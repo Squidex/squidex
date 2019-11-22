@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the roles are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the roles are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can add a role.
     canCreate?: boolean;
 }
@@ -50,6 +53,9 @@ export class RolesState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -62,11 +68,9 @@ export class RolesState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
-       return this.rolesService.getRoles(this.appName).pipe(
+        return this.rolesService.getRoles(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Roles reloaded.');
@@ -104,8 +108,12 @@ export class RolesState extends State<Snapshot> {
     private replaceRoles(payload: RolesPayload, version: Version) {
         const { canCreate, items: roles } = payload;
 
-        this.next(s => {
-            return { ...s, roles, isLoaded: true, version, canCreate };
+        this.next({
+            canCreate,
+            isLoaded: true,
+            isLoading: false,
+            roles,
+            version
         });
     }
 

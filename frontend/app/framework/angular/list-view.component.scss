@@ -19,8 +19,7 @@
 
     &-content {
         @include flex-grow(1);
-        padding-top: .5rem;
-        padding-bottom: .5rem;
+        padding: $panel-padding;
         overflow-y: scroll;
     }
 
@@ -28,9 +27,10 @@
         & {
             border: 0;
             border-bottom: 2px solid $color-border;
+            margin-bottom: -1rem;
         }
 
-        th {
+        /deep/ th {
             padding: .75rem;
         }
 
@@ -41,10 +41,12 @@
 
     &-footer {
         & {
+            border: 0;
             border-top: 2px solid $color-border;
+            margin-top: -1rem;
         }
 
-        .pagination {
+        /deep/ .pagination {
             margin: .25rem 0;
         }
     }

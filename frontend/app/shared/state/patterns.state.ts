@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the patterns are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the patterns are loading.
+    isLoading?: boolean;
+
     // Indicates if patterns can be created.
     canCreate?: boolean;
 }
@@ -50,6 +53,9 @@ export class PatternsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -62,9 +68,7 @@ export class PatternsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.patternsService.getPatterns(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -104,8 +108,11 @@ export class PatternsState extends State<Snapshot> {
     private replacePatterns(payload: PatternsPayload, version: Version) {
         const { canCreate, items: patterns } = payload;
 
-        this.next(s => {
-            return { ...s, patterns, isLoaded: true, version, canCreate };
+        this.next({
+            isLoaded: true,
+            isLoading: false,
+            patterns,
+            version, canCreate
         });
     }
 
