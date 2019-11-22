@@ -36,6 +36,9 @@ export class AssetsListComponent {
     public isListView = false;
 
     @Input()
+    public indicateLoading = false;
+
+    @Input()
     public selectedIds: object;
 
     @Input()

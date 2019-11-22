@@ -3,14 +3,11 @@
 
 .unrow {
     display: block;
-    padding-left: 8px;
-    padding-right: 8px;
-    margin: 0;
 }
 
 h5 {
     font-size: .9rem;
-    margin-top: 1rem;
+    margin-top: 0;
     margin-bottom: .5rem;
 }
 
@@ -24,8 +21,8 @@ h5 {
     & {
         width: $asset-width;
         position: relative;
-        margin-right: 1rem;
         margin-bottom: 1rem;
+        margin-right: .5rem;
         height: $asset-folder-height;
     }
 

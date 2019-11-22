@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -50,15 +51,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (command)
             {
                 case CreateAssetFolder createAssetFolder:
-                    return CreateReturn(createAssetFolder, c =>
+                    return CreateReturnAsync(createAssetFolder, async c =>
                     {
+                        await GuardAssetFolder.CanCreate(c, assetQuery);
+
                         Create(c);
 
                         return Snapshot;
                     });
                 case MoveAssetFolder moveAssetFolder:
-                    return UpdateReturn(moveAssetFolder, c =>
+                    return UpdateReturnAsync(moveAssetFolder, async c =>
                     {
+                        await GuardAssetFolder.CanMove(c, assetQuery, Snapshot.Id, Snapshot.ParentId);
+
                         Move(c);
 
                         return Snapshot;
@@ -66,6 +71,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case RenameAssetFolder renameAssetFolder:
                     return UpdateReturn(renameAssetFolder, c =>
                     {
+                        GuardAssetFolder.CanRename(c, Snapshot.FolderName);
+
                         Rename(c);
 
                         return Snapshot;
@@ -73,6 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case DeleteAssetFolder deleteAssetFolder:
                     return Update(deleteAssetFolder, c =>
                     {
+                        GuardAssetFolder.CanDelete(c);
+
                         Delete(c);
                     });
                 default:

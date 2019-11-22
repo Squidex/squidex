@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
@@ -49,14 +50,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return null;
         }
 
-        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(Guid id)
+        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(Guid id)
         {
-            var assetFolder = await assetFolderRepository.FindAssetFolderAsync(id);
+            var result = new List<IAssetFolderEntity>();
 
-            return assetFolder;
+            while (id != default)
+            {
+                var folder = await assetFolderRepository.FindAssetFolderAsync(id);
+
+                if (folder == null || result.Any(x => x.Id == folder.Id))
+                {
+                    result.Clear();
+                    break;
+                }
+
+                result.Add(folder);
+
+                id = folder.ParentId;
+            }
+
+            return result;
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryFoldersAsync(Context context, Guid parentId)
+        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, Guid parentId)
         {
             var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId);
 

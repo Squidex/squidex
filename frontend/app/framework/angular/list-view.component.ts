@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, Renderer2, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import { fadeAnimation } from '@app/framework/internal';
 
@@ -27,6 +27,9 @@ export class ListViewComponent implements AfterViewInit {
     @ViewChild('footerElement', { static: false })
     public footerElement: ElementRef<ParentNode>;
 
+    @ViewChild('contentElement', { static: false })
+    public contentElement: ElementRef<ParentNode>;
+
     @Input()
     public syncedHeader = false;
 
@@ -41,10 +44,14 @@ export class ListViewComponent implements AfterViewInit {
         if (value) {
             this.isLoadingValue = value;
 
+            this.changeDetector.markForCheck();
+
             clearTimeout(this.timer);
         } else {
             this.timer = setTimeout(() => {
                 this.isLoadingValue = value;
+
+                this.changeDetector.markForCheck();
             }, 250);
         }
     }
@@ -52,6 +59,7 @@ export class ListViewComponent implements AfterViewInit {
     public isLoadingValue = false;
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
     }
@@ -59,6 +67,7 @@ export class ListViewComponent implements AfterViewInit {
     public ngAfterViewInit() {
         this.hideWhenEmpty(this.headerElement.nativeElement);
         this.hideWhenEmpty(this.footerElement.nativeElement);
+        this.hideWhenEmpty(this.contentElement.nativeElement);
     }
 
     private hideWhenEmpty(element: any) {

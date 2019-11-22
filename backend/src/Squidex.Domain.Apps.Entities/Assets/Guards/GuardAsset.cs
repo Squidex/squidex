@@ -46,15 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
-                if (command.ParentId != default)
-                {
-                    var folder = await assetQuery.FindAssetFolderAsync(command.ParentId);
-
-                    if (folder == null)
-                    {
-                        e("Asset folder does not exist.", nameof(command.ParentId));
-                    }
-                }
+                await CheckPathAsync(command.ParentId, assetQuery, e);
             });
         }
 
@@ -68,14 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 {
                     e("Asset is already part of this folder.", nameof(command.ParentId));
                 }
-                else if (command.ParentId != default)
+                else
                 {
-                    var folder = await assetQuery.FindAssetFolderAsync(command.ParentId);
-
-                    if (folder == null)
-                    {
-                        e("Asset folder does not exist.", nameof(command.ParentId));
-                    }
+                    await CheckPathAsync(command.ParentId, assetQuery, e);
                 }
             });
         }
@@ -88,6 +75,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         public static void CanDelete(DeleteAsset command)
         {
             Guard.NotNull(command);
+        }
+
+        private static async Task CheckPathAsync(Guid parentId, IAssetQueryService assetQuery, AddValidation e)
+        {
+            if (parentId != default)
+            {
+                var path = await assetQuery.FindAssetFolderAsync(parentId);
+
+                if (path.Count == 0)
+                {
+                    e("Asset folder does not exist.", nameof(MoveAsset.ParentId));
+                }
+            }
         }
     }
 }

@@ -11,6 +11,10 @@
                 </button>
             </div>
 
+            <div class="modal-tabs clearfix" #tabsElement *ngIf="showTabs">
+                <ng-content select="[tabs]"></ng-content>
+            </div>
+
             <div class="modal-body">
                 <ng-content select="[content]"></ng-content>
             </div>

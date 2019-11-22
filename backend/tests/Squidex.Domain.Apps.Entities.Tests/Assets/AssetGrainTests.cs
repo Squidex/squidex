@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
+        private readonly Guid parentId = Guid.NewGuid();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
         private readonly AssetGrain sut;
@@ -41,6 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetGrainTests()
         {
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
+                .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
+
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .Returns(new Dictionary<string, string>());
 
@@ -181,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Move_should_create_events_and_update_state()
         {
-            var command = new MoveAsset { ParentId = Guid.NewGuid() };
+            var command = new MoveAsset { ParentId = parentId };
 
             await ExecuteCreateAsync();
 
@@ -189,11 +193,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(command.ParentId, sut.Snapshot.ParentId);
+            Assert.Equal(parentId, sut.Snapshot.ParentId);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetMoved { ParentId = command.ParentId })
+                    CreateAssetEvent(new AssetMoved { ParentId = parentId })
                 );
         }
 

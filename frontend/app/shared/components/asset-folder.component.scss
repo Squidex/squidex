@@ -15,9 +15,8 @@ img {
 
 .card {
     & {
+        border-width: 1px;
         border-bottom-width: 1px;
-        margin-bottom: 1rem;
-        margin-right: 1rem;
         width: $asset-width;
     }
 
