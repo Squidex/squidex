@@ -1,6 +1,6 @@
 <sqx-title message="User Management"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" contentClass="grid">
+<sqx-panel desiredWidth="50rem" grid="true">
     <ng-container title>
         Users
     </ng-container>
@@ -27,40 +27,42 @@
     </ng-container>
 
     <ng-container content>
-        <div class="grid-header">
-            <table class="table table-items table-fixed">
-                <thead>
-                    <tr>
-                        <th class="cell-user">
-                            &nbsp;
-                        </th>
-                        <th class="cell-auto">
-                            Name
-                        </th>
-                        <th class="cell-auto">
-                            Email
-                        </th>
-                        <th class="cell-actions">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-        
-        <div class="grid-content">
-            <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
-                    <tbody *ngFor="let user of users; trackBy: trackByUser"
-                        [sqxUser]="user">
-                    </tbody>
+        <sqx-list-view [isLoading]="usersState.isLoading | async">
+            <ng-container header>
+                <table class="table table-items table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="cell-user">
+                                &nbsp;
+                            </th>
+                            <th class="cell-auto">
+                                Name
+                            </th>
+                            <th class="cell-auto">
+                                Email
+                            </th>
+                            <th class="cell-actions">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
                 </table>
-            </div>
-        </div>
-
-        <div class="grid-footer">
-            <sqx-pager [pager]="usersState.usersPager | async" (pagerChange)="usersState.setPager($event)"></sqx-pager>
-        </div>
+            </ng-container>
+                
+            <ng-container content>
+                <div sqxIgnoreScrollbar>
+                    <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
+                        <tbody *ngFor="let user of users; trackBy: trackByUser"
+                            [sqxUser]="user">
+                        </tbody>
+                    </table>
+                </div>
+            </ng-container>
+    
+            <ng-container footer>
+                <sqx-pager [pager]="usersState.usersPager | async" (pagerChange)="usersState.setPager($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 </sqx-panel>
 

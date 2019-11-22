@@ -39,6 +39,9 @@ interface Snapshot {
     // Indicates if the users are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the users are loading.
+    isLoading?: boolean;
+
     // The selected user.
     selectedUser?: UserDto | null;
 
@@ -62,6 +65,9 @@ export class UsersState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -104,16 +110,12 @@ export class UsersState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            const selectedUser = this.snapshot.selectedUser;
-
-            this.resetState({ selectedUser });
-        }
-
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload = false): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
@@ -135,6 +137,7 @@ export class UsersState extends State<Snapshot> {
                     return { ...s,
                         canCreate,
                         isLoaded: true,
+                        isLoading: false,
                         selectedUser,
                         users,
                         usersPager

@@ -60,7 +60,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public showClose = true;
 
     @Input()
-    public contentClass = '';
+    public grid = false;
 
     @Input()
     public customClose = false;

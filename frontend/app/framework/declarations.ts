@@ -61,6 +61,7 @@ export * from './angular/highlight.pipe';
 export * from './angular/hover-background.directive';
 export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
+export * from './angular/list-view.component';
 export * from './angular/pager.component';
 export * from './angular/panel-container.directive';
 export * from './angular/panel.component';

@@ -1,0 +1,15 @@
+<div class="grid-header" *ngIf="showHeader" [class.loading-indicator]="isLoadingValue" #headerElement>
+    <ng-content select="[header]"></ng-content>
+</div>
+
+<div class="grid-content" [class.loading-indicator]="isLoadingValue">
+    <ng-content select="[content]"></ng-content>
+</div>
+
+<div class="grid-footer" *ngIf="showFooter" [class.loading-indicator]="isLoadingValue" #footerElement>
+    <ng-content select="[footer]"></ng-content>
+</div>
+
+<div class="loader text-center" *ngIf="isLoadingValue">
+    <img alt="Loading" src="./images/loader.gif" />
+</div>

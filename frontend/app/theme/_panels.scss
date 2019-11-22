@@ -112,6 +112,10 @@
             overflow-y: auto;
         }
 
+        &.grid {
+            padding: 0;
+        }
+
         & .nav-panel {
             & {
                 margin-left: -$panel-padding;

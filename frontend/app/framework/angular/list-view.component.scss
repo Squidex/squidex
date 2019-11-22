@@ -1,0 +1,59 @@
+@import '_mixins';
+@import '_vars';
+
+:host {
+    @include flex-box;
+    @include flex-direction(column);
+    @include flex-grow(1);
+    overflow: hidden;
+    padding: 0;
+}
+
+.grid {
+    &-content,
+    &-header,
+    &-footer {
+        @include transition(opacity .2 ease);
+        padding: 0 $panel-padding;
+    }
+
+    &-content {
+        @include flex-grow(1);
+        padding-top: .5rem;
+        padding-bottom: .5rem;
+        overflow-y: scroll;
+    }
+
+    &-header {
+        & {
+            border: 0;
+            border-bottom: 2px solid $color-border;
+        }
+
+        th {
+            padding: .75rem;
+        }
+
+        .table-items {
+            margin: 0;
+        }
+    }
+
+    &-footer {
+        & {
+            border-top: 2px solid $color-border;
+        }
+
+        .pagination {
+            margin: .25rem 0;
+        }
+    }
+}
+
+.loading-indicator {
+    @include opacity(.5);
+}
+
+.loader {
+    @include absolute(20%, 0, auto, 0);
+}

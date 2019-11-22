@@ -23,6 +23,9 @@ interface Snapshot {
 
     // Indicates if event consumers are loaded.
     isLoaded?: boolean;
+
+    // Indicates if event consumers are loading.
+    isLoading?: boolean;
 }
 
 type EventConsumersList = ReadonlyArray<EventConsumerDto>;
@@ -35,6 +38,9 @@ export class EventConsumersState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     constructor(
         private readonly dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
@@ -43,8 +49,8 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public load(isReload = false, silent = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
+        if (!silent) {
+            this.next({ isLoading: true });
         }
 
         return this.eventConsumersService.getEventConsumers().pipe(
@@ -53,8 +59,10 @@ export class EventConsumersState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
 
-                this.next(s => {
-                    return { ...s, eventConsumers, isLoaded: true };
+                this.next({
+                    eventConsumers,
+                    isLoaded: true,
+                    isLoading: false
                 });
             }),
             shareSubscribed(this.dialogs, { silent }));

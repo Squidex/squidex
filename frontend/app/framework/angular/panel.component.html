@@ -37,7 +37,8 @@
         </div>
 
         <div class="panel-main">
-            <div class="panel-content {{contentClass}}" 
+            <div class="panel-content"
+                [class.grid]="grid"
                 [class.panel-content-scroll-x]="scrollX" 
                 [class.panel-content-scroll]="showScrollbar"
                 [class.panel-content-blank]="isBlank"
