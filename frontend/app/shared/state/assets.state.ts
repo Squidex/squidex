@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, throwError } from 'rxjs';
+import { empty, forkJoin, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
@@ -233,7 +233,7 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public createFolderFolder(folderName: string) {
+    public createAssetFolder(folderName: string) {
         return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.parentId }).pipe(
             tap(assetFolder => {
                 if (assetFolder.parentId !== this.parentId) {
@@ -276,24 +276,22 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public moveAsset(asset: AssetDto, parentId?: string) {
-        if (asset.id === parentId) {
-            return;
+        if (asset.parentId === parentId) {
+            return empty();
         }
 
         this.next(s => {
             const assets = s.assets.filter(x => x.id !== asset.id);
-            const assetsPager = s.assetsPager.decrementCount();
 
-            return { ...s, assets, assetsPager };
+            return { ...s, assets };
         });
 
         return this.assetsService.putAssetItemParent(this.appName, asset, { parentId }, asset.version).pipe(
             catchError(error => {
                 this.next(s => {
                     const assets = [asset, ...s.assets];
-                    const assetsPager = s.assetsPager.incrementCount();
 
-                    return { ...s, assets, assetsPager };
+                    return { ...s, assets };
                 });
 
                 return throwError(error);
@@ -302,8 +300,8 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public moveAssetFolder(assetFolder: AssetFolderDto, parentId?: string) {
-        if (assetFolder.id === parentId) {
-            return;
+        if (assetFolder.id === parentId || assetFolder.parentId === parentId) {
+            return empty();
         }
 
         this.next(s => {

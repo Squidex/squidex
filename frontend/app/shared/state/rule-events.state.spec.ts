@@ -53,7 +53,7 @@ describe('RuleEventsState', () => {
 
     it('should load ruleEvents', () => {
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
-        expect(ruleEventsState.snapshot.isLoading).toBeTruthy();
+        expect(ruleEventsState.snapshot.isLoading).toBeFalsy();
         expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
         expect(ruleEventsState.snapshot.ruleEventsPager.numberOfItems).toEqual(200);
 
@@ -113,6 +113,18 @@ describe('RuleEventsState', () => {
         rulesService.setup(x => x.getEvents(app, 10, 0, '12'))
             .returns(() => of(new RuleEventsDto(200, [])));
 
+        ruleEventsState.filterByRule('12').subscribe();
+
+        expect().nothing();
+
+        rulesService.verify(x => x.getEvents(app, 10, 0, '12'), Times.once());
+    });
+
+    it('should not load again when rule id has not changed', () => {
+        rulesService.setup(x => x.getEvents(app, 10, 0, '12'))
+            .returns(() => of(new RuleEventsDto(200, [])));
+
+        ruleEventsState.filterByRule('12').subscribe();
         ruleEventsState.filterByRule('12').subscribe();
 
         expect().nothing();

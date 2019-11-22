@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { empty, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -69,10 +69,6 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
-
         return this.loadInternal(isReload);
     }
 
@@ -94,11 +90,14 @@ export class RuleEventsState extends State<Snapshot> {
                     return {
                         ...s,
                         isLoaded: true,
-                        isLoading: true,
+                        isLoading: false,
                         ruleEvents,
                         ruleEventsPager
                     };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }

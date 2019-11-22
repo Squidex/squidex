@@ -58,7 +58,7 @@ describe('RulesState', () => {
             rulesState.load().subscribe();
 
             expect(rulesState.snapshot.isLoaded).toBeTruthy();
-            expect(rulesState.snapshot.isLoading).toBeTruthy();
+            expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());

@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { empty, of, throwError } from 'rxjs';
+import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -22,6 +22,7 @@ import {
 
 import { createContributors } from '../services/contributors.service.spec';
 
+import { ErrorDto } from '@app/framework';
 import { TestValues } from './_test-helpers';
 
 describe('ContributorsState', () => {
@@ -159,6 +160,44 @@ describe('ContributorsState', () => {
             contributorsState.assign(request).subscribe();
 
             expectNewContributors(updated);
+        });
+
+        it('should return proper error when user to add does not exist', () => {
+            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+
+            contributorsService.setup(x => x.postContributor(app, request, version))
+                .returns(() => throwError(new ErrorDto(404, '404')));
+
+            let error: ErrorDto;
+
+            contributorsState.assign(request).pipe(
+                catchError(err => {
+                    error = err;
+
+                    return empty();
+                })
+            ).subscribe();
+
+            expect(error!.message).toBe('The user does not exist.');
+        });
+
+        it('should return original error when not a 404', () => {
+            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+
+            contributorsService.setup(x => x.postContributor(app, request, version))
+                .returns(() => throwError(new ErrorDto(500, '500')));
+
+            let error: ErrorDto;
+
+            contributorsState.assign(request).pipe(
+                catchError(err => {
+                    error = err;
+
+                    return empty();
+                })
+            ).subscribe();
+
+            expect(error!.message).toBe('500');
         });
 
         it('should update contributors when contribution revoked', () => {

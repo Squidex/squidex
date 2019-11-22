@@ -57,7 +57,7 @@ export class AssetFolderFormComponent implements OnInit {
                         this.editForm.submitFailed(error);
                     });
             } else {
-                this.assetsState.createFolderFolder(value.folderName)
+                this.assetsState.createAssetFolder(value.folderName)
                     .subscribe(() => {
                         this.emitComplete();
                     }, error => {

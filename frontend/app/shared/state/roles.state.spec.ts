@@ -50,7 +50,7 @@ describe('RolesState', () => {
             rolesState.load().subscribe();
 
             expect(rolesState.snapshot.isLoaded).toBeTruthy();
-            expect(rolesState.snapshot.isLoading).toBeTruthy();
+            expect(rolesState.snapshot.isLoading).toBeFalsy();
             expect(rolesState.snapshot.roles).toEqual(oldRoles.items);
             expect(rolesState.snapshot.version).toEqual(version);
 
