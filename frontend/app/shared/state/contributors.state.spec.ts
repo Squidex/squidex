@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -50,10 +51,10 @@ describe('ContributorsState', () => {
         localStore = Mock.ofType<LocalStoreService>();
 
         contributorsService = Mock.ofType<ContributorsService>();
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
-
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable();
+
+        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
     });
 
     afterEach(() => {
@@ -67,10 +68,20 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.contributors).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
+            expect(contributorsState.snapshot.isLoading).toBeFalsy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            contributorsService.setup(x => x.getContributors(app))
+                .returns(() => throwError('error'));
+
+            contributorsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(contributorsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should only show current page of contributors', () => {

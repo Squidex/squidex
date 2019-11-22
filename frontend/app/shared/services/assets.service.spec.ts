@@ -18,6 +18,7 @@ import {
     AssetsService,
     DateTime,
     ErrorDto,
+    MathHelper,
     Resource,
     ResourceLinks,
     Version
@@ -401,7 +402,9 @@ describe('AssetsService', () => {
         expect(assetFolder!).toEqual(createAssetFolder(22));
     }));
 
-    function assetResponse(id: number, suffix = '') {
+    function assetResponse(id: number, suffix = '', parentId?: string) {
+        parentId = parentId || MathHelper.EMPTY_GUID;
+
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
@@ -413,7 +416,7 @@ describe('AssetsService', () => {
             fileType: 'png',
             fileSize: id * 2,
             fileVersion: id * 4,
-            parentId: `parent-${id}`,
+            parentId,
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: id * 3,
@@ -430,11 +433,13 @@ describe('AssetsService', () => {
         };
     }
 
-    function assetFolderResponse(id: number, suffix = '') {
+    function assetFolderResponse(id: number, suffix = '', parentId?: string) {
+        parentId = parentId || MathHelper.EMPTY_GUID;
+
         return {
             id: `id${id}`,
             folderName: `My Folder${id}${suffix}`,
-            parentId: `parent-${id}`,
+            parentId,
             version: id,
             _links: {
                 update: { method: 'PUT', href: `/assets/folders/${id}` }
@@ -444,7 +449,7 @@ describe('AssetsService', () => {
     }
 });
 
-export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '') {
+export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '', parentId?: string) {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/assets/${id}` }
     };
@@ -452,6 +457,8 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
     const meta = {
         isDuplicate: 'true'
     };
+
+    parentId = parentId || MathHelper.EMPTY_GUID;
 
     return new AssetDto(links, meta,
         `id${id}`,
@@ -462,7 +469,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         'png',
         id * 2,
         id * 4,
-        `parent-${id}`,
+        parentId,
         'image/png',
         true,
         id * 3,
@@ -472,10 +479,12 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         new Version(`${id}`));
 }
 
-export function createAssetFolder(id: number, suffix = '') {
+export function createAssetFolder(id: number, suffix = '', parentId?: string) {
+    parentId = parentId || MathHelper.EMPTY_GUID;
+
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/assets/folders/${id}` }
     };
 
-    return new AssetFolderDto(links, `id${id}`, `My Folder${id}${suffix}`, `parent-${id}`, new Version(`${id}`));
+    return new AssetFolderDto(links, `id${id}`, `My Folder${id}${suffix}`, parentId, new Version(`${id}`));
 }

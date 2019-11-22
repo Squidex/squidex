@@ -44,8 +44,18 @@ describe('EventConsumersState', () => {
 
             expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, eventConsumer2]);
             expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
+            expect(eventConsumersState.snapshot.isLoading).toBeFalsy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            eventConsumersService.setup(x => x.getEventConsumers())
+                .returns(() => throwError('error'));
+
+            eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(eventConsumersState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

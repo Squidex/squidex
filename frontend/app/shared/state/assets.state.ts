@@ -13,6 +13,7 @@ import {
     compareStrings,
     DialogService,
     LocalStoreService,
+    MathHelper,
     Pager,
     shareSubscribed,
     State
@@ -35,7 +36,7 @@ export type AssetPathItem = { id: string, folderName: string };
 type TagsAvailable = { [name: string]: number };
 type TagsSelected = { [name: string]: boolean };
 
-const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ id: '00000000-0000-0000-0000-000000000000', folderName: 'Assets' }];
+const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ id: MathHelper.EMPTY_GUID, folderName: 'Assets' }];
 
 interface Snapshot {
     // All assets tags.
