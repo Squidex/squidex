@@ -11,6 +11,7 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     AssetFoldersDto,
+    AssetPathItem,
     AssetsDto,
     AssetsService,
     AssetsState,
@@ -25,7 +26,6 @@ import { createAsset, createAssetFolder } from './../services/assets.service.spe
 
 import { TestValues } from './_test-helpers';
 import { encodeQuery } from './query';
-import { AssetPathItem } from './assets.state';
 
 describe('AssetsState', () => {
     const {

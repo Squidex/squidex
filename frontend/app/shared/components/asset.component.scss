@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+// sass-lint:disable single-line-per-selector
+
 $list-height: 2.375rem;
 
 @mixin overlay-container {
@@ -34,12 +36,6 @@ $list-height: 2.375rem;
     color: $color-dark-foreground;
 }
 
-:host {
-    padding-bottom: 1rem;
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
 :host(.isListView) {
     padding: 0;
 }
@@ -59,21 +55,20 @@ $list-height: 2.375rem;
         width: $asset-width;
         border-top-width: 1px;
         border-width: 1px;
-    }
-
-    &-body,
-    &-footer {
-        position: relative;
-        padding: 1rem;
+        margin-bottom: 1rem;
+        margin-right: 1rem;
     }
 
     &-body {
-        padding: 0;
+        position: relative;
+        padding: 1rem;
         min-height: $asset-header;
         max-height: $asset-header;
     }
 
     &-footer {
+        position: relative;
+        padding: 1rem;
         padding-top: .5rem;
         min-height: $asset-footer;
         max-height: auto;
@@ -109,8 +104,7 @@ $list-height: 2.375rem;
         background: $color-dark-black;
     }
 
-    &-name,
-    &-info {
+    &-name, &-info {
         @include truncate;
     }
 
@@ -131,10 +125,10 @@ $list-height: 2.375rem;
     }
 
     &-icon {
-        line-height: $asset-image;
-        background: $color-border;
-        height: $asset-image;
+        padding: 2rem;
+        background: $color-asset-bg;
         border: 0;
+        height: $asset-image;
         text-align: center;
     }
 }
@@ -210,7 +204,7 @@ $list-height: 2.375rem;
     .image {
         @include absolute(0, auto, 0, 4px);
         border: 0;
-        background: $color-border;
+        background: $color-asset-bg;
         width: $list-height + 2rem;
     }
 
@@ -232,7 +226,6 @@ $list-height: 2.375rem;
         }
 
         &-name {
-            width: 100%;
             padding-right: .5rem;
         }
 
@@ -282,6 +275,10 @@ $list-height: 2.375rem;
     .file-type {
         @include opacity(0);
     }
+}
+
+img {
+    max-height: 100%;
 }
 
 .selectable {

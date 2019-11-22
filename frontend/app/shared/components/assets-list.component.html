@@ -18,7 +18,7 @@
     <div class="folders" *ngIf="state.pathAvailable | async">
         <h5>Folders</h5>
 
-        <div class="row assets">
+        <div class="row no-gutters">
             <div class="folder-container" *ngIf="state.pathParent | async; let parent"
                 cdkDropList
                 [cdkDropListData]="parent.id"
@@ -54,7 +54,7 @@
             <h5>Files</h5>
         </ng-container>
         
-        <div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)"
+        <div class="row no-gutters" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)"
             cdkDropList
             cdkDropListSortingDisabled>
             <sqx-asset *ngFor="let file of newFiles" 

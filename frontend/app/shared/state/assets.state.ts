@@ -219,7 +219,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public addAsset(asset: AssetDto) {
-        if (asset.parentId !== this.parentId) {
+        if (asset.parentId !== this.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
             return;
         }
 

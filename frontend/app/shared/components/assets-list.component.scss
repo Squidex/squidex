@@ -24,9 +24,8 @@ h5 {
     & {
         width: $asset-width;
         position: relative;
+        margin-right: 1rem;
         margin-bottom: 1rem;
-        margin-left: 8px;
-        margin-right: 8px;
         height: $asset-folder-height;
     }
 
@@ -77,11 +76,6 @@ h5 {
     &-info {
         color: darken($color-border, 30%);
     }
-}
-
-.assets {
-    margin-left: -8px;
-    margin-right: -8px;
 }
 
 .btn {
