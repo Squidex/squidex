@@ -47,6 +47,9 @@ interface Snapshot {
     // Indicates if the schemas are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the schemas are loading.
+    isLoading?: boolean;
+
     // The selected schema.
     selectedSchema?: SchemaDetailsDto | null;
 
@@ -77,6 +80,9 @@ export class SchemasState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -155,6 +161,8 @@ export class SchemasState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
+        this.next({ isLoading: false });
+
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
                 if (isReload) {
@@ -164,7 +172,13 @@ export class SchemasState extends State<Snapshot> {
                 return this.next(s => {
                     const schemas = items.sortedByString(x => x.displayName);
 
-                    return { ...s, schemas, isLoaded: true, canCreate };
+                    return {
+                        ...s,
+                        canCreate,
+                        isLoaded: true,
+                        isLoading: true,
+                        schemas
+                    };
                 });
             }),
             shareSubscribed(this.dialogs));

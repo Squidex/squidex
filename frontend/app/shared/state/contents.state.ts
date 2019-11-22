@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { empty, forkJoin, Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -202,6 +202,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         statuses
                     };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }));
     }
 
