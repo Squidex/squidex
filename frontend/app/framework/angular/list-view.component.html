@@ -7,13 +7,13 @@
         <ng-content select="[header]"></ng-content>
     </div>
     
-    <div class="grid-content normal" [class.loading-indicator]="isLoadingValue" #contentElement [class.tabled]="table">
+    <div class="grid-content normal" [class.loading-indicator]="isLoadingValue"  #contentElement [class.tabled]="table">
         <ng-content select="[content]"></ng-content>
     </div>
 </ng-container>
 
 <ng-container *ngIf="syncedHeader">
-    <div class="grid-header" [class.loading-indicator]="isLoadingValue" #headerElement>
+    <div class="grid-header synced" [class.loading-indicator]="isLoadingValue" #headerElement>
         <div #header>
             <ng-content select="[syncedHeader]"></ng-content>
         </div>

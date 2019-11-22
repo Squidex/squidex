@@ -65,16 +65,18 @@ export class ListViewComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.hideWhenEmpty(this.headerElement.nativeElement);
-        this.hideWhenEmpty(this.footerElement.nativeElement);
-        this.hideWhenEmpty(this.contentElement.nativeElement);
+        this.hideWhenEmpty(this.headerElement);
+        this.hideWhenEmpty(this.footerElement);
+        this.hideWhenEmpty(this.contentElement);
     }
 
-    private hideWhenEmpty(element: any) {
-        const isEmpty = element.children.length === 0;
+    private hideWhenEmpty(element: ElementRef) {
+        if (element && element.nativeElement) {
+            const isEmpty = element.nativeElement.children.length === 0;
 
-        if (isEmpty) {
-            this.renderer.setStyle(element, 'display', 'none');
+            if (isEmpty) {
+                this.renderer.setStyle(element.nativeElement, 'display', 'none');
+            }
         }
     }
 }

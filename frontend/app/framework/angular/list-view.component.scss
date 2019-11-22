@@ -32,7 +32,7 @@
         }
 
         &.synced {
-            overflow-y: auto;
+            overflow-y: scroll;
             overflow-x: auto;
             padding-right: 0;
         }
@@ -40,21 +40,33 @@
 
     &-header {
         & {
+            @include flex-shrink(1);
             border: 0;
             border-bottom: 2px solid $color-border;
+        }
+
+        &.synced {
+            overflow-y: scroll;
+            max-height: 3.2rem;
+            min-height: 3.2rem;
         }
 
         /deep/ th {
             padding: .75rem;
         }
 
-        .table-items {
+        /deep/ table {
+            margin: 0;
+        }
+
+        /deep/ .table-items {
             margin: 0;
         }
     }
 
     &-footer {
         & {
+            @include flex-shrink(1);
             border: 0;
             border-top: 2px solid $color-border;
         }

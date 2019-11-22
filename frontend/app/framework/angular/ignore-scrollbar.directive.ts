@@ -30,12 +30,12 @@ export class IgnoreScrollbarDirective extends ResourceOwner implements OnInit, A
     }
 
     public ngOnInit() {
-        this.parent = this.renderer.parentNode(this.element.nativeElement);
-
-        this.own(timer(100, 100).subscribe(() => this.reposition));
+        this.own(timer(100, 100).subscribe(() => this.reposition()));
     }
 
     public ngAfterViewInit() {
+        this.parent = this.renderer.parentNode(this.element.nativeElement);
+
         this.reposition();
     }
 
