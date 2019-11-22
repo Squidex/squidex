@@ -24,10 +24,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetFolderGrain : DomainObjectGrain<AssetFolderState>, IAssetFolderGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+        private readonly IAssetQueryService assetQuery;
 
-        public AssetFolderGrain(IStore<Guid> store, IActivationLimit limit, ISemanticLog log)
+        public AssetFolderGrain(IStore<Guid> store, IAssetQueryService assetQuery, IActivationLimit limit, ISemanticLog log)
             : base(store, log)
         {
+            Guard.NotNull(assetQuery);
+
+            this.assetQuery = assetQuery;
+
             limit?.SetLimit(5000, Lifetime);
         }
 
