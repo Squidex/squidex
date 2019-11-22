@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -38,9 +40,44 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             });
         }
 
-        public static void CanCreate(CreateAsset command)
+        public static Task CanCreate(CreateAsset command, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command);
+
+            return Validate.It(() => "Cannot upload asset.", async e =>
+            {
+                if (command.ParentId != default)
+                {
+                    var folder = await assetQuery.FindAssetFolderAsync(command.ParentId);
+
+                    if (folder == null)
+                    {
+                        e("Asset folder does not exist.", nameof(command.ParentId));
+                    }
+                }
+            });
+        }
+
+        public static Task CanMove(MoveAsset command, IAssetQueryService assetQuery, Guid oldParentId)
+        {
+            Guard.NotNull(command);
+
+            return Validate.It(() => "Cannot move asset.", async e =>
+            {
+                if (command.ParentId == oldParentId)
+                {
+                    e("Asset is already part of this folder.", nameof(command.ParentId));
+                }
+                else if (command.ParentId != default)
+                {
+                    var folder = await assetQuery.FindAssetFolderAsync(command.ParentId);
+
+                    if (folder == null)
+                    {
+                        e("Asset folder does not exist.", nameof(command.ParentId));
+                    }
+                }
+            });
         }
 
         public static void CanUpdate(UpdateAsset command)

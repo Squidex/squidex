@@ -27,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetGrainTests : HandlerTestBase<AssetState>
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .Returns(new Dictionary<string, string>());
 
-            sut = new AssetGrain(Store, tagService, limit, A.Dummy<ISemanticLog>());
+            sut = new AssetGrain(Store, tagService, assetQuery, limit, A.Dummy<ISemanticLog>());
             sut.ActivateAsync(Id).Wait();
         }
 
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Create_should_create_events()
+        public async Task Create_should_create_events_and_update_state()
         {
             var command = new CreateAsset { File = file, ImageInfo = image, FileHash = fileHash, Tags = new HashSet<string>() };
 
@@ -95,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Update_should_create_events()
+        public async Task Update_should_create_events_and_update_state()
         {
             var command = new UpdateAsset { File = file, ImageInfo = image, FileHash = fileHash };
 
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateName_should_create_events()
+        public async Task AnnotateName_should_create_events_and_update_state()
         {
             var command = new AnnotateAsset { FileName = "My New Image.png" };
 
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateSlug_should_create_events()
+        public async Task AnnotateSlug_should_create_events_and_update_state()
         {
             var command = new AnnotateAsset { Slug = "my-new-image.png" };
 
@@ -162,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateTag_should_create_events()
+        public async Task AnnotateTag_should_create_events_and_update_state()
         {
             var command = new AnnotateAsset { Tags = new HashSet<string>() };
 
@@ -175,6 +176,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string>() })
+                );
+        }
+
+        [Fact]
+        public async Task Move_should_create_events_with_total_file_size()
+        {
+            var command = new MoveAsset { ParentId = Guid.NewGuid() };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(command.ParentId, sut.Snapshot.ParentId);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetMoved { ParentId = command.ParentId })
                 );
         }
 

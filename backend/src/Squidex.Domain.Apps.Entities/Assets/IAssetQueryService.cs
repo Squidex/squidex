@@ -22,6 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, Guid id);
 
-        Task<IAssetFolderEntity?> FindAssetFolderAsync(Context context, Guid id);
+        Task<IAssetFolderEntity?> FindAssetFolderAsync(Guid id);
     }
 }

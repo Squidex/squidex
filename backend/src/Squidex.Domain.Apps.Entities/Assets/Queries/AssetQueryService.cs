@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return null;
         }
 
-        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(Context context, Guid id)
+        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(Guid id)
         {
             var assetFolder = await assetFolderRepository.FindAssetFolderAsync(id);
 

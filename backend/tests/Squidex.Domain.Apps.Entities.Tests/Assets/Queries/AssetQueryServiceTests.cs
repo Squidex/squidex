@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
+        private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly Context requestContext;
         private readonly AssetQueryParser queryParser = A.Fake<AssetQueryParser>();
@@ -34,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => queryParser.ParseQuery(requestContext, A<Q>.Ignored))
                 .Returns(new ClrQuery());
 
-            sut = new AssetQueryService(assetEnricher, assetRepository, queryParser);
+            sut = new AssetQueryService(assetEnricher, assetRepository, assetFolderRepository, queryParser);
         }
 
         [Fact]
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetRepository.FindAssetAsync(found.Id, false))
+            A.CallTo(() => assetRepository.FindAssetAsync(found.Id))
                 .Returns(found);
 
             A.CallTo(() => assetEnricher.EnrichAsync(found, requestContext))
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
                 .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-            var result = await sut.QueryAsync(requestContext, Q.Empty.WithIds(ids));
+            var result = await sut.QueryAsync(requestContext, null, Q.Empty.WithIds(ids));
 
             Assert.Equal(8, result.Total);
 
@@ -106,13 +107,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var enriched1 = new AssetEntity();
             var enriched2 = new AssetEntity();
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, null, A<ClrQuery>.Ignored))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
                 .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-            var result = await sut.QueryAsync(requestContext, Q.Empty);
+            var result = await sut.QueryAsync(requestContext, null, Q.Empty);
 
             Assert.Equal(8, result.Total);
 
