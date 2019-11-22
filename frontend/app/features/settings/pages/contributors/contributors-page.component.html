@@ -41,7 +41,8 @@
                     </div>
                 </ng-container>
             </ng-container>
-            <ng-container content>
+
+            <div content>
                 <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
                     <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
@@ -63,11 +64,8 @@
                         </ng-template>
                     </ng-container>
                 </ng-container>
-            </ng-container>
+            </div>
         </sqx-list-view>
-        <ng-container *ngIf="contributorsState.isLoaded | async">
-            
-        </ng-container>
     </ng-container>
 
     <ng-container sidebar>

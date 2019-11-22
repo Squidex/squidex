@@ -15,13 +15,13 @@
 
     <ng-container content>
         <sqx-list-view [isLoading]="rolesState.isLoading | async">
-            <ng-container content>
+            <div content>
                 <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
                     <sqx-role *ngFor="let role of roles" [role]="role" [allPermissions]="allPermissions"></sqx-role>
         
                     <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
                 </ng-container>
-            </ng-container>
+            </div>
         </sqx-list-view>
     </ng-container>
 

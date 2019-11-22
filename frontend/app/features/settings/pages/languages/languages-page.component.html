@@ -15,7 +15,7 @@
 
     <ng-container content>
         <sqx-list-view [isLoading]="languagesState.isLoading | async">
-            <ng-container content>
+            <div content>
                 <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
                     <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
                         [language]="languageInfo.language" 
@@ -27,7 +27,7 @@
                         [newLanguages]="languagesState.newLanguages | async">
                     </sqx-language-add-form>
                 </ng-container>
-            </ng-container>
+            </div>
         </sqx-list-view>
     </ng-container>
 

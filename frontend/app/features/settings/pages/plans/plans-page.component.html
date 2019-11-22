@@ -23,7 +23,7 @@
                 </ng-container>
             </ng-container>
 
-            <ng-container content>
+            <div content>
                 <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
                     <div class="text-muted text-center empty" *ngIf="plans.length === 0">
                         No plan configured, this app has unlimited usage.
@@ -39,7 +39,7 @@
                         Go to <a [href]="portalUrl" sqxExternalLink>Billing Portal</a> for payment history and subscription overview.
                     </div>
                 </ng-container>
-            </ng-container>
+            </div>
         </sqx-list-view>
     </ng-container>
 
