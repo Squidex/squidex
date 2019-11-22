@@ -63,10 +63,10 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public grid = false;
 
     @Input()
-    public customClose = false;
+    public noPadding = false;
 
     @Input()
-    public sidebarClass = '';
+    public customClose = false;
 
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;

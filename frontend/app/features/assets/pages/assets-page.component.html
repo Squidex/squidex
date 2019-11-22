@@ -55,19 +55,21 @@
     </ng-container>
 
     <ng-container content>
-        <div class="grid-header">
-            <sqx-asset-path [path]="assetsState.path | async"
-                (navigate)="assetsState.navigate($event)">
-            </sqx-asset-path>
-        </div>
-        
-        <div class="grid-content">
-            <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
-        </div>
+        <sqx-list-view [isLoading]="assetsState.isLoading | async">
+            <ng-container header>
+                <sqx-asset-path [path]="assetsState.path | async"
+                    (navigate)="assetsState.navigate($event)">
+                </sqx-asset-path>
+            </ng-container>
 
-        <div class="grid-footer">
-            <sqx-pager [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>
-        </div>
+            <ng-container content>
+                <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
+            </ng-container>
+
+            <ng-container footer>
+                <sqx-pager [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>   

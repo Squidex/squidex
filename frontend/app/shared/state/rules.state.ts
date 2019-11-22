@@ -30,6 +30,9 @@ interface Snapshot {
     // Indicates if the rules are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the rules are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create rules.
     canCreate?: boolean;
 
@@ -47,6 +50,9 @@ export class RulesState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -62,9 +68,7 @@ export class RulesState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
-        }
+        this.next({ isLoading: true });
 
         return this.rulesService.getRules(this.appName).pipe(
             tap(({ items: rules, canCreate, canReadEvents }) => {
@@ -72,13 +76,12 @@ export class RulesState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
 
-                this.next(s => {
-                    return { ...s,
-                        canCreate,
-                        canReadEvents,
-                        isLoaded: true,
-                        rules
-                    };
+                this.next({
+                    canCreate,
+                    canReadEvents,
+                    isLoaded: true,
+                    isLoading: false,
+                    rules
                 });
             }),
             shareSubscribed(this.dialogs));

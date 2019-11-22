@@ -43,12 +43,6 @@ export class ModalDialogComponent implements AfterViewInit {
     @Input()
     public tabsClass = '';
 
-    @Input()
-    public contentClass = '';
-
-    @ViewChild('tabsElement', { static: false })
-    public tabsElement: ElementRef<ParentNode>;
-
     @ViewChild('footerElement', { static: false })
     public footerElement: ElementRef<ParentNode>;
 
@@ -58,7 +52,6 @@ export class ModalDialogComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.hideWhenEmpty(this.tabsElement.nativeElement);
         this.hideWhenEmpty(this.footerElement.nativeElement);
     }
 

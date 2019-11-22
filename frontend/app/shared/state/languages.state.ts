@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -113,6 +113,9 @@ export class LanguagesState extends State<Snapshot> {
                 const sorted = allLanguages.sortedByString(x => x.englishName);
 
                 this.replaceLanguages(languages.payload, languages.version, sorted);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }

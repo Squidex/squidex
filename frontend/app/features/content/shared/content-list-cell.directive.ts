@@ -68,7 +68,7 @@ export class ContentListWidthPipe implements PipeTransform {
             return 0;
         }
 
-        return `${getTableWidth(value.referenceFields) + 100}px`;
+        return `${getTableWidth(value.listFields) + 100}px`;
     }
 }
 

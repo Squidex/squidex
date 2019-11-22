@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -121,6 +121,9 @@ export class ContributorsState extends State<Snapshot> {
                 }
 
                 this.replaceContributors(version, payload);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }

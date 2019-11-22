@@ -1,6 +1,6 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" grid="true" showSidebar="true">
+<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Contents
     </ng-container>
@@ -38,71 +38,75 @@
     </ng-container>
 
     <ng-container content>
-        <div class="grid-header">
-            <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth" #header>
-                <thead>
-                    <tr>
-                        <th class="cell-select">
-                            <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
-                        </th>
-                        <th class="cell-actions cell-actions-left">
-                            Actions
-                        </th>
-                        <th *ngFor="let field of schema.listFields" [sqxContentListCell]="field">
-                            <sqx-content-list-header
-                                [field]="field"
-                                [query]="contentsState.contentsQuery | async"
-                                (queryChange)="search($event)"
-                                [language]="language">
-                            </sqx-content-list-header>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
+        <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+            <ng-container topHeader>
+                <div class="selection" *ngIf="selectionCount > 0">
+                    {{selectionCount}} items selected&nbsp;&nbsp;
+        
+                    <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                        <sqx-content-status
+                            [status]="status"
+                            [statusColor]="nextStatuses[status]"
+                            showLabel="true"
+                            small="true">
+                        </sqx-content-status>
+                    </button>
+                    
+                    <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
+                        (sqxConfirmClick)="deleteSelected()"
+                        confirmTitle="Delete content" 
+                        confirmText="Do you really want to delete the selected content items?">
+                        Delete
+                    </button>
+                </div>
+            </ng-container>
 
-        <div class="selection" *ngIf="selectionCount > 0">
-            {{selectionCount}} items selected&nbsp;&nbsp;
-
-            <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
-                <sqx-content-status
-                    [status]="status"
-                    [statusColor]="nextStatuses[status]"
-                    showLabel="true"
-                    small="true">
-                </sqx-content-status>
-            </button>
-            
-            <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
-                (sqxConfirmClick)="deleteSelected()"
-                confirmTitle="Delete content" 
-                confirmText="Do you really want to delete the selected content items?">
-                Delete
-            </button>
-        </div>
-
-        <div class="grid-content" [sqxSyncScrolling]="header">
-            <div class="table-container" sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth">
-                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent"
-                        [sqxContent]="content"
-                        (delete)="delete(content)"
-                        [selected]="isItemSelected(content)"
-                        (selectedChange)="selectItem(content, $event)"
-                        (statusChange)="changeStatus(content, $event)"
-                        (clone)="clone(content)"
-                        [link]="[content.id]"
-                        [language]="language"
-                        [canClone]="contentsState.snapshot.canCreate"
-                        [schema]="schema">
-                    </tbody>
+            <ng-container syncedHeader>
+                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth" #header>
+                    <thead>
+                        <tr>
+                            <th class="cell-select">
+                                <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
+                            </th>
+                            <th class="cell-actions cell-actions-left">
+                                Actions
+                            </th>
+                            <th *ngFor="let field of schema.listFields" [sqxContentListCell]="field">
+                                <sqx-content-list-header
+                                    [field]="field"
+                                    [query]="contentsState.contentsQuery | async"
+                                    (queryChange)="search($event)"
+                                    [language]="language">
+                                </sqx-content-list-header>
+                            </th>
+                        </tr>
+                    </thead>
                 </table>
-            </div>
-        </div>
+            </ng-container>
 
-        <div class="grid-footer">
-            <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
-        </div>
+            <ng-container syncedContent>
+                <div class="table-container" sqxIgnoreScrollbar>
+                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth">
+                        <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent"
+                            [sqxContent]="content"
+                            (delete)="delete(content)"
+                            [selected]="isItemSelected(content)"
+                            (selectedChange)="selectItem(content, $event)"
+                            (statusChange)="changeStatus(content, $event)"
+                            (clone)="clone(content)"
+                            [link]="[content.id]"
+                            [language]="language"
+                            [canClone]="contentsState.snapshot.canCreate"
+                            [schema]="schema">
+                        </tbody>
+                    </table>
+                </div>
+            </ng-container>
+
+            <ng-container footer>
+                <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>    
 
     <ng-container sidebar>

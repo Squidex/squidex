@@ -65,6 +65,9 @@ interface Snapshot {
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the assets are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create assets.
     canCreate?: boolean;
 
@@ -103,6 +106,9 @@ export class AssetsState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public path =
         this.project(x => x.path);
@@ -153,12 +159,12 @@ export class AssetsState extends State<Snapshot> {
 
     private loadInternal(isReload = false): Observable<any> {
         if (isReload) {
-            this.next({ isLoaded: false });
+            this.next({ isLoading: true });
         } else {
             this.next({
                 assetFolders: [],
                 assets: [],
-                isLoaded: false
+                isLoading: true
             });
         }
 
@@ -202,9 +208,11 @@ export class AssetsState extends State<Snapshot> {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
+
+                this.next({ isLoaded: true });
             }),
             finalize(() => {
-                this.next({ isLoaded: true });
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }

@@ -86,6 +86,8 @@
         // Content area is gray by default to contain scrollable content, e.g. lists.
         & {
             @include flex-grow(1);
+            @include flex-box;
+            @include flex-direction(column);
             border-top: 1px solid $color-border;
             background: $color-background;
             padding: $panel-padding;
@@ -113,6 +115,7 @@
         }
 
         &.grid {
+            @include flex-box;
             padding: 0;
         }
 

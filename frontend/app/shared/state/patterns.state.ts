@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -77,6 +77,9 @@ export class PatternsState extends State<Snapshot> {
                 }
 
                 this.replacePatterns(payload, version);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }

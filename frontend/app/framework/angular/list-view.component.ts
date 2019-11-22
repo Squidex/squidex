@@ -28,10 +28,10 @@ export class ListViewComponent implements AfterViewInit {
     public footerElement: ElementRef<ParentNode>;
 
     @Input()
-    public showHeader = true;
+    public syncedHeader = false;
 
     @Input()
-    public showFooter = true;
+    public table = false;
 
     @Input()
     public isLoaded = true;
