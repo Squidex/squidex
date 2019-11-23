@@ -89,7 +89,7 @@ describe('SchemasState', () => {
             schemasState.load(true).subscribe();
 
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.isLoading).toBeTruthy();
+            expect(schemasState.snapshot.isLoading).toBeFalsy();
             expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
 
             const categories = getCategories(schemasState);

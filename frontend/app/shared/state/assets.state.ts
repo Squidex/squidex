@@ -158,7 +158,7 @@ export class AssetsState extends State<Snapshot> {
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
         if (isReload) {
             this.next({ isLoading: true });
         } else {
@@ -353,7 +353,7 @@ export class AssetsState extends State<Snapshot> {
     public setPager(assetsPager: Pager) {
         this.next({ assetsPager });
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public searchInternal(query?: Query | null, tags?: TagsSelected) {
@@ -379,7 +379,7 @@ export class AssetsState extends State<Snapshot> {
             return newState;
         });
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public toggleTag(tag: string): Observable<any> {
@@ -419,7 +419,7 @@ export class AssetsState extends State<Snapshot> {
             return { ...s, path };
         });
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public resetTags(): Observable<any> {

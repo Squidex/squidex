@@ -160,6 +160,7 @@ export class ResultSet<T> {
 
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
+    private readonly stateToKeep?: ReadonlyArray<keyof T>;
     private readonly initialState: Readonly<T>;
 
     public get changes(): Observable<Readonly<T>> {
@@ -185,14 +186,25 @@ export class State<T extends {}> {
             distinctUntilChanged(compare), shareReplay(1));
     }
 
-    constructor(state: Readonly<T>) {
+    constructor(state: Readonly<T>, keep?: ReadonlyArray<keyof T>) {
         this.initialState = state;
 
         this.state = new BehaviorSubject(state);
+        this.stateToKeep = keep;
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
-        this.state.next(this.initialState);
+        if (this.stateToKeep) {
+            const reset: T = { ...this.initialState };
+
+            for (let key of this.stateToKeep) {
+                reset[key] = this.snapshot[key];
+            }
+
+            this.state.next(reset);
+        } else {
+            this.state.next(this.initialState);
+        }
 
         if (update) {
             this.next(update);

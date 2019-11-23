@@ -83,11 +83,15 @@ export class PlansState extends State<Snapshot> {
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            this.resetState({ isLoading: true });
+        if (!isReload) {
+            this.resetState();
         }
+
+        return this.loadInternal(isReload, overridePlanId);
+    }
+
+    private loadInternal(isReload: boolean, overridePlanId?: string): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.plansService.getPlans(this.appName).pipe(
             tap(({ version, payload }) => {

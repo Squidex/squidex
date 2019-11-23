@@ -61,10 +61,16 @@ export class BackupsState extends State<Snapshot> {
     }
 
     public load(isReload = false, silent = false): Observable<any> {
-        if (isReload) {
+        if (isReload && !silent) {
+            this.resetState();
+        }
+
+        return this.loadInternal(isReload, silent);
+    }
+
+    private loadInternal(isReload: boolean, silent: boolean): Observable<any> {
+        if (!silent) {
             this.next({ isLoading: true });
-        } else if (!silent) {
-            this.resetState({ isLoading: true });
         }
 
         return this.backupsService.getBackups(this.appName).pipe(

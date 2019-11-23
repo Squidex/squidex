@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { empty, Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
     compareStrings,
@@ -106,7 +106,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: [], categories: [] });
+        super({ schemas: [], categories: [] }, ['categories', 'selectedSchema']);
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -143,21 +143,23 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.loadInternal(isReload);
     }
 
     public loadIfNotLoaded(): Observable<any> {
-        return this.snapshot.isLoaded ? empty() : this.loadInternal(false);
+        if (this.snapshot.isLoaded) {
+            return empty();
+        }
+
+        return this.loadInternal(false);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            const selectedSchema = this.snapshot.selectedSchema;
-
-            this.resetState({ isLoading: true, selectedSchema });
-        }
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
@@ -165,17 +167,17 @@ export class SchemasState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Schemas reloaded.');
                 }
 
-                return this.next(s => {
-                    const schemas = items.sortedByString(x => x.displayName);
+                const schemas = items.sortedByString(x => x.displayName);
 
-                    return {
-                        ...s,
-                        canCreate,
-                        isLoaded: true,
-                        isLoading: true,
-                        schemas
-                    };
+                return this.next({
+                    canCreate,
+                    isLoaded: true,
+                    isLoading: true,
+                    schemas
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -209,7 +211,7 @@ export class SchemasState extends State<Snapshot> {
         this.next(s => {
             const categories = [...s.categories, name];
 
-            return { ...s, categories: categories };
+            return { ...s, categories };
         });
     }
 
@@ -217,7 +219,7 @@ export class SchemasState extends State<Snapshot> {
         this.next(s => {
             const categories = s.categories.removed(name);
 
-            return { ...s, categories: categories };
+            return { ...s, categories };
         });
     }
 

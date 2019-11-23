@@ -109,7 +109,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             contents: [],
             contentsPager: Pager.fromLocalStore('contents', localStore),
             contentsQueryJson: ''
-        });
+        }, ['selectedContent']);
 
         this.contentsPager.subscribe(pager => {
             pager.saveTo('contents', this.localStore);
@@ -141,10 +141,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (this.schemaId !== this.previousId) {
-            const contentsPager = Pager.fromLocalStore('contents', this.localStore);
+        if (!isReload && this.schemaId !== this.previousId) {
+            const contentsPager = this.snapshot.contentsPager.reset();
 
-            this.resetState({ isLoading: true, contentsPager });
+            this.resetState({ contentsPager });
         }
 
         return this.loadInternal(isReload);
@@ -158,11 +158,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    private loadInternal(isReload = false) {
+    private loadInternal(isReload: boolean) {
         return this.loadInternalCore(isReload).pipe(shareSubscribed(this.dialogs));
     }
 
-    private loadInternalCore(isReload = false) {
+    private loadInternalCore(isReload: boolean) {
         if (!this.appName || !this.schemaId) {
             return empty();
         }
@@ -242,7 +242,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return of(error);
             }),
-            switchMap(() => this.loadInternalCore()),
+            switchMap(() => this.loadInternalCore(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -260,7 +260,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return of(error);
             }),
-            switchMap(() => this.loadInternal()),
+            switchMap(() => this.loadInternal(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -327,13 +327,13 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public search(contentsQuery?: Query): Observable<any> {
         this.next(s => ({ ...s, contentsPager: s.contentsPager.reset(), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public setPager(contentsPager: Pager) {
         this.next(s => ({ ...s, contentsPager }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public isQueryUsed(saved: SavedQuery) {

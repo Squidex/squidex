@@ -69,15 +69,15 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            this.resetState({ isLoading: true });
-        }
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
@@ -133,13 +133,13 @@ export class RuleEventsState extends State<Snapshot> {
 
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public setPager(ruleEventsPager: Pager): Observable<any> {
         this.next(s => ({ ...s, ruleEventsPager }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     private get appName() {

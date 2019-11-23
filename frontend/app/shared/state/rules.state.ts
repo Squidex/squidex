@@ -68,11 +68,15 @@ export class RulesState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            this.resetState({ isLoading: true });
+        if (!isReload) {
+            this.resetState();
         }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.rulesService.getRules(this.appName).pipe(
             tap(({ items: rules, canCreate, canReadEvents }) => {

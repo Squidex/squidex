@@ -80,7 +80,7 @@ export class UsersState extends State<Snapshot> {
         super({
             users: [],
             usersPager: Pager.fromLocalStore('users', localStore)
-        });
+        }, ['selectedUser']);
 
         this.usersPager.subscribe(pager => {
             pager.saveTo('users', this.localStore);
@@ -113,15 +113,13 @@ export class UsersState extends State<Snapshot> {
         if (!isReload) {
             const usersPager = this.snapshot.usersPager.reset();
 
-            const selectedUser = this.snapshot.selectedUser;
-
-            this.resetState({ isLoading: true, selectedUser, usersPager });
+            this.resetState({ usersPager });
         }
 
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
         return this.usersService.getUsers(
@@ -198,13 +196,13 @@ export class UsersState extends State<Snapshot> {
     public search(query: string): Observable<UsersResult> {
         this.next(s => ({ ...s, usersPager: s.usersPager.reset(), usersQuery: query }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public setPager(usersPager: Pager) {
         this.next({ usersPager });
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     private replaceUser(user: UserDto) {

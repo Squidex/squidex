@@ -68,11 +68,15 @@ export class PatternsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            this.resetState({ isLoading: true });
+        if (!isReload) {
+            this.resetState();
         }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.patternsService.getPatterns(this.appName).pipe(
             tap(({ version, payload }) => {
