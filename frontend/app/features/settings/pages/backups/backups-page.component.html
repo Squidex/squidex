@@ -18,26 +18,29 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="(backupsState.isLoaded | async) && (backupsState.backups | async); let backups">
+        <ng-container>
             <sqx-list-view [isLoading]="backupsState.isLoading | async">
                 <ng-container topHeader>
                     <div class="panel-alert panel-alert-danger" *ngIf="backupsState.maxBackupsReached | async">
                         Your have reached the maximum number of backups: 10.
                     </div>
                 </ng-container>
-                <ng-container content>
-                    <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
-                        No backups created yet.
-        
-                        <button type="button" class="btn btn-success btn-sm ml-2" (click)="start()">
-                            Start Backup
-                        </button>
-                    </div>
-        
-                    <sqx-backup *ngFor="let backup of backups; trackBy: trackByBackup"
-                        [backup]="backup">
-                    </sqx-backup>
-                </ng-container>
+
+                <div content>
+                    <ng-container *ngIf="(backupsState.isLoaded | async) && (backupsState.backups | async); let backups">
+                        <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
+                            No backups created yet.
+            
+                            <button type="button" class="btn btn-success btn-sm ml-2" (click)="start()">
+                                Start Backup
+                            </button>
+                        </div>
+            
+                        <sqx-backup *ngFor="let backup of backups; trackBy: trackByBackup"
+                            [backup]="backup">
+                        </sqx-backup>
+                    </ng-container>
+                </div>
             </sqx-list-view>
         </ng-container>
     </ng-container>

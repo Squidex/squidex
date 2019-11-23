@@ -53,8 +53,6 @@
                                     [roles]="roles">
                                 </tbody>
                             </table>
-    
-                            <sqx-pager [autoHide]="true" [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
                         </ng-container>
     
                         <ng-template #noContributors>
@@ -65,6 +63,10 @@
                     </ng-container>
                 </ng-container>
             </div>
+
+            <ng-container footer>
+                <sqx-pager [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 

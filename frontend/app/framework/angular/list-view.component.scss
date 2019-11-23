@@ -47,8 +47,14 @@
 
         &.synced {
             overflow-y: scroll;
-            max-height: 3.2rem;
-            min-height: 3.2rem;
+            max-height: 3rem;
+            min-height: 3rem;
+
+            .inner {
+                overflow-y: hidden;
+                max-height: 2.75rem;
+                min-height: 2.75rem;
+            }
         }
 
         /deep/ th {

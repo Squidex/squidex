@@ -62,9 +62,9 @@
                 </sqx-asset-path>
             </ng-container>
 
-            <ng-container content>
+            <div content>
                 <sqx-assets-list [state]="assetsState" [showPager]="false" [isListView]="isListView"></sqx-assets-list>
-            </ng-container>
+            </div>
 
             <ng-container footer>
                 <sqx-pager [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>

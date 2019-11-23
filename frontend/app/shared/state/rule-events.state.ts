@@ -73,7 +73,11 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        this.next({ isLoading: true });
+        if (isReload) {
+            this.next({ isLoading: true });
+        } else {
+            this.resetState({ isLoading: true });
+        }
 
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,

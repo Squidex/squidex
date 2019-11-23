@@ -49,8 +49,10 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public load(isReload = false, silent = false): Observable<any> {
-        if (!silent) {
+        if (isReload) {
             this.next({ isLoading: true });
+        } else if (!silent) {
+            this.resetState({ isLoading: true });
         }
 
         return this.eventConsumersService.getEventConsumers().pipe(

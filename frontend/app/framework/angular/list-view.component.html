@@ -14,7 +14,7 @@
 
 <ng-container *ngIf="syncedHeader">
     <div class="grid-header synced" [class.loading-indicator]="isLoadingValue" #headerElement>
-        <div #header>
+        <div class="inner" #header>
             <ng-content select="[syncedHeader]"></ng-content>
         </div>
     </div>

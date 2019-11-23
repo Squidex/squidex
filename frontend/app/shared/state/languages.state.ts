@@ -99,7 +99,11 @@ export class LanguagesState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        this.next({ isLoading: true });
+        if (isReload) {
+            this.next({ isLoading: true });
+        } else {
+            this.resetState({ isLoading: true });
+        }
 
         return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
             map(args => {

@@ -112,7 +112,13 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        this.next({ isLoading: true });
+        if (isReload) {
+            this.next({ isLoading: true });
+        } else {
+            const contributorsPager = this.snapshot.contributorsPager.reset();
+
+            this.resetState({ isLoading: true, contributorsPager });
+        }
 
         return this.contributorsService.getContributors(this.appName).pipe(
             tap(({ version, payload }) => {

@@ -1,2 +1,6 @@
 @import '_vars';
 @import '_mixins';
+
+.import-hint {
+    padding-right: $panel-padding;
+}

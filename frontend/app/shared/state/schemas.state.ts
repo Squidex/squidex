@@ -143,25 +143,21 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            const selectedSchema = this.snapshot.selectedSchema;
-
-            this.resetState({ selectedSchema });
-        }
-
         return this.loadInternal(isReload);
     }
 
     public loadIfNotLoaded(): Observable<any> {
-        if (this.snapshot.isLoaded) {
-            return empty();
-        }
-
-        return this.loadInternal(false);
+        return this.snapshot.isLoaded ? empty() : this.loadInternal(false);
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        this.next({ isLoading: false });
+        if (isReload) {
+            this.next({ isLoading: true });
+        } else {
+            const selectedSchema = this.snapshot.selectedSchema;
+
+            this.resetState({ isLoading: true, selectedSchema });
+        }
 
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {

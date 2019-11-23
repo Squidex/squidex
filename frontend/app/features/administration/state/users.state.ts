@@ -110,6 +110,14 @@ export class UsersState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            const usersPager = this.snapshot.usersPager.reset();
+
+            const selectedUser = this.snapshot.selectedUser;
+
+            this.resetState({ isLoading: true, selectedUser, usersPager });
+        }
+
         return this.loadInternal(isReload);
     }
 
@@ -194,7 +202,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public setPager(usersPager: Pager) {
-        this.next(s => ({ ...s, usersPager }));
+        this.next({ usersPager });
 
         return this.loadInternal();
     }

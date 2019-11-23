@@ -61,8 +61,10 @@ export class BackupsState extends State<Snapshot> {
     }
 
     public load(isReload = false, silent = false): Observable<any> {
-        if (!silent) {
+        if (isReload) {
             this.next({ isLoading: true });
+        } else if (!silent) {
+            this.resetState({ isLoading: true });
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
