@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     break;
                 }
 
-                result.Add(folder);
+                result.Insert(0, folder);
 
                 id = folder.ParentId;
             }
