@@ -144,7 +144,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         if (this.schemaId !== this.previousId) {
             const contentsPager = Pager.fromLocalStore('contents', this.localStore);
 
-            this.resetState({ contentsPager, isLoading: true });
+            this.resetState({ isLoading: true, contentsPager });
         }
 
         return this.loadInternal(isReload);

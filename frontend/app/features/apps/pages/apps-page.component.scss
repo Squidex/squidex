@@ -105,6 +105,12 @@
     }
 }
 
+.card-image {
+    img {
+        height: 6rem;
+    }
+}
+
 .info {
     color: $color-border-dark;
     padding: 2rem;

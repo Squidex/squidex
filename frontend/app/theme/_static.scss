@@ -30,6 +30,7 @@ noscript {
     // Fix logo on the top right corner of the screen.
     &-logo {
         @include absolute(1rem, 1rem, auto, auto);
+        height: 1.75rem;
     }
 
     &-lg {

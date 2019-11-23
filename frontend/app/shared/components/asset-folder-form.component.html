@@ -13,7 +13,7 @@
             <sqx-form-error [error]="editForm.error | async"></sqx-form-error>
         
             <div class="form-group">
-                <label for="folderName">Name <small class="hint">(required)</small></label>
+                <label for="folderName">Folder Name <small class="hint">(required)</small></label>
                 
                 <sqx-control-errors for="folderName" submitOnly="true" [submitted]="editForm.submitted | async"></sqx-control-errors>
         
@@ -31,10 +31,10 @@
             <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
             
             <button type="submit" class="float-right btn btn-success">
-                <ng-container *ngIf="assetFolder; else noAssetFolder">
+                <ng-container *ngIf="assetFolder; else noAssetFolderButton">
                     Rename
                 </ng-container>
-                <ng-template #noAssetFolder>
+                <ng-template #noAssetFolderButton>
                     Create
                 </ng-template>
             </button>
