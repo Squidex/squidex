@@ -18,12 +18,12 @@
     <ng-container topHeader>
         <div cdkDropListGroup>
             <div class="folders" *ngIf="state.pathAvailable | async">
-                <ng-container *ngIf="(state.assetFolders | async)?.length > 0 || (state.pathParent | async)">
+                <ng-container *ngIf="(state.assetFolders | async)?.length > 0 || (state.parentFolder | async)">
                     <h5>Folders</h5>
                 </ng-container>
         
                 <div class="row no-gutters">
-                    <div class="folder-container" *ngIf="state.pathParent | async; let parent"
+                    <div class="folder-container" *ngIf="state.parentFolder | async; let parent"
                         cdkDropList
                         [cdkDropListData]="parent.id"
                         (cdkDropListDropped)="move($event)">

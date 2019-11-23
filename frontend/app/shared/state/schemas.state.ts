@@ -106,7 +106,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: [], categories: [] }, ['categories', 'selectedSchema']);
+        super({ schemas: [], categories: [] });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -144,7 +144,7 @@ export class SchemasState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState({ categories: this.snapshot.categories, selectedSchema: this.snapshot.selectedSchema });
         }
 
         return this.loadInternal(isReload);

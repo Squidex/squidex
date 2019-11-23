@@ -109,7 +109,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             contents: [],
             contentsPager: Pager.fromLocalStore('contents', localStore),
             contentsQueryJson: ''
-        }, ['selectedContent']);
+        });
 
         this.contentsPager.subscribe(pager => {
             pager.saveTo('contents', this.localStore);
@@ -144,7 +144,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         if (!isReload && this.schemaId !== this.previousId) {
             const contentsPager = this.snapshot.contentsPager.reset();
 
-            this.resetState({ contentsPager });
+            this.resetState({ contentsPager, selectedContent: this.snapshot.selectedContent });
         }
 
         return this.loadInternal(isReload);

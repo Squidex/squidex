@@ -80,7 +80,7 @@ export class UsersState extends State<Snapshot> {
         super({
             users: [],
             usersPager: Pager.fromLocalStore('users', localStore)
-        }, ['selectedUser']);
+        });
 
         this.usersPager.subscribe(pager => {
             pager.saveTo('users', this.localStore);
@@ -113,7 +113,7 @@ export class UsersState extends State<Snapshot> {
         if (!isReload) {
             const usersPager = this.snapshot.usersPager.reset();
 
-            this.resetState({ usersPager });
+            this.resetState({ usersPager, selectedUser: this.snapshot.selectedUser });
         }
 
         return this.loadInternal(isReload);

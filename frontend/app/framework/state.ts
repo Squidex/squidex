@@ -160,7 +160,6 @@ export class ResultSet<T> {
 
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
-    private readonly stateToKeep?: ReadonlyArray<keyof T>;
     private readonly initialState: Readonly<T>;
 
     public get changes(): Observable<Readonly<T>> {
@@ -186,36 +185,35 @@ export class State<T extends {}> {
             distinctUntilChanged(compare), shareReplay(1));
     }
 
-    constructor(state: Readonly<T>, keep?: ReadonlyArray<keyof T>) {
+    constructor(state: Readonly<T>) {
         this.initialState = state;
 
         this.state = new BehaviorSubject(state);
-        this.stateToKeep = keep;
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
-        if (this.stateToKeep) {
-            const reset: T = { ...this.initialState };
-
-            for (let key of this.stateToKeep) {
-                reset[key] = this.snapshot[key];
-            }
-
-            this.state.next(reset);
-        } else {
-            this.state.next(this.initialState);
-        }
+        let newState = this.initialState;
 
         if (update) {
-            this.next(update);
+            if (Types.isFunction(update)) {
+                newState = update(this.initialState);
+            } else {
+                newState = { ...this.initialState, ...update };
+            }
         }
+
+        this.state.next(newState);
     }
 
     public next(update: ((v: T) => Readonly<T>) | Partial<T>) {
+        let newState: T;
+
         if (Types.isFunction(update)) {
-            this.state.next(update(this.state.value));
+            newState = update(this.state.value);
         } else {
-            this.state.next(Object.assign({}, this.snapshot, update));
+            newState = { ...this.state.value, ...update };
         }
+
+        this.state.next(newState);
     }
 }

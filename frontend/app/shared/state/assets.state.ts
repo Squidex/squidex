@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { empty, forkJoin, Observable, throwError } from 'rxjs';
+import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
@@ -36,6 +36,8 @@ export type AssetPathItem = { id: string, folderName: string };
 type TagsAvailable = { [name: string]: number };
 type TagsSelected = { [name: string]: boolean };
 
+const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
+
 const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ id: MathHelper.EMPTY_GUID, folderName: 'Assets' }];
 
 interface Snapshot {
@@ -62,6 +64,9 @@ interface Snapshot {
 
     // The folder path.
     path: ReadonlyArray<AssetPathItem>;
+
+    // The parent folder.
+    parentFolder?: AssetPathItem;
 
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
@@ -114,11 +119,11 @@ export class AssetsState extends State<Snapshot> {
     public path =
         this.project(x => x.path);
 
-    public pathParent =
-        this.project(x => getParent(x.path));
-
     public pathAvailable =
         this.project(x => x.path.length > 0);
+
+    public parentFolder =
+        this.project(x => x.parentFolder);
 
     public pathRoot =
         this.project(x => x.path[x.path.length - 1]);
@@ -159,58 +164,45 @@ export class AssetsState extends State<Snapshot> {
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        if (isReload) {
-            this.next({ isLoading: true });
-        } else {
-            this.next({
-                assetFolders: [],
-                assets: [],
-                isLoading: true
-            });
-        }
-
-        const path = this.snapshot.path;
+        this.next({ isLoading: true });
 
         const searchTags = Object.keys(this.snapshot.tagsSelected);
 
-        const observables: Observable<any>[] = [
+        const assets$ =
             this.assetsService.getAssets(this.appName,
                 this.snapshot.assetsPager.pageSize,
                 this.snapshot.assetsPager.skip,
                 this.snapshot.assetsQuery,
-                searchTags, undefined, this.parentId).pipe(
-                tap(({ items: assets, total, canCreate }) => {
-                    this.next(s => {
-                        const assetsPager = s.assetsPager.setCount(total);
+                searchTags, undefined, this.parentId);
 
-                        return { ...s, assets, assetsPager, canCreate };
-                    });
-                }))
-        ];
+        const assetFolders$ =
+            this.snapshot.path.length === 0 ?
+                of(EMPTY_FOLDERS) :
+                this.assetsService.getAssetFolders(this.appName, this.parentId);
 
-        if (path.length === 1) {
-            observables.push(
-                this.assetsService.getTags(this.appName).pipe(
-                    tap(tagsAvailable => {
-                        this.next({ tagsAvailable });
-                    })));
-        }
+        const tags$ =
+            this.snapshot.path.length === 1 ?
+                this.assetsService.getTags(this.appName) :
+                of(this.snapshot.tagsAvailable);
 
-        if (path.length > 0) {
-            observables.push(
-                this.assetsService.getAssetFolders(this.appName, this.parentId).pipe(
-                    tap(({ items: assetFolders, canCreate: canCreateFolders }) => {
-                        this.next({ assetFolders, canCreateFolders });
-                    })));
-        }
-
-        return forkJoin(observables).pipe(
-            tap(() => {
+        return forkJoin(([assets$, assetFolders$, tags$])).pipe(
+            tap(([assets, assetFolders, tagsAvailable]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
-                this.next({ isLoaded: true });
+                this.next(s => ({
+                    ...s,
+                    assetFolders: assetFolders.items,
+                    assets: assets.items,
+                    assetsPager: s.assetsPager.setCount(assets.total),
+                    canCreate: assets.canCreate,
+                    canCreateFolders: assetFolders.canCreate,
+                    isLoaded: true,
+                    isLoading: false,
+                    parentFolder: getParent(s.path),
+                    tagsAvailable
+                }));
             }),
             finalize(() => {
                 this.next({ isLoading: false });
