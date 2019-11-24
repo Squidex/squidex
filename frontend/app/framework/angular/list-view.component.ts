@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, Renderer2, ViewChild, HostBinding } from '@angular/core';
 
 import { fadeAnimation } from '@app/framework/internal';
 
@@ -29,6 +29,9 @@ export class ListViewComponent implements AfterViewInit {
 
     @ViewChild('contentElement', { static: false })
     public contentElement: ElementRef<ParentNode>;
+
+    @Input() @HostBinding('class.overflow')
+    public overflow = false;
 
     @Input()
     public syncedHeader = false;

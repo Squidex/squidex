@@ -14,7 +14,7 @@
     <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
 </div>
 
-<sqx-list-view [isLoading]="(state.isLoading | async) && indicateLoading">
+<sqx-list-view [isLoading]="(state.isLoading | async) && indicateLoading" overflow="true">
     <ng-container topHeader>
         <div cdkDropListGroup>
             <div class="folders" *ngIf="state.pathAvailable | async">

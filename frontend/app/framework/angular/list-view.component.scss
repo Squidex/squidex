@@ -10,6 +10,10 @@
     position: relative;
 }
 
+:host(.overflow) {
+    overflow: visible;
+}
+
 .grid {
     &-content,
     &-header,

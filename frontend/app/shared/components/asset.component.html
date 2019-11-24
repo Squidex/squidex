@@ -92,12 +92,12 @@
 
         <ng-container *ngIf="asset && progress === 0">
             <ng-container *ngIf="asset.canPreview; else noPreview">
-                <div class="image drag-handle" [class.image-left]="!isSelectable">
+                <div class="image" [class.image-left]="!isSelectable">
                     <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
                 </div>
             </ng-container>
             <ng-template #noPreview>
-                <div class="image drag-handle image-padded" [class.image-left]="!isSelectable">
+                <div class="image image-padded" [class.image-left]="!isSelectable">
                     <img class="icon" [src]="asset | sqxFileIcon">
                 </div>
             </ng-template>
