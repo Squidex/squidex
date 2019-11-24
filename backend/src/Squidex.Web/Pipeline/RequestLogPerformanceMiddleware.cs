@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
@@ -15,10 +16,13 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
+        private readonly RequestLogOptions options;
         private readonly ISemanticLog log;
 
-        public RequestLogPerformanceMiddleware(ISemanticLog log)
+        public RequestLogPerformanceMiddleware(IOptions<RequestLogOptions> options, ISemanticLog log)
         {
+            this.options = options.Value;
+
             this.log = log;
         }
 
@@ -36,13 +40,19 @@ namespace Squidex.Web.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    log.LogInformation((elapsedMs, context), (ctx, w) =>
+                    if (options.LogRequest)
                     {
-                        Profiler.Session?.Write(w);
+                        log.LogInformation((elapsedMs, context), (ctx, w) =>
+                        {
+                            if (options.LogProfiler)
+                            {
+                                Profiler.Session?.Write(w);
+                            }
 
-                        w.WriteObject("filters", ctx.context, LogFilters);
-                        w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
-                    });
+                            w.WriteObject("filters", ctx.context, LogFilters);
+                            w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                        });
+                    }
                 }
             }
         }
