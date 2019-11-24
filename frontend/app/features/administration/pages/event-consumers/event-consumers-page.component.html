@@ -16,7 +16,7 @@
     <ng-container content>
         <sqx-list-view [isLoading]="eventConsumersState.isLoading | async" table="true">
             <ng-container header>
-                <table class="table table-items table-fixed">
+                <table class="table table-items table-fixed" #header>
                     <thead>
                         <tr>
                             <th class="cell-auto">
@@ -34,7 +34,7 @@
             </ng-container>
 
             <div content>
-                <table class="table table-items table-fixed">        
+                <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
                     <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
                         [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
                     </tbody>

@@ -32,7 +32,7 @@
         }
 
         &.synced {
-            overflow-y: scroll;
+            overflow-y: auto;
             overflow-x: auto;
             padding-right: 0;
         }
@@ -40,21 +40,15 @@
 
     &-header {
         & {
-            @include flex-shrink(1);
+            @include flex-shrink(0);
             border: 0;
             border-bottom: 2px solid $color-border;
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
 
-        &.synced {
-            overflow-y: scroll;
-            max-height: 3rem;
-            min-height: 3rem;
-
-            .inner {
-                overflow-y: hidden;
-                max-height: 2.75rem;
-                min-height: 2.75rem;
-            }
+        .inner {
+            display: table-cell;
         }
 
         /deep/ th {

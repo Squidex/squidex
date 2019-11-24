@@ -15,7 +15,7 @@
                 <ng-content select="[tabs]"></ng-content>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body" [class.flexed]="flexBody">
                 <ng-content select="[content]"></ng-content>
             </div>
 

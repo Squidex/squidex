@@ -2,7 +2,7 @@
     <ng-content select="[topHeader]"></ng-content>
 </div>
 
-<ng-container *ngIf="!syncedHeader ">
+<ng-container *ngIf="!syncedHeader">
     <div class="grid-header" [class.loading-indicator]="isLoadingValue" #headerElement>
         <ng-content select="[header]"></ng-content>
     </div>
@@ -14,9 +14,9 @@
 
 <ng-container *ngIf="syncedHeader">
     <div class="grid-header synced" [class.loading-indicator]="isLoadingValue" #headerElement>
-        <div class="inner" #header>
+        <span class="inner" #header>
             <ng-content select="[syncedHeader]"></ng-content>
-        </div>
+        </span>
     </div>
     
     <div class="grid-content synced" [class.loading-indicator]="isLoadingValue" [class.tabled]="table" [sqxSyncScrolling]="header">

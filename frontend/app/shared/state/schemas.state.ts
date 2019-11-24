@@ -143,10 +143,6 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState({ categories: this.snapshot.categories, selectedSchema: this.snapshot.selectedSchema });
-        }
-
         return this.loadInternal(isReload);
     }
 

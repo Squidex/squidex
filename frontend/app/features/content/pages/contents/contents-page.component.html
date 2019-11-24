@@ -62,7 +62,7 @@
             </ng-container>
 
             <ng-container syncedHeader>
-                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth">
+                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth" #header>
                     <thead>
                         <tr>
                             <th class="cell-select">
@@ -86,7 +86,7 @@
 
             <ng-container syncedContent>
                 <div class="table-container">
-                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth">
+                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentListWidth" [sqxSyncWidth]="header">
                         <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent"
                             [sqxContent]="content"
                             (delete)="delete(content)"

@@ -29,7 +29,7 @@
     <ng-container content>
         <sqx-list-view [isLoading]="usersState.isLoading | async" table="true">
             <ng-container header>
-                <table class="table table-items table-fixed">
+                <table class="table table-items table-fixed" #header>
                     <thead>
                         <tr>
                             <th class="cell-user">
@@ -50,13 +50,11 @@
             </ng-container>
                 
             <div content>
-                <div sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
-                        <tbody *ngFor="let user of users; trackBy: trackByUser"
-                            [sqxUser]="user">
-                        </tbody>
-                    </table>
-                </div>
+                <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users" [sqxSyncWidth]="header">
+                    <tbody *ngFor="let user of users; trackBy: trackByUser"
+                        [sqxUser]="user">
+                    </tbody>
+                </table>
             </div>
     
             <ng-container footer>

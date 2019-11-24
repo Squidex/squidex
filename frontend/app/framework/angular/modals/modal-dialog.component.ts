@@ -38,10 +38,10 @@ export class ModalDialogComponent implements AfterViewInit {
     public large = false;
 
     @Input()
-    public fullHeight = false;
+    public flexBody = false;
 
     @Input()
-    public tabsClass = '';
+    public fullHeight = false;
 
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;
