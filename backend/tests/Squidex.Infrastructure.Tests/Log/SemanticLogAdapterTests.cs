@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Log.Adapter;
 using Xunit;
 
@@ -17,6 +18,7 @@ namespace Squidex.Infrastructure.Log
 {
     public class SemanticLogAdapterTests
     {
+        private readonly IOptions<SemanticLogOptions> options = Options.Create(new SemanticLogOptions());
         private readonly List<ILogChannel> channels = new List<ILogChannel>();
         private readonly Lazy<SemanticLog> log;
         private readonly ILogChannel channel = A.Fake<ILogChannel>();
@@ -30,6 +32,8 @@ namespace Squidex.Infrastructure.Log
 
         public SemanticLogAdapterTests()
         {
+            options.Value.Level = SemanticLogLevel.Trace;
+
             channels.Add(channel);
 
             A.CallTo(() => channel.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored))
@@ -38,7 +42,7 @@ namespace Squidex.Infrastructure.Log
                     output = message;
                 });
 
-            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, new List<ILogAppender>(), JsonLogWriterFactory.Default()));
+            log = new Lazy<SemanticLog>(() => new SemanticLog(options, channels, new List<ILogAppender>(), JsonLogWriterFactory.Default()));
 
             sut = SemanticLogLoggerProvider.ForTesting(log.Value);
         }
