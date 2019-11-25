@@ -25,16 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 {
                    e("Either file name, slug or tags must be defined.", nameof(command.FileName), nameof(command.Slug), nameof(command.Tags));
                 }
-
-                if (!string.IsNullOrWhiteSpace(command.FileName) && string.Equals(command.FileName, oldFileName))
-                {
-                    e(Not.New("Asset", "name"), nameof(command.FileName));
-                }
-
-                if (!string.IsNullOrWhiteSpace(command.Slug) && string.Equals(command.Slug, oldSlug))
-                {
-                    e(Not.New("Asset", "slug"), nameof(command.Slug));
-                }
             });
         }
 
