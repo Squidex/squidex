@@ -32,6 +32,12 @@ namespace Squidex.Config.Domain
 
         private static void AddServices(this IServiceCollection services, IConfiguration config)
         {
+            services.Configure<RequestLogOptions>(
+                config.GetSection("logging"));
+
+            services.Configure<SemanticLogOptions>(
+                config.GetSection("logging"));
+
             if (config.GetValue<bool>("logging:human"))
             {
                 services.AddSingletonAs(_ => JsonLogWriterFactory.Readable())

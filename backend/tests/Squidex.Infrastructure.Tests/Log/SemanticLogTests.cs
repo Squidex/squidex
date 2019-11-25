@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Infrastructure.Log.Adapter;
 using Xunit;
@@ -20,6 +21,7 @@ namespace Squidex.Infrastructure.Log
     {
         private readonly List<ILogAppender> appenders = new List<ILogAppender>();
         private readonly List<ILogChannel> channels = new List<ILogChannel>();
+        private readonly IOptions<SemanticLogOptions> options = Options.Create(new SemanticLogOptions());
         private readonly Lazy<SemanticLog> log;
         private readonly ILogChannel channel = A.Fake<ILogChannel>();
         private string output = string.Empty;
@@ -31,6 +33,8 @@ namespace Squidex.Infrastructure.Log
 
         public SemanticLogTests()
         {
+            options.Value.Level = SemanticLogLevel.Trace;
+
             channels.Add(channel);
 
             A.CallTo(() => channel.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored))
@@ -39,7 +43,7 @@ namespace Squidex.Infrastructure.Log
                     output += message;
                 });
 
-            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, appenders, JsonLogWriterFactory.Default()));
+            log = new Lazy<SemanticLog>(() => new SemanticLog(options, channels, appenders, JsonLogWriterFactory.Default()));
         }
 
         [Fact]
@@ -498,7 +502,7 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => channel1.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception1);
             A.CallTo(() => channel2.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception2);
 
-            var sut = new SemanticLog(new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), JsonLogWriterFactory.Default());
+            var sut = new SemanticLog(options, new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), JsonLogWriterFactory.Default());
 
             try
             {
@@ -511,6 +515,16 @@ namespace Squidex.Infrastructure.Log
                 Assert.Equal(exception1, ex.InnerExceptions[0]);
                 Assert.Equal(exception2, ex.InnerExceptions[1]);
             }
+        }
+
+        [Fact]
+        public void Should_not_log_if_level_is_too_low()
+        {
+            options.Value.Level = SemanticLogLevel.Error;
+
+            Log.LogWarning(w => w.WriteProperty("Property", "Value"));
+
+            Assert.Equal(string.Empty, output);
         }
 
         private static string LogTest(Action<IObjectWriter> writer)
