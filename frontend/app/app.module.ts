@@ -72,13 +72,13 @@ export function configCurrency() {
 
 @NgModule({
     imports: [
-        BrowserModule,
         BrowserAnimationsModule,
-        HttpClientModule,
-        FormsModule,
+        BrowserModule,
         CommonModule,
-        RouterModule,
+        FormsModule,
+        HttpClientModule,
         ReactiveFormsModule,
+        RouterModule,
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,

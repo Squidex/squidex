@@ -9,6 +9,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { MentionModule } from 'angular-mentions';
 
 import { SqxFrameworkModule } from '@app/framework';
 
@@ -110,6 +111,7 @@ import { SchemaTagConverter } from './state/schema-tag-converter';
 @NgModule({
     imports: [
         DragDropModule,
+        MentionModule,
         RouterModule,
         SqxFrameworkModule
     ],

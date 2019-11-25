@@ -29,12 +29,13 @@ import {
 export class CommentsComponent extends ResourceOwner implements OnInit {
     public state: CommentsState;
 
-    public userId: string;
+    @Input()
+    public commentsId: string;
 
     public commentForm = new UpsertCommentForm(this.formBuilder);
 
-    @Input()
-    public commentsId: string;
+    public userId: string;
+    public users: ReadonlyArray<string> = ['foobar@abc'];
 
     constructor(authService: AuthService,
         private readonly appsState: AppsState,

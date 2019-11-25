@@ -1,6 +1,16 @@
 @import '_vars';
 @import '_mixins';
 
+:host ::ng-deep {
+    .mention-menu {
+        border-color: $color-border !important;
+    }
+
+    .mention-active > a {
+        background: $color-theme-blue !important;
+    }
+}
+
 .grid-footer {
     border-top-width: 1px;
 }

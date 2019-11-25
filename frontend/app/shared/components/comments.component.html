@@ -15,7 +15,7 @@
         
         <div class="grid-footer">
             <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" />
+                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" [mention]="users" [mentionConfig]="{ dropUp: true }" />
             </form>
         </div>
     </ng-container>
