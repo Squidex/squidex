@@ -24,25 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public void CanAnnotate_should_throw_exception_if_names_are_the_same()
-        {
-            var command = new AnnotateAsset { FileName = "asset-name" };
-
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command, "asset-name", "asset-slug"),
-                new ValidationError("Asset has already this name.", "FileName"));
-        }
-
-        [Fact]
-        public void CanAnnotate_should_throw_exception_if_slugs_are_the_same()
-        {
-            var command = new AnnotateAsset { Slug = "asset-slug" };
-
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command, "asset-name", "asset-slug"),
-                new ValidationError("Asset has already this slug.", "Slug"));
-        }
-
-        [Fact]
-        public void CanAnnotate_should_not_throw_exception_if_names_are_different()
+        public void CanAnnotate_should_not_throw_exception_if_a_value_is_passed()
         {
             var command = new AnnotateAsset { FileName = "new-name", Slug = "new-slug" };
 

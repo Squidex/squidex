@@ -68,21 +68,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     e(Not.Valid("role"), nameof(command.Role));
                 }
-
-                if (client == null)
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
-                {
-                    e(Not.New("Client", "name"), nameof(command.Name));
-                }
-
-                if (command.Role == client.Role)
-                {
-                    e(Not.New("Client", "role"), nameof(command.Role));
-                }
             });
         }
 

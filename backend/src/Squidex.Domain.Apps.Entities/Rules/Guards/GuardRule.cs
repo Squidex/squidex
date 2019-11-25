@@ -70,11 +70,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                     errors.Foreach(x => x.AddTo(e));
                 }
-
-                if (command.Name != null && string.Equals(rule.Name, command.Name))
-                {
-                    e(Not.New("Rule", "name"), nameof(command.Name));
-                }
             });
         }
 

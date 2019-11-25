@@ -118,25 +118,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_same_name()
+        public void UpdateClient_should_not_throw_exception_if_client_has_same_name()
         {
             var command = new UpdateClient { Id = "ios", Name = "ios" };
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
-                new ValidationError("Client has already this name.", "Name"));
+            GuardAppClients.CanUpdate(clients_1, command, roles);
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_same_role()
+        public void UpdateClient_not_should_throw_exception_if_client_has_same_role()
         {
             var command = new UpdateClient { Id = "ios", Role = Role.Editor };
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
-                new ValidationError("Client has already this role.", "Role"));
+            GuardAppClients.CanUpdate(clients_1, command, roles);
         }
 
         [Fact]
