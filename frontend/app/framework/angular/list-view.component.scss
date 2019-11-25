@@ -1,0 +1,95 @@
+@import '_mixins';
+@import '_vars';
+
+:host {
+    @include flex-box;
+    @include flex-direction(column);
+    @include flex-grow(1);
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+
+:host(.overflow) {
+    overflow: visible;
+}
+
+.grid {
+    &-content,
+    &-header,
+    &-footer {
+        @include transition(opacity .2 ease);
+        padding: 0 $panel-padding;
+    }
+
+    &-content {
+        @include flex-grow(1);
+        padding: $panel-padding;
+
+        &.tabled {
+            padding-top: .5rem;
+            padding-bottom: .5rem;
+        }
+
+        &.normal {
+            overflow-y: auto;
+        }
+
+        &.synced {
+            overflow-y: auto;
+            overflow-x: auto;
+            padding-right: 0;
+        }
+    }
+
+    &-header {
+        & {
+            @include flex-shrink(0);
+            border: 0;
+            border-bottom: 2px solid $color-border;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        .inner {
+            display: table-cell;
+        }
+
+        /deep/ th {
+            padding: .75rem;
+        }
+
+        /deep/ table {
+            margin: 0;
+        }
+
+        /deep/ .table-items {
+            margin: 0;
+        }
+    }
+
+    &-footer {
+        & {
+            @include flex-shrink(1);
+            border: 0;
+            border-top: 2px solid $color-border;
+        }
+
+        /deep/ .pagination {
+            margin: .25rem 0;
+        }
+    }
+}
+
+.loader,
+.loading-indicator {
+    pointer-events: none;
+}
+
+.loading-indicator {
+    @include opacity(.5);
+}
+
+.loader {
+    @include absolute(20%, 0, auto, 0);
+}

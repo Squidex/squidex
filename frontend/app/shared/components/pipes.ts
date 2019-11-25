@@ -213,7 +213,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
             if (type === 'subject') {
                 return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
-                return of('./images/client.png');
+                return of('./images/client.svg');
             }
         });
     }
@@ -276,7 +276,7 @@ export class FileIconPipe implements PipeTransform {
             mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
-        return `./images/asset_${mimeIcon}.png`;
+        return `./images/asset_${mimeIcon}.svg`;
     }
 }
 

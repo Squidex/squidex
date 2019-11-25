@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -52,11 +53,21 @@ describe('WorkflowsState', () => {
 
             workflowsState.load().subscribe();
 
-            expect(workflowsState.snapshot.workflows).toEqual(oldWorkflows.items);
             expect(workflowsState.snapshot.isLoaded).toBeTruthy();
+            expect(workflowsState.snapshot.isLoading).toBeFalsy();
             expect(workflowsState.snapshot.version).toEqual(version);
+            expect(workflowsState.snapshot.workflows).toEqual(oldWorkflows.items);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            workflowsService.setup(x => x.getWorkflows(app))
+                .returns(() => throwError('error'));
+
+            workflowsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(workflowsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

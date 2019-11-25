@@ -8,7 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -50,9 +50,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.state = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
 
-        this.own(
-            timer(0, 4000).pipe(switchMap(() => this.state.load().pipe(onErrorResumeNext())))
-                .subscribe());
+        this.own(timer(0, 4000).pipe(switchMap(() => this.state.load())));
     }
 
     public delete(comment: CommentDto) {

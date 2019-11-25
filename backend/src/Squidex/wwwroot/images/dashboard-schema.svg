@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" x="0" y="0" version="1.1" xml:space="preserve" viewBox="0 0 86 64">
+  <path id="path36" fill="#c7e0ff" stroke="#2e3842" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M54.2 63H11.8C5.9 63 1 58.1 1 52.2V28.8C1 22.9 5.9 18 11.8 18h42.4C60.1 18 65 22.9 65 28.8v23.4C65 58.1 60.1 63 54.2 63z"/>
+  <path id="line42" fill="none" stroke="#7d878e" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M12.1 12h42.6"/>
+  <path id="line84" fill="none" stroke="#b4bcc1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M18.1 6h30.6"/>
+  <path id="path86" fill="none" stroke="#eef6ff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M54.2 61H11.9c-4.9 0-8.8-4-8.8-8.8V28.9c0-4.9 4-8.8 8.8-8.8h42.3c4.9 0 8.8 4 8.8 8.8v23.3c0 4.8-4 8.8-8.8 8.8z"/>
+  <path id="path88" fill="#3389ff" d="M54.7 23v14.1c0 2.7-2.2 4.9-4.9 4.9H16.2c-2.7 0-4.9-2.2-4.9-4.9V23h-2v14.1c0 3.8 3.1 6.9 6.9 6.9h33.6c3.8 0 6.9-3.1 6.9-6.9V23z" opacity=".2"/>
+  <circle id="circle122" cx="74.9" cy="11.1" r="11.1" fill="#3389ff"/>
+  <path id="line124" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M70 11h10" class="st19"/>
+  <path id="line126" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M75 16V6" class="st19"/>
+</svg>

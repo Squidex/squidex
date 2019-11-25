@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" large="true" fullHeight="true" contentClass="grid">
+<sqx-modal-dialog (close)="emitComplete()" large="true" fullHeight="true" grid="true" flexBody="true">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
@@ -38,47 +38,49 @@
 
     <ng-container content>
         <ng-container *ngIf="schema">
-            <div class="grid-header">
-                <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" #header>
-                    <thead>
-                        <tr>
-                            <th class="cell-select">
-                                <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
-                            </th>
-                            <th sqxContentListCell="meta.lastModifiedBy.avatar">
-                                <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
-                            </th>
-                            <th *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
-                                <sqx-content-list-header
-                                    [field]="field"
-                                    [query]="contentsState.contentsQuery | async"
-                                    (queryChange)="search($event)"
-                                    [language]="language">
-                                </sqx-content-list-header>
-                            </th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-
-            <div class="grid-content" [sqxSyncScrolling]="header">
-                <div class="table-container" sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" *ngIf="contentsState.contents | async; let contents">
-                        <tbody *ngFor="let content of contents; trackBy: trackByContent"
-                            [sqxContentSelectorItem]="content"
-                            [schema]="schema"
-                            [selectable]="!isItemAlreadySelected(content)"
-                            [selected]="isItemSelected(content)"
-                            (selectedChange)="selectContent(content)"
-                            [language]="language">
-                        </tbody>
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+                <ng-container syncedHeader>
+                    <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" #header>
+                        <thead>
+                            <tr>
+                                <th class="cell-select">
+                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
+                                </th>
+                                <th sqxContentListCell="meta.lastModifiedBy.avatar">
+                                    <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
+                                </th>
+                                <th *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
+                                    <sqx-content-list-header
+                                        [field]="field"
+                                        [query]="contentsState.contentsQuery | async"
+                                        (queryChange)="search($event)"
+                                        [language]="language">
+                                    </sqx-content-list-header>
+                                </th>
+                            </tr>
+                        </thead>
                     </table>
-                </div>
-            </div>
-
-            <div class="grid-footer">
-                <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
-            </div>
+                </ng-container>
+    
+                <ng-container syncedContent>
+                    <div class="table-container">
+                        <table class="table table-items table-fixed" [style.minWidth]="schema | sqxContentReferencesWidth" *ngIf="contentsState.contents | async; let contents" [sqxSyncWidth]="header">
+                            <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                                [sqxContentSelectorItem]="content"
+                                [schema]="schema"
+                                [selectable]="!isItemAlreadySelected(content)"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectContent(content)"
+                                [language]="language">
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+    
+                <ng-container footer>
+                    <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+                </ng-container>
+            </sqx-list-view>
         </ng-container>
     </ng-container>
 

@@ -71,13 +71,15 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
-        const stream = this.assetsService.postAssetFile(this.appName, file);
+        const parentId = target ? target.parentId : undefined;
+
+        const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
 
         return this.upload(stream, MathHelper.guid(), file, asset  => {
             if (asset.isDuplicate) {
                 this.dialogs.notifyError('Asset has already been uploaded.');
             } else if (target) {
-                target.add(asset);
+                target.addAsset(asset);
             }
 
             return asset;

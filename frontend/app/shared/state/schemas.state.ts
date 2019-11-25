@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { empty, Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
     compareStrings,
@@ -47,6 +47,9 @@ interface Snapshot {
     // Indicates if the schemas are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the schemas are loading.
+    isLoading?: boolean;
+
     // The selected schema.
     selectedSchema?: SchemaDetailsDto | null;
 
@@ -77,6 +80,9 @@ export class SchemasState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -137,12 +143,6 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            const selectedSchema = this.snapshot.selectedSchema;
-
-            this.resetState({ selectedSchema });
-        }
-
         return this.loadInternal(isReload);
     }
 
@@ -154,18 +154,26 @@ export class SchemasState extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Schemas reloaded.');
                 }
 
-                return this.next(s => {
-                    const schemas = items.sortedByString(x => x.displayName);
+                const schemas = items.sortedByString(x => x.displayName);
 
-                    return { ...s, schemas, isLoaded: true, canCreate };
+                return this.next({
+                    canCreate,
+                    isLoaded: true,
+                    isLoading: true,
+                    schemas
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -199,7 +207,7 @@ export class SchemasState extends State<Snapshot> {
         this.next(s => {
             const categories = [...s.categories, name];
 
-            return { ...s, categories: categories };
+            return { ...s, categories };
         });
     }
 
@@ -207,7 +215,7 @@ export class SchemasState extends State<Snapshot> {
         this.next(s => {
             const categories = s.categories.removed(name);
 
-            return { ...s, categories: categories };
+            return { ...s, categories };
         });
     }
 

@@ -30,6 +30,12 @@
     }
 }
 
+.card-image {
+    img {
+        height: 5rem;
+    }
+}
+
 .card {
     & {
         margin-right: 1rem;

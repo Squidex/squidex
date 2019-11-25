@@ -3,9 +3,42 @@
 
 .unrow {
     display: block;
-    padding-left: 8px;
-    padding-right: 8px;
-    margin: 0;
+}
+
+h5 {
+    font-size: .9rem;
+    margin-top: 0;
+    margin-bottom: .5rem;
+}
+
+.folders {
+    .cdk-drag-placeholder {
+        @include absolute(0, auto, auto, auto);
+    }
+}
+
+.folder-container {
+    & {
+        width: $asset-width;
+        position: relative;
+        margin-bottom: 1rem;
+        margin-right: .5rem;
+        height: $asset-folder-height;
+    }
+
+    &-over {
+        @include absolute(-6px, -6px, -6px, -6px);
+        @include opacity(0);
+        border: 2px solid $color-theme-blue;
+    }
+
+    &.cdk-drop-list-dragging {
+        &:hover {
+            .folder-container-over {
+                @include opacity(1);
+            }
+        }
+    }
 }
 
 .file-drop {
@@ -14,9 +47,9 @@
         border: 2px dashed $color-border;
         background: transparent;
         padding: 1rem;
-        text-align: center;
         margin-bottom: 1rem;
         margin-right: 0;
+        text-align: center;
     }
 
     &.drag {
@@ -40,11 +73,6 @@
     &-info {
         color: darken($color-border, 30%);
     }
-}
-
-.assets {
-    margin-left: -8px;
-    margin-right: -8px;
 }
 
 .btn {

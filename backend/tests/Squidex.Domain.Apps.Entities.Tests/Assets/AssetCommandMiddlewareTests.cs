@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            asset = new AssetGrain(Store, tagService, A.Fake<IActivationLimit>(), A.Dummy<ISemanticLog>());
+            asset = new AssetGrain(Store, tagService, assetQuery, A.Fake<IActivationLimit>(), A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
             A.CallTo(() => contextProvider.Context)

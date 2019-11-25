@@ -1,0 +1,33 @@
+<div class="top-header">
+    <ng-content select="[topHeader]"></ng-content>
+</div>
+
+<ng-container *ngIf="!syncedHeader">
+    <div class="grid-header" [class.loading-indicator]="isLoadingValue" #headerElement>
+        <ng-content select="[header]"></ng-content>
+    </div>
+    
+    <div class="grid-content normal" [class.loading-indicator]="isLoadingValue"  #contentElement [class.tabled]="table">
+        <ng-content select="[content]"></ng-content>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="syncedHeader">
+    <div class="grid-header synced" [class.loading-indicator]="isLoadingValue" #headerElement>
+        <span class="inner" #header>
+            <ng-content select="[syncedHeader]"></ng-content>
+        </span>
+    </div>
+    
+    <div class="grid-content synced" [class.loading-indicator]="isLoadingValue" [class.tabled]="table" [sqxSyncScrolling]="header">
+        <ng-content select="[syncedContent]"></ng-content>
+    </div>
+</ng-container>
+
+<div class="grid-footer" [class.loading-indicator]="isLoadingValue" #footerElement>
+    <ng-content select="[footer]"></ng-content>
+</div>
+
+<div class="loader text-center" *ngIf="isLoadingValue">
+    <img alt="Loading" src="./images/loader.gif" />
+</div>

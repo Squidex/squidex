@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -20,7 +20,7 @@ import {
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html'
 })
-export class SchemaEditFormComponent implements OnInit {
+export class SchemaEditFormComponent implements OnChanges {
     public readonly standalone = { standalone: true };
 
     @Input()
@@ -37,7 +37,7 @@ export class SchemaEditFormComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.isEditable = this.schema.canUpdate;
 
         this.editForm.load(this.schema.properties);

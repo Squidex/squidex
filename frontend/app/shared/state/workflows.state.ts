@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -37,6 +37,9 @@ interface Snapshot {
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the workflows are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create new workflow.
     canCreate?: boolean;
 }
@@ -51,6 +54,9 @@ export class WorkflowsState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -68,6 +74,12 @@ export class WorkflowsState extends State<Snapshot> {
             this.resetState();
         }
 
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.workflowsService.getWorkflows(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
@@ -75,6 +87,9 @@ export class WorkflowsState extends State<Snapshot> {
                 }
 
                 this.replaceWorkflows(payload, version);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -108,8 +123,13 @@ export class WorkflowsState extends State<Snapshot> {
     private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
         const { canCreate, errors, items: workflows } = payload;
 
-        this.next(s => {
-            return { ...s, workflows, errors, isLoaded: true, version, canCreate };
+        this.next({
+            canCreate,
+            errors,
+            isLoaded: true,
+            isLoading: false,
+            version,
+            workflows
         });
     }
 

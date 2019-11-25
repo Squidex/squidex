@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" x="0" y="0" version="1.1" xml:space="preserve" viewBox="0 0 54.1 62">
+  <path id="path16" fill="#f7f6e7" d="M43.5 31.5s-2 10-18 16l11 7v-7l4.7.1 2.3-1.1 1-3z"/>
+  <path id="path134" fill="#efebbf" stroke="#2e3842" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M49.7 1H12.5C7.3 1 3 5.3 3 10.5v13.3C3 26.7 5.3 29 8.2 29H15v6l5.3-3.7c2.1-1.5 4.7-2.3 7.3-2.3h16c5.2 0 9.5-4.3 9.5-9.5V4.3C53 2.5 51.5 1 49.7 1z"/>
+  <g id="g140" transform="translate(-461 -444)">
+    <g id="g138">
+      <path id="path136" fill="#fcfbeb" d="M509.8 448c.7 0 1.2.5 1.2 1.1v13.8c0 3.7-3.2 6.6-7.1 6.6h-15.3c-2.9 0-5.7.8-8.1 2.4l-2 1.3v-1.7c0-1.1-.9-2-2-2H470c-1.7 0-3-1.2-3-2.8v-12.1c0-3.7 3.2-6.6 7.1-6.6h35.7m0-2h-35.7c-5 0-9.1 3.9-9.1 8.6v12.1c0 2.6 2.3 4.8 5 4.8h6.5v5.5l5.1-3.4c2-1.4 4.5-2.1 7-2.1h15.3c5 0 9.1-3.9 9.1-8.6v-13.8c0-1.7-1.4-3.1-3.2-3.1z"/>
+    </g>
+  </g>
+  <path id="line142" fill="none" stroke="#cec395" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M13.5 10h29" class="st22"/>
+  <path id="line144" fill="none" stroke="#cec395" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M13 16h18" class="st22"/>
+  <circle id="circle146" cx="11.5" cy="50.5" r="11.5" fill="#f9c553"/>
+  <circle id="circle148" cx="15.1" cy="48.1" r="1.5" fill="#fff" class="st14"/>
+  <circle id="circle150" cx="8" cy="48" r="1.5" fill="#fff" class="st14"/>
+  <path id="path152" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M6 53s6 5 12 0"/>
+  <path id="path154" fill="#b4bcc1" d="M43 32v11.8c0 2.3-1.9 4.2-4.2 4.2H36c-.6 0-1 .4-1 1v4.1l-3.7-2.6c-1.9-1.3-4-2.1-6.3-2.4v2c1.8.2 3.6.9 5.1 2l5.3 3.7c.2.1.4.2.6.2.2 0 .3 0 .5-.1.3-.2.5-.5.5-.9v-5h1.8c3.4 0 6.2-2.8 6.2-6.2V32z"/>
+</svg>

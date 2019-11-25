@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public virtual async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
         {
-            var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(query));
+            var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithODataQuery(query));
 
             foreach (var asset in assets)
             {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetQuery.QueryAsync(context, Q.Empty.WithIds(notLoadedAssets));
+                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithIds(notLoadedAssets));
 
                 foreach (var asset in assets)
                 {

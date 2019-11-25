@@ -21,6 +21,7 @@ import {
 import { createAsset } from './../services/assets.service.spec';
 
 import { TestValues } from './_test-helpers';
+import { AssetsState } from './assets.state';
 
 describe('AssetUploaderState', () => {
     const {
@@ -48,7 +49,7 @@ describe('AssetUploaderState', () => {
     it('should create initial state when uploading file', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.postAssetFile(app, file))
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => never()).verifiable();
 
         assetUploader.uploadFile(file).subscribe();
@@ -59,10 +60,26 @@ describe('AssetUploaderState', () => {
         expect(upload.progress).toBe(1);
     });
 
+    it('should upload file with folder id from asset state', () => {
+        const assetsState = Mock.ofType<AssetsState>();
+
+        assetsState.setup(x => x.parentId)
+            .returns(() => 'parent1');
+
+        const file: File = <any>{ name: 'my-file' };
+
+        assetsService.setup(x => x.postAssetFile(app, file, 'parent1'))
+            .returns(() => never()).verifiable();
+
+        assetUploader.uploadFile(file, assetsState.object).subscribe();
+
+        expect().nothing();
+    });
+
     it('should update progress when uploading file makes progress', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.postAssetFile(app, file))
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => ofForever(10, 20)).verifiable();
 
         assetUploader.uploadFile(file).subscribe();
@@ -76,7 +93,7 @@ describe('AssetUploaderState', () => {
     it('should update status when uploading file failed', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.postAssetFile(app, file))
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => throwError('Error')).verifiable();
 
         assetUploader.uploadFile(file).pipe(onErrorResumeNext()).subscribe();
@@ -90,7 +107,7 @@ describe('AssetUploaderState', () => {
     it('should update status when uploading file completes', (cb) => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.postAssetFile(app, file))
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => of(10, 20, asset)).verifiable();
 
         let uploadedAsset: AssetDto;

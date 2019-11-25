@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         NamedId<Guid> AppId { get; }
 
+        Guid ParentId { get; }
+
         string MimeType { get; }
 
         long FileVersion { get; }

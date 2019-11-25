@@ -5,12 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
     AssetDto,
+    AssetFolderDto,
     AssetsState,
-    getFiles
+    getFiles,
+    Types
 } from '@app/shared/internal';
 
 @Component({
@@ -33,7 +36,13 @@ export class AssetsListComponent {
     public isListView = false;
 
     @Input()
+    public indicateLoading = false;
+
+    @Input()
     public selectedIds: object;
+
+    @Input()
+    public showPager = true;
 
     public newFiles: ReadonlyArray<File> = [];
 
@@ -52,20 +61,28 @@ export class AssetsListComponent {
         } else {
             this.newFiles = this.newFiles.removed(file);
 
-            this.state.add(asset);
+            this.state.addAsset(asset);
         }
     }
 
-    public search() {
-        this.state.load();
+    public move(drag: CdkDragDrop<any>) {
+        if (!this.isDisabled && drag.isPointerOverContainer) {
+            const item = drag.item.data;
+
+            if (Types.is(item, AssetDto)) {
+                this.state.moveAsset(item, drag.container.data);
+            } else {
+                this.state.moveAssetFolder(item, drag.container.data);
+            }
+        }
     }
 
-    public delete(asset: AssetDto) {
-        this.state.delete(asset);
+    public deleteAsset(asset: AssetDto) {
+        this.state.deleteAsset(asset);
     }
 
-    public update(asset: AssetDto) {
-        this.state.update(asset);
+    public deleteAssetFolder(assetFolder: AssetFolderDto) {
+        this.state.deleteAssetFolder(assetFolder);
     }
 
     public emitSelect(asset: AssetDto) {
@@ -86,7 +103,11 @@ export class AssetsListComponent {
         return true;
     }
 
-    public trackByAsset(index: number, asset: AssetDto) {
+    public canEnter(drag: CdkDrag, drop: CdkDropList) {
+        return drag.data.id !== drop.data;
+    }
+
+    public trackByAssetItem(index: number, asset: AssetDto | AssetFolderDto) {
         return asset.id;
     }
 }

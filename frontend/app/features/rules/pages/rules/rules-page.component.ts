@@ -46,7 +46,7 @@ export class RulesPageComponent implements OnInit {
                 this.ruleActions = actions;
             });
 
-        this.schemasState.load();
+        this.schemasState.loadIfNotLoaded();
     }
 
     public reload() {

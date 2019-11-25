@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -39,6 +39,9 @@ interface Snapshot {
 
     // Indicates if the contributors are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the contributors are loading.
+    isLoading?: boolean;
 
     // The maximum allowed users.
     maxContributors: number;
@@ -75,6 +78,9 @@ export class ContributorsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -106,9 +112,17 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
+        if (isReload) {
+            const contributorsPager = this.snapshot.contributorsPager.reset();
+
+            this.resetState({ contributorsPager });
         }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return this.contributorsService.getContributors(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -117,6 +131,9 @@ export class ContributorsState extends State<Snapshot> {
                 }
 
                 this.replaceContributors(version, payload);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -163,6 +180,7 @@ export class ContributorsState extends State<Snapshot> {
                 contributors,
                 contributorsPager,
                 isLoaded: true,
+                isLoading: false,
                 maxContributors,
                 version
             };

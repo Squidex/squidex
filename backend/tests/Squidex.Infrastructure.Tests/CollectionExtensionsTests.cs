@@ -16,6 +16,34 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();
 
         [Fact]
+        public void IndexOf_should_return_index_when_found()
+        {
+            var source = new List<(int Value, int Other)>
+            {
+                (5, 5),
+                (4, 4)
+            };
+
+            var index = source.IndexOf(x => x.Other == 4);
+
+            Assert.Equal(1, index);
+        }
+
+        [Fact]
+        public void IndexOf_should_return_negative_value_when_not_found()
+        {
+            var source = new List<(int Value, int Other)>
+            {
+                (5, 5),
+                (4, 4)
+            };
+
+            var index = source.IndexOf(x => x.Other == 2);
+
+            Assert.Equal(-1, index);
+        }
+
+        [Fact]
         public void GetOrDefault_should_return_value_if_key_exists()
         {
             valueDictionary[12] = 34;

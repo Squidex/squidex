@@ -6,6 +6,7 @@
  */
 
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { SchemaCategory, SchemasState } from './schemas.state';
@@ -87,8 +88,9 @@ describe('SchemasState', () => {
             schemasState.addCategory('category3');
             schemasState.load(true).subscribe();
 
-            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
+            expect(schemasState.snapshot.isLoading).toBeFalsy();
+            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
 
             const categories = getCategories(schemasState);
 
@@ -99,6 +101,15 @@ describe('SchemasState', () => {
             ]);
 
             schemasService.verifyAll();
+        });
+
+        it('should reset loading when loading failed', () => {
+            schemasService.setup(x => x.getSchemas(app))
+                .returns(() => throwError('error'));
+
+            schemasState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(schemasState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

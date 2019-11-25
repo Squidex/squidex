@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -41,6 +41,9 @@ interface Snapshot {
     // Indicates if the plans are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the plans are loading.
+    isLoading?: boolean;
+
     // Indicates if there is a billing portal for the current Squidex instance.
     hasPortal?: boolean;
 
@@ -58,6 +61,9 @@ export class PlansState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public isDisabled =
         this.project(x => !x.isOwner);
@@ -81,25 +87,32 @@ export class PlansState extends State<Snapshot> {
             this.resetState();
         }
 
+        return this.loadInternal(isReload, overridePlanId);
+    }
+
+    private loadInternal(isReload: boolean, overridePlanId?: string): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.plansService.getPlans(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
 
-                this.next(s => {
-                    const planId = overridePlanId || payload.currentPlanId;
-                    const plans = payload.plans.map(x => this.createPlan(x, planId));
+                const planId = overridePlanId || payload.currentPlanId;
+                const plans = payload.plans.map(x => this.createPlan(x, planId));
 
-                    return {
-                        ...s,
-                        plans: plans,
-                        isOwner: !payload.planOwner || payload.planOwner === this.userId,
-                        isLoaded: true,
-                        version,
-                        hasPortal: payload.hasPortal
-                    };
+                this.next({
+                    hasPortal: payload.hasPortal,
+                    isLoaded: true,
+                    isLoading: false,
+                    isOwner: !payload.planOwner || payload.planOwner === this.userId,
+                    plans: plans,
+                    version
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }

@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -52,10 +53,21 @@ describe('PatternsState', () => {
 
             patternsState.load().subscribe();
 
+            expect(patternsState.snapshot.isLoaded).toBeTruthy();
+            expect(patternsState.snapshot.isLoading).toBeFalsy();
             expect(patternsState.snapshot.patterns).toEqual(oldPatterns.items);
             expect(patternsState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            patternsService.setup(x => x.getPatterns(app))
+                .returns(() => throwError('error'));
+
+            patternsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(patternsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

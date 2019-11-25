@@ -1,6 +1,6 @@
 <sqx-title message="Events"></sqx-title>
 
-<sqx-panel desiredWidth="63rem">
+<sqx-panel desiredWidth="63rem" grid="true">
     <ng-container title>
         Events
     </ng-container>
@@ -14,83 +14,87 @@
     </ng-container>
     
     <ng-container content>
-        <table class="table table-items table-fixed">
-            <thead>
-                <tr>
-                    <th class="cell-label">
-                        Status
-                    </th>
-                    <th class="cell-40">
-                        Event
-                    </th>
-                    <th class="cell-60">
-                        Description
-                    </th>
-                    <th class="cell-time">
-                        Created
-                    </th>
-                    <th class="cell-actions"></th>
-                </tr>
-            </thead>
+        <sqx-list-view>
+            <ng-container content>
+                <table class="table table-items table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="cell-label">
+                                Status
+                            </th>
+                            <th class="cell-40">
+                                Event
+                            </th>
+                            <th class="cell-60">
+                                Description
+                            </th>
+                            <th class="cell-time">
+                                Created
+                            </th>
+                            <th class="cell-actions"></th>
+                        </tr>
+                    </thead>
 
-            <tbody *ngFor="let event of ruleEventsState.ruleEvents | async; trackBy: trackByRuleEvent">
-                <tr [class.expanded]="selectedEventId === event.id">
-                    <td class="cell-label">
-                        <span class="badge badge-pill badge-{{event.jobResult | sqxRuleEventBadgeClass}}">{{event.jobResult}}</span>
-                    </td>
-                    <td class="cell-40">
-                        <span class="truncate">{{event.eventName}}</span>
-                    </td>
-                    <td class="cell-60">
-                        <span class="truncate">{{event.description}}</span>
-                    </td>
-                    <td class="cell-time">
-                        <small class="item-modified">{{event.created | sqxFromNow}}</small>
-                    </td>
-                    <td class="cell-actions">
-                        <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="selectedEventId === event.id" (click)="selectEvent(event.id)">
-                            <i class="icon-settings"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr *ngIf="selectedEventId === event.id">
-                    <td colspan="5">
-                        <div class="event-header">
-                            <h3>Last Invocation</h3>
-                        </div>
-                        
-                        <div class="row no-gutters event-stats align-items-center">
-                            <div class="col-3">
-                                <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
-                            </div>
-                            <div class="col-2">
-                                Attempts: {{event.numCalls}}
-                            </div>
-                            <div class="col-4">
-                                Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
-                            </div>
-                            <div class="col-3 text-right">
-                                <button type="button" class="btn btn-text-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
-                                    Cancel
+                    <tbody *ngFor="let event of ruleEventsState.ruleEvents | async; trackBy: trackByRuleEvent">
+                        <tr [class.expanded]="selectedEventId === event.id">
+                            <td class="cell-label">
+                                <span class="badge badge-pill badge-{{event.jobResult | sqxRuleEventBadgeClass}}">{{event.jobResult}}</span>
+                            </td>
+                            <td class="cell-40">
+                                <span class="truncate">{{event.eventName}}</span>
+                            </td>
+                            <td class="cell-60">
+                                <span class="truncate">{{event.description}}</span>
+                            </td>
+                            <td class="cell-time">
+                                <small class="item-modified">{{event.created | sqxFromNow}}</small>
+                            </td>
+                            <td class="cell-actions">
+                                <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="selectedEventId === event.id" (click)="selectEvent(event.id)">
+                                    <i class="icon-settings"></i>
                                 </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="selectedEventId === event.id">
+                            <td colspan="5">
+                                <div class="event-header">
+                                    <h3>Last Invocation</h3>
+                                </div>
+                                
+                                <div class="row no-gutters event-stats align-items-center">
+                                    <div class="col-3">
+                                        <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
+                                    </div>
+                                    <div class="col-2">
+                                        Attempts: {{event.numCalls}}
+                                    </div>
+                                    <div class="col-4">
+                                        Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
+                                    </div>
+                                    <div class="col-3 text-right">
+                                        <button type="button" class="btn btn-text-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
+                                            Cancel
+                                        </button>
 
-                                <button type="button" class="btn btn-success btn-sm" (click)="enqueue(event)">
-                                    Enqueue
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <textarea class="event-dump form-control" readonly>{{event.lastDump}}</textarea>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="spacer"></tr>
-            </tbody>
-        </table>
+                                        <button type="button" class="btn btn-success btn-sm" (click)="enqueue(event)">
+                                            Enqueue
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <textarea class="event-dump form-control" readonly>{{event.lastDump}}</textarea>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </tbody>
+                </table>
 
-        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async" (pagerChange)="ruleEventsState.setPager($event)"></sqx-pager>
+                <sqx-pager [autoHide]="true" [pager]="ruleEventsState.ruleEventsPager | async" (pagerChange)="ruleEventsState.setPager($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 </sqx-panel>
 

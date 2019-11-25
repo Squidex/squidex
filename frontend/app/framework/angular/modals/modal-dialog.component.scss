@@ -4,3 +4,10 @@
 .modal {
     display: block;
 }
+
+.flexed {
+    @include flex-box;
+    @include flex-grow(1);
+    @include flex-direction(column);
+    padding: 0;
+}
