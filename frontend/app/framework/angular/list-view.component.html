@@ -7,7 +7,7 @@
         <ng-content select="[header]"></ng-content>
     </div>
     
-    <div class="grid-content normal" [class.loading-indicator]="isLoadingValue"  #contentElement [class.tabled]="table">
+    <div class="grid-content normal" [class.loading-indicator]="isLoadingValue" [class.tabled]="table" #contentElement>
         <ng-content select="[content]"></ng-content>
     </div>
 </ng-container>
