@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
-        private readonly IndexWriter indexWriter;
+        private readonly IndexHolder index;
         private readonly IndexState indexState;
         private readonly Guid id;
 
-        public TextIndexContent(IndexWriter indexWriter, IndexState indexState, Guid id)
+        public TextIndexContent(IndexHolder index, IndexState indexState, Guid id)
         {
-            this.indexWriter = indexWriter;
+            this.index = index;
             this.indexState = indexState;
 
             this.id = id;
@@ -34,17 +34,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Delete()
         {
-            indexWriter.DeleteDocuments(new Term(MetaId, id.ToString()));
+            index.Writer.DeleteDocuments(new Term(MetaId, id.ToString()));
         }
 
-        public static bool TryGetId(int docId, Scope scope, IndexReader reader, IndexState indexState, out Guid result)
+        public static bool TryGetId(int docId, Scope scope, IndexHolder index, IndexState indexState, out Guid result)
         {
             result = Guid.Empty;
 
-            if (!indexState.TryGet(docId, out var draft, out var published))
-            {
-                return false;
-            }
+            indexState.Get(docId, out var draft, out var published);
 
             if (scope == Scope.Draft && draft != 1)
             {
@@ -56,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return false;
             }
 
-            var document = reader.Document(docId);
+            var document = index.Searcher.Doc(docId);
 
             var idString = document.Get(MetaId);
 
@@ -169,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 indexState.Index(id, draft, document, forDraft, forPublished);
 
-                indexWriter.UpdateDocument(new Term(MetaKey, contentKey), document);
+                index.Writer.UpdateDocument(new Term(MetaKey, contentKey), document);
             }
         }
 
@@ -197,12 +194,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private bool IsAdded(byte draft, out int docId)
         {
-            return indexState.HasBeenAdded(id, draft, new Term(MetaKey, BuildKey(draft)), out docId);
+            var term = new Term(MetaKey, BuildKey(draft));
+
+            return indexState.HasBeenAdded(id, draft, term, out docId);
         }
 
         private bool IsForPublished(byte draft, int docId)
         {
-            return indexState.TryGet(id, draft, docId, out _, out var p) && p == 1;
+            indexState.Get(id, draft, docId, out _, out var forPublished);
+
+            return forPublished == 1;
         }
 
         private string BuildKey(byte draft)
