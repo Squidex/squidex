@@ -8,7 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Validation;
 using Xunit;
@@ -21,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly SearchContext context;
-        private readonly IAssetStore assetStore = new MemoryAssetStore();
+        private readonly IDirectoryFactory directoryFactory;
         private readonly TextIndexerGrain sut;
 
         public TextIndexerGrainTests()
@@ -31,7 +34,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 Languages = new HashSet<string> { "de", "en" }
             };
 
-            sut = new TextIndexerGrain(assetStore);
+            var mongoClient = new MongoClient("mongodb://localhost");
+            var mongoDatabase = mongoClient.GetDatabase("FullText");
+            var mongoBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
+            {
+                BucketName = "fs"
+            });
+
+            directoryFactory = new MongoDirectoryFactory(mongoBucket);
+
+            sut = new TextIndexerGrain(directoryFactory);
             sut.ActivateAsync(schemaId).Wait();
         }
 
@@ -53,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.DeactivateAsync(true);
 
-            var other = new TextIndexerGrain(assetStore);
+            var other = new TextIndexerGrain(directoryFactory);
             try
             {
                 await other.ActivateAsync(schemaId);

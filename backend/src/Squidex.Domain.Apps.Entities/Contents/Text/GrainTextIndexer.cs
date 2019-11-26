@@ -66,10 +66,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         await index.DeleteAsync(id);
                         break;
                     case ContentCreated contentCreated:
-                        await index.IndexAsync(GetUpdate(id, contentCreated.Data));
+                        await index.IndexAsync(Data(id, contentCreated.Data, true));
+                        break;
+                    case ContentUpdateProposed contentUpdateProposed:
+                        await index.IndexAsync(Data(id, contentUpdateProposed.Data, true));
                         break;
                     case ContentUpdated contentUpdated:
-                        await index.IndexAsync(GetUpdate(id, contentUpdated.Data));
+                        await index.IndexAsync(Data(id, contentUpdated.Data, false));
+                        break;
+                    case ContentChangesDiscarded _:
+                        await index.CopyAsync(id, false);
                         break;
                     case ContentChangesPublished _:
                     case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
@@ -79,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static J<Update> GetUpdate(Guid contentId, NamedContentData data)
+        private static J<Update> Data(Guid contentId, NamedContentData data, bool onlySelf)
         {
-            return new Update { Id = contentId, Data = data };
+            return new Update { Id = contentId, Data = data, OnlyDraft = onlySelf };
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)

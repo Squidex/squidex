@@ -16,8 +16,8 @@ using Lucene.Net.Search;
 using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -30,20 +30,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
-        private readonly IAssetStore assetStore;
+        private readonly IDirectoryFactory directoryFactory;
         private IDisposable? timer;
-        private DirectoryInfo directory;
         private IndexHolder index;
         private IndexState indexState;
         private QueryParser? queryParser;
         private HashSet<string>? currentLanguages;
         private int updates;
 
-        public TextIndexerGrain(IAssetStore assetStore)
+        public TextIndexerGrain(IDirectoryFactory directoryFactory)
         {
-            Guard.NotNull(assetStore);
+            Guard.NotNull(directoryFactory);
 
-            this.assetStore = assetStore;
+            this.directoryFactory = directoryFactory;
         }
 
         public override async Task OnDeactivateAsync()
@@ -51,14 +50,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await DeactivateAsync(true);
         }
 
-        protected override async Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(Guid key)
         {
-            directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), $"Index_{key}"));
-
-            await assetStore.DownloadAsync(directory);
-
-            index = new IndexHolder(directory);
+            index = new IndexHolder(directoryFactory, key);
             indexState = new IndexState(index);
+
+            return TaskHelper.Done;
         }
 
         public Task<bool> IndexAsync(J<Update> update)
@@ -170,24 +167,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return false;
         }
 
-        public async Task FlushAsync(bool recreate)
+        public Task FlushAsync(bool recreate)
         {
             if (updates > 0)
             {
                 index.Commit(recreate);
 
-                var commit = index.Snapshotter.Snapshot();
-                try
-                {
-                    await assetStore.UploadDirectoryAsync(directory, commit);
-                }
-                finally
-                {
-                    index.Snapshotter.Release(commit);
-                }
-
                 updates = 0;
             }
+
+            return TaskHelper.Done;
         }
 
         public async Task DeactivateAsync(bool deleteFolder = false)
@@ -198,13 +187,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
             else
             {
-                index.Commit(false);
+                index?.Commit(false);
             }
 
-            if (deleteFolder && directory.Exists)
-            {
-                directory.Delete(true);
-            }
+            index?.Dispose();
         }
     }
 }

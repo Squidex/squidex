@@ -21,13 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public static async Task UploadDirectoryAsync(this IAssetStore assetStore, DirectoryInfo directory, IndexCommit commit)
         {
-            using (var fileStream = new FileStream(
-                   Path.Combine(directory.FullName, ArchiveFile),
-                   FileMode.Create,
-                   FileAccess.ReadWrite,
-                   FileShare.None,
-                   4096,
-                   FileOptions.DeleteOnClose))
+            using (var fileStream = CreateStream(directory))
             {
                 using (var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
@@ -65,13 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             directory.Create();
 
-            using (var fileStream = new FileStream(
-                   Path.Combine(directory.FullName, ArchiveFile),
-                   FileMode.Create,
-                   FileAccess.ReadWrite,
-                   FileShare.None,
-                   4096,
-                   FileOptions.DeleteOnClose))
+            using (var fileStream = CreateStream(directory))
             {
                 try
                 {
@@ -89,6 +77,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     return;
                 }
             }
+        }
+
+        private static FileStream CreateStream(DirectoryInfo directory)
+        {
+            return new FileStream(
+                Path.Combine(directory.FullName, ArchiveFile),
+                FileMode.Create,
+                FileAccess.ReadWrite,
+                FileShare.None,
+                4096,
+                FileOptions.DeleteOnClose);
         }
     }
 }

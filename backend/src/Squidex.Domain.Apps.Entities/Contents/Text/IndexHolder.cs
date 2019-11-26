@@ -6,22 +6,22 @@
 // ==========================================================================
 
 using System;
-using System.IO;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class IndexHolder
+    public sealed class IndexHolder : DisposableObjectBase
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
-        private readonly DirectoryInfo directory;
+        private readonly Directory directory;
         private DirectoryReader indexReader;
         private IndexWriter indexWriter;
         private IndexSearcher indexSearcher;
@@ -46,11 +46,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return indexSearcher; }
         }
 
-        public IndexHolder(DirectoryInfo directory)
+        public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
         {
-            this.directory = directory;
+            directory = directoryFactory.Create(schemaId);
 
             RecreateIndexWriter();
+        }
+
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                directory.Dispose();
+            }
         }
 
         private void RecreateIndexWriter()
@@ -62,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 MergeScheduler = MergeScheduler
             };
 
-            indexWriter = new IndexWriter(FSDirectory.Open(directory), config);
+            indexWriter = new IndexWriter(directory, config);
 
             RecreateReader();
         }
