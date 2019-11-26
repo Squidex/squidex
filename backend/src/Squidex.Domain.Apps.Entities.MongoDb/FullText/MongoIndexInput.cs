@@ -16,28 +16,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         private readonly IndexInput cacheInput;
         private readonly MongoDirectory indexDirectory;
         private readonly IOContext context;
-        private readonly string indexName;
+        private readonly string indexFileName;
 
         public override long Length
         {
             get { return cacheInput.Length; }
         }
 
-        public MongoIndexInput(MongoDirectory indexDirectory, IOContext context, string indexName)
-            : base(indexDirectory.GetFullName(indexName))
+        public MongoIndexInput(MongoDirectory indexDirectory, IOContext context, string indexFileName)
+            : base(indexDirectory.GetFullName(indexFileName))
         {
             this.indexDirectory = indexDirectory;
-            this.indexName = indexName;
+            this.indexFileName = indexFileName;
 
             this.context = context;
 
             try
             {
-                var file = indexDirectory.FindFile(indexName);
+                var file = indexDirectory.FindFile(indexFileName);
 
                 if (file != null)
                 {
-                    var fileInfo = new FileInfo(indexDirectory.GetFullPath(indexName));
+                    var fileInfo = new FileInfo(indexDirectory.GetFullPath(indexFileName));
 
                     var writtenTime = file.Metadata["WrittenTime"].ToUniversalTime();
 
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     {
                         using (var fs = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write))
                         {
-                            var fullName = indexDirectory.GetFullName(indexName);
+                            var fullName = indexDirectory.GetFullName(indexFileName);
 
                             indexDirectory.Bucket.DownloadToStream(fullName, fs);
                         }
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 throw new FileNotFoundException();
             }
 
-            cacheInput = indexDirectory.CacheDirectory.OpenInput(indexName, context);
+            cacheInput = indexDirectory.CacheDirectory.OpenInput(indexFileName, context);
         }
 
         protected override void Dispose(bool disposing)
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public override object Clone()
         {
-            return new MongoIndexInput(indexDirectory, context, indexName);
+            return new MongoIndexInput(indexDirectory, context, indexFileName);
         }
     }
 }

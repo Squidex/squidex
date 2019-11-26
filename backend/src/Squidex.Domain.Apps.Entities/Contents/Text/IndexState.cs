@@ -29,6 +29,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.index = index;
         }
 
+        public void Commit()
+        {
+            lastChanges.Clear();
+        }
+
         public void Index(Guid id, byte draft, Document document, byte forDraft, byte forPublished)
         {
             var value = GetValue(forDraft, forPublished);
@@ -84,8 +89,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var forValue = GetForValues(docId);
 
-            binaryValues?.Get(docId, forValue);
-
             forDraft = forValue.Bytes[0];
             forPublished = forValue.Bytes[1];
         }
@@ -102,7 +105,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var result = new BytesRef(2);
 
-            binaryValues?.Get(docId, result);
+            if (docId != NotFound)
+            {
+                binaryValues?.Get(docId, result);
+            }
 
             return result;
         }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Lucene.Net.Analysis;
@@ -45,9 +44,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.directoryFactory = directoryFactory;
         }
 
-        public override async Task OnDeactivateAsync()
+        public override Task OnDeactivateAsync()
         {
-            await DeactivateAsync(true);
+            index?.Dispose();
+
+            return Task.CompletedTask;
         }
 
         protected override Task OnActivateAsync(Guid key)
@@ -152,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
             else
             {
-                index.RecreateReader();
+                index.CleanReader();
 
                 try
                 {
@@ -172,25 +173,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (updates > 0)
             {
                 index.Commit(recreate);
+                indexState.Commit();
 
                 updates = 0;
             }
 
             return TaskHelper.Done;
-        }
-
-        public async Task DeactivateAsync(bool deleteFolder = false)
-        {
-            if (updates > 0)
-            {
-                await FlushAsync(false);
-            }
-            else
-            {
-                index?.Commit(false);
-            }
-
-            index?.Dispose();
         }
     }
 }

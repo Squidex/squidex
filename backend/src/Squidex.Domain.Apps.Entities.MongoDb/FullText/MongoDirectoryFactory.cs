@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public LuceneDirectory Create(Guid schemaId)
         {
-            var folderName = $"Indexes/{schemaId}";
+            var folderName = schemaId.ToString();
 
             var tempFolder = Path.Combine(Path.GetTempPath(), folderName);
             var tempDirectory = new DirectoryInfo(tempFolder);

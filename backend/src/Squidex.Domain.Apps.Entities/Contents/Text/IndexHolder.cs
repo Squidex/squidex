@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly Directory directory;
-        private DirectoryReader indexReader;
         private IndexWriter indexWriter;
-        private IndexSearcher indexSearcher;
+        private IndexSearcher? indexSearcher;
+        private DirectoryReader? indexReader;
 
         public SnapshotDeletionPolicy Snapshotter
         {
@@ -38,12 +38,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public IndexReader Reader
         {
-            get { return indexReader; }
+            get
+            {
+                EnsureReader();
+
+                return indexReader!;
+            }
         }
 
         public IndexSearcher Searcher
         {
-            get { return indexSearcher; }
+            get
+            {
+                EnsureReader();
+
+                return indexSearcher!;
+            }
         }
 
         public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
@@ -57,6 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (disposing)
             {
+                Commit(false);
+
                 directory.Dispose();
             }
         }
@@ -72,25 +84,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             indexWriter = new IndexWriter(directory, config);
 
-            RecreateReader();
+            CleanReader();
         }
 
-        public void RecreateReader()
+        public void CleanReader()
         {
-            if (indexReader != null)
-            {
-                var newReader = DirectoryReader.OpenIfChanged(indexReader);
+            indexReader?.Dispose();
+            indexReader = null;
 
-                if (newReader != null)
-                {
-                    indexReader.Dispose();
-                    indexReader = newReader;
-                    indexSearcher = new IndexSearcher(indexReader);
-                }
-            }
-            else
+            indexSearcher = null;
+        }
+
+        public void EnsureReader()
+        {
+            if (indexReader == null)
             {
-                indexReader?.Dispose();
                 indexReader = indexWriter.GetReader(true);
                 indexSearcher = new IndexSearcher(indexReader);
             }
@@ -100,8 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             try
             {
-                indexReader?.Dispose();
-                indexReader = null!;
+                CleanReader();
 
                 indexWriter?.Commit();
                 indexWriter?.Dispose(true);

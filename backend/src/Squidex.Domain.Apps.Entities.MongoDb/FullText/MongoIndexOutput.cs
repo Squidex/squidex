@@ -7,8 +7,10 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using Lucene.Net.Store;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
@@ -17,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
     {
         private readonly IndexOutput cacheOutput;
         private readonly MongoDirectory indexDirectory;
-        private readonly string indexName;
+        private readonly string indexFileName;
         private bool isFlushed;
         private bool isWritten;
 
@@ -31,12 +33,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             get { return cacheOutput.Checksum; }
         }
 
-        public MongoIndexOutput(MongoDirectory indexDirectory, IOContext context, string indexName)
+        public MongoIndexOutput(MongoDirectory indexDirectory, IOContext context, string indexFileName)
         {
             this.indexDirectory = indexDirectory;
-            this.indexName = indexName;
+            this.indexFileName = indexFileName;
 
-            cacheOutput = indexDirectory.CacheDirectory.CreateOutput(indexName, context);
+            cacheOutput = indexDirectory.CacheDirectory.CreateOutput(indexFileName, context);
         }
 
         protected override void Dispose(bool disposing)
@@ -49,11 +51,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
                 if (isWritten && isFlushed)
                 {
-                    var fileInfo = new FileInfo(indexDirectory.GetFullPath(indexName));
+                    var fileInfo = new FileInfo(indexDirectory.GetFullPath(indexFileName));
 
-                    using (var fs = new FileStream(indexDirectory.GetFullPath(indexName), FileMode.Open, FileAccess.Read))
+                    using (var fs = new FileStream(indexDirectory.GetFullPath(indexFileName), FileMode.Open, FileAccess.Read))
                     {
-                        var fullName = indexDirectory.GetFullName(indexName);
+                        var fullName = indexDirectory.GetFullName(indexFileName);
 
                         var options = new GridFSUploadOptions
                         {
@@ -63,7 +65,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                             }
                         };
 
-                        indexDirectory.Bucket.UploadFromStream(fullName, indexName, fs, options);
+                        try
+                        {
+                            indexDirectory.Bucket.UploadFromStream(fullName, indexFileName, fs, options);
+                        }
+                        catch (MongoBulkWriteException ex) when (ex.WriteErrors.Any(x => x.Code == 11000))
+                        {
+                            indexDirectory.Bucket.Delete(fullName);
+                            indexDirectory.Bucket.UploadFromStream(fullName, indexFileName, fs, options);
+                        }
                     }
                 }
             }

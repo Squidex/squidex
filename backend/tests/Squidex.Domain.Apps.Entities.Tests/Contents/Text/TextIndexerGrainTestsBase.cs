@@ -8,42 +8,32 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.FullText;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable RECS0021 // Warns about calls to virtual member functions occuring in the constructor
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerGrainTests : IDisposable
+    public abstract class TextIndexerGrainTestsBase : IDisposable
     {
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly SearchContext context;
-        private readonly IDirectoryFactory directoryFactory;
         private readonly TextIndexerGrain sut;
 
-        public TextIndexerGrainTests()
+        public abstract IDirectoryFactory DirectoryFactory { get; }
+
+        protected TextIndexerGrainTestsBase()
         {
             context = new SearchContext
             {
                 Languages = new HashSet<string> { "de", "en" }
             };
 
-            var mongoClient = new MongoClient("mongodb://localhost");
-            var mongoDatabase = mongoClient.GetDatabase("FullText");
-            var mongoBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
-            {
-                BucketName = "fs"
-            });
-
-            directoryFactory = new MongoDirectoryFactory(mongoBucket);
-
-            sut = new TextIndexerGrain(directoryFactory);
+            sut = new TextIndexerGrain(DirectoryFactory);
             sut.ActivateAsync(schemaId).Wait();
         }
 
@@ -63,9 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent("Hello", "World", false);
 
-            await sut.DeactivateAsync(true);
+            await sut.OnDeactivateAsync();
 
-            var other = new TextIndexerGrain(directoryFactory);
+            var other = new TextIndexerGrain(DirectoryFactory);
             try
             {
                 await other.ActivateAsync(schemaId);
