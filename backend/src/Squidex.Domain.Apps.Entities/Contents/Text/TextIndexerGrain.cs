@@ -175,7 +175,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (updates > 0)
             {
                 index.Commit(recreate);
-                indexState.Flush();
 
                 var commit = index.Snapshotter.Snapshot();
                 try

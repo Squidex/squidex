@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const int NotFound = -1;
         private const string MetaFor = "_fd";
-        private readonly Dictionary<(Guid, byte), BytesRef> changes = new Dictionary<(Guid, byte), BytesRef>();
+        private readonly Dictionary<(Guid, byte), BytesRef> lastChanges = new Dictionary<(Guid, byte), BytesRef>();
         private readonly IndexHolder index;
         private IndexReader? lastReader;
         private BinaryDocValues binaryValues;
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             document.SetBinaryDocValue(MetaFor, value);
 
-            changes[(id, draft)] = value;
+            lastChanges[(id, draft)] = value;
         }
 
         public void Index(Guid id, byte draft, Term term, byte forDraft, byte forPublished)
@@ -44,14 +44,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             index.Writer.UpdateBinaryDocValue(term, MetaFor, value);
 
-            changes[(id, draft)] = value;
+            lastChanges[(id, draft)] = value;
         }
 
         public bool HasBeenAdded(Guid id, byte draft, Term term, out int docId)
         {
             docId = 0;
 
-            if (changes.ContainsKey((id, draft)))
+            if (lastChanges.ContainsKey((id, draft)))
             {
                 return true;
             }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Get(Guid id, byte draft, int docId, out byte forDraft, out byte forPublished)
         {
-            if (changes.TryGetValue((id, draft), out var forValue))
+            if (lastChanges.TryGetValue((id, draft), out var forValue))
             {
                 forDraft = forValue.Bytes[0];
                 forPublished = forValue.Bytes[1];
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             forDraft = forValue.Bytes[0];
             forPublished = forValue.Bytes[1];
 
-            changes[(id, draft)] = forValue;
+            lastChanges[(id, draft)] = forValue;
         }
 
         public void Get(int docId, out byte forDraft, out byte forPublished)
@@ -94,6 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (lastReader != index.Reader)
             {
+                lastChanges.Clear();
                 lastReader = index.Reader;
 
                 binaryValues = MultiDocValues.GetBinaryValues(index.Reader, MetaFor);
@@ -109,11 +110,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static BytesRef GetValue(byte forDraft, byte forPublished)
         {
             return new BytesRef(new[] { forDraft, forPublished });
-        }
-
-        public void Flush()
-        {
-            changes.Clear();
         }
     }
 }
