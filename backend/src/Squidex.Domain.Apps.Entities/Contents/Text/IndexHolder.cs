@@ -19,12 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
-        private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
+        private static readonly Analyzer SharedAnalyzer = new MultiLanguageAnalyzer(Version);
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly Directory directory;
         private IndexWriter indexWriter;
         private IndexSearcher? indexSearcher;
         private DirectoryReader? indexReader;
+
+        public Analyzer Analyzer
+        {
+            get { return SharedAnalyzer; }
+        }
 
         public SnapshotDeletionPolicy Snapshotter
         {
@@ -36,35 +41,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return indexWriter; }
         }
 
+        public IndexReader? Reader
+        {
+            get { return indexReader; }
+        }
+
+        public IndexSearcher? Searcher
+        {
+            get { return indexSearcher; }
+        }
+
         public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
         {
             directory = directoryFactory.Create(schemaId);
 
             RecreateIndexWriter();
+
+            if (indexWriter.NumDocs > 0)
+            {
+                EnsureReader();
+            }
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                Commit(false);
-
-                directory.Dispose();
+                indexWriter.Dispose();
             }
-        }
-
-        public IndexReader? GetReader(bool create)
-        {
-            EnsureReader(create);
-
-            return indexReader!;
-        }
-
-        public IndexSearcher? GetSearcher(bool create)
-        {
-            EnsureReader(create);
-
-            return indexSearcher;
         }
 
         private void RecreateIndexWriter()
@@ -81,46 +85,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             CleanReader();
         }
 
-        public void CleanReader()
+        public void EnsureReader()
         {
-            indexReader?.Dispose();
-            indexReader = null;
-
-            indexSearcher = null;
-        }
-
-        public void EnsureReader(bool create)
-        {
-            if (indexReader == null && create)
+            if (indexReader == null)
             {
                 indexReader = indexWriter.GetReader(true);
                 indexSearcher = new IndexSearcher(indexReader);
             }
         }
 
-        public void Commit(bool recreate)
+        public void CleanReader()
+        {
+            if (indexReader != null)
+            {
+                indexReader.Dispose();
+                indexReader = null;
+                indexSearcher = null;
+            }
+        }
+
+        public void Commit()
         {
             try
             {
                 CleanReader();
 
-                indexWriter?.Commit();
-                indexWriter?.Dispose(true);
-                indexWriter = null!;
+                indexWriter.Commit();
             }
             catch (OutOfMemoryException)
             {
-                if (recreate)
-                {
-                    RecreateIndexWriter();
-                }
+                RecreateIndexWriter();
 
                 throw;
-            }
-
-            if (recreate)
-            {
-                RecreateIndexWriter();
             }
         }
     }

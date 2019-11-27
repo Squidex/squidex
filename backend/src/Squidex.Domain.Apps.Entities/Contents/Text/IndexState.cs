@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return true;
             }
 
-            var docs = index.GetSearcher(false)?.Search(new TermQuery(term), 1);
+            var docs = index.Searcher?.Search(new TermQuery(term), 1);
 
             docId = docs?.ScoreDocs.FirstOrDefault()?.Doc ?? NotFound;
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private BytesRef GetForValues(int docId)
         {
-            var reader = index.GetReader(false);
+            var reader = index.Reader;
 
             if (lastReader != reader)
             {

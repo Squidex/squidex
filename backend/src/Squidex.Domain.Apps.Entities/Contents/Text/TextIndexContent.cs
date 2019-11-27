@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return false;
             }
 
-            var document = index.GetSearcher(true)!.Doc(docId);
+            var document = index.Searcher?.Doc(docId);
 
             if (document != null)
             {

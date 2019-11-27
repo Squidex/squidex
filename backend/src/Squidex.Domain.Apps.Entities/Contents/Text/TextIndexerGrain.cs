@@ -27,7 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxResults = 2000;
         private const int MaxUpdates = 400;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
-        private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
         private readonly IDirectoryFactory directoryFactory;
         private IDisposable? timer;
@@ -54,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         protected override Task OnActivateAsync(Guid key)
         {
             index = new IndexHolder(directoryFactory, key);
+
             indexState = new IndexState(index);
 
             return TaskHelper.Done;
@@ -97,25 +97,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (!string.IsNullOrWhiteSpace(queryText))
             {
-                var query = BuildQuery(queryText, context);
+                index.EnsureReader();
 
-                var found = new HashSet<Guid>();
-
-                var hits = index.GetSearcher(true)!.Search(query, MaxResults).ScoreDocs;
-
-                foreach (var hit in hits)
+                if (index.Searcher != null)
                 {
-                    if (TextIndexContent.TryGetId(hit.Doc, context.Scope, index, indexState, out var id))
+                    var query = BuildQuery(queryText, context);
+
+                    var hits = index.Searcher.Search(query, MaxResults).ScoreDocs;
+
+                    if (hits.Length > 0)
                     {
-                        if (found.Add(id))
+                        var found = new HashSet<Guid>();
+
+                        foreach (var hit in hits)
                         {
-                            result.Add(id);
+                            if (TextIndexContent.TryGetId(hit.Doc, context.Scope, index, indexState, out var id))
+                            {
+                                if (found.Add(id))
+                                {
+                                    result.Add(id);
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            return Task.FromResult(result.ToList());
+            return Task.FromResult(result);
         }
 
         private Query BuildQuery(string query, SearchContext context)
@@ -124,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var fields = context.Languages.Union(Invariant).ToArray();
 
-                queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
+                queryParser = new MultiFieldQueryParser(Version, fields, index.Analyzer);
 
                 currentLanguages = context.Languages;
             }
@@ -172,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (updates > 0)
             {
-                index.Commit(recreate);
+                index.Commit();
 
                 updates = 0;
             }
