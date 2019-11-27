@@ -60,6 +60,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             cacheInput = indexDirectory.CacheDirectory.OpenInput(indexFileName, context);
         }
 
+        public MongoIndexInput(MongoIndexInput source)
+            : base("clone")
+        {
+            cacheInput = (IndexInput)source.cacheInput.Clone();
+            context = source.context;
+            indexDirectory = source.indexDirectory;
+            indexFileName = source.indexFileName;
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

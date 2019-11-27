@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var elapsed = watch.Stop();
 
-            Assert.InRange(elapsed, 0, 7000);
+            Assert.InRange(elapsed, 0, 1);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class IndexHolder : DisposableObjectBase
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
-        private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
+        private static readonly MergeScheduler MergeScheduler = new SerialMergeScheduler();
         private static readonly Analyzer SharedAnalyzer = new MultiLanguageAnalyzer(Version);
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly Directory directory;
