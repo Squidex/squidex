@@ -15,7 +15,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public static void SetBinaryDocValue(this Document document, string name, BytesRef value)
         {
             document.RemoveField(name);
+
             document.AddBinaryDocValuesField(name, value);
+        }
+
+        public static void SetField(this Document document, string name, string value)
+        {
+            document.RemoveField(name);
+
+            document.AddStringField(name, value, Field.Store.YES);
         }
     }
 }

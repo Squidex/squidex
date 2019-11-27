@@ -8,7 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
+using FakeItEasy;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -33,7 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 Languages = new HashSet<string> { "de", "en" }
             };
 
-            sut = new TextIndexerGrain(DirectoryFactory);
+            var factory = new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>());
+
+            sut = new TextIndexerGrain(factory);
             sut.ActivateAsync(schemaId).Wait();
         }
 
@@ -55,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.OnDeactivateAsync();
 
-            var other = new TextIndexerGrain(DirectoryFactory);
+            var other = new TextIndexerGrain(new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>()));
             try
             {
                 await other.ActivateAsync(schemaId);
@@ -201,38 +204,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task AddLocalizedContent()
         {
-            var germanData =
-                new NamedContentData()
-                    .AddField("localized",
-                        new ContentFieldData()
-                            .AddValue("de", "Stadt und Umgebung and whatever"));
+            var germanText = new TextContent
+            {
+                ["de"] = "Stadt und Umgebung and whatever"
+            };
 
-            var englishData =
-                new NamedContentData()
-                    .AddField("localized",
-                        new ContentFieldData()
-                            .AddValue("en", "City and Surroundings und sonstiges"));
+            var englishText = new TextContent
+            {
+                ["en"] = "City and Surroundings und sonstiges"
+            };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Data = germanData, OnlyDraft = true });
-            await sut.IndexAsync(new Update { Id = ids2[0], Data = englishData, OnlyDraft = true });
+            await sut.IndexAsync(new Update { Id = ids1[0], Text = germanText, OnlyDraft = true });
+            await sut.IndexAsync(new Update { Id = ids2[0], Text = englishText, OnlyDraft = true });
         }
 
         private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
         {
-            var data1 =
-                new NamedContentData()
-                    .AddField("test",
-                        new ContentFieldData()
-                            .AddValue("iv", text1));
+            var content1 = new TextContent
+            {
+                ["iv"] = text1
+            };
 
-            var data2 =
-                new NamedContentData()
-                    .AddField("test",
-                        new ContentFieldData()
-                            .AddValue("iv", text2));
+            var content2 = new TextContent
+            {
+                ["iv"] = text2
+            };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Data = data1, OnlyDraft = onlyDraft });
-            await sut.IndexAsync(new Update { Id = ids2[0], Data = data2, OnlyDraft = onlyDraft });
+            await sut.IndexAsync(new Update { Id = ids1[0], Text = content1, OnlyDraft = onlyDraft });
+            await sut.IndexAsync(new Update { Id = ids2[0], Text = content2, OnlyDraft = onlyDraft });
         }
 
         private async Task DeleteAsync(Guid id)

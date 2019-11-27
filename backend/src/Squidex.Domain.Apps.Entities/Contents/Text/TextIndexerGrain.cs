@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Lucene.Net.Analysis;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxUpdates = 400;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
-        private readonly IDirectoryFactory directoryFactory;
+        private readonly IndexHolderFactory indexHolderFactory;
         private IDisposable? timer;
         private IndexHolder index;
         private IndexState indexState;
@@ -36,39 +35,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private HashSet<string>? currentLanguages;
         private int updates;
 
-        public TextIndexerGrain(IDirectoryFactory directoryFactory)
+        public TextIndexerGrain(IndexHolderFactory indexHolderFactory)
         {
-            Guard.NotNull(directoryFactory);
+            Guard.NotNull(indexHolderFactory);
 
-            this.directoryFactory = directoryFactory;
+            this.indexHolderFactory = indexHolderFactory;
         }
 
         public override Task OnDeactivateAsync()
         {
             index?.Dispose();
+            indexHolderFactory.Release(Key);
 
             return Task.CompletedTask;
         }
 
         protected override Task OnActivateAsync(Guid key)
         {
-            index = new IndexHolder(directoryFactory, key);
-
+            index = indexHolderFactory.Acquire(key);
             indexState = new IndexState(index);
 
             return TaskHelper.Done;
         }
 
-        public Task<bool> IndexAsync(J<Update> update)
-        {
-            return IndexInternalAsync(update);
-        }
-
-        private Task<bool> IndexInternalAsync(Update update)
+        public Task<bool> IndexAsync(Update update)
         {
             var content = new TextIndexContent(index, indexState, update.Id);
 
-            content.Index(update.Data, update.OnlyDraft);
+            content.Index(update.Text, update.OnlyDraft);
 
             return TryFlushAsync();
         }
@@ -155,17 +149,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (updates >= MaxUpdates)
             {
-                await FlushAsync(true);
+                await FlushAsync();
 
                 return true;
             }
             else
             {
-                index.CleanReader();
+                index.MarkStale();
 
                 try
                 {
-                    timer = RegisterTimer(_ => FlushAsync(true), null, CommitDelay, CommitDelay);
+                    timer = RegisterTimer(_ => FlushAsync(), null, CommitDelay, CommitDelay);
                 }
                 catch (InvalidOperationException)
                 {
@@ -176,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return false;
         }
 
-        public Task FlushAsync(bool recreate)
+        public Task FlushAsync()
         {
             if (updates > 0)
             {

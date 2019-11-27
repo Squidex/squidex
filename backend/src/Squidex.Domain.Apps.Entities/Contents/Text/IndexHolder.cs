@@ -28,33 +28,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Analyzer Analyzer
         {
-            get { return SharedAnalyzer; }
+            get
+            {
+                ThrowIfDisposed();
+
+                return SharedAnalyzer;
+            }
         }
 
         public SnapshotDeletionPolicy Snapshotter
         {
-            get { return snapshotter; }
+            get
+            {
+                ThrowIfDisposed();
+
+                return snapshotter;
+            }
         }
 
         public IndexWriter Writer
         {
-            get { return indexWriter; }
+            get
+            {
+                ThrowIfDisposed();
+
+                return indexWriter;
+            }
         }
 
         public IndexReader? Reader
         {
-            get { return indexReader; }
+            get
+            {
+                ThrowIfDisposed();
+
+                return indexReader;
+            }
         }
 
         public IndexSearcher? Searcher
         {
-            get { return indexSearcher; }
+            get
+            {
+                ThrowIfDisposed();
+
+                return indexSearcher;
+            }
         }
 
         public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
         {
             directory = directoryFactory.Create(schemaId);
+        }
 
+        public void Open()
+        {
             RecreateIndexWriter();
 
             if (indexWriter.NumDocs > 0)
@@ -82,11 +110,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             indexWriter = new IndexWriter(directory, config);
 
-            CleanReader();
+            MarkStale();
         }
 
         public void EnsureReader()
         {
+            ThrowIfDisposed();
+
             if (indexReader == null)
             {
                 indexReader = indexWriter.GetReader(true);
@@ -94,8 +124,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public void CleanReader()
+        public void MarkStale()
         {
+            ThrowIfDisposed();
+
             if (indexReader != null)
             {
                 indexReader.Dispose();
@@ -106,9 +138,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Commit()
         {
+            ThrowIfDisposed();
+
             try
             {
-                CleanReader();
+                MarkStale();
 
                 indexWriter.Commit();
             }

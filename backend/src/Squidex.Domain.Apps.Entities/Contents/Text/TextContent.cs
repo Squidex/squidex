@@ -12,8 +12,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable ORL1001
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
+    [Serializable]
     public sealed class TextContent : Dictionary<string, string>
     {
         public TextContent()
@@ -22,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextContent(NamedContentData data)
         {
+            if (data == null)
+            {
+                return;
+            }
+
             var languages = new Dictionary<string, StringBuilder>();
 
             void AppendText(string language, string text)

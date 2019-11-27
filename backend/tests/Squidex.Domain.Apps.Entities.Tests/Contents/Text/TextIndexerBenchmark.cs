@@ -7,38 +7,33 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
+using FakeItEasy;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerBenchmark : IDisposable
+    public class TextIndexerBenchmark
     {
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly TextIndexerGrain sut;
 
         public TextIndexerBenchmark()
         {
-            var factory = new FSDirectoryFactory();
+            var factory = new IndexHolderFactory(new FSDirectoryFactory(), A.Fake<ISemanticLog>());
 
             sut = new TextIndexerGrain(factory);
             sut.ActivateAsync(schemaId).Wait();
         }
 
-        public void Dispose()
-        {
-            sut.OnDeactivateAsync().Wait();
-        }
-
         [Fact]
         public async Task Should_index_many_documents()
         {
-            var data =
-                new NamedContentData()
-                    .AddField("test",
-                        new ContentFieldData()
-                            .AddValue("iv", "Hallo Welt"));
+            var text = new TextContent
+            {
+                ["iv"] = "Hallo Welt"
+            };
 
             var ids = new Guid[10000];
 
@@ -51,14 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             foreach (var id in ids)
             {
-                await sut.IndexAsync(new Update { Data = data, Id = id });
+                await sut.IndexAsync(new Update { Text = text, Id = id });
             }
 
             sut.OnDeactivateAsync().Wait();
 
             var elapsed = watch.Stop();
 
-            Assert.InRange(elapsed, 0, 1);
+            Assert.InRange(elapsed, 0, 7000);
         }
     }
 }

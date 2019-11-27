@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const int NotFound = -1;
         private const string MetaFor = "_fd";
-        private readonly Dictionary<(Guid, byte), BytesRef> lastChanges = new Dictionary<(Guid, byte), BytesRef>();
+        private readonly Dictionary<(Guid, Scope), BytesRef> lastChanges = new Dictionary<(Guid, Scope), BytesRef>();
         private readonly IndexHolder index;
         private IndexReader? lastReader;
         private BinaryDocValues binaryValues;
@@ -29,29 +29,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.index = index;
         }
 
-        public void Index(Guid id, byte draft, Document document, byte forDraft, byte forPublished)
+        public void Index(Guid id, Scope scope, Document document, bool forDraft, bool forPublished)
         {
             var value = GetValue(forDraft, forPublished);
 
             document.SetBinaryDocValue(MetaFor, value);
 
-            lastChanges[(id, draft)] = value;
+            lastChanges[(id, scope)] = value;
         }
 
-        public void Index(Guid id, byte draft, Term term, byte forDraft, byte forPublished)
+        public void Index(Guid id, Scope scope, Term term, bool forDraft, bool forPublished)
         {
             var value = GetValue(forDraft, forPublished);
 
             index.Writer.UpdateBinaryDocValue(term, MetaFor, value);
 
-            lastChanges[(id, draft)] = value;
+            lastChanges[(id, scope)] = value;
         }
 
-        public bool HasBeenAdded(Guid id, byte draft, Term term, out int docId)
+        public bool HasBeenAdded(Guid id, Scope scope, Term term, out int docId)
         {
             docId = 0;
 
-            if (lastChanges.ContainsKey((id, draft)))
+            if (lastChanges.ContainsKey((id, scope)))
             {
                 return true;
             }
@@ -63,29 +63,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return docId > NotFound;
         }
 
-        public void Get(Guid id, byte draft, int docId, out byte forDraft, out byte forPublished)
+        public void Get(Guid id, Scope scope, int docId, out bool forDraft, out bool forPublished)
         {
-            if (lastChanges.TryGetValue((id, draft), out var forValue))
+            if (lastChanges.TryGetValue((id, scope), out var forValue))
             {
-                forDraft = forValue.Bytes[0];
-                forPublished = forValue.Bytes[1];
-                return;
+                (forDraft, forPublished) = ToFlags(forValue);
             }
-
-            forValue = GetForValues(docId);
-
-            forDraft = forValue.Bytes[0];
-            forPublished = forValue.Bytes[1];
-
-            lastChanges[(id, draft)] = forValue;
+            else
+            {
+                Get(docId, out forDraft, out forPublished);
+            }
         }
 
-        public void Get(int docId, out byte forDraft, out byte forPublished)
+        public void Get(int docId, out bool forDraft, out bool forPublished)
         {
             var forValue = GetForValues(docId);
 
-            forDraft = forValue.Bytes[0];
-            forPublished = forValue.Bytes[1];
+            (forDraft, forPublished) = ToFlags(forValue);
         }
 
         private BytesRef GetForValues(int docId)
@@ -113,9 +107,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return result;
         }
 
+        private static BytesRef GetValue(bool forDraft, bool forPublished)
+        {
+            return GetValue((byte)(forDraft ? 1 : 0), (byte)(forPublished ? 1 : 0));
+        }
+
         private static BytesRef GetValue(byte forDraft, byte forPublished)
         {
             return new BytesRef(new[] { forDraft, forPublished });
+        }
+
+        private static (bool, bool) ToFlags(BytesRef bytes)
+        {
+            return (bytes.Bytes[0] == 1, bytes.Bytes[1] == 1);
         }
     }
 }

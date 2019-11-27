@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -78,6 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         await index.CopyAsync(id, false);
                         break;
                     case ContentChangesPublished _:
+                        await index.CopyAsync(id, true);
+                        break;
                     case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
                         await index.CopyAsync(id, true);
                         break;
@@ -85,9 +86,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static J<Update> Data(Guid contentId, NamedContentData data, bool onlySelf)
+        private static Update Data(Guid contentId, NamedContentData data, bool onlyDraft)
         {
-            return new Update { Id = contentId, Data = data, OnlyDraft = onlySelf };
+            var text = new TextContent(data);
+
+            return new Update { Id = contentId, Text = text, OnlyDraft = onlyDraft };
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)
