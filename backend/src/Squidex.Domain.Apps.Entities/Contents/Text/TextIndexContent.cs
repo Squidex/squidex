@@ -53,13 +53,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return false;
             }
 
-            var document = index.Searcher.Doc(docId);
+            var document = index.GetSearcher(true)!.Doc(docId);
 
-            var idString = document.Get(MetaId);
-
-            if (!Guid.TryParse(idString, out result))
+            if (document != null)
             {
-                return false;
+                var idString = document.Get(MetaId);
+
+                if (!Guid.TryParse(idString, out result))
+                {
+                    return false;
+                }
             }
 
             return true;

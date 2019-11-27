@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 var found = new HashSet<Guid>();
 
-                var hits = index.Searcher.Search(query, MaxResults).ScoreDocs;
+                var hits = index.GetSearcher(true)!.Search(query, MaxResults).ScoreDocs;
 
                 foreach (var hit in hits)
                 {
@@ -173,7 +173,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (updates > 0)
             {
                 index.Commit(recreate);
-                indexState.Commit();
 
                 updates = 0;
             }

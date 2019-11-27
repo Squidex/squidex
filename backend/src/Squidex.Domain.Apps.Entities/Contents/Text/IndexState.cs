@@ -29,11 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.index = index;
         }
 
-        public void Commit()
-        {
-            lastChanges.Clear();
-        }
-
         public void Index(Guid id, byte draft, Document document, byte forDraft, byte forPublished)
         {
             var value = GetValue(forDraft, forPublished);
@@ -61,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return true;
             }
 
-            var docs = index.Searcher.Search(new TermQuery(term), 1);
+            var docs = index.GetSearcher(false)?.Search(new TermQuery(term), 1);
 
             docId = docs?.ScoreDocs.FirstOrDefault()?.Doc ?? NotFound;
 
@@ -95,12 +90,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private BytesRef GetForValues(int docId)
         {
-            if (lastReader != index.Reader)
+            var reader = index.GetReader(false);
+
+            if (lastReader != reader)
             {
                 lastChanges.Clear();
-                lastReader = index.Reader;
+                lastReader = reader;
 
-                binaryValues = MultiDocValues.GetBinaryValues(index.Reader, MetaFor);
+                if (reader != null)
+                {
+                    binaryValues = MultiDocValues.GetBinaryValues(reader, MetaFor);
+                }
             }
 
             var result = new BytesRef(2);

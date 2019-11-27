@@ -36,26 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return indexWriter; }
         }
 
-        public IndexReader Reader
-        {
-            get
-            {
-                EnsureReader();
-
-                return indexReader!;
-            }
-        }
-
-        public IndexSearcher Searcher
-        {
-            get
-            {
-                EnsureReader();
-
-                return indexSearcher!;
-            }
-        }
-
         public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
         {
             directory = directoryFactory.Create(schemaId);
@@ -71,6 +51,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 directory.Dispose();
             }
+        }
+
+        public IndexReader? GetReader(bool create)
+        {
+            EnsureReader(create);
+
+            return indexReader!;
+        }
+
+        public IndexSearcher? GetSearcher(bool create)
+        {
+            EnsureReader(create);
+
+            return indexSearcher;
         }
 
         private void RecreateIndexWriter()
@@ -95,9 +89,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             indexSearcher = null;
         }
 
-        public void EnsureReader()
+        public void EnsureReader(bool create)
         {
-            if (indexReader == null)
+            if (indexReader == null && create)
             {
                 indexReader = indexWriter.GetReader(true);
                 indexSearcher = new IndexSearcher(indexReader);
