@@ -40,7 +40,7 @@ namespace Squidex.Web.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    if (options.LogRequest)
+                    if (options.LogRequests)
                     {
                         log.LogInformation((elapsedMs, context), (ctx, w) =>
                         {
