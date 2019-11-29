@@ -143,7 +143,8 @@ module.exports = function (env) {
                 }, {
                     loader: 'postcss-loader'
                 }, {
-                    loader: 'sass-loader', options: {
+                    loader: 'sass-loader', 
+                    options: {
                         sassOptions: {
                             includePaths: [root('app', 'theme')]
                         }
