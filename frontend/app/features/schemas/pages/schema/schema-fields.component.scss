@@ -2,10 +2,10 @@
 @import '_mixins';
 
 :host {
+    overflow-x: hidden;
+    overflow-y: auto;
     padding: $panel-padding;
     padding-bottom: 8rem;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .field-button {

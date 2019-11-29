@@ -9,8 +9,8 @@ $color-gold: #ffd700;
 
 .stars {
     & {
-        display: inline-block;
         border: 0;
+        display: inline-block;
         height: 2.4rem;
         line-height: 2.4rem;
     }
@@ -33,9 +33,9 @@ $color-gold: #ffd700;
     }
 
     &::before {
-        display: inline-block;
         color: $color-gold;
         content: '☆';
+        display: inline-block;
         font-size: 1.8rem;
         line-height: 1px;
     }

@@ -3,8 +3,8 @@
 
 .card {
     & {
-        @include border-radius(0);
         border-bottom-width: 2px;
+        border-radius: 0;
         border-top-width: 0;
         margin-bottom: .25rem;
     }
@@ -16,12 +16,11 @@
 
     &-footer {
         background: $color-theme-secondary;
-        font-weight: normal;
         font-size: 90%;
+        font-weight: normal;
     }
 }
 
 .col-last {
-    min-width: 80px;
-    max-width: 80px;
+    @include force-width(80px);
 }

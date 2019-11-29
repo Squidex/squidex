@@ -14,13 +14,11 @@
 }
 
 .col-form-label {
-    min-width: 4rem;
-    max-width: 4rem;
+    @include force-width(4rem);
 }
 
 .col-tags {
-    padding: .6rem 1rem;
-    padding-bottom: 0;
+    padding: .6rem 1rem 0;
 }
 
 .form-group {

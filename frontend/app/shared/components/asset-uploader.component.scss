@@ -13,35 +13,35 @@
 
         .nav-link {
             color: $color-dark-foreground;
-            padding-top: 0;
             padding-bottom: 0;
+            padding-top: 0;
         }
     }
 }
 
 .icon-upload-3 {
-    vertical-align: middle;
     font-size: 1.4rem;
     font-weight: lighter;
     padding-right: .5rem;
+    vertical-align: middle;
 }
 
 .dropdown-menu {
     @include absolute(2.6rem, 0, auto, auto);
     display: block;
-    min-width: 30rem;
     max-width: 60%;
     min-height: 4rem;
+    min-width: 30rem;
     padding: 1rem;
 }
 
 .uploads {
     & {
-        border: 2px solid transparent;
         background: none;
+        border: 2px solid transparent;
         min-height: 2rem;
     }
-    
+
     &-empty {
         line-height: 1.8rem;
     }
@@ -50,9 +50,9 @@
 .upload {
     & {
         line-height: 2rem;
-        min-height: 2rem;
-        max-height: 2rem;
         margin-bottom: .5rem;
+        max-height: 2rem;
+        min-height: 2rem;
     }
 
     &:last-child {
@@ -61,8 +61,8 @@
 
     &-name {
         @include truncate;
-        padding-right: .5rem;
         padding-left: .5rem;
+        padding-right: .5rem;
     }
 }
 
@@ -71,14 +71,13 @@ $circle-size: 1.6rem;
 .upload-status {
     & {
         @include circle($circle-size);
-        display: inline-block;
-        line-height: $circle-size + .1rem;
-        text-align: center;
-        font-size: .4 * $circle-size;
-        font-weight: normal;
         background: $color-border;
         color: $color-dark-foreground;
         cursor: none;
+        font-size: .4 * $circle-size;
+        font-weight: normal;
+        line-height: $circle-size + .1rem;
+        text-align: center;
     }
 
     &-running {

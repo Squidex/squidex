@@ -14,33 +14,33 @@
     }
 
     &-primary {
-        color: $color-badge-primary-foreground;
         background: $color-badge-primary-background;
+        color: $color-badge-primary-foreground;
     }
 
     &-secondary {
-        color: $color-badge-secondary-foreground;
         background: $color-badge-secondary-background;
+        color: $color-badge-secondary-foreground;
     }
 
     &-success {
-        color: $color-badge-success-foreground;
         background: $color-badge-success-background;
+        color: $color-badge-success-foreground;
     }
 
     &-info {
-        color: $color-badge-info-foreground;
         background: $color-badge-info-background;
+        color: $color-badge-info-foreground;
     }
 
     &-warning {
-        color: $color-badge-warning-foreground;
         background: $color-badge-warning-background;
+        color: $color-badge-warning-foreground;
     }
 
     &-danger {
-        color: $color-badge-danger-foreground;
         background: $color-badge-danger-background;
+        color: $color-badge-danger-foreground;
     }
 }
 
@@ -64,8 +64,8 @@
 
     .close {
         & {
-            font-weight: 400;
             font-size: 1.6rem;
+            font-weight: 400;
             padding-top: .25rem;
         }
 
@@ -82,12 +82,12 @@
 }
 
 .alert-hint {
-    @include border-radius(0);
     background: lighten($color-theme-blue, 35%);
     border: 1px solid $color-border;
+    border-radius: 0;
+    color: $color-text;
     font-size: 90%;
     font-weight: normal;
-    color: $color-text;
 
     .alert-link {
         color: $color-text !important;
@@ -104,7 +104,7 @@
 a {
     &:disabled,
     &.disabled {
-        @include opacity(.8);
+        opacity: .8;
         pointer-events: none;
     }
 
@@ -124,9 +124,9 @@ a {
         }
 
         &:hover {
-            text-decoration: underline !important;
-            cursor: pointer;
             color: inherit;
+            cursor: pointer;
+            text-decoration: underline !important;
         }
     }
 }
@@ -163,8 +163,8 @@ a {
     // White dropdown menu without border and shadow.
     & {
         @include box-shadow(0, 3px, 16px, .2);
-        border: 0;
         background: $panel-light-background;
+        border: 0;
         z-index: 1200;
     }
 
@@ -203,9 +203,9 @@ a {
 //
 .breadcrumb {
     & {
-        margin-bottom: 2rem;
         background: none;
         border: 1px solid $color-border;
+        margin-bottom: 2rem;
     }
 
     &.steps {
@@ -215,12 +215,12 @@ a {
 
         .breadcrumb-item {
             & {
-                padding: .75rem 2rem .75rem 1rem;
                 background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
                 background-position-x: right;
                 background-repeat: no-repeat;
                 background-size: contain;
                 color: $color-text-decent;
+                padding: .75rem 2rem .75rem 1rem;
 
                 a {
                     color: $color-text-decent !important;
@@ -343,11 +343,11 @@ a {
 
     & .nav-link {
         & {
+            border-bottom: .25rem solid transparent;
             color: $color-text;
             cursor: pointer;
-            padding: 1rem 0;
-            border-bottom: .25rem solid transparent;
             margin: 0 1rem;
+            padding: 1rem 0;
             text-align: center;
         }
 
@@ -444,13 +444,13 @@ a {
     &-radio {
         & {
             @include border-radius;
+            background: transparent;
+            border: 1px solid $color-border;
             color: $color-text-decent;
             cursor: pointer;
-            border: 1px solid $color-border;
-            background: transparent;
-            margin-right: .5rem;
             font-size: 1.5rem;
             font-weight: normal;
+            margin-right: .5rem;
             text-align: center;
             width: 4.5rem;
         }
@@ -463,9 +463,9 @@ a {
             display: block;
             font-size: .7rem;
             font-weight: bold;
+            line-height: 1.5rem;
             margin-left: -.5rem;
             margin-right: -.5rem;
-            line-height: 1.5rem;
         }
 
         .radio-input {
@@ -505,8 +505,8 @@ a {
     &-group {
         .btn-toggle {
             & {
-                border: 1px solid $color-theme-secondary;
                 background: $color-dark-foreground;
+                border: 1px solid $color-theme-secondary;
             }
 
             &.btn-primary {
@@ -580,8 +580,8 @@ $icon-size: 4.5rem;
 
     &-title {
         font-weight: bold;
-        margin-top: -.25rem;
         margin-bottom: 0;
+        margin-top: -.25rem;
     }
 
     &-text {
@@ -590,10 +590,10 @@ $icon-size: 4.5rem;
 
     .btn-radio {
         & {
-            line-height: $icon-size;
             font-size: 1.75rem;
             font-weight: normal;
             height: $icon-size;
+            line-height: $icon-size;
         }
 
         i {
@@ -616,7 +616,7 @@ $icon-size: 4.5rem;
 .modal {
     &-header,
     &-footer {
-        @include flex-shrink(0);
+        flex-shrink: 0;
     }
 
     &-body {
@@ -649,9 +649,9 @@ $icon-size: 4.5rem;
 
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
-        @include border-radiusn(.4rem, .35rem, .35rem, .4rem);
-        max-height: 100%;
         border: 0;
+        border-radius: .4rem, .35rem, .35rem, .4rem;
+        max-height: 100%;
     }
 
     &-fh {
@@ -675,8 +675,8 @@ $icon-size: 4.5rem;
 
     &-tabs {
         background: $color-theme-secondary;
-        position: relative;
         padding: .75rem 1.25rem;
+        position: relative;
     }
 
     &-footer {

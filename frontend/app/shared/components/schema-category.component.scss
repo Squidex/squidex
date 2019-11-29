@@ -38,9 +38,9 @@ $drag-margin: -8px;
 
     .drop-indicator {
         @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
-        display: none;
-        border: 2px dashed $color-dark-black;
         background: none;
+        border: 2px dashed $color-dark-black;
+        display: none;
         pointer-events: none;
     }
 }
@@ -50,9 +50,9 @@ $drag-margin: -8px;
 }
 
 .nav-link {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
     border: 0;
+    padding-bottom: .75rem;
+    padding-top: .75rem;
 }
 
 .nav-item {
@@ -92,7 +92,7 @@ $drag-margin: -8px;
 }
 
 .cdk-drag-animating {
-    @include transition(none);
+    transition: none;
 }
 
 .schema {
@@ -105,23 +105,23 @@ $drag-margin: -8px;
     }
 
     &-modified {
-        text-align: right;
-        width: auto;
-        white-space: nowrap;
         padding-left: 0;
+        text-align: right;
+        white-space: nowrap;
+        width: auto;
     }
 
     &-user {
         @include border-radius(1px);
         @include truncate;
-        display: inline-block;
         background: $color-dark2-control;
-        padding: .1rem .25rem;
+        display: inline-block;
         font-size: .8rem;
         font-weight: normal;
-        margin-left: 10px;
         margin-bottom: 2px;
+        margin-left: 10px;
         max-width: 100%;
+        padding: .1rem .25rem;
         vertical-align: middle;
     }
 }

@@ -11,9 +11,9 @@
     }
 
     &-text {
+        color: $color-dark-foreground;
         font-size: .9rem;
         font-weight: normal;
-        color: $color-dark-foreground;
     }
 
     &-buttons {
@@ -21,6 +21,6 @@
     }
 
     &-rect {
-        @include box-shadow-raw(0 0 0 9999px rgba(0, 0, 0, .5));
+        @include box-shadow(0 0 0 9999px .5);
     }
 }

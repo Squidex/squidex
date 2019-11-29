@@ -3,16 +3,16 @@
 
 .comments {
     &-list {
-        @include flex-grow(1);
-        overflow-y: auto;
+        flex-grow: 0;
         overflow-x: hidden;
+        overflow-y: auto;
         padding: 1rem;
         padding-left: 1.5rem;
     }
 
     &-footer {
-        @include flex-shrink(0);
         border-top: 1px solid $color-border;
+        flex-shrink: 0;
     }
 }
 
@@ -21,6 +21,6 @@
     border: 0;
 
     &:focus {
-        @include box-shadow-none;
+        box-shadow: none;
     }
 }

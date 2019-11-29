@@ -9,23 +9,23 @@
 
 img {
     height: 1.5rem;
-    margin-right: 1rem;
     margin-bottom: .25rem;
+    margin-right: 1rem;
 }
 
 .card {
     & {
-        border-width: 1px;
         border-bottom-width: 1px;
+        border-width: 1px;
         width: $asset-width;
     }
 
     &-body {
         font-size: 1.1rem;
-        padding-top: .75rem;
+        line-height: 2.2rem;
         padding-bottom: .75rem;
         padding-right: .5rem;
-        line-height: 2.2rem;
+        padding-top: .75rem;
     }
 }
 

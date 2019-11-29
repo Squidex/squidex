@@ -18,9 +18,9 @@
         @include border-radius;
         background: $color-tooltip;
         border: 0;
+        color: $color-dark-foreground;
         font-size: .9rem;
         font-weight: normal;
-        color: $color-dark-foreground;
         padding: .75rem;
     }
 }

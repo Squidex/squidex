@@ -16,15 +16,14 @@
 
     .form-control {
         @include absolute(-.4rem, auto, auto, 0);
-        max-width: 300px;
-        min-width: 300px;
+        @include force-width(300px);
         color: $color-dark-foreground;
     }
 }
 
 .table-container {
     display: inline-block;
+    min-width: 100%;
     padding: 0;
     padding-right: 1.5rem;
-    min-width: 100%;
 }

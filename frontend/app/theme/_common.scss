@@ -21,8 +21,8 @@ body {
 
 // Common style for user email.
 .user-email {
-    font-style: italic;
     font-size: .8rem;
+    font-style: italic;
 }
 
 .text-decent {
@@ -30,8 +30,8 @@ body {
 }
 
 .drag-handle {
-    cursor: move;
     color: $color-text-decent;
+    cursor: move;
 }
 
 //
@@ -48,7 +48,7 @@ body {
 }
 
 .cdk-drag-preview {
-    @include opacity(.7);
+    opacity: .7;
 
     &.table-drag {
         background: $color-dark-foreground;
@@ -62,20 +62,20 @@ body {
 }
 
 .cdk-drag-placeholder {
-    @include opacity(0);
+    opacity: 0;
 }
 
 .cdk-drag-animating {
-    @include transition(transform 250ms cubic-bezier(0, 0, .2, 1));
+    transition: transform 250ms cubic-bezier(0, 0, .2, 1);
 }
 
 .cdk-drop-list-dragging {
     * {
-        @include transition(transform 250ms cubic-bezier(0, 0, .2, 1));
+        transition: transform 250ms cubic-bezier(0, 0, .2, 1);
     }
 
     .cdk-drag-placeholder {
-        @include transition(none);
+        transition: none;
     }
 }
 
@@ -107,7 +107,7 @@ body {
     }
 
     &:not([src]) {
-        @include opacity(0);
+        opacity: 0;
     }
 }
 
@@ -121,9 +121,8 @@ body {
 .item-published {
     & {
         @include circle(.5rem);
-        display: inline-block;
-        border: 0;
         background: $color-theme-green;
+        border: 0;
         margin-left: .4rem;
     }
 
@@ -191,25 +190,25 @@ body {
         & {
             @include absolute(30px, 30px, 30px, 30px);
             @include border-radius;
-            z-index: 10;
             align-content: center;
             align-items: center;
-            display: none;
             border: 2px dashed $color-border;
+            color: darken($color-border, 30%);
+            display: none;
             font-size: 1.2rem;
             font-weight: normal;
             justify-content: center;
-            color: darken($color-border, 30%);
+            z-index: 10;
         }
 
         &.dragging {
-            @include flex-box;
+            display: flex;
         }
 
         &.drag {
             border-color: darken($color-border, 10%);
-            cursor: copy;
             color: darken($color-border, 40%);
+            cursor: copy;
             text-decoration: none;
         }
     }
@@ -222,7 +221,7 @@ body {
 .sorting {
     &,
     & > * {
-        @include opacity(.5);
+        opacity: .5;
     }
 }
 
@@ -230,41 +229,41 @@ body {
 // Animations
 //
 .spin {
-    @include animation(spin 3s infinite linear);
+    animation: spin 3s infinite linear;
 }
 
 .spin2 {
-    @include animation(spin2 5s infinite linear);
+    animation: spin2 5s infinite linear;
 }
 
-@include keyframes (spin2) {
+@keyframes spin2 {
     50% {
-        @include rotate(180deg);
+        transform: rotate(180deg);
     }
 
     100% {
-        @include rotate(360deg);
+        transform: rotate(360deg);
     }
 }
 
-@include keyframes (spin) {
+@keyframes spin {
     20% {
-        @include rotate(0deg);
+        transform: rotate(0deg);
     }
 
     30% {
-        @include rotate(180deg);
+        transform: rotate(180deg);
     }
 
     70% {
-        @include rotate(180deg);
+        transform: rotate(180deg);
     }
 
     80% {
-        @include rotate(360deg);
+        transform: rotate(360deg);
     }
 
     100% {
-        @include rotate(360deg);
+        transform: rotate(360deg);
     }
 }
