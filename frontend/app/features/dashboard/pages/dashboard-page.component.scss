@@ -38,11 +38,10 @@
 
 .card {
     & {
+        @include force-height(16rem);
         float: left;
         margin-bottom: 1rem;
         margin-right: 1rem;
-        max-height: 16rem;
-        min-height: 16rem;
         width: 16rem;
     }
 

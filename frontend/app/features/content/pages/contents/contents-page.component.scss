@@ -1,12 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-:host ::ng-deep {
-    .search-form {
-        display: block;
-    }
-}
-
 .content {
     cursor: pointer;
 }
@@ -28,6 +22,6 @@
 
 .selection {
     background: $color-theme-secondary;
-    border-bottom: 2px solid $color-border;
+    border-bottom: 1px solid $color-border;
     padding: .25 * $panel-padding $panel-padding;
 }

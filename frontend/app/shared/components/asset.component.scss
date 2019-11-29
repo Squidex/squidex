@@ -61,8 +61,7 @@ $list-height: 2.25rem;
     }
 
     &-body {
-        max-height: $asset-header;
-        min-height: $asset-header;
+        @include force-height($asset-header);
         padding: 1rem;
         position: relative;
     }

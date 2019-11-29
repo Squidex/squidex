@@ -48,9 +48,8 @@
     // First row of the panel with the header. Fixed height.
     &-header {
         & {
+            @include force-height($panel-header);
             background: $panel-light-background;
-            max-height: $panel-header;
-            min-height: $panel-header;
             padding: $panel-padding;
             position: relative;
         }
@@ -64,8 +63,7 @@
         }
 
         &.large {
-            max-height: 8rem;
-            min-height: 8rem;
+            @include force-height(8rem);
         }
 
         .form-inline {
@@ -76,7 +74,7 @@
     // Second row of the panel with the content.
     &-main {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex-grow: 1;
         overflow: hidden;
     }

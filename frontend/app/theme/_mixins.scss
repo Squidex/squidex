@@ -154,6 +154,18 @@
     }
 }
 
+@mixin hover-visible($selector, $display: 'block') {
+    #{$selector} {
+        display: none;
+    }
+
+    &:hover {
+        #{$selector} {
+            display: $display;
+        }
+    }
+}
+
 @mixin box-shadow($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
     box-shadow: $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
 }

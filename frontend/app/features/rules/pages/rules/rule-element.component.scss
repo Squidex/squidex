@@ -34,8 +34,7 @@
 
 .large {
     & {
-        max-height: 100px;
-        min-height: 100px;
+        @include force-height(100px);
     }
 
     &.editable {

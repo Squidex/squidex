@@ -21,16 +21,18 @@ export class ExternalLinkDirective implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.renderer.setProperty(this.element.nativeElement, 'target', '_blank');
-        this.renderer.setProperty(this.element.nativeElement, 'rel', 'noopener');
+        const element = this.element.nativeElement;
+
+        this.renderer.setProperty(element, 'target', '_blank');
+        this.renderer.setProperty(element, 'rel', 'noopener');
 
         if (this.type !== 'noicon') {
             const icon = this.renderer.createElement('i');
 
             this.renderer.addClass(icon, 'icon-external-link');
-            this.renderer.addClass(icon, 'ml-1');
 
-            this.renderer.appendChild(this.element.nativeElement, icon);
+            this.renderer.appendChild(element, this.renderer.createText(' '));
+            this.renderer.appendChild(element, icon);
         }
     }
 }

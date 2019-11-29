@@ -9,9 +9,6 @@ $color-gold: #ffd700;
 
 .stars {
     & {
-        border: 0;
-        display: inline-block;
-        height: 2.4rem;
         line-height: 2.4rem;
     }
 
@@ -26,8 +23,6 @@ $color-gold: #ffd700;
 
 .star {
     & {
-        background: transparent;
-        border: 0;
         line-height: 1px;
         vertical-align: middle;
     }
@@ -37,6 +32,7 @@ $color-gold: #ffd700;
         content: '☆';
         display: inline-block;
         font-size: 1.8rem;
+        font-weight: normal;
         line-height: 1px;
     }
 

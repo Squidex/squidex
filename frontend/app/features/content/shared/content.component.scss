@@ -10,8 +10,6 @@
         @include absolute(.75rem, auto, auto, .25rem);
         background: $color-table-background;
         border-right: 1px solid $color-border;
-        max-height: 2.4rem;
-        min-height: 2.4rem;
         padding-right: 1rem;
         white-space: nowrap;
         z-index: 100;

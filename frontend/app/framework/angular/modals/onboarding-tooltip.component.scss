@@ -1,19 +1,19 @@
 @import '_mixins';
 @import '_vars';
 
+$hide-shadow: rgba(0, 0, 0, .5);
+
 .onboarding {
     &-help {
         @include border-radius;
         background: $color-tooltip;
-        border: 0;
         max-width: 20rem;
-        padding: .75rem;
+        min-width: 10rem;
+        padding: .75rem 1rem;
     }
 
     &-text {
         color: $color-dark-foreground;
-        font-size: .9rem;
-        font-weight: normal;
     }
 
     &-buttons {
@@ -21,6 +21,6 @@
     }
 
     &-rect {
-        @include box-shadow(0 0 0 9999px .5);
+        box-shadow: 0 0 0 9999px $hide-shadow;
     }
 }

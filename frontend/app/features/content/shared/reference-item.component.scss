@@ -3,22 +3,14 @@
 
 .reference-edit {
     & {
+        @include hover-visible('.reference-menu');
         position: relative;
-    }
-
-    &:hover {
-        .reference-menu {
-            display: block;
-        }
     }
 
     .reference-menu {
         @include absolute(0, -.25rem, auto, auto);
         background: $color-table-background;
         border-left: 1px solid $color-border;
-        display: none;
-        max-height: 2.4rem;
-        min-height: 2.4rem;
         padding-left: 1rem;
         white-space: nowrap;
     }

@@ -14,6 +14,7 @@
 
 .card {
     & {
+        @include hover-visible('.deeplinks', inline-block);
         display: inline-block;
         margin-bottom: 1rem;
         margin-right: 1rem;
@@ -79,16 +80,6 @@
         &:active {
             text-decoration: none;
         }
-    }
-
-    &:hover {
-        .deeplinks {
-            display: inline-block;
-        }
-    }
-
-    .deeplinks {
-        display: none;
     }
 }
 

@@ -3,7 +3,6 @@
 
 .table-items-row {
     border-left-width: 4px;
-    border-width: 1px;
     position: relative;
 }
 
@@ -44,8 +43,6 @@
 
     &-disabled {
         color: $color-border-dark;
-        font-size: .8rem;
-        font-weight: normal;
     }
 
     &-copy {
@@ -57,5 +54,16 @@
 .compare {
     border: 0;
     border-bottom: 1px solid $color-border;
-    padding: .5rem 0;
+    padding-bottom: .25rem;
+    padding-top: .5rem;
+}
+
+:host {
+    &:last-child {
+        margin-bottom: 0;
+
+        .compare {
+            border: 0;
+        }
+    }
 }

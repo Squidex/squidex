@@ -49,10 +49,9 @@
 
 .upload {
     & {
+        @include force-height(2rem);
         line-height: 2rem;
         margin-bottom: .5rem;
-        max-height: 2rem;
-        min-height: 2rem;
     }
 
     &:last-child {
