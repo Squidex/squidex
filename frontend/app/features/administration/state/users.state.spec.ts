@@ -6,9 +6,14 @@
  */
 
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { DialogService } from '@app/shared';
+import {
+    DialogService,
+    LocalStoreService,
+    Pager
+} from '@app/shared';
 
 import {
     UserDto,
@@ -29,14 +34,17 @@ describe('UsersState', () => {
     const newUser = createUser(3);
 
     let dialogs: IMock<DialogService>;
+    let localStore: IMock<LocalStoreService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
+        localStore = Mock.ofType<LocalStoreService>();
+
         usersService = Mock.ofType<UsersService>();
-        usersState = new UsersState(dialogs.object, usersService.object);
+        usersState = new UsersState(dialogs.object, localStore.object, usersService.object);
     });
 
     afterEach(() => {
@@ -50,11 +58,30 @@ describe('UsersState', () => {
 
             usersState.load().subscribe();
 
+            expect(usersState.snapshot.isLoaded).toBeTruthy();
+            expect(usersState.snapshot.isLoading).toBeFalsy();
             expect(usersState.snapshot.users).toEqual([user1, user2]);
             expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
-            expect(usersState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => throwError('error'));
+
+            usersState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(usersState.snapshot.isLoading).toBeFalsy();
+        });
+
+        it('should load page size from local store', () => {
+            localStore.setup(x => x.getInt('users.pageSize', 10))
+                .returns(() => 25);
+
+            const state = new UsersState(dialogs.object, localStore.object, usersService.object);
+
+            expect(state.snapshot.usersPager.pageSize).toBe(25);
         });
 
         it('should show notification on load when reload is true', () => {
@@ -87,16 +114,22 @@ describe('UsersState', () => {
             expect(usersState.snapshot.selectedUser).toEqual(newUsers[0]);
         });
 
-        it('should load next page and prev page when paging', () => {
-            usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
-
+        it('should load with new pagination when paging', () => {
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();
 
-            usersState.load().subscribe();
-            usersState.goNext().subscribe();
-            usersState.goPrev().subscribe();
+            usersState.setPager(new Pager(200, 1, 10)).subscribe();
+
+            expect().nothing();
+        });
+
+        it('should update page size in local store', () => {
+            usersService.setup(x => x.getUsers(50, 0, undefined))
+                .returns(() => of(new UsersDto(200, []))).verifiable();
+
+            usersState.setPager(new Pager(0, 0, 50));
+
+            localStore.verify(x => x.setInt('users.pageSize', 50), Times.atLeastOnce());
 
             expect().nothing();
         });

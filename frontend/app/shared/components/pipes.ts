@@ -69,6 +69,7 @@ class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;
     private lastValue: string | undefined = undefined;
     private subscription: Subscription;
+    private current: Observable<string | null>;
 
     constructor(loading: string,
         private readonly users: UsersProviderService,
@@ -91,11 +92,17 @@ class UserAsyncPipe implements OnDestroy {
                 this.subscription.unsubscribe();
             }
 
-            this.subscription = transform(this.users).subscribe(value => {
+            const pipe = transform(this.users);
+
+            this.subscription = pipe.subscribe(value => {
                 this.lastValue = value || undefined;
 
-                this.changeDetector.markForCheck();
+                if (this.current === pipe) {
+                    this.changeDetector.markForCheck();
+                }
             });
+
+            this.current = pipe;
         }
 
         return this.lastValue;
@@ -127,15 +134,15 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
 
     public transform(userId: string, placeholder: string | null = 'Me') {
         return super.transformInternal(userId, users => {
-            const parts = userId.split(':');
+            const { type, id } = split(userId);
 
-            if (parts[0] === 'subject') {
-                return users.getUser(parts[1], placeholder).pipe(map(u => u.displayName));
+            if (type === 'subject') {
+                return users.getUser(id, placeholder).pipe(map(u => u.displayName));
             } else {
-                if (parts[1].endsWith('client')) {
-                    return of(parts[1]);
+                if (id.endsWith('client')) {
+                    return of(id);
                 } else {
-                    return of(`${parts[1]}-client`);
+                    return of(`${id} client`);
                 }
             }
         });
@@ -201,12 +208,12 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
 
     public transform(userId: string) {
         return super.transformInternal(userId, users => {
-            const parts = userId.split(':');
+            const { type, id } = split(userId);
 
-            if (parts[0] === 'subject') {
-                return users.getUser(parts[1]).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
+            if (type === 'subject') {
+                return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
-                return of('./images/client.png');
+                return of('./images/client.svg');
             }
         });
     }
@@ -269,6 +276,19 @@ export class FileIconPipe implements PipeTransform {
             mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
-        return `./images/asset_${mimeIcon}.png`;
+        return `./images/asset_${mimeIcon}.svg`;
     }
+}
+
+function split(token: string) {
+    const index = token.indexOf(':');
+
+    if (index > 0 && index < token.length - 1) {
+        const type = token.substr(0, index);
+        const name = token.substr(index + 1);
+
+        return { type, id: name };
+    }
+
+    return { type: token, id: token };
 }

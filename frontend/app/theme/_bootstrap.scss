@@ -198,6 +198,84 @@ a {
     }
 }
 
+//
+// Breadcrump
+//
+.breadcrumb {
+    & {
+        margin-bottom: 2rem;
+        background: none;
+        border: 1px solid $color-border;
+    }
+
+    &.steps {
+        & {
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            & {
+                padding: .75rem 2rem .75rem 1rem;
+                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+                background-position-x: right;
+                background-repeat: no-repeat;
+                background-size: contain;
+                color: $color-text-decent;
+
+                a {
+                    color: $color-text-decent !important;
+                }
+            }
+
+            &.active {
+                color: $color-text;
+
+                a {
+                    color: $color-text !important;
+                }
+            }
+
+            &.done {
+                color: $color-theme-green !important;
+
+                a {
+                    color: $color-theme-green !important;
+                }
+            }
+
+            &:last-child {
+                background: none;
+            }
+
+            &::before {
+                content: none;
+            }
+        }
+    }
+
+    &-item {
+        i {
+            display: none;
+        }
+
+        &::before {
+            color: darken($color-border, 10%);
+        }
+
+        &.done {
+            color: $color-theme-green;
+
+            a {
+                color: $color-theme-green !important;
+            }
+
+            i {
+                display: inline-block;
+            }
+        }
+    }
+}
+
 .dropdown-divider {
     &:first-child {
         display: none;
@@ -366,7 +444,7 @@ a {
     &-radio {
         & {
             @include border-radius;
-            color: $color-border-dark;
+            color: $color-text-decent;
             cursor: pointer;
             border: 1px solid $color-border;
             background: transparent;
@@ -375,6 +453,10 @@ a {
             font-weight: normal;
             text-align: center;
             width: 4.5rem;
+        }
+
+        i {
+            color: $color-border-dark;
         }
 
         .radio-label {
@@ -392,19 +474,30 @@ a {
 
         &.active {
             & {
-                @include box-shadow(0, 0, 10px, .5);
-                background: $color-theme-blue;
+                background: none;
                 border-color: $color-theme-blue;
-                color: $color-dark-foreground;
+                color: $color-theme-blue;
+            }
+
+            i {
+                color: $color-theme-blue;
             }
 
             &:hover {
-                color: $color-dark-foreground;
+                color: $color-theme-blue-dark;
+
+                i {
+                    color: $color-theme-blue-dark;
+                }
             }
         }
 
         &:hover {
             color: $color-theme-blue;
+
+            i {
+                color: $color-theme-blue;
+            }
         }
     }
 
@@ -475,6 +568,48 @@ a {
     }
 }
 
+$icon-size: 4.5rem;
+
+//
+// Type icons, for example for apps or schemas
+//
+.type {
+    & {
+        margin-bottom: .5rem;
+    }
+
+    &-title {
+        font-weight: bold;
+        margin-top: -.25rem;
+        margin-bottom: 0;
+    }
+
+    &-text {
+        font-size: .9rem;
+    }
+
+    .btn-radio {
+        & {
+            line-height: $icon-size;
+            font-size: 1.75rem;
+            font-weight: normal;
+            height: $icon-size;
+        }
+
+        i {
+            color: $color-theme-blue;
+        }
+
+        .radio-input {
+            display: none;
+        }
+    }
+
+    .radio-input {
+        display: none;
+    }
+}
+
 //
 // Restyle modal dialogs.
 //
@@ -542,7 +677,6 @@ a {
         background: $color-theme-secondary;
         position: relative;
         padding: .75rem 1.25rem;
-        height: 70px;
     }
 
     &-footer {

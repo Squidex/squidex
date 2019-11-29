@@ -1,0 +1,170 @@
+<sqx-modal-dialog (close)="emitComplete()" large="true">
+    <ng-container title>
+        Connect
+    </ng-container>
+
+    <ng-container content>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb steps">
+                <li class="breadcrumb-item done">
+                    <i class="icon-checkmark"></i> Setup client
+                </li>
+                <ng-container *ngIf="isStart; else noStart">
+                    <li class="breadcrumb-item active">
+                        <span>
+                            <i class="icon-checkmark"></i> Choose connection method
+                        </span>
+                    </li>
+                </ng-container>
+                <ng-template #noStart>
+                    <li class="breadcrumb-item done">
+                        <a class="force" (click)="go('Start')">
+                            <i class="icon-checkmark"></i> Choose connection method
+                        </a>
+                    </li>
+                </ng-template>
+                <li class="breadcrumb-item" [class.active]="!isStart">
+                    <i class="icon-checkmark"></i> Connect
+                </li>
+            </ol>
+        </nav>
+
+        <ng-container [ngSwitch]="step">
+            <ng-container *ngSwitchCase="'Start'">
+                <h3>Choose a connection method</h3>
+
+                <sqx-form-hint>
+                    Start with the Postman tutorial in the <a href="https://docs.squidex.io/02-documentation/developer-guides/api-overview/postman" sqxExternalLink>Documentation</a>
+                </sqx-form-hint>
+        
+                <div class="section">
+                    <div class="option" (click)="go('HTTP')">
+                        <h5>Connect manually</h5>
+            
+                        <small class="text-muted">Get instructions how to establish a connection with Postman or curl.</small>
+            
+                        <i class="icon-angle-right"></i>
+                    </div>
+            
+                    <div class="option" (click)="go('CLI')">
+                        <h5>Connect with Squidex CLI</h5>
+            
+                        <small class="text-muted">Download the CLI and connect to this app to start backups, sync schemas or export content.</small>
+                        
+                        <i class="icon-angle-right"></i>
+                    </div>
+            
+                    <div class="option" (click)="go('SDK')">
+                        <h5>Connect to your App with SDK</h5>
+            
+                        <small class="text-muted">Download an SDK and establish a connection to this app.</small>
+                        
+                        <i class="icon-angle-right"></i>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'HTTP'">
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">1</span> Get a token using curl</h5>
+
+                    <p>                 
+                        <sqx-code>{{connectHttpText}}</sqx-code>
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">2</span> Just use the following token</h5>
+
+                    <p>              
+                        <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">3</span> Add the token as HTTP header to all requests</h5>
+
+                    <p>              
+                        <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section">
+                    <sqx-form-hint>
+                        Tokens usally expire after 30days, but you can request multiple tokens.
+                    </sqx-form-hint>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'CLI'">
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">1</span> Get the latest Squidex CLI</h5>
+
+                    <p>
+                        <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>Download the CLI from Github</a>
+
+                        <sqx-form-hint>
+                            The releases contains binaries for all major operation system and a small download if you have .NET Core installed.
+                        </sqx-form-hint>
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">2</span> Add <samp>&lt;your Squidex CLI download directory&gt;</samp> to your <samp>$PATH</samp> variable</h5>
+                </div>
+
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">3</span> Add your app name the CLI config</h5>
+
+                    <p>                 
+                        <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}}</sqx-code>
+                        
+                        <sqx-form-hint>
+                            You can manage configuration to multiple apps in the CLI and switch to an app.
+                        </sqx-form-hint>
+                    </p>
+                </div>
+
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">4</span> Switch to your app in the CLI</h5>
+            
+                    <p>    
+                        <sqx-code>sq config use {{appName}}</sqx-code>
+                    </p>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'SDK'">
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">1</span> Install the .NET SDK</h5>
+
+                    <p>
+                        The SDK is available on <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget</a>
+                    </p>
+
+                    <p>              
+                        <sqx-code>dotnet add package Squidex.ClientLibrary</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section">
+                    <h5><span class="badge badge-pill badge-dark">2</span> Create a client manager</h5>
+
+                    <p>              
+                        <sqx-code>{{connectLibraryText}}</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section">
+                    <sqx-form-hint>
+                        You need another SDK? <a href="https://support.squidex.io" sqxExternalLink>Contact us in the Support Forum</a>
+                    </sqx-form-hint>
+                </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container footer>
+        <button class="btn btn-secondary" [disabled]="isStart" (click)="go('Start')">
+            Back
+        </button>
+    </ng-container>
+</sqx-modal-dialog>

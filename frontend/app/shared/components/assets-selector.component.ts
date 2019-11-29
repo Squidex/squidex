@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, On
 import {
     AssetDto,
     AssetsState,
-    fadeAnimation,
     LocalStoreService,
     Query,
     StatefulComponent
@@ -27,9 +26,6 @@ interface State {
     selector: 'sqx-assets-selector',
     styleUrls: ['./assets-selector.component.scss'],
     templateUrl: './assets-selector.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsSelectorComponent extends StatefulComponent<State> implements OnInit {

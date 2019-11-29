@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The role of the contributor.
         /// </summary>
-        public string Role { get; set; } = Roles.Developer;
+        public string? Role { get; set; } = Roles.Developer;
 
         /// <summary>
         /// Set to true to invite the user if he does not exist.

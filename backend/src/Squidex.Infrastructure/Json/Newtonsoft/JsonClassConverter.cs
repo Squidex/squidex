@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             get { yield return typeof(T); }
         }
 
-        public sealed override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public sealed override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
             {
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected abstract T ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer);
 
-        public sealed override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public sealed override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value == null)
             {

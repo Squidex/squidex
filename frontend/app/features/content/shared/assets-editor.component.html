@@ -20,46 +20,18 @@
     </div>
 
     <div class="body">
-        <ng-container *ngIf="!snapshot.isListView; else listTemplate">
-            <div class="row no-gutters">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file" 
-                    (loadError)="removeLoadingAsset(file)"
-                    (load)="addAsset(file, $event)">
-                </sqx-asset>
-                <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" [isCompact]="isCompact" removeMode="true"
-                    (update)="notifyOthers(asset)"
-                    (remove)="removeLoadedAsset(asset)">
-                </sqx-asset>
-            </div>
-        </ng-container>
-    
-        <ng-template #listTemplate>
-            <div class="list-view">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file"
-                    [isListView]="true" 
-                    (loadError)="removeLoadingAsset(file)"
-                    (load)="addAsset(file, $event)">
-                </sqx-asset>
-                
-                <div
-                    cdkDropList
-                    [cdkDropListDisabled]="snapshot.isDisabled"
-                    [cdkDropListData]="snapshot.assets"
-                    (cdkDropListDropped)="sortAssets($event)">
-                    <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset"
-                        class="table-drag"
-                        cdkDrag
-                        cdkDragLockAxis="y">
-                        <sqx-asset [asset]="asset" removeMode="true" 
-                            [isListView]="true"
-                            [isCompact]="isCompact"
-                            (update)="notifyOthers(asset)"
-                            (remove)="removeLoadedAsset(asset)">
-                        </sqx-asset>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
+        <div class="row no-gutters" [class.unrow]="snapshot.isListView">
+            <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file" 
+                (loadError)="removeLoadingAsset(file)"
+                (load)="addAsset(file, $event)">
+            </sqx-asset>
+            <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" 
+                [isCompact]="isCompact" removeMode="true"
+                [isListView]="snapshot.isListView"
+                (update)="notifyOthers(asset)"
+                (remove)="removeLoadedAsset(asset)">
+            </sqx-asset>
+        </div>
     </div>
 </div>
 

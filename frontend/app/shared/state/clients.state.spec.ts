@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -38,7 +39,7 @@ describe('ClientsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         clientsService = Mock.ofType<ClientsService>();
-        clientsState = new ClientsState(clientsService.object, appsState.object, dialogs.object);
+        clientsState = new ClientsState(appsState.object, clientsService.object, dialogs.object);
     });
 
     afterEach(() => {
@@ -53,10 +54,20 @@ describe('ClientsState', () => {
             clientsState.load().subscribe();
 
             expect(clientsState.snapshot.clients).toEqual(oldClients.items);
+            expect(clientsState.snapshot.isLoaded).toBeTruthy();
+            expect(clientsState.snapshot.isLoading).toBeFalsy();
             expect(clientsState.snapshot.version).toEqual(version);
-            expect(clientsState.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            clientsService.setup(x => x.getClients(app))
+                .returns(() => throwError('error'));
+
+            clientsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(clientsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

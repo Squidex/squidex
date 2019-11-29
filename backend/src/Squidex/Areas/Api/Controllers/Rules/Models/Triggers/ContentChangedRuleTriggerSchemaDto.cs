@@ -19,6 +19,6 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// <summary>
         /// Javascript condition when to trigger.
         /// </summary>
-        public string Condition { get; set; }
+        public string? Condition { get; set; }
     }
 }

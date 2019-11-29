@@ -38,14 +38,6 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.load(true);
     }
 
-    public goPrev() {
-        this.contributorsState.goPrev();
-    }
-
-    public goNext() {
-        this.contributorsState.goNext();
-    }
-
     public search(query: string) {
         this.contributorsState.search(query);
     }

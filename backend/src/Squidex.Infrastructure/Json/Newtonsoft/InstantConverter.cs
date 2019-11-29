@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value != null)
             {
@@ -36,8 +36,13 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
+            if (reader.Value == null)
+            {
+                return null;
+            }
+
             if (reader.TokenType == JsonToken.String)
             {
                 return InstantPattern.General.Parse(reader.Value.ToString()).Value;

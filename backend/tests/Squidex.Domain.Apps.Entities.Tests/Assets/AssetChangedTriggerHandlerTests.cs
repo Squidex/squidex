@@ -63,6 +63,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_skip_moved_event()
+        {
+            var envelope = Envelope.Create<AppEvent>(new AssetMoved());
+
+            var result = await sut.CreateEnrichedEventAsync(envelope);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
         public void Should_not_trigger_precheck_when_event_type_not_correct()
         {
             TestForCondition(string.Empty, trigger =>

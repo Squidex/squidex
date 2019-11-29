@@ -15,11 +15,11 @@ namespace Squidex.Domain.Users
 {
     public sealed class UserValues
     {
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
-        public string PictureUrl { get; set; }
+        public string? PictureUrl { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public string Email { get; set; }
 

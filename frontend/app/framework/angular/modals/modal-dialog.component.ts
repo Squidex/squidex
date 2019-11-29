@@ -5,14 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
 
-import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
-
-interface State {
-    hasTabs: boolean;
-    hasFooter: boolean;
-}
+import { fadeAnimation } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-modal-dialog',
@@ -23,7 +18,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.Default
 })
-export class ModalDialogComponent extends StatefulComponent<State> implements AfterViewInit {
+export class ModalDialogComponent implements AfterViewInit {
     @Output()
     public close = new EventEmitter();
 
@@ -43,32 +38,35 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
     public large = false;
 
     @Input()
+    public flexBody = false;
+
+    @Input()
     public fullHeight = false;
-
-    @Input()
-    public tabsClass = '';
-
-    @Input()
-    public contentClass = '';
 
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;
 
-    @ViewChild('footerElement', { static: false })
+    @ViewChild('tabsElement', { static: false })
     public footerElement: ElementRef<ParentNode>;
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            hasTabs: false,
-            hasFooter: false
-        });
+    constructor(
+        private readonly renderer: Renderer2
+    ) {
     }
 
     public ngAfterViewInit() {
-        const hasTabs = this.tabsElement.nativeElement.children.length > 0;
-        const hasFooter = this.footerElement.nativeElement.children.length > 0;
+        this.hideWhenEmpty(this.tabsElement);
+        this.hideWhenEmpty(this.footerElement);
+    }
 
-        this.next({ hasTabs, hasFooter });
+    private hideWhenEmpty(element: ElementRef) {
+        if (element && element.nativeElement) {
+            const isEmpty = element.nativeElement.children.length === 0;
+
+            if (isEmpty) {
+                this.renderer.setStyle(element.nativeElement, 'display', 'none');
+            }
+        }
     }
 
     public emitClose() {

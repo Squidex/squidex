@@ -2,9 +2,5 @@
 @import '_mixins';
 
 .import-hint {
-    margin-bottom: 1rem;
-}
-
-.panel-alert {
-    margin: 0;
+    padding-right: $panel-padding;
 }

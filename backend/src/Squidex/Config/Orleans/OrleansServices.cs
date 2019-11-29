@@ -14,6 +14,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
+using Orleans.Providers.MongoDB.Utils;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -30,10 +31,12 @@ namespace Squidex.Config.Orleans
         {
             builder.ConfigureServices(siloServices =>
             {
+                siloServices.AddSingleton<IMongoClientFactory, DefaultMongoClientFactory>();
+
                 siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
                 siloServices.AddScoped<IActivationLimit, ActivationLimit>();
 
-                siloServices.AddScoped(typeof(IGrainState<>), typeof(Squidex.Infrastructure.Orleans.GrainState<>));
+                siloServices.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
             });
 
             builder.ConfigureApplicationParts(parts =>
@@ -84,6 +87,8 @@ namespace Squidex.Config.Orleans
 
                     builder.UseMongoDBClustering(options =>
                     {
+                        options.Strategy = MongoDBMembershipStrategy.SingleDocument;
+
                         options.Configure(config);
                     });
                 },
@@ -107,13 +112,9 @@ namespace Squidex.Config.Orleans
 
         private static void Configure(this MongoDBOptions options, IConfiguration config)
         {
-            var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-            var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-
-            options.ConnectionString = mongoConfiguration;
             options.CollectionPrefix = "Orleans_";
 
-            options.DatabaseName = mongoDatabaseName;
+            options.DatabaseName = config.GetRequiredValue("store:mongoDb:database");
         }
 
         private static void Configure(this ClusterOptions options)

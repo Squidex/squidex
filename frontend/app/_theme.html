@@ -515,6 +515,11 @@
                                     <small class="text-muted form-text">We'll never share your email with anyone else.</small>
                                 </div>
                                 <div class="form-group">
+                                    <label for="underlinedInputHelp">Underlined</label>
+                                    <input type="text" class="form-control form-underlined" name="xyz" aria-describedby="underlinedInputHelp" placeholder="Enter text">
+                                    <small class="text-muted form-text">Input with just a line.</small>
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleInputPassword1">Password</label>
                                     <input type="password" class="form-control" placeholder="Password">
                                 </div>
@@ -587,12 +592,22 @@
                                 <label class="control-label" for="disabledInput">Disabled input</label>
                                 <input class="form-control" type="text" placeholder="Disabled input here..." disabled="">
                             </fieldset>
+
+                            <fieldset disabled>
+                                <label class="control-label" for="disabledInput">Disabled underlined input</label>
+                                <input class="form-control form-underlined" type="text" placeholder="Disabled input here..." disabled="">
+                            </fieldset>
                         </div>
 
                         <div class="form-group">
                             <fieldset>
                                 <label class="control-label" for="readOnlyInput">Readonly input</label>
                                 <input class="form-control" type="text" placeholder="Readonly input here…" readonly>
+                            </fieldset>
+
+                            <fieldset>
+                                <label class="control-label" for="readOnlyInput">Readonly underlined input</label>
+                                <input class="form-control form-underlined" type="text" placeholder="Readonly input here…" readonly>
                             </fieldset>
                         </div>
 
@@ -744,7 +759,14 @@
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#">Home</a></li>
                             <li class="breadcrumb-item"><a href="#">Library</a></li>
+                            <li class="breadcrumb-item done"><a href="#">Others</a></li>
                             <li class="breadcrumb-item active">Data</li>
+                        </ol>
+                        <ol class="breadcrumb steps">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item done"><a href="#">Library</a></li>
+                            <li class="breadcrumb-item active">Others</li>
+                            <li class="breadcrumb-item">Data</li>
                         </ol>
                     </div>
                 </div>
@@ -1227,8 +1249,8 @@
                                         Modal body text goes here.
                                     </div>
                         
-                                    <div class="modal-footer" [hidden]="!showFooter">
-                                        <div class="clearfix" #footerElement>
+                                    <div class="modal-footer">
+                                        <div class="clearfix">
                                             <button type="button" class="float-right btn btn-primary">Save changes</button>
                                             <button type="button" class="float-left btn btn-secondary">Close</button>
                                         </div>

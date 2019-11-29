@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { RulesState } from './rules.state';
@@ -56,10 +57,20 @@ describe('RulesState', () => {
 
             rulesState.load().subscribe();
 
-            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
             expect(rulesState.snapshot.isLoaded).toBeTruthy();
+            expect(rulesState.snapshot.isLoading).toBeFalsy();
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            rulesService.setup(x => x.getRules(app))
+                .returns(() => throwError('error'));
+
+            rulesState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(rulesState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

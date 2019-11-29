@@ -9,18 +9,17 @@
 
     <input type="text" class="blank" #input
         (blur)="markTouched()"
-        (cut)="onCut($event)"
         (copy)="onCopy($event)"
-        (paste)="onPaste($event)"
+        (cut)="onCut($event)"
         (focus)="focus()"
         (keydown)="onKeyDown($event)"
-        [formControl]="addInput"
-        [attr.name]="inputName"
-        [attr.placeholder]="placeholder"
+        (paste)="onPaste($event)"
+        [name]="inputName" [placeholder]="placeholder"
         autocomplete="off" 
         autocorrect="off"
         autocapitalize="off"
-        spellcheck="false">
+        spellcheck="false"
+        [formControl]="addInput">
 </div>
 
 <ng-container *sqxModal="snapshot.suggestedItems.length > 0">

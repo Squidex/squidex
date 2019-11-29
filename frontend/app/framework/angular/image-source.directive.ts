@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { MathHelper, ResourceOwner } from '@app/framework/internal';
 
@@ -33,6 +33,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     public parent: any = null;
 
     constructor(
+        private readonly zone: NgZone,
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
@@ -50,10 +51,22 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
             this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
-        this.own(
-            this.renderer.listen(this.parent, 'resize', () => {
-                this.resize();
-            }));
+        this.zone.runOutsideAngular(() => {
+            this.own(
+                this.renderer.listen(this.parent, 'resize', () => {
+                    this.resize();
+                }));
+
+            this.own(
+                this.renderer.listen(this.element.nativeElement, 'load', () => {
+                    this.onLoad();
+                }));
+
+            this.own(
+                this.renderer.listen(this.element.nativeElement, 'error', () => {
+                    this.onError();
+                }));
+        });
     }
 
     public ngAfterViewInit() {
@@ -67,12 +80,10 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
         this.setImageSource();
     }
 
-    @HostListener('load')
     public onLoad() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
-    @HostListener('error')
     public onError() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');
 

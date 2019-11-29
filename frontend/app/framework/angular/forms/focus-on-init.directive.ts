@@ -16,12 +16,19 @@ export class FocusOnInitDirective implements AfterViewInit {
     @Input()
     public select: boolean;
 
+    @Input('sqxFocusOnInit')
+    public enabled = true;
+
     constructor(
         private readonly element: ElementRef<HTMLElement>
     ) {
     }
 
     public ngAfterViewInit() {
+        if (this.enabled === false) {
+            return;
+        }
+
         setTimeout(() => {
             if (Types.isFunction(this.element.nativeElement.focus)) {
                 this.element.nativeElement.focus();

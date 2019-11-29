@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -46,12 +47,10 @@ describe('LanguagesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         allLanguagesService = Mock.ofType<LanguagesService>();
-
         allLanguagesService.setup(x => x.getLanguages())
             .returns(() => of([languageDE, languageEN, languageIT, languageES])).verifiable();
 
         languagesService = Mock.ofType<AppLanguagesService>();
-
         languagesService.setup(x => x.getLanguages(app))
             .returns(() => of({ payload: oldLanguages, version })).verifiable();
 
@@ -81,9 +80,19 @@ describe('LanguagesState', () => {
             ]);
             expect(languagesState.snapshot.allLanguagesNew).toEqual([languageIT, languageES]);
             expect(languagesState.snapshot.isLoaded).toBeTruthy();
+            expect(languagesState.snapshot.isLoading).toBeFalsy();
             expect(languagesState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            languagesService.setup(x => x.getLanguages(app))
+                .returns(() => throwError('error'));
+
+            languagesState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(languagesState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

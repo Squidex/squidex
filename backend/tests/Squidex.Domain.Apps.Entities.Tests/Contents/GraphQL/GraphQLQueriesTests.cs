@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -228,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId)))
                 .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -331,7 +331,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId)))
                 .Returns(ResultList.CreateFrom(1, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -361,6 +361,105 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         pixelHeight = 600,
                         tags = new[] { "tag1", "tag2" },
                         slug = "myfile.png"
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_multiple_flat_contents_when_querying_contents()
+        {
+            const string query = @"
+                query {
+                  queryMySchemaContents(top: 30, skip: 5) {
+                    id
+                    version
+                    created
+                    createdBy
+                    lastModified
+                    lastModifiedBy
+                    status
+                    statusColor
+                    url
+                    flatData {
+                      myString
+                      myNumber
+                      myBoolean
+                      myDatetime
+                      myJson
+                      myGeolocation
+                      myTags
+                      myLocalized
+                      myArray {
+                        nestedNumber
+                        nestedBoolean
+                      }
+                    }
+                  }
+                }";
+
+            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+                .Returns(ResultList.CreateFrom(0, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    queryMySchemaContents = new dynamic[]
+                    {
+                        new
+                        {
+                            id = content.Id,
+                            version = 1,
+                            created = content.Created,
+                            createdBy = "subject:user1",
+                            lastModified = content.LastModified,
+                            lastModifiedBy = "subject:user2",
+                            status = "DRAFT",
+                            statusColor = "red",
+                            url = $"contents/my-schema/{content.Id}",
+                            flatData = new
+                            {
+                                myString = "value",
+                                myNumber = 1,
+                                myBoolean = true,
+                                myDatetime = content.LastModified,
+                                myJson = new
+                                {
+                                    value = 1
+                                },
+                                myGeolocation = new
+                                {
+                                    latitude = 10,
+                                    longitude = 20
+                                },
+                                myTags = new[]
+                                {
+                                    "tag1",
+                                    "tag2"
+                                },
+                                myLocalized = "de-DE",
+                                myArray = new[]
+                                {
+                                    new
+                                    {
+                                        nestedNumber = 10,
+                                        nestedBoolean = true
+                                    },
+                                    new
+                                    {
+                                        nestedNumber = 20,
+                                        nestedBoolean = false
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -1032,7 +1131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.Ignored))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1085,10 +1184,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", assetId2.ToString());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId1)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId1)))
                 .Returns(ResultList.CreateFrom(0, asset1));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchIdQuery(assetId2)))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId2)))
                 .Returns(ResultList.CreateFrom(0, asset2));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query1 }, new GraphQLQuery { Query = query2 });

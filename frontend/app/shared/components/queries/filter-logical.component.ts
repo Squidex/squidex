@@ -10,7 +10,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
-    fadeAnimation,
     FilterLogical,
     FilterNode,
     LanguageDto,
@@ -21,9 +20,6 @@ import {
     selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterLogicalComponent {

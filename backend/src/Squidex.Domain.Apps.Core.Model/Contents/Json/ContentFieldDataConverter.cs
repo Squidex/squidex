@@ -38,14 +38,14 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
                 switch (reader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        var propertyName = reader.Value.ToString()!;
+                        var propertyName = reader.Value!.ToString()!;
 
                         if (!reader.Read())
                         {
                             throw new JsonSerializationException("Unexpected end when reading Object.");
                         }
 
-                        var value = serializer.Deserialize<IJsonValue>(reader);
+                        var value = serializer.Deserialize<IJsonValue>(reader)!;
 
                         if (Language.IsValidLanguage(propertyName) || propertyName == InvariantPartitioning.Key)
                         {

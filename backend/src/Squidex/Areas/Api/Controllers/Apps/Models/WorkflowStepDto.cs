@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Reflection;
+using NoUpdateType = Squidex.Domain.Apps.Core.Contents.NoUpdate;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -31,19 +32,33 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool NoUpdate { get; set; }
 
-        public static WorkflowStepDto? FromWorkflowStep(WorkflowStep step)
-        {
-            if (step == null)
-            {
-                return null;
-            }
+        /// <summary>
+        /// Optional expression that must evaluate to true when you want to prevent updates.
+        /// </summary>
+        public string? NoUpdateExpression { get; set; }
 
-            return SimpleMapper.Map(step, new WorkflowStepDto
+        /// <summary>
+        /// Optional list of roles to restrict the updates for users with these roles.
+        /// </summary>
+        public string[]? NoUpdateRoles { get; set; }
+
+        public static WorkflowStepDto FromWorkflowStep(WorkflowStep step)
+        {
+            var response = SimpleMapper.Map(step, new WorkflowStepDto
             {
                 Transitions = step.Transitions.ToDictionary(
                     y => y.Key,
-                    y => WorkflowTransitionDto.FromWorkflowTransition(y.Value)!)
+                    y => WorkflowTransitionDto.FromWorkflowTransition(y.Value))
             });
+
+            if (step.NoUpdate != null)
+            {
+                response.NoUpdate = true;
+                response.NoUpdateExpression = step.NoUpdate.Expression;
+                response.NoUpdateRoles = step.NoUpdate.Roles?.ToArray();
+            }
+
+            return response;
         }
 
         public WorkflowStep ToStep()
@@ -52,7 +67,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Transitions?.ToDictionary(
                     y => y.Key,
                     y => y.Value?.ToTransition()!),
-                Color, NoUpdate);
+                Color,
+                NoUpdate ?
+                    NoUpdateType.When(NoUpdateExpression, NoUpdateRoles) :
+                    null);
         }
     }
 }

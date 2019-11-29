@@ -28,13 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
+        private readonly IAssetQueryService assetQuery;
 
-        public AssetGrain(IStore<Guid> store, ITagService tagService, IActivationLimit limit, ISemanticLog log)
+        public AssetGrain(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, IActivationLimit limit, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(tagService);
+            Guard.NotNull(assetQuery);
 
             this.tagService = tagService;
+
+            this.assetQuery = assetQuery;
 
             limit?.SetLimit(5000, Lifetime);
         }
@@ -55,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case CreateAsset createAsset:
                     return CreateReturnAsync(createAsset, async c =>
                     {
-                        GuardAsset.CanCreate(c);
+                        await GuardAsset.CanCreate(c, assetQuery);
 
                         var tagIds = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
 
@@ -75,11 +79,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case AnnotateAsset annotateAsset:
                     return UpdateReturnAsync(annotateAsset, async c =>
                     {
-                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
+                        GuardAsset.CanAnnotate(c, Snapshot.FileName!, Snapshot.Slug);
 
                         var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
 
                         Annotate(c, tagIds);
+
+                        return Snapshot;
+                    });
+                case MoveAsset moveAsset:
+                    return UpdateReturnAsync(moveAsset, async c =>
+                    {
+                        await GuardAsset.CanMove(c, assetQuery, Snapshot.ParentId);
+
+                        Move(c);
 
                         return Snapshot;
                     });
@@ -150,6 +163,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             @event.Tags = tagIds;
 
             RaiseEvent(@event);
+        }
+
+        public void Move(MoveAsset command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AssetMoved()));
         }
 
         public void Delete(DeleteAsset command)

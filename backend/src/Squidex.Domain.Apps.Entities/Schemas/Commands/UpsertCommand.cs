@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
             if (FieldsInReferences != null)
             {
-                schema = schema.ConfigureFieldsInLists(FieldsInReferences);
+                schema = schema.ConfigureFieldsInReferences(FieldsInReferences);
             }
 
             if (!string.IsNullOrWhiteSpace(Category))

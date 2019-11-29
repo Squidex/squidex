@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core;
@@ -14,6 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
@@ -112,8 +114,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             Validate.It(() => "Cannot configure UI fields.", e =>
             {
-                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e);
-                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
+                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
             });
         }
 
@@ -161,8 +163,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 }
             }
 
-            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e);
-            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e);
+            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
         }
 
         private static void ValidateRootField(UpsertSchemaField field, UpsertCommand command, string prefix, AddValidation e)
@@ -241,7 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
             else
             {
-                if (!field.Properties.IsForApi())
+                if (field.Properties.IsUIProperty())
                 {
                     if (field.IsHidden)
                     {
@@ -260,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e)
+        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {
@@ -272,15 +274,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     fieldIndex++;
                     fieldPrefix = $"{path}[{fieldIndex}]";
 
+                    var field = schema.FieldsByName.GetOrDefault(fieldName ?? string.Empty);
+
                     if (string.IsNullOrWhiteSpace(fieldName))
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (!schema.FieldsByName.TryGetValue(fieldName, out var field))
+                    else if (field == null && !isAllowed(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (!field.IsForApi())
+                    else if (field?.IsUI() == true)
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }
@@ -296,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e)
+        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {
@@ -314,11 +318,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e(Not.Defined("Field"), fieldPrefix);
                     }
-                    else if (field == null)
+                    else if (field == null && !isAllowed(fieldName))
                     {
                         e($"Field is not part of the schema.", fieldPrefix);
                     }
-                    else if (field?.Properties.IsForApi() != true)
+                    else if (field?.Properties?.IsUIProperty() == true)
                     {
                         e($"Field cannot be an UI field.", fieldPrefix);
                     }
@@ -332,6 +336,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                 }
             }
+        }
+
+        private static bool IsMetaField(string field)
+        {
+            return field.StartsWith("meta.", StringComparison.Ordinal);
+        }
+
+        private static bool IsNotAllowed(string field)
+        {
+            return false;
         }
 
         private static void ValidateFieldIds<T>(ReorderFields c, IReadOnlyDictionary<long, T> fields, AddValidation e)

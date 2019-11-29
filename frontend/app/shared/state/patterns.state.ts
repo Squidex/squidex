@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the patterns are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the patterns are loading.
+    isLoading?: boolean;
+
     // Indicates if patterns can be created.
     canCreate?: boolean;
 }
@@ -50,13 +53,16 @@ export class PatternsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly patternsService: PatternsService
     ) {
         super({ patterns: [], version: Version.EMPTY });
     }
@@ -66,6 +72,12 @@ export class PatternsState extends State<Snapshot> {
             this.resetState();
         }
 
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.patternsService.getPatterns(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
@@ -73,6 +85,9 @@ export class PatternsState extends State<Snapshot> {
                 }
 
                 this.replacePatterns(payload, version);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
@@ -104,8 +119,11 @@ export class PatternsState extends State<Snapshot> {
     private replacePatterns(payload: PatternsPayload, version: Version) {
         const { canCreate, items: patterns } = payload;
 
-        this.next(s => {
-            return { ...s, patterns, isLoaded: true, version, canCreate };
+        this.next({
+            isLoaded: true,
+            isLoading: false,
+            patterns,
+            version, canCreate
         });
     }
 

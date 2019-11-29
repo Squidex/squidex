@@ -10,7 +10,6 @@ import { Component, Input, OnInit } from '@angular/core';
 
 import {
     DialogModel,
-    fadeAnimation,
     FieldDto,
     fieldTypes,
     PatternsState,
@@ -22,10 +21,7 @@ import {
 @Component({
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
-    templateUrl: './schema-fields.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './schema-fields.component.html'
 })
 export class SchemaFieldsComponent implements OnInit {
     public fieldTypes = fieldTypes;

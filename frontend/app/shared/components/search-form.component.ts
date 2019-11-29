@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 
 import {
     DialogModel,
-    fadeAnimation,
     hasFilter,
     LanguageDto,
     Queries,
@@ -24,9 +23,6 @@ import {
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
@@ -70,16 +66,16 @@ export class SearchFormComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['queryModel'] && !changes['query']) {
+            this.query = {};
+        }
+
         if (changes['query'] || changes['queries']) {
             this.updateSaveKey();
         }
 
         if (changes['query']) {
             this.hasFilter = hasFilter(this.query);
-        }
-
-        if (changes['queryModel']) {
-            this.query = {};
         }
     }
 

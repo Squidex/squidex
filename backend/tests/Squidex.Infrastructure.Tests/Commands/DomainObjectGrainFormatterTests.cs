@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectGrainFormatterTests
     {
-        private readonly IGrainCallContext context = A.Fake<IGrainCallContext>();
+        private readonly IIncomingGrainCallContext context = A.Fake<IIncomingGrainCallContext>();
 
         [Fact]
         public void Should_return_fallback_if_no_method_is_defined()

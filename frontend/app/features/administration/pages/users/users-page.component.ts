@@ -35,14 +35,6 @@ export class UsersPageComponent implements OnInit {
         this.usersState.search(this.usersFilter.value);
     }
 
-    public goPrev() {
-        this.usersState.goPrev();
-    }
-
-    public goNext() {
-        this.usersState.goNext();
-    }
-
     public trackByUser(index: number, user: UserDto) {
         return user.id;
     }

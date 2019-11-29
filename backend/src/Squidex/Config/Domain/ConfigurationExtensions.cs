@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace Squidex.Config.Domain
 {

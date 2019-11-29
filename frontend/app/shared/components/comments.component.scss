@@ -1,11 +1,26 @@
 @import '_vars';
 @import '_mixins';
 
-.grid-footer {
-    border-top-width: 1px;
+.comments {
+    &-list {
+        @include flex-grow(1);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 1rem;
+        padding-left: 1.5rem;
+    }
+
+    &-footer {
+        @include flex-shrink(0);
+        border-top: 1px solid $color-border;
+    }
 }
 
-.grid-body,
-.grid-footer {
-    padding: 1rem;
+
+.form-control {
+    border: 0;
+
+    &:focus {
+        @include box-shadow-none;
+    }
 }

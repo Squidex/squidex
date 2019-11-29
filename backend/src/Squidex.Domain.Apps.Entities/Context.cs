@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public static Context Anonymous()
         {
-            return new Context(new ClaimsPrincipal());
+            return new Context(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
         public void UpdatePermissions()

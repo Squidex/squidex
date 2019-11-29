@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 
 import {
     DialogService,
-    fadeAnimation,
     LoadingService,
     Notification,
     ResourceOwner
@@ -19,10 +18,7 @@ import {
 @Component({
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
-    templateUrl: './internal-area.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './internal-area.component.html'
 })
 export class InternalAreaComponent extends ResourceOwner implements OnInit {
     constructor(

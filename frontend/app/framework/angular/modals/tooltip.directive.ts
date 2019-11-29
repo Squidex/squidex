@@ -50,7 +50,7 @@ export class TooltipDirective {
 
     private unsetAttribute() {
         try {
-            this.renderer.setAttribute(this.element.nativeElement, 'title', '');
+            this.renderer.setProperty(this.element.nativeElement, 'title', '');
         } catch (ex) {
             return;
         }

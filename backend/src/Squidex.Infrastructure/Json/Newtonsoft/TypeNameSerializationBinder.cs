@@ -22,14 +22,14 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             this.typeNameRegistry = typeNameRegistry;
         }
 
-        public override Type BindToType(string assemblyName, string typeName)
+        public override Type BindToType(string? assemblyName, string typeName)
         {
             var type = typeNameRegistry.GetTypeOrNull(typeName);
 
             return type ?? base.BindToType(assemblyName, typeName);
         }
 
-        public override void BindToName(Type serializedType, out string? assemblyName, out string typeName)
+        public override void BindToName(Type serializedType, out string? assemblyName, out string? typeName)
         {
             assemblyName = null;
 

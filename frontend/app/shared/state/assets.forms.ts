@@ -93,3 +93,15 @@ export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug
         super.load({ fileName, slug: asset.slug, tags: asset.tags });
     }
 }
+
+export class AssetFolderForm extends Form<FormGroup, { folderName: string }> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            folderName: ['',
+                [
+                    Validators.required
+                ]
+            ]
+        }));
+    }
+}

@@ -20,7 +20,7 @@ import {
     template: `
         <tr>
             <td class="cell-user">
-                <img class="user-picture" title="{{contributor.contributorName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
+                <img class="user-picture" title="{{contributor.contributorName}}" [src]="contributor.contributorId | sqxUserPicture" />
             </td>
             <td class="cell-auto">
                 <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:search"></span>

@@ -5,23 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
-
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class WorkflowTransition
+    public sealed class WorkflowTransition : WorkflowCondition
     {
-        public static readonly WorkflowTransition Default = new WorkflowTransition();
+        public static readonly WorkflowTransition Always = new WorkflowTransition(null, null);
 
-        public string? Expression { get; }
-
-        public ReadOnlyCollection<string>? Roles { get; }
-
-        public WorkflowTransition(string? expression = null, ReadOnlyCollection<string>? roles = null)
+        public WorkflowTransition(string? expression, params string[]? roles)
+            : base(expression, roles)
         {
-            Expression = expression;
+        }
 
-            Roles = roles;
+        public static WorkflowTransition When(string? expression, params string[]? roles)
+        {
+            return new WorkflowTransition(expression, roles);
         }
     }
 }

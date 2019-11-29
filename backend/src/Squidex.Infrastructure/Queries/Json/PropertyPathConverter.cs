@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         protected override PropertyPath ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var value = serializer.Deserialize<string>(reader);
+            var value = serializer.Deserialize<string>(reader)!;
 
             return value;
         }

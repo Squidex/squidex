@@ -18,12 +18,12 @@
 
         // Additional padding for the first column.
         &:first-child {
-            padding-left: 1.25rem;
+            padding-left: 1.25rem !important;
         }
 
         // Additional padding for the last. column.
         &:last-child {
-            padding-right: 1.25rem;
+            padding-right: 1.25rem !important;
         }
     }
 
@@ -39,6 +39,7 @@
             font-weight: normal;
             border: 0;
             padding-top: 0;
+            vertical-align: middle;
 
             // Auto truncate all header elements.
             & > span {

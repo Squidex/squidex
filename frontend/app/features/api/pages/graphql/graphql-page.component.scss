@@ -22,6 +22,10 @@
         & .editorWrap {
             overflow: hidden;
         }
+
+        svg {
+            fill: $color-dark-black;
+        }
     }
 
     .CodeMirror-linenumbers {

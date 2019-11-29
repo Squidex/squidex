@@ -22,11 +22,6 @@
     margin-bottom: 1rem;
 }
 
-.list {
-    margin-left: 8px;
-    margin-right: 8px;
-}
-
 .body {
     margin-bottom: -.25rem;
     margin-top: 1rem;
@@ -35,9 +30,6 @@
 
 .unrow {
     display: block;
-    padding-left: 8px;
-    padding-right: 8px;
-    margin: 0;
 }
 
 .drop-area {
@@ -68,11 +60,6 @@
         color: darken($color-border, 40%);
         text-decoration: none;
     }
-}
-
-.row {
-    margin-left: -.5rem;
-    margin-right: -.5rem;
 }
 
 .col-4 {

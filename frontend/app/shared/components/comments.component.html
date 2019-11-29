@@ -1,11 +1,11 @@
-<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false" contentClass="grid">
+<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false" grid="true">
     <ng-container title>
         Comments
     </ng-container>
 
     <ng-container content>
-        <div class="grid-content" #scrollMe [scrollTop]="scrollMe.scrollHeight">
-            <sqx-comment *ngFor="let comment of state.comments | async; trackBy: trackByComment"
+        <div class="comments-list" #scrollMe [scrollTop]="scrollMe.scrollHeight">
+            <sqx-comment *ngFor="let comment of commentsState.comments | async; trackBy: trackByComment"
                 [comment]="comment"
                 [userId]="userId"
                 (update)="update(comment, $event)"
@@ -13,9 +13,13 @@
             </sqx-comment>
         </div>
         
-        <div class="grid-footer">
+        <div class="comments-footer">
             <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" />
+                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment"
+                    autocomplete="off" 
+                    autocorrect="off"
+                    autocapitalize="off"
+                />
             </form>
         </div>
     </ng-container>

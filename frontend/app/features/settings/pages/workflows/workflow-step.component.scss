@@ -2,6 +2,12 @@
 @import '_mixins';
 
 :host ::ng-deep {
+    .dashed {
+        @include placeholder-color($color-theme-secondary);
+        border-style: dashed;
+        border-width: 1px;
+    }
+
     .color {
         line-height: 2.8rem;
     }
@@ -10,10 +16,24 @@
         padding: 0 .5rem;
     }
 
+    .col-arrow {
+        min-width: 2rem;
+        max-width: 2rem;
+    }
+
+    .col-button {
+        min-width: 3rem;
+        max-width: 3rem;
+    }
+
     .col-step {
         min-width: 10rem;
         max-width: 10rem;
-        padding-left: .5rem;
+    }
+
+    .col-roles {
+        min-width: 18rem;
+        max-width: 18rem;
     }
 
     .transition {
@@ -34,6 +54,7 @@
 .step {
     & {
         margin-bottom: 1.5rem;
+        border-bottom: 1px solid $color-border;
     }
 
     &-inner {
@@ -66,4 +87,22 @@
     &.active {
         visibility: visible;
     }
+}
+
+.transition-prevent-updates {
+    & {
+        margin-top: .25rem;
+        margin-bottom: 1rem;
+        line-height: 2.5rem;
+    }
+
+    &-to {
+        padding: .5rem .75rem;
+        padding-right: 0;
+        line-height: 1.2rem;
+    }
+}
+
+.transition-prevent-updates-checkbox {
+    margin-top: .8rem;
 }

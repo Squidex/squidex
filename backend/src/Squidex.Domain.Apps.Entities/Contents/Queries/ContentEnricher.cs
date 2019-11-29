@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         if (ShouldEnrichWithStatuses(context))
                         {
                             await EnrichNextsAsync(content, result, context);
-                            await EnrichCanUpdateAsync(content, result);
+                            await EnrichCanUpdateAsync(content, result, context);
                         }
 
                         results.Add(result);
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                         if (ShouldEnrichWithSchema(context))
                         {
-                            var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
+                            var referenceFields = schema.SchemaDef.ReferencesFields().ToArray();
 
                             var schemaName = schema.SchemaDef.Name;
                             var schemaDisplayName = schema.SchemaDef.DisplayNameUnchanged();
@@ -322,14 +322,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 return EmptyAssets;
             }
 
-            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), Q.Empty.WithIds(ids));
+            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), null, Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }
 
-        private async Task EnrichCanUpdateAsync(IContentEntity content, ContentEntity result)
+        private async Task EnrichCanUpdateAsync(IContentEntity content, ContentEntity result, Context context)
         {
-            result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
+            result.CanUpdate = await contentWorkflow.CanUpdateAsync(content, context.User);
         }
 
         private async Task EnrichNextsAsync(IContentEntity content, ContentEntity result, Context context)

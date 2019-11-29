@@ -11,15 +11,15 @@
                 </button>
             </div>
 
-            <div class="modal-tabs {{tabsClass}} clearfix" #tabsElement [hidden]="!showTabs || !snapshot.hasTabs">
+            <div class="modal-tabs clearfix" #tabsElement *ngIf="showTabs">
                 <ng-content select="[tabs]"></ng-content>
             </div>
 
-            <div class="modal-body {{contentClass}}">
+            <div class="modal-body" [class.flexed]="flexBody">
                 <ng-content select="[content]"></ng-content>
             </div>
 
-            <div class="modal-footer" [hidden]="!showFooter || !snapshot.hasFooter">
+            <div class="modal-footer" *ngIf="showFooter">
                 <div class="clearfix" #footerElement>
                     <ng-content select="[footer]"></ng-content>
                 </div>

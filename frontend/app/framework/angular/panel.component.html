@@ -16,7 +16,7 @@
                 </div>
             </div>
 
-            <ng-container  *ngIf="showClose">
+            <ng-container *ngIf="showClose">
                 <ng-container *ngIf="customClose; else defaultClose">
                     <a class="panel-close" (click)="emitClose()">
                         <i class="icon-close"></i>
@@ -37,7 +37,9 @@
         </div>
 
         <div class="panel-main">
-            <div class="panel-content {{contentClass}}" 
+            <div class="panel-content"
+                [class.grid]="grid"
+                [class.no-padding]="noPadding"
                 [class.panel-content-scroll-x]="scrollX" 
                 [class.panel-content-scroll]="showScrollbar"
                 [class.panel-content-blank]="isBlank"
@@ -45,7 +47,7 @@
                 <ng-content select="[content]"></ng-content>
             </div>
 
-            <div class="panel-sidebar {{sidebarClass}}" *ngIf="showSidebar">
+            <div class="panel-sidebar" *ngIf="showSidebar">
                 <ng-content select="[sidebar]"></ng-content>
             </div>
         </div>

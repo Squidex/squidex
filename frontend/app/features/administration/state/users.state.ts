@@ -7,12 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State
@@ -38,6 +39,9 @@ interface Snapshot {
     // Indicates if the users are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the users are loading.
+    isLoading?: boolean;
+
     // The selected user.
     selectedUser?: UserDto | null;
 
@@ -62,14 +66,25 @@ export class UsersState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
     constructor(
         private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService,
         private readonly usersService: UsersService
     ) {
-        super({ users: [], usersPager: new Pager(0) });
+        super({
+            users: [],
+            usersPager: Pager.fromLocalStore('users', localStore)
+        });
+
+        this.usersPager.subscribe(pager => {
+            pager.saveTo('users', this.localStore);
+        });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
@@ -96,15 +111,17 @@ export class UsersState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            const selectedUser = this.snapshot.selectedUser;
+            const usersPager = this.snapshot.usersPager.reset();
 
-            this.resetState({ selectedUser });
+            this.resetState({ usersPager, selectedUser: this.snapshot.selectedUser });
         }
 
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
@@ -126,11 +143,15 @@ export class UsersState extends State<Snapshot> {
                     return { ...s,
                         canCreate,
                         isLoaded: true,
+                        isLoading: false,
                         selectedUser,
                         users,
                         usersPager
                     };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -173,21 +194,15 @@ export class UsersState extends State<Snapshot> {
     }
 
     public search(query: string): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: new Pager(0), usersQuery: query }));
+        this.next(s => ({ ...s, usersPager: s.usersPager.reset(), usersQuery: query }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
-    public goNext(): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
+    public setPager(usersPager: Pager) {
+        this.next({ usersPager });
 
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
-
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     private replaceUser(user: UserDto) {

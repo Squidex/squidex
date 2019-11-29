@@ -20,9 +20,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 
         public string Name { get; set; }
 
-        public string Error { get; set; }
+        public string? Error { get; set; }
 
-        public string Position { get; set; }
+        public string? Position { get; set; }
 
         public static EventConsumerDto FromEventConsumerInfo(EventConsumerInfo eventConsumerInfo, ApiController controller)
         {

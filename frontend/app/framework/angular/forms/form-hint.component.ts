@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 @Component({
     selector: 'sqx-form-hint',
     template: `
-        <small class="text-muted form-text {{class}}">
+        <small class="text-muted form-text mt-{{marginTop}} mb-{{marginBottom}} {{class}}">
             <ng-content></ng-content>
         </small>`,
     styles: [`
@@ -29,4 +29,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 export class FormHintComponent {
     @Input()
     public class: string;
+
+    @Input()
+    public marginTop = 0;
+
+    @Input()
+    public marginBottom = 0;
 }

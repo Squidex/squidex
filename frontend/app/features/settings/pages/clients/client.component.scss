@@ -1,29 +1,13 @@
 @import '_vars';
 @import '_mixins';
 
-$color-editor: #eceeef;
-
 .card {
     & {
-        @include border-radius(0);
-        border-bottom-width: 2px;
-        border-top-width: 0;
         margin-bottom: .25rem;
     }
 
-    &-header,
-    &-body {
+    &-header {
         padding: .75rem 1.25rem;
-    }
-}
-
-.client {
-    &-info {
-        margin: 0;
-    }
-
-    &-delete {
-        vertical-align: top;
     }
 }
 
@@ -37,12 +21,4 @@ $color-editor: #eceeef;
 
 .cell-input {
     padding-right: 0;
-}
-
-.access-token {
-    height: 10rem;
-    font-size: 1rem;
-    font-weight: normal;
-    font-family: monospace;
-    resize: none;
 }

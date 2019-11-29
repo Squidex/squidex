@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public IReadOnlyList<Guid> SchemaIds { get; set; }
+        public IReadOnlyList<Guid>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
-                    x => WorkflowStepDto.FromWorkflowStep(x.Value)!),
+                    x => WorkflowStepDto.FromWorkflowStep(x.Value)),
                 Id = id
             });
 

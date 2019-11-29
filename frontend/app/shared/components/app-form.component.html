@@ -18,26 +18,22 @@
                 
                 <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
-                <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
+                <input type="text" class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
                     
                 <sqx-form-hint>
                     You can only use letters, numbers and dashes and not more than 40 characters.
                 </sqx-form-hint>
-                
-                <sqx-form-hint>
-                    The app name becomes part of the api url:
-                </sqx-form-hint>
+            </div>
 
-                <sqx-code>{{apiUrl.buildUrl("api/content/")}}{{createForm.appName | async}}</sqx-code>
-
-                <sqx-form-alert marginTop="2">
+            <div class="form-group">
+                <sqx-form-alert marginTop="2" marginBottom="0">
                     The app name cannot be changed later.
                 </sqx-form-alert>
             </div>
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()" [disabled]="createForm.submitted | async">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
             <button type="submit" class="float-right btn btn-success">Create</button>
         </ng-container>
     </sqx-modal-dialog>

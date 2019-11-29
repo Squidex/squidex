@@ -8,6 +8,7 @@
 export * from './pages/backups/backup.component';
 export * from './pages/backups/backups-page.component';
 export * from './pages/clients/client-add-form.component';
+export * from './pages/clients/client-connect-form.component';
 export * from './pages/clients/client.component';
 export * from './pages/clients/clients-page.component';
 export * from './pages/contributors/contributor-add-form.component';

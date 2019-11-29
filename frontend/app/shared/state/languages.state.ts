@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -54,6 +54,9 @@ interface Snapshot {
     // Indicates if the languages are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the languages are loading.
+    isLoading?: boolean;
+
     // Inedicates if the user can add a language.
     canCreate?: boolean;
 }
@@ -75,6 +78,9 @@ export class LanguagesState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -93,9 +99,15 @@ export class LanguagesState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
+        if (isReload) {
             this.resetState();
         }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
 
         return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
             map(args => {
@@ -109,6 +121,9 @@ export class LanguagesState extends State<Snapshot> {
                 const sorted = allLanguages.sortedByString(x => x.englishName);
 
                 this.replaceLanguages(languages.payload, languages.version, sorted);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -145,11 +160,12 @@ export class LanguagesState extends State<Snapshot> {
 
             return {
                 ...s,
-                canCreate,
-                languages: languages.map(x => this.createLanguage(x, languages)),
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
+                canCreate,
                 isLoaded: true,
+                isLoading: false,
+                languages: languages.map(x => this.createLanguage(x, languages)),
                 version: version
             };
         });

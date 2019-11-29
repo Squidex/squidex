@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             get { yield return typeof(EnvelopeHeaders); }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var result = base.ReadJson(reader, objectType, existingValue, serializer);
 

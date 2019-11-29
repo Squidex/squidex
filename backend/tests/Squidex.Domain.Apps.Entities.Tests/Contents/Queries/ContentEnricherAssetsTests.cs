@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             var enriched = await sut.EnrichAsync(source, requestContext);
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(enriched.ElementAt(0).ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(enriched.ElementAt(0).ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(enriched.ElementAt(0).ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -203,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
                 .MustNotHaveHappened();
         }
 

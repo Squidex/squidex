@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                         if (regex == null || regex.IsMatch(streamName))
                         {
-                            var commit = JsonConvert.DeserializeObject<CosmosDbEventCommit>(document.ToString(), store.SerializerSettings);
+                            var commit = JsonConvert.DeserializeObject<CosmosDbEventCommit>(document.ToString(), store.SerializerSettings)!;
 
                             var eventStreamOffset = (int)commit.EventStreamOffset;
 

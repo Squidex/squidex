@@ -1,6 +1,6 @@
 <sqx-title message="Event Consumers"></sqx-title>
 
-<sqx-panel theme="light" desiredWidth="50rem">
+<sqx-panel theme="light" desiredWidth="50rem" grid="true">
     <ng-container title>
         Consumers
     </ng-container>
@@ -14,25 +14,33 @@
     </ng-container>
 
     <ng-container content>
-        <table class="table table-items table-fixed">
-            <thead>
-                <tr>
-                    <th class="cell-auto">
-                        Name
-                    </th>
-                    <th class="cell-auto-right">
-                        Position
-                    </th>
-                    <th class="cell-actions-lg">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
+        <sqx-list-view [isLoading]="eventConsumersState.isLoading | async" table="true">
+            <ng-container header>
+                <table class="table table-items table-fixed" #header>
+                    <thead>
+                        <tr>
+                            <th class="cell-auto">
+                                Name
+                            </th>
+                            <th class="cell-auto-right">
+                                Position
+                            </th>
+                            <th class="cell-actions-lg">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </ng-container>
 
-            <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
-                [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
-            </tbody>
-        </table>
+            <div content>
+                <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
+                    <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
+                        [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
+                    </tbody>
+                </table>
+            </div>
+        </sqx-list-view>
     </ng-container>
 </sqx-panel>
 

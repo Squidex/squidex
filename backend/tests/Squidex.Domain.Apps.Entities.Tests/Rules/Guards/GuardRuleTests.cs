@@ -100,15 +100,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         }
 
         [Fact]
-        public async Task CanUpdate_should_throw_exception_if_rule_has_already_this_name()
+        public async Task CanUpdate_should_not_throw_exception_if_rule_has_already_this_name()
         {
-            var command = new UpdateRule
-            {
-                Name = "MyName"
-            };
+            var command = new UpdateRule { Name = "MyName" };
 
-            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider, rule_0),
-                new ValidationError("Rule has already this name.", "Name"));
+            await GuardRule.CanUpdate(command, appId.Id, appProvider, rule_0);
         }
 
         [Fact]

@@ -34,12 +34,12 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The yearly costs of the plan.
         /// </summary>
-        public string YearlyCosts { get; set; }
+        public string? YearlyCosts { get; set; }
 
         /// <summary>
         /// The yearly id of the plan.
         /// </summary>
-        public string YearlyId { get; set; }
+        public string? YearlyId { get; set; }
 
         /// <summary>
         /// The maximum number of API calls.

@@ -1,10 +1,75 @@
 # Changelog
 
+## 4.0.3 - 2019-11-18
+
+### Features
+
+* **Login**: Support for Microsoft TenantId. Thanks to [mhilgersom](https://github.com/mhilgersom)
+
+## 4.0.2 - 2019-11-18
+
+### Bugfixes
+
+* **API**: Fix parsing of OData queries with required fields.
+* **API**: Also add client to contributor index.
+* **API**: Fix Asset upload size limit.
+* **API**: Fixed required attribute for generated OpenAPI schema.
+* **UI**: Add scripts to schema export so that it does not get overwritten on sync.
+* **UI**: Field readonly fields in content lists.
+
+## 4.0.1 - 2019-11-14
+
+### Bugfixes
+
+* **UI**: Cancel button for new apps should not be disabled after submit.
+* **Schema**: Fixed synchronization for list fields and reference fields.
+
+## 4.0.0 - 2019-11-13
+
+### Breaking Changes
+
+#### List Fields
+
+This feature contains a major update how reference fields and list fields are managed. In previous versions, schema fields had the properties `IsListField` or `IsReferenceField` to indicate whether a field should be shown in content lists or not. This was hard to manage in the UI and you could not specify the order. With this release schemas contain list of field names that should be used as list fields or reference fields. List field names can also contain meta fields like the content id or the content author. But we have decided not to implement a migration for that. If you use the feature you have to configure these fields again. Please not that the API is not affected and it is very likely not a breaking change for your consuming applications.
+
+#### .NET Core 3.0
+
+Migration to .NET Core 3.0. This also includes some code changes such as cleanup of configuration and proper nullable support.
+
+This version does not use alpine image with self contained image any more. Therefore the final image is larger than before but the Squidex layer itself is smaller, which means a reduced disk size and download size when you update Squidex or when you have multiple versions installed or other .NET Core applications on your servers.
+
+#### Clustering
+
+This version introduces a new storage to communicate cluster members. Therefore it is recommended not to use a rolling deployment and restart the entire cluster instead.
+
+### Features
+
+* **UI**: New approach to manage list fields and schema fields.
+* **UI**: Many small UI / UX improvements.
+* **UI**: Improvements to the Geolocation editor.
+* **UI**: Improved dialog to connect a client.
+* **UI**: Improved Rule Wizard dialog.
+* **UI**: Integrated cluster monitoring UI.
+* **UI**: Improved schema UI.
+* **UI**: Confirm dialog before removing contributor.
+* **Workflows**: Restrict when a content item can be updated by setting an expression or roles.
+* **Workflows**: Define multiple roles for workflows.
+* **Rules**: Action to write comments.
+* **API**: Migration to .NET Core 3.0
+* **API**: Configuratiopn option to recreated the superadmin whe nyou loose the password.
+* **GraphQL**: Flat content structure.
+* **Clustering**: Clustering improvements.
+
+### Bugfixes
+
+* **UI**: Fixed the buttons to change the status of multiple contents.
+* **Rules**: Fixed saving of rule names.
+
 ## 4.0.0 Beta 1 - 2019-10-27
 
-Migration to .NET Core 3.0. This also includes some code changes such as cleanup of configuration and docke nullable support.
+Migration to .NET Core 3.0. This also includes some code changes such as cleanup of configuration and proper nullable support.
 
-This version does not use alpine image with self contained image any more. Therefore the final image is larger than before but the Squidex layer itself is smaller, which means a reduced disk size and download size when you update Squidex or have multiple versions installed or other .NET Core applications.
+This version does not use alpine image with self contained image any more. Therefore the final image is larger than before but the Squidex layer itself is smaller, which means a reduced disk size and download size when you update Squidex or when you have multiple versions installed or other .NET Core applications on your servers.
 
 ## 3.5.0 - 2019-10-26
 

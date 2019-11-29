@@ -31,14 +31,10 @@ export class WorkflowTransitionComponent {
     public transition: WorkflowTransitionView;
 
     @Input()
-    public roles: ReadonlyArray<RoleDto>;
+    public roles: ReadonlyArray<string>;
 
     @Input()
     public disabled: boolean;
-
-    public get roleSuggestions() {
-        return this.roles.map(x => x.name);
-    }
 
     public changeExpression(expression: string) {
         this.update.emit({ expression });

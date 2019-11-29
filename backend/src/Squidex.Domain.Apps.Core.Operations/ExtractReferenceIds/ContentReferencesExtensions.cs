@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -122,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 sb.Append(value);
             }
 
-            var referenceFields = schema.ReferenceFields();
+            var referenceFields = schema.ReferencesFields();
 
             foreach (var referenceField in referenceFields)
             {

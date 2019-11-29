@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -37,25 +36,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Draft] = new WorkflowTransition()
+                            [Status.Draft] = WorkflowTransition.Always
                         },
-                        StatusColors.Archived, true),
+                        StatusColors.Archived, NoUpdate.Always),
                 [Status.Draft] =
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition("data.field.iv === 2", ReadOnlyCollection.Create("Owner", "Editor"))
+                            [Status.Archived] = WorkflowTransition.Always,
+                            [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
                         },
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Archived] = new WorkflowTransition(),
-                            [Status.Draft] = new WorkflowTransition()
+                            [Status.Archived] = WorkflowTransition.Always,
+                            [Status.Draft] = WorkflowTransition.Always
                         },
-                        StatusColors.Published)
+                        StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
             });
 
         public DynamicContentWorkflowTests()
@@ -70,14 +69,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Published] = new WorkflowTransition()
+                                [Status.Published] = WorkflowTransition.Always
                             },
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Draft] = new WorkflowTransition()
+                                [Status.Draft] = WorkflowTransition.Always
                             },
                             StatusColors.Published)
                 },
@@ -179,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
 
             Assert.True(result);
         }
@@ -189,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
 
             Assert.True(result);
         }
@@ -199,9 +198,49 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Archived, 2);
 
-            var result = await sut.CanUpdateAsync(content);
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_update_published_with_true_expression()
+        {
+            var content = CreateContent(Status.Published, 2);
+
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_update_published_with_false_expression()
+        {
+            var content = CreateContent(Status.Published, 1);
+
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_update_published_with_correct_roles()
+        {
+            var content = CreateContent(Status.Published, 2);
+
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Editor"));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_update_published_with_incorrect_roles()
+        {
+            var content = CreateContent(Status.Published, 1);
+
+            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+
+            Assert.True(result);
         }
 
         [Fact]

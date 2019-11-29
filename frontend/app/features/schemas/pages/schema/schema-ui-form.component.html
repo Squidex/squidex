@@ -14,7 +14,8 @@
             emptyText="Drop field here or reorder them to show the fields in the content list. When no list field is defined, the first field is used."
             [schema]="schema"
             [fieldNames]="state.fieldsInLists"
-            (fieldNamesChange)="setFieldsInLists($event)">
+            (fieldNamesChange)="setFieldsInLists($event)"
+            [withMetaFields]="true">
         </sqx-field-list>
         <sqx-field-list [class.hidden]="selectedTab !== 'Reference Fields'"
             emptyText="Drop field here or reorder them to show the fields when referenced by another content. When no reference field is defined, the list fields are used instead."

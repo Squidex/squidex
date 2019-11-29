@@ -1,0 +1,48 @@
+@import '_vars';
+@import '_mixins';
+
+.badge {
+    @include circle(1.3rem);
+    margin-right: .25rem;
+    font-size: 80%;
+    padding-left: 0;
+    padding-right: 0;
+    vertical-align: top;
+}
+
+.section {
+    margin-top: 2rem;
+
+    p {
+        padding-left: 1.75rem;
+    }
+}
+
+.option {
+    @include border-radius;
+    cursor: pointer;
+    background: none;
+    border: 1px solid $color-border;
+    padding: 1rem;
+    position: relative;
+    margin-top: .5rem;
+
+    &:hover {
+        border-color: darken($color-border, 10%);
+    }
+
+    i {
+        @include absolute(1.6rem, 1rem, auto, auto);
+        font-size: 1.8rem;
+        font-weight: 300;
+        color: $color-border;
+    }
+}
+
+.access-token {
+    height: 10rem;
+    font-size: 1rem;
+    font-weight: normal;
+    font-family: monospace;
+    resize: none;
+}

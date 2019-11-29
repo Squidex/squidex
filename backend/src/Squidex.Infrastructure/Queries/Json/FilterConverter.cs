@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 switch (reader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        var propertyName = reader.Value.ToString()!;
+                        var propertyName = reader.Value!.ToString()!;
 
                         if (!reader.Read())
                         {
@@ -68,17 +68,17 @@ namespace Squidex.Infrastructure.Queries.Json
                         switch (propertyName.ToLowerInvariant())
                         {
                             case "not":
-                                var filter = serializer.Deserialize<FilterNode<IJsonValue>>(reader);
+                                var filter = serializer.Deserialize<FilterNode<IJsonValue>>(reader)!;
 
                                 result = new NegateFilter<IJsonValue>(filter);
                                 break;
                             case "and":
-                                var andFilters = serializer.Deserialize<List<FilterNode<IJsonValue>>>(reader);
+                                var andFilters = serializer.Deserialize<List<FilterNode<IJsonValue>>>(reader)!;
 
                                 result = new LogicalFilter<IJsonValue>(LogicalFilterType.And, andFilters);
                                 break;
                             case "or":
-                                var orFilters = serializer.Deserialize<List<FilterNode<IJsonValue>>>(reader);
+                                var orFilters = serializer.Deserialize<List<FilterNode<IJsonValue>>>(reader)!;
 
                                 result = new LogicalFilter<IJsonValue>(LogicalFilterType.Or, orFilters);
                                 break;
@@ -126,7 +126,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
         private static CompareOperator ReadOperator(JsonReader reader, JsonSerializer serializer)
         {
-            var value = serializer.Deserialize<string>(reader);
+            var value = serializer.Deserialize<string>(reader)!;
 
             switch (value.ToLowerInvariant())
             {

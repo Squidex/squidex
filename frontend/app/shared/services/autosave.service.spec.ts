@@ -19,7 +19,7 @@ describe('AutoSaveService', () => {
     let autoSaveService: AutoSaveService;
 
     beforeEach(() => {
-        localStore = Mock.ofType(LocalStoreService);
+        localStore = Mock.ofType<LocalStoreService>();
 
         autoSaveService = new AutoSaveService(localStore.object);
     });

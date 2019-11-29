@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.FileName.FileType()),
+                Resolver = Resolve(x => x.FileName!.FileType()),
                 Description = "The file type."
             });
 

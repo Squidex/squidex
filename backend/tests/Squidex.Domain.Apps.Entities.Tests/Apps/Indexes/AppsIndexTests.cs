@@ -19,6 +19,8 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable SA1133 // Do not combine attributes
+
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public sealed class AppsIndexTests
@@ -149,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_not_app_to_user_index_if_app_created_by_client()
+        public async Task Should_also_app_to_user_index_if_app_created_by_client()
         {
             var token = RandomHash.Simple();
 
@@ -169,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -262,10 +264,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_remove_app_from_indexes_on_archive()
+        [Theory, InlineData(true), InlineData(false)]
+        public async Task Should_remove_app_from_indexes_on_archive(bool isArchived)
         {
-            var app = SetupApp(0, false);
+            var app = SetupApp(0, isArchived);
 
             var context =
                 new CommandContext(new ArchiveApp { AppId = appId.Id }, commandBus)

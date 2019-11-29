@@ -19,19 +19,16 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             get { yield return typeof(Status); }
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            writer.WriteValue(value.ToString());
+            writer.WriteValue(value!.ToString());
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
-            if (reader.TokenType != JsonToken.String)
-            {
-                throw new JsonException($"Expected String, but got {reader.TokenType}.");
-            }
+            var value = serializer.Deserialize<string>(reader)!;
 
-            return new Status(reader.Value.ToString());
+            return new Status(value);
         }
 
         public override bool CanConvert(Type objectType)

@@ -7,7 +7,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <span class="user">
-                <img class="user-picture" [attr.src]="snapshot.profileId | sqxUserIdPicture" />
+                <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture" />
                 
                 <span>{{snapshot.profileDisplayName}}</span>
             </span>

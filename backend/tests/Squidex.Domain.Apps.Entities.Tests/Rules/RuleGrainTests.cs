@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
@@ -37,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public sealed class TestAction : RuleAction
         {
-            public Uri Url { get; set; }
+            public int Value { get; set; }
         }
 
         public RuleGrainTests()
@@ -209,30 +208,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static CreateRule MakeCreateCommand()
         {
-            var newTrigger = new ContentChangedTriggerV2
-            {
-                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
-            };
-
-            var newAction = new TestAction
-            {
-                Url = new Uri("https://squidex.io/v2")
-            };
+            var newTrigger = new ManualTrigger();
+            var newAction = new TestAction { Value = 123 };
 
             return new CreateRule { Trigger = newTrigger, Action = newAction };
         }
 
         private static UpdateRule MakeUpdateCommand()
         {
-            var newTrigger = new ContentChangedTriggerV2
-            {
-                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
-            };
-
-            var newAction = new TestAction
-            {
-                Url = new Uri("https://squidex.io/v2")
-            };
+            var newTrigger = new ManualTrigger();
+            var newAction = new TestAction { Value = 123 };
 
             return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }

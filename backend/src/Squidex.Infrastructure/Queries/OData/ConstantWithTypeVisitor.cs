@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.Queries.OData
     public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
     {
         private static readonly IEdmPrimitiveType BooleanType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Boolean);
+        private static readonly IEdmPrimitiveType DateType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Date);
         private static readonly IEdmPrimitiveType DateTimeType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
         private static readonly IEdmPrimitiveType DoubleType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Double);
         private static readonly IEdmPrimitiveType GuidType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Guid);
@@ -53,7 +54,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 return Guid.Parse(value.ToString()!);
             }
 
-            if (nodeIn.TypeReference.Definition == DateTimeType)
+            if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
@@ -70,7 +71,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(CollectionConstantNode nodeIn)
         {
-            if (nodeIn.ItemType.Definition == DateTimeType)
+            if (nodeIn.ItemType.Definition == DateTimeType || nodeIn.ItemType.Definition == DateType)
             {
                 return nodeIn.Collection.Select(x => ParseInstant(x.Value)).ToList();
             }
@@ -115,6 +116,16 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConstantNode nodeIn)
         {
+            if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
+            {
+                return ParseInstant(nodeIn.Value);
+            }
+
+            if (nodeIn.TypeReference.Definition == GuidType)
+            {
+                return (Guid)nodeIn.Value;
+            }
+
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
                 return (bool)nodeIn.Value;

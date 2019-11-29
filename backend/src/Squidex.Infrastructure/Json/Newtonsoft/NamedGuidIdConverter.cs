@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override NamedId<Guid> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var value = serializer.Deserialize<string>(reader);
+            var value = serializer.Deserialize<string>(reader)!;
 
             if (!NamedId<Guid>.TryParse(value, Guid.TryParse, out var result))
             {

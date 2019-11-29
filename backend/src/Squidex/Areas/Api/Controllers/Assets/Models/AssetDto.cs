@@ -26,6 +26,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public Guid Id { get; set; }
 
         /// <summary>
+        /// The id of the parent folder. Empty for files without parent.
+        /// </summary>
+        public Guid ParentId { get; set; }
+
+        /// <summary>
         /// The file name.
         /// </summary>
         [Required]
@@ -57,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The asset tags.
         /// </summary>
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string>? Tags { get; set; }
 
         /// <summary>
         /// The size of the file in bytes.
@@ -141,6 +146,8 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             {
                 response.AddPutLink("update", controller.Url<AssetsController>(x => nameof(x.PutAsset), values));
                 response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
+
+                response.AddPutLink("move", controller.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
             }
 
             if (controller.HasPermission(Permissions.AppAssetsDelete))

@@ -25,6 +25,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public SchemaScriptsDto? Scripts { get; set; }
 
         /// <summary>
+        /// The names of the fields that should be used in references.
+        /// </summary>
+        public FieldNames? FieldsInReferences { get; set; }
+
+        /// <summary>
+        /// The names of the fields that should be shown in lists, including meta fields.
+        /// </summary>
+        public FieldNames? FieldsInLists { get; set; }
+
+        /// <summary>
         /// Optional fields.
         /// </summary>
         public List<UpsertSchemaFieldDto?>? Fields { get; set; }

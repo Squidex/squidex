@@ -38,22 +38,34 @@
             </div>
 
             <div class="table-items-row-details-tab">
-                <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
-                    <div class="col">
-                        <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
+                    <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
+                        <div class="col">
+                            <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
+    
+                            <sqx-autocomplete [underlined]="true" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
+                        </div>
+                        <div class="col-auto pl-1" *ngIf="isEditable">
+                            <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
 
-                        <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
+                <ng-template #defaultRole>
+                    <sqx-form-alert>
+                        {{descriptions[role.name]}}
+                    </sqx-form-alert>
+                    
+                    <div class="form-group" *ngFor="let control of editForm.controls">
+                       <input class="form-control form-underlined" [formControl]="control" />
                     </div>
-                    <div class="col-auto pl-1" *ngIf="isEditable">
-                        <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
-                            <i class="icon-bin2"></i>
-                        </button>
-                    </div>
-                </div>
+                </ng-template>
 
                 <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
-                        <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
+                        <sqx-autocomplete [autoFocus]="true" formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
                     </div>
                     <div class="col-auto pl-1">
                         <button type="submit" class="btn btn-success">

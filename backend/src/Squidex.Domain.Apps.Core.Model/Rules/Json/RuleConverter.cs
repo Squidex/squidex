@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Json
 
         protected override Rule ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            return serializer.Deserialize<JsonRule>(reader).ToRule();
+            return serializer.Deserialize<JsonRule>(reader)!.ToRule();
         }
     }
 }

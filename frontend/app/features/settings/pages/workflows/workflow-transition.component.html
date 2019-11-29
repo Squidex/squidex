@@ -1,5 +1,5 @@
 <div class="row transition no-gutters">
-    <div class="col-auto">
+    <div class="col col-arrow">
         <i class="icon-corner-down-right text-decent"></i>
     </div>
     <div class="col col-step">
@@ -21,8 +21,7 @@
     <div class="col-auto col-label">
         <span class="text-decent">for</span>
     </div>
-    
-    <div class="col" style="width: 70px">
+    <div class="col col-roles">
         <sqx-tag-editor
             [allowDuplicates]="false"
             [dashed]="true"
@@ -31,12 +30,12 @@
             [ngModel]="transition.roles"
             [ngModelOptions]="onBlur"
             [singleLine]="true"
-            [suggestions]="roleSuggestions"
+            [suggestions]="roles"
             placeholder="Role">
         </sqx-tag-editor>
     </div>
 
-    <div class="col-auto pl-2">
+    <div class="col col-button pl-2">
         <button type="button" class="btn btn-text-danger" (click)="emitRemove()" [disabled]="disabled">
             <i class="icon-bin2"></i>
         </button>

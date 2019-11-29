@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -15,25 +16,34 @@ namespace Squidex.Infrastructure.Log
     {
         private readonly ILogChannel[] channels;
         private readonly ILogAppender[] appenders;
+        private readonly IOptions<SemanticLogOptions> options;
         private readonly IObjectWriterFactory writerFactory;
 
         public SemanticLog(
+            IOptions<SemanticLogOptions> options,
             IEnumerable<ILogChannel> channels,
             IEnumerable<ILogAppender> appenders,
             IObjectWriterFactory writerFactory)
         {
+            Guard.NotNull(options);
             Guard.NotNull(channels);
             Guard.NotNull(appenders);
             Guard.NotNull(writerFactory);
 
             this.channels = channels.ToArray();
             this.appenders = appenders.ToArray();
+            this.options = options;
             this.writerFactory = writerFactory;
         }
 
         public void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action)
         {
             Guard.NotNull(action);
+
+            if (logLevel < options.Value.Level)
+            {
+                return;
+            }
 
             var formattedText = FormatText(logLevel, context, action);
 
@@ -92,7 +102,7 @@ namespace Squidex.Infrastructure.Log
 
         public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
         {
-            return new SemanticLog(channels, appenders.Union(new ILogAppender[] { new ConstantsLogWriter(objectWriter) }).ToArray(), writerFactory);
+            return new SemanticLog(options, channels, appenders.Union(new ILogAppender[] { new ConstantsLogWriter(objectWriter) }).ToArray(), writerFactory);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Commands
 
             try
             {
-                log.LogInformation(logContext, (ctx, w) => w
+                log.LogDebug(logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Started")

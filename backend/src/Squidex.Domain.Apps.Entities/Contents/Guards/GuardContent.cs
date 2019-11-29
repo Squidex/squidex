@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (!isProposal)
             {
-                await ValidateCanUpdate(content, contentWorkflow);
+                await ValidateCanUpdate(content, contentWorkflow, command.User);
             }
         }
 
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (!isProposal)
             {
-                await ValidateCanUpdate(content, contentWorkflow);
+                await ValidateCanUpdate(content, contentWorkflow, command.User);
             }
         }
 
@@ -121,13 +122,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (command.Data == null)
             {
-               e(Not.Defined("Data"), nameof(command.Data));
+                e(Not.Defined("Data"), nameof(command.Data));
             }
         }
 
-        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow)
+        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
         {
-            if (!await contentWorkflow.CanUpdateAsync(content))
+            if (!await contentWorkflow.CanUpdateAsync(content, user))
             {
                 throw new DomainException($"The workflow does not allow updates at status {content.Status}");
             }

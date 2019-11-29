@@ -50,8 +50,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public queryModel: QueryModel;
     public queries: Queries;
 
-    public minWidth: string;
-
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
@@ -71,8 +69,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.resetSelection();
 
                     this.schema = schema;
-
-                    this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
 
@@ -141,14 +137,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public goPrev() {
-        this.contentsState.goPrev();
-    }
-
-    public goNext() {
-        this.contentsState.goNext();
-    }
-
     public search(query: Query) {
         this.contentsState.search(query);
     }
@@ -158,7 +146,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemSelected(content: ContentDto): boolean {
-        return !!this.selectedItems[content.id];
+        return this.selectedItems[content.id] === true;
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
@@ -210,7 +198,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 this.selectionCount++;
 
                 for (const action in this.nextStatuses) {
-                    if (!content.statusUpdates) {
+                    if (!content.statusUpdates.find(x => x.status === action)) {
                         delete this.nextStatuses[action];
                     }
                 }

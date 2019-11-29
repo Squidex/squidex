@@ -100,6 +100,10 @@ namespace Squidex.Config.Domain
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>();
 
+                    services.AddSingletonAs<MongoAssetFolderRepository>()
+                        .As<IAssetFolderRepository>()
+                        .As<ISnapshotStore<AssetFolderState, Guid>>();
+
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),

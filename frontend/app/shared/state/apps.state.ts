@@ -34,14 +34,6 @@ interface Snapshot {
 
 @Injectable()
 export class AppsState extends State<Snapshot> {
-    public get appName() {
-        return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
-    }
-
-    public get appDisplayName() {
-        return this.snapshot.selectedApp ? this.snapshot.selectedApp.displayName : '';
-    }
-
     public apps =
         this.project(s => s.apps);
 
@@ -50,6 +42,14 @@ export class AppsState extends State<Snapshot> {
 
     public selectedApp =
         this.selectedAppOrNull.pipe(defined());
+
+    public get appName() {
+        return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
+    }
+
+    public get appDisplayName() {
+        return this.snapshot.selectedApp ? this.snapshot.selectedApp.displayName : '';
+    }
 
     constructor(
         private readonly appsService: AppsService,

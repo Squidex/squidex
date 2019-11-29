@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
 
-                if (IsFound(app.Value))
+                if (IsFound(app.Value, false))
                 {
                     return app.Value;
                 }
@@ -184,10 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         {
                             await index.AddAsync(token);
 
-                            if (createApp.Actor.IsSubject)
-                            {
-                                await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
-                            }
+                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
                         }
                         else
                         {
@@ -257,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
 
-            if (IsFound(app.Value))
+            if (IsFound(app.Value, true))
             {
                 await Index().RemoveAsync(appId);
             }
@@ -268,9 +265,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private static bool IsFound(IAppEntity app)
+        private static bool IsFound(IAppEntity entity, bool allowArchived)
         {
-            return app.Version > EtagVersion.Empty && !app.IsArchived;
+            return entity.Version > EtagVersion.Empty && (!entity.IsArchived || allowArchived);
         }
 
         private IAppsByNameIndexGrain Index()

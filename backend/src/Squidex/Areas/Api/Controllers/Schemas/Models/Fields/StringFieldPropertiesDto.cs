@@ -16,17 +16,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The default value for the field value.
         /// </summary>
-        public string DefaultValue { get; set; }
+        public string? DefaultValue { get; set; }
 
         /// <summary>
         /// The pattern to enforce a specific format for the field value.
         /// </summary>
-        public string Pattern { get; set; }
+        public string? Pattern { get; set; }
 
         /// <summary>
         /// The validation message for the pattern.
         /// </summary>
-        public string PatternMessage { get; set; }
+        public string? PatternMessage { get; set; }
 
         /// <summary>
         /// The minimum allowed length for the field value.
@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ReadOnlyCollection<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string>? AllowedValues { get; set; }
 
         /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
