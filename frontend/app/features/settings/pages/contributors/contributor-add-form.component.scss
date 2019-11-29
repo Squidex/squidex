@@ -12,7 +12,7 @@
 }
 
 .table-items-header {
-    border-bottom-width: 2px;
-    border-width: 0;
+    border: 0;
+    border-bottom: 2px solid $color-border;
     margin: 0;
 }

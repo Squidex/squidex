@@ -13,14 +13,4 @@
     &-label {
         color: $color-text;
     }
-
-    &-tooltip {
-        @include border-radius;
-        background: $color-tooltip;
-        border: 0;
-        color: $color-dark-foreground;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: .75rem;
-    }
 }

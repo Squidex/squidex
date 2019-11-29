@@ -8,17 +8,13 @@
 
     &-section {
         @include clearfix;
-        display: block;
-        padding-bottom: 0;
-        padding-left: $size-sidebar-width + .25rem;
-        padding-right: 1.25rem;
-        padding-top: 2rem;
+        padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
     }
 }
 
 .card {
     & {
-        float: left;
+        display: inline-block;
         margin-bottom: 1rem;
         margin-right: 1rem;
         width: 20rem;
@@ -47,18 +43,9 @@
         margin-top: .5rem;
     }
 
-    &-more {
-        color: $color-text-decent;
-        font-size: .8rem;
-        font-weight: normal;
-        margin-top: .4rem;
-    }
-
     &-title {
         @include truncate;
         color: $color-title;
-        font-size: 1.2rem;
-        font-weight: light;
         margin-bottom: 0;
         margin-top: 0;
     }
@@ -113,7 +100,4 @@
 
 .info {
     color: $color-border-dark;
-    font-size: .8rem;
-    padding: 2rem;
-    padding-left: $size-sidebar-width + .25rem;
 }

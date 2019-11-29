@@ -1,16 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
-.form-group-password {
-    margin-top: 2rem;
-}
-
-.form-group-permissions {
+.form-group-section {
     margin-top: 2rem;
 }
 
 textarea {
-    font-size: .9rem;
-    font-weight: normal;
     height: 200px;
 }

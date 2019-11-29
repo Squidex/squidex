@@ -46,7 +46,7 @@ export class ModalDialogComponent implements AfterViewInit {
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;
 
-    @ViewChild('tabsElement', { static: false })
+    @ViewChild('footerElement', { static: false })
     public footerElement: ElementRef<ParentNode>;
 
     constructor(

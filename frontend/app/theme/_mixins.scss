@@ -79,13 +79,15 @@
 }
 
 @mixin force-width($width) {
+    width:  $width;
+    // Ensure that we use the minimum width in flex scenarios.
     max-width: $width;
     min-width: $width;
-    width:  $width;
 }
 
 @mixin force-height($height) {
     height:  $height;
+    // Ensure that we use the minimum width in flex scenarios.
     max-height: $height;
     min-height: $height;
 }
@@ -180,7 +182,6 @@
     border-radius: $radius $radius 0 0;
 }
 
-
 @mixin position($t: null, $r: null, $b: null, $l: null) {
     bottom: $b; left: $l; right: $r; top: $t;
 }
@@ -198,7 +199,7 @@
 @mixin truncate-nowidth {
     display: block;
     overflow-x: hidden;
-    overflow-y: visible;;
+    overflow-y: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

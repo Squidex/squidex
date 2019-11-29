@@ -5,10 +5,8 @@
     img {
         @include box-shadow(0, 4px, 20px, .2);
         display: block;
-        margin: 0 auto;
-        margin-bottom: 10px;
-        margin-top: 10px;
-        width: 80%;
+        margin: 10px auto;
+        max-width: 80%;
     }
 
     p {
