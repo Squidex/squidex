@@ -77,6 +77,7 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddIdentityServer(options =>
                 {
                     options.UserInteraction.ErrorUrl = "/error/";
+
                     if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
                     {
                         options.PublicOrigin = urlsOptions.BaseUrl;
