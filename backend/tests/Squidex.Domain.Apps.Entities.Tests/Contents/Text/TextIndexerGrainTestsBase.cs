@@ -8,30 +8,35 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Assets;
+using FakeItEasy;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable RECS0021 // Warns about calls to virtual member functions occuring in the constructor
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerGrainTests : IDisposable
+    public abstract class TextIndexerGrainTestsBase : IDisposable
     {
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly SearchContext context;
-        private readonly IAssetStore assetStore = new MemoryAssetStore();
         private readonly TextIndexerGrain sut;
 
-        public TextIndexerGrainTests()
+        public abstract IDirectoryFactory DirectoryFactory { get; }
+
+        protected TextIndexerGrainTestsBase()
         {
             context = new SearchContext
             {
                 Languages = new HashSet<string> { "de", "en" }
             };
 
-            sut = new TextIndexerGrain(assetStore);
+            var factory = new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>());
+
+            sut = new TextIndexerGrain(factory);
             sut.ActivateAsync(schemaId).Wait();
         }
 
@@ -51,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent("Hello", "World", false);
 
-            await sut.DeactivateAsync(true);
+            await sut.OnDeactivateAsync();
 
-            var other = new TextIndexerGrain(assetStore);
+            var other = new TextIndexerGrain(new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>()));
             try
             {
                 await other.ActivateAsync(schemaId);
@@ -199,38 +204,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task AddLocalizedContent()
         {
-            var germanData =
-                new NamedContentData()
-                    .AddField("localized",
-                        new ContentFieldData()
-                            .AddValue("de", "Stadt und Umgebung and whatever"));
+            var germanText = new TextContent
+            {
+                ["de"] = "Stadt und Umgebung and whatever"
+            };
 
-            var englishData =
-                new NamedContentData()
-                    .AddField("localized",
-                        new ContentFieldData()
-                            .AddValue("en", "City and Surroundings und sonstiges"));
+            var englishText = new TextContent
+            {
+                ["en"] = "City and Surroundings und sonstiges"
+            };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Data = germanData, OnlyDraft = true });
-            await sut.IndexAsync(new Update { Id = ids2[0], Data = englishData, OnlyDraft = true });
+            await sut.IndexAsync(new Update { Id = ids1[0], Text = germanText, OnlyDraft = true });
+            await sut.IndexAsync(new Update { Id = ids2[0], Text = englishText, OnlyDraft = true });
         }
 
         private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
         {
-            var data1 =
-                new NamedContentData()
-                    .AddField("test",
-                        new ContentFieldData()
-                            .AddValue("iv", text1));
+            var content1 = new TextContent
+            {
+                ["iv"] = text1
+            };
 
-            var data2 =
-                new NamedContentData()
-                    .AddField("test",
-                        new ContentFieldData()
-                            .AddValue("iv", text2));
+            var content2 = new TextContent
+            {
+                ["iv"] = text2
+            };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Data = data1, OnlyDraft = onlyDraft });
-            await sut.IndexAsync(new Update { Id = ids2[0], Data = data2, OnlyDraft = onlyDraft });
+            await sut.IndexAsync(new Update { Id = ids1[0], Text = content1, OnlyDraft = onlyDraft });
+            await sut.IndexAsync(new Update { Id = ids2[0], Text = content2, OnlyDraft = onlyDraft });
         }
 
         private async Task DeleteAsync(Guid id)

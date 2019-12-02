@@ -7,19 +7,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Lucene.Net.Analysis;
-using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -30,95 +26,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxResults = 2000;
         private const int MaxUpdates = 400;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
-        private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
-        private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
-        private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
-        private readonly IAssetStore assetStore;
+        private readonly IndexHolderFactory indexHolderFactory;
         private IDisposable? timer;
-        private DirectoryInfo directory;
-        private IndexWriter? indexWriter;
-        private IndexReader? indexReader;
-        private IndexSearcher? indexSearcher;
-        private IndexState? indexState;
+        private IndexHolder index;
+        private IndexState indexState;
         private QueryParser? queryParser;
         private HashSet<string>? currentLanguages;
         private int updates;
 
-        public TextIndexerGrain(IAssetStore assetStore)
+        public TextIndexerGrain(IndexHolderFactory indexHolderFactory)
         {
-            Guard.NotNull(assetStore);
+            Guard.NotNull(indexHolderFactory);
 
-            this.assetStore = assetStore;
+            this.indexHolderFactory = indexHolderFactory;
         }
 
-        public override async Task OnDeactivateAsync()
+        public override Task OnDeactivateAsync()
         {
-            await DeactivateAsync(true);
+            index?.Dispose();
+            indexHolderFactory.Release(Key);
+
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(Guid key)
         {
-            directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), $"Index_{key}"));
+            index = indexHolderFactory.Acquire(key);
+            indexState = new IndexState(index);
 
-            await assetStore.DownloadAsync(directory);
-
-            var config = new IndexWriterConfig(Version, Analyzer)
-            {
-                IndexDeletionPolicy = snapshotter,
-                MergePolicy = new TieredMergePolicy(),
-                MergeScheduler = MergeScheduler
-            };
-
-            indexWriter = new IndexWriter(FSDirectory.Open(directory), config);
-
-            if (indexWriter.NumDocs > 0)
-            {
-                OpenReader();
-            }
-            else
-            {
-                indexState = new IndexState(indexWriter);
-            }
+            return TaskHelper.Done;
         }
 
-        public Task<bool> IndexAsync(J<Update> update)
+        public Task<bool> IndexAsync(Update update)
         {
-            return IndexInternalAsync(update);
-        }
+            var content = new TextIndexContent(index, indexState, update.Id);
 
-        private Task<bool> IndexInternalAsync(Update update)
-        {
-            if (indexWriter != null && indexState != null)
-            {
-                var content = new TextIndexContent(indexWriter, indexState, update.Id);
-
-                content.Index(update.Data, update.OnlyDraft);
-            }
+            content.Index(update.Text, update.OnlyDraft);
 
             return TryFlushAsync();
         }
 
         public Task<bool> CopyAsync(Guid id, bool fromDraft)
         {
-            if (indexWriter != null && indexState != null)
-            {
-                var content = new TextIndexContent(indexWriter, indexState, id);
+            var content = new TextIndexContent(index, indexState, id);
 
-                content.Copy(fromDraft);
-            }
+            content.Copy(fromDraft);
 
             return TryFlushAsync();
         }
 
         public Task<bool> DeleteAsync(Guid id)
         {
-            if (indexWriter != null && indexState != null)
-            {
-                var content = new TextIndexContent(indexWriter, indexState, id);
+            var content = new TextIndexContent(index, indexState, id);
 
-                content.Delete();
-            }
+            content.Delete();
 
             return TryFlushAsync();
         }
@@ -129,33 +91,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (!string.IsNullOrWhiteSpace(queryText))
             {
-                var query = BuildQuery(queryText, context);
+                index.EnsureReader();
 
-                if (indexReader == null && indexWriter?.NumDocs > 0)
+                if (index.Searcher != null)
                 {
-                    OpenReader();
-                }
+                    var query = BuildQuery(queryText, context);
 
-                if (indexReader != null && indexSearcher != null && indexState != null)
-                {
-                    var found = new HashSet<Guid>();
+                    var hits = index.Searcher.Search(query, MaxResults).ScoreDocs;
 
-                    var hits = indexSearcher.Search(query, MaxResults).ScoreDocs;
-
-                    foreach (var hit in hits)
+                    if (hits.Length > 0)
                     {
-                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState, out var id))
+                        var found = new HashSet<Guid>();
+
+                        foreach (var hit in hits)
                         {
-                            if (found.Add(id))
+                            if (TextIndexContent.TryGetId(hit.Doc, context.Scope, index, indexState, out var id))
                             {
-                                result.Add(id);
+                                if (found.Add(id))
+                                {
+                                    result.Add(id);
+                                }
                             }
                         }
                     }
                 }
             }
 
-            return Task.FromResult(result.ToList());
+            return Task.FromResult(result);
         }
 
         private Query BuildQuery(string query, SearchContext context)
@@ -164,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var fields = context.Languages.Union(Invariant).ToArray();
 
-                queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
+                queryParser = new MultiFieldQueryParser(Version, fields, index.Analyzer);
 
                 currentLanguages = context.Languages;
             }
@@ -193,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
             else
             {
-                CleanReader();
+                index.MarkStale();
 
                 try
                 {
@@ -208,64 +170,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return false;
         }
 
-        public async Task FlushAsync()
+        public Task FlushAsync()
         {
-            if (updates > 0 && indexWriter != null)
+            if (updates > 0)
             {
-                indexWriter.Commit();
-                indexWriter.Flush(true, true);
-
-                CleanReader();
-
-                var commit = snapshotter.Snapshot();
-                try
-                {
-                    await assetStore.UploadDirectoryAsync(directory, commit);
-                }
-                finally
-                {
-                    snapshotter.Release(commit);
-                }
+                index.Commit();
 
                 updates = 0;
             }
-        }
 
-        public async Task DeactivateAsync(bool deleteFolder = false)
-        {
-            await FlushAsync();
-
-            CleanWriter();
-            CleanReader();
-
-            if (deleteFolder && directory.Exists)
-            {
-                directory.Delete(true);
-            }
-        }
-
-        private void OpenReader()
-        {
-            if (indexWriter != null)
-            {
-                indexReader = indexWriter!.GetReader(true);
-                indexSearcher = new IndexSearcher(indexReader);
-                indexState = new IndexState(indexWriter, indexReader, indexSearcher);
-            }
-        }
-
-        private void CleanReader()
-        {
-            indexReader?.Dispose();
-            indexReader = null;
-            indexSearcher = null;
-            indexState?.CloseReader();
-        }
-
-        private void CleanWriter()
-        {
-            indexWriter?.Dispose();
-            indexWriter = null;
+            return TaskHelper.Done;
         }
     }
 }

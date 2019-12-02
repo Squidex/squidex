@@ -19,116 +19,97 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const int NotFound = -1;
         private const string MetaFor = "_fd";
-        private readonly IndexSearcher? indexSearcher;
-        private readonly IndexWriter indexWriter;
-        private readonly BinaryDocValues binaryValues;
-        private readonly Dictionary<(Guid, byte), BytesRef> changes = new Dictionary<(Guid, byte), BytesRef>();
-        private bool isClosed;
+        private readonly Dictionary<(Guid, Scope), BytesRef> lastChanges = new Dictionary<(Guid, Scope), BytesRef>();
+        private readonly IndexHolder index;
+        private IndexReader? lastReader;
+        private BinaryDocValues binaryValues;
 
-        public IndexState(IndexWriter indexWriter, IndexReader? indexReader = null, IndexSearcher? indexSearcher = null)
+        public IndexState(IndexHolder index)
         {
-            this.indexSearcher = indexSearcher;
-            this.indexWriter = indexWriter;
-
-            if (indexReader != null)
-            {
-                binaryValues = MultiDocValues.GetBinaryValues(indexReader, MetaFor);
-            }
+            this.index = index;
         }
 
-        public void Index(Guid id, byte draft, Document document, byte forDraft, byte forPublished)
+        public void Index(Guid id, Scope scope, Document document, bool forDraft, bool forPublished)
         {
             var value = GetValue(forDraft, forPublished);
 
             document.SetBinaryDocValue(MetaFor, value);
 
-            changes[(id, draft)] = value;
+            lastChanges[(id, scope)] = value;
         }
 
-        public void Index(Guid id, byte draft, Term term, byte forDraft, byte forPublished)
+        public void Index(Guid id, Scope scope, Term term, bool forDraft, bool forPublished)
         {
             var value = GetValue(forDraft, forPublished);
 
-            indexWriter.UpdateBinaryDocValue(term, MetaFor, value);
+            index.Writer.UpdateBinaryDocValue(term, MetaFor, value);
 
-            changes[(id, draft)] = value;
+            lastChanges[(id, scope)] = value;
         }
 
-        public bool HasBeenAdded(Guid id, byte draft, Term term, out int docId)
+        public bool HasBeenAdded(Guid id, Scope scope, Term term, out int docId)
         {
             docId = 0;
 
-            if (changes.ContainsKey((id, draft)))
+            if (lastChanges.ContainsKey((id, scope)))
             {
                 return true;
             }
 
-            if (indexSearcher != null && !isClosed)
-            {
-                var docs = indexSearcher.Search(new TermQuery(term), 1);
+            var docs = index.Searcher?.Search(new TermQuery(term), 1);
 
-                docId = docs?.ScoreDocs.FirstOrDefault()?.Doc ?? NotFound;
+            docId = docs?.ScoreDocs.FirstOrDefault()?.Doc ?? NotFound;
 
-                return docId > NotFound;
-            }
-
-            return false;
+            return docId > NotFound;
         }
 
-        public bool TryGet(Guid id, byte draft, int docId, out byte forDraft, out byte forPublished)
+        public void Get(Guid id, Scope scope, int docId, out bool forDraft, out bool forPublished)
         {
-            forDraft = 0;
-            forPublished = 0;
-
-            if (changes.TryGetValue((id, draft), out var forValue))
+            if (lastChanges.TryGetValue((id, scope), out var forValue))
             {
-                forDraft = forValue.Bytes[0];
-                forPublished = forValue.Bytes[1];
-
-                return true;
+                (forDraft, forPublished) = ToFlags(forValue);
             }
-
-            if (!isClosed && docId != NotFound)
+            else
             {
-                forValue = new BytesRef();
+                Get(docId, out forDraft, out forPublished);
+            }
+        }
 
-                binaryValues?.Get(docId, forValue);
+        public void Get(int docId, out bool forDraft, out bool forPublished)
+        {
+            var forValue = GetForValues(docId);
 
-                if (forValue.Bytes.Length == 2)
+            (forDraft, forPublished) = ToFlags(forValue);
+        }
+
+        private BytesRef GetForValues(int docId)
+        {
+            var reader = index.Reader;
+
+            if (lastReader != reader)
+            {
+                lastChanges.Clear();
+                lastReader = reader;
+
+                if (reader != null)
                 {
-                    forDraft = forValue.Bytes[0];
-                    forPublished = forValue.Bytes[1];
-
-                    changes[(id, draft)] = forValue;
-
-                    return true;
+                    binaryValues = MultiDocValues.GetBinaryValues(reader, MetaFor);
                 }
             }
 
-            return false;
-        }
+            var result = new BytesRef(2);
 
-        public bool TryGet(int docId, out byte forDraft, out byte forPublished)
-        {
-            forDraft = 0;
-            forPublished = 0;
-
-            if (!isClosed && docId != NotFound)
+            if (docId != NotFound)
             {
-                var forValue = new BytesRef();
-
-                binaryValues?.Get(docId, forValue);
-
-                if (forValue.Bytes.Length == 2)
-                {
-                    forDraft = forValue.Bytes[0];
-                    forPublished = forValue.Bytes[1];
-
-                    return true;
-                }
+                binaryValues?.Get(docId, result);
             }
 
-            return false;
+            return result;
+        }
+
+        private static BytesRef GetValue(bool forDraft, bool forPublished)
+        {
+            return GetValue((byte)(forDraft ? 1 : 0), (byte)(forPublished ? 1 : 0));
         }
 
         private static BytesRef GetValue(byte forDraft, byte forPublished)
@@ -136,9 +117,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return new BytesRef(new[] { forDraft, forPublished });
         }
 
-        public void CloseReader()
+        private static (bool, bool) ToFlags(BytesRef bytes)
         {
-            isClosed = true;
+            return (bytes.Bytes[0] == 1, bytes.Bytes[1] == 1);
         }
     }
 }

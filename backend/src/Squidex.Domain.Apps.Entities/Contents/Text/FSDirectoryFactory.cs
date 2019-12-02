@@ -6,20 +6,21 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
+using System.IO;
+using Lucene.Net.Store;
+using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public sealed class FSDirectoryFactory : IDirectoryFactory
     {
-        Task<bool> DeleteAsync(Guid id);
+        public LuceneDirectory Create(Guid schemaId)
+        {
+            var folderName = $"Indexes/{schemaId}";
 
-        Task<bool> CopyAsync(Guid id, bool fromDraft);
+            var tempFolder = Path.Combine(Path.GetTempPath(), folderName);
 
-        Task<bool> IndexAsync(Update update);
-
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+            return FSDirectory.Open(tempFolder);
+        }
     }
 }

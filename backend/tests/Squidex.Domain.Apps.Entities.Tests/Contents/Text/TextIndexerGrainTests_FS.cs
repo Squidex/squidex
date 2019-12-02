@@ -5,21 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public class TextIndexerGrainTests_FS : TextIndexerGrainTestsBase
     {
-        Task<bool> DeleteAsync(Guid id);
+        public override IDirectoryFactory DirectoryFactory => CreateFactory();
 
-        Task<bool> CopyAsync(Guid id, bool fromDraft);
+        private static IDirectoryFactory CreateFactory()
+        {
+            var directoryFactory = new FSDirectoryFactory();
 
-        Task<bool> IndexAsync(Update update);
-
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+            return directoryFactory;
+        }
     }
 }
