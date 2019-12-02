@@ -372,7 +372,7 @@ export class ContentsState extends ContentsStateBase {
     }
 
     protected get schemaId() {
-        return this.schemasState.schemaId;
+        return this.schemasState.schemaName;
     }
 }
 
