@@ -1,5 +1,8 @@
-<div class="form-control tags" [class.blank]="styleBlank" [class.gray]="styleGray" #form (click)="input.focus()" 
-    [class.single-line]="singleLine"
+<div class="form-control tags" #form (click)="input.focus()"
+    [class.blank]="styleBlank" 
+    [class.gray]="styleGray" 
+    [class.singleline]="singleLine"
+    [class.multiline]="!singleLine"
     [class.focus]="snapshot.hasFocus" 
     [class.disabled]="addInput.disabled"
     [class.dashed]="dashed && !(snapshot.items.length > 0)">

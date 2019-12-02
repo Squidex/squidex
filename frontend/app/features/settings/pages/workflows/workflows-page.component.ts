@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import {
     ResourceOwner,
     RolesState,
-    SchemaTagConverter,
+    SchemaTagSource,
     WorkflowDto,
     WorkflowsState
 } from '@app/shared';
@@ -25,7 +25,7 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
 
     constructor(
         public readonly rolesState: RolesState,
-        public readonly schemasSource: SchemaTagConverter,
+        public readonly schemasSource: SchemaTagSource,
         public readonly workflowsState: WorkflowsState
     ) {
         super();

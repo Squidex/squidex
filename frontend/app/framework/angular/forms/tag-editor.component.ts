@@ -7,7 +7,7 @@
 
 // tslint:disable:template-use-track-by-function
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
@@ -45,7 +45,7 @@ export interface Converter {
 export class IntConverter implements Converter {
     private static ZERO = new TagValue(0, '0', 0);
 
-    public convertInput(input: string): TagValue<number> | null {
+    public convertInput(input: string) {
         if (input === '0') {
             return IntConverter.ZERO;
         }
@@ -59,7 +59,7 @@ export class IntConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<number> | null {
+    public convertValue(value: any) {
         if (Types.isNumber(value)) {
             return new TagValue(value, `${value}`, value);
         }
@@ -71,7 +71,7 @@ export class IntConverter implements Converter {
 export class FloatConverter implements Converter {
     private static ZERO = new TagValue(0, '0', 0);
 
-    public convertInput(input: string): TagValue<number> | null {
+    public convertInput(input: string) {
         if (input === '0') {
             return FloatConverter.ZERO;
         }
@@ -85,7 +85,7 @@ export class FloatConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<number> | null {
+    public convertValue(value: any) {
         if (Types.isNumber(value)) {
             return new TagValue(value, `${value}`, value);
         }
@@ -95,7 +95,7 @@ export class FloatConverter implements Converter {
 }
 
 export class StringConverter implements Converter {
-    public convertInput(input: string): TagValue<string> | null {
+    public convertInput(input: string) {
         if (input) {
             const trimmed = input.trim();
 
@@ -107,7 +107,7 @@ export class StringConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<string> | null {
+    public convertValue(value: any) {
         if (Types.isString(value)) {
             const trimmed = value.trim();
 
@@ -121,8 +121,6 @@ export class StringConverter implements Converter {
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
-
-const CACHED_SIZES: { [key: string]: number } = {};
 
 let CACHED_FONT: string;
 
@@ -140,13 +138,15 @@ interface State {
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line: readonly-array
-export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
+export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnChanges, OnInit {
+    private latestValue: any;
+
     @ViewChild('form', { static: false })
     public formElement: ElementRef<HTMLElement>;
 
@@ -212,13 +212,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public ngAfterViewInit() {
-        if (!CACHED_FONT) {
-            const style = window.getComputedStyle(this.inputElement.nativeElement);
-
-            CACHED_FONT = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
-        }
-
         this.resetSize();
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['converter']) {
+            this.writeValue(this.latestValue);
+        }
     }
 
     public ngOnInit() {
@@ -252,6 +252,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public writeValue(obj: any) {
+        this.latestValue = obj;
+
         this.resetForm();
         this.resetSize();
 
@@ -304,6 +306,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public resetSize() {
+        this.calculateStyle();
+
         if (!CACHED_FONT ||
             !this.inputElement ||
             !this.inputElement.nativeElement) {
@@ -321,18 +325,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 ctx.font = CACHED_FONT;
 
                 const textValue = this.inputElement.nativeElement.value;
-                const textKey = `${textValue}§${this.placeholder}§${ctx.font}`;
 
-                let width = CACHED_SIZES[textKey];
+                const widthText = ctx.measureText(textValue).width;
+                const widthPlaceholder = ctx.measureText(this.placeholder).width;
 
-                if (!width) {
-                    const widthText = ctx.measureText(textValue).width;
-                    const widthPlaceholder = ctx.measureText(this.placeholder).width;
-
-                    width = Math.max(widthText, widthPlaceholder);
-
-                    CACHED_SIZES[textKey] = width;
-                }
+                const width = Math.max(widthText, widthPlaceholder);
 
                 this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
             }
@@ -343,6 +340,25 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
             }, 0);
         }
+    }
+
+    private calculateStyle() {
+        if (CACHED_FONT ||
+            !this.inputElement ||
+            !this.inputElement.nativeElement) {
+            return;
+        }
+
+        const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+        const fontSize = style.getPropertyValue('font-size');
+        const fontFamily = style.getPropertyValue('font-family');
+
+        if (!fontSize || !fontFamily) {
+            return;
+        }
+
+        CACHED_FONT = `${fontSize} ${fontFamily}`;
     }
 
     public onKeyDown(event: KeyboardEvent) {
