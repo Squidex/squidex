@@ -2,9 +2,9 @@
 @import '_vars';
 
 :host {
-    @include flex-box;
-    @include flex-direction(column);
-    @include flex-grow(1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     overflow: hidden;
     padding: 0;
     position: relative;
@@ -18,17 +18,17 @@
     &-content,
     &-header,
     &-footer {
-        @include transition(opacity .2 ease);
         padding: 0 $panel-padding;
+        transition: opacity .2 ease;
     }
 
     &-content {
-        @include flex-grow(1);
+        flex-grow: 1;
         padding: $panel-padding;
 
         &.tabled {
-            padding-top: .5rem;
             padding-bottom: .5rem;
+            padding-top: .5rem;
         }
 
         &.normal {
@@ -36,17 +36,17 @@
         }
 
         &.synced {
-            overflow-y: auto;
             overflow-x: auto;
+            overflow-y: auto;
             padding-right: 0;
         }
     }
 
     &-header {
         & {
-            @include flex-shrink(0);
             border: 0;
             border-bottom: 1px solid $color-border;
+            flex-shrink: 0;
             overflow-x: hidden;
             overflow-y: hidden;
         }
@@ -70,9 +70,9 @@
 
     &-footer {
         & {
-            @include flex-shrink(1);
             border: 0;
             border-top: 1px solid $color-border;
+            flex-shrink: 0;
         }
 
         /deep/ .pagination {
@@ -87,7 +87,7 @@
 }
 
 .loading-indicator {
-    @include opacity(.5);
+    opacity: .5;
 }
 
 .loader {

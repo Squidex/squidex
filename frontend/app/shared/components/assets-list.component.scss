@@ -7,8 +7,8 @@
 
 h5 {
     font-size: .9rem;
-    margin-top: 0;
     margin-bottom: .5rem;
+    margin-top: 0;
 }
 
 .folders {
@@ -19,23 +19,23 @@ h5 {
 
 .folder-container {
     & {
-        width: $asset-width;
-        position: relative;
+        height: $asset-folder-height;
         margin-bottom: 1rem;
         margin-right: .5rem;
-        height: $asset-folder-height;
+        position: relative;
+        width: $asset-width;
     }
 
     &-over {
         @include absolute(-6px, -6px, -6px, -6px);
-        @include opacity(0);
         border: 2px solid $color-theme-blue;
+        opacity: 0;
     }
 
     &.cdk-drop-list-dragging {
         &:hover {
             .folder-container-over {
-                @include opacity(1);
+                opacity: 1;
             }
         }
     }
@@ -43,13 +43,13 @@ h5 {
 
 .file-drop {
     & {
-        @include transition(border-color .4s ease);
-        border: 2px dashed $color-border;
         background: transparent;
-        padding: 1rem;
+        border: 2px dashed $color-border;
         margin-bottom: 1rem;
         margin-right: 0;
+        padding: 1rem;
         text-align: center;
+        transition: border-color .4s ease;
     }
 
     &.drag {

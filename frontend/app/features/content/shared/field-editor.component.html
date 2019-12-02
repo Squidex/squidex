@@ -4,7 +4,7 @@
             {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
         </label> 
     
-        <span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>
+        <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
     
         <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
     </ng-container>

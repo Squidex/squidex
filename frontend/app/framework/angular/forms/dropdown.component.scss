@@ -22,28 +22,28 @@ $color-input-disabled: #eef1f4;
 }
 
 .control-dropdown {
-    max-width: 40rem;
     max-height: none;
+    max-width: 40rem;
     overflow-y: hidden;
 }
 
 .control-dropdown-items {
-    overflow-y: auto;
     max-height: 15rem;
+    overflow-y: auto;
 }
 
 .selection {
     & {
-        position: relative;
         overflow: hidden;
+        position: relative;
     }
 
     .control-dropdown-item {
         @include absolute(0, 1rem, 0, 0);
+        line-height: 1.2rem;
         padding-bottom: 0;
         pointer-events: none;
         position: absolute;
-        line-height: 1.2rem;
     }
 
     .icon-caret-down {

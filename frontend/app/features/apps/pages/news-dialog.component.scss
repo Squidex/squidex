@@ -4,11 +4,9 @@
 :host ::ng-deep {
     img {
         @include box-shadow(0, 4px, 20px, .2);
-        width: 80%;
-        margin: 0 auto;
-        margin-top: 10px;
-        margin-bottom: 10px;
         display: block;
+        margin: 10px auto;
+        max-width: 80%;
     }
 
     p {

@@ -9,7 +9,7 @@ $background: #fff;
 
 .fullscreen {
     @include fixed(0, 0, 0, 0);
-    border: 0;
     background: $background;
+    border: 0;
     z-index: 1040;
 }

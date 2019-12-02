@@ -8,7 +8,7 @@ rules:
   clean-import-paths:
     - 0
   property-sort-order:
-    - 0
+    - 1
   indentation:
     - 2
     -
@@ -24,3 +24,4 @@ leading-underscore: false
 files:
   ignore:
     - 'app/theme/_mixins.scss'
+    - 'node_modules/**/*.*'

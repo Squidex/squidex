@@ -2,6 +2,7 @@
 @import '_vars';
 
 $focus-color: #b3d3ff;
+$focus-shadow: rgba(51, 137, 255, .25);
 
 :host {
     text-align: left;
@@ -22,8 +23,8 @@ $focus-color: #b3d3ff;
     }
 
     &.focus {
-        @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
         border-color: $focus-color;
+        box-shadow: 0 0 0 .2rem $focus-shadow;
     }
 
     &.single-line {
@@ -40,26 +41,26 @@ $focus-color: #b3d3ff;
 div {
     &.form-control {
         height: auto;
+        position: relative;
         text-align: left;
         text-decoration: none;
-        position: relative;
     }
 }
 
 .blank {
     & {
         @include placeholder-color($color-input-placeholder);
-        padding: 0;
-        border: 0;
         background: transparent;
-        min-width: 50px;
-        max-width: 100%;
+        border: 0;
         height: auto !important;
+        max-width: 100%;
+        min-width: 50px;
+        padding: 0;
     }
 
     &:focus,
     &.focus {
-        @include box-shadow-none;
+        box-shadow: none;
         outline: none;
     }
 
@@ -88,15 +89,15 @@ div {
 .item {
     & {
         @include border-radius(10px);
-        color: $color-dark-foreground;
-        cursor: default;
-        padding: 1px .6rem;
         background: $color-theme-blue;
         border: 0;
-        height: 1.25rem;
+        color: $color-dark-foreground;
+        cursor: default;
         font-size: .8rem;
         font-weight: normal;
+        height: 1.25rem;
         margin-right: 2px;
+        padding: 1px .6rem;
         white-space: nowrap;
     }
 

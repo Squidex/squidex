@@ -23,17 +23,17 @@
 
 .save-search {
     color: $color-border-dark !important;
+    cursor: pointer !important;
     font-size: .9rem;
     font-weight: normal;
-    cursor: pointer !important;
 }
 
 .expand-search {
     & {
         color: $color-border-dark !important;
+        cursor: pointer !important;
         font-size: .9rem;
         font-weight: normal;
-        cursor: pointer !important;
         padding: 0 .5rem;
     }
 
@@ -43,9 +43,9 @@
 }
 
 .link {
-    margin-top: 1.5rem;
     font-size: .8rem;
     font-weight: normal;
+    margin-top: 1.5rem;
 }
 
 .col-form-label {

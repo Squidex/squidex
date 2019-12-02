@@ -7,18 +7,18 @@
 }
 
 .navbar-brand {
-    width: $size-sidebar-width;
     background: $color-theme-blue-dark;
-    padding-top: 0;
-    padding-bottom: 0;
     cursor: pointer;
-    margin-top: -.5rem;
-    margin-left: -1rem;
-    margin-right: 2rem;
+    float: left;
     font-size: 1.8rem;
     height: $size-navbar-height;
-    text-decoration: none;
-    text-align: center;
     line-height: $size-navbar-height;
-    float: left;
+    margin-left: -1rem;
+    margin-right: 2rem;
+    margin-top: -.5rem;
+    padding-bottom: 0;
+    padding-top: 0;
+    text-align: center;
+    text-decoration: none;
+    width: $size-sidebar-width;
 }

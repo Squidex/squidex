@@ -11,10 +11,9 @@
 }
 
 .col-options {
-    min-width: 6rem;
+    @include force-width(6rem);
 }
 
 .col-name {
-    min-width: 14rem;
-    max-width: 14rem;
+    @include force-width(14rem);
 }

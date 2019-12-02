@@ -3,8 +3,8 @@
 
 .badge {
     @include circle(1.3rem);
-    margin-right: .25rem;
     font-size: 80%;
+    margin-right: .25rem;
     padding-left: 0;
     padding-right: 0;
     vertical-align: top;
@@ -20,12 +20,12 @@
 
 .option {
     @include border-radius;
-    cursor: pointer;
     background: none;
     border: 1px solid $color-border;
+    cursor: pointer;
+    margin-top: .5rem;
     padding: 1rem;
     position: relative;
-    margin-top: .5rem;
 
     &:hover {
         border-color: darken($color-border, 10%);
@@ -33,16 +33,16 @@
 
     i {
         @include absolute(1.6rem, 1rem, auto, auto);
+        color: $color-border;
         font-size: 1.8rem;
         font-weight: 300;
-        color: $color-border;
     }
 }
 
 .access-token {
-    height: 10rem;
+    font-family: monospace;
     font-size: 1rem;
     font-weight: normal;
-    font-family: monospace;
+    height: 10rem;
     resize: none;
 }

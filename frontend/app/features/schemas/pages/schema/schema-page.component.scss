@@ -4,13 +4,13 @@
 .btn-publishing {
     &.disabled,
     &:disabled {
-        @include opacity(1);
+        opacity: 1;
     }
 }
 
 .cards {
-    padding: $panel-padding;
     overflow-y: auto;
+    padding: $panel-padding;
 }
 
 .nav-tabs2 {

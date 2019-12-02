@@ -6,8 +6,8 @@
 }
 
 .flexed {
-    @include flex-box;
-    @include flex-grow(1);
-    @include flex-direction(column);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     padding: 0;
 }

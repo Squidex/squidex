@@ -9,11 +9,11 @@
     &-container {
         & {
             background: $color-background;
+            height: $asset-height + 2rem;
             overflow-x: hidden;
             overflow-y: scroll;
             padding: 1rem;
             padding-bottom: 0;
-            height: $asset-height + 2rem;
         }
     }
 }
@@ -34,16 +34,16 @@
 
 .drop-area {
     & {
-        @include transition(border-color .4s ease);
         @include border-radius;
         @include truncate-nowidth;
         border: 2px dashed darken($color-border, 10%);
-        padding: 5px .5rem;
-        font-weight: normal;
-        font-size: 1rem;
-        text-align: center;
         color: darken($color-border, 30%);
         cursor: pointer;
+        font-size: 1rem;
+        font-weight: normal;
+        padding: 5px .5rem;
+        text-align: center;
+        transition: border-color .4s ease;
     }
 
     &:hover {
@@ -56,8 +56,8 @@
 
     &.drag {
         border-color: darken($color-border, 15%);
-        cursor: copy;
         color: darken($color-border, 40%);
+        cursor: copy;
         text-decoration: none;
     }
 }

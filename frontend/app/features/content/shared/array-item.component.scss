@@ -20,9 +20,8 @@
     }
 
     .header-index {
+        @include force-width(3rem);
         display: inline-block;
-        min-width: 3rem;
-        max-width: 3rem;
     }
 }
 

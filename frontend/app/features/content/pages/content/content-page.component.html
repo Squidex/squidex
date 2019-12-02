@@ -1,7 +1,7 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="hasContent">
+    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="hasContent" grid="true">
         <ng-container title>
             <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
@@ -98,26 +98,31 @@
         </ng-container>
 
         <ng-container content>
-            <div class="panel-alert panel-alert-danger" *ngIf="contentVersion; let version">
-                <div class="float-right">
-                    <a class="force" (click)="showLatest()">View latest</a>
+            <sqx-list-view>
+                <ng-container topHeader>
+                    <div class="panel-alert panel-alert-danger" *ngIf="contentVersion; let version">
+                        <div class="float-right">
+                            <a class="force" (click)="showLatest()">View latest</a>
+                        </div>
+        
+                        Viewing <strong>version {{version.value}}</strong>.
+                    </div>
+                </ng-container>
+
+                <div content>
+                    <sqx-content-field *ngFor="let field of schema.fields; trackBy: trackByFieldFn"
+                        [form]="contentForm"
+                        [formContext]="formContext"
+                        [field]="field"
+                        [fieldForm]="contentForm.form.get(field.name)"
+                        [fieldFormCompare]="contentFormCompare?.form.get(field.name)"
+                        [schema]="schema"
+                        [languages]="languages"
+                        [(language)]="language">
+                    </sqx-content-field>
                 </div>
+            </sqx-list-view>
 
-                Viewing <strong>version {{version.value}}</strong>.
-            </div>
-
-            <ng-container *ngFor="let field of schema.fields; trackBy: trackByFieldFn">
-                <sqx-content-field 
-                    [form]="contentForm"
-                    [formContext]="formContext"
-                    [field]="field"
-                    [fieldForm]="contentForm.form.get(field.name)"
-                    [fieldFormCompare]="contentFormCompare?.form.get(field.name)"
-                    [schema]="schema"
-                    [languages]="languages"
-                    [(language)]="language">
-                </sqx-content-field>
-            </ng-container>
         </ng-container>
 
         <ng-container sidebar>
