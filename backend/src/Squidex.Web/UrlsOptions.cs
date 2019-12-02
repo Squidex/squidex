@@ -15,6 +15,8 @@ namespace Squidex.Web
 
         public string BaseUrl { get; set; }
 
+        public bool EnableXForwardedHost { get; set; }
+
         public string BuildUrl(string path, bool trailingSlash = true)
         {
             if (string.IsNullOrWhiteSpace(BaseUrl))

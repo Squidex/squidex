@@ -13,11 +13,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure.Json;
 using Squidex.Pipeline.Robots;
+using Squidex.Web;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Web
@@ -105,14 +107,32 @@ namespace Squidex.Config.Web
                 .AllowAnyHeader());
         }
 
-        public static void UseSquidexForwardingRules(this IApplicationBuilder app)
+        public static void UseSquidexForwardingRules(this IApplicationBuilder app, IConfiguration config)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
+            var forwardedHeadersOptions = new ForwardedHeadersOptions();
+
+            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl) && urlsOptions.EnableXForwardedHost)
             {
-                ForwardedHeaders = ForwardedHeaders.XForwardedProto,
-                ForwardLimit = null,
-                RequireHeaderSymmetry = false
-            });
+                forwardedHeadersOptions = new ForwardedHeadersOptions()
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
+                    AllowedHosts = new List<string>() { new Uri(urlsOptions.BaseUrl).Host },
+                    ForwardLimit = null,
+                    RequireHeaderSymmetry = false
+                };
+            }
+            else
+            {
+                forwardedHeadersOptions = new ForwardedHeadersOptions()
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedProto,
+                    ForwardLimit = null,
+                    RequireHeaderSymmetry = false
+                };
+            }
+
+            app.UseForwardedHeaders(forwardedHeadersOptions);
 
             app.UseMiddleware<EnforceHttpsMiddleware>();
             app.UseMiddleware<CleanupHostMiddleware>();

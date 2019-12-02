@@ -76,7 +76,7 @@ namespace Squidex
             app.UseSquidexTracking();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
-            app.UseSquidexForwardingRules();
+            app.UseSquidexForwardingRules(config);
 
             app.ConfigureApi();
             app.ConfigurePortal();
