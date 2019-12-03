@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private const string HeaderLanguages = "X-Languages";
         private const string HeaderResolveFlow = "X-ResolveFlow";
         private const string HeaderResolveAssetUrls = "X-Resolve-Urls";
-        private const string HeaderNoResolveLanguage = "X-NoResolveLanguage";
+        private const string HeaderNoResolveLanguages = "X-NoResolveLanguages";
         private const string HeaderNoEnrichment = "X-NoEnrichment";
         private static readonly char[] Separators = { ',', ';' };
 
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Headers.ContainsKey(HeaderNoEnrichment);
         }
 
-        public static Context WithNoContentEnrichment(this Context context, bool value = true)
+        public static Context WithoutContentEnrichment(this Context context, bool value = true)
         {
             if (value)
             {
@@ -99,20 +99,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context;
         }
 
-        public static bool IsNoResolveLanguage(this Context context)
+        public static bool IsNoResolveLanguages(this Context context)
         {
-            return context.Headers.ContainsKey(HeaderNoResolveLanguage);
+            return context.Headers.ContainsKey(HeaderNoResolveLanguages);
         }
 
-        public static Context WithNoResolveLanguage(this Context context, bool value = true)
+        public static Context WithoutResolveLanguages(this Context context, bool value = true)
         {
             if (value)
             {
-                context.Headers[HeaderNoResolveLanguage] = "1";
+                context.Headers[HeaderNoResolveLanguages] = "1";
             }
             else
             {
-                context.Headers.Remove(HeaderNoResolveLanguage);
+                context.Headers.Remove(HeaderNoResolveLanguages);
             }
 
             return context;
