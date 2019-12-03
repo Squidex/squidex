@@ -10,11 +10,16 @@ $inner-height: 1.75rem;
     text-align: left;
 }
 
+.form-container {
+    position: relative;
+}
+
 .form-control {
     & {
         cursor: text;
         padding-bottom: 0;
         padding-left: .25rem;
+        padding-right: 2rem;
         padding-top: .25rem;
         position: relative;
         text-align: left;
@@ -61,6 +66,7 @@ div {
         @include placeholder-color($color-input-placeholder);
         background: transparent;
         border: 0;
+        border-radius: 0;
         padding: 0;
     }
 
@@ -89,7 +95,7 @@ div {
     }
 }
 
-input {
+.text-input {
     height: $inner-height;
     margin-bottom: .25rem;
     margin-left: .25rem;
@@ -138,4 +144,20 @@ input {
     &:hover {
         background: $color-theme-blue-dark;
     }
+}
+
+.btn {
+    @include absolute(.25rem, 0, null, null);
+    border: 0;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: normal;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.suggestions-dropdown {
+    max-width: 300px;
+    min-width: 300px;
+    padding: 1rem;
 }

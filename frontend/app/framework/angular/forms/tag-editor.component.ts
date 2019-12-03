@@ -14,6 +14,7 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     fadeAnimation,
     Keys,
+    ModalModel,
     StatefulControlComponent,
     Types
 } from '@app/framework/internal';
@@ -154,9 +155,6 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Input()
-    public suggestedValues: ReadonlyArray<TagValue> = [];
-
-    @Input()
     public converter: Converter = new StringConverter();
 
     @Input()
@@ -187,11 +185,20 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputName = 'tag-editor';
 
     @Input()
+    public set suggestedValues(value: ReadonlyArray<TagValue>) {
+        if (value) {
+            this.suggestionsSorted = value.sortedByString(x => x.lowerCaseName);
+        } else {
+            this.suggestionsSorted = [];
+        }
+    }
+
+    @Input()
     public set suggestions(value: ReadonlyArray<string>) {
         if (value) {
-            this.suggestedValues = value.map(x => new TagValue(x, x, x));
+            this.suggestionsSorted = value.map(x => new TagValue(x, x, x)).sortedByString(x => x.lowerCaseName);
         } else {
-            this.suggestedValues = [];
+            this.suggestionsSorted = [];
         }
     }
 
@@ -199,6 +206,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public set disabled(value: boolean) {
         this.setDisabledState(value);
     }
+
+    public suggestionsSorted: ReadonlyArray<TagValue> = [];
+    public suggestionsModal = new ModalModel();
 
     public addInput = new FormControl();
 
@@ -236,8 +246,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                     }),
                     distinctUntilChanged(),
                     map(query => {
-                        if (Types.isArray(this.suggestedValues) && query && query.length > 0) {
-                            return this.suggestedValues.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
+                        if (Types.isArray(this.suggestionsSorted) && query && query.length > 0) {
+                            return this.suggestionsSorted.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
                         } else {
                             return [];
                         }
@@ -377,10 +387,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 return false;
             }
         } else if (key === Keys.UP) {
-            this.up();
+            this.selectPrevIndex();
             return false;
         } else if (key === Keys.DOWN) {
-            this.down();
+            this.selectNextIndex();
             return false;
         } else if (key === Keys.ENTER) {
             if (this.snapshot.suggestedIndex >= 0) {
@@ -411,7 +421,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         }
 
         if (tagValue) {
-            if (this.allowDuplicates || !this.snapshot.items.find(x => x.id === tagValue!.id)) {
+            if (this.allowDuplicates || !this.isSelected(tagValue)) {
                 this.updateItems([...this.snapshot.items, tagValue]);
             }
 
@@ -423,12 +433,20 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         return false;
     }
 
-    private resetAutocompletion() {
-        this.next(s => ({
-            ...s,
-            suggestedItems: [],
-            suggestedIndex: -1
-        }));
+    public toggleValue(isSelected: boolean, tagValue: TagValue) {
+        if (isSelected) {
+            this.updateItems([...this.snapshot.items, tagValue]);
+        } else {
+            this.updateItems(this.snapshot.items.filter(x => x.id !== tagValue.id));
+        }
+    }
+
+    public selectPrevIndex() {
+        this.selectIndex(this.snapshot.suggestedIndex - 1);
+    }
+
+    public selectNextIndex() {
+        this.selectIndex(this.snapshot.suggestedIndex + 1);
     }
 
     public selectIndex(suggestedIndex: number) {
@@ -447,16 +465,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         this.next(s => ({ ...s, hasFocus: false }));
     }
 
+    private resetAutocompletion() {
+        this.next(s => ({ ...s, suggestedItems: [], suggestedIndex: -1 }));
+    }
+
     private resetForm() {
         this.addInput.reset();
     }
 
-    private up() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1);
-    }
-
-    private down() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1);
+    public isSelected(tagValue: TagValue) {
+        return this.snapshot.items.find(x => x.id === tagValue.id);
     }
 
     public onCut(event: ClipboardEvent) {
