@@ -42,7 +42,7 @@ namespace Squidex.Web.Services
                 return null;
             }
 
-            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}&width=100&mode=Max");
+            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.FileVersion}&width=100&mode=Max");
         }
 
         public string GenerateUrl(string assetId)
@@ -52,7 +52,7 @@ namespace Squidex.Web.Services
 
         public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)
         {
-            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}");
+            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.FileVersion}");
         }
 
         public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
