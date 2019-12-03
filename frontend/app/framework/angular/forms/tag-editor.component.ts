@@ -7,13 +7,14 @@
 
 // tslint:disable:template-use-track-by-function
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     fadeAnimation,
     Keys,
+    ModalModel,
     StatefulControlComponent,
     Types
 } from '@app/framework/internal';
@@ -45,7 +46,7 @@ export interface Converter {
 export class IntConverter implements Converter {
     private static ZERO = new TagValue(0, '0', 0);
 
-    public convertInput(input: string): TagValue<number> | null {
+    public convertInput(input: string) {
         if (input === '0') {
             return IntConverter.ZERO;
         }
@@ -59,7 +60,7 @@ export class IntConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<number> | null {
+    public convertValue(value: any) {
         if (Types.isNumber(value)) {
             return new TagValue(value, `${value}`, value);
         }
@@ -71,7 +72,7 @@ export class IntConverter implements Converter {
 export class FloatConverter implements Converter {
     private static ZERO = new TagValue(0, '0', 0);
 
-    public convertInput(input: string): TagValue<number> | null {
+    public convertInput(input: string) {
         if (input === '0') {
             return FloatConverter.ZERO;
         }
@@ -85,7 +86,7 @@ export class FloatConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<number> | null {
+    public convertValue(value: any) {
         if (Types.isNumber(value)) {
             return new TagValue(value, `${value}`, value);
         }
@@ -95,7 +96,7 @@ export class FloatConverter implements Converter {
 }
 
 export class StringConverter implements Converter {
-    public convertInput(input: string): TagValue<string> | null {
+    public convertInput(input: string) {
         if (input) {
             const trimmed = input.trim();
 
@@ -107,7 +108,7 @@ export class StringConverter implements Converter {
         return null;
     }
 
-    public convertValue(value: any): TagValue<string> | null {
+    public convertValue(value: any) {
         if (Types.isString(value)) {
             const trimmed = value.trim();
 
@@ -121,8 +122,6 @@ export class StringConverter implements Converter {
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
-
-const CACHED_SIZES: { [key: string]: number } = {};
 
 let CACHED_FONT: string;
 
@@ -140,21 +139,20 @@ interface State {
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line: readonly-array
-export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
+export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnChanges, OnInit {
+    private latestValue: any;
+
     @ViewChild('form', { static: false })
     public formElement: ElementRef<HTMLElement>;
 
     @ViewChild('input', { static: false })
     public inputElement: ElementRef<HTMLInputElement>;
-
-    @Input()
-    public suggestedValues: ReadonlyArray<TagValue> = [];
 
     @Input()
     public converter: Converter = new StringConverter();
@@ -187,11 +185,20 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputName = 'tag-editor';
 
     @Input()
+    public set suggestedValues(value: ReadonlyArray<TagValue>) {
+        if (value) {
+            this.suggestionsSorted = value.sortedByString(x => x.lowerCaseName);
+        } else {
+            this.suggestionsSorted = [];
+        }
+    }
+
+    @Input()
     public set suggestions(value: ReadonlyArray<string>) {
         if (value) {
-            this.suggestedValues = value.map(x => new TagValue(x, x, x));
+            this.suggestionsSorted = value.map(x => new TagValue(x, x, x)).sortedByString(x => x.lowerCaseName);
         } else {
-            this.suggestedValues = [];
+            this.suggestionsSorted = [];
         }
     }
 
@@ -199,6 +206,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public set disabled(value: boolean) {
         this.setDisabledState(value);
     }
+
+    public suggestionsSorted: ReadonlyArray<TagValue> = [];
+    public suggestionsModal = new ModalModel();
 
     public addInput = new FormControl();
 
@@ -212,13 +222,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public ngAfterViewInit() {
-        if (!CACHED_FONT) {
-            const style = window.getComputedStyle(this.inputElement.nativeElement);
-
-            CACHED_FONT = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
-        }
-
         this.resetSize();
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['converter']) {
+            this.writeValue(this.latestValue);
+        }
     }
 
     public ngOnInit() {
@@ -236,8 +246,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                     }),
                     distinctUntilChanged(),
                     map(query => {
-                        if (Types.isArray(this.suggestedValues) && query && query.length > 0) {
-                            return this.suggestedValues.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
+                        if (Types.isArray(this.suggestionsSorted) && query && query.length > 0) {
+                            return this.suggestionsSorted.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
                         } else {
                             return [];
                         }
@@ -252,6 +262,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public writeValue(obj: any) {
+        this.latestValue = obj;
+
         this.resetForm();
         this.resetSize();
 
@@ -304,6 +316,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public resetSize() {
+        this.calculateStyle();
+
         if (!CACHED_FONT ||
             !this.inputElement ||
             !this.inputElement.nativeElement) {
@@ -321,18 +335,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 ctx.font = CACHED_FONT;
 
                 const textValue = this.inputElement.nativeElement.value;
-                const textKey = `${textValue}§${this.placeholder}§${ctx.font}`;
 
-                let width = CACHED_SIZES[textKey];
+                const widthText = ctx.measureText(textValue).width;
+                const widthPlaceholder = ctx.measureText(this.placeholder).width;
 
-                if (!width) {
-                    const widthText = ctx.measureText(textValue).width;
-                    const widthPlaceholder = ctx.measureText(this.placeholder).width;
-
-                    width = Math.max(widthText, widthPlaceholder);
-
-                    CACHED_SIZES[textKey] = width;
-                }
+                const width = Math.max(widthText, widthPlaceholder);
 
                 this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
             }
@@ -343,6 +350,25 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
             }, 0);
         }
+    }
+
+    private calculateStyle() {
+        if (CACHED_FONT ||
+            !this.inputElement ||
+            !this.inputElement.nativeElement) {
+            return;
+        }
+
+        const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+        const fontSize = style.getPropertyValue('font-size');
+        const fontFamily = style.getPropertyValue('font-family');
+
+        if (!fontSize || !fontFamily) {
+            return;
+        }
+
+        CACHED_FONT = `${fontSize} ${fontFamily}`;
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -361,10 +387,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 return false;
             }
         } else if (key === Keys.UP) {
-            this.up();
+            this.selectPrevIndex();
             return false;
         } else if (key === Keys.DOWN) {
-            this.down();
+            this.selectNextIndex();
             return false;
         } else if (key === Keys.ENTER) {
             if (this.snapshot.suggestedIndex >= 0) {
@@ -395,7 +421,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         }
 
         if (tagValue) {
-            if (this.allowDuplicates || !this.snapshot.items.find(x => x.id === tagValue!.id)) {
+            if (this.allowDuplicates || !this.isSelected(tagValue)) {
                 this.updateItems([...this.snapshot.items, tagValue]);
             }
 
@@ -407,12 +433,20 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         return false;
     }
 
-    private resetAutocompletion() {
-        this.next(s => ({
-            ...s,
-            suggestedItems: [],
-            suggestedIndex: -1
-        }));
+    public toggleValue(isSelected: boolean, tagValue: TagValue) {
+        if (isSelected) {
+            this.updateItems([...this.snapshot.items, tagValue]);
+        } else {
+            this.updateItems(this.snapshot.items.filter(x => x.id !== tagValue.id));
+        }
+    }
+
+    public selectPrevIndex() {
+        this.selectIndex(this.snapshot.suggestedIndex - 1);
+    }
+
+    public selectNextIndex() {
+        this.selectIndex(this.snapshot.suggestedIndex + 1);
     }
 
     public selectIndex(suggestedIndex: number) {
@@ -431,16 +465,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         this.next(s => ({ ...s, hasFocus: false }));
     }
 
+    private resetAutocompletion() {
+        this.next(s => ({ ...s, suggestedItems: [], suggestedIndex: -1 }));
+    }
+
     private resetForm() {
         this.addInput.reset();
     }
 
-    private up() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1);
-    }
-
-    private down() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1);
+    public isSelected(tagValue: TagValue) {
+        return this.snapshot.items.find(x => x.id === tagValue.id);
     }
 
     public onCut(event: ClipboardEvent) {

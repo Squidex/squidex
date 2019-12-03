@@ -4,13 +4,26 @@
 $focus-color: #b3d3ff;
 $focus-shadow: rgba(51, 137, 255, .25);
 
+$inner-height: 1.75rem;
+
 :host {
     text-align: left;
+}
+
+.form-container {
+    position: relative;
 }
 
 .form-control {
     & {
         cursor: text;
+        padding-bottom: 0;
+        padding-left: .25rem;
+        padding-right: 2rem;
+        padding-top: .25rem;
+        position: relative;
+        text-align: left;
+        text-decoration: none;
     }
 
     &.disabled {
@@ -27,7 +40,7 @@ $focus-shadow: rgba(51, 137, 255, .25);
         box-shadow: 0 0 0 .2rem $focus-shadow;
     }
 
-    &.single-line {
+    &.singleline {
         overflow-x: hidden;
         overflow-y: hidden;
         white-space: nowrap;
@@ -38,12 +51,13 @@ $focus-shadow: rgba(51, 137, 255, .25);
     }
 }
 
+.multiline {
+    height: auto;
+}
+
 div {
-    &.form-control {
+    &.blank {
         height: auto;
-        position: relative;
-        text-align: left;
-        text-decoration: none;
     }
 }
 
@@ -52,15 +66,12 @@ div {
         @include placeholder-color($color-input-placeholder);
         background: transparent;
         border: 0;
-        height: auto !important;
-        max-width: 100%;
-        min-width: 50px;
+        border-radius: 0;
         padding: 0;
     }
 
     &:focus,
     &.focus {
-        box-shadow: none;
         outline: none;
     }
 
@@ -72,6 +83,25 @@ div {
     &:hover {
         background: transparent;
     }
+
+    &.singleline {
+        .item {
+            margin-bottom: 0;
+        }
+
+        .blank {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.text-input {
+    height: $inner-height;
+    margin-bottom: .25rem;
+    margin-left: .25rem;
+    max-width: 100%;
+    min-width: 50px;
+    padding-left: .25rem;
 }
 
 .gray {
@@ -88,35 +118,46 @@ div {
 
 .item {
     & {
-        @include border-radius(10px);
         background: $color-theme-blue;
         border: 0;
+        border-radius: 2px;
         color: $color-dark-foreground;
         cursor: default;
-        font-size: .8rem;
-        font-weight: normal;
-        height: 1.25rem;
-        margin-right: 2px;
-        padding: 1px .6rem;
-        white-space: nowrap;
-    }
-
-    &,
-    &-container {
         display: inline-block;
-    }
-
-    &-container {
-        height: 24px;
-        padding: 2px;
-        padding-left: 0;
+        height: $inner-height;
+        margin-bottom: .25rem;
+        margin-right: 2px;
+        padding: 1px .5rem;
+        vertical-align: top;
+        white-space: nowrap;
+        width: auto;
     }
 
     &.disabled {
         pointer-events: none;
+
+        i {
+            display: none;
+        }
     }
 
     &:hover {
         background: $color-theme-blue-dark;
     }
+}
+
+.btn {
+    @include absolute(.25rem, 0, null, null);
+    border: 0;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: normal;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.suggestions-dropdown {
+    max-width: 300px;
+    min-width: 300px;
+    padding: 1rem;
 }

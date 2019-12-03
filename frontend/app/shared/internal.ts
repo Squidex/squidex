@@ -61,7 +61,7 @@ export * from './state/roles.forms';
 export * from './state/roles.state';
 export * from './state/rule-events.state';
 export * from './state/rules.state';
-export * from './state/schema-tag-converter';
+export * from './state/schema-tag-source';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/ui.state';
