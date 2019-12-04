@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         {
             var folderName = schemaId.ToString();
 
-            var tempFolder = Path.Combine(Path.GetTempPath(), folderName);
+            var tempFolder = Path.Combine(Path.GetTempPath(), "Indices", folderName);
             var tempDirectory = new DirectoryInfo(tempFolder);
 
             return new MongoDirectory(bucket, folderName, tempDirectory);

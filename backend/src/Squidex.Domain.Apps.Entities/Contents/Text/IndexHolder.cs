@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (disposing)
             {
-                indexWriter.Dispose();
+                indexWriter?.Dispose();
             }
         }
 

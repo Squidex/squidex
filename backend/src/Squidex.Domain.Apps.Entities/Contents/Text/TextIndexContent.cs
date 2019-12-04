@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var document = new Document();
 
-            foreach (var field in text)
+            foreach (var field in text.Texts)
             {
                 document.AddTextField(field.Key, field.Value, Field.Store.NO);
             }

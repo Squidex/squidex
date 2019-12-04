@@ -12,13 +12,24 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-#pragma warning disable ORL1001
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    [Serializable]
-    public sealed class TextContent : Dictionary<string, string>
+    public sealed class TextContent
     {
+        public Dictionary<string, string> Texts { get; } = new Dictionary<string, string>();
+
+        public string this[string key]
+        {
+            get
+            {
+                return Texts.GetOrDefault(key) ?? string.Empty;
+            }
+            set
+            {
+                Texts[key] = value;
+            }
+        }
+
         public TextContent()
         {
         }
@@ -62,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             foreach (var kvp in languages)
             {
-                this[kvp.Key] = kvp.Value.ToString();
+                Texts[kvp.Key] = kvp.Value.ToString();
             }
         }
 
