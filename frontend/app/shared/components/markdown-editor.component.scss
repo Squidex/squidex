@@ -3,13 +3,14 @@
 
 $background: #fff;
 
-.editor {
-    height: 30rem;
+:host ::ng-deep {
+    // sass-lint:disable class-name-format
+    .CodeMirror {
+        height: 300px;
+    }
 }
 
 .fullscreen {
     @include fixed(0, 0, 0, 0);
-    background: $background;
-    border: 0;
     z-index: 1040;
 }
