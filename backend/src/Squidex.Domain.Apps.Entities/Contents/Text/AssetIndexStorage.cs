@@ -17,20 +17,20 @@ using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class AssetStoreDirectoryFactory : IDirectoryFactory
+    public sealed class AssetIndexStorage : IIndexStorage
     {
         private const string ArchiveFile = "Archive.zip";
         private const string LockFile = "write.lock";
         private readonly IAssetStore assetStore;
 
-        public AssetStoreDirectoryFactory(IAssetStore assetStore)
+        public AssetIndexStorage(IAssetStore assetStore)
         {
             Guard.NotNull(assetStore);
 
             this.assetStore = assetStore;
         }
 
-        public async Task<LuceneDirectory> CreateAsync(Guid schemaId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
         {
             var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "LocalIndices", schemaId.ToString()));
 
@@ -64,12 +64,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return directory;
         }
 
-        public async Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter)
+        public async Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
-            Guard.NotNull(writer);
-            Guard.NotNull(writer);
+            Guard.NotNull(directory);
+            Guard.NotNull(snapshotter);
 
-            var directoryInfo = ((FSDirectory)writer.Directory).Directory;
+            var directoryInfo = ((FSDirectory)directory).Directory;
 
             var commit = snapshotter.Snapshot();
             try

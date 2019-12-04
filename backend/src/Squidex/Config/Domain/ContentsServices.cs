@@ -51,7 +51,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GrainTextIndexer>()
                 .As<ITextIndexer>().As<IEventConsumer>();
 
-            services.AddSingletonAs<IndexHolderFactory>()
+            services.AddSingletonAs<IndexManager>()
                 .AsSelf();
 
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()

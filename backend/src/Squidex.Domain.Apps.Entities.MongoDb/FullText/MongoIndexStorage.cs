@@ -15,16 +15,16 @@ using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public sealed class MongoDirectoryFactory : IDirectoryFactory
+    public sealed class MongoIndexStorage : IIndexStorage
     {
         private readonly IGridFSBucket<string> bucket;
 
-        public MongoDirectoryFactory(IGridFSBucket<string> bucket)
+        public MongoIndexStorage(IGridFSBucket<string> bucket)
         {
             this.bucket = bucket;
         }
 
-        public Task<LuceneDirectory> CreateAsync(Guid schemaId)
+        public Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
         {
             var folderName = schemaId.ToString();
 
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return Task.FromResult<LuceneDirectory>(directory);
         }
 
-        public Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter)
+        public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
             return Task.CompletedTask;
         }

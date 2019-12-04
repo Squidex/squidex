@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly SearchContext context;
         private readonly TextIndexerGrain sut;
 
-        public abstract IDirectoryFactory DirectoryFactory { get; }
+        public abstract IIndexStorage Storage { get; }
 
         protected TextIndexerGrainTestsBase()
         {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 Languages = new HashSet<string> { "de", "en" }
             };
 
-            var factory = new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>());
+            var factory = new IndexManager(Storage, A.Fake<ISemanticLog>());
 
             sut = new TextIndexerGrain(factory);
             sut.ActivateAsync(schemaId).Wait();
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.OnDeactivateAsync();
 
-            var other = new TextIndexerGrain(new IndexHolderFactory(DirectoryFactory, A.Fake<ISemanticLog>()));
+            var other = new TextIndexerGrain(new IndexManager(Storage, A.Fake<ISemanticLog>()));
             try
             {
                 await other.ActivateAsync(schemaId);

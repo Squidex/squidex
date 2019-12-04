@@ -26,32 +26,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxUpdates = 400;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
-        private readonly IndexHolderFactory indexHolderFactory;
+        private readonly IndexManager indexManager;
         private IDisposable? timer;
-        private IndexHolder index;
+        private IIndex index;
         private IndexState indexState;
         private QueryParser? queryParser;
         private HashSet<string>? currentLanguages;
         private int updates;
 
-        public TextIndexerGrain(IndexHolderFactory indexHolderFactory)
+        public TextIndexerGrain(IndexManager indexManager)
         {
-            Guard.NotNull(indexHolderFactory);
+            Guard.NotNull(indexManager);
 
-            this.indexHolderFactory = indexHolderFactory;
+            this.indexManager = indexManager;
         }
 
-        public override Task OnDeactivateAsync()
+        public override async Task OnDeactivateAsync()
         {
-            index?.Dispose();
-            indexHolderFactory.Release(Key);
-
-            return Task.CompletedTask;
+            if (index != null)
+            {
+                await indexManager.ReleaseAsync(index);
+            }
         }
 
         protected override async Task OnActivateAsync(Guid key)
         {
-            index = await indexHolderFactory.AcquireAsync(key);
+            index = await indexManager.AcquireAsync(key);
 
             indexState = new IndexState(index);
         }
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             content.Index(update.Text, update.OnlyDraft);
 
-            return TryFlushAsync();
+            return TryCommitAsync();
         }
 
         public Task<bool> CopyAsync(Guid id, bool fromDraft)
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             content.Copy(fromDraft);
 
-            return TryFlushAsync();
+            return TryCommitAsync();
         }
 
         public Task<bool> DeleteAsync(Guid id)
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             content.Delete();
 
-            return TryFlushAsync();
+            return TryCommitAsync();
         }
 
         public Task<List<Guid>> SearchAsync(string queryText, SearchContext context)
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task<bool> TryFlushAsync()
+        private async Task<bool> TryCommitAsync()
         {
             timer?.Dispose();
 
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (updates >= MaxUpdates)
             {
-                await FlushAsync();
+                await CommitAsync();
 
                 return true;
             }
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 try
                 {
-                    timer = RegisterTimer(_ => FlushAsync(), null, CommitDelay, CommitDelay);
+                    timer = RegisterTimer(_ => CommitAsync(), null, CommitDelay, CommitDelay);
                 }
                 catch (InvalidOperationException)
                 {
@@ -168,11 +168,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return false;
         }
 
-        public async Task FlushAsync()
+        public async Task CommitAsync()
         {
             if (updates > 0)
             {
-                await index.CommitAsync();
+                await indexManager.CommitAsync(index);
 
                 updates = 0;
             }

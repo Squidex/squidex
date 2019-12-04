@@ -133,8 +133,8 @@ namespace Squidex.Config.Domain
                             BucketName = "fullText"
                         });
 
-                        return new MongoDirectoryFactory(mongoBucket);
-                    }).As<IDirectoryFactory>();
+                        return new MongoIndexStorage(mongoBucket);
+                    }).As<IIndexStorage>();
                 }
             });
 

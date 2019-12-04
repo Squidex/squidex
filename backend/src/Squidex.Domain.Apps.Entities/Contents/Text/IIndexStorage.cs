@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Threading.Tasks;
+using Lucene.Net.Index;
+using Lucene.Net.Store;
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerGrainTests_FS : TextIndexerGrainTestsBase
+    public interface IIndexStorage
     {
-        public override IIndexStorage Storage => CreateStorage();
+        Task<Directory> CreateDirectoryAsync(Guid schemaId);
 
-        private static IIndexStorage CreateStorage()
-        {
-            var storage = new FileIndexStorage();
-
-            return storage;
-        }
+        Task WriteAsync(Directory directory, SnapshotDeletionPolicy snapshotter);
     }
 }

@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerBenchmark()
         {
-            var factory = new IndexHolderFactory(new FSDirectoryFactory(), A.Fake<ISemanticLog>());
+            var factory = new IndexManager(new FileIndexStorage(), A.Fake<ISemanticLog>());
 
             sut = new TextIndexerGrain(factory);
             sut.ActivateAsync(schemaId).Wait();

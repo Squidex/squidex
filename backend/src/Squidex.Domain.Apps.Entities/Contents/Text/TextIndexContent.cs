@@ -16,11 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
-        private readonly IndexHolder index;
+        private readonly IIndex index;
         private readonly IndexState indexState;
         private readonly Guid id;
 
-        public TextIndexContent(IndexHolder index, IndexState indexState, Guid id)
+        public TextIndexContent(IIndex index, IndexState indexState, Guid id)
         {
             this.index = index;
             this.indexState = indexState;
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             index.Writer.DeleteDocuments(new Term(MetaId, id.ToString()));
         }
 
-        public static bool TryGetId(int docId, Scope scope, IndexHolder index, IndexState indexState, out Guid result)
+        public static bool TryGetId(int docId, Scope scope, IIndex index, IndexState indexState, out Guid result)
         {
             result = Guid.Empty;
 

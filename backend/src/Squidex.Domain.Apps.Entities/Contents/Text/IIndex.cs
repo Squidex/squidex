@@ -5,17 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Lucene.Net.Analysis;
 using Lucene.Net.Index;
-using Lucene.Net.Store;
+using Lucene.Net.Search;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface IDirectoryFactory
+    public interface IIndex
     {
-        Task<Directory> CreateAsync(Guid schemaId);
+        Analyzer? Analyzer { get; }
 
-        Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter);
+        IndexReader? Reader { get; }
+
+        IndexSearcher? Searcher { get; }
+
+        IndexWriter Writer { get; }
+
+        void EnsureReader();
+
+        void MarkStale();
     }
 }

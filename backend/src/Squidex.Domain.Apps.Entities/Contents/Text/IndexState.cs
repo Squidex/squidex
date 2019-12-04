@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int NotFound = -1;
         private const string MetaFor = "_fd";
         private readonly Dictionary<(Guid, Scope), BytesRef> lastChanges = new Dictionary<(Guid, Scope), BytesRef>();
-        private readonly IndexHolder index;
+        private readonly IIndex index;
         private IndexReader? lastReader;
         private BinaryDocValues binaryValues;
 
-        public IndexState(IndexHolder index)
+        public IndexState(IIndex index)
         {
             this.index = index;
         }

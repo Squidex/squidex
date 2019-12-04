@@ -13,9 +13,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     internal class TextIndexerGrainTests_Mongo : TextIndexerGrainTestsBase
     {
-        public override IDirectoryFactory DirectoryFactory => CreateFactory();
+        public override IIndexStorage Storage => CreateStorage();
 
-        private static IDirectoryFactory CreateFactory()
+        private static IIndexStorage CreateStorage()
         {
             var mongoClient = new MongoClient("mongodb://localhost");
             var mongoDatabase = mongoClient.GetDatabase("FullText");
@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 BucketName = "fs"
             });
 
-            var directoryFactory = new MongoDirectoryFactory(mongoBucket);
+            var storage = new MongoIndexStorage(mongoBucket);
 
-            return directoryFactory;
+            return storage;
         }
     }
 }

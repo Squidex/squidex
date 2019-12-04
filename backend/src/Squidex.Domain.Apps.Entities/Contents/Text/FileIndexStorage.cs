@@ -14,9 +14,9 @@ using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class FSDirectoryFactory : IDirectoryFactory
+    public sealed class FileIndexStorage : IIndexStorage
     {
-        public Task<LuceneDirectory> CreateAsync(Guid schemaId)
+        public Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
         {
             var folderName = $"Indexes/{schemaId}";
             var folderPath = Path.Combine(Path.GetTempPath(), folderName);
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Task.FromResult<LuceneDirectory>(FSDirectory.Open(folderPath));
         }
 
-        public Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter)
+        public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
             return Task.CompletedTask;
         }
