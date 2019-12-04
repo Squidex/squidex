@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure;
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact(Skip = "Only used for benchmarks")]
         public async Task Should_index_many_documents()
         {
-            var text = new TextContent
+            var text = new Dictionary<string, string>
             {
                 ["iv"] = "Hallo Welt"
             };

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Orleans.Concurrency;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -15,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         public Guid Id { get; set; }
 
-        public TextContent Text { get; set; }
+        public Dictionary<string, string> Text { get; set; }
 
         public bool OnlyDraft { get; set; }
     }

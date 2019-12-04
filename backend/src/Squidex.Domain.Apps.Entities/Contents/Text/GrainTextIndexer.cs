@@ -88,9 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static Update Data(Guid contentId, NamedContentData data, bool onlyDraft)
         {
-            var text = new TextContent(data);
-
-            return new Update { Id = contentId, Text = text, OnlyDraft = onlyDraft };
+            return new Update { Id = contentId, Text = data.ToTexts(), OnlyDraft = onlyDraft };
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)

@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await sut.On(E(new ContentCreated()));
 
-            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Texts.Count == 0 && x.Id == contentId && x.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && x.OnlyDraft)))
                 .MustHaveHappened();
         }
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await sut.On(E(new ContentUpdated()));
 
-            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Texts.Count == 0 && x.Id == contentId && !x.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && !x.OnlyDraft)))
                 .MustHaveHappened();
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await sut.On(E(new ContentUpdateProposed()));
 
-            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Texts.Count == 0 && x.Id == contentId && x.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && x.OnlyDraft)))
                 .MustHaveHappened();
         }
 

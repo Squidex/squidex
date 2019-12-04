@@ -204,12 +204,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task AddLocalizedContent()
         {
-            var germanText = new TextContent
+            var germanText = new Dictionary<string, string>
             {
                 ["de"] = "Stadt und Umgebung and whatever"
             };
 
-            var englishText = new TextContent
+            var englishText = new Dictionary<string, string>
             {
                 ["en"] = "City and Surroundings und sonstiges"
             };
@@ -220,12 +220,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
         {
-            var content1 = new TextContent
+            var content1 = new Dictionary<string, string>
             {
                 ["iv"] = text1
             };
 
-            var content2 = new TextContent
+            var content2 = new Dictionary<string, string>
             {
                 ["iv"] = text2
             };

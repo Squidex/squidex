@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return true;
         }
 
-        public void Index(TextContent text, bool onlyDraft)
+        public void Index(Dictionary<string, string> text, bool onlyDraft)
         {
             var converted = CreateDocument(text);
 
@@ -118,11 +119,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static Document CreateDocument(TextContent text)
+        private static Document CreateDocument(Dictionary<string, string> text)
         {
             var document = new Document();
 
-            foreach (var field in text.Texts)
+            foreach (var field in text)
             {
                 document.AddTextField(field.Key, field.Value, Field.Store.NO);
             }
