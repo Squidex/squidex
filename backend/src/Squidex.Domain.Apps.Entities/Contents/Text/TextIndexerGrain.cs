@@ -15,7 +15,6 @@ using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -50,12 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Task.CompletedTask;
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override async Task OnActivateAsync(Guid key)
         {
-            index = indexHolderFactory.Acquire(key);
-            indexState = new IndexState(index);
+            index = await indexHolderFactory.AcquireAsync(key);
 
-            return TaskHelper.Done;
+            indexState = new IndexState(index);
         }
 
         public Task<bool> IndexAsync(Update update)
@@ -170,16 +168,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return false;
         }
 
-        public Task FlushAsync()
+        public async Task FlushAsync()
         {
             if (updates > 0)
             {
-                index.Commit();
+                await index.CommitAsync();
 
                 updates = 0;
             }
-
-            return TaskHelper.Done;
         }
     }
 }

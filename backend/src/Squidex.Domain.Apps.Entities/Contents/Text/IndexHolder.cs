@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
@@ -22,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly Analyzer SharedAnalyzer = new MultiLanguageAnalyzer(Version);
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly Directory directory;
+        private readonly IDirectoryFactory directoryFactory;
         private IndexWriter indexWriter;
         private IndexSearcher? indexSearcher;
         private DirectoryReader? indexReader;
@@ -76,9 +78,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public IndexHolder(IDirectoryFactory directoryFactory, Guid schemaId)
+        public IndexHolder(Directory directory, IDirectoryFactory directoryFactory)
         {
-            directory = directoryFactory.Create(schemaId);
+            this.directory = directory;
+            this.directoryFactory = directoryFactory;
         }
 
         public void Open()
@@ -136,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public void Commit()
+        public async Task CommitAsync()
         {
             ThrowIfDisposed();
 
@@ -145,6 +148,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 MarkStale();
 
                 indexWriter.Commit();
+
+                await directoryFactory.WriteAsync(indexWriter, snapshotter);
             }
             catch (OutOfMemoryException)
             {

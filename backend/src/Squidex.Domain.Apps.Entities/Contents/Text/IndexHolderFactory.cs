@@ -7,6 +7,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -15,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class IndexHolderFactory : DisposableObjectBase
     {
         private readonly Dictionary<Guid, IndexHolder> indices = new Dictionary<Guid, IndexHolder>();
+        private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
         private readonly IDirectoryFactory directoryFactory;
         private readonly ISemanticLog log;
 
@@ -32,8 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (disposing)
             {
-                lock (indices)
+                try
                 {
+                    lockObject.Wait();
+
                     if (indices.Count > 0)
                     {
                         log.LogWarning(w => w
@@ -48,15 +53,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         indices.Clear();
                     }
                 }
+                finally
+                {
+                    lockObject.Release();
+                }
             }
         }
 
-        public IndexHolder Acquire(Guid schemaId)
+        public async Task<IndexHolder> AcquireAsync(Guid schemaId)
         {
             IndexHolder? index;
 
-            lock (indices)
+            try
             {
+                await lockObject.WaitAsync();
+
                 if (indices.TryGetValue(schemaId, out index))
                 {
                     log.LogWarning(w => w
@@ -66,9 +77,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     index.Dispose();
                 }
 
-                index = new IndexHolder(directoryFactory, schemaId);
+                var directory = await directoryFactory.CreateAsync(schemaId);
+
+                index = new IndexHolder(directory, directoryFactory);
 
                 indices[schemaId] = index;
+            }
+            finally
+            {
+                lockObject.Release();
             }
 
             index.Open();
@@ -78,9 +95,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Release(Guid id)
         {
-            lock (indices)
+            try
             {
+                lockObject.Wait();
+
                 indices.Remove(id);
+            }
+            finally
+            {
+                lockObject.Release();
             }
         }
     }

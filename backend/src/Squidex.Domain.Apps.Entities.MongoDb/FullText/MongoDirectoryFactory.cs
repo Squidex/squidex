@@ -7,6 +7,8 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using Lucene.Net.Index;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using LuceneDirectory = Lucene.Net.Store.Directory;
@@ -22,14 +24,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             this.bucket = bucket;
         }
 
-        public LuceneDirectory Create(Guid schemaId)
+        public Task<LuceneDirectory> CreateAsync(Guid schemaId)
         {
             var folderName = schemaId.ToString();
 
             var tempFolder = Path.Combine(Path.GetTempPath(), "Indices", folderName);
             var tempDirectory = new DirectoryInfo(tempFolder);
 
-            return new MongoDirectory(bucket, folderName, tempDirectory);
+            var directory = new MongoDirectory(bucket, folderName, tempDirectory);
+
+            return Task.FromResult<LuceneDirectory>(directory);
+        }
+
+        public Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter)
+        {
+            return Task.CompletedTask;
         }
     }
 }

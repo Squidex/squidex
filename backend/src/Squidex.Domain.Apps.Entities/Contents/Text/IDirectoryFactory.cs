@@ -6,12 +6,16 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
+using Lucene.Net.Index;
 using Lucene.Net.Store;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface IDirectoryFactory
     {
-        Directory Create(Guid schemaId);
+        Task<Directory> CreateAsync(Guid schemaId);
+
+        Task WriteAsync(IndexWriter writer, SnapshotDeletionPolicy snapshotter);
     }
 }
