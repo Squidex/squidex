@@ -23,14 +23,32 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
     public static class FieldConverters
     {
-        private static readonly Func<IField, string> KeyNameResolver = f => f.Name;
-        private static readonly Func<IField, string> KeyIdResolver = f => f.Id.ToString();
+        private delegate string FieldKeyResolver(IField field);
 
-        private static readonly Func<IArrayField, string, IField?> FieldByIdResolver =
-            (f, k) => long.TryParse(k, out var id) ? f.FieldsById.GetOrDefault(id) : null;
+        private static readonly FieldKeyResolver KeyNameResolver = f => f.Name;
+        private static readonly FieldKeyResolver KeyIdResolver = f => f.Id.ToString();
 
-        private static readonly Func<IArrayField, string, IField?> FieldByNameResolver =
-            (f, k) => f.FieldsByName.GetOrDefault(k);
+        private delegate IField? FieldResolver(IArrayField field, string key);
+
+        private static IField? FieldByIdResolver(IArrayField array, string key)
+        {
+            if (key != null && long.TryParse(key, out var id))
+            {
+                return array.FieldsById.GetOrDefault(id);
+            }
+
+            return null;
+        }
+
+        private static IField? FieldByNameResolver(IArrayField array, string key)
+        {
+            if (key != null)
+            {
+                return array.FieldsByName.GetOrDefault(key);
+            }
+
+            return null;
+        }
 
         public static FieldConverter ExcludeHidden()
         {
@@ -69,11 +87,51 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 return (data, field) => data;
             }
 
-            var isAll = fields.First() == "*";
+            bool ShouldHandle(IField field, IField? parent = null)
+            {
+                if (field is IField<AssetsFieldProperties>)
+                {
+                    if (fields.Contains("*"))
+                    {
+                        return true;
+                    }
+
+                    if (parent == null)
+                    {
+                        return fields.Contains(field.Name);
+                    }
+                    else
+                    {
+                        return fields.Contains($"{parent.Name}.{field.Name}");
+                    }
+                }
+
+                return false;
+            }
+
+            void Resolve(IJsonValue value)
+            {
+                if (value is JsonArray array)
+                {
+                    for (var i = 0; i < array.Count; i++)
+                    {
+                        var id = array[i].ToString();
+
+                        array[i] = JsonValue.Create(urlGenerator.GenerateUrl(id));
+                    }
+                }
+            }
 
             return (data, field) =>
             {
-                if (field is IField<AssetsFieldProperties> && (isAll || fields.Contains(field.Name)))
+                if (ShouldHandle(field))
+                {
+                    foreach (var partition in data)
+                    {
+                        Resolve(partition.Value);
+                    }
+                }
+                else if (field is IArrayField arrayField)
                 {
                     foreach (var partition in data)
                     {
@@ -81,9 +139,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         {
                             for (var i = 0; i < array.Count; i++)
                             {
-                                var id = array[i].ToString();
-
-                                array[i] = JsonValue.Create(urlGenerator.GenerateUrl(id));
+                                if (array[i] is JsonObject arrayItem)
+                                {
+                                    foreach (var kvp in arrayItem)
+                                    {
+                                        if (arrayField.FieldsByName.TryGetValue(kvp.Key, out var nestedField) && ShouldHandle(nestedField, field))
+                                        {
+                                            Resolve(kvp.Value);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -259,10 +324,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return ForNested(FieldByIdResolver, KeyIdResolver, converters);
         }
 
-        private static FieldConverter ForNested(
-            Func<IArrayField, string, IField?> fieldResolver,
-            Func<IField, string> keyResolver,
-            params ValueConverter[] converters)
+        private static FieldConverter ForNested(FieldResolver fieldResolver, FieldKeyResolver keyResolver, params ValueConverter[] converters)
         {
             return (data, field) =>
             {

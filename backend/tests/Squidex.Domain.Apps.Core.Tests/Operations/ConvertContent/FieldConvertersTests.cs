@@ -22,14 +22,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     {
         private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
-        private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
-        private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
-        private readonly RootField<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
-        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
-        private readonly RootField<AssetsFieldProperties> assetsField = Fields.Assets(1, "1", Partitioning.Invariant);
-        private readonly RootField<ArrayFieldProperties> arrayField = Fields.Array(1, "1", Partitioning.Invariant,
-            Fields.Number(1, "field1"),
-            Fields.Number(2, "field2").Hide());
 
         public FieldConvertersTests()
         {
@@ -40,11 +32,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_filter_for_value_conversion()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var input =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Object());
 
-            var actual = FieldConverters.ForValues((f, i) => Value.Unset)(input, stringInvariantField);
+            var actual = FieldConverters.ForValues((f, i) => Value.Unset)(input, field);
 
             var expected = new ContentFieldData();
 
@@ -54,11 +48,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_for_value_conversion()
         {
+            var field = Fields.Json(1, "json", Partitioning.Invariant);
+
             var input =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Object());
 
-            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(input, jsonField);
+            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(input, field);
 
             var expected =
                 new ContentFieldData()
@@ -70,6 +66,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_name_to_id()
         {
+            var field =
+                Fields.Array(1, "1", Partitioning.Invariant,
+                    Fields.Number(1, "field1"),
+                    Fields.Number(2, "field2").Hide());
+
             var input =
                 new ContentFieldData()
                     .AddValue("iv",
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                 .Add("field2", 200)
                                 .Add("invalid", 300)));
 
-            var actual = FieldConverters.ForNestedName2Id(ValueConverters.ExcludeHidden())(input, arrayField);
+            var actual = FieldConverters.ForNestedName2Id(ValueConverters.ExcludeHidden())(input, field);
 
             var expected =
                new ContentFieldData()
@@ -94,6 +95,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_name_to_name()
         {
+            var field =
+                Fields.Array(1, "1", Partitioning.Invariant,
+                    Fields.Number(1, "field1"),
+                    Fields.Number(2, "field2").Hide());
+
             var input =
                 new ContentFieldData()
                     .AddValue("iv",
@@ -103,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                 .Add("field2", 200)
                                 .Add("invalid", 300)));
 
-            var actual = FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden())(input, arrayField);
+            var actual = FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden())(input, field);
 
             var expected =
                 new ContentFieldData()
@@ -118,6 +124,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_id_to_id()
         {
+            var field =
+                Fields.Array(1, "1", Partitioning.Invariant,
+                    Fields.Number(1, "field1"),
+                    Fields.Number(2, "field2").Hide());
+
             var input =
                new ContentFieldData()
                     .AddValue("iv",
@@ -127,7 +138,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                 .Add("2", 200)
                                 .Add("99", 300)));
 
-            var actual = FieldConverters.ForNestedId2Id(ValueConverters.ExcludeHidden())(input, arrayField);
+            var actual = FieldConverters.ForNestedId2Id(ValueConverters.ExcludeHidden())(input, field);
 
             var expected =
                new ContentFieldData()
@@ -142,6 +153,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_id_to_name()
         {
+            var field =
+                Fields.Array(1, "1", Partitioning.Invariant,
+                    Fields.Number(1, "field1"),
+                    Fields.Number(2, "field2").Hide());
+
             var input =
                new ContentFieldData()
                     .AddValue("iv",
@@ -151,7 +167,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                 .Add("2", 200)
                                 .Add("99", 300)));
 
-            var actual = FieldConverters.ForNestedId2Name(ValueConverters.ExcludeHidden())(input, arrayField);
+            var actual = FieldConverters.ForNestedId2Name(ValueConverters.ExcludeHidden())(input, field);
 
             var expected =
                new ContentFieldData()
@@ -164,27 +180,31 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_same_values_if_all_values_are_valid()
+        public void Should_return_same_values_when_excluding_changed_types_if_all_values_are_valid()
         {
+            var field = Fields.Number(1, "number", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("en", null)
                     .AddValue("de", 1);
 
-            var result = FieldConverters.ExcludeChangedTypes()(source, numberField);
+            var result = FieldConverters.ExcludeChangedTypes()(source, field);
 
             Assert.Same(source, result);
         }
 
         [Fact]
-        public void Should_return_null_values_any_value_is_invalid()
+        public void Should_return_null_when_excluding_changed_types_if_any_value_is_invalid()
         {
+            var field = Fields.Number(1, "number", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("en", "EN")
                     .AddValue("de", 0);
 
-            var result = FieldConverters.ExcludeChangedTypes()(source, numberField);
+            var result = FieldConverters.ExcludeChangedTypes()(source, field);
 
             Assert.Null(result);
         }
@@ -192,9 +212,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_field_not_hidden()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ExcludeHidden()(source, stringLanguageField);
+            var result = FieldConverters.ExcludeHidden()(source, field);
 
             Assert.Same(source, result);
         }
@@ -202,9 +224,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_null_values_if_field_hidden()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ExcludeHidden()(source, stringLanguageField.Hide());
+            var result = FieldConverters.ExcludeHidden()(source, field.Hide());
 
             Assert.Null(result);
         }
@@ -212,6 +236,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_resolve_languages_and_cleanup_old_languages()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source =
                 new ContentFieldData()
                     .AddValue("en", "EN")
@@ -221,7 +247,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("en", "EN");
 
-            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, stringLanguageField);
+            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -229,6 +255,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_resolve_languages_and_resolve_master_language_from_invariant()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", "A")
@@ -238,7 +266,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("en", "A");
 
-            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, stringLanguageField);
+            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -246,9 +274,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_resolving_languages_from_invariant_field()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, stringInvariantField);
+            var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
             Assert.Same(source, result);
         }
@@ -256,6 +286,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_resolve_invariant_and_use_direct_value()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", "A")
@@ -265,7 +297,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", "A");
 
-            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, stringInvariantField);
+            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -273,6 +305,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_resolve_invariant_and_resolve_invariant_from_master_language()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("de", "DE")
@@ -282,7 +316,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", "EN");
 
-            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, stringInvariantField);
+            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -290,6 +324,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_resolve_invariant_and_resolve_invariant_from_first_language()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("de", "DE")
@@ -299,7 +335,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", "DE");
 
-            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, stringInvariantField);
+            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -307,9 +343,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_resolving_invariant_from_language_field()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, stringLanguageField);
+            var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
             Assert.Same(source, result);
         }
@@ -317,6 +355,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_language_from_fallback_if_found()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var config_1 = languagesConfig.Set(new LanguageConfig(Language.IT));
             var config_2 = config_1.Set(new LanguageConfig(Language.ES, false, Language.IT));
 
@@ -332,7 +372,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("it", "IT")
                     .AddValue("es", "IT");
 
-            var result = FieldConverters.ResolveFallbackLanguages(config_2)(source, stringLanguageField);
+            var result = FieldConverters.ResolveFallbackLanguages(config_2)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -340,6 +380,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_not_return_value_if_master_is_missing()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source =
                 new ContentFieldData()
                     .AddValue("de", "DE");
@@ -348,7 +390,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("de", "DE");
 
-            var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, stringLanguageField);
+            var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -356,6 +398,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_filter_languages()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source =
                 new ContentFieldData()
                     .AddValue("en", "EN")
@@ -365,7 +409,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("de", "DE");
 
-            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.DE })(source, stringLanguageField);
+            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.DE })(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -373,6 +417,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_master_language_if_languages_to_filter_are_invalid()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source =
                 new ContentFieldData()
                     .AddValue("en", "EN")
@@ -382,7 +428,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("en", "EN");
 
-            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.CA })(source, stringLanguageField);
+            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.CA })(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -390,9 +436,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_resolving_fallback_languages_from_invariant_field()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, stringInvariantField);
+            var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, field);
 
             Assert.Same(source, result);
         }
@@ -400,9 +448,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_filtered_languages_is_empty()
         {
+            var field = Fields.String(1, "string", Partitioning.Language);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.FilterLanguages(languagesConfig, Enumerable.Empty<Language>())(source, stringLanguageField);
+            var result = FieldConverters.FilterLanguages(languagesConfig, Enumerable.Empty<Language>())(source, field);
 
             Assert.Same(source, result);
         }
@@ -410,9 +460,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_return_same_values_if_filtering_languages_from_invariant_field()
         {
+            var field = Fields.String(1, "string", Partitioning.Invariant);
+
             var source = new ContentFieldData();
 
-            var result = FieldConverters.FilterLanguages(languagesConfig, null)(source, stringInvariantField);
+            var result = FieldConverters.FilterLanguages(languagesConfig, null)(source, field);
 
             Assert.Same(source, result);
         }
@@ -420,6 +472,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_asset_ids_to_urls()
         {
+            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
@@ -428,7 +482,31 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "1" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "assets" }), assetUrlGenerator)(source, field);
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_convert_nested_asset_ids_to_urls()
+        {
+            var field =
+                Fields.Array(1, "array", Partitioning.Invariant,
+                    Fields.Assets(1, "assets"));
+
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("assets", JsonValue.Array("1", "2"))));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("assets", JsonValue.Array("url/to/1", "url/to/2"))));
+
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "array.assets" }), assetUrlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -436,6 +514,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_convert_asset_ids_to_urls_for_wildcard_fields()
         {
+            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
@@ -444,7 +524,31 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, field);
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_convert_nested_asset_ids_to_urls_for_wildcard_fields()
+        {
+            var field =
+                Fields.Array(1, "array", Partitioning.Invariant,
+                    Fields.Assets(1, "assets"));
+
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("assets", JsonValue.Array("1", "2"))));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("assets", JsonValue.Array("url/to/1", "url/to/2"))));
+
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -452,6 +556,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_not_convert_asset_ids_to_urls_when_field_does_not_match()
         {
+            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
@@ -460,14 +566,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
 
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "2" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "other" }), assetUrlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
 
         [Fact]
-        public void Should_not_convert_asset_ids_to_urls_when_field_is_specified()
+        public void Should_not_convert_asset_ids_to_urls_when_fields_is_null()
         {
+            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
             var source =
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
@@ -476,7 +584,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
 
-            var result = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
