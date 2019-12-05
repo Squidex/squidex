@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             sut.ActivateAsync(schemaId).Wait();
         }
 
-        [Fact]// (Skip = "Only used for benchmarks")]
+        [Fact(Skip = "Only used for benchmarks")]
         public async Task Should_index_many_documents()
         {
             var text = new Dictionary<string, string>

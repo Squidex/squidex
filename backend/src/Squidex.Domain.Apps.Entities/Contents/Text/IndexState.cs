@@ -17,12 +17,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     internal sealed class IndexState
     {
-        private const int NotFound = -1;
         private const string MetaFor = "_fd";
-        private readonly Dictionary<(Guid, Scope), BytesRef> lastChanges = new Dictionary<(Guid, Scope), BytesRef>();
+        private readonly Dictionary<(Guid, Scope), (bool, bool)> lastChanges = new Dictionary<(Guid, Scope), (bool, bool)>();
+        private readonly BytesRef bytesRef = new BytesRef(2);
         private readonly IIndex index;
-        private IndexReader? lastReader;
-        private BinaryDocValues binaryValues;
 
         public IndexState(IIndex index)
         {
@@ -35,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             document.SetBinaryDocValue(MetaFor, value);
 
-            lastChanges[(id, scope)] = value;
+            lastChanges[(id, scope)] = (forDraft, forPublished);
         }
 
         public void Index(Guid id, Scope scope, Term term, bool forDraft, bool forPublished)
@@ -44,30 +42,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             index.Writer.UpdateBinaryDocValue(term, MetaFor, value);
 
-            lastChanges[(id, scope)] = value;
+            lastChanges[(id, scope)] = (forDraft, forPublished);
         }
 
         public bool HasBeenAdded(Guid id, Scope scope, Term term, out int docId)
         {
-            docId = 0;
+            docId = -1;
 
             if (lastChanges.ContainsKey((id, scope)))
             {
                 return true;
             }
 
-            var docs = index.Searcher?.Search(new TermQuery(term), 1);
+            if (index.Searcher == null)
+            {
+                return false;
+            }
 
-            docId = docs?.ScoreDocs.FirstOrDefault()?.Doc ?? NotFound;
+            var docs = index.Searcher.Search(new TermQuery(term), 1);
 
-            return docId > NotFound;
+            var found = docs.ScoreDocs.FirstOrDefault();
+
+            if (found != null)
+            {
+                docId = found.Doc;
+
+                return true;
+            }
+
+            return false;
         }
 
         public void Get(Guid id, Scope scope, int docId, out bool forDraft, out bool forPublished)
         {
             if (lastChanges.TryGetValue((id, scope), out var forValue))
             {
-                (forDraft, forPublished) = ToFlags(forValue);
+                (forDraft, forPublished) = forValue;
             }
             else
             {
@@ -84,37 +94,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private BytesRef GetForValues(int docId)
         {
-            var reader = index.Reader;
-
-            if (lastReader != reader)
-            {
-                lastChanges.Clear();
-                lastReader = reader;
-
-                if (reader != null)
-                {
-                    binaryValues = MultiDocValues.GetBinaryValues(reader, MetaFor);
-                }
-            }
-
-            var result = new BytesRef(2);
-
-            if (docId != NotFound)
-            {
-                binaryValues?.Get(docId, result);
-            }
-
-            return result;
+            return index.Reader.GetBinaryValue(MetaFor, docId, bytesRef);
         }
 
         private static BytesRef GetValue(bool forDraft, bool forPublished)
         {
-            return GetValue((byte)(forDraft ? 1 : 0), (byte)(forPublished ? 1 : 0));
-        }
-
-        private static BytesRef GetValue(byte forDraft, byte forPublished)
-        {
-            return new BytesRef(new[] { forDraft, forPublished });
+            return new BytesRef(new[]
+            {
+                (byte)(forDraft ? 1 : 0),
+                (byte)(forPublished ? 1 : 0)
+            });
         }
 
         private static (bool, bool) ToFlags(BytesRef bytes)

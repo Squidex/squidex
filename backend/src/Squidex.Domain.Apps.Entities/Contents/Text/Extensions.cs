@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -97,6 +98,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     AppendJsonText(item, appendText);
                 }
             }
+        }
+
+        public static BytesRef GetBinaryValue(this IndexReader? reader, string field, int docId, BytesRef? result = null)
+        {
+            if (result != null)
+            {
+                Array.Clear(result.Bytes, 0, result.Bytes.Length);
+            }
+            else
+            {
+                result = new BytesRef();
+            }
+
+            if (reader == null)
+            {
+                return result;
+            }
+
+            var leaves = reader.Leaves;
+
+            if (leaves.Count == 1)
+            {
+                var docValues = leaves[0].AtomicReader.GetBinaryDocValues(field);
+
+                docValues.Get(docId, result);
+            }
+            else if (leaves.Count > 1)
+            {
+                var subIndex = ReaderUtil.SubIndex(docId, leaves);
+
+                var subLeave = leaves[subIndex];
+                var subValues = subLeave.AtomicReader.GetBinaryDocValues(field);
+
+                subValues.Get(docId - subLeave.DocBase, result);
+            }
+
+            return result;
         }
     }
 }
