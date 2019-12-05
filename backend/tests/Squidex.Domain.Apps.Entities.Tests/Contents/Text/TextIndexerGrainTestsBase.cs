@@ -7,23 +7,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable SA1115 // Parameter should follow comma
 #pragma warning disable RECS0021 // Warns about calls to virtual member functions occuring in the constructor
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public abstract class TextIndexerGrainTestsBase : IDisposable
+    public abstract class TextIndexerGrainTestsBase
     {
-        private readonly Guid schemaId = Guid.NewGuid();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly SearchContext context;
-        private readonly TextIndexerGrain sut;
 
         public abstract IIndexStorage Storage { get; }
 
@@ -33,176 +33,157 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 Languages = new HashSet<string> { "de", "en" }
             };
-
-            var factory = new IndexManager(Storage, A.Fake<ISemanticLog>());
-
-            sut = new TextIndexerGrain(factory);
-            sut.ActivateAsync(schemaId).Wait();
-        }
-
-        public void Dispose()
-        {
-            sut.OnDeactivateAsync().Wait();
         }
 
         [Fact]
         public async Task Should_throw_exception_for_invalid_query()
         {
-            await Assert.ThrowsAsync<ValidationException>(() => sut.SearchAsync("~hello", context));
-        }
-
-        [Fact]
-        public async Task Should_read_index_and_retrieve()
-        {
-            await AddInvariantContent("Hello", "World", false);
-
-            await sut.OnDeactivateAsync();
-
-            var other = new TextIndexerGrain(new IndexManager(Storage, A.Fake<ISemanticLog>()));
-            try
+            await ExecuteAsync(Guid.NewGuid(), async sut =>
             {
-                await other.ActivateAsync(schemaId);
-
-                await TestSearchAsync(ids1, "Hello", grain: other);
-                await TestSearchAsync(ids2, "World", grain: other);
-            }
-            finally
-            {
-                await other.OnDeactivateAsync();
-            }
+                await Assert.ThrowsAsync<ValidationException>(() => sut.SearchAsync("~hello", context));
+            });
         }
 
         [Fact]
         public async Task Should_index_invariant_content_and_retrieve()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, "Hello", "World", false),
 
-            await TestSearchAsync(ids1, "Hello");
-            await TestSearchAsync(ids2, "World");
+                g => TestSearchAsync(g, expected: ids1, text: "Hello"),
+                g => TestSearchAsync(g, expected: ids2, text: "World"));
         }
 
         [Fact]
         public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, "Hello", "World", false),
 
-            await TestSearchAsync(ids1, "helo~");
-            await TestSearchAsync(ids2, "wold~");
+                g => TestSearchAsync(g, expected: ids1, text: "helo~"),
+                g => TestSearchAsync(g, expected: ids2, text: "wold~"));
         }
 
         [Fact]
         public async Task Should_update_draft_only()
         {
-            await AddInvariantContent("Hello", "World", false);
-            await AddInvariantContent("Hallo", "Welt", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
+                g => AddInvariantContent(g, text1: "Hallo", text2: "Welt", onlyDraft: false),
 
-            await TestSearchAsync(null, "Hello", Scope.Draft);
-            await TestSearchAsync(null, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Published),
 
-            await TestSearchAsync(ids1, "Hallo", Scope.Draft);
-            await TestSearchAsync(null, "Hallo", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hallo", target: Scope.Published));
         }
 
         [Fact]
         public async Task Should_also_update_published_after_copy()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
 
-            await CopyAsync(true);
+                g => CopyAsync(g, fromDraft: true),
 
-            await AddInvariantContent("Hallo", "Welt", false);
+                g => AddInvariantContent(g, text1: "Hallo", text2: "Welt", onlyDraft: false),
 
-            await TestSearchAsync(null, "Hello", Scope.Draft);
-            await TestSearchAsync(null, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Published),
 
-            await TestSearchAsync(ids1, "Hallo", Scope.Draft);
-            await TestSearchAsync(ids1, "Hallo", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Published));
         }
 
         [Fact]
         public async Task Should_simulate_content_reversion()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
 
-            await CopyAsync(true);
+                g => CopyAsync(g, fromDraft: true),
 
-            await AddInvariantContent("Hallo", "Welt", true);
+                g => AddInvariantContent(g, text1: "Hallo", text2: "Welt", onlyDraft: true),
 
-            await TestSearchAsync(null, "Hello", Scope.Draft);
-            await TestSearchAsync(ids1, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Published),
 
-            await TestSearchAsync(ids1, "Hallo", Scope.Draft);
-            await TestSearchAsync(null, "Hallo", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hallo", target: Scope.Published),
 
-            await CopyAsync(false);
+                g => CopyAsync(g, fromDraft: false),
 
-            await TestSearchAsync(ids1, "Hello", Scope.Draft);
-            await TestSearchAsync(ids1, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Published),
 
-            await TestSearchAsync(null, "Hallo", Scope.Draft);
-            await TestSearchAsync(null, "Hallo", Scope.Published);
+                g => TestSearchAsync(g, expected: null, text: "Hallo", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hallo", target: Scope.Published),
 
-            await AddInvariantContent("Guten Morgen", "Welt", true);
+                g => AddInvariantContent(g, text1: "Guten Morgen", text2: "Welt", onlyDraft: true),
 
-            await TestSearchAsync(null, "Hello", Scope.Draft);
-            await TestSearchAsync(ids1, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Published),
 
-            await TestSearchAsync(ids1, "Guten Morgen", Scope.Draft);
-            await TestSearchAsync(null, "Guten Morgen", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Guten Morgen", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Guten Morgen", target: Scope.Published));
         }
 
         [Fact]
         public async Task Should_also_retrieve_published_content_after_copy()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
 
-            await TestSearchAsync(ids1, "Hello", Scope.Draft);
-            await TestSearchAsync(null, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Published),
 
-            await CopyAsync(true);
+                g => CopyAsync(g, fromDraft: true),
 
-            await TestSearchAsync(ids1, "Hello", Scope.Draft);
-            await TestSearchAsync(ids1, "Hello", Scope.Published);
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Published));
         }
 
         [Fact]
         public async Task Should_delete_documents_from_index()
         {
-            await AddInvariantContent("Hello", "World", false);
+            await SearchWithGrains(
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
 
-            await TestSearchAsync(ids1, "Hello");
-            await TestSearchAsync(ids2, "World");
+                g => TestSearchAsync(g, expected: ids1, text: "Hello"),
+                g => TestSearchAsync(g, expected: ids2, text: "World"),
 
-            await DeleteAsync(ids1[0]);
+                g => DeleteAsync(g, id: ids1[0]),
 
-            await TestSearchAsync(null, "Hello");
-            await TestSearchAsync(ids2, "World");
+                g => TestSearchAsync(g, expected: null, text: "Hello"),
+                g => TestSearchAsync(g, expected: ids2, text: "World"));
         }
 
         [Fact]
         public async Task Should_search_by_field()
         {
-            await AddLocalizedContent();
+            await SearchWithGrains(
+                g => AddLocalizedContent(g),
 
-            await TestSearchAsync(null, "de:city");
-            await TestSearchAsync(null, "en:Stadt");
+                g => TestSearchAsync(g, expected: null, text: "de:city"),
+                g => TestSearchAsync(g, expected: null, text: "en:Stadt"));
         }
 
         [Fact]
         public async Task Should_index_localized_content_and_retrieve()
         {
-            await AddLocalizedContent();
+            await SearchWithGrains(
+                g => AddLocalizedContent(g),
 
-            await TestSearchAsync(ids1, "Stadt");
-            await TestSearchAsync(ids1, "and");
-            await TestSearchAsync(ids2, "und");
+                g => TestSearchAsync(g, expected: ids1, text: "Stadt"),
+                g => TestSearchAsync(g, expected: ids1, text: "and"),
+                g => TestSearchAsync(g, expected: ids2, text: "und"),
 
-            await TestSearchAsync(ids2, "City");
-            await TestSearchAsync(ids2, "und");
-            await TestSearchAsync(ids1, "and");
+                g => TestSearchAsync(g, expected: ids2, text: "City"),
+                g => TestSearchAsync(g, expected: ids2, text: "und"),
+                g => TestSearchAsync(g, expected: ids1, text: "and"));
         }
 
-        private async Task AddLocalizedContent()
+        private async Task AddLocalizedContent(TextIndexerGrain grain)
         {
             var germanText = new Dictionary<string, string>
             {
@@ -214,11 +195,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 ["en"] = "City and Surroundings und sonstiges"
             };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Text = germanText, OnlyDraft = true });
-            await sut.IndexAsync(new Update { Id = ids2[0], Text = englishText, OnlyDraft = true });
+            await grain.IndexAsync(new Update { Id = ids1[0], Text = germanText, OnlyDraft = true });
+            await grain.IndexAsync(new Update { Id = ids2[0], Text = englishText, OnlyDraft = true });
         }
 
-        private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
+        private async Task AddInvariantContent(TextIndexerGrain grain, string text1, string text2, bool onlyDraft = false)
         {
             var content1 = new Dictionary<string, string>
             {
@@ -230,26 +211,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 ["iv"] = text2
             };
 
-            await sut.IndexAsync(new Update { Id = ids1[0], Text = content1, OnlyDraft = onlyDraft });
-            await sut.IndexAsync(new Update { Id = ids2[0], Text = content2, OnlyDraft = onlyDraft });
+            await grain.IndexAsync(new Update { Id = ids1[0], Text = content1, OnlyDraft = onlyDraft });
+            await grain.IndexAsync(new Update { Id = ids2[0], Text = content2, OnlyDraft = onlyDraft });
         }
 
-        private async Task DeleteAsync(Guid id)
+        private async Task DeleteAsync(TextIndexerGrain grain, Guid id)
         {
-            await sut.DeleteAsync(id);
+            await grain.DeleteAsync(id);
         }
 
-        private async Task CopyAsync(bool fromDraft)
+        private async Task CopyAsync(TextIndexerGrain grain, bool fromDraft)
         {
-            await sut.CopyAsync(ids1[0], fromDraft);
-            await sut.CopyAsync(ids2[0], fromDraft);
+            await grain.CopyAsync(ids1[0], fromDraft);
+            await grain.CopyAsync(ids2[0], fromDraft);
         }
 
-        private async Task TestSearchAsync(List<Guid>? expected, string text, Scope target = Scope.Draft, TextIndexerGrain? grain = null)
+        private async Task TestSearchAsync(TextIndexerGrain grain, List<Guid>? expected, string text, Scope target = Scope.Draft)
         {
             context.Scope = target;
 
-            var result = await (grain ?? sut).SearchAsync(text, context);
+            var result = await grain.SearchAsync(text, context);
 
             if (expected != null)
             {
@@ -258,6 +239,45 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             else
             {
                 Assert.Empty(result);
+            }
+        }
+
+        private async Task SearchWithGrains(params Func<TextIndexerGrain, Task>[] actions)
+        {
+            for (var i = 0; i < actions.Length; i++)
+            {
+                var schemaId = Guid.NewGuid();
+
+                await ExecuteAsync(schemaId, async sut =>
+                {
+                    foreach (var action in actions.Take(i))
+                    {
+                        await action(sut);
+                    }
+                });
+
+                await ExecuteAsync(schemaId, async sut =>
+                {
+                    foreach (var action in actions.Skip(i))
+                    {
+                        await action(sut);
+                    }
+                });
+            }
+        }
+
+        private async Task ExecuteAsync(Guid id, Func<TextIndexerGrain, Task> action)
+        {
+            var sut = new TextIndexerGrain(new IndexManager(Storage, A.Fake<ISemanticLog>()));
+            try
+            {
+                await sut.ActivateAsync(id);
+
+                await action(sut);
+            }
+            finally
+            {
+                await sut.OnDeactivateAsync();
             }
         }
     }
