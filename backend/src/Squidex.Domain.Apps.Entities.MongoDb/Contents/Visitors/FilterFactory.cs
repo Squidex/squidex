@@ -62,11 +62,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return !includeDraft ? cursor.Not(x => x.DataDraftByIds, x => x.IsDeleted) : cursor;
         }
 
-        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[]? status)
-        {
-            return CreateFilter(null, schemaId, new List<Guid> { id }, status, null);
-        }
-
         public static FilterDefinition<MongoContentEntity> IdsByApp(Guid appId, ICollection<Guid> ids, Status[]? status)
         {
             return CreateFilter(appId, null, ids, status, null);

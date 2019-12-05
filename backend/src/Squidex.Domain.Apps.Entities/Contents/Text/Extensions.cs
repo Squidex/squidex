@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 result = new BytesRef();
             }
 
-            if (reader == null)
+            if (reader == null || docId < 0)
             {
                 return result;
             }

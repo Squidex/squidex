@@ -62,7 +62,7 @@ namespace LoadTest
 
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.CreateAsync(new TestEntityData { Value = random.Next() }, true);
+                await Fixture.Client.CreateAsync(new TestEntityData { Number = random.Next() }, true);
             });
         }
     }
