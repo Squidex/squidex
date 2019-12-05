@@ -213,7 +213,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
             if (type === 'subject') {
                 return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
-                return of('./images/client.svg');
+                return of('./images/client.png');
             }
         });
     }
