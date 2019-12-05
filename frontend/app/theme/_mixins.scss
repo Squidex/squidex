@@ -154,7 +154,7 @@
     }
 }
 
-@mixin hover-visible($selector, $display: 'block') {
+@mixin hover-visible($selector, $display: block) {
     #{$selector} {
         display: none;
     }
