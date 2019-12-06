@@ -6,20 +6,28 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupGrain : IGrainWithGuidKey
+    public abstract class BackupContextBase
     {
-        Task RunAsync(RefToken actor);
+        public UserMapping UserMapping { get; }
 
-        Task DeleteAsync(Guid id);
+        public Guid AppId { get; set; }
 
-        Task<J<List<IBackupJob>>> GetStateAsync();
+        public RefToken Initiator
+        {
+            get { return UserMapping.Initiator; }
+        }
+
+        protected BackupContextBase(Guid appId, UserMapping userMapping)
+        {
+            Guard.NotNull(userMapping);
+
+            AppId = appId;
+
+            UserMapping = userMapping;
+        }
     }
 }

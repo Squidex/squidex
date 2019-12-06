@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
         }
 
-        public override Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.True;
         }
 
-        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        public Task RestoreAsync(RestoreContext context)
         {
             var contentIds = contentIdsBySchemaId.Values.SelectMany(x => x);
 

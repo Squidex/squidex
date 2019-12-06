@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupReader : DisposableObjectBase
+    public class BackupReader : DisposableObjectBase, IBackupReader
     {
         private readonly GuidMapper guidMapper = new GuidMapper();
         private readonly ZipArchive archive;

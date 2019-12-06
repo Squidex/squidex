@@ -10,66 +10,50 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Shared.Users;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class BackupApps : BackupHandler
+    public sealed class BackupApps : IBackupHandler
     {
-        private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
         private readonly IAppUISettings appUISettings;
         private readonly IAppsIndex appsIndex;
-        private readonly IUserResolver userResolver;
         private readonly HashSet<string> contributors = new HashSet<string>();
-        private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
-        private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
         private string? appReservation;
         private string appName;
 
-        public override string Name { get; } = "Apps";
+        public string Name { get; } = "Apps";
 
-        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex, IUserResolver userResolver)
+        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex)
         {
             Guard.NotNull(appsIndex);
             Guard.NotNull(appUISettings);
-            Guard.NotNull(userResolver);
 
             this.appsIndex = appsIndex;
             this.appUISettings = appUISettings;
-            this.userResolver = userResolver;
         }
 
-        public override async Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
             if (@event.Payload is AppContributorAssigned appContributorAssigned)
             {
-                var userId = appContributorAssigned.ContributorId;
-
-                if (!usersWithEmail.ContainsKey(userId))
-                {
-                    var user = await userResolver.FindByIdOrEmailAsync(userId);
-
-                    if (user != null)
-                    {
-                        usersWithEmail.Add(userId, user.Email);
-                    }
-                }
+                context.UserMapping.Backup(appContributorAssigned.ContributorId);
             }
+
+            return TaskHelper.Done;
         }
 
-        public override async Task BackupAsync(Guid appId, BackupWriter writer)
+        public async Task BackupAsync(Guid appId, BackupContext writer)
         {
-            await WriteUsersAsync(writer);
             await WriteSettingsAsync(writer, appId);
         }
 
-        public override async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
@@ -77,15 +61,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         appName = appCreated.Name;
 
-                        await ResolveUsersAsync(reader);
-                        await ReserveAppAsync(appId);
+                        await ReserveAppAsync(context.AppId);
 
                         break;
                     }
 
                 case AppContributorAssigned contributorAssigned:
                     {
-                        if (!userMapping.TryGetValue(contributorAssigned.ContributorId, out var user) || user.Equals(actor))
+                        if (!context.UserMapping.TryMap(contributorAssigned.ContributorId, out var user) || user.Equals(context.Initiator))
                         {
                             return false;
                         }
@@ -97,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 case AppContributorRemoved contributorRemoved:
                     {
-                        if (!userMapping.TryGetValue(contributorRemoved.ContributorId, out var user) || user.Equals(actor))
+                        if (!context.UserMapping.TryMap(contributorRemoved.ContributorId, out var user) || user.Equals(context.Initiator))
                         {
                             return false;
                         }
@@ -108,17 +91,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     }
             }
 
-            if (@event.Payload is SquidexEvent squidexEvent)
-            {
-                squidexEvent.Actor = MapUser(squidexEvent.Actor.Identifier, actor);
-            }
-
             return true;
         }
 
-        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        public Task RestoreAsync(Guid appId, RestoreContext context)
         {
-            return ReadSettingsAsync(reader, appId);
+            return ReadSettingsAsync(context, appId);
         }
 
         private async Task ReserveAppAsync(Guid appId)
@@ -131,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public override async Task CleanupRestoreErrorAsync(Guid appId)
+        public async Task CleanupRestoreErrorAsync(Guid appId)
         {
             if (appReservation != null)
             {
@@ -139,66 +117,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private RefToken MapUser(string userId, RefToken fallback)
-        {
-            return userMapping.GetOrAdd(userId, fallback);
-        }
-
-        private async Task ResolveUsersAsync(BackupReader reader)
-        {
-            await ReadUsersAsync(reader);
-
-            foreach (var kvp in usersWithEmail)
-            {
-                var email = kvp.Value;
-
-                var user = await userResolver.FindByIdOrEmailAsync(email);
-
-                if (user == null && await userResolver.CreateUserIfNotExists(kvp.Value))
-                {
-                    user = await userResolver.FindByIdOrEmailAsync(email);
-                }
-
-                if (user != null)
-                {
-                    userMapping[kvp.Key] = new RefToken(RefTokenType.Subject, user.Id);
-                }
-            }
-        }
-
-        private async Task ReadUsersAsync(BackupReader reader)
-        {
-            var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
-
-            usersWithEmail = json;
-        }
-
-        private async Task WriteUsersAsync(BackupWriter writer)
-        {
-            var json = usersWithEmail;
-
-            await writer.WriteJsonAsync(UsersFile, json);
-        }
-
-        private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
+        private async Task WriteSettingsAsync(BackupContext context, Guid appId)
         {
             var json = await appUISettings.GetAsync(appId, null);
 
-            await writer.WriteJsonAsync(SettingsFile, json);
+            await context.Writer.WriteJsonAsync(SettingsFile, json);
         }
 
-        private async Task ReadSettingsAsync(BackupReader reader, Guid appId)
+        private async Task ReadSettingsAsync(RestoreContext context, Guid appId)
         {
-            var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
+            var json = await context.Reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
 
             await appUISettings.SetAsync(appId, null, json);
         }
 
-        public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
+        public async Task CompleteRestoreAsync(RestoreContext context)
         {
             await appsIndex.AddAsync(appReservation);
 
-            await appsIndex.RebuildByContributorsAsync(appId, contributors);
+            await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
         }
     }
 }

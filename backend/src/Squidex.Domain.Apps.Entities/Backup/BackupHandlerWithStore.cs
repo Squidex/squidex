@@ -14,9 +14,11 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public abstract class BackupHandlerWithStore : BackupHandler
+    public abstract class BackupHandlerWithStore : IBackupHandler
     {
         private readonly IStore<Guid> store;
+
+        public abstract string Name { get; }
 
         protected BackupHandlerWithStore(IStore<Guid> store)
         {

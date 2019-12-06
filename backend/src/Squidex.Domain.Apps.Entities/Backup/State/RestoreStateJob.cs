@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Guid Id { get; set; }
 
         [DataMember]
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
         [DataMember]
         public RefToken Actor { get; set; }

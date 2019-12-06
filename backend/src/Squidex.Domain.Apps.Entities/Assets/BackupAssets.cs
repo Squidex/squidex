@@ -41,25 +41,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public override Task BackupAsync(Guid appId, BackupWriter writer)
+        public Task BackupAsync(Guid appId, BackupContext context)
         {
-            return BackupTagsAsync(appId, writer);
+            return BackupTagsAsync(appId, context.Writer);
         }
 
-        public override Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
             switch (@event.Payload)
             {
                 case AssetCreated assetCreated:
-                    return WriteAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, writer);
+                    return WriteAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, context.Writer);
                 case AssetUpdated assetUpdated:
-                    return WriteAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, writer);
+                    return WriteAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, context.Writer);
             }
 
             return TaskHelper.Done;
         }
 
-        public override async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
@@ -67,25 +67,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     assetFolderIds.Add(assetFolderCreated.AssetFolderId);
                     break;
                 case AssetCreated assetCreated:
-                    await ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, reader);
+                    await ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, context.Reader);
                     break;
                 case AssetUpdated assetUpdated:
-                    await ReadAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, reader);
+                    await ReadAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, context.Reader);
                     break;
             }
 
             return true;
         }
 
-        public override async Task RestoreAsync(Guid appId, BackupReader reader)
+        public async Task RestoreAsync(RestoreContext context)
         {
-            await RestoreTagsAsync(appId, reader);
+            await RestoreTagsAsync(context.AppId, context.Reader);
 
             await RebuildManyAsync(assetIds, RebuildAsync<AssetState, AssetGrain>);
             await RebuildManyAsync(assetFolderIds, RebuildAsync<AssetFolderState, AssetFolderGrain>);
         }
 
-        private async Task RestoreTagsAsync(Guid appId, BackupReader reader)
+        private async Task RestoreTagsAsync(Guid appId, IBackupReader reader)
         {
             var tags = await reader.ReadJsonAttachmentAsync<TagsExport>(TagsFile);
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             });
         }
 
-        private Task ReadAssetAsync(Guid assetId, long fileVersion, BackupReader reader)
+        private Task ReadAssetAsync(Guid assetId, long fileVersion, IBackupReader reader)
         {
             assetIds.Add(assetId);
 

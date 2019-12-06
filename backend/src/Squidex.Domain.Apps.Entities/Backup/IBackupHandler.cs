@@ -7,47 +7,46 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public abstract class BackupHandler
+    public interface IBackupHandler
     {
-        public abstract string Name { get; }
+        string Name { get; }
 
-        public virtual Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             return TaskHelper.True;
         }
 
-        public virtual Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task RestoreAsync(Guid appId, BackupReader reader)
+        public Task RestoreAsync(RestoreContext context)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task BackupAsync(Guid appId, BackupWriter writer)
+        public Task BackupAsync(BackupContext context)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task CleanupRestoreErrorAsync(Guid appId)
+        public Task CleanupRestoreErrorAsync(Guid appId)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task CompleteRestoreAsync(Guid appId, BackupReader reader)
+        public Task CompleteRestoreAsync(RestoreContext context)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task CompleteBackupAsync(Guid appId, BackupWriter writer)
+        public Task CompleteBackupAsync(BackupContext context)
         {
             return TaskHelper.Done;
         }

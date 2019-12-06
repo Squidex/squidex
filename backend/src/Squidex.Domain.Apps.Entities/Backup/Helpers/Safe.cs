@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
         }
 
-        public static async Task CleanupRestoreErrorAsync(BackupHandler handler, Guid appId, Guid id, ISemanticLog log)
+        public static async Task CleanupRestoreErrorAsync(IBackupHandler handler, Guid appId, Guid id, ISemanticLog log)
         {
             try
             {
