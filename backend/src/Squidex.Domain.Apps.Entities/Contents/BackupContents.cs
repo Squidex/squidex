@@ -14,21 +14,24 @@ using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class BackupContents : BackupHandlerWithStore
+    public sealed class BackupContents : IBackupHandler
     {
         private readonly Dictionary<Guid, HashSet<Guid>> contentIdsBySchemaId = new Dictionary<Guid, HashSet<Guid>>();
+        private readonly Rebuilder rebuilder;
 
-        public override string Name { get; } = "Contents";
+        public string Name { get; } = "Contents";
 
-        public BackupContents(IStore<Guid> store)
-            : base(store)
+        public BackupContents(Rebuilder rebuilder)
         {
+            Guard.NotNull(rebuilder);
+
+            this.rebuilder = rebuilder;
         }
 
         public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
@@ -46,11 +49,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.True;
         }
 
-        public Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context)
         {
-            var contentIds = contentIdsBySchemaId.Values.SelectMany(x => x);
-
-            return RebuildManyAsync(contentIds, RebuildAsync<ContentState, ContentGrain>);
+            if (contentIdsBySchemaId.Count > 0)
+            {
+                await rebuilder.RebuildAsync<ContentState, ContentGrain>(async target =>
+                {
+                    foreach (var contentId in contentIdsBySchemaId.Values.SelectMany(x => x))
+                    {
+                        await target(contentId);
+                    }
+                });
+            }
         }
     }
 }

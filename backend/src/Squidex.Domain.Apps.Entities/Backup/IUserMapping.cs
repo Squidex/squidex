@@ -5,21 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupContext : BackupContextBase
+    public interface IUserMapping
     {
-        public IBackupWriter Writer { get; }
+        RefToken Initiator { get; }
 
-        public BackupContext(Guid appId, IUserMapping userMapping, IBackupWriter writer)
-            : base(appId, userMapping)
-        {
-            Guard.NotNull(writer);
+        void Backup(RefToken token);
 
-            Writer = writer;
-        }
+        void Backup(string userId);
+
+        bool TryMap(RefToken token, out RefToken result);
+
+        bool TryMap(string userId, out RefToken result);
     }
 }

@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppsIndex appsIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private string? appReservation;
-        private string appName;
 
         public string Name { get; } = "Apps";
 
@@ -48,9 +47,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return TaskHelper.Done;
         }
 
-        public async Task BackupAsync(Guid appId, BackupContext writer)
+        public async Task BackupAsync(BackupContext context)
         {
-            await WriteSettingsAsync(writer, appId);
+            var json = await appUISettings.GetAsync(context.AppId, null);
+
+            await context.Writer.WriteJsonAsync(SettingsFile, json);
         }
 
         public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
@@ -59,9 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 case AppCreated appCreated:
                     {
-                        appName = appCreated.Name;
-
-                        await ReserveAppAsync(context.AppId);
+                        await ReserveAppAsync(context.AppId, appCreated.Name);
 
                         break;
                     }
@@ -94,12 +93,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return true;
         }
 
-        public Task RestoreAsync(Guid appId, RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context)
         {
-            return ReadSettingsAsync(context, appId);
+            var json = await context.Reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
+
+            await appUISettings.SetAsync(context.AppId, null, json);
         }
 
-        private async Task ReserveAppAsync(Guid appId)
+        private async Task ReserveAppAsync(Guid appId, string appName)
         {
             appReservation = await appsIndex.ReserveAsync(appId, appName);
 
@@ -115,20 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 await appsIndex.RemoveReservationAsync(appReservation);
             }
-        }
-
-        private async Task WriteSettingsAsync(BackupContext context, Guid appId)
-        {
-            var json = await appUISettings.GetAsync(appId, null);
-
-            await context.Writer.WriteJsonAsync(SettingsFile, json);
-        }
-
-        private async Task ReadSettingsAsync(RestoreContext context, Guid appId)
-        {
-            var json = await context.Reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
-
-            await appUISettings.SetAsync(appId, null, json);
         }
 
         public async Task CompleteRestoreAsync(RestoreContext context)

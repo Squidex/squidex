@@ -6,20 +6,22 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
+using System.IO;
+using System.Threading.Tasks;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupContext : BackupContextBase
+    public interface IBackupWriter
     {
-        public IBackupWriter Writer { get; }
+        int WrittenAttachments { get; }
 
-        public BackupContext(Guid appId, IUserMapping userMapping, IBackupWriter writer)
-            : base(appId, userMapping)
-        {
-            Guard.NotNull(writer);
+        int WrittenEvents { get; }
 
-            Writer = writer;
-        }
+        Task WriteBlobAsync(string name, Func<Stream, Task> handler);
+
+        void WriteEvent(StoredEvent storedEvent);
+
+        Task WriteJsonAsync(string name, object value);
     }
 }

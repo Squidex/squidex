@@ -14,36 +14,37 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class BackupAssets : BackupHandlerWithStore
+    public sealed class BackupAssets : IBackupHandler
     {
         private const string TagsFile = "AssetTags.json";
         private readonly HashSet<Guid> assetIds = new HashSet<Guid>();
         private readonly HashSet<Guid> assetFolderIds = new HashSet<Guid>();
+        private readonly Rebuilder rebuilder;
         private readonly IAssetStore assetStore;
         private readonly ITagService tagService;
 
-        public override string Name { get; } = "Assets";
+        public string Name { get; } = "Assets";
 
-        public BackupAssets(IStore<Guid> store, IAssetStore assetStore, ITagService tagService)
-            : base(store)
+        public BackupAssets(Rebuilder rebuilder, IAssetStore assetStore, ITagService tagService)
         {
+            Guard.NotNull(rebuilder);
             Guard.NotNull(assetStore);
             Guard.NotNull(tagService);
 
+            this.rebuilder = rebuilder;
             this.assetStore = assetStore;
-
             this.tagService = tagService;
         }
 
-        public Task BackupAsync(Guid appId, BackupContext context)
+        public Task BackupAsync(BackupContext context)
         {
-            return BackupTagsAsync(appId, context.Writer);
+            return BackupTagsAsync(context);
         }
 
         public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
@@ -79,27 +80,46 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task RestoreAsync(RestoreContext context)
         {
-            await RestoreTagsAsync(context.AppId, context.Reader);
+            await RestoreTagsAsync(context);
 
-            await RebuildManyAsync(assetIds, RebuildAsync<AssetState, AssetGrain>);
-            await RebuildManyAsync(assetFolderIds, RebuildAsync<AssetFolderState, AssetFolderGrain>);
+            if (assetIds.Count > 0)
+            {
+                await rebuilder.RebuildAsync<AssetState, AssetGrain>(async target =>
+                {
+                    foreach (var id in assetIds)
+                    {
+                        await target(id);
+                    }
+                });
+            }
+
+            if (assetFolderIds.Count > 0)
+            {
+                await rebuilder.RebuildAsync<AssetFolderState, AssetFolderGrain>(async target =>
+                {
+                    foreach (var id in assetFolderIds)
+                    {
+                        await target(id);
+                    }
+                });
+            }
         }
 
-        private async Task RestoreTagsAsync(Guid appId, IBackupReader reader)
+        private async Task RestoreTagsAsync(RestoreContext context)
         {
-            var tags = await reader.ReadJsonAttachmentAsync<TagsExport>(TagsFile);
+            var tags = await context.Reader.ReadJsonAttachmentAsync<TagsExport>(TagsFile);
 
-            await tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags);
+            await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, tags);
         }
 
-        private async Task BackupTagsAsync(Guid appId, BackupWriter writer)
+        private async Task BackupTagsAsync(BackupContext context)
         {
-            var tags = await tagService.GetExportableTagsAsync(appId, TagGroups.Assets);
+            var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
 
-            await writer.WriteJsonAsync(TagsFile, tags);
+            await context.Writer.WriteJsonAsync(TagsFile, tags);
         }
 
-        private Task WriteAssetAsync(Guid assetId, long fileVersion, BackupWriter writer)
+        private Task WriteAssetAsync(Guid assetId, long fileVersion, IBackupWriter writer)
         {
             return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {

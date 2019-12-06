@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public abstract class BackupContextBase
     {
-        public UserMapping UserMapping { get; }
+        public IUserMapping UserMapping { get; }
 
         public Guid AppId { get; set; }
 
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get { return UserMapping.Initiator; }
         }
 
-        protected BackupContextBase(Guid appId, UserMapping userMapping)
+        protected BackupContextBase(Guid appId, IUserMapping userMapping)
         {
             Guard.NotNull(userMapping);
 

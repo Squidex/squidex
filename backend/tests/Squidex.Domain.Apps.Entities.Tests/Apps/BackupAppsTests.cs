@@ -1,0 +1,300 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using FakeItEasy;
+using Squidex.Domain.Apps.Entities.Apps.Indexes;
+using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
+using Xunit;
+
+namespace Squidex.Domain.Apps.Entities.Apps
+{
+    public class BackupAppsTests
+    {
+        private readonly IAppsIndex index = A.Fake<IAppsIndex>();
+        private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
+        private readonly Guid appId = Guid.NewGuid();
+        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
+        private readonly BackupApps sut;
+
+        public BackupAppsTests()
+        {
+            sut = new BackupApps(appUISettings, index);
+        }
+
+        [Fact]
+        public void Should_provide_name()
+        {
+            Assert.Equal("Apps", sut.Name);
+        }
+
+        [Fact]
+        public async Task Should_reserve_app_name()
+        {
+            const string appName = "my-app";
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => index.ReserveAsync(appId, appName))
+                .Returns("Reservation");
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
+            {
+                Name = appName
+            }), context);
+
+            A.CallTo(() => index.ReserveAsync(appId, appName))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_complete_reservation_with_previous_token()
+        {
+            const string appName = "my-app";
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => index.ReserveAsync(appId, appName))
+                .Returns("Reservation");
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
+            {
+                Name = appName
+            }), context);
+
+            await sut.CompleteRestoreAsync(context);
+
+            A.CallTo(() => index.AddAsync("Reservation"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_cleanup_reservation_with_previous_token()
+        {
+            const string appName = "my-app";
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => index.ReserveAsync(appId, appName))
+                .Returns("Reservation");
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
+            {
+                Name = appName
+            }), context);
+
+            await sut.CleanupRestoreErrorAsync(appId);
+
+            A.CallTo(() => index.RemoveReservationAsync("Reservation"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_no_reservation_token_returned()
+        {
+            const string appName = "my-app";
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => index.ReserveAsync(appId, appName))
+                .Returns(Task.FromResult<string?>(null));
+
+            await Assert.ThrowsAsync<BackupRestoreException>(() =>
+            {
+                return sut.RestoreEventAsync(Envelope.Create(new AppCreated
+                {
+                    Name = appName
+                }), context);
+            });
+        }
+
+        [Fact]
+        public async Task Should_not_cleanup_reservation_when_no_reservation_token_hold()
+        {
+            var context = CreateRestoreContext();
+
+            await sut.CleanupRestoreErrorAsync(appId);
+
+            A.CallTo(() => index.RemoveReservationAsync("Reservation"))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_writer_user_settings()
+        {
+            var settings = JsonValue.Object();
+
+            var context = CreateBackupContext();
+
+            A.CallTo(() => appUISettings.GetAsync(appId, null))
+                .Returns(settings);
+
+            await sut.BackupAsync(context);
+
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>.Ignored, settings))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_read_user_settings()
+        {
+            var settings = JsonValue.Object();
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.ReadJsonAttachmentAsync<JsonObject>(A<string>.Ignored))
+                .Returns(settings);
+
+            await sut.RestoreAsync(context);
+
+            A.CallTo(() => appUISettings.SetAsync(appId, null, settings))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_map_contributor_id_when_assigned()
+        {
+            var context = CreateRestoreContext();
+
+            var @event = Envelope.Create(new AppContributorAssigned
+            {
+                ContributorId = "found"
+            });
+
+            var result = await sut.RestoreEventAsync(@event, context);
+
+            Assert.True(result);
+            Assert.Equal("found_mapped", @event.Payload.ContributorId);
+        }
+
+        [Fact]
+        public async Task Should_ignore_contributor_event_when_assigned_user_not_mapped()
+        {
+            var context = CreateRestoreContext();
+
+            var @event = Envelope.Create(new AppContributorAssigned
+            {
+                ContributorId = "unknown"
+            });
+
+            var result = await sut.RestoreEventAsync(@event, context);
+
+            Assert.False(result);
+            Assert.Equal("unknown", @event.Payload.ContributorId);
+        }
+
+        [Fact]
+        public async Task Should_map_contributor_id_when_revoked()
+        {
+            var context = CreateRestoreContext();
+
+            var @event = Envelope.Create(new AppContributorRemoved
+            {
+                ContributorId = "found"
+            });
+
+            var result = await sut.RestoreEventAsync(@event, context);
+
+            Assert.True(result);
+            Assert.Equal("found_mapped", @event.Payload.ContributorId);
+        }
+
+        [Fact]
+        public async Task Should_ignore_contributor_event_when_removed_user_not_mapped()
+        {
+            var context = CreateRestoreContext();
+
+            var @event = Envelope.Create(new AppContributorRemoved
+            {
+                ContributorId = "unknown"
+            });
+
+            var result = await sut.RestoreEventAsync(@event, context);
+
+            Assert.False(result);
+            Assert.Equal("unknown", @event.Payload.ContributorId);
+        }
+
+        [Fact]
+        public async Task Should_restore_indices_for_all_non_deleted_schemas()
+        {
+            var userId1 = "found1";
+            var userId2 = "found2";
+            var userId3 = "found3";
+            var context = CreateRestoreContext();
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
+            {
+                ContributorId = userId1
+            }), context);
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
+            {
+                ContributorId = userId2
+            }), context);
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
+            {
+                ContributorId = userId3
+            }), context);
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppContributorRemoved
+            {
+                ContributorId = userId3
+            }), context);
+
+            HashSet<string>? newIndex = null;
+
+            A.CallTo(() => index.RebuildByContributorsAsync(appId, A<HashSet<string>>.Ignored))
+                .Invokes(new Action<Guid, HashSet<string>>((_, i) => newIndex = i));
+
+            await sut.CompleteRestoreAsync(context);
+
+            Assert.Equal(new HashSet<string>
+            {
+                "found1_mapped",
+                "found2_mapped",
+            }, newIndex);
+        }
+
+        private BackupContext CreateBackupContext()
+        {
+            return new BackupContext(appId, CreateUserMapping(), A.Fake<IBackupWriter>());
+        }
+
+        private RestoreContext CreateRestoreContext()
+        {
+            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>());
+        }
+
+        private IUserMapping CreateUserMapping()
+        {
+            var mapping = A.Fake<IUserMapping>();
+
+            A.CallTo(() => mapping.Initiator).Returns(actor);
+
+            RefToken mapped;
+
+            A.CallTo(() => mapping.TryMap(A<string>.That.Matches(x => x.StartsWith("found", StringComparison.OrdinalIgnoreCase)), out mapped))
+                .Returns(true)
+                .AssignsOutAndRefParametersLazily(
+                    new Func<string, RefToken, object[]>((x, _) =>
+                        new[] { new RefToken(RefTokenType.Subject, $"{x}_mapped") }));
+
+            A.CallTo(() => mapping.TryMap("notfound", out mapped))
+                .Returns(false);
+
+            return mapping;
+        }
+    }
+}
