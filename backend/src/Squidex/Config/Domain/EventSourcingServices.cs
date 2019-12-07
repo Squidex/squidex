@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
@@ -84,6 +85,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<OrleansEventNotifier>()
                 .As<IEventNotifier>();
+
+            services.AddTransientAs<Rebuilder>()
+                .AsSelf();
 
             services.AddSingletonAs<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>();

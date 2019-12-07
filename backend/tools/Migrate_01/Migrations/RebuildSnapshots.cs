@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01.Migrations

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupWriter
+    public interface IBackupWriter : IDisposable
     {
         int WrittenAttachments { get; }
 

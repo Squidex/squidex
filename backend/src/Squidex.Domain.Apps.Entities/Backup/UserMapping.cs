@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task StoreAsync(BackupWriter writer, IUserResolver userResolver)
+        public async Task StoreAsync(IBackupWriter writer, IUserResolver userResolver)
         {
             Guard.NotNull(writer);
             Guard.NotNull(userResolver);
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await writer.WriteJsonAsync(UsersFile, json);
         }
 
-        public async Task RestoreAsync(BackupReader reader, IUserResolver userResolver)
+        public async Task RestoreAsync(IBackupReader reader, IUserResolver userResolver)
         {
             Guard.NotNull(reader);
             Guard.NotNull(userResolver);

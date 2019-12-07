@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_restore_indices_for_all_non_deleted_contents()
+        public async Task Should_restore_states_for_all_contents()
         {
             var appId = Guid.NewGuid();
 
@@ -100,11 +100,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 contentId1,
                 contentId2
             }, rebuildContents);
-        }
-
-        private int ContentState(IdSource ignored1, CancellationToken ignored2)
-        {
-            throw new NotImplementedException();
         }
     }
 }

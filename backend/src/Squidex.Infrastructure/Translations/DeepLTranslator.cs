@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -17,6 +18,7 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure.Translations
 {
+    [ExcludeFromCodeCoverage]
     public sealed class DeepLTranslator : ITranslator
     {
         private const string Url = "https://api.deepl.com/v2/translate";

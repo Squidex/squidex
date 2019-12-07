@@ -13,6 +13,7 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
@@ -74,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
 
-            backupGrain.RunAsync().Forget();
+            backupGrain.RunAsync(User.Token()!).Forget();
 
             return NoContent();
         }

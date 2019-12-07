@@ -7,12 +7,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using McMaster.NETCore.Plugins;
 
 namespace Squidex.Infrastructure.Plugins
 {
+    [ExcludeFromCodeCoverage]
     public static class PluginLoaders
     {
         public static PluginLoader? LoadPlugin(string pluginPath, AssemblyName[] sharedAssemblies)

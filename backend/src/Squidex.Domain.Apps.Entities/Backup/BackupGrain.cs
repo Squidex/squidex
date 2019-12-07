@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
@@ -35,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IAssetStore assetStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
-        private readonly IJsonSerializer serializer;
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
@@ -52,18 +50,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
             IGrainState<BackupState> state,
-            IJsonSerializer serializer,
-            ISemanticLog log,
             IServiceProvider serviceProvider,
-            IUserResolver userResolver)
+            IUserResolver userResolver,
+            ISemanticLog log)
         {
             Guard.NotNull(assetStore);
             Guard.NotNull(backupArchiveLocation);
             Guard.NotNull(clock);
-            Guard.NotNull(eventStore);
             Guard.NotNull(eventDataFormatter);
+            Guard.NotNull(eventStore);
             Guard.NotNull(serviceProvider);
-            Guard.NotNull(serializer);
             Guard.NotNull(state);
             Guard.NotNull(userResolver);
             Guard.NotNull(log);
@@ -71,12 +67,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.assetStore = assetStore;
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
-            this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.serializer = serializer;
+            this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
             this.state = state;
             this.userResolver = userResolver;
+
             this.log = log;
         }
 
@@ -151,9 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
+                var userMapping = new UserMapping(actor);
+
                 using (var stream = await backupArchiveLocation.OpenStreamAsync(jobId))
                 {
-                    using (var writer = new BackupWriter(serializer, stream, true))
+                    using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
                         var context = new BackupContext(Key, new UserMapping(actor), writer);
 
@@ -187,6 +185,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                             await handler.CompleteBackupAsync(context);
                         }
+
+                        await userMapping.StoreAsync(writer, userResolver);
                     }
 
                     stream.Position = 0;

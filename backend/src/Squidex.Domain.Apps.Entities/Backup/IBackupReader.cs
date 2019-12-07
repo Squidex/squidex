@@ -13,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupReader
+    public interface IBackupReader : IDisposable
     {
         int ReadAttachments { get; }
 

@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -33,7 +32,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
-        private readonly IJsonSerializer serializer;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly ISemanticLog log;
@@ -55,18 +53,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
             IGrainState<RestoreState> state,
-            IJsonSerializer serializer,
-            ISemanticLog log,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
-            IUserResolver userResolver)
+            IUserResolver userResolver,
+            ISemanticLog log)
         {
             Guard.NotNull(backupArchiveLocation);
             Guard.NotNull(clock);
             Guard.NotNull(commandBus);
-            Guard.NotNull(eventStore);
             Guard.NotNull(eventDataFormatter);
-            Guard.NotNull(serializer);
+            Guard.NotNull(eventStore);
             Guard.NotNull(serviceProvider);
             Guard.NotNull(state);
             Guard.NotNull(streamNameResolver);
@@ -76,13 +72,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
             this.commandBus = commandBus;
-            this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.serializer = serializer;
+            this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
+            this.state = state;
             this.streamNameResolver = streamNameResolver;
             this.userResolver = userResolver;
-            this.state = state;
             this.log = log;
         }
 
@@ -166,12 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         .WriteProperty("operationId", ctx.jobId)
                         .WriteProperty("url", ctx.jobUrl));
 
-                    using (Profiler.Trace("Download"))
-                    {
-                        await DownloadAsync();
-                    }
-
-                    using (var reader = await backupArchiveLocation.OpenArchiveAsync(CurrentJob.Id.ToString(), serializer))
+                    using (var reader = await DownloadAsync())
                     {
                         using (Profiler.Trace("ReadEvents"))
                         {
@@ -292,16 +282,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private async Task DownloadAsync()
+        private async Task<IBackupReader> DownloadAsync()
         {
-            Log("Downloading Backup");
+            using (Profiler.Trace("Download"))
+            {
+                Log("Downloading Backup");
 
-            await backupArchiveLocation.DownloadAsync(CurrentJob.Url, CurrentJob.Id.ToString());
+                var reader = await backupArchiveLocation.OpenReaderAsync(CurrentJob.Url, CurrentJob.Id.ToString());
 
-            Log("Downloaded Backup");
+                Log("Downloaded Backup");
+
+                return reader;
+            }
         }
 
-        private async Task ReadEventsAsync(BackupReader reader, IEnumerable<IBackupHandler> handlers)
+        private async Task ReadEventsAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers)
         {
             await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async storedEvent =>
             {
@@ -311,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Log($"Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.", true);
         }
 
-        private async Task HandleEventAsync(BackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
         {
             if (@event.Payload is AppCreated appCreated)
             {

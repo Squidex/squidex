@@ -23,19 +23,19 @@ namespace Squidex.Config.Domain
                 .As<IBackupArchiveLocation>();
 
             services.AddTransientAs<BackupApps>()
-                .As<BackupHandler>();
+                .As<IBackupHandler>();
 
             services.AddTransientAs<BackupAssets>()
-                .As<BackupHandler>();
+                .As<IBackupHandler>();
 
             services.AddTransientAs<BackupContents>()
-                .As<BackupHandler>();
+                .As<IBackupHandler>();
 
             services.AddTransientAs<BackupRules>()
-                .As<BackupHandler>();
+                .As<IBackupHandler>();
 
             services.AddTransientAs<BackupSchemas>()
-                .As<BackupHandler>();
+                .As<IBackupHandler>();
         }
     }
 }
