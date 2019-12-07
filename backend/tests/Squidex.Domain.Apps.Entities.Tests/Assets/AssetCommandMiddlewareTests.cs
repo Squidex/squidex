@@ -147,6 +147,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var result = context.Result<AssetCreatedResult>();
 
             result.Asset.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
+
+            AssertAssetHasBeenUploaded(0);
+            AssertAssetImageChecked();
         }
 
         [Fact]
@@ -230,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            AssertAssetHasBeenUploaded(1, context.ContextId);
+            AssertAssetHasBeenUploaded(1);
             AssertAssetImageChecked();
         }
 
@@ -282,13 +285,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
         }
 
-        private void AssertAssetHasBeenUploaded(long version, Guid commitId)
+        private void AssertAssetHasBeenUploaded(long version)
         {
-            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), A<HasherStream>.Ignored, false, CancellationToken.None))
+            var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
+
+            A.CallTo(() => assetStore.UploadAsync(A<string>.Ignored, A<HasherStream>.Ignored, false, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), assetId.ToString(), version, null, CancellationToken.None))
+            A.CallTo(() => assetStore.CopyAsync(A<string>.Ignored, fileName, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
+            A.CallTo(() => assetStore.DeleteAsync(A<string>.Ignored))
                 .MustHaveHappened();
         }
 

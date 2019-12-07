@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             context.Complete(new AssetCreatedResult(asset, false));
 
-                            await assetStore.CopyAsync(tempFile, createAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, createAsset.AssetId, asset.FileVersion, null);
                         }
                         finally
                         {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             var asset = context.Result<IEnrichedAssetEntity>();
 
-                            await assetStore.CopyAsync(tempFile, updateAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, updateAsset.AssetId, asset.FileVersion, null);
                         }
                         finally
                         {
