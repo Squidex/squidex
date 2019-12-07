@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {
-                return assetStore.DownloadAsync(assetId.ToString(), fileVersion, null, stream);
+                return assetStore.DownloadAsync(assetId, fileVersion, null, stream);
             });
         }
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 try
                 {
-                    await assetStore.UploadAsync(assetId.ToString(), fileVersion, null, stream, true);
+                    await assetStore.UploadAsync(assetId, fileVersion, null, stream, true);
                 }
                 catch (AssetAlreadyExistsException)
                 {

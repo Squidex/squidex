@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             return new FileCallbackResult("application/zip", fileName, false, bodyStream =>
             {
-                return assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream);
+                return assetStore.DownloadAsync(id, 0, null, bodyStream);
             });
         }
     }
