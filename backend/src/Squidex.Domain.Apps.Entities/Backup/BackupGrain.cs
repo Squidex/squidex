@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ISemanticLog log;
         private readonly IGrainState<BackupState> state;
         private readonly IUserResolver userResolver;
-        private CancellationTokenSource? currentTask;
+        private CancellationTokenSource? currentTaskToken;
         private BackupStateJob? currentJob;
 
         public BackupGrain(
@@ -85,27 +85,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task RecoverAfterRestartAsync()
         {
-            foreach (var job in state.Value.Jobs)
-            {
-                if (!job.Stopped.HasValue)
-                {
-                    var jobId = job.Id.ToString();
+            state.Value.Jobs.RemoveAll(x => !x.Stopped.HasValue);
 
-                    job.Stopped = clock.GetCurrentInstant();
-
-                    await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-                    await Safe.DeleteAsync(assetStore, jobId, log);
-
-                    job.Status = JobStatus.Failed;
-
-                    await state.WriteAsync();
-                }
-            }
+            await state.WriteAsync();
         }
 
         public async Task RunAsync(RefToken actor)
         {
-            if (currentTask != null)
+            if (currentTaskToken != null)
             {
                 throw new DomainException("Another backup process is already running.");
             }
@@ -122,14 +109,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Status = JobStatus.Started
             };
 
-            currentTask = new CancellationTokenSource();
+            currentTaskToken = new CancellationTokenSource();
             currentJob = job;
 
             state.Value.Jobs.Insert(0, job);
 
             await state.WriteAsync();
 
-            Process(job, actor, currentTask.Token);
+            Process(job, actor, currentTaskToken.Token);
         }
 
         private void Process(BackupStateJob job, RefToken actor, CancellationToken ct)
@@ -139,8 +126,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ProcessAsync(BackupStateJob job, RefToken actor, CancellationToken ct)
         {
-            var jobId = job.Id.ToString();
-
             var handlers = CreateHandlers();
 
             var lastTimestamp = job.Started;
@@ -149,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var userMapping = new UserMapping(actor);
 
-                using (var stream = await backupArchiveLocation.OpenStreamAsync(jobId))
+                using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
@@ -159,12 +144,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                            writer.WriteEvent(storedEvent);
+                            if (@event.Payload is SquidexEvent squidexEvent)
+                            {
+                                context.UserMapping.Backup(squidexEvent.Actor);
+                            }
 
                             foreach (var handler in handlers)
                             {
                                 await handler.BackupEventAsync(@event, context);
                             }
+
+                            writer.WriteEvent(storedEvent);
 
                             job.HandledEvents = writer.WrittenEvents;
                             job.HandledAssets = writer.WrittenAttachments;
@@ -193,14 +183,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     ct.ThrowIfCancellationRequested();
 
-                    await assetStore.UploadAsync(jobId, 0, null, stream, false, ct);
+                    await assetStore.UploadAsync(job.Id, 0, null, stream, false, ct);
                 }
 
                 job.Status = JobStatus.Completed;
             }
+            catch (OperationCanceledException)
+            {
+                await RemoveAsync(job);
+            }
             catch (Exception ex)
             {
-                log.LogError(ex, jobId, (ctx, w) => w
+                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
                     .WriteProperty("action", "makeBackup")
                     .WriteProperty("status", "failed")
                     .WriteProperty("backupId", ctx));
@@ -209,13 +203,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             finally
             {
-                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-
                 job.Stopped = clock.GetCurrentInstant();
 
                 await state.WriteAsync();
 
-                currentTask = null;
+                currentTaskToken = null;
                 currentJob = null;
             }
         }
@@ -245,19 +237,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (currentJob == job)
             {
-                currentTask?.Cancel();
+                currentTaskToken?.Cancel();
             }
             else
             {
-                var jobId = job.Id.ToString();
-
-                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-                await Safe.DeleteAsync(assetStore, jobId, log);
-
-                state.Value.Jobs.Remove(job);
-
-                await state.WriteAsync();
+                await RemoveAsync(job);
             }
+        }
+
+        private async Task RemoveAsync(BackupStateJob job)
+        {
+            await Safe.DeleteAsync(assetStore, job.Id, log);
+
+            state.Value.Jobs.Remove(job);
+
+            await state.WriteAsync();
         }
 
         private IEnumerable<IBackupHandler> CreateHandlers()

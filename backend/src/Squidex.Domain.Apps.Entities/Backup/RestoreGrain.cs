@@ -92,13 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (CurrentJob?.Status == JobStatus.Started)
             {
-                var handlers = CreateHandlers();
-
                 Log("Failed due application restart");
 
                 CurrentJob.Status = JobStatus.Failed;
-
-                await CleanupAsync(handlers);
 
                 await state.WriteAsync();
             }
@@ -271,8 +267,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task CleanupAsync(IEnumerable<IBackupHandler> handlers)
         {
-            await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id.ToString(), log);
-
             if (CurrentJob.AppId != null)
             {
                 foreach (var handler in handlers)
@@ -288,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 Log("Downloading Backup");
 
-                var reader = await backupArchiveLocation.OpenReaderAsync(CurrentJob.Url, CurrentJob.Id.ToString());
+                var reader = await backupArchiveLocation.OpenReaderAsync(CurrentJob.Url, CurrentJob.Id);
 
                 Log("Downloaded Backup");
 

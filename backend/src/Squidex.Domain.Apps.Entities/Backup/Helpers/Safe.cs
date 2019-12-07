@@ -14,22 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 {
     public static class Safe
     {
-        public static async Task DeleteAsync(IBackupArchiveLocation backupArchiveLocation, string id, ISemanticLog log)
-        {
-            try
-            {
-                await backupArchiveLocation.DeleteArchiveAsync(id);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, id, (logOperationId, w) => w
-                    .WriteProperty("action", "deleteArchive")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", logOperationId));
-            }
-        }
-
-        public static async Task DeleteAsync(IAssetStore assetStore, string id, ISemanticLog log)
+        public static async Task DeleteAsync(IAssetStore assetStore, Guid id, ISemanticLog log)
         {
             try
             {
@@ -37,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             catch (Exception ex)
             {
-                log.LogError(ex, id, (logOperationId, w) => w
+                log.LogError(ex, id.ToString(), (logOperationId, w) => w
                     .WriteProperty("action", "deleteBackup")
                     .WriteProperty("status", "failed")
                     .WriteProperty("operationId", logOperationId));
