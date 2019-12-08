@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     [DataContract]
-    public sealed class RestoreStateJob : IRestoreJob
+    public sealed class RestoreJob : IRestoreJob
     {
         [DataMember]
         public string AppName { get; set; }

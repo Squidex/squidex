@@ -7,11 +7,9 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
@@ -24,12 +22,12 @@ namespace Squidex.Areas.Api.Controllers.Backups
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class RestoreController : ApiController
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IBackupService backupService;
 
-        public RestoreController(ICommandBus commandBus, IGrainFactory grainFactory)
+        public RestoreController(ICommandBus commandBus, IBackupService backupService)
             : base(commandBus)
         {
-            this.grainFactory = grainFactory;
+            this.backupService = backupService;
         }
 
         /// <summary>
@@ -44,16 +42,14 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestore)]
         public async Task<IActionResult> GetRestoreJob()
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
+            var job = await backupService.GetRestoreAsync();
 
-            var job = await restoreGrain.GetJobAsync();
-
-            if (job.Value == null)
+            if (job == null)
             {
                 return NotFound();
             }
 
-            var response = RestoreJobDto.FromJob(job.Value);
+            var response = RestoreJobDto.FromJob(job);
 
             return Ok(response);
         }
@@ -70,9 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestore)]
         public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
-
-            await restoreGrain.RestoreAsync(request.Url, User.Token()!, request.Name);
+            await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name);
 
             return NoContent();
         }

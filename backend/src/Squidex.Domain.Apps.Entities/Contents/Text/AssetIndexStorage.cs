@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 try
                 {
-                    await assetStore.DownloadAsync(directoryInfo.Name, 0, string.Empty, fileStream);
+                    await assetStore.DownloadAsync(directoryInfo.Name, fileStream);
 
                     fileStream.Position = 0;
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                     fileStream.Position = 0;
 
-                    await assetStore.UploadAsync(directoryInfo.Name, 0, string.Empty, fileStream, true);
+                    await assetStore.UploadAsync(directoryInfo.Name, fileStream, true);
                 }
             }
             finally

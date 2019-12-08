@@ -7,44 +7,52 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class BackupApps : IBackupHandler
     {
         private const string SettingsFile = "Settings.json";
-        private readonly IAppUISettings appUISettings;
+        private const string AvatarFile = "Avatar.image";
+        private readonly IAppImageStore appImageStore;
         private readonly IAppsIndex appsIndex;
+        private readonly IAppUISettings appUISettings;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private string? appReservation;
 
         public string Name { get; } = "Apps";
 
-        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex)
+        public BackupApps(IAppImageStore appImageStore, IAppsIndex appsIndex, IAppUISettings appUISettings)
         {
+            Guard.NotNull(appImageStore);
             Guard.NotNull(appsIndex);
             Guard.NotNull(appUISettings);
 
             this.appsIndex = appsIndex;
+            this.appImageStore = appImageStore;
             this.appUISettings = appUISettings;
         }
 
-        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
-            if (@event.Payload is AppContributorAssigned appContributorAssigned)
+            switch (@event.Payload)
             {
-                context.UserMapping.Backup(appContributorAssigned.ContributorId);
+                case AppContributorAssigned appContributorAssigned:
+                    context.UserMapping.Backup(appContributorAssigned.ContributorId);
+                    break;
+                case AppImageUploaded _:
+                    await WriteAssetAsync(context.AppId, context.Writer);
+                    break;
             }
-
-            return TaskHelper.Done;
         }
 
         public async Task BackupAsync(BackupContext context)
@@ -61,6 +69,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AppCreated appCreated:
                     {
                         await ReserveAppAsync(context.AppId, appCreated.Name);
+
+                        break;
+                    }
+
+                case AppImageUploaded _:
+                    {
+                        await ReadAssetAsync(context.AppId, context.Reader);
 
                         break;
                     }
@@ -123,6 +138,34 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await appsIndex.AddAsync(appReservation);
 
             await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
+        }
+
+        private Task WriteAssetAsync(Guid appId, IBackupWriter writer)
+        {
+            return writer.WriteBlobAsync(AvatarFile, async stream =>
+            {
+                try
+                {
+                    await appImageStore.DownloadAsync(appId, stream);
+                }
+                catch (AssetNotFoundException)
+                {
+                }
+            });
+        }
+
+        private async Task ReadAssetAsync(Guid appId, IBackupReader reader)
+        {
+            await reader.ReadBlobAsync(AvatarFile, async stream =>
+            {
+                try
+                {
+                    await appImageStore.UploadAsync(appId, stream);
+                }
+                catch (AssetAlreadyExistsException)
+                {
+                }
+            });
         }
     }
 }

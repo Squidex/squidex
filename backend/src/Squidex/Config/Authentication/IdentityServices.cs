@@ -22,7 +22,7 @@ namespace Squidex.Config.Authentication
             services.AddSingletonAs<DefaultUserResolver>()
                 .AsOptional<IUserResolver>();
 
-            services.AddSingletonAs<AssetUserPictureStore>()
+            services.AddSingletonAs<DefaultUserPictureStore>()
                 .AsOptional<IUserPictureStore>();
         }
     }

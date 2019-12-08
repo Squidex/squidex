@@ -5,18 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using System.Runtime.Serialization;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup.State
 {
-    public interface IRestoreGrain : IGrainWithStringKey
+    public class RestoreState2
     {
-        Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null);
-
-        Task<J<IRestoreJob>> GetStateAsync();
+        [DataMember]
+        public RestoreJob Job { get; set; }
     }
 }

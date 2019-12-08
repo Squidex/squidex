@@ -6,17 +6,24 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IRestoreGrain : IGrainWithStringKey
+    public interface IBackupService
     {
-        Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null);
+        Task StartBackupAsync(Guid appId, RefToken actor);
 
-        Task<J<IRestoreJob>> GetStateAsync();
+        Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName);
+
+        Task<IRestoreJob?> GetRestoreAsync();
+
+        Task<List<IBackupJob>> GetBackupsAsync(Guid appId);
+
+        Task<IBackupJob?> GetBackupAsync(Guid appId, Guid backupId);
+
+        Task DeleteBackupAsync(Guid appId, Guid backupId);
     }
 }

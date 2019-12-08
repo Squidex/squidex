@@ -30,12 +30,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetContentController : ApiController
     {
+        private readonly IAssetFileStore assetFileStore;
         private readonly IAssetStore assetStore;
         private readonly IAssetRepository assetRepository;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetContentController(
             ICommandBus commandBus,
+            IAssetFileStore assetFileStore,
             IAssetStore assetStore,
             IAssetRepository assetRepository,
             IAssetThumbnailGenerator assetThumbnailGenerator)
@@ -123,20 +125,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var handler = new Func<Stream, Task>(async bodyStream =>
             {
-                var assetId = asset.Id.ToString();
-
                 if (asset.IsImage && query.ShouldResize())
                 {
-                    var assetSuffix = $"{query.Width}_{query.Height}_{query.Mode}";
+                    var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{query.Width}_{query.Height}_{query.Mode}";
 
                     if (query.Quality.HasValue)
                     {
-                        assetSuffix += $"_{query.Quality}";
+                        resizedAsset += $"_{query.Quality}";
                     }
 
                     try
                     {
-                        await assetStore.DownloadAsync(assetId, fileVersion, assetSuffix, bodyStream);
+                        await assetStore.DownloadAsync(resizedAsset, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                                 {
                                     using (Profiler.Trace("ResizeDownload"))
                                     {
-                                        await assetStore.DownloadAsync(assetId, fileVersion, null, sourceStream);
+                                        await assetFileStore.DownloadAsync(asset.Id, fileVersion, sourceStream);
                                         sourceStream.Position = 0;
                                     }
 
@@ -160,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                                     using (Profiler.Trace("ResizeUpload"))
                                     {
-                                        await assetStore.UploadAsync(assetId, fileVersion, assetSuffix, destinationStream);
+                                        await assetStore.UploadAsync(resizedAsset, destinationStream);
                                         destinationStream.Position = 0;
                                     }
 
@@ -172,7 +172,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
                 else
                 {
-                    await assetStore.DownloadAsync(assetId, fileVersion, null, bodyStream);
+                    await assetFileStore.DownloadAsync(asset.Id, fileVersion, bodyStream);
                 }
             });
 

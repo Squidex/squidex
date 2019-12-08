@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Backup.State
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class RestoreState
+    public interface IAppImageStore
     {
-        [DataMember]
-        public RestoreStateJob Job { get; set; }
+        Task UploadAsync(Guid appId, Stream stream, CancellationToken ct = default);
+
+        Task DownloadAsync(Guid appId, Stream stream, CancellationToken ct = default);
     }
 }

@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -38,10 +37,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
-        private readonly IGrainState<RestoreState> state;
+        private readonly IGrainState<RestoreState2> state;
         private RestoreContext restoreContext;
 
-        private RestoreStateJob CurrentJob
+        private RestoreJob CurrentJob
         {
             get { return state.Value.Job; }
         }
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ICommandBus commandBus,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
-            IGrainState<RestoreState> state,
+            IGrainState<RestoreState2> state,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException("A restore operation is already running.");
             }
 
-            state.Value.Job = new RestoreStateJob
+            state.Value.Job = new RestoreJob
             {
                 Id = Guid.NewGuid(),
                 NewAppName = newAppName,
@@ -269,9 +268,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (CurrentJob.AppId != null)
             {
+                var appId = CurrentJob.AppId.Id;
+
                 foreach (var handler in handlers)
                 {
-                    await Safe.CleanupRestoreErrorAsync(handler, CurrentJob.AppId.Id, CurrentJob.Id, log);
+                    try
+                    {
+                        await handler.CleanupRestoreErrorAsync(appId);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, appId.ToString(), (logOperationId, w) => w
+                            .WriteProperty("action", "cleanupRestore")
+                            .WriteProperty("status", "failed")
+                            .WriteProperty("operationId", logOperationId));
+                    }
                 }
             }
         }
@@ -315,11 +326,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     CurrentJob.AppId = appCreated.AppId;
                 }
 
-                var userMapping = new UserMapping(CurrentJob.Actor);
-
-                await userMapping.RestoreAsync(reader, userResolver);
-
-                restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader);
+                await CreateContextAsync(reader);
             }
 
             if (@event.Payload is SquidexEvent squidexEvent)
@@ -351,6 +358,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
         }
 
+        private async Task CreateContextAsync(IBackupReader reader)
+        {
+            var userMapping = new UserMapping(CurrentJob.Actor);
+
+            using (Profiler.Trace("CreateUsers"))
+            {
+                Log("Creating Users");
+
+                await userMapping.RestoreAsync(reader, userResolver);
+
+                Log("Created Users");
+            }
+
+            restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader);
+        }
+
         private void Log(string message, bool replace = false)
         {
             if (replace && CurrentJob.Log.Count > 0)
@@ -368,7 +391,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
         }
 
-        public Task<J<IRestoreJob>> GetJobAsync()
+        public Task<J<IRestoreJob>> GetStateAsync()
         {
             return Task.FromResult<J<IRestoreJob>>(CurrentJob);
         }

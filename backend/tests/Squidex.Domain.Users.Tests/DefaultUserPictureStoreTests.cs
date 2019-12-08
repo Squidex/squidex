@@ -13,26 +13,24 @@ using FakeItEasy;
 using Squidex.Infrastructure.Assets;
 using Xunit;
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-
 namespace Squidex.Domain.Users
 {
-    public class AssetUserPictureStoreTests
+    public class DefaultUserPictureStoreTests
     {
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly AssetUserPictureStore sut;
+        private readonly DefaultUserPictureStore sut;
         private readonly string userId = Guid.NewGuid().ToString();
         private readonly string file;
 
-        public AssetUserPictureStoreTests()
+        public DefaultUserPictureStoreTests()
         {
             file = AssetStoreExtensions.GetFileName(userId, 0, "picture");
 
-            sut = new AssetUserPictureStore(assetStore);
+            sut = new DefaultUserPictureStore(assetStore);
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_upload_picture()
+        public async Task Should_invoke_asset_store_to_upload_picture_using_suffix_for_compatibility()
         {
             var stream = new MemoryStream();
 
@@ -43,22 +41,13 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_download_picture()
+        public async Task Should_invoke_asset_store_to_download_picture_using_suffix_for_compatibility()
         {
-            A.CallTo(() => assetStore.DownloadAsync(file, A<Stream>.Ignored, CancellationToken.None))
-                .Invokes(async call =>
-                {
-                    var stream = call.GetArgument<Stream>(1);
+            var stream = new MemoryStream();
 
-                    await stream.WriteAsync(new byte[] { 1, 2, 3, 4 }, 0, 4);
-                });
+            await sut.DownloadAsync(userId, stream);
 
-            var result = await sut.DownloadAsync(userId);
-
-            Assert.Equal(0, result.Position);
-            Assert.Equal(4, result.Length);
-
-            A.CallTo(() => assetStore.DownloadAsync(file, A<Stream>.Ignored, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(file, stream, CancellationToken.None))
                 .MustHaveHappened();
         }
     }

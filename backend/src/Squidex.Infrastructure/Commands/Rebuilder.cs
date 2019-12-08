@@ -55,6 +55,15 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(source);
 
+            await store.GetSnapshotStore<TState>().ClearAsync();
+
+            await InsertManyAsync<TState, TGrain>(source, ct);
+        }
+
+        public virtual async Task InsertManyAsync<TState, TGrain>(IdSource source, CancellationToken ct = default) where TState : IDomainState<TState>, new()
+        {
+            Guard.NotNull(source);
+
             var worker = new ActionBlock<Guid>(async id =>
             {
                 try
@@ -88,8 +97,6 @@ namespace Squidex.Infrastructure.Commands
 
             using (localCache.StartContext())
             {
-                await store.GetSnapshotStore<TState>().ClearAsync();
-
                 await source(new Func<Guid, Task>(async id =>
                 {
                     if (handledIds.Add(id))

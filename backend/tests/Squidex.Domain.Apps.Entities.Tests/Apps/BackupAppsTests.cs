@@ -7,15 +7,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
+
+#pragma warning disable IDE0067 // Dispose objects before losing scope
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
@@ -23,13 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private readonly IAppsIndex index = A.Fake<IAppsIndex>();
         private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
+        private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
         private readonly BackupApps sut;
 
         public BackupAppsTests()
         {
-            sut = new BackupApps(appUISettings, index);
+            sut = new BackupApps(appImageStore, index,  appUISettings);
         }
 
         [Fact]
@@ -223,6 +228,70 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.False(result);
             Assert.Equal("unknown", @event.Payload.ContributorId);
+        }
+
+        [Fact]
+        public async Task Should_ignore_exception_when_app_image_to_backup_does_not_exist()
+        {
+            var imageStream = new MemoryStream();
+
+            var context = CreateBackupContext();
+
+            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+                .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
+
+            A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, default))
+                .Throws(new AssetNotFoundException("Image"));
+
+            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context);
+        }
+
+        [Fact]
+        public async Task Should_backup_app_image()
+        {
+            var imageStream = new MemoryStream();
+
+            var context = CreateBackupContext();
+
+            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+                .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
+
+            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context);
+
+            A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_restore_app_image()
+        {
+            var imageStream = new MemoryStream();
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+                .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context);
+
+            A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_ignore_exception_when_app_image_cannot_be_overriden()
+        {
+            var imageStream = new MemoryStream();
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+                .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
+
+            A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, default))
+                .Throws(new AssetAlreadyExistsException("Image"));
+
+            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context);
         }
 
         [Fact]

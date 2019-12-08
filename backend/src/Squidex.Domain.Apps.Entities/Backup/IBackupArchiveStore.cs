@@ -6,17 +6,18 @@
 // ==========================================================================
 
 using System;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IRestoreGrain : IGrainWithStringKey
+    public interface IBackupArchiveStore
     {
-        Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null);
+        Task UploadAsync(Guid backupId, Stream stream, CancellationToken ct = default);
 
-        Task<J<IRestoreJob>> GetStateAsync();
+        Task DownloadAsync(Guid backupId, Stream stream, CancellationToken ct = default);
+
+        Task DeleteAsync(Guid backupId);
     }
 }

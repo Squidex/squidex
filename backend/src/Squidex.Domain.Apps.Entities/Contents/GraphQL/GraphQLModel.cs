@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetSourceUrl(app, c.Source);
+                return context.UrlGenerator.GenerateAssetSourceUrl(c.Source);
             });
 
             return resolver;

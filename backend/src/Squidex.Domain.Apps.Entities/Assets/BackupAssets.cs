@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
@@ -26,19 +25,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly HashSet<Guid> assetIds = new HashSet<Guid>();
         private readonly HashSet<Guid> assetFolderIds = new HashSet<Guid>();
         private readonly Rebuilder rebuilder;
-        private readonly IAssetStore assetStore;
+        private readonly IAssetFileStore assetFileStore;
         private readonly ITagService tagService;
 
         public string Name { get; } = "Assets";
 
-        public BackupAssets(Rebuilder rebuilder, IAssetStore assetStore, ITagService tagService)
+        public BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService)
         {
             Guard.NotNull(rebuilder);
-            Guard.NotNull(assetStore);
+            Guard.NotNull(assetFileStore);
             Guard.NotNull(tagService);
 
             this.rebuilder = rebuilder;
-            this.assetStore = assetStore;
+            this.assetFileStore = assetFileStore;
             this.tagService = tagService;
         }
 
@@ -84,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.RebuildAsync<AssetState, AssetGrain>(async target =>
+                await rebuilder.InsertManyAsync<AssetState, AssetGrain>(async target =>
                 {
                     foreach (var id in assetIds)
                     {
@@ -95,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.RebuildAsync<AssetFolderState, AssetFolderGrain>(async target =>
+                await rebuilder.InsertManyAsync<AssetFolderState, AssetFolderGrain>(async target =>
                 {
                     foreach (var id in assetFolderIds)
                     {
@@ -123,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {
-                return assetStore.DownloadAsync(assetId, fileVersion, null, stream);
+                return assetFileStore.DownloadAsync(assetId, fileVersion, stream);
             });
         }
 
@@ -131,16 +130,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetIds.Add(assetId);
 
-            return reader.ReadBlobAsync(GetName(reader.OldGuid(assetId), fileVersion), async stream =>
+            return reader.ReadBlobAsync(GetName(reader.OldGuid(assetId), fileVersion), stream =>
             {
-                try
-                {
-                    await assetStore.UploadAsync(assetId, fileVersion, null, stream, true);
-                }
-                catch (AssetAlreadyExistsException)
-                {
-                    return;
-                }
+                return assetFileStore.UploadAsync(assetId, fileVersion, stream);
             });
         }
 

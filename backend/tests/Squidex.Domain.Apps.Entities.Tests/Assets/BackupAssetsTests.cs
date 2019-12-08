@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class BackupAssetsTests
     {
         private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
-        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+        private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
@@ -37,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public BackupAssetsTests()
         {
-            sut = new BackupAssets(rebuilder, assetStore, tagService);
+            sut = new BackupAssets(rebuilder, assetFileStore, tagService);
         }
 
         [Fact]
@@ -101,14 +100,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
-
             A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>.Ignored))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
 
             await sut.BackupEventAsync(Envelope.Create(@event), context);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, assetStream, default))
+            A.CallTo(() => assetFileStore.DownloadAsync(assetId, version, assetStream, default))
                 .MustHaveHappened();
         }
 
@@ -137,8 +134,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
-            var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
-
             A.CallTo(() => context.Reader.OldGuid(assetId))
                 .Returns(oldId);
 
@@ -147,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreEventAsync(Envelope.Create(@event), context);
 
-            A.CallTo(() => assetStore.UploadAsync(fileName, assetStream, true, default))
+            A.CallTo(() => assetFileStore.UploadAsync(assetId, version, assetStream, default))
                 .MustHaveHappened();
         }
 
@@ -183,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return TaskHelper.Done;
             });
 
-            A.CallTo(() => rebuilder.RebuildAsync<AssetState, AssetGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetState, AssetGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
                 .Invokes((IdSource source, CancellationToken _) => source(add));
 
             await sut.RestoreAsync(context);
@@ -227,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return TaskHelper.Done;
             });
 
-            A.CallTo(() => rebuilder.RebuildAsync<AssetFolderState, AssetFolderGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderState, AssetFolderGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
                 .Invokes((IdSource source, CancellationToken _) => source(add));
 
             await sut.RestoreAsync(context);

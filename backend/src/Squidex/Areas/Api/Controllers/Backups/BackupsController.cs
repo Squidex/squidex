@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
@@ -26,12 +25,12 @@ namespace Squidex.Areas.Api.Controllers.Backups
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupsController : ApiController
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IBackupService backupService;
 
-        public BackupsController(ICommandBus commandBus, IGrainFactory grainFactory)
+        public BackupsController(ICommandBus commandBus, IBackupService backupService)
             : base(commandBus)
         {
-            this.grainFactory = grainFactory;
+            this.backupService = backupService;
         }
 
         /// <summary>
@@ -49,11 +48,9 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> GetBackups(string app)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
+            var jobs = await backupService.GetBackupsAsync(AppId);
 
-            var jobs = await backupGrain.GetStateAsync();
-
-            var response = BackupJobsDto.FromBackups(jobs.Value, this, app);
+            var response = BackupJobsDto.FromBackups(jobs, this, app);
 
             return Ok(response);
         }
@@ -73,9 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public IActionResult PostBackup(string app)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
-
-            backupGrain.RunAsync(User.Token()!).Forget();
+            backupService.StartBackupAsync(App.Id, User.Token()!).Forget();
 
             return NoContent();
         }
@@ -96,9 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, Guid id)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
-
-            await backupGrain.DeleteAsync(id);
+            await backupService.DeleteBackupAsync(AppId, id);
 
             return NoContent();
         }

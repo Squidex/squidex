@@ -6,37 +6,41 @@
 // ==========================================================================
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Users
 {
-    public sealed class AssetUserPictureStore : IUserPictureStore
+    public sealed class DefaultUserPictureStore : IUserPictureStore
     {
         private readonly IAssetStore assetStore;
 
-        public AssetUserPictureStore(IAssetStore assetStore)
+        public DefaultUserPictureStore(IAssetStore assetStore)
         {
             Guard.NotNull(assetStore);
 
             this.assetStore = assetStore;
         }
 
-        public Task UploadAsync(string userId, Stream stream)
+        public Task UploadAsync(string userId, Stream stream, CancellationToken ct = default)
         {
-            return assetStore.UploadAsync(userId, 0, "picture", stream, true);
+            var fileName = GetFileName(userId);
+
+            return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        public async Task<Stream> DownloadAsync(string userId)
+        public Task DownloadAsync(string userId, Stream stream, CancellationToken ct = default)
         {
-            var memoryStream = new MemoryStream();
+            var fileName = GetFileName(userId);
 
-            await assetStore.DownloadAsync(userId, 0, "picture", memoryStream);
+            return assetStore.DownloadAsync(fileName, stream, ct);
+        }
 
-            memoryStream.Position = 0;
-
-            return memoryStream;
+        private static string GetFileName(string userId)
+        {
+            return $"{userId}_0_picture";
         }
     }
 }

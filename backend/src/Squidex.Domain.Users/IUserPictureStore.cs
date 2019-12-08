@@ -6,14 +6,15 @@
 // ==========================================================================
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Domain.Users
 {
     public interface IUserPictureStore
     {
-        Task UploadAsync(string userId, Stream stream);
+        Task UploadAsync(string userId, Stream stream, CancellationToken ct = default);
 
-        Task<Stream> DownloadAsync(string userId);
+        Task DownloadAsync(string userId, Stream stream, CancellationToken ct = default);
     }
 }

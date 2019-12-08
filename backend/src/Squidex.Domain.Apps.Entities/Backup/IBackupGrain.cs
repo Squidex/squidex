@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IBackupGrain : IGrainWithGuidKey
     {
-        Task RunAsync(RefToken actor);
+        Task BackupAsync(RefToken actor);
 
         Task DeleteAsync(Guid id);
 
