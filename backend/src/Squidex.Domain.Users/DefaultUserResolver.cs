@@ -27,7 +27,7 @@ namespace Squidex.Domain.Users
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<bool> CreateUserIfNotExists(string email, bool invited)
+        public async Task<bool> CreateUserIfNotExistsAsync(string email, bool invited)
         {
             Guard.NotNullOrEmpty(email);
 

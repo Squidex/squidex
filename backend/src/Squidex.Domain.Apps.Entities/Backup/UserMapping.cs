@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (!userMap.ContainsKey(userId))
             {
-                userMap[userId] = new RefToken(userId, RefTokenType.Subject);
+                userMap[userId] = new RefToken(RefTokenType.Subject, userId);
             }
         }
 
@@ -78,14 +78,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 var user = await userResolver.FindByIdOrEmailAsync(email);
 
-                if (user == null && await userResolver.CreateUserIfNotExists(kvp.Value))
+                if (user == null && await userResolver.CreateUserIfNotExistsAsync(kvp.Value, false))
                 {
                     user = await userResolver.FindByIdOrEmailAsync(email);
                 }
 
                 if (user != null)
                 {
-                    userMap[kvp.Key] = new RefToken(user.Id, RefTokenType.Subject);
+                    userMap[kvp.Key] = new RefToken(RefTokenType.Subject, user.Id);
                 }
             }
         }
