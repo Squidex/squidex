@@ -24,7 +24,7 @@ namespace Squidex.Domain.Users
 
         public DefaultUserPictureStoreTests()
         {
-            file = AssetStoreExtensions.GetFileName(userId, 0, "picture");
+            file = $"{userId}_0_picture";
 
             sut = new DefaultUserPictureStore(assetStore);
         }

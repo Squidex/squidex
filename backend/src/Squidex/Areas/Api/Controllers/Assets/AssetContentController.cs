@@ -31,20 +31,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
     public sealed class AssetContentController : ApiController
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly IAssetStore assetStore;
         private readonly IAssetRepository assetRepository;
+        private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetContentController(
             ICommandBus commandBus,
             IAssetFileStore assetFileStore,
-            IAssetStore assetStore,
             IAssetRepository assetRepository,
+            IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
-            this.assetStore = assetStore;
+            this.assetFileStore = assetFileStore;
             this.assetRepository = assetRepository;
+            this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 

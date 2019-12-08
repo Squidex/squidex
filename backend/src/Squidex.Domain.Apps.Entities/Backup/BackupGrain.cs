@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     ct.ThrowIfCancellationRequested();
 
-                    await backupArchiveStore.DownloadAsync(job.Id, stream, ct);
+                    await backupArchiveStore.UploadAsync(job.Id, stream, ct);
                 }
 
                 job.Status = JobStatus.Completed;
