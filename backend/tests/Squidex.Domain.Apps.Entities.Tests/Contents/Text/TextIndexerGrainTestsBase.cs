@@ -96,6 +96,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
+        public async Task Should_also_update_published_after_copy_for_specific_step()
+        {
+            await SearchWithGrains(3,
+                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
+
+                g => CopyAsync(g, fromDraft: true),
+
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
+
+                g => AddInvariantContent(g, text1: "Hallo", text2: "Welt", onlyDraft: false),
+
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Published),
+
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Draft),
+                g => TestSearchAsync(g, expected: ids1, text: "Hallo", target: Scope.Published));
+        }
+
+        [Fact]
         public async Task Should_simulate_content_reversion()
         {
             await SearchWithGrains(
@@ -246,24 +266,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             for (var i = 0; i < actions.Length; i++)
             {
-                var schemaId = Guid.NewGuid();
-
-                await ExecuteAsync(schemaId, async sut =>
-                {
-                    foreach (var action in actions.Take(i))
-                    {
-                        await action(sut);
-                    }
-                });
-
-                await ExecuteAsync(schemaId, async sut =>
-                {
-                    foreach (var action in actions.Skip(i))
-                    {
-                        await action(sut);
-                    }
-                });
+                await SearchWithGrains(i, actions);
             }
+        }
+
+        private async Task SearchWithGrains(int i, params Func<TextIndexerGrain, Task>[] actions)
+        {
+            var schemaId = Guid.NewGuid();
+
+            await ExecuteAsync(schemaId, async sut =>
+            {
+                foreach (var action in actions.Take(i))
+                {
+                    await action(sut);
+                }
+            });
+
+            await ExecuteAsync(schemaId, async sut =>
+            {
+                foreach (var action in actions.Skip(i))
+                {
+                    await action(sut);
+                }
+            });
         }
 
         private async Task ExecuteAsync(Guid id, Func<TextIndexerGrain, Task> action)
