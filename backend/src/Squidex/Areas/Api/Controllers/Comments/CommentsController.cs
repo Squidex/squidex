@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ProducesResponseType(typeof(CommentsDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
+        public async Task<IActionResult> GetComments(string app, string commentsId, [FromQuery] long version = EtagVersion.Any)
         {
             var result = await commentsLoader.GetCommentsAsync(commentsId, version);
 
@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PostComment(string app, Guid commentsId, [FromBody] UpsertCommentDto request)
+        public async Task<IActionResult> PostComment(string app, string commentsId, [FromBody] UpsertCommentDto request)
         {
             var command = request.ToCreateCommand(commentsId);
 
@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutComment(string app, Guid commentsId, Guid commentId, [FromBody] UpsertCommentDto request)
+        public async Task<IActionResult> PutComment(string app, string commentsId, Guid commentId, [FromBody] UpsertCommentDto request)
         {
             await CommandBus.PublishAsync(request.ToUpdateComment(commentsId, commentId));
 
@@ -129,7 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteComment(string app, Guid commentsId, Guid commentId)
+        public async Task<IActionResult> DeleteComment(string app, string commentsId, Guid commentId)
         {
             await CommandBus.PublishAsync(new DeleteComment { CommentsId = commentsId, CommentId = commentId });
 

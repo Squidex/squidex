@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_get_comments_from_grain()
         {
-            var commentsId = Guid.NewGuid();
+            var commentsId = Guid.NewGuid().ToString();
             var comments = new CommentsResult();
 
             var grain = A.Fake<ICommentsGrain>();

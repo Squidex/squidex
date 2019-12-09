@@ -7,21 +7,15 @@
 
 using System;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public abstract class CommentsCommand : SquidexCommand, IAggregateCommand, IAppCommand
+    public abstract class CommentsCommand : SquidexCommand, IAppCommand
     {
-        public Guid CommentsId { get; set; }
+        public string CommentsId { get; set; }
 
         public Guid CommentId { get; set; }
 
         public NamedId<Guid> AppId { get; set; }
-
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return CommentsId; }
-        }
     }
 }

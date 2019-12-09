@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Events.Comments
 {
     public abstract class CommentsEvent : AppEvent
     {
-        public Guid CommentsId { get; set; }
+        public string CommentsId { get; set; }
 
         public Guid CommentId { get; set; }
     }
