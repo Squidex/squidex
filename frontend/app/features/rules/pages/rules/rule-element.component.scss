@@ -3,9 +3,9 @@
 
 .small {
     & {
-        @include transition(background-color .4s ease);
         height: 3rem;
         position: relative;
+        transition: background-color .4s ease;
     }
 
     &.editable {
@@ -16,26 +16,25 @@
         @include absolute(0, 0, 0, 3rem);
         @include truncate;
         color: $color-dark-foreground;
-        line-height: 3rem;
         font-size: 1rem;
         font-weight: normal;
+        line-height: 3rem;
         padding: 0 .8rem;
     }
 
     &-icon {
         @include absolute(0, auto, 0, 0);
         color: $color-dark-foreground;
-        line-height: 3.2rem;
         font-size: 1.2rem;
         font-weight: normal;
+        line-height: 3.2rem;
         padding: 0 .8rem;
     }
 }
 
 .large {
     & {
-        min-height: 100px;
-        max-height: 100px;
+        @include force-height(100px);
     }
 
     &.editable {
@@ -47,23 +46,23 @@
     }
 
     &-title {
-        font-weight: bold;
         font-size: 1rem;
+        font-weight: bold;
         line-height: 1;
     }
 
     &-text {
         font-size: .8rem;
-        margin-top: .25rem;
         margin-bottom: .25rem;
+        margin-top: .25rem;
     }
 
     &-icon {
         color: $color-dark-foreground;
         display: inline-block;
-        margin-right: .5rem;
-        position: relative;
-        padding: 1rem;
         line-height: 1px;
+        margin-right: .5rem;
+        padding: 1rem;
+        position: relative;
     }
 }

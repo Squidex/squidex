@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Guid Id { get; set; }
 
-        public Guid AssetId { get; set; }
+        public Guid ParentId { get; set; }
 
         public Instant Created { get; set; }
 
@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public long Version { get; set; }
 
-        public string MimeType { get; set; }
-
         public string FileName { get; set; }
 
         public string FileHash { get; set; }
+
+        public string MimeType { get; set; }
 
         public string Slug { get; set; }
 
@@ -53,5 +53,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
+
+        public Guid AssetId
+        {
+            get { return Id; }
+        }
     }
 }

@@ -66,16 +66,16 @@ export class SearchFormComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['queryModel'] && !changes['query']) {
+            this.query = {};
+        }
+
         if (changes['query'] || changes['queries']) {
             this.updateSaveKey();
         }
 
         if (changes['query']) {
             this.hasFilter = hasFilter(this.query);
-        }
-
-        if (changes['queryModel']) {
-            this.query = {};
         }
     }
 

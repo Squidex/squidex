@@ -1,43 +1,39 @@
 @import '_vars';
 @import '_mixins';
 
-$list-height: 2.375rem;
+// sass-lint:disable single-line-per-selector
+
+$list-height: 2.25rem;
 
 @mixin overlay-container {
-    position: relative;
-    padding: 0;
     overflow: hidden;
+    padding: 0;
+    position: relative;
 }
 
 @mixin overlay {
     & {
-        @include transition(opacity .4s ease);
         @include absolute(0, 0, 0, 0);
-        @include opacity(0);
-        @include flex-box;
         color: $color-dark-foreground;
+        display: flex;
+        opacity: 0;
+        transition: opacity .4s ease;
     }
 
     &-background {
         @include absolute(0, 0, 0, 0);
-        @include opacity(.7);
         background: $color-dark-black;
+        opacity: .7;
     }
 }
 
 @mixin asset-type {
-    padding: .1rem .25rem;
-    text-transform: uppercase;
+    color: $color-dark-foreground;
+    cursor: none;
     font-size: .7rem;
     font-weight: normal;
-    cursor: none;
-    color: $color-dark-foreground;
-}
-
-:host {
-    padding-bottom: 1rem;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: .1rem .25rem;
+    text-transform: uppercase;
 }
 
 :host(.isListView) {
@@ -46,6 +42,7 @@ $list-height: 2.375rem;
 
 :host ::ng-deep {
     .form-control {
+
         &.disabled,
         &:disabled {
             background: transparent;
@@ -56,27 +53,25 @@ $list-height: 2.375rem;
 .card {
     & {
         @include overlay-container;
-        width: $asset-width;
         border-top-width: 1px;
         border-width: 1px;
-    }
-
-    &-body,
-    &-footer {
-        position: relative;
-        padding: 1rem;
+        margin-bottom: 1rem;
+        margin-right: .5rem;
+        width: $asset-width;
     }
 
     &-body {
-        padding: 0;
-        min-height: $asset-header;
-        max-height: $asset-header;
+        @include force-height($asset-header);
+        padding: 1rem;
+        position: relative;
     }
 
     &-footer {
-        padding-top: .5rem;
-        min-height: $asset-footer;
         max-height: auto;
+        min-height: $asset-footer;
+        padding: 1rem;
+        padding-top: .5rem;
+        position: relative;
     }
 }
 
@@ -92,21 +87,21 @@ $list-height: 2.375rem;
 
         &:hover {
             .overlay {
-                @include opacity(1);
+                opacity: 1;
             }
 
             .file-type {
-                @include opacity(0);
+                opacity: 0;
             }
         }
     }
 
     &-type {
-        @include transition(opacity .4s ease);
         @include absolute(1rem, auto, auto, 1rem);
         @include asset-type;
         @include border-radius(3px);
         background: $color-dark-black;
+        transition: opacity .4s ease;
     }
 
     &-name,
@@ -131,10 +126,10 @@ $list-height: 2.375rem;
     }
 
     &-icon {
-        line-height: $asset-image;
-        background: $color-border;
-        height: $asset-image;
+        background: $color-asset-bg;
         border: 0;
+        height: $asset-image;
+        padding: 2rem;
         text-align: center;
     }
 }
@@ -153,10 +148,10 @@ $list-height: 2.375rem;
 
         a {
             & {
+                color: darken($color-dark-foreground, 10%);
+                cursor: pointer;
                 font-size: 1.1rem;
                 font-weight: normal;
-                cursor: pointer;
-                color: darken($color-dark-foreground, 10%);
             }
 
             &:hover {
@@ -181,24 +176,24 @@ $list-height: 2.375rem;
 }
 
 .editable {
-    height: 2rem;
-    border-top: 0;
     border-bottom: 1px solid transparent;
+    border-top: 0;
+    height: 2rem;
 }
 
 .table-items-row {
     & {
-        position: relative;
-        padding-left: $list-height + 3rem;
         height: $list-height + 2rem;
+        padding-left: $list-height + 3rem;
+        position: relative;
     }
 
     .left-border {
         & {
             @include absolute(0, auto, auto, 0);
-            height: $list-height + 2rem;
-            border: 0;
             background: $color-border;
+            border: 0;
+            height: $list-height + 2rem;
             width: 4px;
         }
 
@@ -209,8 +204,8 @@ $list-height: 2.375rem;
 
     .image {
         @include absolute(0, auto, 0, 4px);
+        background: $color-asset-bg;
         border: 0;
-        background: $color-border;
         width: $list-height + 2rem;
     }
 
@@ -232,7 +227,6 @@ $list-height: 2.375rem;
         }
 
         &-name {
-            width: 100%;
             padding-right: .5rem;
         }
 
@@ -268,20 +262,24 @@ $list-height: 2.375rem;
     }
 
     &-text {
-        position: absolute;
         font-size: 1.25rem;
         font-weight: lighter;
+        position: absolute;
     }
 }
 
 .drag {
     .drop-overlay {
-        @include opacity(1);
+        opacity: 1;
     }
 
     .file-type {
-        @include opacity(0);
+        opacity: 0;
     }
+}
+
+img {
+    max-height: 100%;
 }
 
 .selectable {

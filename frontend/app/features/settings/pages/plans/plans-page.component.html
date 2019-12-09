@@ -14,25 +14,33 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-            <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
-                You have not created the subscription. Therefore you cannot change the plan.
-            </div>
+        <sqx-list-view [isLoading]="plansState.isLoading | async">
+            <ng-container topHeader>
+                <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+                    <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
+                        You have not created the subscription. Therefore you cannot change the plan.
+                    </div>
+                </ng-container>
+            </ng-container>
 
-            <div class="text-muted text-center empty" *ngIf="plans.length === 0">
-                No plan configured, this app has unlimited usage.
-            </div>
+            <div content>
+                <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+                    <div class="text-muted text-center empty" *ngIf="plans.length === 0">
+                        No plan configured, this app has unlimited usage.
+                    </div>
 
-            <div class="clearfix">
-                <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan"
-                    [planInfo]="planInfo">
-                </sqx-plan>
-            </div>
+                    <div class="clearfix">
+                        <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan"
+                            [planInfo]="planInfo">
+                        </sqx-plan>
+                    </div>
 
-            <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
-                Go to <a [href]="portalUrl" sqxExternalLink>Billing Portal</a> for payment history and subscription overview.
+                    <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
+                        Go to <a [href]="portalUrl" sqxExternalLink>Billing Portal</a> for payment history and subscription overview.
+                    </div>
+                </ng-container>
             </div>
-        </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

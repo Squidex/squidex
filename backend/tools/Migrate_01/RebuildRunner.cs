@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Migrate_01.Migrations;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Migrate_01
 {

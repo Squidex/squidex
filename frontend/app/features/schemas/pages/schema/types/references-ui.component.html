@@ -17,6 +17,13 @@
 
                 <span class="radio-label">Dropdown</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Tags'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Tags" />
+
+                <i class="icon-control-Tags"></i>
+
+                <span class="radio-label">Tags</span>
+            </label>
         </div>
     </div>
 

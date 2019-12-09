@@ -276,7 +276,7 @@ export class FileIconPipe implements PipeTransform {
             mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
-        return `./images/asset_${mimeIcon}.png`;
+        return `./images/asset_${mimeIcon}.svg`;
     }
 }
 

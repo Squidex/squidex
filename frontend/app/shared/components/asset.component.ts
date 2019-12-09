@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
 
 import {
     AssetDto,
+    AssetsState,
     AssetUploaderState,
     DialogModel,
     DialogService,
@@ -33,19 +34,19 @@ export class AssetComponent implements OnInit {
     public remove = new EventEmitter();
 
     @Output()
-    public update = new EventEmitter();
-
-    @Output()
     public delete = new EventEmitter();
 
     @Output()
     public select = new EventEmitter();
 
     @Input()
-    public initFile: File;
+    public assetFile: File;
 
     @Input()
     public asset: AssetDto;
+
+    @Input()
+    public assetsState: AssetsState;
 
     @Input()
     public removeMode = false;
@@ -80,12 +81,12 @@ export class AssetComponent implements OnInit {
     }
 
     public ngOnInit() {
-        const initFile = this.initFile;
+        const assetFile = this.assetFile;
 
-        if (initFile) {
+        if (assetFile) {
             this.setProgress(1);
 
-            this.assetUploader.uploadFile(initFile)
+            this.assetUploader.uploadFile(assetFile, this.assetsState)
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);
@@ -107,11 +108,13 @@ export class AssetComponent implements OnInit {
             this.setProgress(1);
 
             this.assetUploader.uploadAsset(this.asset, files[0])
-                .subscribe(dto => {
-                    if (Types.isNumber(dto)) {
-                        this.setProgress(dto);
+                .subscribe(asset => {
+                    if (Types.isNumber(asset)) {
+                        this.setProgress(asset);
                     } else {
-                        this.updateAsset(dto, true);
+                        this.setProgress(0);
+
+                        this.asset = asset;
                     }
                 }, error => {
                     this.dialogs.notifyError(error);
@@ -127,10 +130,6 @@ export class AssetComponent implements OnInit {
         if (!this.isDisabled) {
             this.editDialog.show();
         }
-    }
-
-    public cancelEdit() {
-        this.editDialog.hide();
     }
 
     public emitSelect() {
@@ -149,10 +148,6 @@ export class AssetComponent implements OnInit {
         this.loadError.emit(error);
     }
 
-    public emitUpdate() {
-        this.update.emit();
-    }
-
     public emitRemove() {
         this.remove.emit();
     }
@@ -161,17 +156,5 @@ export class AssetComponent implements OnInit {
         this.progress = progress;
 
         this.changeDetector.markForCheck();
-    }
-
-    public updateAsset(asset: AssetDto, emitEvent: boolean) {
-        this.asset = asset;
-
-        if (emitEvent) {
-            this.emitUpdate();
-        }
-
-        this.setProgress(0);
-
-        this.cancelEdit();
     }
 }

@@ -6,6 +6,7 @@
  */
 
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -57,11 +58,21 @@ describe('UsersState', () => {
 
             usersState.load().subscribe();
 
+            expect(usersState.snapshot.isLoaded).toBeTruthy();
+            expect(usersState.snapshot.isLoading).toBeFalsy();
             expect(usersState.snapshot.users).toEqual([user1, user2]);
             expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
-            expect(usersState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => throwError('error'));
+
+            usersState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(usersState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should load page size from local store', () => {

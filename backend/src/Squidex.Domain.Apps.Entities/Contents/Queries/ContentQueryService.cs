@@ -224,7 +224,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (!context.IsFrontendClient)
             {
-                yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
+                if (!context.IsNoResolveLanguages())
+                {
+                    yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
+                }
 
                 var languages = context.Languages();
 

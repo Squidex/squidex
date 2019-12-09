@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
     public static class Adapt
     {
         private static readonly Dictionary<string, string> PropertyMap =
-               typeof(MongoContentEntity).GetProperties()
-                   .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
+            typeof(MongoContentEntity).GetProperties()
+                .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
 
         public static Func<PropertyPath, PropertyPath> Path(Schema schema, bool inDraft)
         {

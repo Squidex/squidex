@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Users;
@@ -26,11 +27,13 @@ namespace Squidex.Areas.IdentityServer.Config
 {
     public static class IdentityServerServices
     {
-        public static void AddSquidexIdentityServer(this IServiceCollection services)
+        public static void AddSquidexIdentityServer(this IServiceCollection services, IConfiguration config)
         {
             X509Certificate2 certificate;
 
             var assembly = typeof(IdentityServerServices).Assembly;
+
+            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
 
             using (var certificateStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
             {
@@ -74,6 +77,11 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddIdentityServer(options =>
                 {
                     options.UserInteraction.ErrorUrl = "/error/";
+
+                    if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
+                    {
+                        options.PublicOrigin = urlsOptions.BaseUrl;
+                    }
                 })
                 .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryApiResources(GetApiResources())

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -22,6 +21,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
+
+        [DataMember]
+        public Guid ParentId { get; set; }
 
         [DataMember]
         public string FileName { get; set; }
@@ -59,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         [DataMember]
         public HashSet<string> Tags { get; set; }
 
-        Guid IAssetInfo.AssetId
+        public Guid AssetId
         {
             get { return Id; }
         }
@@ -113,6 +115,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         {
                             Tags = e.Tags;
                         }
+
+                        break;
+                    }
+
+                case AssetMoved e:
+                    {
+                        ParentId = e.ParentId;
 
                         break;
                     }

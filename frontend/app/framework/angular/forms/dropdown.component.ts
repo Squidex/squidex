@@ -130,10 +130,10 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
     public onKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case Keys.UP:
-                this.up();
+                this.selectPrevIndex();
                 return false;
             case Keys.DOWN:
-                this.down();
+                this.selectNextIndex();
                 return false;
             case Keys.ENTER:
                 this.selectIndexAndClose(this.snapshot.selectedIndex);
@@ -172,6 +172,14 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
         this.queryInput.setValue('');
     }
 
+    public selectPrevIndex() {
+        this.selectIndex(this.snapshot.selectedIndex - 1, true);
+    }
+
+    public selectNextIndex() {
+        this.selectIndex(this.snapshot.selectedIndex + 1, true);
+    }
+
     public selectIndex(selectedIndex: number, emitEvents: boolean) {
         if (selectedIndex < 0) {
             selectedIndex = 0;
@@ -194,13 +202,5 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
             this.next(s => ({ ...s, selectedIndex, selectedItem: value }));
         }
 
-    }
-
-    private up() {
-        this.selectIndex(this.snapshot.selectedIndex - 1, true);
-    }
-
-    private down() {
-        this.selectIndex(this.snapshot.selectedIndex + 1, true);
     }
 }

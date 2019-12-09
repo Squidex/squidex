@@ -59,8 +59,8 @@ export * from './angular/code.component';
 export * from './angular/external-link.directive';
 export * from './angular/highlight.pipe';
 export * from './angular/hover-background.directive';
-export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
+export * from './angular/list-view.component';
 export * from './angular/pager.component';
 export * from './angular/panel-container.directive';
 export * from './angular/panel.component';
@@ -71,6 +71,7 @@ export * from './angular/shortcut.component';
 export * from './angular/status-icon.component';
 export * from './angular/stop-click.directive';
 export * from './angular/sync-scrolling.directive';
+export * from './angular/sync-width.directive';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
 

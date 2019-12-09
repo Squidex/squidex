@@ -38,13 +38,10 @@ export class ModalDialogComponent implements AfterViewInit {
     public large = false;
 
     @Input()
+    public flexBody = false;
+
+    @Input()
     public fullHeight = false;
-
-    @Input()
-    public tabsClass = '';
-
-    @Input()
-    public contentClass = '';
 
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;
@@ -58,15 +55,27 @@ export class ModalDialogComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.hideWhenEmpty(this.tabsElement.nativeElement);
-        this.hideWhenEmpty(this.footerElement.nativeElement);
+        this.hideWhenEmpty(this.tabsElement);
+        this.hideParentWhenEmpty(this.footerElement);
     }
 
-    private hideWhenEmpty(element: any) {
-        const isEmpty = element.children.length === 0;
+    private hideWhenEmpty(element: ElementRef) {
+        if (element && element.nativeElement) {
+            const isEmpty = element.nativeElement.children.length === 0;
 
-        if (isEmpty) {
-            this.renderer.setStyle(element, 'display', 'none');
+            if (isEmpty) {
+                this.renderer.setStyle(element.nativeElement, 'display', 'none');
+            }
+        }
+    }
+
+    private hideParentWhenEmpty(element: ElementRef) {
+        if (element && element.nativeElement) {
+            const isEmpty = element.nativeElement.children.length === 0;
+
+            if (isEmpty) {
+                this.renderer.setStyle(element.nativeElement.parentNode, 'display', 'none');
+            }
         }
     }
 

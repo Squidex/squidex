@@ -63,7 +63,7 @@ export function configAnalyticsId() {
 }
 
 export function configDecimalSeparator() {
-    return  new DecimalSeparatorConfig('.');
+    return new DecimalSeparatorConfig('.');
 }
 
 export function configCurrency() {

@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 return EmptyContents;
             }
 
-            var references = await ContentQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), ids.ToList());
+            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), ids.ToList());
 
             return references.ToLookup(x => x.Id);
         }
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 return EmptyAssets;
             }
 
-            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), Q.Empty.WithIds(ids));
+            var assets = await assetQuery.QueryAsync(context.Clone().WithNoAssetEnrichment(true), null, Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }

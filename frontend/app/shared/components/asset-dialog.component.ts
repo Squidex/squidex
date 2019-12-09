@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
     AnnotateAssetForm,
-    AppsState,
     AssetDto,
-    AssetsService,
-    StatefulComponent
+    AssetsState
 } from '@app/shared/internal';
 
 @Component({
@@ -22,12 +20,9 @@ import {
     templateUrl: './asset-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetDialogComponent extends StatefulComponent implements OnInit {
+export class AssetDialogComponent implements OnInit {
     @Output()
-    public cancel = new EventEmitter();
-
-    @Output()
-    public complete = new EventEmitter<AssetDto>();
+    public complete = new EventEmitter();
 
     @Input()
     public asset: AssetDto;
@@ -39,16 +34,10 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
 
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
 
-    constructor(changeDetector: ChangeDetectorRef,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
+    constructor(
+        private readonly assetsState: AssetsState,
         private readonly formBuilder: FormBuilder
     ) {
-        super(changeDetector, {
-            isRenaming: false,
-            isTagging: false,
-            progress: 0
-        });
     }
 
     public ngOnInit() {
@@ -62,12 +51,8 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
         this.annotateForm.generateSlug(this.asset);
     }
 
-    public emitCancel() {
-        this.cancel.emit();
-    }
-
-    public emitComplete(asset: AssetDto) {
-        this.complete.emit(asset);
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public annotateAsset() {
@@ -78,9 +63,9 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
         const value = this.annotateForm.submit(this.asset);
 
         if (value) {
-            this.assetsService.putAsset(this.appsState.appName, this.asset, value, this.asset.version)
-                .subscribe(dto => {
-                    this.emitComplete(dto);
+            this.assetsState.updateAsset(this.asset, value)
+                .subscribe(() => {
+                    this.emitComplete();
                 }, error => {
                     this.annotateForm.submitFailed(error);
                 });

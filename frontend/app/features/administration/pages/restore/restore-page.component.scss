@@ -27,8 +27,8 @@ h3 {
     }
 
     &-body {
-        font-family: monospace;
         background: $color-border;
+        font-family: monospace;
         max-height: 400px;
         min-height: 300px;
         overflow-y: scroll;
@@ -39,12 +39,12 @@ h3 {
     &-status {
         & {
             @include circle($circle-size);
-            line-height: $circle-size + .1rem;
-            text-align: center;
-            font-size: .6 * $circle-size;
-            font-weight: normal;
             background: $color-border;
             color: $color-dark-foreground;
+            font-size: .6 * $circle-size;
+            font-weight: normal;
+            line-height: $circle-size + .1rem;
+            text-align: center;
             vertical-align: middle;
         }
 

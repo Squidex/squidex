@@ -17,9 +17,9 @@ $padding: 1rem;
 }
 
 .table-items-row-summary {
-    position: relative;
-    padding-right: 1.25rem;
     padding-left: 3rem;
+    padding-right: 1.25rem;
+    position: relative;
 }
 
 .drag-container {
@@ -39,12 +39,12 @@ $padding: 1rem;
 }
 
 .nested-fields {
+    background: $color-theme-secondary;
+    border: 1px solid $color-border;
+    border-top-width: 0;
     padding: $padding;
     padding-left: 2 * $padding;
     position: relative;
-    border: 1px solid $color-border;
-    border-top-width: 0;
-    background: $color-theme-secondary;
 }
 
 .nested-field {
@@ -54,8 +54,8 @@ $padding: 1rem;
 
     &-add {
         border: 2px dashed $field-line;
-        position: relative;
         padding: 1rem;
+        position: relative;
     }
 
     &-line-v {
@@ -79,10 +79,10 @@ $padding: 1rem;
     }
 
     &-icon {
-        margin-right: 1rem;
         color: $color-border-dark;
         font-size: 1.2rem;
         font-weight: normal;
+        margin-right: 1rem;
         vertical-align: middle;
     }
 
@@ -96,13 +96,13 @@ $padding: 1rem;
 
     &-partitioning {
         color: $color-text-decent;
-        font-weight: normal;
         font-size: .85rem;
+        font-weight: normal;
     }
 
     .tag {
-        @include opacity(.9);
-        min-width: 4rem;
         max-width: 6rem;
+        min-width: 4rem;
+        opacity: .9;
     }
 }

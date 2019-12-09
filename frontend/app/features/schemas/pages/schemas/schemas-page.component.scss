@@ -4,27 +4,24 @@
 $button-size: calc(2.5rem - 2px);
 
 .subheader-button {
-    height: $button-size;
-    margin-right: .4rem;
-    min-width: $button-size;
-    max-width: $button-size;
-    padding: 0;
-    padding-left: 0;
-    padding-right: 0;
+    @include force-width($button-size);
     font-size: 1rem;
+    height: $button-size;
     line-height: 2.5rem;
+    margin-right: .4rem;
+    padding: 0;
 }
 
 .new-category-input {
     & {
-        margin-top: 1rem;
         background: 0;
-        border-width: 0;
         border-bottom-width: 1px;
+        border-width: 0;
+        margin-top: 1rem;
         padding-left: 0;
     }
 
     &:focus {
-        @include box-shadow-none;
+        box-shadow: none;
     }
 }

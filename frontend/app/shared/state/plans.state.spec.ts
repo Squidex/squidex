@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
@@ -83,12 +83,22 @@ describe('PlansState', () => {
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: true,  plan: oldPlans.plans[1] }
             ]);
-            expect(plansState.snapshot.isOwner).toBeFalsy();
-            expect(plansState.snapshot.isLoaded).toBeTruthy();
             expect(plansState.snapshot.hasPortal).toBeTruthy();
+            expect(plansState.snapshot.isLoaded).toBeTruthy();
+            expect(plansState.snapshot.isLoading).toBeFalsy();
+            expect(plansState.snapshot.isOwner).toBeFalsy();
             expect(plansState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            plansService.setup(x => x.getPlans(app))
+                .returns(() => throwError('error'));
+
+            plansState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(plansState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

@@ -2,11 +2,10 @@
 @import '_mixins';
 
 .col-options {
-    min-width: 6rem;
+    @include force-width(6rem);
 }
 
 .col-name,
 .col-message {
-    min-width: 10rem;
-    max-width: 10rem;
+    @include force-width(10rem);
 }

@@ -44,6 +44,7 @@
 
     <ng-container content>
         <sqx-assets-list
+            [indicateLoading]="true"
             [isListView]="snapshot.isListView"
             (select)="selectAsset($event)"
             [selectedIds]="snapshot.selectedAssets"

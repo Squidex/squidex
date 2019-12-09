@@ -1,6 +1,6 @@
 <sqx-title message="Clients"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Clients
     </ng-container>
@@ -14,20 +14,24 @@
     </ng-container>
     
     <ng-container content>
-        <ng-container *ngIf="(clientsState.isLoaded | async) && (clientsState.clients | async); let clients">
-            <div class="table-items-row table-items-row-empty" *ngIf="clients.length === 0">
-                No client created yet.
-            </div>
+        <sqx-list-view [isLoading]="clientsState.isLoading | async">
+            <div content>
+                <ng-container *ngIf="(clientsState.isLoaded | async) && (clientsState.clients | async); let clients">
+                    <div class="table-items-row table-items-row-empty" *ngIf="clients.length === 0">
+                        No client created yet.
+                    </div>
+                
+                    <ng-container *ngIf="rolesState.roles | async; let roles">
+                        <sqx-client *ngFor="let client of clients; trackBy: trackByClient" 
+                            [client]="client"
+                            [clientRoles]="roles">
+                        </sqx-client>
+                    </ng-container>
         
-            <ng-container *ngIf="rolesState.roles | async; let roles">
-                <sqx-client *ngFor="let client of clients; trackBy: trackByClient" 
-                    [client]="client"
-                    [clientRoles]="roles">
-                </sqx-client>
-            </ng-container>
-
-            <sqx-client-add-form *ngIf="clientsState.canCreate | async"></sqx-client-add-form>
-        </ng-container>
+                    <sqx-client-add-form *ngIf="clientsState.canCreate | async"></sqx-client-add-form>
+                </ng-container>
+            </div>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

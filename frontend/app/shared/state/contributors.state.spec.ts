@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { empty, of, throwError } from 'rxjs';
+import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -21,6 +22,7 @@ import {
 
 import { createContributors } from '../services/contributors.service.spec';
 
+import { ErrorDto } from '@app/framework';
 import { TestValues } from './_test-helpers';
 
 describe('ContributorsState', () => {
@@ -50,10 +52,10 @@ describe('ContributorsState', () => {
         localStore = Mock.ofType<LocalStoreService>();
 
         contributorsService = Mock.ofType<ContributorsService>();
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
-
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable();
+
+        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
     });
 
     afterEach(() => {
@@ -67,10 +69,20 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.contributors).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
+            expect(contributorsState.snapshot.isLoading).toBeFalsy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            contributorsService.setup(x => x.getContributors(app))
+                .returns(() => throwError('error'));
+
+            contributorsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(contributorsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should only show current page of contributors', () => {
@@ -148,6 +160,44 @@ describe('ContributorsState', () => {
             contributorsState.assign(request).subscribe();
 
             expectNewContributors(updated);
+        });
+
+        it('should return proper error when user to add does not exist', () => {
+            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+
+            contributorsService.setup(x => x.postContributor(app, request, version))
+                .returns(() => throwError(new ErrorDto(404, '404')));
+
+            let error: ErrorDto;
+
+            contributorsState.assign(request).pipe(
+                catchError(err => {
+                    error = err;
+
+                    return empty();
+                })
+            ).subscribe();
+
+            expect(error!.message).toBe('The user does not exist.');
+        });
+
+        it('should return original error when not a 404', () => {
+            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+
+            contributorsService.setup(x => x.postContributor(app, request, version))
+                .returns(() => throwError(new ErrorDto(500, '500')));
+
+            let error: ErrorDto;
+
+            contributorsState.assign(request).pipe(
+                catchError(err => {
+                    error = err;
+
+                    return empty();
+                })
+            ).subscribe();
+
+            expect(error!.message).toBe('500');
         });
 
         it('should update contributors when contribution revoked', () => {

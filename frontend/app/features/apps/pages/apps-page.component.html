@@ -14,14 +14,14 @@
             <h3 class="empty-headline">You are not collaborating to any app yet</h3>
         </div>
 
-        <div class="card card-href card-app float-left" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
+        <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
             <div class="card-body">
                 <div class="row no-gutters">
                     <div class="col-auto card-left">
                         <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
                     </div>
                     <div class="col">
-                        <h4 class="card-title">{{app.displayName}}</h4>
+                        <h3 class="card-title">{{app.displayName}}</h3>
 
                         <div class="card-text card-links">
                             <a [routerLink]="['/app', app.name]" sqxStopClick>Edit</a>
@@ -48,10 +48,10 @@
     <div class="card card-template card-href" (click)="createNewApp('')">
         <div class="card-body">
             <div class="card-image">
-                <img src="./images/add-app.png" />
+                <img src="./images/add-app.svg" />
             </div>
 
-            <h4 class="card-title">New App</h4>
+            <h3 class="card-title">New App</h3>
 
             <div class="card-text">
                 Create a new blank app without content and schemas.
@@ -62,10 +62,10 @@
     <div class="card card-template card-href" (click)="createNewApp('Blog')">
         <div class="card-body">
             <div class="card-image">
-                <img src="./images/add-blog.png" />
+                <img src="./images/add-blog.svg" />
             </div>
 
-            <h4 class="card-title">New Blog Sample</h4>
+            <h3 class="card-title">New Blog Sample</h3>
 
             <div class="card-text">
                 <div>Start with our ready to use blog.</div>
@@ -79,10 +79,10 @@
     <div class="card card-template card-href" (click)="createNewApp('Profile')">
         <div class="card-body">
             <div class="card-image">
-                <img src="./images/add-profile.png" />
+                <img src="./images/add-profile.svg" />
             </div>
 
-            <h4 class="card-title">New Profile Sample</h4>
+            <h3 class="card-title">New Profile Sample</h3>
 
             <div class="card-text">
                 <div>Create your profile page.</div>
@@ -96,10 +96,10 @@
     <div class="card card-template card-href" (click)="createNewApp('Identity')">
         <div class="card-body">
             <div class="card-image">
-                <img src="./images/add-identity.png" />
+                <img src="./images/add-identity.svg" />
             </div>
 
-            <h4 class="card-title">New Identity App</h4>
+            <h3 class="card-title">New Identity App</h3>
 
             <div class="card-text">
                 <div>Create app for Squidex Identity.</div>
@@ -111,7 +111,9 @@
     </div>
 </div>
 
-<div *ngIf="info" class="info">{{info}}</div>
+<div *ngIf="info" class="apps-section">
+    <small class="info">{{info}}</small>
+</div>
 
 <ng-container *sqxModal="addAppDialog">
     <sqx-app-form [template]="addAppTemplate"

@@ -17,14 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
     {
         Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, ClrQuery query);
+        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? parentId, ClrQuery query);
 
         Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
 
-        Task<IAssetEntity?> FindAssetAsync(Guid id, bool allowDeleted = false);
+        Task<IAssetEntity?> FindAssetAsync(Guid id);
 
         Task<IAssetEntity?> FindAssetBySlugAsync(Guid appId, string slug);
-
-        Task RemoveAsync(Guid appId);
     }
 }

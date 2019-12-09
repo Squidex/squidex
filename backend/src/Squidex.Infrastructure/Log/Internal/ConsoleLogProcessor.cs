@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
+    [ExcludeFromCodeCoverage]
     public sealed class ConsoleLogProcessor : DisposableObjectBase
     {
         private const int MaxQueuedMessages = 1024;

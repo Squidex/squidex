@@ -180,8 +180,4 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
         return [{ name: '- No Reference -' }, ...names];
     }
-
-    public trackByContent(content: ContentDto) {
-        return content.id;
-    }
 }

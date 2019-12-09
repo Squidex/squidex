@@ -1,6 +1,6 @@
 <sqx-title message="Assets"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true">
+<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Assets
     </ng-container>
@@ -44,11 +44,32 @@
                     </button>
                 </div>
             </div>
+            <div class="col-auto pl-1">
+                <sqx-shortcut keys="ctrl+shift+g" (trigger)="reload()"></sqx-shortcut>
+
+                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="Create new folder (CTRL + SHIFT + G)">
+                    <i class="icon-create_new_folder"></i>
+                </button>
+            </div>
         </div>
     </ng-container>
 
     <ng-container content>
-        <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
+        <sqx-list-view [isLoading]="assetsState.isLoading | async">
+            <ng-container header>
+                <sqx-asset-path [path]="assetsState.path | async"
+                    (navigate)="assetsState.navigate($event)">
+                </sqx-asset-path>
+            </ng-container>
+
+            <div content>
+                <sqx-assets-list [state]="assetsState" [showPager]="false" [isListView]="isListView"></sqx-assets-list>
+            </div>
+
+            <ng-container footer>
+                <sqx-pager [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>   
@@ -59,5 +80,11 @@
         </div> 
     </ng-container>
 </sqx-panel>
+
+<ng-container *sqxModal="addAssetFolderDialog">
+    <sqx-asset-folder-form
+        (complete)="addAssetFolderDialog.hide()">
+    </sqx-asset-folder-form>
+</ng-container>
 
 <router-outlet></router-outlet>

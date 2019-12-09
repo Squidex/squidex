@@ -1,18 +1,18 @@
 @import '_mixins';
 @import '_vars';
 
+$hide-shadow: rgba(0, 0, 0, .5);
+
 .onboarding {
     &-help {
         @include border-radius;
         background: $color-tooltip;
-        border: 0;
         max-width: 20rem;
-        padding: .75rem;
+        min-width: 10rem;
+        padding: .75rem 1rem;
     }
 
     &-text {
-        font-size: .9rem;
-        font-weight: normal;
         color: $color-dark-foreground;
     }
 
@@ -21,6 +21,6 @@
     }
 
     &-rect {
-        @include box-shadow-raw(0 0 0 9999px rgba(0, 0, 0, .5));
+        box-shadow: 0 0 0 9999px $hide-shadow;
     }
 }

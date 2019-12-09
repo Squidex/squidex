@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface IEntity
     {
-        Guid Id { get; }
+        Guid Id { get;  }
 
         Instant Created { get; }
 

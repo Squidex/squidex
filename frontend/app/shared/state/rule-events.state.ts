@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { empty, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -31,6 +31,9 @@ interface Snapshot {
     // Indicates if the rule events are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the rule events are loading.
+    isLoading?: boolean;
+
     // The current rule id.
     ruleId?: string;
 }
@@ -45,6 +48,9 @@ export class RuleEventsState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     constructor(
         private readonly appsState: AppsState,
@@ -70,7 +76,9 @@ export class RuleEventsState extends State<Snapshot> {
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
                 this.snapshot.ruleEventsPager.skip,
@@ -83,8 +91,17 @@ export class RuleEventsState extends State<Snapshot> {
                 return this.next(s => {
                     const ruleEventsPager = s.ruleEventsPager.setCount(total);
 
-                    return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
+                    return {
+                        ...s,
+                        isLoaded: true,
+                        isLoading: false,
+                        ruleEvents,
+                        ruleEventsPager
+                    };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -116,13 +133,13 @@ export class RuleEventsState extends State<Snapshot> {
 
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public setPager(ruleEventsPager: Pager): Observable<any> {
         this.next(s => ({ ...s, ruleEventsPager }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     private get appName() {

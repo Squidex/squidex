@@ -89,6 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get assets.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="parentId">The optional parent folder id.</param>
         /// <param name="ids">The optional asset ids.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
@@ -103,9 +104,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string? ids = null, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] Guid? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context,
+            var assets = await assetQuery.QueryAsync(Context, parentId,
                 Q.Empty
                     .WithIds(ids)
                     .WithJsonQuery(q)
@@ -168,6 +169,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Upload a new asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="parentId">The optional parent folder id.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 201 => Asset created.
@@ -183,11 +185,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [OpenApiIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] Guid parentId, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
-            var command = new CreateAsset { File = assetFile };
+            var command = new CreateAsset { File = assetFile, ParentId = parentId };
 
             var response = await InvokeCommandAsync(app, command);
 
@@ -242,6 +244,31 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AnnotateAssetDto request)
+        {
+            var command = request.ToCommand(id);
+
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Moves the asset.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <param name="request">The asset object that needs to updated.</param>
+        /// <returns>
+        /// 200 => Asset moved.
+        /// 404 => Asset or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/assets/{id}/parent")]
+        [ProducesResponseType(typeof(AssetDto), 200)]
+        [AssetRequestSizeLimit]
+        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutAssetParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
         {
             var command = request.ToCommand(id);
 

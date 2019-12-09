@@ -6,9 +6,9 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import Marked from 'marked';
+import marked from 'marked';
 
-const renderer = new Marked.Renderer();
+const renderer = new marked.Renderer();
 
 renderer.link = (href, _, text) => {
     return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
@@ -21,7 +21,7 @@ renderer.link = (href, _, text) => {
 export class MarkdownPipe implements PipeTransform {
     public transform(text: string | null | undefined): string {
         if (text) {
-            return Marked(text, { renderer });
+            return marked(text, { renderer });
         } else {
             return '';
         }

@@ -46,6 +46,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
             profileUrl: apiUrl.buildUrl('/identity-server/account/profile')
         });
     }
+
     public ngOnInit() {
         this.own(
             this.authService.userChanges

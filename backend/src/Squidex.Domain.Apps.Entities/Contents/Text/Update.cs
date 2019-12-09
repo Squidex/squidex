@@ -6,15 +6,17 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.Contents;
+using System.Collections.Generic;
+using Orleans.Concurrency;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
+    [Immutable]
     public sealed class Update
     {
         public Guid Id { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public Dictionary<string, string> Text { get; set; }
 
         public bool OnlyDraft { get; set; }
     }
