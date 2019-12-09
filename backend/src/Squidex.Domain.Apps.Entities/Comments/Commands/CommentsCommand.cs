@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
     {
         public Guid CommentsId { get; set; }
 
+        public Guid CommentId { get; set; }
+
         public NamedId<Guid> AppId { get; set; }
 
         Guid IAggregateCommand.AggregateId

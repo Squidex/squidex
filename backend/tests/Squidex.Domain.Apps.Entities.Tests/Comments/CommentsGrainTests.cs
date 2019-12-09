@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
     public class CommentsGrainTests : HandlerTestBase<CommentsState>
     {
         private readonly Guid commentsId = Guid.NewGuid();
+        private readonly Guid commentId = Guid.NewGuid();
         private readonly CommentsGrain sut;
 
         protected override Guid Id
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Create_should_create_events()
         {
-            var command = new CreateComment { Text = "text1" };
+            var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
 
@@ -60,17 +61,16 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentCreated { CommentId = command.CommentId, Text = command.Text })
+                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = new Uri("http://uri") })
                 );
         }
 
         [Fact]
         public async Task Update_should_create_events_and_update_state()
         {
-            var createCommand = new CreateComment { Text = "text1" };
-            var updateCommand = new UpdateComment { Text = "text2", CommentId = createCommand.CommentId };
+            await ExecuteCreateAsync();
 
-            await sut.ExecuteAsync(CreateCommentsCommand(createCommand));
+            var updateCommand = new UpdateComment { Text = "text2" };
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 CreatedComments = new List<Comment>
                 {
-                    new Comment(createCommand.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), createCommand.Actor, "text2")
+                    new Comment(commentId, LastEvents.ElementAt(0).Headers.Timestamp(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
@@ -89,26 +89,24 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 UpdatedComments = new List<Comment>
                 {
-                    new Comment(createCommand.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), createCommand.Actor, "text2")
+                    new Comment(commentId, LastEvents.ElementAt(0).Headers.Timestamp(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentUpdated { CommentId = createCommand.CommentId, Text = updateCommand.Text })
+                    CreateCommentsEvent(new CommentUpdated { Text = updateCommand.Text })
                 );
         }
 
         [Fact]
         public async Task Delete_should_create_events_and_update_state()
         {
-            var createCommand = new CreateComment { Text = "text1" };
-            var updateCommand = new UpdateComment { Text = "text2", CommentId = createCommand.CommentId };
-            var deleteCommand = new DeleteComment { CommentId = createCommand.CommentId };
+            await ExecuteCreateAsync();
+            await ExecuteUpdateAsync();
 
-            await sut.ExecuteAsync(CreateCommentsCommand(createCommand));
-            await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
+            var deleteCommand = new DeleteComment();
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
 
@@ -119,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 DeletedComments = new List<Guid>
                 {
-                    deleteCommand.CommentId
+                    commentId
                 },
                 Version = 2
             });
@@ -127,20 +125,31 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 DeletedComments = new List<Guid>
                 {
-                    deleteCommand.CommentId
+                    commentId
                 },
                 Version = 2
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentDeleted { CommentId = createCommand.CommentId })
+                    CreateCommentsEvent(new CommentDeleted())
                 );
+        }
+
+        private Task ExecuteCreateAsync()
+        {
+            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }));
+        }
+
+        private Task ExecuteUpdateAsync()
+        {
+            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }));
         }
 
         protected T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
         {
             @event.CommentsId = commentsId;
+            @event.CommentId = commentId;
 
             return CreateEvent(@event);
         }
@@ -148,6 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         protected T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
             command.CommentsId = commentsId;
+            command.CommentId = commentId;
 
             return CreateCommand(command);
         }

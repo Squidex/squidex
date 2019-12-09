@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Injectable, Input, OnInit } from '@angular/core';
+import { Component, Injectable, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
@@ -51,7 +51,7 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource
     ]
 })
-export class ContributorAddFormComponent implements OnInit {
+export class ContributorAddFormComponent implements OnChanges {
     private defaultValue: any;
 
     @Input()
@@ -69,7 +69,7 @@ export class ContributorAddFormComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.defaultValue = { role: this.roles[0].name, contributorId: '' };
 
         this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });

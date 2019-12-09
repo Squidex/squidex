@@ -20,6 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         [Required]
         public string Text { get; set; }
 
+        /// <summary>
+        /// The url where the comment is created.
+        /// </summary>
+        public string? Url { get; set; }
+
         public CreateComment ToCreateCommand(Guid commentsId)
         {
             return SimpleMapper.Map(this, new CreateComment { CommentsId = commentsId });

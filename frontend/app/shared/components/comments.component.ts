@@ -8,7 +8,7 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { timer } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -16,6 +16,7 @@ import {
     CommentDto,
     CommentsService,
     CommentsState,
+    ContributorsState,
     DialogService,
     ResourceOwner,
     UpsertCommentForm
@@ -27,20 +28,21 @@ import {
     templateUrl: './comments.component.html'
 })
 export class CommentsComponent extends ResourceOwner implements OnInit {
-    public state: CommentsState;
-
     @Input()
     public commentsId: string;
 
     public commentsState: CommentsState;
     public commentForm = new UpsertCommentForm(this.formBuilder);
 
+    public mentionUsers = this.contributorsState.contributors.pipe(map(x => x.map(c => c.contributorEmail)));
+    public mentionConfig = { dropUp: true };
+
     public userId: string;
-    public users: ReadonlyArray<string> = ['foobar@abc'];
 
     constructor(authService: AuthService,
         private readonly appsState: AppsState,
         private readonly commentsService: CommentsService,
+        private readonly contributorsState: ContributorsState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
@@ -51,6 +53,8 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
+        this.contributorsState.load();
+
         this.commentsState = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
 
         this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load())));
@@ -69,10 +73,11 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
 
         if (value && value.text && value.text.length > 0) {
             this.commentsState.create(value.text);
-            this.commentForm.submitCompleted();
 
             this.changeDetector.detectChanges();
         }
+
+        this.commentForm.submitCompleted();
     }
 
     public trackByComment(index: number, comment: CommentDto) {

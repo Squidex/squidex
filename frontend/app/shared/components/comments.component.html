@@ -15,7 +15,9 @@
         
         <div class="comments-footer">
             <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" [mention]="users" [mentionConfig]="{ dropUp: true }"
+                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" 
+                    [mention]="mentionUsers | async" 
+                    [mentionConfig]="mentionConfig"
                     autocomplete="off" 
                     autocorrect="off"
                     autocapitalize="off" />

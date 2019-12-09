@@ -12,7 +12,8 @@
                 </button>
             </div>
 
-            <div>{{comment.text}}</div>
+            <div [innerHTML]="comment.text | sqxMarkdown"></div>
+
             <div class="comment-created text-muted">{{comment.time | sqxFromNow}}</div>
         </div>
     </div>

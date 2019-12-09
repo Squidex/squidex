@@ -11,8 +11,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
     public sealed class CreateComment : CommentsCommand
     {
-        public Guid CommentId { get; } = Guid.NewGuid();
+        public bool NoMention { get; set; }
 
         public string Text { get; set; }
+
+        public Uri? Url { get; set; }
+
+        public CreateComment()
+        {
+            CommentId = Guid.NewGuid();
+        }
     }
 }

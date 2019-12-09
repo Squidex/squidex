@@ -42,6 +42,7 @@ export class ContributorDto {
         links: ResourceLinks,
         public readonly contributorId: string,
         public readonly contributorName: string,
+        public readonly contributorEmail: string,
         public readonly role: string
     ) {
         this._links = links;
@@ -114,6 +115,7 @@ function parseContributors(response: any) {
         new ContributorDto(item._links,
             item.contributorId,
             item.contributorName,
+            item.contributorEmail,
             item.role));
 
     const { maxContributors, _links, _meta } = response;

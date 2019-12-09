@@ -13,8 +13,6 @@ namespace Squidex.Domain.Apps.Events.Comments
     [EventType(nameof(CommentUpdated))]
     public sealed class CommentUpdated : CommentsEvent
     {
-        public Guid CommentId { get; set; }
-
         public string Text { get; set; }
     }
 }

@@ -37,3 +37,9 @@
         font-size: .75rem;
     }
 }
+
+p {
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
