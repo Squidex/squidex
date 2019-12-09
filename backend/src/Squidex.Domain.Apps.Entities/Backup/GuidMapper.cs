@@ -94,6 +94,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private Guid GenerateNewGuid(Guid oldGuid)
         {
+            if (oldGuid == Guid.Empty)
+            {
+                return Guid.Empty;
+            }
+
             return oldToNewGuid.GetOrAdd(oldGuid, GuidGenerator);
         }
 

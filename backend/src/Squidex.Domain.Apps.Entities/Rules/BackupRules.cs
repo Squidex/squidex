@@ -17,12 +17,12 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class BackupRules : BackupHandler
+    public sealed class BackupRules : IBackupHandler
     {
         private readonly HashSet<Guid> ruleIds = new HashSet<Guid>();
         private readonly IRulesIndex indexForRules;
 
-        public override string Name { get; } = "Rules";
+        public string Name { get; } = "Rules";
 
         public BackupRules(IRulesIndex indexForRules)
         {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.indexForRules = indexForRules;
         }
 
-        public override Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return TaskHelper.True;
         }
 
-        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        public Task RestoreAsync(RestoreContext context)
         {
-            return indexForRules.RebuildAsync(appId, ruleIds);
+            return indexForRules.RebuildAsync(context.AppId, ruleIds);
         }
     }
 }

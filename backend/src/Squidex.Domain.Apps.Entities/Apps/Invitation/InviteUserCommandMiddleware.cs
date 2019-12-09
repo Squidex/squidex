@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             if (context.Command is AssignContributor assignContributor && ShouldInvite(assignContributor))
             {
-                var created = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId, true);
+                var created = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true);
 
                 await next();
 

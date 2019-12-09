@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_user_already_exists_with_some_role_but_is_from_restore()
         {
-            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IsRestore = true };
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, Restoring = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(2);
 
-            var command = new AssignContributor { ContributorId = "3", IsRestore = true };
+            var command = new AssignContributor { ContributorId = "3", Restoring = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);

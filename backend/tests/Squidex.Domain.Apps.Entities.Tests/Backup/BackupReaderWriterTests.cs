@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             public Guid GuidRaw { get; set; }
 
+            public Guid GuidEmpty { get; set; }
+
             public NamedId<Guid> GuidNamed { get; set; }
 
             public Dictionary<Guid, string> Values { get; set; }
@@ -158,14 +160,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
-                    var source = targetEvents[i].Event.To<MyEvent>();
+                    var target = targetEvents[i].Event.To<MyEvent>();
 
-                    var target = sourceEvents[i].Event.To<MyEvent>();
+                    var source = sourceEvents[i].Event.To<MyEvent>();
 
-                    CompareGuid(target.Payload.Values.First().Key, source.Payload.Values.First().Key);
-                    CompareGuid(target.Payload.GuidRaw, source.Payload.GuidRaw);
-                    CompareGuid(target.Payload.GuidNamed.Id, source.Payload.GuidNamed.Id);
-                    CompareGuid(target.Headers.GetGuid("Id"), source.Headers.GetGuid("Id"));
+                    CompareGuid(source.Payload.Values.First().Key, target.Payload.Values.First().Key);
+                    CompareGuid(source.Payload.GuidRaw, target.Payload.GuidRaw);
+                    CompareGuid(source.Payload.GuidNamed.Id, target.Payload.GuidNamed.Id);
+                    CompareGuid(source.Headers.GetGuid("Id"), target.Headers.GetGuid("Id"));
+
+                    Assert.Equal(Guid.Empty, target.Payload.GuidEmpty);
                 }
             }
         }

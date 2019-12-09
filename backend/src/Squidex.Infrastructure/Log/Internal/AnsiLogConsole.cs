@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class AnsiLogConsole : IConsole
+    [ExcludeFromCodeCoverage]
+    public sealed class AnsiLogConsole : IConsole
     {
         private readonly bool logToStdError;
 

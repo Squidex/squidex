@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public class AppCommandMiddlewareTests : HandlerTestBase<AppState>
     {
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+        private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly Context requestContext = Context.Anonymous();
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new AppCommandMiddleware(A.Fake<IGrainFactory>(), assetStore, assetThumbnailGenerator, contextProvider);
+            sut = new AppCommandMiddleware(A.Fake<IGrainFactory>(), appImageStore, assetThumbnailGenerator, contextProvider);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => assetStore.UploadAsync(appId.ToString(), stream, true, A<CancellationToken>.Ignored))
+            A.CallTo(() => appImageStore.UploadAsync(appId, stream, A<CancellationToken>.Ignored))
                 .MustHaveHappened();
         }
 

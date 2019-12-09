@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
-        private readonly IAssetStore assetStore;
+        private readonly IAssetFileStore assetFileStore;
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -31,20 +31,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IGrainFactory grainFactory,
             IAssetEnricher assetEnricher,
             IAssetQueryService assetQuery,
-            IAssetStore assetStore,
+            IAssetFileStore assetFileStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IContextProvider contextProvider,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
             Guard.NotNull(assetEnricher);
-            Guard.NotNull(assetStore);
+            Guard.NotNull(assetFileStore);
             Guard.NotNull(assetQuery);
             Guard.NotNull(assetThumbnailGenerator);
             Guard.NotNull(contextProvider);
             Guard.NotNull(tagGenerators);
 
-            this.assetStore = assetStore;
+            this.assetFileStore = assetFileStore;
             this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -90,11 +90,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             context.Complete(new AssetCreatedResult(asset, false));
 
-                            await assetStore.CopyAsync(tempFile, createAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetFileStore.CopyAsync(tempFile, createAsset.AssetId, asset.FileVersion);
                         }
                         finally
                         {
-                            await assetStore.DeleteAsync(tempFile);
+                            await assetFileStore.DeleteAsync(tempFile);
                         }
 
                         break;
@@ -111,11 +111,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             var asset = context.Result<IEnrichedAssetEntity>();
 
-                            await assetStore.CopyAsync(tempFile, updateAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetFileStore.CopyAsync(tempFile, updateAsset.AssetId, asset.FileVersion);
                         }
                         finally
                         {
-                            await assetStore.DeleteAsync(tempFile);
+                            await assetFileStore.DeleteAsync(tempFile);
                         }
 
                         break;
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             using (var hashStream = new HasherStream(command.File.OpenRead(), HashAlgorithmName.SHA256))
             {
-                await assetStore.UploadAsync(tempFile, hashStream);
+                await assetFileStore.UploadAsync(tempFile, hashStream);
 
                 command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
             }

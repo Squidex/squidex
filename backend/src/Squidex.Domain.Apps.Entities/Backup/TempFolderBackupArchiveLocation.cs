@@ -5,39 +5,106 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
+    [ExcludeFromCodeCoverage]
     public sealed class TempFolderBackupArchiveLocation : IBackupArchiveLocation
     {
-        public Task<Stream> OpenStreamAsync(string backupId)
-        {
-            var tempFile = GetTempFile(backupId);
+        private readonly IJsonSerializer jsonSerializer;
 
-            return Task.FromResult<Stream>(new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite));
+        public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
+        {
+            Guard.NotNull(jsonSerializer);
+
+            this.jsonSerializer = jsonSerializer;
         }
 
-        public Task DeleteArchiveAsync(string backupId)
+        public async Task<IBackupReader> OpenReaderAsync(Uri url, Guid id)
         {
-            var tempFile = GetTempFile(backupId);
+            var stream = OpenStream(id);
+
+            if (string.Equals(url.Scheme, "file"))
+            {
+                try
+                {
+                    using (var sourceStream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read))
+                    {
+                        await sourceStream.CopyToAsync(stream);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    throw new BackupRestoreException($"Cannot download the archive: {ex.Message}.", ex);
+                }
+            }
+            else
+            {
+                HttpResponseMessage? response = null;
+                try
+                {
+                    using (var client = new HttpClient())
+                    {
+                        response = await client.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+
+                        using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        {
+                            await sourceStream.CopyToAsync(stream);
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                }
+            }
 
             try
             {
-                File.Delete(tempFile);
+                return new BackupReader(jsonSerializer, stream);
             }
             catch (IOException)
             {
-            }
+                stream.Dispose();
 
-            return TaskHelper.Done;
+                throw new BackupRestoreException("The backup archive is corrupt and cannot be opened.");
+            }
+            catch (Exception)
+            {
+                stream.Dispose();
+
+                throw;
+            }
         }
 
-        private static string GetTempFile(string backupId)
+        public Stream OpenStream(Guid backupId)
         {
-            return Path.Combine(Path.GetTempPath(), backupId + ".zip");
+            var tempFile = Path.Combine(Path.GetTempPath(), backupId + ".zip");
+
+            var fileStream = new FileStream(
+                tempFile,
+                FileMode.Create,
+                FileAccess.ReadWrite,
+                FileShare.None,
+                4096,
+                FileOptions.DeleteOnClose);
+
+            return fileStream;
+        }
+
+        public Task<IBackupWriter> OpenWriterAsync(Stream stream)
+        {
+            var writer = new BackupWriter(jsonSerializer, stream, true);
+
+            return Task.FromResult<IBackupWriter>(writer);
         }
     }
 }

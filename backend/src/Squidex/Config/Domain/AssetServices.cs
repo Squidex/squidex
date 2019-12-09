@@ -33,6 +33,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
+            services.AddSingletonAs<DefaultAssetFileStore>()
+                .As<IAssetFileStore>();
+
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
 

@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class WindowsLogConsole : IConsole
+    [ExcludeFromCodeCoverage]
+    public sealed class WindowsLogConsole : IConsole
     {
         private readonly bool logToStdError;
 

@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null);
 
-        Task<J<IRestoreJob>> GetJobAsync();
+        Task<J<IRestoreJob>> GetStateAsync();
     }
 }

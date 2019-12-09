@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Email
 {
+    [ExcludeFromCodeCoverage]
     public sealed class SmtpEmailSender : IEmailSender
     {
         private readonly SmtpClient smtpClient;

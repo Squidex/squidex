@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     [DataContract]
-    public sealed class RestoreStateJob : IRestoreJob
+    public sealed class RestoreJob : IRestoreJob
     {
         [DataMember]
         public string AppName { get; set; }
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Guid Id { get; set; }
 
         [DataMember]
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
         [DataMember]
         public RefToken Actor { get; set; }

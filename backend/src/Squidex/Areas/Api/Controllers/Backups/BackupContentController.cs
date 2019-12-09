@@ -9,9 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
@@ -23,14 +21,16 @@ namespace Squidex.Areas.Api.Controllers.Backups
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupContentController : ApiController
     {
-        private readonly IAssetStore assetStore;
-        private readonly IGrainFactory grainFactory;
+        private readonly IBackupArchiveStore backupArchiveStore;
+        private readonly IBackupService backupservice;
 
-        public BackupContentController(ICommandBus commandBus, IAssetStore assetStore, IGrainFactory grainFactory)
+        public BackupContentController(ICommandBus commandBus,
+            IBackupArchiveStore backupArchiveStore,
+            IBackupService backupservice)
             : base(commandBus)
         {
-            this.assetStore = assetStore;
-            this.grainFactory = grainFactory;
+            this.backupArchiveStore = backupArchiveStore;
+            this.backupservice = backupservice;
         }
 
         /// <summary>
@@ -50,10 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public async Task<IActionResult> GetBackupContent(string app, Guid id)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
-
-            var backups = await backupGrain.GetStateAsync();
-            var backup = backups.Value.Find(x => x.Id == id);
+            var backup = await backupservice.GetBackupAsync(AppId, id);
 
             if (backup == null || backup.Status != JobStatus.Completed)
             {
@@ -64,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             return new FileCallbackResult("application/zip", fileName, false, bodyStream =>
             {
-                return assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream);
+                return backupArchiveStore.DownloadAsync(id, bodyStream);
             });
         }
     }

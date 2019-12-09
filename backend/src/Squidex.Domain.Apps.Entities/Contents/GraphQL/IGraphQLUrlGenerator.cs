@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset);
 
-        string? GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset);
+        string? GenerateAssetSourceUrl(IAssetEntity asset);
 
         string GenerateAssetUrl(IAppEntity app, IAssetEntity asset);
 

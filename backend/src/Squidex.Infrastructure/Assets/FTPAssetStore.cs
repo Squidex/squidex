@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.Assets
 {
+    [ExcludeFromCodeCoverage]
     public sealed class FTPAssetStore : IAssetStore, IInitializable
     {
         private readonly string path;
