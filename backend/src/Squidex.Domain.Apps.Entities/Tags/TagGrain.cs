@@ -58,15 +58,15 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         var tagName = tag.ToLowerInvariant();
                         var tagId = string.Empty;
 
-                        var found = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, tagName, StringComparison.OrdinalIgnoreCase));
+                        var (key, value) = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, tagName, StringComparison.OrdinalIgnoreCase));
 
-                        if (found.Value != null)
+                        if (value != null)
                         {
-                            tagId = found.Key;
+                            tagId = key;
 
                             if (ids == null || !ids.Contains(tagId))
                             {
-                                found.Value.Count++;
+                                value.Count++;
                             }
                         }
                         else

@@ -126,8 +126,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_not_cleanup_reservation_when_no_reservation_token_hold()
         {
-            var context = CreateRestoreContext();
-
             await sut.CleanupRestoreErrorAsync(appId);
 
             A.CallTo(() => index.RemoveReservationAsync("Reservation"))

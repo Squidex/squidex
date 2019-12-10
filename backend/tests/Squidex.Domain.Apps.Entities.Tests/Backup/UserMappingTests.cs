@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Assert.Same(client, mapped);
         }
 
-        private IUser CreateUser(string id, string email)
+        private static IUser CreateUser(string id, string email)
         {
             var user = A.Fake<IUser>();
 

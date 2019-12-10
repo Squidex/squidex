@@ -21,11 +21,11 @@ namespace Squidex.Web
             {
                 context = new Context(httpContext.User);
 
-                foreach (var header in httpContext.Request.Headers)
+                foreach (var (key, value) in httpContext.Request.Headers)
                 {
-                    if (header.Key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+                    if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
                     {
-                        context.Headers.Add(header.Key, header.Value.ToString());
+                        context.Headers.Add(key, value.ToString());
                     }
                 }
 

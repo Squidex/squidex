@@ -75,15 +75,15 @@ namespace Squidex.Infrastructure.Log.Adapter
 
                 if (ctx.state is IReadOnlyList<KeyValuePair<string, object>> parameters)
                 {
-                    foreach (var kvp in parameters)
+                    foreach (var (key, value) in parameters)
                     {
-                        if (kvp.Value != null)
+                        if (value != null)
                         {
-                            var key = kvp.Key.Trim('{', '}', ' ');
+                            var trimmedName = key.Trim('{', '}', ' ');
 
-                            if (key.Length > 2 && !string.Equals(key, "originalFormat", StringComparison.OrdinalIgnoreCase))
+                            if (trimmedName.Length > 2 && !string.Equals(trimmedName, "originalFormat", StringComparison.OrdinalIgnoreCase))
                             {
-                                writer.WriteProperty(key.ToCamelCase(), kvp.Value.ToString());
+                                writer.WriteProperty(trimmedName.ToCamelCase(), value.ToString());
                             }
                         }
                     }

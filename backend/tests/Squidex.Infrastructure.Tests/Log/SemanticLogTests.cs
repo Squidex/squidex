@@ -49,8 +49,8 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_multiple_lines()
         {
-            Log.Log<None>(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg1"));
-            Log.Log<None>(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg2"));
+            Log.Log(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg1"));
+            Log.Log(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg2"));
 
             var expected1 =
                 LogTest(w => w

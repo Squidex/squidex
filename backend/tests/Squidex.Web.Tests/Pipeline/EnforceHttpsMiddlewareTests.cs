@@ -61,7 +61,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_redirect_if_not_required()
         {
-            var httpContext = CreateHttpContext("http");
+            var httpContext = CreateHttpContext();
 
             options.EnforceHTTPS = false;
 

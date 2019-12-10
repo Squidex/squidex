@@ -41,17 +41,17 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var source in sources)
             {
-                foreach (var otherValue in source)
+                foreach (var (key, contentFieldData) in source)
                 {
-                    if (otherValue.Value != null)
+                    if (contentFieldData != null)
                     {
-                        var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+                        var fieldValue = target.GetOrAdd(key, x => new ContentFieldData());
 
                         if (fieldValue != null)
                         {
-                            foreach (var value in otherValue.Value)
+                            foreach (var (fieldName, value) in contentFieldData)
                             {
-                                fieldValue[value.Key] = value.Value;
+                                fieldValue[fieldName] = value;
                             }
                         }
                     }
@@ -67,9 +67,9 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 var resultValue = new ContentFieldData();
 
-                foreach (var partitionValue in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
+                foreach (var (key, value) in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
                 {
-                    resultValue[partitionValue.Key] = partitionValue.Value;
+                    resultValue[key] = value;
                 }
 
                 if (resultValue.Count > 0)

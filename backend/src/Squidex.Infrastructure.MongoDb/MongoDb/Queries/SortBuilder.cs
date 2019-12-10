@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
 
@@ -17,12 +18,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
         {
             if (query.Sort.Count > 0)
             {
-                var sorts = new List<SortDefinition<T>>();
-
-                foreach (var sort in query.Sort)
-                {
-                    sorts.Add(OrderBy<T>(sort));
-                }
+                var sorts = query.Sort.Select(OrderBy<T>).ToList();
 
                 if (sorts.Count > 1)
                 {

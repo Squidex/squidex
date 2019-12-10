@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Empty(result);
         }
 
-        private IAssetFolderEntity CreateFolder(Guid id, Guid parentId = default)
+        private static IAssetFolderEntity CreateFolder(Guid id, Guid parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 

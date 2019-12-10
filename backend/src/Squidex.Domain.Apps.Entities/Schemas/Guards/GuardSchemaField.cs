@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command);
 
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
             Validate.It(() => "Cannot update field.", e =>
             {

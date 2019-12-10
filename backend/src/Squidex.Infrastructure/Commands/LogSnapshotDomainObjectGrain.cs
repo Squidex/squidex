@@ -69,14 +69,14 @@ namespace Squidex.Infrastructure.Commands
             return persistence.ReadAsync();
         }
 
-        protected sealed override async Task WriteAsync(Envelope<IEvent>[] events, long previousVersion)
+        protected sealed override async Task WriteAsync(Envelope<IEvent>[] newEvents, long previousVersion)
         {
-            if (events.Length > 0 && persistence != null)
+            if (newEvents.Length > 0 && persistence != null)
             {
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
-                await persistence.WriteEventsAsync(events);
-                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, previousVersion + events.Length);
+                await persistence.WriteEventsAsync(newEvents);
+                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, previousVersion + newEvents.Length);
             }
         }
 

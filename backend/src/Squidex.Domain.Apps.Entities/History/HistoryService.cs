@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.History
 
             foreach (var creator in this.creators)
             {
-                foreach (var text in creator.Texts)
+                foreach (var (key, value) in creator.Texts)
                 {
-                    texts[text.Key] = text.Value;
+                    texts[key] = value;
                 }
             }
 

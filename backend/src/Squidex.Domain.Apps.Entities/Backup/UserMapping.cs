@@ -72,20 +72,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
 
-            foreach (var kvp in json)
+            foreach (var (userId, email) in json)
             {
-                var email = kvp.Value;
-
                 var user = await userResolver.FindByIdOrEmailAsync(email);
 
-                if (user == null && await userResolver.CreateUserIfNotExistsAsync(kvp.Value, false))
+                if (user == null && await userResolver.CreateUserIfNotExistsAsync(email, false))
                 {
                     user = await userResolver.FindByIdOrEmailAsync(email);
                 }
 
                 if (user != null)
                 {
-                    userMap[kvp.Key] = new RefToken(RefTokenType.Subject, user.Id);
+                    userMap[userId] = new RefToken(RefTokenType.Subject, user.Id);
                 }
             }
         }

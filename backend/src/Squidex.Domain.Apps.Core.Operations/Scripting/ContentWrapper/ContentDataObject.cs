@@ -53,13 +53,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 if (fieldProperties != null)
                 {
-                    foreach (var kvp in fieldProperties)
+                    foreach (var (key, propertyDescriptor) in fieldProperties)
                     {
-                        var value = (ContentDataProperty)kvp.Value;
+                        var value = (ContentDataProperty)propertyDescriptor;
 
                         if (value.ContentField != null && value.ContentField.TryUpdate(out var fieldData))
                         {
-                            contentData[kvp.Key] = fieldData;
+                            contentData[key] = fieldData;
                         }
                     }
                 }
@@ -120,9 +120,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             {
                 fieldProperties = new Dictionary<string, PropertyDescriptor>(contentData.Count);
 
-                foreach (var kvp in contentData)
+                foreach (var (key, value) in contentData)
                 {
-                    fieldProperties.Add(kvp.Key, new ContentDataProperty(this, new ContentFieldObject(this, kvp.Value, false)));
+                    fieldProperties.Add(key, new ContentDataProperty(this, new ContentFieldObject(this, value, false)));
                 }
             }
         }

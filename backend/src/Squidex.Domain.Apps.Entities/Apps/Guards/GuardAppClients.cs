@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command);
 
-            var client = GetClientOrThrow(clients, command.Id);
+            GetClientOrThrow(clients, command.Id);
 
             Validate.It(() => "Cannot update client.", e =>
             {

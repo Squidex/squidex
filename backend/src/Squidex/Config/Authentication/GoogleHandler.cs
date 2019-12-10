@@ -49,7 +49,7 @@ namespace Squidex.Config.Authentication
 
                 if (pictureUrl != null && pictureUrl.EndsWith("?sz=50", System.StringComparison.Ordinal))
                 {
-                    pictureUrl = pictureUrl[0..^6];
+                    pictureUrl = pictureUrl[..^6];
                 }
             }
 

@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = new Dictionary<string, string>(value.Count);
 
-            foreach (var contributor in value)
+            foreach (var (userId, role) in value)
             {
-                json.Add(contributor.Key, contributor.Value);
+                json.Add(userId, role);
             }
 
             serializer.Serialize(writer, json);

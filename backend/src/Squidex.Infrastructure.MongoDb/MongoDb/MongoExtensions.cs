@@ -191,8 +191,6 @@ namespace Squidex.Infrastructure.MongoDb
                     {
                         await source.ForEachAsync(async i =>
                         {
-                            var t = source;
-
                             if (!await actionBlock.SendAsync(i, combined.Token))
                             {
                                 selfToken.Cancel();

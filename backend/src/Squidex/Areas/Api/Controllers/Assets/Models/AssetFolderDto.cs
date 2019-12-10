@@ -7,7 +7,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;

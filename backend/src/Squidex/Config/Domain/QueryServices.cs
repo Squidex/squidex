@@ -32,7 +32,7 @@ namespace Squidex.Config.Domain
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>().As<IEmailUrlGenerator>();
 
-            services.AddSingletonAs(x => new FuncDependencyResolver(t => x.GetRequiredService(t)))
+            services.AddSingletonAs(x => new FuncDependencyResolver(x.GetRequiredService))
                 .As<IDependencyResolver>();
 
             services.AddSingletonAs<DataLoaderContextAccessor>()

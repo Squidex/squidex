@@ -45,9 +45,9 @@ namespace Squidex.Web
                     {
                         var id = permissionId;
 
-                        foreach (var routeParam in context.RouteData.Values)
+                        foreach (var (key, value) in context.RouteData.Values)
                         {
-                            id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
+                            id = id.Replace($"{{{key}}}", value?.ToString());
                         }
 
                         if (permissions.Allows(new Permission(id)))

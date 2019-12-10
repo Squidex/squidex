@@ -60,11 +60,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
             return persistence.ReadAsync();
         }
 
-        protected override async Task WriteAsync(Envelope<IEvent>[] events, long previousVersion)
+        protected override async Task WriteAsync(Envelope<IEvent>[] newEvents, long previousVersion)
         {
-            if (events.Length > 0)
+            if (newEvents.Length > 0)
             {
-                await persistence.WriteEventsAsync(events);
+                await persistence.WriteEventsAsync(newEvents);
             }
         }
 
