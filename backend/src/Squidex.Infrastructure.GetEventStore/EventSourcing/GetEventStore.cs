@@ -21,6 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
+        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
         private readonly IEventStoreConnection connection;
         private readonly IJsonSerializer serializer;
         private readonly string prefix;
@@ -117,6 +118,51 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             }
             while (!currentSlice.IsEndOfStream && !ct.IsCancellationRequested);
+        }
+
+        public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
+        {
+            Guard.NotNullOrEmpty(streamName);
+
+            if (count <= 0)
+            {
+                return EmptyEvents;
+            }
+
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var result = new List<StoredEvent>();
+
+                var sliceStart = (long)StreamPosition.End;
+
+                StreamEventsSlice currentSlice;
+                do
+                {
+                    currentSlice = await connection.ReadStreamEventsBackwardAsync(GetStreamName(streamName), sliceStart, ReadPageSize, true);
+
+                    if (currentSlice.Status == SliceReadStatus.Success)
+                    {
+                        sliceStart = currentSlice.NextEventNumber;
+
+                        foreach (var resolved in currentSlice.Events)
+                        {
+                            var storedEvent = Formatter.Read(resolved, prefix, serializer);
+
+                            result.Add(storedEvent);
+                        }
+                    }
+                }
+                while (!currentSlice.IsEndOfStream);
+
+                IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
+
+                if (result.Count > count)
+                {
+                    ordered = ordered.Skip(result.Count - count);
+                }
+
+                return ordered.ToList();
+            }
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)

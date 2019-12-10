@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
             {
-                throw new NotSupportedException();
+                throw exception;
             }
 
             public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -181,7 +181,6 @@ namespace Squidex.Infrastructure.EventSourcing
             };
 
             ShouldBeEquivalentTo(readEventsFromPosition, expectedFromPosition);
-
             ShouldBeEquivalentTo(readEventsFromBeginning, expectedFromBeginning);
         }
 
@@ -210,6 +209,45 @@ namespace Squidex.Infrastructure.EventSourcing
 
             ShouldBeEquivalentTo(readEvents1, expected);
             ShouldBeEquivalentTo(readEvents2, expected);
+        }
+
+        [Theory]
+        [InlineData(30)]
+        [InlineData(60)]
+        public async Task Should_read_latest_events(int count)
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new List<EventData>();
+
+            for (var i = 0; i < count; i++)
+            {
+                events.Add(new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString()));
+            }
+
+            for (var i = 0; i < events.Count / 2; i++)
+            {
+                var commit = events.Skip(i * 2).Take(2);
+
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, commit.ToArray());
+            }
+
+            var offset = 25;
+
+            var take = count - offset;
+
+            var expected1 = events
+                .Skip(offset)
+                .Select((x, i) => new StoredEvent(streamName, "Position", i + offset, events[i + offset]))
+                .ToArray();
+
+            var expected2 = new StoredEvent[0];
+
+            var readEvents1 = await Sut.QueryLatestAsync(streamName, take);
+            var readEvents2 = await Sut.QueryLatestAsync(streamName, 0);
+
+            ShouldBeEquivalentTo(readEvents1, expected1);
+            ShouldBeEquivalentTo(readEvents2, expected2);
         }
 
         [Fact]
