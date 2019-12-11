@@ -1,36 +1,65 @@
-<div class="form-control tags" [class.blank]="styleBlank" [class.gray]="styleGray" #form (click)="input.focus()" 
-    [class.single-line]="singleLine"
-    [class.focus]="snapshot.hasFocus" 
-    [class.disabled]="addInput.disabled"
-    [class.dashed]="dashed && !(snapshot.items.length > 0)">
-    <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
-        {{item}} <i class="icon-close" (click)="remove(i)"></i>
-    </span>
+<div class="form-container">
+    <div class="form-control tags" #form (click)="input.focus()"
+        [class.blank]="styleBlank" 
+        [class.gray]="styleGray" 
+        [class.singleline]="singleLine"
+        [class.multiline]="!singleLine"
+        [class.focus]="snapshot.hasFocus" 
+        [class.disabled]="addInput.disabled"
+        [class.dashed]="dashed && !(snapshot.items.length > 0)">
 
-    <input type="text" class="blank" #input
-        (blur)="markTouched()"
-        (copy)="onCopy($event)"
-        (cut)="onCut($event)"
-        (focus)="focus()"
-        (keydown)="onKeyDown($event)"
-        (paste)="onPaste($event)"
-        [name]="inputName" [placeholder]="placeholder"
-        autocomplete="off" 
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        [formControl]="addInput">
-</div>
+        <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
+            {{item}} <i class="icon-close" (click)="remove(i)"></i>
+        </span>
 
-<ng-container *sqxModal="snapshot.suggestedItems.length > 0">
-    <div class="control-dropdown" [sqxAnchoredTo]="form" position="bottom-left" #container @fade>
-        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-            [class.active]="i === snapshot.suggestedIndex"
-            (mousedown)="selectValue(item)" 
-            (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === snapshot.suggestedIndex"
-            [sqxScrollContainer]="container">
-            <ng-container>{{item}}</ng-container>
-        </div>
+        <input type="text" class="blank text-input" #input
+            (blur)="markTouched()"
+            (copy)="onCopy($event)"
+            (cut)="onCut($event)"
+            (focus)="focus()"
+            (keydown)="onKeyDown($event)"
+            (paste)="onPaste($event)"
+            [name]="inputName" [placeholder]="placeholder"
+            autocomplete="off" 
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            [formControl]="addInput">
     </div>
-</ng-container>
+
+    <div class="btn btn-sm" (click)="suggestionsModal.show()" sqxStopClick *ngIf="suggestionsSorted.length > 0">
+        <i class="icon-caret-down"></i>
+    </div>
+
+    <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
+        <div class="control-dropdown" [sqxAnchoredTo]="form" position="bottom-left" #container @fade>
+            <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+                [class.active]="i === snapshot.suggestedIndex"
+                (mousedown)="selectValue(item)" 
+                (mouseover)="selectIndex(i)"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="container">
+                <ng-container>{{item}}</ng-container>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="snapshot.suggestedItems.length === 0 && suggestionsSorted.length > 0">
+        <ng-container *sqxModal="suggestionsModal">
+            <div class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left" @fade>
+                <div class="row">
+                    <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="tag_{{i}}"
+                                [ngModel]="isSelected(item)"
+                                (ngModelChange)="toggleValue($event, item)" />
+                            <label class="form-check-label truncate" for="tag_{{i}}">
+                                {{item.name}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</div>

@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var segments = path.Split('.');
 
-            key = segments[segments.Length - 1];
+            key = segments[^1];
 
             var current = state.Value.Settings;
 

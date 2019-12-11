@@ -3,17 +3,17 @@
 
 .code {
     background: $color-code-background;
+    margin: .25rem 0;
     padding-left: .5rem;
     padding-right: 3rem;
-    margin: .25rem 0;
 }
 
 .code,
 .code-copy {
     font-size: .8rem;
-    padding-top: .25rem;
-    padding-bottom: .25rem;
     min-height: 27px;
+    padding-bottom: .25rem;
+    padding-top: .25rem;
 }
 
 .copy-container {
@@ -23,11 +23,11 @@
 .code-copy {
     & {
         @include absolute(0, 0, auto, auto);
-        border: 0;
         background: darken($color-border-dark, 30%);
+        border: 0;
+        color: $color-dark-foreground;
         padding-left: .375rem;
         padding-right: .375rem;
-        color: $color-dark-foreground;
     }
 
     &:focus {

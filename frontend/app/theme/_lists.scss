@@ -34,10 +34,10 @@
     thead {
         // Small font size for the table header, content is more important!
         th {
+            border: 0;
             color: $color-table-header;
             font-size: .8rem;
             font-weight: normal;
-            border: 0;
             padding-top: 0;
             vertical-align: middle;
 
@@ -61,7 +61,6 @@
         tr {
             // Each row is white and a has a border.
             & {
-                @include transition(all .2s ease);
                 background: $color-table-background;
                 border: 1px solid $color-table-border;
                 border-bottom: 2px solid $color-table-border;
@@ -96,19 +95,19 @@
     //
     &-row {
         & {
-            padding: .75rem 1.25rem;
             background: $color-table-background;
             border: 1px solid $color-border;
-            border-top: 0;
             border-bottom-width: 2px;
+            border-top: 0;
             margin-bottom: .25rem;
+            padding: .75rem 1.25rem;
         }
 
         // Summary row for expandable rows.
         &-summary {
+            line-height: 2.5rem;
             padding: .75rem 1.25rem;
             position: relative;
-            line-height: 2.5rem;
         }
 
         &-expandable {
@@ -137,9 +136,9 @@
 
             &-tabs {
                 background: $color-table-footer;
-                position: relative;
-                padding: 1rem 1.25rem;
                 height: 70px;
+                padding: 1rem 1.25rem;
+                position: relative;
             }
         }
     }
@@ -147,10 +146,10 @@
     // Footer that typically contains an add-item-form.
     &-header,
     &-footer {
-        padding: .75rem 1.25rem;
         background: $color-table-footer;
         border: 1px solid $color-input;
         border-bottom-width: 2px;
+        padding: .75rem 1.25rem;
     }
 
     &-header {

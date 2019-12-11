@@ -53,7 +53,7 @@ namespace Squidex.Areas.Frontend.Middlewares
                 }
 
                 var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-                var jsonOptions = jsonSerializer.Serialize(uiOptions, false);
+                var jsonOptions = jsonSerializer.Serialize(uiOptions);
 
                 result = result.Replace("<body>", $"<body><script>var options = {jsonOptions};</script>");
             }

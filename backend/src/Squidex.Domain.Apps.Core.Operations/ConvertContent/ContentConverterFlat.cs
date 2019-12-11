@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             var result = new Dictionary<string, object?>();
 
-            foreach (var fieldValue in content)
+            foreach (var (key, value) in content)
             {
-                result[fieldValue.Key] = GetFirst(fieldValue.Value);
+                result[key] = GetFirst(value);
             }
 
             return result;
@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             var result = new FlatContentData();
 
-            foreach (var fieldValue in content)
+            foreach (var (key, value) in content)
             {
-                result[fieldValue.Key] = GetFirst(fieldValue.Value, fallback);
+                result[key] = GetFirst(value, fallback);
             }
 
             return result;

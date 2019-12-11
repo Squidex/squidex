@@ -11,7 +11,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import {
     FieldDto,
     ReferencesFieldPropertiesDto,
-    SchemaTagConverter
+    SchemaTagSource
 } from '@app/shared';
 
 @Component({
@@ -30,7 +30,7 @@ export class ReferencesValidationComponent implements OnInit {
     public properties: ReferencesFieldPropertiesDto;
 
     constructor(
-        public readonly schemasSource: SchemaTagConverter
+        public readonly schemasSource: SchemaTagSource
     ) {
     }
 

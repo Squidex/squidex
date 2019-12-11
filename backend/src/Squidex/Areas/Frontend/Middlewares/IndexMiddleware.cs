@@ -23,8 +23,6 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            var basePath = context.Request.PathBase;
-
             if (context.IsHtmlPath() && context.Response.StatusCode != 304)
             {
                 var responseBuffer = new MemoryStream();

@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Migrations
                         .WriteProperty("action", "Migrate")
                         .WriteProperty("mesage", $"Waiting {LockWaitMs}ms to acquire lock."));
 
-                    await Task.Delay(LockWaitMs);
+                    await Task.Delay(LockWaitMs, ct);
                 }
 
                 version = await migrationStatus.GetVersionAsync();

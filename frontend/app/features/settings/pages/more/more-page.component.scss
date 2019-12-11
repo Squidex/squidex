@@ -3,9 +3,9 @@
 
 .app {
     &-image {
-        position: relative;
-        min-width: 150px;
         min-height: 150px;
+        min-width: 150px;
+        position: relative;
     }
 
     &-image-remove {
@@ -24,17 +24,17 @@
 
 @mixin overlay {
     & {
-        @include transition(opacity .4s ease);
         @include absolute(0, 0, 0, 0);
-        @include opacity(0);
-        @include flex-box;
         color: $color-dark-foreground;
+        display: flex;
+        opacity: 0;
+        transition: opacity .4s ease;
     }
 
     &-background {
         @include absolute(0, 0, 0, 0);
-        @include opacity(.7);
         background: $color-dark-black;
+        opacity: .7;
     }
 }
 
@@ -55,15 +55,15 @@
     }
 
     &-text {
-        position: absolute;
         font-size: 1.25rem;
         font-weight: lighter;
+        position: absolute;
     }
 }
 
 .drag {
     .drop-overlay {
-        @include opacity(1);
+        opacity: 1;
     }
 
     .app-image-remove {

@@ -25,7 +25,9 @@ const plugins = {
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
     OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
     // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('tslint-webpack-plugin')
+    TsLintPlugin: require('tslint-webpack-plugin'),
+    // https://www.npmjs.com/package/sass-lint-webpack
+    SassLintPlugin: require('sass-lint-webpack')
 };
 
 module.exports = function (env) {
@@ -131,13 +133,18 @@ module.exports = function (env) {
                     plugins.MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader'
+                    }, {
+                        loader: 'postcss-loader'
                     }]
             }, {
                 test: /\.scss$/,
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader', options: {
+                    loader: 'postcss-loader'
+                }, {
+                    loader: 'sass-loader', 
+                    options: {
                         sassOptions: {
                             includePaths: [root('app', 'theme')]
                         }
@@ -171,6 +178,8 @@ module.exports = function (env) {
                     context: '/'
                 }
             }),
+
+            new plugins.SassLintPlugin(),
 
             /**
              * Detect circular dependencies in app.
@@ -348,6 +357,8 @@ module.exports = function (env) {
                 {
                     loader: 'css-loader'
                 }, {
+                    loader: 'postcss-loader'
+                }, {
                     loader: 'sass-loader'
                 }],
             /*
@@ -362,6 +373,8 @@ module.exports = function (env) {
                 loader: 'style-loader'
             }, {
                 loader: 'css-loader'
+            }, {
+                loader: 'postcss-loader'
             }, {
                 loader: 'sass-loader?sourceMap'
             }],

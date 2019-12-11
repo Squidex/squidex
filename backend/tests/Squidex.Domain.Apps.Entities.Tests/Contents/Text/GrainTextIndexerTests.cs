@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -29,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly Guid contentId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly NamedContentData data = new NamedContentData();
         private readonly GrainTextIndexer sut;
 
         public GrainTextIndexerTests()
@@ -54,27 +52,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_created()
         {
-            await sut.On(E(new ContentCreated { Data = data }));
+            await sut.On(E(new ContentCreated()));
 
-            A.CallTo(() => grain.IndexAsync(A<J<Update>>.That.Matches(x => x.Value.Data == data && x.Value.Id == contentId && x.Value.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && x.OnlyDraft)))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_call_grain_when_content_updated()
         {
-            await sut.On(E(new ContentUpdated { Data = data }));
+            await sut.On(E(new ContentUpdated()));
 
-            A.CallTo(() => grain.IndexAsync(A<J<Update>>.That.Matches(x => x.Value.Data == data && x.Value.Id == contentId && !x.Value.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && !x.OnlyDraft)))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_call_grain_when_content_change_proposed()
         {
-            await sut.On(E(new ContentUpdateProposed { Data = data }));
+            await sut.On(E(new ContentUpdateProposed()));
 
-            A.CallTo(() => grain.IndexAsync(A<J<Update>>.That.Matches(x => x.Value.Data == data && x.Value.Id == contentId && x.Value.OnlyDraft)))
+            A.CallTo(() => grain.IndexAsync(A<Update>.That.Matches(x => x.Text.Count == 0 && x.Id == contentId && x.OnlyDraft)))
                 .MustHaveHappened();
         }
 

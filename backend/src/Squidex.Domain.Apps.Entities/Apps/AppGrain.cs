@@ -327,9 +327,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 CreateInitialLanguage()
             };
 
-            foreach (var pattern in initialPatterns)
+            foreach (var (key, value) in initialPatterns)
             {
-                events.Add(CreateInitialPattern(pattern.Key, pattern.Value));
+                events.Add(CreateInitialPattern(key, value));
             }
 
             foreach (var @event in events)

@@ -7,6 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import marked from 'marked';
 
 import {
     ApiUrlConfig,
@@ -91,6 +92,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
         this.resourceLoader.loadScript('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js').then(() => {
             this.simplemde = new SimpleMDE({
+                previewRender: (text: string) => {
+                    return marked(text, { pedantic: true });
+                },
                 toolbar: [
                     {
                         name: 'bold',

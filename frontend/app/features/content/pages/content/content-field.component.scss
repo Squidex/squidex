@@ -2,13 +2,12 @@
 @import '_mixins';
 
 .table-items-row {
-    position: relative;
-    border-width: 1px;
     border-left-width: 4px;
+    position: relative;
 }
 
 .languages-buttons {
-    @include absolute(.25rem, 1.25rem, auto, auto);
+    @include absolute(.25rem, 1.25rem);
 }
 
 .row {
@@ -44,18 +43,27 @@
 
     &-disabled {
         color: $color-border-dark;
-        font-size: .8rem;
-        font-weight: normal;
     }
 
     &-copy {
-        @include absolute(1rem, auto, auto, -1rem);
+        @include absolute($t: 1rem, $l: -1rem);
         z-index: 1000;
     }
 }
 
 .compare {
-    padding: .5rem 0;
     border: 0;
     border-bottom: 1px solid $color-border;
+    padding-bottom: .25rem;
+    padding-top: .5rem;
+}
+
+:host {
+    &:last-child {
+        margin-bottom: 0;
+
+        .compare {
+            border: 0;
+        }
+    }
 }

@@ -142,13 +142,13 @@ namespace Squidex.Infrastructure
         {
             var hashCode = 17;
 
-            foreach (var kvp in dictionary.OrderBy(x => x.Key))
+            foreach (var (key, value) in dictionary.OrderBy(x => x.Key))
             {
-                hashCode = (hashCode * 23) + keyComparer.GetHashCode(kvp.Key);
+                hashCode = (hashCode * 23) + keyComparer.GetHashCode(key);
 
-                if (!Equals(kvp.Value, null))
+                if (!Equals(value, null))
                 {
-                    hashCode = (hashCode * 23) + valueComparer.GetHashCode(kvp.Value);
+                    hashCode = (hashCode * 23) + valueComparer.GetHashCode(value);
                 }
             }
 

@@ -13,7 +13,7 @@ namespace Squidex.Config.Domain
     {
         public static void ConfigureForSquidex(this IConfigurationBuilder builder)
         {
-            builder.AddJsonFile($"appsettings.Custom.json", true);
+            builder.AddJsonFile("appsettings.Custom.json", true);
         }
     }
 }

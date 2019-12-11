@@ -23,9 +23,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<Migrator>()
                 .AsSelf();
 
-            services.AddTransientAs<Rebuilder>()
-                .AsSelf();
-
             services.AddTransientAs<RebuildRunner>()
                 .AsSelf();
 

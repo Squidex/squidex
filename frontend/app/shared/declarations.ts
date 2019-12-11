@@ -25,6 +25,7 @@ export * from './components/language-selector.component';
 export * from './components/markdown-editor.component';
 export * from './components/pipes';
 export * from './components/references-dropdown.component';
+export * from './components/references-tags.component';
 export * from './components/rich-editor.component';
 export * from './components/saved-queries.component';
 export * from './components/schema-category.component';

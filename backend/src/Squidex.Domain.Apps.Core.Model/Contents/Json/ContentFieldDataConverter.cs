@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
         {
             writer.WriteStartObject();
 
-            foreach (var kvp in value)
+            foreach (var (key, jsonValue) in value)
             {
-                writer.WritePropertyName(kvp.Key);
+                writer.WritePropertyName(key);
 
-                serializer.Serialize(writer, kvp.Value);
+                serializer.Serialize(writer, jsonValue);
             }
 
             writer.WriteEndObject();

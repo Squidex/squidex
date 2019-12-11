@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             if (TryGetStep(status, out var step))
             {
-                foreach (var transition in step.Transitions)
+                foreach (var (nextStatus, transition) in step.Transitions)
                 {
-                    yield return (transition.Key, Steps[transition.Key], transition.Value);
+                    yield return (nextStatus, Steps[nextStatus], transition);
                 }
             }
             else if (TryGetStep(Initial, out var initial))

@@ -11,7 +11,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import {
     ArrayFieldPropertiesDto,
     FieldDto,
-    SchemaTagConverter
+    SchemaTagSource
 } from '@app/shared';
 
 @Component({
@@ -30,7 +30,7 @@ export class ArrayValidationComponent implements OnInit {
     public properties: ArrayFieldPropertiesDto;
 
     constructor(
-        public readonly schemasSource: SchemaTagConverter
+        public readonly schemasSource: SchemaTagSource
     ) {
     }
 

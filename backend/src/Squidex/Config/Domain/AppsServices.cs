@@ -26,6 +26,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
+            services.AddSingletonAs<DefaultAppImageStore>()
+                .As<IAppImageStore>();
+
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 

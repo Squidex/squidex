@@ -5,13 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using Lucene.Net.Analysis;
+using Lucene.Net.Index;
+using Lucene.Net.Search;
 
-namespace Squidex.Domain.Apps.Entities.Backup.State
+namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class RestoreState
+    public interface IIndex
     {
-        [DataMember]
-        public RestoreStateJob Job { get; set; }
+        Analyzer? Analyzer { get; }
+
+        IndexReader? Reader { get; }
+
+        IndexSearcher? Searcher { get; }
+
+        IndexWriter Writer { get; }
+
+        void EnsureReader();
+
+        void MarkStale();
     }
 }

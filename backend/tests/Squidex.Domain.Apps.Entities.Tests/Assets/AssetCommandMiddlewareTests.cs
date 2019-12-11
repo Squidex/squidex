@@ -29,14 +29,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetState>
     {
-        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
+        private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
+        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-        private readonly IAssetStore assetStore = A.Fake<MemoryAssetStore>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly ITagGenerator<CreateAsset> tagGenerator = A.Fake<ITagGenerator<CreateAsset>>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly ITagGenerator<CreateAsset> tagGenerator = A.Fake<ITagGenerator<CreateAsset>>();
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly Stream stream = new MemoryStream();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             sut = new AssetCommandMiddleware(grainFactory,
                 assetEnricher,
                 assetQuery,
-                assetStore,
+                assetFileStore,
                 assetThumbnailGenerator,
                 contextProvider, new[] { tagGenerator });
         }
@@ -147,6 +147,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var result = context.Result<AssetCreatedResult>();
 
             result.Asset.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
+
+            AssertAssetHasBeenUploaded(0);
+            AssertAssetImageChecked();
         }
 
         [Fact]
@@ -230,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            AssertAssetHasBeenUploaded(1, context.ContextId);
+            AssertAssetHasBeenUploaded(1);
             AssertAssetImageChecked();
         }
 
@@ -282,15 +285,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
         }
 
-        private void AssertAssetHasBeenUploaded(long version, Guid commitId)
+        private void AssertAssetHasBeenUploaded(long version)
         {
-            var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
-
-            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), A<HasherStream>.Ignored, false, CancellationToken.None))
+            A.CallTo(() => assetFileStore.UploadAsync(A<string>.Ignored, A<HasherStream>.Ignored, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), fileName, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>.Ignored, Id, version, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
+            A.CallTo(() => assetFileStore.DeleteAsync(A<string>.Ignored))
                 .MustHaveHappened();
         }
 

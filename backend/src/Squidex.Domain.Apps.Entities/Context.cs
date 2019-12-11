@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities
         {
             var clone = new Context(User, App);
 
-            foreach (var kvp in Headers)
+            foreach (var (key, value) in Headers)
             {
-                clone.Headers[kvp.Key] = kvp.Value;
+                clone.Headers[key] = value;
             }
 
             return clone;

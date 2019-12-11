@@ -44,9 +44,9 @@ namespace Squidex.Infrastructure.Log
             {
                 writer.WriteObject("profiler", p =>
                 {
-                    foreach (var kvp in traces)
+                    foreach (var (key, profilerItem) in traces)
                     {
-                        p.WriteObject(kvp.Key, kvp.Value, (value, k) => k
+                        p.WriteObject(key, profilerItem, (value, k) => k
                             .WriteProperty("elapsedMsTotal", value.Total)
                             .WriteProperty("elapsedMsAvg", value.Total / value.Count)
                             .WriteProperty("count", value.Count));

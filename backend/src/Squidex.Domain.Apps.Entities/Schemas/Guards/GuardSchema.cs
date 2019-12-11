@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     fieldIndex++;
                     fieldPrefix = $"Fields[{fieldIndex}]";
 
-                    ValidateRootField(field, command, fieldPrefix, e);
+                    ValidateRootField(field, fieldPrefix, e);
                 }
 
                 foreach (var fieldName in command.Fields.Duplicates(x => x.Name))
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
         }
 
-        private static void ValidateRootField(UpsertSchemaField field, UpsertCommand command, string prefix, AddValidation e)
+        private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
         {
             if (field == null)
             {
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                             nestedIndex++;
                             nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
 
-                            ValidateNestedField(nestedField, field.Nested, nestedPrefix, e);
+                            ValidateNestedField(nestedField, nestedPrefix, e);
                         }
                     }
                     else if (field.Nested.Count > 0)
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateNestedField(UpsertSchemaNestedField nestedField, IEnumerable<UpsertSchemaFieldBase> fields, string prefix, AddValidation e)
+        private static void ValidateNestedField(UpsertSchemaNestedField nestedField, string prefix, AddValidation e)
         {
             if (nestedField == null)
             {
@@ -282,11 +282,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     else if (field == null && !isAllowed(fieldName))
                     {
-                        e($"Field is not part of the schema.", fieldPrefix);
+                        e("Field is not part of the schema.", fieldPrefix);
                     }
                     else if (field?.IsUI() == true)
                     {
-                        e($"Field cannot be an UI field.", fieldPrefix);
+                        e("Field cannot be an UI field.", fieldPrefix);
                     }
                 }
 
@@ -320,11 +320,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     else if (field == null && !isAllowed(fieldName))
                     {
-                        e($"Field is not part of the schema.", fieldPrefix);
+                        e("Field is not part of the schema.", fieldPrefix);
                     }
                     else if (field?.Properties?.IsUIProperty() == true)
                     {
-                        e($"Field cannot be an UI field.", fieldPrefix);
+                        e("Field cannot be an UI field.", fieldPrefix);
                     }
                 }
 

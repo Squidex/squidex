@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
         }
 
-        private ContentsDto CreateLinks(ApiController controller, string app, string schema)
+        private void CreateLinks(ApiController controller, string app, string schema)
         {
             var values = new { app, name = schema };
 
@@ -74,8 +74,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
                 AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
             }
-
-            return this;
         }
     }
 }

@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contents.QueryIdsAsync(ids);
+                return await contents.QueryIdsAsync(appId, ids);
             }
         }
 

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"assets/{asset.Id}?width=100";
         }
 
-        public string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)
+        public string GenerateAssetSourceUrl(IAssetEntity asset)
         {
             return $"assets/source/{asset.Id}";
         }

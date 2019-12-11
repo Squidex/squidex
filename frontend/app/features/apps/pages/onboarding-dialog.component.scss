@@ -15,24 +15,21 @@ p {
 }
 
 .col-image {
-    min-width: 489px;
-    max-width: 489px;
+    @include force-width(489px);
 }
 
 :host ::ng-deep {
     .modal {
         &-content,
         &-dialog {
-            min-height: $size-height;
-            max-height: $size-height;
-            min-width: $size-width;
-            max-width: $size-width;
+            @include force-width($size-width);
+            @include force-height($size-height);
         }
 
         &-content {
-            color: $color-dark-foreground;
             background-color: $color-dark-onboarding;
             background-image: url('./images/onboarding-background.png');
+            color: $color-dark-foreground;
             position: relative;
         }
 
@@ -42,9 +39,9 @@ p {
         }
 
         &-close {
-            text-decoration: underline !important;
-            cursor: pointer;
             color: $color-dark-foreground;
+            cursor: pointer;
+            text-decoration: underline !important;
         }
     }
 }
@@ -54,24 +51,23 @@ p {
 }
 
 .header-left {
-    @include absolute(-70px, auto, auto, 2rem);
+    @include absolute($t: -70px, $l: 2rem);
 }
 
 .header-right {
-    @include absolute(2rem, 2rem, auto, auto);
+    @include absolute($t: 2rem, $r: 2rem);
 }
 
 .footer {
-    @include absolute(auto, auto, 5rem, 2rem);
+    @include absolute($b: 5rem, $l: 2rem);
 }
 
 .onboarding {
     &-enter-leave {
         & {
-            text-align: center;
+            @include force-width(28rem);
             margin: 4rem auto 0;
-            max-width: 28rem;
-            min-width: 28rem;
+            text-align: center;
         }
 
         p {

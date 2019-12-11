@@ -138,13 +138,13 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Theory]
         public void Should_get_default_roles(string name)
         {
-            var found = roles_0.TryGet("app", name, out var role);
+            var found = roles_0.TryGet("app", name, out var result);
 
             Assert.True(found);
-            Assert.True(role!.IsDefault);
+            Assert.True(result!.IsDefault);
             Assert.True(roles_0.Contains(name));
 
-            foreach (var permission in role.Permissions)
+            foreach (var permission in result.Permissions)
             {
                 Assert.StartsWith("squidex.apps.app.", permission.Id);
             }
@@ -153,10 +153,10 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_return_null_if_role_not_found()
         {
-            var found = roles_0.TryGet("app", "custom", out var role);
+            var found = roles_0.TryGet("app", "custom", out var result);
 
             Assert.False(found);
-            Assert.Null(role);
+            Assert.Null(result);
         }
     }
 }

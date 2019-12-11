@@ -70,8 +70,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (contents.Any())
                 {
-                    var appVersion = context.App.Version;
-
                     var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
                     foreach (var content in contents)
@@ -190,10 +188,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         if (content.DataDraft.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                         {
-                            foreach (var partitionValue in fieldData)
+                            foreach (var (partition, partitionValue) in fieldData)
                             {
                                 var referencedContents =
-                                    field.GetReferencedIds(partitionValue.Value, Ids.ContentOnly)
+                                    field.GetReferencedIds(partitionValue, Ids.ContentOnly)
                                         .Select(x => references[x])
                                         .SelectMany(x => x)
                                         .ToList();
@@ -211,13 +209,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
-                                    fieldReference.AddJsonValue(partitionValue.Key, value);
+                                    fieldReference.AddJsonValue(partition, value);
                                 }
                                 else if (referencedContents.Count > 1)
                                 {
                                     var value = CreateFallback(context, referencedContents);
 
-                                    fieldReference.AddJsonValue(partitionValue.Key, value);
+                                    fieldReference.AddJsonValue(partition, value);
                                 }
                             }
                         }
@@ -245,10 +243,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                     if (content.DataDraft.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                     {
-                        foreach (var partitionValue in fieldData)
+                        foreach (var (partitionKey, partitionValue) in fieldData)
                         {
                             var referencedImage =
-                                field.GetReferencedIds(partitionValue.Value, Ids.ContentOnly)
+                                field.GetReferencedIds(partitionValue, Ids.ContentOnly)
                                     .Select(x => assets[x])
                                     .SelectMany(x => x)
                                     .FirstOrDefault(x => x.IsImage);
@@ -260,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 content.CacheDependencies.Add(referencedImage.Id);
                                 content.CacheDependencies.Add(referencedImage.Version);
 
-                                fieldReference.AddJsonValue(partitionValue.Key, JsonValue.Create(url));
+                                fieldReference.AddJsonValue(partitionKey, JsonValue.Create(url));
                             }
                         }
                     }
@@ -310,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 return EmptyContents;
             }
 
-            var references = await ContentQuery.QueryAsync(context.Clone().WithNoContentEnrichment(true), ids.ToList());
+            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), ids.ToList());
 
             return references.ToLookup(x => x.Id);
         }

@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupReader : DisposableObjectBase
+    public class BackupReader : DisposableObjectBase, IBackupReader
     {
         private readonly GuidMapper guidMapper = new GuidMapper();
         private readonly ZipArchive archive;
@@ -138,15 +138,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private void MapHeaders(EventData data)
         {
-            foreach (var kvp in data.Headers.ToList())
+            foreach (var (key, value) in data.Headers.ToList())
             {
-                if (kvp.Value.Type == JsonValueType.String)
+                if (value.Type == JsonValueType.String)
                 {
-                    var newGuid = guidMapper.NewGuidOrNull(kvp.Value.ToString());
+                    var newGuid = guidMapper.NewGuidOrNull(value.ToString());
 
                     if (newGuid != null)
                     {
-                        data.Headers.Add(kvp.Key, newGuid);
+                        data.Headers.Add(key, newGuid);
                     }
                 }
             }

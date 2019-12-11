@@ -4,8 +4,8 @@
 $icon-size: 4.5rem;
 
 .btn-text {
-    margin-top: -1rem;
     margin-left: -.5rem;
+    margin-top: -1rem;
 }
 
 .form-group {
@@ -32,16 +32,17 @@ $icon-size: 4.5rem;
     &-icon {
         & {
             @include border-radius;
-            height: $icon-size;
+            background: transparent;
+            border: 1px solid $color-border;
             color: $color-theme-blue;
             cursor: pointer;
-            border: 1px solid $color-border;
-            background: transparent;
-            margin-right: .5rem;
-            line-height: $icon-size;
             font-size: 1.75rem;
             font-weight: normal;
+            height: $icon-size;
+            line-height: $icon-size;
+            margin-right: .5rem;
             text-align: center;
+            text-decoration: none;
             width: $icon-size;
         }
 

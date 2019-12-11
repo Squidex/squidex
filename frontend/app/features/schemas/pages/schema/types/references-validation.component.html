@@ -4,7 +4,7 @@
 
         <div class="col-6">
             <sqx-tag-editor placeholder=", to add schema" formControlName="schemaIds"
-                [converter]="schemasSource" [suggestedValues]="schemasSource.suggestions">
+                [converter]="schemasSource.converter | async" [suggestedValues]="(schemasSource.converter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>

@@ -72,11 +72,18 @@ namespace LoadTest.Model
                     {
                         new UpsertSchemaFieldDto
                         {
-                            Name = "value",
+                            Name = "number",
                             Properties = new NumberFieldPropertiesDto
                             {
-                                IsRequired = true,
-                                IsListField = true
+                                IsRequired = true
+                            }
+                        },
+                        new UpsertSchemaFieldDto
+                        {
+                            Name = "string",
+                            Properties = new StringFieldPropertiesDto
+                            {
+                                IsRequired = false
                             }
                         }
                     },

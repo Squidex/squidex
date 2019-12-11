@@ -12,9 +12,9 @@
     }
 
     &-inner {
+        max-width: 75rem;
         padding: 2rem;
         padding-right: 1rem;
-        max-width: 75rem;
     }
 }
 
@@ -25,8 +25,8 @@
 :host ::ng-deep {
     canvas {
         height: 12rem !important;
-        margin-top: -1rem;
         margin-bottom: 0;
+        margin-top: -1rem;
     }
 }
 
@@ -38,12 +38,11 @@
 
 .card {
     & {
-        margin-right: 1rem;
-        margin-bottom: 1rem;
-        width: 16rem;
-        min-height: 16rem;
-        max-height: 16rem;
+        @include force-height(16rem);
         float: left;
+        margin-bottom: 1rem;
+        margin-right: 1rem;
+        width: 16rem;
     }
 
     &-lg {
@@ -60,14 +59,14 @@
 
     &-text {
         color: $color-text-decent;
-        font-weight: normal;
         font-size: .9rem;
+        font-weight: normal;
     }
 
     &-title {
         color: $color-title;
-        font-weight: light;
         font-size: 1.2rem;
+        font-weight: light;
         margin-top: 1rem;
     }
 
@@ -103,7 +102,7 @@
 
     &-value {
         font-size: 3rem;
-        margin-top: 1rem;
         margin-bottom: .5rem;
+        margin-top: 1rem;
     }
 }

@@ -11,21 +11,21 @@ h3 {
     }
 
     &-dump {
-        margin-top: 1rem;
         font-family: monospace;
         font-size: .8rem;
         font-weight: normal;
         height: 20rem;
+        margin-top: 1rem;
     }
 
     &-header {
         & {
-            padding: .75rem 1.25rem;
-            position: relative;
             background: $color-border;
             border: 0;
             margin: -.75rem -1.25rem;
             margin-bottom: 1rem;
+            padding: .75rem 1.25rem;
+            position: relative;
         }
 
         &::before {

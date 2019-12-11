@@ -17,12 +17,12 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class BackupSchemas : BackupHandler
+    public sealed class BackupSchemas : IBackupHandler
     {
         private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
         private readonly ISchemasIndex indexSchemas;
 
-        public override string Name { get; } = "Schemas";
+        public string Name { get; } = "Schemas";
 
         public BackupSchemas(ISchemasIndex indexSchemas)
         {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.indexSchemas = indexSchemas;
         }
 
-        public override Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return TaskHelper.True;
         }
 
-        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        public Task RestoreAsync(RestoreContext context)
         {
-            return indexSchemas.RebuildAsync(appId, schemasByName);
+            return indexSchemas.RebuildAsync(context.AppId, schemasByName);
         }
     }
 }

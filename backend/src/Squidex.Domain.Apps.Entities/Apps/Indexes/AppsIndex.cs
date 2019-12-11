@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 var apps =
                     await Task.WhenAll(ids
-                        .Select(id => GetAppAsync(id)));
+                        .Select(GetAppAsync));
 
                 return apps.Where(x => x != null).ToList();
             }
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var apps =
                     await Task.WhenAll(ids
                         .SelectMany(x => x)
-                        .Select(id => GetAppAsync(id)));
+                        .Select(GetAppAsync));
 
                 return apps.Where(x => x != null).ToList();
             }
@@ -217,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<string?> CheckAppAsync(IAppsByNameIndexGrain index, CreateApp command)
+        private static async Task<string?> CheckAppAsync(IAppsByNameIndexGrain index, CreateApp command)
         {
             var name = command.Name;
 

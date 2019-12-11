@@ -67,16 +67,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 .Returns(persistence2);
 
             A.CallTo(() => persistence1.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
-                .Invokes(new Action<IEnumerable<Envelope<IEvent>>>(events =>
-                {
-                    LastEvents = events;
-                }));
+                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
 
             A.CallTo(() => persistence2.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
-                .Invokes(new Action<IEnumerable<Envelope<IEvent>>>(events =>
-                {
-                    LastEvents = events;
-                }));
+                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
         }
 
         protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand

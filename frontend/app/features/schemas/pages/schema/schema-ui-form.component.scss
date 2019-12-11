@@ -4,9 +4,9 @@
 :host,
 .inner-form,
 .inner-main {
-    @include flex-box;
-    @include flex-grow(1);
-    @include flex-direction(column);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .inner-header,

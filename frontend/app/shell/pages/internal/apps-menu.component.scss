@@ -3,31 +3,33 @@
 
 $color-apps-border: #65a6ff;
 
+$color-nav-shadow: rgba(26, 93, 184, .26);
+
 .nav {
     & {
-        @include flex-direction(row);
+        flex-direction: row;
     }
 
     .nav-item {
         .nav-link {
             & {
-                @include box-shadow-colored(0, 2px, 4px, rgba(26, 93, 184, .26));
-                @include transition(opacity .4 ease);
-                @include opacity(.95);
-                @include no-selection;
                 @include border-radius;
-                cursor: pointer;
-                color: $color-dark-foreground;
-                border: 1px solid $color-theme-blue-lighter;
                 background: $color-theme-blue;
+                border: 1px solid $color-theme-blue-lighter;
+                box-shadow: 0, 2px, 4px $color-nav-shadow;
+                color: $color-dark-foreground;
+                cursor: pointer;
                 line-height: 1.25rem;
+                min-width: 150px;
+                opacity: .95;
                 padding-left: 1rem;
                 padding-right: 2rem;
-                min-width: 150px;
+                transition: opacity .4 ease;
+                user-select: none;
             }
 
             &:hover {
-                @include opacity(1);
+                opacity: 1;
             }
 
             &::after {
@@ -48,7 +50,7 @@ $color-apps-border: #65a6ff;
     }
 
     &-item {
-        @include border-radius(0);
+        border-radius: 0;
     }
 }
 
@@ -61,8 +63,8 @@ $color-apps-border: #65a6ff;
 }
 
 .apps-list {
-    max-height: 600px;
     margin: -.5rem 0;
+    max-height: 600px;
     overflow-y: auto;
 }
 

@@ -47,16 +47,16 @@ namespace Squidex.Web
         {
             var sb = new StringBuilder();
 
-            foreach (var kvp in this)
+            foreach (var (key, value) in this)
             {
                 if (sb.Length > 0)
                 {
                     sb.Append(", ");
                 }
 
-                sb.Append(kvp.Key);
+                sb.Append(key);
                 sb.Append(": ");
-                sb.Append(kvp.Value);
+                sb.Append(value);
             }
 
             return sb.ToString();

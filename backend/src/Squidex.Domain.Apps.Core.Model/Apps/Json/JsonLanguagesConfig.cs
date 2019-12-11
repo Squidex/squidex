@@ -43,9 +43,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             {
                 var i = 0;
 
-                foreach (var config in Languages)
+                foreach (var (key, value) in Languages)
                 {
-                    languagesConfig[i++] = config.Value.ToConfig(config.Key);
+                    languagesConfig[i++] = value.ToConfig(key);
                 }
             }
 

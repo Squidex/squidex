@@ -95,11 +95,11 @@ namespace Squidex.Infrastructure.Http
                 return;
             }
 
-            foreach (var header in headers)
+            foreach (var (key, value) in headers)
             {
-                writer.Append(header.Key);
+                writer.Append(key);
                 writer.Append(": ");
-                writer.Append(string.Join("; ", header.Value));
+                writer.Append(string.Join("; ", value));
                 writer.AppendLine();
             }
         }

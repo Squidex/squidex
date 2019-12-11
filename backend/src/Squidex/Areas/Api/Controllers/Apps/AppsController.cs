@@ -36,18 +36,21 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
+        private readonly IAppImageStore appImageStore;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
 
         public AppsController(ICommandBus commandBus,
+            IAppImageStore appImageStore,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider)
             : base(commandBus)
         {
+            this.appImageStore = appImageStore;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.appProvider = appProvider;
@@ -179,12 +182,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var handler = new Func<Stream, Task>(async bodyStream =>
             {
-                var assetId = App.Id.ToString();
-                var assetResizedId = $"{assetId}_{etag}_Resized";
+                var resizedAsset = $"{App.Id}_{etag}_Resized";
 
                 try
                 {
-                    await assetStore.DownloadAsync(assetResizedId, bodyStream);
+                    await assetStore.DownloadAsync(resizedAsset, bodyStream);
                 }
                 catch (AssetNotFoundException)
                 {
@@ -196,7 +198,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                             {
                                 using (Profiler.Trace("ResizeDownload"))
                                 {
-                                    await assetStore.DownloadAsync(assetId, sourceStream);
+                                    await appImageStore.DownloadAsync(App.Id, sourceStream);
                                     sourceStream.Position = 0;
                                 }
 
@@ -208,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                                 using (Profiler.Trace("ResizeUpload"))
                                 {
-                                    await assetStore.UploadAsync(assetResizedId, destinationStream);
+                                    await assetStore.UploadAsync(resizedAsset, destinationStream);
                                     destinationStream.Position = 0;
                                 }
 

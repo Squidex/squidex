@@ -20,7 +20,7 @@ namespace LoadTest
         {
             Task.Run(async () =>
             {
-                Client = await TestClient.BuildAsync("reading");
+                Client = await TestClient.BuildAsync("writing");
             }).Wait();
         }
 

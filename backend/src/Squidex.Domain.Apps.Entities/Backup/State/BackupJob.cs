@@ -11,7 +11,7 @@ using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
-    public sealed class BackupStateJob : IBackupJob
+    public sealed class BackupJob : IBackupJob
     {
         [DataMember]
         public Guid Id { get; set; }

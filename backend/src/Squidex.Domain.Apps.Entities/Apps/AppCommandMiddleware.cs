@@ -18,22 +18,22 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppCommandMiddleware : GrainCommandMiddleware<AppCommand, IAppGrain>
     {
-        private readonly IAssetStore assetStore;
+        private readonly IAppImageStore appImageStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IContextProvider contextProvider;
 
         public AppCommandMiddleware(
             IGrainFactory grainFactory,
-            IAssetStore assetStore,
+            IAppImageStore appImageStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IContextProvider contextProvider)
             : base(grainFactory)
         {
             Guard.NotNull(contextProvider);
-            Guard.NotNull(assetStore);
+            Guard.NotNull(appImageStore);
             Guard.NotNull(assetThumbnailGenerator);
 
-            this.assetStore = assetStore;
+            this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.contextProvider = contextProvider;
         }
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 throw new ValidationException("File is not an image.");
             }
 
-            await assetStore.UploadAsync(uploadImage.AppId.ToString(), file.OpenRead(), true);
+            await appImageStore.UploadAsync(uploadImage.AppId, file.OpenRead());
         }
     }
 }

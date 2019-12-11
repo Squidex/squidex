@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Theory, InlineData(true), InlineData(false)]
         public async Task Should_remove_app_from_indexes_on_archive(bool isArchived)
         {
-            var app = SetupApp(0, isArchived);
+            SetupApp(0, isArchived);
 
             var context =
                 new CommandContext(new ArchiveApp { AppId = appId.Id }, commandBus)
