@@ -7,12 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -20,13 +16,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
-        private readonly IndexWriter indexWriter;
+        private readonly IIndex index;
         private readonly IndexState indexState;
         private readonly Guid id;
 
-        public TextIndexContent(IndexWriter indexWriter, IndexState indexState, Guid id)
+        public TextIndexContent(IIndex index, IndexState indexState, Guid id)
         {
-            this.indexWriter = indexWriter;
+            this.index = index;
             this.indexState = indexState;
 
             this.id = id;
@@ -34,60 +30,68 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Delete()
         {
-            indexWriter.DeleteDocuments(new Term(MetaId, id.ToString()));
+            index.Writer.DeleteDocuments(new Term(MetaId, id.ToString()));
         }
 
-        public static bool TryGetId(int docId, Scope scope, IndexReader reader, IndexState indexState, out Guid result)
+        public static bool TryGetId(int docId, Scope scope, IIndex index, IndexState indexState, out Guid result)
         {
             result = Guid.Empty;
 
-            if (!indexState.TryGet(docId, out var draft, out var published))
+            indexState.Get(docId, out var draft, out var published);
+
+            if (scope == Scope.Draft && !draft)
             {
                 return false;
             }
 
-            if (scope == Scope.Draft && draft != 1)
+            if (scope == Scope.Published && !published)
             {
                 return false;
             }
 
-            if (scope == Scope.Published && published != 1)
+            var document = index.Searcher?.Doc(docId);
+
+            if (document != null)
             {
-                return false;
-            }
+                var idString = document.Get(MetaId);
 
-            var document = reader.Document(docId);
-
-            var idString = document.Get(MetaId);
-
-            if (!Guid.TryParse(idString, out result))
-            {
-                return false;
+                if (!Guid.TryParse(idString, out result))
+                {
+                    return false;
+                }
             }
 
             return true;
         }
 
-        public void Index(NamedContentData data, bool onlyDraft)
+        public void Index(Dictionary<string, string> text, bool onlyDraft)
         {
-            var converted = CreateDocument(data);
+            var converted = CreateDocument(text);
 
-            Upsert(converted, 1, 1, 0);
+            Upsert(converted, Scope.Draft,
+                forDraft: true,
+                forPublished: false);
 
-            var isPublishDocumentAdded = IsAdded(0, out var docId);
-            var isPublishForPublished = IsForPublished(0, docId);
+            var isPublishDocumentAdded = IsAdded(Scope.Published, out var docId);
+            var isPublishForPublished = IsForPublished(Scope.Published, docId);
 
             if (!onlyDraft && isPublishDocumentAdded && isPublishForPublished)
             {
-                Upsert(converted, 0, 0, 1);
+                Upsert(converted, Scope.Published,
+                    forDraft: false,
+                    forPublished: true);
             }
             else if (!onlyDraft || !isPublishDocumentAdded)
             {
-                Upsert(converted, 0, 0, 0);
+                Upsert(converted, Scope.Published,
+                    forDraft: false,
+                    forPublished: false);
             }
             else
             {
-                UpdateFor(0, 0, isPublishForPublished ? (byte)1 : (byte)0);
+                UpdateFor(Scope.Published,
+                    forDraft: false,
+                    forPublished: isPublishForPublished);
             }
         }
 
@@ -95,119 +99,74 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (fromDraft)
             {
-                UpdateFor(1, 1, 0);
-                UpdateFor(0, 0, 1);
+                UpdateFor(Scope.Draft,
+                    forDraft: true,
+                    forPublished: false);
+
+                UpdateFor(Scope.Published,
+                    forDraft: false,
+                    forPublished: true);
             }
             else
             {
-                UpdateFor(1, 0, 0);
-                UpdateFor(0, 1, 1);
+                UpdateFor(Scope.Draft,
+                    forDraft: false,
+                    forPublished: false);
+
+                UpdateFor(Scope.Published,
+                    forDraft: true,
+                    forPublished: true);
             }
         }
 
-        private static Document CreateDocument(NamedContentData data)
+        private static Document CreateDocument(Dictionary<string, string> text)
         {
-            var languages = new Dictionary<string, StringBuilder>();
-
-            void AppendText(string language, string text)
-            {
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    var sb = languages.GetOrAddNew(language);
-
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(" ");
-                    }
-
-                    sb.Append(text);
-                }
-            }
-
-            foreach (var field in data)
-            {
-                if (field.Value != null)
-                {
-                    foreach (var fieldValue in field.Value)
-                    {
-                        var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
-
-                        AppendJsonText(fieldValue.Value, appendText);
-                    }
-                }
-            }
-
             var document = new Document();
 
-            foreach (var field in languages)
+            foreach (var (key, value) in text)
             {
-                document.AddTextField(field.Key, field.Value.ToString(), Field.Store.NO);
+                document.AddTextField(key, value, Field.Store.NO);
             }
 
             return document;
         }
 
-        private void UpdateFor(byte draft, byte forDraft, byte forPublished)
+        private void UpdateFor(Scope scope, bool forDraft, bool forPublished)
         {
-            var term = new Term(MetaKey, BuildKey(draft));
+            var term = new Term(MetaKey, BuildKey(scope));
 
-            indexState.Index(id, draft, term, forDraft, forPublished);
+            indexState.Index(id, scope, term, forDraft, forPublished);
         }
 
-        private void Upsert(Document document, byte draft, byte forDraft, byte forPublished)
+        private void Upsert(Document document, Scope draft, bool forDraft, bool forPublished)
         {
-            if (document != null)
-            {
-                document.RemoveField(MetaId);
-                document.RemoveField(MetaKey);
+            var contentKey = BuildKey(draft);
 
-                var contentId = id.ToString();
-                var contentKey = BuildKey(draft);
+            document.SetField(MetaId, id.ToString());
+            document.SetField(MetaKey, contentKey);
 
-                document.AddStringField(MetaId, contentId, Field.Store.YES);
-                document.AddStringField(MetaKey, contentKey, Field.Store.YES);
+            indexState.Index(id, draft, document, forDraft, forPublished);
 
-                indexState.Index(id, draft, document, forDraft, forPublished);
-
-                indexWriter.UpdateDocument(new Term(MetaKey, contentKey), document);
-            }
+            index.Writer.UpdateDocument(new Term(MetaKey, contentKey), document);
         }
 
-        private static void AppendJsonText(IJsonValue value, Action<string> appendText)
+        private bool IsAdded(Scope scope, out int docId)
         {
-            if (value.Type == JsonValueType.String)
-            {
-                appendText(value.ToString());
-            }
-            else if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    AppendJsonText(item, appendText);
-                }
-            }
-            else if (value is JsonObject obj)
-            {
-                foreach (var item in obj.Values)
-                {
-                    AppendJsonText(item, appendText);
-                }
-            }
+            var term = new Term(MetaKey, BuildKey(scope));
+
+            return indexState.HasBeenAdded(id, scope, term, out docId);
         }
 
-        private bool IsAdded(byte draft, out int docId)
+        private bool IsForPublished(Scope scope, int docId)
         {
-            return indexState.HasBeenAdded(id, draft, new Term(MetaKey, BuildKey(draft)), out docId);
+            indexState.Get(id, scope, docId, out _, out var forPublished);
+
+            return forPublished;
         }
 
-        private bool IsForPublished(byte draft, int docId)
+        private string BuildKey(Scope scope)
         {
-            return indexState.TryGet(id, draft, docId, out _, out var p) && p == 1;
-        }
-
-        private string BuildKey(byte draft)
-        {
-            return $"{id}_{draft}";
+            return $"{id}_{(scope == Scope.Draft ? 1 : 0)}";
         }
     }
 }

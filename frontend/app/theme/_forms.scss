@@ -14,8 +14,8 @@
 
             &:hover,
             &:focus {
-                @include box-shadow-colored(0, 0, .2rem, $color-theme-error);
                 border-color: $color-theme-error-dark;
+                box-shadow: 0 0 .2rem, $color-theme-error;
             }
         }
     }
@@ -33,11 +33,11 @@
     // Small triangle under the error tooltip with the border trick.
     &::after {
         @include absolute(auto, auto, -.75rem, .625rem);
-        content: '';
-        height: 0;
+        border-color: $color-theme-error transparent transparent;
         border-style: solid;
         border-width: .4rem;
-        border-color: $color-theme-error transparent transparent;
+        content: '';
+        height: 0;
         width: 0;
     }
 
@@ -45,6 +45,7 @@
     & {
         @include absolute(auto, auto, .4rem, 0);
         @include border-radius(2px);
+        background: $color-theme-error;
         color: $color-dark-foreground;
         cursor: none;
         display: inline-block;
@@ -53,7 +54,6 @@
         line-height: 1.1rem;
         padding: .25rem .4rem;
         padding-bottom: .5rem;
-        background: $color-theme-error;
     }
 }
 
@@ -72,18 +72,18 @@
     & {
         @include border-radius(4px);
         color: $color-dark-foreground;
-        margin-top: .25rem;
-        margin-bottom: .8rem;
         font-size: .9rem;
         font-weight: normal;
+        margin-bottom: .8rem;
+        margin-top: .25rem;
         padding: .5rem;
         padding-right: 1.5rem;
     }
 
     &-close {
         @include absolute(0, 0, auto, auto);
-        padding: .5rem;
         display: none;
+        padding: .5rem;
     }
 
     &-error {
@@ -120,21 +120,21 @@
 
     .form-alert {
         @include absolute(.25rem, 0, auto, auto);
-        padding: 1rem;
-        min-width: 200px;
-        max-width: 600px;
         font-size: 1rem;
         font-weight: normal;
+        max-width: 600px;
+        min-width: 200px;
+        padding: 1rem;
         text-align: left;
         z-index: 2000;
 
         &::after {
             @include absolute(-.75rem, .625rem, auto, auto);
-            content: '';
-            height: 0;
+            border-color: transparent transparent $color-theme-error;
             border-style: solid;
             border-width: .4rem;
-            border-color: transparent transparent $color-theme-error;
+            content: '';
+            height: 0;
             width: 0;
         }
     }
@@ -148,11 +148,11 @@
         @include absolute(2px, auto, auto, 0);
         @include border-radius(.25em);
         @include box-shadow;
-        max-height: 15rem;
-        border: 1px solid $color-input-border;
         background: $color-dark-foreground;
-        padding: .25rem 0;
+        border: 1px solid $color-input;
+        max-height: 15rem;
         overflow-y: auto;
+        padding: .25rem 0;
     }
 
     &-item {
@@ -166,9 +166,9 @@
 
         &.active,
         &:hover {
-            color: $color-dark-foreground;
-            border: 0;
             background: $color-theme-blue;
+            border: 0;
+            color: $color-dark-foreground;
         }
     }
 }
@@ -218,7 +218,7 @@ label {
 //
 .search-form {
     & {
-        @include flex-grow(1);
+        flex-grow: 1;
         position: relative;
     }
 
@@ -239,11 +239,11 @@ label {
 // Dark form control for the dark panel.
 .form-control-dark {
     & {
-        @include transition(background-color .3s ease);
         @include placeholder-color($color-dark2-placeholder);
         background: $color-dark2-control;
         border: 1px solid $color-dark2-control;
         color: darken($color-dark-foreground, 20%);
+        transition: background-color .3s ease;
     }
 
     &:focus {
@@ -256,38 +256,43 @@ label {
 input {
     &.form-underlined {
         & {
-            @include border-radius(0);
-            padding-left: 0;
-            padding-right: 0;
             border: 0;
-            border-bottom: 1px solid $color-input-border;
+            border-bottom: 1px solid $color-input;
+            border-radius: 0;
         }
 
         &:focus,
         &.focus {
-            @include box-shadow-none;
             background: transparent;
-            border-color: transparent;
             border-bottom-color: $color-theme-blue;
+            box-shadow: none;
             outline: none;
+        }
+
+        &:disabled {
+            background: none;
+        }
+
+        &[readonly] {
+            background: none;
         }
 
         &.ng-invalid {
             &.ng-touched,
             &.ng-dirty {
                 & {
-                    @include box-shadow-none;
                     background: transparent;
-                    border-color: transparent;
                     border-bottom-color: $color-theme-error;
+                    border-color: transparent;
+                    box-shadow: none;
                     outline: none;
                 }
 
                 &:hover,
                 &:focus {
-                    @include box-shadow-none;
-                    border-color: transparent;
                     border-bottom-color: $color-theme-error-dark;
+                    border-color: transparent;
+                    box-shadow: none;
                 }
             }
         }

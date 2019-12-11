@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             var postsId = await CreateBasicsSchemaAsync(publish);
 
-            await publish(new CreateContent
+            await publish(new UpdateContent
             {
-                SchemaId = postsId,
+                ContentId = postsId.Id,
                 Data =
                     new NamedContentData()
                         .AddField("firstName",
@@ -70,8 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                                 .AddValue("Doe"))
                         .AddField("profession",
                             new ContentFieldData()
-                                .AddValue("Software Developer")),
-                Publish = true
+                                .AddValue("Software Developer"))
             });
         }
 
@@ -79,6 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             var command =
                 SchemaBuilder.Create("Basics")
+                    .Singleton()
                     .AddString("First Name", f => f
                         .Required()
                         .ShowInList()

@@ -1,6 +1,6 @@
 <sqx-title message="Languages"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
         Languages
     </ng-container>
@@ -14,17 +14,21 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
-            <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
-                [language]="languageInfo.language" 
-                [fallbackLanguages]="languageInfo.fallbackLanguages"
-                [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
-            </sqx-language>
-
-            <sqx-language-add-form *ngIf="languagesState.canCreate | async"
-                [newLanguages]="languagesState.newLanguages | async">
-            </sqx-language-add-form>
-        </ng-container>
+        <sqx-list-view [isLoading]="languagesState.isLoading | async">
+            <div content>
+                <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
+                    <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
+                        [language]="languageInfo.language" 
+                        [fallbackLanguages]="languageInfo.fallbackLanguages"
+                        [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
+                    </sqx-language>
+        
+                    <sqx-language-add-form *ngIf="languagesState.canCreate | async"
+                        [newLanguages]="languagesState.newLanguages | async">
+                    </sqx-language-add-form>
+                </ng-container>
+            </div>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

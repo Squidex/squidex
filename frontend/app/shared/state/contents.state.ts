@@ -7,11 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { empty, forkJoin, Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ErrorDto,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State,
@@ -42,6 +43,9 @@ interface Snapshot {
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the contents are loading.
+    isLoading?: boolean;
+
     // The statuses.
     statuses?: ReadonlyArray<StatusInfo>;
 
@@ -60,6 +64,8 @@ function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
+    private previousId: string;
+
     public selectedContent =
         this.project(x => x.selectedContent, sameContent);
 
@@ -74,6 +80,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -93,9 +102,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService
     ) {
-        super({ contents: [], contentsPager: new Pager(0), contentsQueryJson: '' });
+        super({
+            contents: [],
+            contentsPager: Pager.fromLocalStore('contents', localStore),
+            contentsQueryJson: ''
+        });
+
+        this.contentsPager.subscribe(pager => {
+            pager.saveTo('contents', this.localStore);
+        });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -115,7 +133,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             of(this.snapshot.contents.find(x => x.id === id)).pipe(
                 switchMap(content => {
                     if (!content) {
-                        return this.contentsService.getContent(this.appName, this.schemaName, id).pipe(catchError(() => of(null)));
+                        return this.contentsService.getContent(this.appName, this.schemaId, id).pipe(catchError(() => of(null)));
                     } else {
                         return of(content);
                     }
@@ -123,8 +141,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (!isReload) {
-            this.resetState();
+        if (!isReload && this.schemaId !== this.previousId) {
+            const contentsPager = this.snapshot.contentsPager.reset();
+
+            this.resetState({ contentsPager, selectedContent: this.snapshot.selectedContent });
         }
 
         return this.loadInternal(isReload);
@@ -138,16 +158,20 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    private loadInternal(isReload = false) {
+    private loadInternal(isReload: boolean) {
         return this.loadInternalCore(isReload).pipe(shareSubscribed(this.dialogs));
     }
 
-    private loadInternalCore(isReload = false) {
-        if (!this.appName) {
+    private loadInternalCore(isReload: boolean) {
+        if (!this.appName || !this.schemaId) {
             return empty();
         }
 
-        return this.contentsService.getContents(this.appName, this.schemaName,
+        this.next({ isLoading: true });
+
+        this.previousId = this.schemaId;
+
+        return this.contentsService.getContents(this.appName, this.schemaId,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined).pipe(
@@ -173,20 +197,24 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contents,
                         contentsPager,
                         isLoaded: true,
+                        isLoading: false,
                         selectedContent,
                         statuses
                     };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }));
     }
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
+        return this.contentsService.getVersionData(this.appName, this.schemaId, content.id, version).pipe(
             shareSubscribed(this.dialogs));
     }
 
     public create(request: any, publish: boolean): Observable<ContentDto> {
-        return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
+        return this.contentsService.postContent(this.appName, this.schemaId, request, publish).pipe(
             tap(payload => {
                 this.dialogs.notifyInfo('Content created successfully.');
 
@@ -214,7 +242,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return of(error);
             }),
-            switchMap(() => this.loadInternalCore()),
+            switchMap(() => this.loadInternalCore(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -232,7 +260,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return of(error);
             }),
-            switchMap(() => this.loadInternal()),
+            switchMap(() => this.loadInternal(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -297,21 +325,15 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(contentsQuery?: Query): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
+        this.next(s => ({ ...s, contentsPager: s.contentsPager.reset(), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
-    public goNext(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.goNext() }));
+    public setPager(contentsPager: Pager) {
+        this.next(s => ({ ...s, contentsPager }));
 
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.goPrev() }));
-
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     public isQueryUsed(saved: SavedQuery) {
@@ -338,18 +360,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    protected abstract get schemaName(): string;
+    protected abstract get schemaId(): string;
 }
 
 @Injectable()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
+    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs, localStore);
     }
 
-    protected get schemaName() {
+    protected get schemaId() {
         return this.schemasState.schemaName;
     }
 }
@@ -359,12 +381,12 @@ export class ManualContentsState extends ContentsStateBase {
     public schema: SchemaDto;
 
     constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService
     ) {
-        super(appsState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs, localStore);
     }
 
-    protected get schemaName() {
+    protected get schemaId() {
         return this.schema.name;
     }
 }

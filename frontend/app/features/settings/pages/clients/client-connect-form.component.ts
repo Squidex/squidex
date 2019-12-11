@@ -14,17 +14,13 @@ import {
     ClientDto,
     ClientsService,
     DialogService,
-    fadeAnimation,
     RoleDto
 } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
-    templateUrl: './client-connect-form.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './client-connect-form.component.html'
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()
@@ -67,7 +63,7 @@ export class ClientConnectFormComponent implements OnInit {
             .subscribe(dto => {
                 this.connectToken = dto;
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             }, error => {
                 this.dialogs.notifyError(error);
             });

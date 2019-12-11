@@ -10,6 +10,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public enum ReferencesFieldEditor
     {
         List,
-        Dropdown
+        Dropdown,
+        Tags
     }
 }

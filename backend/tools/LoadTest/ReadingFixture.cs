@@ -36,7 +36,7 @@ namespace LoadTest
 
                     for (var i = 10; i > 0; i--)
                     {
-                        await Client.CreateAsync(new TestEntityData { Value = i }, true);
+                        await Client.CreateAsync(new TestEntityData { Number = i }, true);
                     }
                 }
 

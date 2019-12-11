@@ -43,14 +43,6 @@ export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
         this.ruleEventsState.load(true);
     }
 
-    public goNext() {
-        this.ruleEventsState.goNext();
-    }
-
-    public goPrev() {
-        this.ruleEventsState.goPrev();
-    }
-
     public enqueue(event: RuleEventDto) {
         this.ruleEventsState.enqueue(event);
     }

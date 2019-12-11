@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
 
         private readonly IMongoDatabase mongoDatabase;
-        private Lazy<IMongoCollection<TEntity>> mongoCollection;
+        private readonly Lazy<IMongoCollection<TEntity>> mongoCollection;
 
         protected IMongoCollection<TEntity> Collection
         {

@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -26,6 +26,9 @@ interface Snapshot {
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the backups are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create new backups.
     canCreate?: boolean;
 }
@@ -43,6 +46,9 @@ export class BackupsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
@@ -55,8 +61,16 @@ export class BackupsState extends State<Snapshot> {
     }
 
     public load(isReload = false, silent = false): Observable<any> {
-        if (!isReload) {
+        if (isReload && !silent) {
             this.resetState();
+        }
+
+        return this.loadInternal(isReload, silent);
+    }
+
+    private loadInternal(isReload: boolean, silent: boolean): Observable<any> {
+        if (!silent) {
+            this.next({ isLoading: true });
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
@@ -65,9 +79,15 @@ export class BackupsState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
 
-                this.next(s => {
-                    return { ...s, backups, isLoaded: true, canCreate };
+                this.next({
+                    backups,
+                    canCreate,
+                    isLoaded: true,
+                    isLoading: false
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs, { silent }));
     }

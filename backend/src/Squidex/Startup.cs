@@ -54,7 +54,7 @@ namespace Squidex
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory();
             services.AddSquidexIdentity(config);
-            services.AddSquidexIdentityServer();
+            services.AddSquidexIdentityServer(config);
             services.AddSquidexInfrastructure(config);
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);

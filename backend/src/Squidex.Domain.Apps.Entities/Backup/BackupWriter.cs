@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupWriter : DisposableObjectBase
+    public sealed class BackupWriter : DisposableObjectBase, IBackupWriter
     {
         private readonly ZipArchive archive;
         private readonly IJsonSerializer serializer;

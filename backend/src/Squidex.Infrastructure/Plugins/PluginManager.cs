@@ -119,12 +119,12 @@ namespace Squidex.Infrastructure.Plugins
                     .WriteProperty("status", status)
                     .WriteArray("errors", e =>
                     {
-                        foreach (var error in exceptions)
+                        foreach (var (plugin, action, exception) in exceptions)
                         {
                             e.WriteObject(x => x
-                                .WriteProperty("plugin", error.Plugin)
-                                .WriteProperty("action", error.Action)
-                                .WriteException(error.Exception));
+                                .WriteProperty("plugin", plugin)
+                                .WriteProperty("action", action)
+                                .WriteException(exception));
                         }
                     })
                     .WriteArray("plugins", a =>

@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 var sourceName = GetFileName(sourceFileName, nameof(sourceFileName));
 
-                using (var readStream = await bucket.OpenDownloadStreamAsync(sourceFileName, cancellationToken: ct))
+                using (var readStream = await bucket.OpenDownloadStreamAsync(sourceName, cancellationToken: ct))
                 {
                     await UploadAsync(targetFileName, readStream, false, ct);
                 }
@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Assets
                     await DeleteAsync(fileName);
                 }
 
-                await bucket.UploadFromStreamAsync(fileName, fileName, stream, cancellationToken: ct);
+                await bucket.UploadFromStreamAsync(name, name, stream, cancellationToken: ct);
             }
             catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
             {
@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static string GetFileName(string fileName, string parameterName)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, parameterName);
 
             return fileName;
         }

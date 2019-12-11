@@ -16,7 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, Guid appId, string hash);
 
-        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Q query);
+        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Guid? parentId, Q query);
+
+        Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, Guid parentId);
+
+        Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(Guid id);
 
         Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, Guid id);
     }

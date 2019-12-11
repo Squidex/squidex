@@ -26,7 +26,8 @@ if ($all -Or $infrastructure) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
+	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
 	-oldStyle
@@ -37,7 +38,8 @@ if ($all -Or $appsCore) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
+	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Core.xml" `
 	-oldStyle
@@ -48,7 +50,8 @@ if ($all -Or $appsEntities) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
+	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Entities.xml" `
 	-oldStyle
@@ -59,7 +62,8 @@ if ($all -Or $users) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
+	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Users.xml" `
 	-oldStyle
@@ -70,12 +74,13 @@ if ($all -Or $web) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
+	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Web.xml" `
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.3.3\tools\net47\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\4.3.6\tools\net47\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

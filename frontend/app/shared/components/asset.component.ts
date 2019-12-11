@@ -9,29 +9,21 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
 
 import {
     AssetDto,
+    AssetsState,
     AssetUploaderState,
     DialogModel,
     DialogService,
-    fadeAnimation,
-    StatefulComponent,
     Types,
     UploadCanceled
 } from '@app/shared/internal';
-
-interface State {
-    progress: number;
-}
 
 @Component({
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetComponent extends StatefulComponent<State> implements OnInit {
+export class AssetComponent implements OnInit {
     @Output()
     public load = new EventEmitter<AssetDto>();
 
@@ -42,19 +34,19 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public remove = new EventEmitter();
 
     @Output()
-    public update = new EventEmitter();
-
-    @Output()
     public delete = new EventEmitter();
 
     @Output()
     public select = new EventEmitter();
 
     @Input()
-    public initFile: File;
+    public assetFile: File;
 
     @Input()
     public asset: AssetDto;
+
+    @Input()
+    public assetsState: AssetsState;
 
     @Input()
     public removeMode = false;
@@ -77,24 +69,24 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public allTags: ReadonlyArray<string>;
 
+    public progress = 0;
+
     public editDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly assetUploader: AssetUploaderState,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
-        super(changeDetector, {
-            progress: 0
-        });
     }
 
     public ngOnInit() {
-        const initFile = this.initFile;
+        const assetFile = this.assetFile;
 
-        if (initFile) {
+        if (assetFile) {
             this.setProgress(1);
 
-            this.assetUploader.uploadFile(initFile)
+            this.assetUploader.uploadFile(assetFile, this.assetsState)
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);
@@ -116,11 +108,13 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
             this.setProgress(1);
 
             this.assetUploader.uploadAsset(this.asset, files[0])
-                .subscribe(dto => {
-                    if (Types.isNumber(dto)) {
-                        this.setProgress(dto);
+                .subscribe(asset => {
+                    if (Types.isNumber(asset)) {
+                        this.setProgress(asset);
                     } else {
-                        this.updateAsset(dto, true);
+                        this.setProgress(0);
+
+                        this.asset = asset;
                     }
                 }, error => {
                     this.dialogs.notifyError(error);
@@ -136,10 +130,6 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (!this.isDisabled) {
             this.editDialog.show();
         }
-    }
-
-    public cancelEdit() {
-        this.editDialog.hide();
     }
 
     public emitSelect() {
@@ -158,27 +148,13 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         this.loadError.emit(error);
     }
 
-    public emitUpdate() {
-        this.update.emit();
-    }
-
     public emitRemove() {
         this.remove.emit();
     }
 
     private setProgress(progress: number) {
-        this.next(s => ({ ...s, progress }));
-    }
+        this.progress = progress;
 
-    public updateAsset(asset: AssetDto, emitEvent: boolean) {
-        this.asset = asset;
-
-        if (emitEvent) {
-            this.emitUpdate();
-        }
-
-        this.next(s => ({ ...s, progress: 0 }));
-
-        this.cancelEdit();
+        this.changeDetector.markForCheck();
     }
 }

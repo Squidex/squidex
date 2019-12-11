@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -22,6 +23,7 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
+using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -100,6 +102,10 @@ namespace Squidex.Config.Domain
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>();
 
+                    services.AddSingletonAs<MongoAssetFolderRepository>()
+                        .As<IAssetFolderRepository>()
+                        .As<ISnapshotStore<AssetFolderState, Guid>>();
+
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),
@@ -117,6 +123,18 @@ namespace Squidex.Config.Domain
                         services.AddSingletonAs<MongoPersistedGrantStore>()
                             .As<IPersistedGrantStore>();
                     }
+
+                    services.AddSingletonAs(c =>
+                    {
+                        var database = c.GetRequiredService<IMongoDatabase>();
+
+                        var mongoBucket = new GridFSBucket<string>(database, new GridFSBucketOptions
+                        {
+                            BucketName = "fullText"
+                        });
+
+                        return new MongoIndexStorage(mongoBucket);
+                    }).As<IIndexStorage>();
                 }
             });
 

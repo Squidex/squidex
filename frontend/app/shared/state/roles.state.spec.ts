@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -38,7 +39,7 @@ describe('RolesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         rolesService = Mock.ofType<RolesService>();
-        rolesState = new RolesState(rolesService.object, appsState.object, dialogs.object);
+        rolesState = new RolesState(appsState.object, dialogs.object, rolesService.object);
     });
 
     describe('Loading', () => {
@@ -48,11 +49,21 @@ describe('RolesState', () => {
 
             rolesState.load().subscribe();
 
-            expect(rolesState.snapshot.roles).toEqual(oldRoles.items);
             expect(rolesState.snapshot.isLoaded).toBeTruthy();
+            expect(rolesState.snapshot.isLoading).toBeFalsy();
+            expect(rolesState.snapshot.roles).toEqual(oldRoles.items);
             expect(rolesState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            rolesService.setup(x => x.getRoles(app))
+                .returns(() => throwError('error'));
+
+            rolesState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(rolesState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {

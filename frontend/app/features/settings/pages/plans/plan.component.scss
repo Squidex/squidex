@@ -3,15 +3,15 @@
 
 .plan {
     & {
-        min-width: 13rem;
-        max-width: 20rem;
         margin: .5rem;
+        max-width: 20rem;
+        min-width: 13rem;
     }
 
     &-price {
         color: $color-theme-blue;
-        margin-top: 0;
         margin-bottom: 0;
+        margin-top: 0;
     }
 
     &-selected {

@@ -6,6 +6,7 @@
  */
 
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { SchemaCategory, SchemasState } from './schemas.state';
@@ -87,8 +88,9 @@ describe('SchemasState', () => {
             schemasState.addCategory('category3');
             schemasState.load(true).subscribe();
 
-            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
+            expect(schemasState.snapshot.isLoading).toBeFalsy();
+            expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
 
             const categories = getCategories(schemasState);
 
@@ -99,6 +101,15 @@ describe('SchemasState', () => {
             ]);
 
             schemasService.verifyAll();
+        });
+
+        it('should reset loading when loading failed', () => {
+            schemasService.setup(x => x.getSchemas(app))
+                .returns(() => throwError('error'));
+
+            schemasState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(schemasState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {
@@ -207,7 +218,7 @@ describe('SchemasState', () => {
 
         it('should return schema on get and cache it', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
-                .returns(() => of(schema)).verifiable(Times.exactly(1));
+                .returns(() => of(schema)).verifiable(Times.once());
 
             schemasState.loadSchema(schema1.name, true).subscribe();
             schemasState.loadSchema(schema1.name, true).subscribe();
@@ -217,7 +228,7 @@ describe('SchemasState', () => {
 
         it('should return schema on get and reuse it from select when caching', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
-                .returns(() => of(schema)).verifiable(Times.exactly(1));
+                .returns(() => of(schema)).verifiable(Times.once());
 
             schemasState.select(schema1.name).subscribe();
             schemasState.loadSchema(schema1.name, true).subscribe();

@@ -7,10 +7,11 @@
 
 import { Injectable } from '@angular/core';
 import { empty, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
+    LocalStoreService,
     Pager,
     shareSubscribed,
     State
@@ -30,6 +31,9 @@ interface Snapshot {
     // Indicates if the rule events are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the rule events are loading.
+    isLoading?: boolean;
+
     // The current rule id.
     ruleId?: string;
 }
@@ -45,12 +49,23 @@ export class RuleEventsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
+        private readonly localStore: LocalStoreService,
         private readonly rulesService: RulesService
     ) {
-        super({ ruleEvents: [], ruleEventsPager: new Pager(0) });
+        super({
+            ruleEvents: [],
+            ruleEventsPager: Pager.fromLocalStore('rule-events', localStore)
+        });
+
+        this.ruleEventsPager.subscribe(pager => {
+            pager.saveTo('rule-events', this.localStore);
+        });
     }
 
     public load(isReload = false): Observable<any> {
@@ -61,7 +76,9 @@ export class RuleEventsState extends State<Snapshot> {
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<any> {
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
                 this.snapshot.ruleEventsPager.skip,
@@ -74,8 +91,17 @@ export class RuleEventsState extends State<Snapshot> {
                 return this.next(s => {
                     const ruleEventsPager = s.ruleEventsPager.setCount(total);
 
-                    return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
+                    return {
+                        ...s,
+                        isLoaded: true,
+                        isLoading: false,
+                        ruleEvents,
+                        ruleEventsPager
+                    };
                 });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -105,21 +131,15 @@ export class RuleEventsState extends State<Snapshot> {
             return empty();
         }
 
-        this.next(s => ({ ...s, ruleEventsPager: new Pager(0), ruleId }));
+        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
 
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
-    public goNext(): Observable<any> {
-        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goNext() }));
+    public setPager(ruleEventsPager: Pager): Observable<any> {
+        this.next(s => ({ ...s, ruleEventsPager }));
 
-        return this.loadInternal();
-    }
-
-    public goPrev(): Observable<any> {
-        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goPrev() }));
-
-        return this.loadInternal();
+        return this.loadInternal(false);
     }
 
     private get appName() {

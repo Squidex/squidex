@@ -10,17 +10,12 @@ using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
-using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity :
-        IAssetEntity,
-        IUpdateableEntityWithVersion,
-        IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy
+    public sealed class MongoAssetEntity : IAssetEntity
     {
         [BsonId]
         [BsonElement("_id")]
@@ -31,6 +26,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("_ai")]
         [BsonRepresentation(BsonType.String)]
         public Guid IndexedAppId { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("pi")]
+        public Guid ParentId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -100,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }
 
-        Guid IAssetInfo.AssetId
+        public Guid AssetId
         {
             get { return Id; }
         }

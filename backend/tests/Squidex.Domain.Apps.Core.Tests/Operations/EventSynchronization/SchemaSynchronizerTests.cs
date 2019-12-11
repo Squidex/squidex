@@ -569,9 +569,6 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_fields_reordered()
         {
-            var id1 = NamedId.Of(1, "f1");
-            var id2 = NamedId.Of(2, "f1");
-
             var sourceSchema =
                 new Schema("source")
                     .AddString(10, "f1", Partitioning.Invariant)
@@ -592,9 +589,6 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_fields_reordered_after_sync()
         {
-            var id1 = NamedId.Of(1, "f1");
-            var id2 = NamedId.Of(2, "f1");
-
             var sourceSchema =
                 new Schema("source")
                     .AddString(10, "f1", Partitioning.Invariant)
@@ -617,9 +611,6 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_fields_reordered_after_sync2()
         {
-            var id1 = NamedId.Of(1, "f1");
-            var id2 = NamedId.Of(2, "f1");
-
             var sourceSchema =
                 new Schema("source")
                     .AddString(10, "f1", Partitioning.Invariant)

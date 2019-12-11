@@ -17,10 +17,7 @@ import { Pager } from '@app/framework/internal';
 })
 export class PagerComponent {
     @Output()
-    public nextPage = new EventEmitter();
-
-    @Output()
-    public prevPage = new EventEmitter();
+    public pagerChange = new EventEmitter<Pager>();
 
     @Input()
     public pager: Pager;
@@ -28,11 +25,15 @@ export class PagerComponent {
     @Input()
     public autoHide = false;
 
-    public emitNext() {
-        this.nextPage.emit();
+    public goPrev() {
+        this.pagerChange.emit(this.pager.goPrev());
     }
 
-    public emitPrev() {
-        this.prevPage.emit();
+    public goNext() {
+        this.pagerChange.emit(this.pager.goNext());
+    }
+
+    public setPageSize(pageSize: number) {
+        this.pagerChange.emit(this.pager.setPageSize(pageSize));
     }
 }

@@ -5,7 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Mock, Times } from 'typemoq';
+
 import { Pager } from './pager';
+
+import { LocalStoreService } from './../services/local-store.service';
 
 describe('Pager', () => {
     it('should init with default values', () => {
@@ -194,5 +198,42 @@ describe('Pager', () => {
             canGoNext: false,
             canGoPrev: true
         });
+    });
+
+    it('should update page size', () => {
+        const pager_1 = new Pager(21, 0, 10);
+        const pager_2 = pager_1.setPageSize(30);
+
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
+            page: 0,
+            pageSize: 30,
+            itemFirst: 1,
+            itemLast: 21,
+            skip: 0,
+            numberOfItems: 21,
+            canGoNext: false,
+            canGoPrev: false
+        });
+    });
+
+    it('should create pager from local store', () => {
+        const localStore = Mock.ofType<LocalStoreService>();
+
+        localStore.setup(x => x.getInt('my.pageSize', 15))
+            .returns((() => 25));
+
+        const pager = Pager.fromLocalStore('my', localStore.object, 15);
+
+        expect(pager.pageSize).toBe(25);
+    });
+
+    it('should save pager to local store', () => {
+        const localStore = Mock.ofType<LocalStoreService>();
+
+        const pager = new Pager(0, 0, 25);
+
+        pager.saveTo('my', localStore.object);
+
+        localStore.verify(x => x.setInt('my.pageSize', 25), Times.once());
     });
 });

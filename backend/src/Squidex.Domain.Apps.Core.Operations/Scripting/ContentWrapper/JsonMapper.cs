@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         {
             var target = new ObjectInstance(engine);
 
-            foreach (var property in obj)
+            foreach (var (key, value) in obj)
             {
-                target.FastAddProperty(property.Key, Map(property.Value, engine), false, true, true);
+                target.FastAddProperty(key, Map(value, engine), false, true, true);
             }
 
             return target;
@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 var result = JsonValue.Object();
 
-                foreach (var kvp in obj.GetOwnProperties())
+                foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
                 {
-                    result[kvp.Key] = Map(kvp.Value.Value);
+                    result[key] = Map(propertyDescriptor.Value);
                 }
 
                 return result;

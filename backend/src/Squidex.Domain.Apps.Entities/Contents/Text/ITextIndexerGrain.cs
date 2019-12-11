@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -19,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         Task<bool> CopyAsync(Guid id, bool fromDraft);
 
-        Task<bool> IndexAsync(J<Update> update);
+        Task<bool> IndexAsync(Update update);
 
         Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
     }

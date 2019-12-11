@@ -45,15 +45,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 var tasks = new List<Task>();
 
-                foreach (var field in schema)
+                foreach (var (fieldName, fieldConfig) in schema)
                 {
-                    var name = field.Key;
+                    var (isOptional, validator) = fieldConfig;
 
-                    var (isOptional, validator) = field.Value;
+                    var fieldValue = Undefined.Value;
 
-                    object? fieldValue = Undefined.Value;
-
-                    if (!values.TryGetValue(name, out var temp))
+                    if (!values.TryGetValue(fieldName, out var temp))
                     {
                         if (isPartial)
                         {
@@ -65,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         fieldValue = temp;
                     }
 
-                    var fieldContext = context.Nested(name).Optional(isOptional);
+                    var fieldContext = context.Nested(fieldName).Optional(isOptional);
 
                     tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, addError));
                 }

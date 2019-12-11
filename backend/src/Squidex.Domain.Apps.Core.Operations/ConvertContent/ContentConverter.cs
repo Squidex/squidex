@@ -123,14 +123,14 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             where TKey1 : notnull
             where TKey2 : notnull
         {
-            foreach (var fieldKvp in source)
+            foreach (var (fieldName, value) in source)
             {
-                if (!fields.TryGetValue(fieldKvp.Key, out var field))
+                if (!fields.TryGetValue(fieldName, out var field))
                 {
                     continue;
                 }
 
-                ContentFieldData? newValue = fieldKvp.Value;
+                var newValue = value;
 
                 if (newValue != null)
                 {

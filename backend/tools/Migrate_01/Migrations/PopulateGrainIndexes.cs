@@ -114,9 +114,9 @@ namespace Migrate_01.Migrations
 
             await indexApps.RebuildAsync(appsByName);
 
-            foreach (var kvp in appsByUser)
+            foreach (var (contributorId, apps) in appsByUser)
             {
-                await indexApps.RebuildByContributorsAsync(kvp.Key, kvp.Value);
+                await indexApps.RebuildByContributorsAsync(contributorId, apps);
             }
         }
 
@@ -146,9 +146,9 @@ namespace Migrate_01.Migrations
                 return TaskHelper.Done;
             }, "^rule\\-");
 
-            foreach (var kvp in rulesByApp)
+            foreach (var (appId, rules) in rulesByApp)
             {
-                await indexRules.RebuildAsync(kvp.Key, kvp.Value);
+                await indexRules.RebuildAsync(appId, rules);
             }
         }
 
@@ -178,9 +178,9 @@ namespace Migrate_01.Migrations
                 return TaskHelper.Done;
             }, "^schema\\-");
 
-            foreach (var kvp in schemasByApp)
+            foreach (var (appId, schemas) in schemasByApp)
             {
-                await indexSchemas.RebuildAsync(kvp.Key, kvp.Value);
+                await indexSchemas.RebuildAsync(appId, schemas);
             }
         }
     }

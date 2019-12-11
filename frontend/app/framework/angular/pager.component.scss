@@ -1,2 +1,16 @@
 @import '_mixins';
 @import '_vars';
+
+.form-control {
+    display: inline-block;
+    margin-right: 2rem;
+    margin-top: .25rem;
+    width: auto;
+}
+
+.page-info {
+    display: inline-block;
+    text-align: right;
+    text-decoration: none;
+    width: 14rem;
+}

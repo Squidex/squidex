@@ -17,44 +17,40 @@
     }
 
     .col-arrow {
-        min-width: 2rem;
-        max-width: 2rem;
+        @include force-width(2rem);
     }
 
     .col-button {
-        min-width: 3rem;
-        max-width: 3rem;
+        @include force-width(3rem);
     }
 
     .col-step {
-        min-width: 10rem;
-        max-width: 10rem;
+        @include force-width(10rem);
     }
 
     .col-roles {
-        min-width: 18rem;
-        max-width: 18rem;
+        @include force-width(18rem);
     }
 
     .transition {
         & {
-            margin-top: .25rem;
-            margin-bottom: .5rem;
             line-height: 2.2rem;
+            margin-bottom: .5rem;
+            margin-top: .25rem;
         }
 
         &-to {
+            line-height: 1.2rem;
             padding: .5rem .75rem;
             padding-right: 0;
-            line-height: 1.2rem;
         }
     }
 }
 
 .step {
     & {
-        margin-bottom: 1.5rem;
         border-bottom: 1px solid $color-border;
+        margin-bottom: 1.5rem;
     }
 
     &-inner {
@@ -72,16 +68,16 @@
 
 .btn-initial {
     & {
-        visibility: hidden;
         line-height: 1.6rem;
         padding-left: 0;
         padding-right: 0;
-        width: 2rem;
         text-align: center;
+        visibility: hidden;
+        width: 2rem;
     }
 
     &:disabled {
-        @include opacity(1);
+        opacity: 1;
     }
 
     &.active {
@@ -91,15 +87,15 @@
 
 .transition-prevent-updates {
     & {
-        margin-top: .25rem;
-        margin-bottom: 1rem;
         line-height: 2.5rem;
+        margin-bottom: 1rem;
+        margin-top: .25rem;
     }
 
     &-to {
+        line-height: 1.2rem;
         padding: .5rem .75rem;
         padding-right: 0;
-        line-height: 1.2rem;
     }
 }
 

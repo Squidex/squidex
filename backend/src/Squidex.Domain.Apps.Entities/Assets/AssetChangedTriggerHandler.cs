@@ -34,6 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
         {
+            if (@event.Payload is AssetMoved)
+            {
+                return null;
+            }
+
             var result = new EnrichedAssetEvent();
 
             var asset = await assetLoader.GetAsync(@event.Payload.AssetId, @event.Headers.EventStreamNumber());

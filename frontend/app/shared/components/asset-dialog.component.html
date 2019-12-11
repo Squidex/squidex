@@ -1,5 +1,5 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (close)="emitCancel()">
+    <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
             Update Asset
         </ng-container>
@@ -37,7 +37,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitCancel()">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
             <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">Save</button>
         </ng-container>
     </sqx-modal-dialog>

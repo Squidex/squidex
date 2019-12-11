@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Security
 
         private Part[] Path
         {
-            get { return path ?? (path = Part.ParsePath(id)); }
+            get { return path ??= Part.ParsePath(id); }
         }
 
         public Permission(string id)

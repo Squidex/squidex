@@ -15,7 +15,7 @@ import { picasso } from '@app/framework/internal';
         <img
             [style.width]="sizeInPx"
             [style.height]="sizeInPx"
-            [attr.src]="imageSource | sqxSafeUrl"
+            [src]="imageSource | sqxSafeUrl"
         />
     `
 })

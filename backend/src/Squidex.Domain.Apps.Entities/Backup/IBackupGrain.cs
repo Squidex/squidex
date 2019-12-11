@@ -9,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IBackupGrain : IGrainWithGuidKey
     {
-        Task RunAsync();
+        Task BackupAsync(RefToken actor);
 
         Task DeleteAsync(Guid id);
 

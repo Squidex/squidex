@@ -69,6 +69,7 @@ class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;
     private lastValue: string | undefined = undefined;
     private subscription: Subscription;
+    private current: Observable<string | null>;
 
     constructor(loading: string,
         private readonly users: UsersProviderService,
@@ -91,11 +92,17 @@ class UserAsyncPipe implements OnDestroy {
                 this.subscription.unsubscribe();
             }
 
-            this.subscription = transform(this.users).subscribe(value => {
+            const pipe = transform(this.users);
+
+            this.subscription = pipe.subscribe(value => {
                 this.lastValue = value || undefined;
 
-                this.changeDetector.markForCheck();
+                if (this.current === pipe) {
+                    this.changeDetector.markForCheck();
+                }
             });
+
+            this.current = pipe;
         }
 
         return this.lastValue;
@@ -269,7 +276,7 @@ export class FileIconPipe implements PipeTransform {
             mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
-        return `./images/asset_${mimeIcon}.png`;
+        return `./images/asset_${mimeIcon}.svg`;
     }
 }
 

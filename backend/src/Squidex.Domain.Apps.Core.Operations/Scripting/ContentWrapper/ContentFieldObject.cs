@@ -65,13 +65,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 if (valueProperties != null)
                 {
-                    foreach (var kvp in valueProperties)
+                    foreach (var (key, propertyDescriptor) in valueProperties)
                     {
-                        var value = (ContentFieldProperty)kvp.Value;
+                        var value = (ContentFieldProperty)propertyDescriptor;
 
                         if (value.IsChanged)
                         {
-                            fieldData[kvp.Key] = value.ContentValue;
+                            fieldData[key] = value.ContentValue;
                         }
                     }
                 }
@@ -127,9 +127,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 if (fieldData != null)
                 {
-                    foreach (var kvp in fieldData)
+                    foreach (var (key, value) in fieldData)
                     {
-                        valueProperties.Add(kvp.Key, new ContentFieldProperty(this, kvp.Value));
+                        valueProperties.Add(key, new ContentFieldProperty(this, value));
                     }
                 }
             }

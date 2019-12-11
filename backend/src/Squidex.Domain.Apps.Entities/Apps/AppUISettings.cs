@@ -49,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private IAppUISettingsGrain GetGrain(Guid appId, string? userId)
         {
-            return grainFactory.GetGrain<IAppUISettingsGrain>(Key(appId, userId));
+            return grainFactory.GetGrain<IAppUISettingsGrain>(GetKey(appId, userId));
         }
 
-        private string Key(Guid appId, string? userId)
+        private static string GetKey(Guid appId, string? userId)
         {
             if (!string.IsNullOrWhiteSpace(userId))
             {

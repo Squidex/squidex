@@ -37,10 +37,11 @@ $color-theme-error-dark:    #c00;
 
 $color-theme-info:          #5bc0de;
 
+$color-asset-bg:            #f7f8fa;
+
 $color-input:               #dbe4eb;
 $color-input-background:    #fff;
 $color-input-disabled:      $color-theme-secondary;
-$color-input-border:        rgba(0, 0, 0, .15);
 $color-input-placeholder:   lighten($color-text-decent, 20%);
 
 $color-dark1-background:        #2e3842;
@@ -102,6 +103,7 @@ $panel-sidebar:             3.75rem;
 $panel-light-background:    #fff;
 
 $asset-width:               14.5rem;
+$asset-folder-height:       4rem;
 $asset-height:              19rem;
 $asset-header:              12rem;
 $asset-image:               12rem;

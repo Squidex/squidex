@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command);
 
-            var client = GetClientOrThrow(clients, command.Id);
+            GetClientOrThrow(clients, command.Id);
 
             Validate.It(() => "Cannot update client.", e =>
             {
@@ -67,21 +67,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 if (command.Role != null && !roles.Contains(command.Role))
                 {
                     e(Not.Valid("role"), nameof(command.Role));
-                }
-
-                if (client == null)
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
-                {
-                    e(Not.New("Client", "name"), nameof(command.Name));
-                }
-
-                if (command.Role == client.Role)
-                {
-                    e(Not.New("Client", "role"), nameof(command.Role));
                 }
             });
         }

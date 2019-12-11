@@ -137,14 +137,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public goPrev() {
-        this.contentsState.goPrev();
-    }
-
-    public goNext() {
-        this.contentsState.goNext();
-    }
-
     public search(query: Query) {
         this.contentsState.search(query);
     }
@@ -154,7 +146,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemSelected(content: ContentDto): boolean {
-        return !!this.selectedItems[content.id];
+        return this.selectedItems[content.id] === true;
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {

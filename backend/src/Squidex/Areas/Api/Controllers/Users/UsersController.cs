@@ -164,7 +164,17 @@ namespace Squidex.Areas.Api.Controllers.Users
                 {
                     if (entity.IsPictureUrlStored())
                     {
-                        return new FileStreamResult(await userPictureStore.DownloadAsync(entity.Id), "image/png");
+                        return new FileCallbackResult("image/png", null, false, async stream =>
+                        {
+                            try
+                            {
+                                await userPictureStore.DownloadAsync(entity.Id, stream);
+                            }
+                            catch
+                            {
+                                await stream.WriteAsync(AvatarBytes);
+                            }
+                        });
                     }
 
                     using (var client = new HttpClient())

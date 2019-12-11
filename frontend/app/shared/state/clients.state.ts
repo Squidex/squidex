@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the clients are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the clients are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can create new clients.
     canCreate?: boolean;
 }
@@ -50,12 +53,15 @@ export class ClientsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly clientsService: ClientsService,
         private readonly appsState: AppsState,
+        private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService
     ) {
         super({ clients: [], version: Version.EMPTY });
@@ -66,6 +72,12 @@ export class ClientsState extends State<Snapshot> {
             this.resetState();
         }
 
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
         return this.clientsService.getClients(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
@@ -73,6 +85,9 @@ export class ClientsState extends State<Snapshot> {
                 }
 
                 this.replaceClients(payload, version);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -104,14 +119,12 @@ export class ClientsState extends State<Snapshot> {
     private replaceClients(payload: ClientsPayload, version: Version) {
         const { canCreate, items: clients } = payload;
 
-        this.next(s => {
-            return {
-                ...s,
-                canCreate,
-                clients,
-                isLoaded: true,
-                version
-            };
+        this.next({
+            canCreate,
+            clients,
+            isLoaded: true,
+            isLoading: false,
+            version
         });
     }
 

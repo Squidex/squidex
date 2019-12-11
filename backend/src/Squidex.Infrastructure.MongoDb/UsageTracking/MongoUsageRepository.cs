@@ -85,9 +85,9 @@ namespace Squidex.Infrastructure.UsageTracking
                 .SetOnInsert(x => x.Date, usageUpdate.Date)
                 .SetOnInsert(x => x.Category, usageUpdate.Category);
 
-            foreach (var counter in usageUpdate.Counters)
+            foreach (var (key, value) in usageUpdate.Counters)
             {
-                update = update.Inc($"Counters.{counter.Key}", counter.Value);
+                update = update.Inc($"Counters.{key}", value);
             }
 
             var filter = Filter.Eq(x => x.Id, id);

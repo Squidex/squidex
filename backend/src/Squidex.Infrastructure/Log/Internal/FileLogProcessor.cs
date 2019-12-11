@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -15,7 +16,8 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class FileLogProcessor : DisposableObjectBase
+    [ExcludeFromCodeCoverage]
+    public sealed class FileLogProcessor : DisposableObjectBase
     {
         private const int MaxQueuedMessages = 1024;
         private const int Retries = 10;

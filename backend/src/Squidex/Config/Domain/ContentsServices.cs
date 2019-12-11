@@ -24,7 +24,7 @@ namespace Squidex.Config.Domain
             services.Configure<ContentOptions>(
                 config.GetSection("contents"));
 
-            services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
+            services.AddSingletonAs(c => new Lazy<IContentQueryService>(c.GetRequiredService<IContentQueryService>))
                 .AsSelf();
 
             services.AddSingletonAs<ContentQueryParser>()
@@ -50,6 +50,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainTextIndexer>()
                 .As<ITextIndexer>().As<IEventConsumer>();
+
+            services.AddSingletonAs<IndexManager>()
+                .AsSelf();
 
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();

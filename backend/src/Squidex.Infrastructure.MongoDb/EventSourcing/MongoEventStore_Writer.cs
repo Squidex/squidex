@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public partial class MongoEventStore
     {
-        private const int MaxCommitSize = 10;
+        private const int MaxCommitSize = 100;
         private const int MaxWriteAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 

@@ -25,11 +25,11 @@ namespace Squidex.Infrastructure
 
         public Task InitializeAsync(CancellationToken ct = default)
         {
-            foreach (var kvp in options)
+            foreach (var (key, value) in options)
             {
-                if (!string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
+                if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
                 {
-                    Language.AddLanguage(kvp.Key, kvp.Value);
+                    Language.AddLanguage(key, value);
                 }
             }
 

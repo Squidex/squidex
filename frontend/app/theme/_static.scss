@@ -5,8 +5,8 @@
 // Noscript element with warning, when javascript is disabled.
 //
 noscript {
-    display: block;
     color: $color-theme-error;
+    display: block;
     font-size: 30px;
     font-weight: lighter;
     margin-bottom: 20px;
@@ -17,8 +17,8 @@ noscript {
 //
 .profile {
     & {
-        max-width: 20rem;
         margin: 0 auto;
+        max-width: 20rem;
         padding: 1rem 2rem;
     }
 
@@ -30,6 +30,7 @@ noscript {
     // Fix logo on the top right corner of the screen.
     &-logo {
         @include absolute(1rem, 1rem, auto, auto);
+        height: 1.75rem;
     }
 
     &-lg {
@@ -75,20 +76,20 @@ noscript {
     //
     &-separator {
         & {
-            text-align: center;
+            border-bottom: 1px solid $color-border;
             margin-bottom: 2.5rem;
             margin-top: 1.5rem;
-            border-bottom: 1px solid $color-border;
+            text-align: center;
         }
 
         &-text {
-            color: darken($color-border, 15%);
-            display: inline-block;
             background: $color-dark-foreground;
             border: 0;
             bottom: -.75rem;
-            position: relative;
+            color: darken($color-border, 15%);
+            display: inline-block;
             padding: 0 1rem;
+            position: relative;
         }
     }
 
@@ -105,23 +106,23 @@ noscript {
     // External button and icon.
     .external {
         &-button {
+            line-height: 1.8rem;
             text-align: left;
             text-transform: none;
-            line-height: 1.8rem;
         }
 
         &-button-small {
-            text-align: center;
             padding-left: 0;
             padding-right: 0;
+            text-align: center;
             width: 40px;
         }
 
         &-icon {
             display: inline-block;
-            height: 20px;
             font-size: 1.1rem;
             font-weight: normal;
+            height: 20px;
             vertical-align: middle;
             width: 1.6rem;
         }
@@ -153,8 +154,8 @@ noscript {
     }
 
     &-image {
-        max-width: 100%;
         margin-bottom: 2rem;
+        max-width: 100%;
     }
 }
 
@@ -163,9 +164,9 @@ noscript {
 //
 .loading {
     & {
-        text-align: center;
-        margin-top: 200px;
         margin-bottom: 20px;
+        margin-top: 200px;
+        text-align: center;
     }
 
     div {

@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
@@ -32,9 +32,7 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.backupsState.load();
 
-        this.own(
-            timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(true, true).pipe(onErrorResumeNext())))
-                .subscribe());
+        this.own(timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(false, true))));
     }
 
     public reload() {

@@ -3,7 +3,7 @@
 
 iframe {
     @include absolute(0, 0, 0, 0);
-    min-width: 100%;
-    min-height: 100%;
+    @include force-height(100%);
+    @include force-width(100%);
     border: 0;
 }

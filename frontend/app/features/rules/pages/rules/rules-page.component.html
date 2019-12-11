@@ -1,6 +1,6 @@
 <sqx-title message="Rules"></sqx-title>
 
-<sqx-panel desiredWidth="54rem" showSidebar="true">
+<sqx-panel desiredWidth="54rem" showSidebar="true" grid="true">
     <ng-container title>
         Rules
     </ng-container>
@@ -22,38 +22,42 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="ruleActions && ruleTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
-            <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
-                No rule created yet.
-
-                <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()" *ngIf="rulesState.canCreate | async">
-                    <i class="icon icon-plus"></i> Add Rule
-                </button>
+        <sqx-list-view [isLoading]="rulesState.isLoading | async">
+            <div content>
+                <ng-container *ngIf="ruleActions && ruleTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
+                    <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
+                        No rule created yet.
+        
+                        <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()" *ngIf="rulesState.canCreate | async">
+                            <i class="icon icon-plus"></i> Add Rule
+                        </button>
+                    </div>
+        
+                    <table class="table table-items table-fixed">
+                        <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
+                            [rule]="rule"
+                            [ruleActions]="ruleActions"
+                            [ruleTriggers]="ruleTriggers"
+                            (delete)="delete(rule)"
+                            (editAction)="editAction(rule)"
+                            (editTrigger)="editTrigger(rule)"
+                            (toggle)="toggle(rule)">
+                        </sqx-rule>
+                    </table>
+        
+                    <ng-container *sqxModal="addRuleDialog">
+                        <sqx-rule-wizard 
+                            [schemas]="schemasState.schemas | async"
+                            [rule]="wizardRule"
+                            [ruleActions]="ruleActions"
+                            [ruleTriggers]="ruleTriggers"
+                            [mode]="wizardMode"
+                            (complete)="addRuleDialog.hide()">
+                        </sqx-rule-wizard>
+                    </ng-container>
+                </ng-container>
             </div>
-
-            <table class="table table-items table-fixed">
-                <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
-                    [rule]="rule"
-                    [ruleActions]="ruleActions"
-                    [ruleTriggers]="ruleTriggers"
-                    (delete)="delete(rule)"
-                    (editAction)="editAction(rule)"
-                    (editTrigger)="editTrigger(rule)"
-                    (toggle)="toggle(rule)">
-                </sqx-rule>
-            </table>
-
-            <ng-container *sqxModal="addRuleDialog">
-                 <sqx-rule-wizard 
-                    [schemas]="schemasState.schemas | async"
-                    [rule]="wizardRule"
-                    [ruleActions]="ruleActions"
-                    [ruleTriggers]="ruleTriggers"
-                    [mode]="wizardMode"
-                    (complete)="addRuleDialog.hide()">
-                </sqx-rule-wizard>
-            </ng-container>
-        </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container sidebar>

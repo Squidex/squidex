@@ -13,16 +13,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Orleans.Concurrency;
-using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
@@ -31,47 +29,48 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
-        private readonly IAssetStore assetStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
+        private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IClock clock;
-        private readonly IJsonSerializer serializer;
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
         private readonly IGrainState<BackupState> state;
-        private CancellationTokenSource? currentTask;
-        private BackupStateJob? currentJob;
+        private readonly IUserResolver userResolver;
+        private CancellationTokenSource? currentTaskToken;
+        private BackupJob? currentJob;
 
         public BackupGrain(
-            IAssetStore assetStore,
             IBackupArchiveLocation backupArchiveLocation,
+            IBackupArchiveStore backupArchiveStore,
             IClock clock,
-            IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IJsonSerializer serializer,
+            IEventStore eventStore,
+            IGrainState<BackupState> state,
             IServiceProvider serviceProvider,
-            ISemanticLog log,
-            IGrainState<BackupState> state)
+            IUserResolver userResolver,
+            ISemanticLog log)
         {
-            Guard.NotNull(assetStore);
             Guard.NotNull(backupArchiveLocation);
+            Guard.NotNull(backupArchiveStore);
             Guard.NotNull(clock);
-            Guard.NotNull(eventStore);
             Guard.NotNull(eventDataFormatter);
+            Guard.NotNull(eventStore);
             Guard.NotNull(serviceProvider);
-            Guard.NotNull(serializer);
             Guard.NotNull(state);
+            Guard.NotNull(userResolver);
             Guard.NotNull(log);
 
-            this.assetStore = assetStore;
             this.backupArchiveLocation = backupArchiveLocation;
+            this.backupArchiveStore = backupArchiveStore;
             this.clock = clock;
-            this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.serializer = serializer;
+            this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
             this.state = state;
+            this.userResolver = userResolver;
+
             this.log = log;
         }
 
@@ -84,27 +83,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task RecoverAfterRestartAsync()
         {
-            foreach (var job in state.Value.Jobs)
-            {
-                if (!job.Stopped.HasValue)
-                {
-                    var jobId = job.Id.ToString();
+            state.Value.Jobs.RemoveAll(x => !x.Stopped.HasValue);
 
-                    job.Stopped = clock.GetCurrentInstant();
-
-                    await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-                    await Safe.DeleteAsync(assetStore, jobId, log);
-
-                    job.Status = JobStatus.Failed;
-
-                    await state.WriteAsync();
-                }
-            }
+            await state.WriteAsync();
         }
 
-        public async Task RunAsync()
+        public async Task BackupAsync(RefToken actor)
         {
-            if (currentTask != null)
+            if (currentTaskToken != null)
             {
                 throw new DomainException("Another backup process is already running.");
             }
@@ -114,52 +100,59 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException($"You cannot have more than {MaxBackups} backups.");
             }
 
-            var job = new BackupStateJob
+            var job = new BackupJob
             {
                 Id = Guid.NewGuid(),
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started
             };
 
-            currentTask = new CancellationTokenSource();
+            currentTaskToken = new CancellationTokenSource();
             currentJob = job;
 
             state.Value.Jobs.Insert(0, job);
 
             await state.WriteAsync();
 
-            Process(job, currentTask.Token);
+            Process(job, actor, currentTaskToken.Token);
         }
 
-        private void Process(BackupStateJob job, CancellationToken ct)
+        private void Process(BackupJob job, RefToken actor, CancellationToken ct)
         {
-            ProcessAsync(job, ct).Forget();
+            ProcessAsync(job, actor, ct).Forget();
         }
 
-        private async Task ProcessAsync(BackupStateJob job, CancellationToken ct)
+        private async Task ProcessAsync(BackupJob job, RefToken actor, CancellationToken ct)
         {
-            var jobId = job.Id.ToString();
-
             var handlers = CreateHandlers();
 
             var lastTimestamp = job.Started;
 
             try
             {
-                using (var stream = await backupArchiveLocation.OpenStreamAsync(jobId))
+                using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
-                    using (var writer = new BackupWriter(serializer, stream, true))
+                    using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
+                        var userMapping = new UserMapping(actor);
+
+                        var context = new BackupContext(Key, userMapping, writer);
+
                         await eventStore.QueryAsync(async storedEvent =>
                         {
                             var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                            writer.WriteEvent(storedEvent);
+                            if (@event.Payload is SquidexEvent squidexEvent)
+                            {
+                                context.UserMapping.Backup(squidexEvent.Actor);
+                            }
 
                             foreach (var handler in handlers)
                             {
-                                await handler.BackupEventAsync(@event, Key, writer);
+                                await handler.BackupEventAsync(@event, context);
                             }
+
+                            writer.WriteEvent(storedEvent);
 
                             job.HandledEvents = writer.WrittenEvents;
                             job.HandledAssets = writer.WrittenAttachments;
@@ -169,27 +162,37 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            await handler.BackupAsync(Key, writer);
+                            ct.ThrowIfCancellationRequested();
+
+                            await handler.BackupAsync(context);
                         }
 
                         foreach (var handler in handlers)
                         {
-                            await handler.CompleteBackupAsync(Key, writer);
+                            ct.ThrowIfCancellationRequested();
+
+                            await handler.CompleteBackupAsync(context);
                         }
+
+                        await userMapping.StoreAsync(writer, userResolver);
                     }
 
                     stream.Position = 0;
 
                     ct.ThrowIfCancellationRequested();
 
-                    await assetStore.UploadAsync(jobId, 0, null, stream, false, ct);
+                    await backupArchiveStore.UploadAsync(job.Id, stream, ct);
                 }
 
                 job.Status = JobStatus.Completed;
             }
+            catch (OperationCanceledException)
+            {
+                await RemoveAsync(job);
+            }
             catch (Exception ex)
             {
-                log.LogError(ex, jobId, (ctx, w) => w
+                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
                     .WriteProperty("action", "makeBackup")
                     .WriteProperty("status", "failed")
                     .WriteProperty("backupId", ctx));
@@ -198,13 +201,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             finally
             {
-                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-
                 job.Stopped = clock.GetCurrentInstant();
 
                 await state.WriteAsync();
 
-                currentTask = null;
+                currentTaskToken = null;
                 currentJob = null;
             }
         }
@@ -234,24 +235,36 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (currentJob == job)
             {
-                currentTask?.Cancel();
+                currentTaskToken?.Cancel();
             }
             else
             {
-                var jobId = job.Id.ToString();
-
-                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
-                await Safe.DeleteAsync(assetStore, jobId, log);
-
-                state.Value.Jobs.Remove(job);
-
-                await state.WriteAsync();
+                await RemoveAsync(job);
             }
         }
 
-        private IEnumerable<BackupHandler> CreateHandlers()
+        private async Task RemoveAsync(BackupJob job)
         {
-            return serviceProvider.GetRequiredService<IEnumerable<BackupHandler>>();
+            try
+            {
+                await backupArchiveStore.DeleteAsync(job.Id);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, job.Id.ToString(), (logOperationId, w) => w
+                    .WriteProperty("action", "deleteBackup")
+                    .WriteProperty("status", "failed")
+                    .WriteProperty("operationId", logOperationId));
+            }
+
+            state.Value.Jobs.Remove(job);
+
+            await state.WriteAsync();
+        }
+
+        private IEnumerable<IBackupHandler> CreateHandlers()
+        {
+            return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
         }
 
         public Task<J<List<IBackupJob>>> GetStateAsync()

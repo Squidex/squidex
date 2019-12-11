@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = new Dictionary<Guid, JsonAppPattern>(value.Count);
 
-            foreach (var client in value)
+            foreach (var (key, appPattern) in value)
             {
-                json.Add(client.Key, new JsonAppPattern(client.Value));
+                json.Add(key, new JsonAppPattern(appPattern));
             }
 
             serializer.Serialize(writer, json);

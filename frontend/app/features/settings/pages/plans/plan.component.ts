@@ -7,19 +7,12 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import {
-    fadeAnimation,
-    PlanInfo,
-    PlansState
-} from '@app/shared';
+import { PlanInfo, PlansState } from '@app/shared';
 
 @Component({
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlanComponent {

@@ -191,19 +191,29 @@ export class State<T extends {}> {
         this.state = new BehaviorSubject(state);
     }
 
-    public resetState(update?: ((v: T) => Readonly<T>) | object) {
-        this.state.next(this.initialState);
+    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
+        let newState = this.initialState;
 
         if (update) {
-            this.next(update);
+            if (Types.isFunction(update)) {
+                newState = update(this.initialState);
+            } else {
+                newState = { ...this.initialState, ...update };
+            }
         }
+
+        this.state.next(newState);
     }
 
-    public next(update: ((v: T) => Readonly<T>) | object) {
+    public next(update: ((v: T) => Readonly<T>) | Partial<T>) {
+        let newState: T;
+
         if (Types.isFunction(update)) {
-            this.state.next(update(this.state.value));
+            newState = update(this.state.value);
         } else {
-            this.state.next(Object.assign({}, this.snapshot, update));
+            newState = { ...this.state.value, ...update };
         }
+
+        this.state.next(newState);
     }
 }

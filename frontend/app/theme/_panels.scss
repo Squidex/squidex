@@ -3,18 +3,18 @@
 
 @mixin panel-icon {
     color: $color-border-dark;
+    cursor: pointer;
     font-size: 1.2rem;
     font-weight: 400;
-    text-decoration: none;
-    text-align: center;
     padding: .6rem;
-    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
 
     &:hover,
     &:focus {
-        text-decoration: none;
-        cursor: pointer;
         color: darken($color-border-dark, 10%);
+        cursor: pointer;
+        text-decoration: none;
     }
 
     &.active {
@@ -37,34 +37,33 @@
 //
 .panel {
     & {
-        @include flex-box;
-        @include flex-flow(column);
-        height: 100%;
         background: $color-background;
         border-right: 1px solid $color-border;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
         position: relative;
     }
 
     // First row of the panel with the header. Fixed height.
     &-header {
         & {
+            @include force-height($panel-header);
             background: $panel-light-background;
-            min-height: $panel-header;
-            max-height: $panel-header;
             padding: $panel-padding;
             position: relative;
         }
 
         &-row {
-            @include flex-box;
-            @include flex-flow(row);
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 0;
             margin-top: 1.2rem;
             position: relative;
         }
 
         &.large {
-            min-height: 8rem;
-            max-height: 8rem;
+            @include force-height(8rem);
         }
 
         .form-inline {
@@ -74,9 +73,9 @@
 
     // Second row of the panel with the content.
     &-main {
-        @include flex-box;
-        @include flex-flow(row);
-        @include flex-grow(1);
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
         overflow: hidden;
     }
 
@@ -84,12 +83,14 @@
     &-content {
         // Content area is gray by default to contain scrollable content, e.g. lists.
         & {
-            @include flex-grow(1);
-            border-top: 1px solid $color-border;
             background: $color-background;
-            padding: $panel-padding;
+            border-top: 1px solid $color-border;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
             overflow-x: hidden;
             overflow-y: auto;
+            padding: $panel-padding;
         }
 
         // White content area, e.g. for history panel.
@@ -111,6 +112,11 @@
             overflow-y: auto;
         }
 
+        &.grid {
+            display: flex;
+            padding: 0;
+        }
+
         & .nav-panel {
             & {
                 margin-left: -$panel-padding;
@@ -127,12 +133,10 @@
     // Error or alert on top of the panel content.
     &-alert {
         & {
-            padding: .5 * $panel-padding $panel-padding;
-            margin: -$panel-padding;
-            margin-bottom: $panel-padding;
+            color: $color-dark-foreground;
             font-size: .9rem;
             font-weight: normal;
-            color: $color-dark-foreground;
+            padding: .5 * $panel-padding $panel-padding;
         }
 
         a {
@@ -158,33 +162,30 @@
     // Second column of the main row (second row) with additional links.
     &-sidebar {
         & {
+            @include force-width($panel-sidebar);
             background: $panel-light-background;
             border-left: 1px solid $color-border;
-            min-width: $panel-sidebar;
-            max-width: $panel-sidebar;
         }
 
         &.wide {
-            min-width: 16rem;
-            max-width: 16rem;
+            @include force-width(16rem);
         }
 
         & .panel-nav {
-            min-width: $panel-sidebar;
-            max-width: $panel-sidebar;
+            @include force-width($panel-sidebar);
             position: absolute;
         }
 
         & .panel-link {
             & {
-                @include transition(background-color .3s ease);
                 @include panel-icon;
-                display: block;
-                padding-top: .6rem;
-                padding-bottom: .6rem;
-                position: relative;
-                border-top: 1px solid transparent;
                 border-bottom: 1px solid transparent;
+                border-top: 1px solid transparent;
+                display: block;
+                padding-bottom: .6rem;
+                padding-top: .6rem;
+                position: relative;
+                transition: background-color .3s ease;
             }
 
             &:hover {
@@ -198,10 +199,10 @@
 
                 &::before {
                     @include absolute(0, -1px, 0, auto);
-                    width: 2px;
+                    background: $panel-light-background;
                     color: transparent;
                     content: '';
-                    background: $panel-light-background;
+                    width: 2px;
                 }
             }
 
@@ -218,9 +219,9 @@
     // Panel title.
     &-title {
         @include truncate;
-        line-height: 2rem;
         font-size: 1.5rem;
         font-weight: 400;
+        line-height: 2rem;
         padding-right: 2rem;
     }
 
@@ -244,8 +245,8 @@
 .panel-dark {
     & {
         @include box-shadow(2px, 0, 1px, .3);
-        border-right: 1px solid darken($color-dark2-foreground, 15%);
         background: $color-dark2-background;
+        border-right: 1px solid darken($color-dark2-foreground, 15%);
         color: $color-dark2-foreground;
     }
 
@@ -270,7 +271,7 @@
     }
 
     .nav-link {
-        @include transition(color .4s ease);
+        transition: color .4s ease;
     }
 }
 
@@ -281,10 +282,9 @@
     & {
         @include fixed($size-navbar-height, auto, 0, 0);
         @include box-shadow(2px, 0, 1px, .1);
-        min-width: $size-sidebar-width;
-        max-width: $size-sidebar-width;
-        border-right: 1px solid $color-dark1-border1;
+        @include force-width($size-sidebar-width);
         background: $color-dark1-background;
+        border-right: 1px solid $color-dark1-border1;
         z-index: 100;
     }
 
@@ -299,12 +299,12 @@
 
         &-link {
             & {
-                @include transition(color .3s ease);
-                padding: 1.25rem;
+                color: $color-dark1-foreground;
                 display: block;
+                padding: 1.25rem;
                 text-align: center;
                 text-decoration: none;
-                color: $color-dark1-foreground;
+                transition: color .3s ease;
             }
 
             &:hover,
@@ -325,11 +325,11 @@
     &-item {
         & {
             @include border-radius;
-            padding: .25rem 1rem;
             display: block;
             font-size: .9rem;
             font-weight: normal;
             margin-bottom: .25rem;
+            padding: .25rem 1rem;
         }
 
         &-remove {
@@ -360,53 +360,5 @@
 a {
     &.sidebar-item {
         cursor: pointer !important;
-    }
-}
-
-//
-// Grid with footer and header
-//
-.grid {
-    & {
-        @include flex-box;
-        @include flex-direction(column);
-        overflow: hidden;
-        padding: 0;
-    }
-
-    .grid-content,
-    .grid-header,
-    .grid-footer {
-        padding: 0 $panel-padding;
-    }
-
-    .grid-content {
-        @include flex-grow(1);
-        padding-top: .5rem;
-        padding-bottom: .5rem;
-        overflow-y: scroll;
-    }
-
-    .grid-header {
-        & {
-            border: 0;
-            border-bottom: 2px solid $color-border;
-        }
-
-        th {
-            padding: .75rem;
-        }
-
-        .table-items {
-            margin: 0;
-        }
-    }
-
-    .grid-footer {
-        border-top: 2px solid $color-border;
-    }
-
-    .pagination {
-        margin: .25rem 0;
     }
 }

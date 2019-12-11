@@ -33,7 +33,7 @@ namespace Squidex.Domain.Users
 
         public bool IsLocked
         {
-            get { return Identity.LockoutEnd > DateTime.Now.ToUniversalTime(); }
+            get { return Identity.LockoutEnd > DateTime.UtcNow; }
         }
 
         IReadOnlyList<Claim> IUser.Claims

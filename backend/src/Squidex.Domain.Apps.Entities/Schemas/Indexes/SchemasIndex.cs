@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (context.IsCompleted)
                 {
-                     if (context.Command is DeleteSchema deleteSchema)
+                    if (context.Command is DeleteSchema deleteSchema)
                     {
                         await DeleteSchemaAsync(deleteSchema);
                     }
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<string?> CheckSchemaAsync(ISchemasByAppIndexGrain index, CreateSchema command)
+        private static async Task<string?> CheckSchemaAsync(ISchemasByAppIndexGrain index, CreateSchema command)
         {
             var name = command.Name;
 

@@ -10,7 +10,6 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     EditPatternForm,
-    fadeAnimation,
     PatternDto,
     PatternsState
 } from '@app/shared';
@@ -19,9 +18,6 @@ import {
     selector: 'sqx-pattern',
     styleUrls: ['./pattern.component.scss'],
     templateUrl: './pattern.component.html',
-    animations: [
-        fadeAnimation
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PatternComponent implements OnChanges {

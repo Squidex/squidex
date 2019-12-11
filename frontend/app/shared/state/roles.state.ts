@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -36,6 +36,9 @@ interface Snapshot {
     // Indicates if the roles are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the roles are loading.
+    isLoading?: boolean;
+
     // Indicates if the user can add a role.
     canCreate?: boolean;
 }
@@ -50,13 +53,16 @@ export class RolesState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
     public canCreate =
         this.project(x => x.canCreate === true);
 
     constructor(
-        private readonly rolesService: RolesService,
         private readonly appsState: AppsState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        private readonly rolesService: RolesService
     ) {
         super({ roles: [], version: Version.EMPTY });
     }
@@ -66,13 +72,22 @@ export class RolesState extends State<Snapshot> {
             this.resetState();
         }
 
-       return this.rolesService.getRoles(this.appName).pipe(
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload: boolean): Observable<any> {
+        this.next({ isLoading: true });
+
+        return this.rolesService.getRoles(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Roles reloaded.');
                 }
 
                 this.replaceRoles(payload, version);
+            }),
+            finalize(() => {
+                this.next({ isLoading: false });
             }),
             shareSubscribed(this.dialogs));
     }
@@ -104,8 +119,12 @@ export class RolesState extends State<Snapshot> {
     private replaceRoles(payload: RolesPayload, version: Version) {
         const { canCreate, items: roles } = payload;
 
-        this.next(s => {
-            return { ...s, roles, isLoaded: true, version, canCreate };
+        this.next({
+            canCreate,
+            isLoaded: true,
+            isLoading: false,
+            roles,
+            version
         });
     }
 

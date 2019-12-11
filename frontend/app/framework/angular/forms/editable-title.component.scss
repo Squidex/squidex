@@ -3,41 +3,28 @@
 
 .title {
     & {
+        @include hover-visible('.title-edit', inline);
         position: relative;
     }
 
     &-edit {
         color: $color-border-dark;
-        display: none;
-        font-size: .9rem;
-        font-weight: normal;
+        cursor: pointer;
         padding: .6rem .25rem;
-        border: 0;
-        background: transparent;
-        vertical-align: baseline;
     }
 
     &-name {
-        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        display: inline;
         font-size: 1.2rem;
         font-weight: normal;
-        display: inline;
-        margin: 0;
     }
 
     &-view {
         @include truncate;
+        border-bottom: 1px solid transparent;
+        border-top: 0;
         padding: .375rem 0;
         position: absolute;
-        border-top: 0;
-        border-bottom: 1px solid transparent;
-        line-height: 1.5rem;
-    }
-
-    &:hover {
-        .title-edit {
-            display: inline;
-        }
     }
 }
 

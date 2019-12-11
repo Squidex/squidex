@@ -1,9 +1,9 @@
 <ng-container *sqxModal="tooltipModal">
     <div class="onboarding-rect" [sqxAnchoredTo]="for" [offset]="4" [position]="'full'"></div>
     <div class="onboarding-help" [sqxAnchoredTo]="for" [offset]="4" [position]="position" @fade>
-        <div class="onboarding-text">
+        <small class="onboarding-text">
             <ng-content></ng-content>
-        </div>
+        </small>
 
         <div class="onboarding-buttons clearfix">
             <button (click)="hideAll()" class="btn btn-text-primary btn-sm float-left">

@@ -164,11 +164,11 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonObject obj:
                     writer.WriteStartObject();
 
-                    foreach (var kvp in obj)
+                    foreach (var (key, jsonValue) in obj)
                     {
-                        writer.WritePropertyName(kvp.Key);
+                        writer.WritePropertyName(key);
 
-                        WriteJson(writer, kvp.Value);
+                        WriteJson(writer, jsonValue);
                     }
 
                     writer.WriteEndObject();

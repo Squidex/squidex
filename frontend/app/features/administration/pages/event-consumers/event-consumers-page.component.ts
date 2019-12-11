@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import { DialogModel, ResourceOwner } from '@app/shared';
 
@@ -31,7 +31,7 @@ export class EventConsumersPageComponent extends ResourceOwner implements OnInit
     public ngOnInit() {
         this.eventConsumersState.load();
 
-        this.own(timer(5000, 5000).pipe(switchMap(() => this.eventConsumersState.load(true, true)), onErrorResumeNext()));
+        this.own(timer(5000, 5000).pipe(switchMap(() => this.eventConsumersState.load(false, true))));
     }
 
     public reload() {

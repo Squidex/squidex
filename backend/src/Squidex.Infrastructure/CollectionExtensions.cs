@@ -33,6 +33,23 @@ namespace Squidex.Infrastructure
             return input.GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key);
         }
 
+        public static int IndexOf<T>(this IEnumerable<T> input, Func<T, bool> predicate)
+        {
+            var i = 0;
+
+            foreach (var item in input)
+            {
+                if (predicate(item))
+                {
+                    return i;
+                }
+
+                i++;
+            }
+
+            return -1;
+        }
+
         public static IEnumerable<TResult> Duplicates<TResult, T>(this IEnumerable<T> input, Func<T, TResult> selector)
         {
             return input.GroupBy(selector).Where(x => x.Count() > 1).Select(x => x.Key);
@@ -125,13 +142,13 @@ namespace Squidex.Infrastructure
         {
             var hashCode = 17;
 
-            foreach (var kvp in dictionary.OrderBy(x => x.Key))
+            foreach (var (key, value) in dictionary.OrderBy(x => x.Key))
             {
-                hashCode = (hashCode * 23) + keyComparer.GetHashCode(kvp.Key);
+                hashCode = (hashCode * 23) + keyComparer.GetHashCode(key);
 
-                if (!Equals(kvp.Value, null))
+                if (!Equals(value, null))
                 {
-                    hashCode = (hashCode * 23) + valueComparer.GetHashCode(kvp.Value);
+                    hashCode = (hashCode * 23) + valueComparer.GetHashCode(value);
                 }
             }
 

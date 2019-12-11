@@ -6,33 +6,33 @@
 }
 
 .invalid {
-    padding: 2rem;
+    color: darken($color-border, 30%);
     font-size: 1.2rem;
     font-weight: normal;
+    padding: 2rem;
     text-align: center;
-    color: darken($color-border, 30%);
 }
 
 .references-container {
     background: $color-background;
+    max-height: 20rem;
+    min-height: 6rem;
     overflow-x: hidden;
     overflow-y: auto;
     padding: 1rem;
-    min-height: 6rem;
-    max-height: 20rem;
 }
 
 .drop-area {
     & {
-        @include transition(border-color .4s ease);
         @include border-radius;
         border: 2px dashed darken($color-border, 10%);
+        color: darken($color-border, 30%);
+        cursor: pointer;
         font-size: 1.2rem;
         font-weight: normal;
-        text-align: center;
         padding: 1rem;
-        cursor: pointer;
-        color: darken($color-border, 30%);
+        text-align: center;
+        transition: border-color .4s ease;
     }
 
     &:hover {

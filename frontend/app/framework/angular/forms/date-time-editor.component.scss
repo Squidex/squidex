@@ -23,8 +23,8 @@
 .input-group {
     .form-control {
         &:last-child {
-            position: relative;
             padding-right: 2rem;
+            position: relative;
         }
     }
 
@@ -47,6 +47,6 @@
     }
 
     &:focus {
-        @include box-shadow-none;
+        box-shadow: none;
     }
 }

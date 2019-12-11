@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public IJsonValue ContentValue
         {
-            get { return contentValue ?? (contentValue = JsonMapper.Map(value)); }
+            get { return contentValue ??= JsonMapper.Map(value); }
         }
 
         public bool IsChanged

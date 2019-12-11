@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     command.ContributorId = user.Id;
 
-                    if (!command.IsRestore)
+                    if (!command.Restoring)
                     {
                         if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                         {

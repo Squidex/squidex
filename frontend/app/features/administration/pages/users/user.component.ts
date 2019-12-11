@@ -16,7 +16,7 @@ import { UserDto, UsersState } from '@app/features/administration/internal';
     template: `
         <tr [routerLink]="user.id" routerLinkActive="active">
             <td class="cell-user">
-                <img class="user-picture" title="{{user.displayName}}" [attr.src]="user | sqxUserDtoPicture" />
+                <img class="user-picture" title="{{user.displayName}}" [src]="user | sqxUserDtoPicture" />
             </td>
             <td class="cell-auto">
                 <span class="user-name table-cell">{{user.displayName}}</span>

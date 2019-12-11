@@ -59,10 +59,12 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
         this.selectUrl(selectedName);
     }
 
-    public follow(name: string) {
-        this.selectUrl(name);
+    public follow(name?: string) {
+        if (name) {
+            this.selectUrl(name);
 
-        this.navigateTo(name);
+            this.navigateTo(name);
+        }
 
         this.dropdown.hide();
     }
@@ -78,6 +80,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
             if (selectedName === s.previewNameSelected) {
                 return s;
             }
+
             const state = { ...s };
 
             const keys = Object.keys(this.schema.previewUrls);

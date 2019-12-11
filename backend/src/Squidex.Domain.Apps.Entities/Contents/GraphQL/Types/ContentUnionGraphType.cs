@@ -35,9 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
             else
             {
-                foreach (var schemaType in schemaTypes)
+                foreach (var (key, value) in schemaTypes)
                 {
-                    types[schemaType.Key] = schemaType.Value;
+                    types[key] = value;
                 }
             }
 

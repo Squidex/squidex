@@ -17,6 +17,9 @@ namespace LoadTest.Model
     public sealed class TestEntityData
     {
         [JsonConverter(typeof(InvariantConverter))]
-        public int Value { get; set; }
+        public int Number { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public string String { get; set; }
     }
 }

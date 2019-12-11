@@ -5,7 +5,7 @@
                 <span class="workflow-name">{{workflow.displayName}}</span>
             </div>
             <div class="col col-tags">
-                <sqx-tag-editor [converter]="schemasSource" [ngModel]="workflow.schemaIds"
+                <sqx-tag-editor [converter]="schemasSource.converter | async" [ngModel]="workflow.schemaIds"
                     placeholder=""
                     styleGray="true"
                     styleBlank="true"
@@ -62,10 +62,10 @@
         
                 <div class="col">
                     <sqx-tag-editor placeholder=", to add schema"
-                        [converter]="schemasSource"
+                        [converter]="schemasSource.converter | async"
                         [ngModel]="workflow.schemaIds"
                         (ngModelChange)="changeSchemaIds($event)"
-                        [suggestedValues]="schemasSource.suggestions">
+                        [suggestedValues]="(schemasSource.converter | async)?.suggestions">
                     </sqx-tag-editor>
         
                     <sqx-form-hint>

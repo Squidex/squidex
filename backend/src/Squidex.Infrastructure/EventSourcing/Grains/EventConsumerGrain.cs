@@ -203,13 +203,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer.Name);
 
-            log.LogInformation(logContext, (ctx, w) => w
+            log.LogDebug(logContext, (ctx, w) => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", ctx.actionId)
                 .WriteProperty("status", "Started")
                 .WriteProperty("eventConsumer", ctx.consumer));
 
-            using (log.MeasureTrace(logContext, (ctx, w) => w
+            using (log.MeasureInformation(logContext, (ctx, w) => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", ctx.actionId)
                 .WriteProperty("status", "Completed")
@@ -226,7 +226,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var logContext = (eventId, eventType, consumer: eventConsumer.Name);
 
-            log.LogInformation(logContext, (ctx, w) => w
+            log.LogDebug(logContext, (ctx, w) => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", ctx.eventId)
                 .WriteProperty("status", "Started")
@@ -234,7 +234,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 .WriteProperty("eventType", ctx.eventType)
                 .WriteProperty("eventConsumer", ctx.consumer));
 
-            using (log.MeasureTrace(logContext, (ctx, w) => w
+            using (log.MeasureInformation(logContext, (ctx, w) => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", ctx.eventId)
                 .WriteProperty("status", "Completed")

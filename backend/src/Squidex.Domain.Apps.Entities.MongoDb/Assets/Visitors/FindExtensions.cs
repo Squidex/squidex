@@ -19,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
     public static class FindExtensions
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
+        private static readonly SortDefinitionBuilder<MongoAssetEntity> Sorting = Builders<MongoAssetEntity>.Sort;
 
         public static ClrQuery AdjustToModel(this ClrQuery query)
         {
@@ -52,13 +53,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, Guid appId)
+        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, Guid appId, Guid? parentId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IsDeleted, false)
             };
+
+            if (parentId.HasValue)
+            {
+                if (parentId == Guid.Empty)
+                {
+                    filters.Add(
+                        Filter.Or(
+                            Filter.Exists(x => x.ParentId, false),
+                            Filter.Eq(x => x.ParentId, Guid.Empty)));
+                }
+                else
+                {
+                    filters.Add(Filter.Eq(x => x.ParentId, parentId.Value));
+                }
+            }
 
             var (filter, last) = query.BuildFilter<MongoAssetEntity>(false);
 

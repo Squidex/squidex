@@ -19,12 +19,7 @@ namespace Squidex.Infrastructure.Validation
 
         public override bool IsValid(object value)
         {
-            if (value is Uri uri && !uri.IsAbsoluteUri)
-            {
-                return false;
-            }
-
-            return true;
+            return !(value is Uri uri) || uri.IsAbsoluteUri;
         }
     }
 }

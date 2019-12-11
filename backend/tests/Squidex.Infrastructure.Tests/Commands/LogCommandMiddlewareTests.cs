@@ -24,13 +24,10 @@ namespace Squidex.Infrastructure.Commands
 
         private sealed class MyLog : ISemanticLog
         {
-            public int LogCount { get; private set; }
-
             public Dictionary<SemanticLogLevel, int> LogLevels { get; } = new Dictionary<SemanticLogLevel, int>();
 
             public void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action)
             {
-                LogCount++;
                 LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
             }
 
@@ -57,8 +54,11 @@ namespace Squidex.Infrastructure.Commands
                 return TaskHelper.Done;
             });
 
-            Assert.Equal(3, log.LogCount);
-            Assert.Equal(3, log.LogLevels[SemanticLogLevel.Information]);
+            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
+            {
+                [SemanticLogLevel.Debug] = 1,
+                [SemanticLogLevel.Information] = 2
+            });
         }
 
         [Fact]
@@ -71,9 +71,12 @@ namespace Squidex.Infrastructure.Commands
                 await sut.HandleAsync(context, () => throw new InvalidOperationException());
             });
 
-            Assert.Equal(3, log.LogCount);
-            Assert.Equal(2, log.LogLevels[SemanticLogLevel.Information]);
-            Assert.Equal(1, log.LogLevels[SemanticLogLevel.Error]);
+            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
+            {
+                [SemanticLogLevel.Debug] = 1,
+                [SemanticLogLevel.Information] = 1,
+                [SemanticLogLevel.Error] = 1,
+            });
         }
 
         [Fact]
@@ -83,9 +86,12 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.HandleAsync(context, () => TaskHelper.Done);
 
-            Assert.Equal(4, log.LogCount);
-            Assert.Equal(3, log.LogLevels[SemanticLogLevel.Information]);
-            Assert.Equal(1, log.LogLevels[SemanticLogLevel.Fatal]);
+            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
+            {
+                [SemanticLogLevel.Debug] = 1,
+                [SemanticLogLevel.Information] = 2,
+                [SemanticLogLevel.Fatal] = 1,
+            });
         }
     }
 }

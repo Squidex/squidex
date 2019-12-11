@@ -10,6 +10,7 @@ import { FormControl } from '@angular/forms';
 
 import {
     AssetsState,
+    DialogModel,
     LocalStoreService,
     Queries,
     Query,
@@ -26,6 +27,8 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public assetsFilter = new FormControl();
 
     public queries = new Queries(this.uiState, 'assets');
+
+    public addAssetFolderDialog = new DialogModel();
 
     public isListView: boolean;
 
@@ -57,14 +60,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
 
     public toggleTag(tag: string) {
         this.assetsState.toggleTag(tag);
-    }
-
-    public goNext() {
-        this.assetsState.goNext();
-    }
-
-    public goPrev() {
-        this.assetsState.goPrev();
     }
 
     public changeView(isListView: boolean) {

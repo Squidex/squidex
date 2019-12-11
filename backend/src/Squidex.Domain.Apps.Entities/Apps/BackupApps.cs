@@ -10,82 +10,78 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class BackupApps : BackupHandler
+    public sealed class BackupApps : IBackupHandler
     {
-        private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
-        private readonly IAppUISettings appUISettings;
+        private const string AvatarFile = "Avatar.image";
+        private readonly IAppImageStore appImageStore;
         private readonly IAppsIndex appsIndex;
-        private readonly IUserResolver userResolver;
+        private readonly IAppUISettings appUISettings;
         private readonly HashSet<string> contributors = new HashSet<string>();
-        private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
-        private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
         private string? appReservation;
-        private string appName;
 
-        public override string Name { get; } = "Apps";
+        public string Name { get; } = "Apps";
 
-        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex, IUserResolver userResolver)
+        public BackupApps(IAppImageStore appImageStore, IAppsIndex appsIndex, IAppUISettings appUISettings)
         {
+            Guard.NotNull(appImageStore);
             Guard.NotNull(appsIndex);
             Guard.NotNull(appUISettings);
-            Guard.NotNull(userResolver);
 
             this.appsIndex = appsIndex;
+            this.appImageStore = appImageStore;
             this.appUISettings = appUISettings;
-            this.userResolver = userResolver;
         }
 
-        public override async Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
+        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
-            if (@event.Payload is AppContributorAssigned appContributorAssigned)
+            switch (@event.Payload)
             {
-                var userId = appContributorAssigned.ContributorId;
-
-                if (!usersWithEmail.ContainsKey(userId))
-                {
-                    var user = await userResolver.FindByIdOrEmailAsync(userId);
-
-                    if (user != null)
-                    {
-                        usersWithEmail.Add(userId, user.Email);
-                    }
-                }
+                case AppContributorAssigned appContributorAssigned:
+                    context.UserMapping.Backup(appContributorAssigned.ContributorId);
+                    break;
+                case AppImageUploaded _:
+                    await WriteAssetAsync(context.AppId, context.Writer);
+                    break;
             }
         }
 
-        public override async Task BackupAsync(Guid appId, BackupWriter writer)
+        public async Task BackupAsync(BackupContext context)
         {
-            await WriteUsersAsync(writer);
-            await WriteSettingsAsync(writer, appId);
+            var json = await appUISettings.GetAsync(context.AppId, null);
+
+            await context.Writer.WriteJsonAsync(SettingsFile, json);
         }
 
-        public override async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
             switch (@event.Payload)
             {
                 case AppCreated appCreated:
                     {
-                        appName = appCreated.Name;
+                        await ReserveAppAsync(context.AppId, appCreated.Name);
 
-                        await ResolveUsersAsync(reader);
-                        await ReserveAppAsync(appId);
+                        break;
+                    }
+
+                case AppImageUploaded _:
+                    {
+                        await ReadAssetAsync(context.AppId, context.Reader);
 
                         break;
                     }
 
                 case AppContributorAssigned contributorAssigned:
                     {
-                        if (!userMapping.TryGetValue(contributorAssigned.ContributorId, out var user) || user.Equals(actor))
+                        if (!context.UserMapping.TryMap(contributorAssigned.ContributorId, out var user) || user.Equals(context.Initiator))
                         {
                             return false;
                         }
@@ -97,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 case AppContributorRemoved contributorRemoved:
                     {
-                        if (!userMapping.TryGetValue(contributorRemoved.ContributorId, out var user) || user.Equals(actor))
+                        if (!context.UserMapping.TryMap(contributorRemoved.ContributorId, out var user) || user.Equals(context.Initiator))
                         {
                             return false;
                         }
@@ -108,20 +104,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     }
             }
 
-            if (@event.Payload is SquidexEvent squidexEvent)
-            {
-                squidexEvent.Actor = MapUser(squidexEvent.Actor.Identifier, actor);
-            }
-
             return true;
         }
 
-        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        public async Task RestoreAsync(RestoreContext context)
         {
-            return ReadSettingsAsync(reader, appId);
+            var json = await context.Reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
+
+            await appUISettings.SetAsync(context.AppId, null, json);
         }
 
-        private async Task ReserveAppAsync(Guid appId)
+        private async Task ReserveAppAsync(Guid appId, string appName)
         {
             appReservation = await appsIndex.ReserveAsync(appId, appName);
 
@@ -131,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public override async Task CleanupRestoreErrorAsync(Guid appId)
+        public async Task CleanupRestoreErrorAsync(Guid appId)
         {
             if (appReservation != null)
             {
@@ -139,66 +132,39 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private RefToken MapUser(string userId, RefToken fallback)
-        {
-            return userMapping.GetOrAdd(userId, fallback);
-        }
-
-        private async Task ResolveUsersAsync(BackupReader reader)
-        {
-            await ReadUsersAsync(reader);
-
-            foreach (var kvp in usersWithEmail)
-            {
-                var email = kvp.Value;
-
-                var user = await userResolver.FindByIdOrEmailAsync(email);
-
-                if (user == null && await userResolver.CreateUserIfNotExists(kvp.Value))
-                {
-                    user = await userResolver.FindByIdOrEmailAsync(email);
-                }
-
-                if (user != null)
-                {
-                    userMapping[kvp.Key] = new RefToken(RefTokenType.Subject, user.Id);
-                }
-            }
-        }
-
-        private async Task ReadUsersAsync(BackupReader reader)
-        {
-            var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
-
-            usersWithEmail = json;
-        }
-
-        private async Task WriteUsersAsync(BackupWriter writer)
-        {
-            var json = usersWithEmail;
-
-            await writer.WriteJsonAsync(UsersFile, json);
-        }
-
-        private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
-        {
-            var json = await appUISettings.GetAsync(appId, null);
-
-            await writer.WriteJsonAsync(SettingsFile, json);
-        }
-
-        private async Task ReadSettingsAsync(BackupReader reader, Guid appId)
-        {
-            var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
-
-            await appUISettings.SetAsync(appId, null, json);
-        }
-
-        public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
+        public async Task CompleteRestoreAsync(RestoreContext context)
         {
             await appsIndex.AddAsync(appReservation);
 
-            await appsIndex.RebuildByContributorsAsync(appId, contributors);
+            await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
+        }
+
+        private Task WriteAssetAsync(Guid appId, IBackupWriter writer)
+        {
+            return writer.WriteBlobAsync(AvatarFile, async stream =>
+            {
+                try
+                {
+                    await appImageStore.DownloadAsync(appId, stream);
+                }
+                catch (AssetNotFoundException)
+                {
+                }
+            });
+        }
+
+        private async Task ReadAssetAsync(Guid appId, IBackupReader reader)
+        {
+            await reader.ReadBlobAsync(AvatarFile, async stream =>
+            {
+                try
+                {
+                    await appImageStore.UploadAsync(appId, stream);
+                }
+                catch (AssetAlreadyExistsException)
+                {
+                }
+            });
         }
     }
 }

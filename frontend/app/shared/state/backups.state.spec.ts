@@ -53,8 +53,18 @@ describe('BackupsState', () => {
 
             expect(backupsState.snapshot.backups).toEqual([backup1, backup2]);
             expect(backupsState.snapshot.isLoaded).toBeTruthy();
+            expect(backupsState.snapshot.isLoading).toBeFalsy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should reset loading when loading failed', () => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => throwError('error'));
+
+            backupsState.load().pipe(onErrorResumeNext()).subscribe();
+
+            expect(backupsState.snapshot.isLoading).toBeFalsy();
         });
 
         it('should show notification on load when reload is true', () => {
