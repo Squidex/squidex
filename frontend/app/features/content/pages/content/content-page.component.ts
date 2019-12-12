@@ -48,6 +48,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     private isLoadingContent: boolean;
     private autoSaveKey: AutoSaveKey;
 
+    @ViewChild('dueTimeSelector', { static: false })
+    public dueTimeSelector: DueTimeSelectorComponent;
+
     public schema: SchemaDetailsDto;
 
     public formContext: any;
@@ -62,14 +65,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public get hasContent() {
-        return !!this.content;
-    }
-
     public trackByFieldFn: (index: number, field: FieldDto) => any;
-
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly contentsState: ContentsState,
@@ -237,14 +233,18 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public discardChanges() {
-        if (this.content) {
-            this.contentsState.discardDraft(this.content);
+        const content = this.content;
+
+        if (content) {
+            this.contentsState.discardDraft(content);
         }
     }
 
     public delete() {
-        if (this.content) {
-            this.contentsState.deleteMany([this.content]).pipe(onErrorResumeNext())
+        const content = this.content;
+
+        if (content) {
+            this.contentsState.deleteMany([content]).pipe(onErrorResumeNext())
                 .subscribe(() => {
                     this.back();
                 });

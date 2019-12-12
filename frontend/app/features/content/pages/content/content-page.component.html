@@ -1,7 +1,7 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="hasContent" grid="true">
+    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" grid="true">
         <ng-container title>
             <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
