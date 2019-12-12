@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     var fieldValue = Undefined.Value;
 
-                    if (!values.TryGetValue(fieldName, out var temp))
+                    if (!values.TryGetValue(fieldName, out var nestedValue))
                     {
                         if (isPartial)
                         {
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        fieldValue = temp;
+                        fieldValue = nestedValue!;
                     }
 
                     var fieldContext = context.Nested(fieldName).Optional(isOptional);

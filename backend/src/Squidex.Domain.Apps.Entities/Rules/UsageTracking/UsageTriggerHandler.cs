@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                 Name = EventName
             };
 
-            return Task.FromResult(result);
+            return Task.FromResult<EnrichedUsageExceededEvent?>(result);
         }
 
         protected override bool Trigger(EnrichedUsageExceededEvent @event, UsageTrigger trigger)

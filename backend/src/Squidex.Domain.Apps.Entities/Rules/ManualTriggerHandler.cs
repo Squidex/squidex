@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Name = "Manual"
             };
 
-            return Task.FromResult(result);
+            return Task.FromResult<EnrichedManualEvent?>(result);
         }
 
         protected override bool Trigger(EnrichedManualEvent @event, ManualTrigger trigger)

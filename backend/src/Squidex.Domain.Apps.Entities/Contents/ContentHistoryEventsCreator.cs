@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 result = result.Param("Status", contentStatusScheduled.Status);
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult<HistoryEvent?>(result);
         }
     }
 }
