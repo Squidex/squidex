@@ -26,7 +26,7 @@ import {
 export class UserPageComponent extends ResourceOwner implements OnInit {
     public isEditable = true;
 
-    public user?: UserDto;
+    public user?: UserDto | null;
     public userForm = new UserForm(this.formBuilder);
 
     constructor(
@@ -41,15 +41,13 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.own(
             this.usersState.selectedUser
-                .subscribe(selectedUser => {
-                    if (selectedUser) {
-                        this.user = selectedUser;
+                .subscribe(user => {
+                    this.user = user;
 
-                        this.isEditable = this.user.canUpdate;
+                    this.isEditable = !user || user.canUpdate;
 
-                        this.userForm.load(selectedUser);
-                        this.userForm.setEnabled(this.isEditable);
-                    }
+                    this.userForm.load(user || { permissions: [] });
+                    this.userForm.setEnabled(this.isEditable);
                 }));
     }
 
