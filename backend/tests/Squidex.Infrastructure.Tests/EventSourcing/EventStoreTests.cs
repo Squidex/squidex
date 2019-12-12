@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         [Theory]
         [InlineData(30)]
-        [InlineData(60)]
+        [InlineData(1000)]
         public async Task Should_read_latest_events(int count)
         {
             var streamName = $"test-{Guid.NewGuid()}";

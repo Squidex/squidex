@@ -17,39 +17,46 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
     public sealed class CommentsGrain : GrainOfString, ICommentsGrain
     {
-        private readonly IStore<string> store;
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
-        private IPersistence persistence;
+        private readonly IEventStore eventStore;
+        private readonly IEventDataFormatter eventDataFormatter;
+        private long version = EtagVersion.Empty;
+        private string streamName;
 
         private long Version
         {
-            get { return events.Count + uncommittedEvents.Count - 1; }
+            get { return version; }
         }
 
-        public CommentsGrain(IStore<string> store)
+        public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(store);
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventDataFormatter);
 
-            this.store = store;
+            this.eventStore = eventStore;
+            this.eventDataFormatter = eventDataFormatter;
         }
 
-        protected override Task OnActivateAsync(string key)
+        protected override async Task OnActivateAsync(string key)
         {
-            persistence = store.WithEventSourcing(GetType(), key, ApplyEvent);
+            streamName = $"comments-{key}";
 
-            return persistence.ReadAsync();
-        }
+            var storedEvents = await eventStore.QueryLatestAsync(streamName, 100);
 
-        private void ApplyEvent(Envelope<IEvent> @event)
-        {
-            events.Add(@event.To<CommentsEvent>());
+            foreach (var @event in storedEvents)
+            {
+                var parsedEvent = eventDataFormatter.Parse(@event.Data);
+
+                version = @event.EventStreamNumber;
+
+                events.Add(parsedEvent.To<CommentsEvent>());
+            }
         }
 
         public async Task<J<object>> ExecuteAsync(J<CommentsCommand> command)
@@ -114,12 +121,22 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                 if (uncommittedEvents.Count > 0)
                 {
-                    await persistence.WriteEventsAsync(uncommittedEvents.Select(x => x.To<IEvent>()));
+                    var commitId = Guid.NewGuid();
+
+                    var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
+
+                    await eventStore.AppendAsync(commitId, streamName, version, eventData);
                 }
 
                 events.AddRange(uncommittedEvents);
 
                 return result;
+            }
+            catch
+            {
+                version -= uncommittedEvents.Count;
+
+                throw;
             }
             finally
             {
@@ -145,6 +162,13 @@ namespace Squidex.Domain.Apps.Entities.Comments
         private void RaiseEvent(CommentsEvent @event)
         {
             uncommittedEvents.Add(Envelope.Create(@event));
+
+            version++;
+        }
+
+        public List<Envelope<CommentsEvent>> GetUncommittedEvents()
+        {
+            return uncommittedEvents;
         }
 
         public Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any)

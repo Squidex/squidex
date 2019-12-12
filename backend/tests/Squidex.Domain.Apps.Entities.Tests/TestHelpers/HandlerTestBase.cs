@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
 
-        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, Guid.NewGuid().ToString());
+        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, "me");
 
         protected Guid AppId { get; } = Guid.NewGuid();
 

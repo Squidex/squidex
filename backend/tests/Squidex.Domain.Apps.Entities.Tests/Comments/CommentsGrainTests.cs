@@ -18,15 +18,14 @@ using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
     public class CommentsGrainTests
     {
-        private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence persistence = A.Fake<IPersistence>();
+        private readonly IEventStore eventStore = A.Fake<IEventStore>();
+        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly Guid commentsId = Guid.NewGuid();
         private readonly Guid commentId = Guid.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
@@ -41,13 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentsGrainTests()
         {
-            A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<HandleEvent>.Ignored))
-                .Returns(persistence);
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
+                .Invokes(x => LastEvents = sut.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
-                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events.ToArray());
-
-            sut = new CommentsGrain(store);
+            sut = new CommentsGrain(eventStore, eventDataFormatter);
             sut.ActivateAsync(Id).Wait();
         }
 

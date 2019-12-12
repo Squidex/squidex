@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
     public sealed class UpdateComment : CommentsCommand

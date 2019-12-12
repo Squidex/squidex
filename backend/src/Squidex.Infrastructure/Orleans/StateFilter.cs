@@ -7,22 +7,54 @@
 
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Storage;
-using StateInconsistentStateException = Squidex.Infrastructure.States.InconsistentStateException;
+using Orleans.Runtime;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public sealed class StateFilter : IIncomingGrainCallFilter
     {
+        private readonly IGrainRuntime runtime;
+
+        public StateFilter(IGrainRuntime runtime)
+        {
+            Guard.NotNull(runtime);
+
+            this.runtime = runtime;
+        }
+
         public async Task Invoke(IIncomingGrainCallContext context)
         {
             try
             {
                 await context.Invoke();
             }
-            catch (StateInconsistentStateException ex)
+            catch (DomainObjectNotFoundException)
             {
-                throw new InconsistentStateException(ex.Message, ex);
+                TryDeactivate(context);
+
+                throw;
+            }
+            catch (WrongEventVersionException)
+            {
+                TryDeactivate(context);
+
+                throw;
+            }
+            catch (InconsistentStateException)
+            {
+                TryDeactivate(context);
+
+                throw;
+            }
+        }
+
+        private void TryDeactivate(IIncomingGrainCallContext context)
+        {
+            if (context.Grain is Grain grain)
+            {
+                runtime.DeactivateOnIdle(grain);
             }
         }
     }

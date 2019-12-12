@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Events.Comments
     {
         public string Text { get; set; }
 
+        public string[]? Mentions { get; set; }
+
         public Uri? Url { get; set; }
     }
 }

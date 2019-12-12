@@ -41,15 +41,17 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.own(
             this.usersState.selectedUser
-                .subscribe(selectedUser => {
-                    if (selectedUser) {
-                        this.user = selectedUser;
+                .subscribe(user => {
+                    this.user = user || undefined;
 
-                        this.isEditable = this.user.canUpdate;
-
-                        this.userForm.load(selectedUser);
-                        this.userForm.setEnabled(this.isEditable);
+                    if (user) {
+                        this.isEditable = user.canUpdate;
+                    } else {
+                        this.isEditable = true;
                     }
+
+                    this.userForm.load(user || {});
+                    this.userForm.setEnabled(this.isEditable);
                 }));
     }
 
