@@ -38,6 +38,26 @@
     &-bottom-left {
         @include fixed(auto, auto, 0, 0);
     }
+
+    .overlayed {
+        position: relative;
+    }
+
+    .overlay {
+        @include absolute(0, auto, 0, 0);
+        animation: width 10s 1 linear;
+        background: $color-white;
+        border: 0;
+        opacity: .1;
+        overflow: hidden;
+        width: 100%;
+    }
+}
+
+@keyframes width {
+    100% {
+        width: 0;
+    }
 }
 
 $caret-size: 6px;

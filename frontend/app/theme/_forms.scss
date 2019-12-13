@@ -125,17 +125,13 @@
         max-width: 600px;
         min-width: 200px;
         padding: 1rem;
+        padding-right: 2.5rem;
         text-align: left;
         z-index: 2000;
 
         &::after {
             @include absolute(-.75rem, .625rem, auto, auto);
-            border-color: transparent transparent $color-theme-error;
-            border-style: solid;
-            border-width: .4rem;
-            content: '';
-            height: 0;
-            width: 0;
+            @include caret-top($color-theme-error, .4rem);
         }
     }
 }
