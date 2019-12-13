@@ -20,20 +20,8 @@
         </ng-container>
 
         <ng-container menu>
-            <ng-container *ngIf="!content; else notNew">
-                <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
-                    Save
-                </button>
-
-                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="contentsState.canCreateAndPublish | async">
-                    Save and Publish
-                </button>
-
-                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
-            </ng-container>
-
-            <ng-template #notNew>
-                <div class="dropdown dropdown-options ml-1" *ngIf="content">
+            <ng-container *ngIf="content; else noContent">
+                <div class="dropdown dropdown-options ml-1">
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
                     <button type="button" class="btn btn-outline-secondary btn-status" (click)="dropdown.toggle()" [disabled]="schema.isSingleton && !content.isPending"
@@ -69,10 +57,10 @@
                                     <div class="dropdown-divider"></div>
 
                                     <a class="dropdown-item dropdown-item-delete"
-                                       [class.disabled]="!content.canDelete"
-                                       (sqxConfirmClick)="delete()"
-                                       confirmTitle="Delete content"
-                                       confirmText="Do you really want to delete the content?">
+                                        [class.disabled]="!content.canDelete"
+                                        (sqxConfirmClick)="delete()"
+                                        confirmTitle="Delete content"
+                                        confirmText="Do you really want to delete the content?">
                                         Delete
                                     </a>
                                 </ng-container>
@@ -85,13 +73,25 @@
                     Save as Draft
                 </button>
 
-                <ng-container *ngIf="content.canUpdate">
+                <ng-container *ngIf="content?.canUpdate">
                     <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
                         Save
                     </button>
 
                     <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                 </ng-container>
+            </ng-container>
+
+            <ng-template #noContent>
+                <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
+                    Save
+                </button>
+
+                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="contentsState.canCreateAndPublish | async">
+                    Save and Publish
+                </button>
+
+                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-template>
 
             <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
