@@ -62,6 +62,25 @@ describe('AppsService', () => {
         expect(apps!).toEqual([createApp(12), createApp(13)]);
     }));
 
+    it('should make get request to get app',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        let app: AppDto;
+
+        appsService.getApp('my-app').subscribe(result => {
+            app = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(appResponse(12));
+
+        expect(app!).toEqual(createApp(12));
+    }));
+
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 

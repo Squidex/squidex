@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
 
 import {
@@ -56,7 +56,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBe(app1);
     });
 
-    it('should return null on select when unselecting user', () => {
+    it('should return null on select when unselecting app', () => {
         let selectedApp: AppDto;
 
         appsState.select(null).subscribe(x => {
@@ -67,8 +67,39 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
-    it('should return null on select when apps is not found', () => {
+    it('should return new app when loaded', () => {
+        const newApp = createApp(1, '_new');
+
+        appsService.setup(x => x.getApp(app1.name))
+            .returns(() => of(newApp));
+
         let selectedApp: AppDto;
+
+        appsState.loadApp(app1.name).subscribe(x => {
+            selectedApp = x!;
+        });
+
+        expect(selectedApp!).toEqual(newApp);
+        expect(appsState.snapshot.selectedApp).toEqual(newApp);
+    });
+
+    it('should return new app when reloaded', () => {
+        const newApp = createApp(1, '_new');
+
+        appsService.setup(x => x.getApp(app1.name))
+            .returns(() => of(newApp));
+
+        appsState.select(app1.name);
+        appsState.reloadSelected();
+
+        expect(appsState.snapshot.selectedApp).toEqual(newApp);
+    });
+
+    it('should return null on select when app is not found', () => {
+        let selectedApp: AppDto;
+
+        appsService.setup(x => x.getApp('unknown'))
+            .returns(() => throwError(new Error('404')));
 
         appsState.select('unknown').subscribe(x => {
             selectedApp = x!;
@@ -151,6 +182,9 @@ describe('AppsState', () => {
     it('should remove selected app from snapshot when archived', () => {
         appsService.setup(x => x.deleteApp(app1))
             .returns(() => of({})).verifiable();
+
+        appsService.setup(x => x.getApp(app1.name))
+            .returns(() => of(app1));
 
         appsState.select(app1.name).subscribe();
         appsState.delete(app1).subscribe();

@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 import {
     defined,
@@ -58,16 +58,38 @@ export class AppsState extends State<Snapshot> {
         super({ apps: [], selectedApp: null });
     }
 
-    public select(name: string | null): Observable<AppDto | null> {
-        const observable =
-            !name ?
-                of(null) :
-                of(this.snapshot.apps.find(x => x.name === name) || null);
+    public reloadSelected() {
+        return this.loadApp(this.appName).pipe(
+            shareSubscribed(this.dialogs));
+    }
 
-        return observable.pipe(
+    public select(name: string | null): Observable<AppDto | null> {
+        return this.loadApp(name, true).pipe(
             tap(selectedApp => {
-                this.next(s => ({ ...s, selectedApp }));
+                this.next(s => {
+                    return { ...s, selectedApp };
+                });
             }));
+    }
+
+    public loadApp(name: string | null, cached = false) {
+        if (!name) {
+            return of(null);
+        }
+
+        if (cached) {
+            const found = this.snapshot.apps.find(x => x.name === name);
+
+            if (found) {
+                return of(found);
+            }
+        }
+
+        return this.appsService.getApp(name).pipe(
+            tap(app => {
+                this.replaceApp(app, app);
+            }),
+            catchError(() => of(null)));
     }
 
     public load(): Observable<any> {

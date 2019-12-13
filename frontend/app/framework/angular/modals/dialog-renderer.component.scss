@@ -46,7 +46,7 @@
     .overlay {
         @include absolute(0, auto, 0, 0);
         animation: width 10s 1 linear;
-        background: $color-white;
+        background: $color-black;
         border: 0;
         opacity: .1;
         overflow: hidden;

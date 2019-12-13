@@ -81,10 +81,40 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
+                var userPermissions = HttpContext.Permissions();
+
                 return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get an app by name.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Apps returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}")]
+        [ProducesResponseType(typeof(AppDto), 200)]
+        [ApiPermission]
+        [ApiCosts(0)]
+        public IActionResult GetApp(string app)
+        {
+            var response = Deferred.Response(() =>
+            {
+                var userOrClientId = HttpContext.User.UserOrClientId()!;
+                var userPermissions = HttpContext.Permissions();
+
+                return AppDto.FromApp(App, userOrClientId, userPermissions, appPlansProvider, this);
+            });
+
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }
