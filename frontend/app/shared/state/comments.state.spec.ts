@@ -21,17 +21,15 @@ import { TestValues } from './_test-helpers';
 
 describe('CommentsState', () => {
     const {
-        app,
-        appsState,
         creator,
         modified
     } = TestValues;
 
-    const commentsId = 'my-comments';
+    const commentsUrl = 'my-comments';
 
     const oldComments = new CommentsDto([
-        new CommentDto('1', modified, 'text1', creator),
-        new CommentDto('2', modified, 'text2', creator)
+        new CommentDto('1', modified, 'text1', undefined, creator),
+        new CommentDto('2', modified, 'text2', undefined, creator)
     ], [], [], new Version('1'));
 
     let dialogs: IMock<DialogService>;
@@ -42,7 +40,7 @@ describe('CommentsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         commentsService = Mock.ofType<CommentsService>();
-        commentsState = new CommentsState(appsState.object, commentsId, commentsService.object, dialogs.object);
+        commentsState = new CommentsState(commentsUrl, commentsService.object, dialogs.object);
     });
 
     beforeEach(() => {
@@ -52,15 +50,15 @@ describe('CommentsState', () => {
     describe('Loading', () => {
         it('should load and merge comments', () => {
             const newComments = new CommentsDto([
-                    new CommentDto('3', modified, 'text3', creator)
+                    new CommentDto('3', modified, 'text3', undefined, creator)
                 ], [
-                    new CommentDto('2', modified, 'text2_2', creator)
+                    new CommentDto('2', modified, 'text2_2', undefined, creator)
                 ], ['1'], new Version('2'));
 
-            commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
+            commentsService.setup(x => x.getComments(commentsUrl, new Version('-1')))
                 .returns(() => of(oldComments)).verifiable();
 
-            commentsService.setup(x => x.getComments(app, commentsId, new Version('1')))
+            commentsService.setup(x => x.getComments(commentsUrl, new Version('1')))
                 .returns(() => of(newComments)).verifiable();
 
             commentsState.load().subscribe();
@@ -68,59 +66,59 @@ describe('CommentsState', () => {
 
             expect(commentsState.snapshot.isLoaded).toBeTruthy();
             expect(commentsState.snapshot.comments).toEqual([
-                new CommentDto('2', modified, 'text2_2', creator),
-                new CommentDto('3', modified, 'text3', creator)
+                new CommentDto('2', modified, 'text2_2', undefined, creator),
+                new CommentDto('3', modified, 'text3', undefined, creator)
             ]);
         });
     });
 
     describe('Updates', () => {
         beforeEach(() => {
-            commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
+            commentsService.setup(x => x.getComments(commentsUrl, new Version('-1')))
                 .returns(() => of(oldComments)).verifiable();
 
             commentsState.load().subscribe();
         });
 
         it('should add comment to snapshot when created', () => {
-            const newComment = new CommentDto('3', modified, 'text3', creator);
+            const newComment = new CommentDto('3', modified, 'text3', undefined, creator);
 
             const request = { text: 'text3' };
 
-            commentsService.setup(x => x.postComment(app, commentsId, request))
+            commentsService.setup(x => x.postComment(commentsUrl, request))
                 .returns(() => of(newComment)).verifiable();
 
             commentsState.create('text3').subscribe();
 
             expect(commentsState.snapshot.comments).toEqual([
-                new CommentDto('1', modified, 'text1', creator),
-                new CommentDto('2', modified, 'text2', creator),
-                new CommentDto('3', modified, 'text3', creator)
+                new CommentDto('1', modified, 'text1', undefined, creator),
+                new CommentDto('2', modified, 'text2', undefined, creator),
+                new CommentDto('3', modified, 'text3', undefined, creator)
             ]);
         });
 
         it('should update properties when updated', () => {
             const request = { text: 'text2_2' };
 
-            commentsService.setup(x => x.putComment(app, commentsId, '2', request))
+            commentsService.setup(x => x.putComment(commentsUrl, '2', request))
                 .returns(() => of({})).verifiable();
 
             commentsState.update(oldComments.createdComments[1], 'text2_2', modified).subscribe();
 
             expect(commentsState.snapshot.comments).toEqual([
-                new CommentDto('1', modified, 'text1', creator),
-                new CommentDto('2', modified, 'text2_2', creator)
+                new CommentDto('1', modified, 'text1', undefined, creator),
+                new CommentDto('2', modified, 'text2_2', undefined, creator)
             ]);
         });
 
         it('should remove comment from snapshot when deleted', () => {
-            commentsService.setup(x => x.deleteComment(app, commentsId, '2'))
+            commentsService.setup(x => x.deleteComment(commentsUrl, '2'))
                 .returns(() => of({})).verifiable();
 
             commentsState.delete(oldComments.createdComments[1]).subscribe();
 
             expect(commentsState.snapshot.comments).toEqual([
-                new CommentDto('1', modified, 'text1', creator)
+                new CommentDto('1', modified, 'text1', undefined, creator)
             ]);
         });
     });

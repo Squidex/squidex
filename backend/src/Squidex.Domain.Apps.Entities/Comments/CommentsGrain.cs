@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
                     {
-                        GuardComments.CanUpdate(events, c);
+                        GuardComments.CanUpdate(Key, events, c);
 
                         Update(c);
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
                     {
-                        GuardComments.CanDelete(events, c);
+                        GuardComments.CanDelete(Key, events, c);
 
                         Delete(c);
 
@@ -115,6 +115,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 throw new DomainObjectVersionException(Key, GetType(), Version, command.ExpectedVersion);
             }
 
+            var prevVersion = version;
+
             try
             {
                 var result = handler(command);
@@ -125,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                     var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
 
-                    await eventStore.AppendAsync(commitId, streamName, version, eventData);
+                    await eventStore.AppendAsync(commitId, streamName, prevVersion, eventData);
                 }
 
                 events.AddRange(uncommittedEvents);
@@ -134,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             }
             catch
             {
-                version -= uncommittedEvents.Count;
+                version = prevVersion;
 
                 throw;
             }

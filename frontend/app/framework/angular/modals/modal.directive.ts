@@ -150,7 +150,7 @@ export class ModalDirective implements OnDestroy {
         const model = this.currentModel;
 
         if (!this.isClickedInside(event)) {
-            this.eventsView.own(timer(100).subscribe(() => {
+            this.eventsView.own(timer(250).subscribe(() => {
                 this.hideModal(model);
             }));
         }

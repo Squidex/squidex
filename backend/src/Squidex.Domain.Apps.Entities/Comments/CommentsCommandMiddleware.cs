@@ -21,13 +21,13 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public sealed class CommentsCommandHandler : ICommandMiddleware
+    public sealed class CommentsCommandMiddleware : ICommandMiddleware
     {
         private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
 
-        public CommentsCommandHandler(IGrainFactory grainFactory, IUserResolver userResolver)
+        public CommentsCommandMiddleware(IGrainFactory grainFactory, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory);
             Guard.NotNull(userResolver);

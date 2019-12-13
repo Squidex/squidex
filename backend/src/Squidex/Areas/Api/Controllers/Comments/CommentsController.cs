@@ -20,7 +20,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Comments
 {
     /// <summary>
-    /// Manages comments for any kind of resource.
+    /// Manages comments for any kind of app resource.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Comments))]
     public sealed class CommentsController : ApiController
@@ -78,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/comments/{commentsId}")]
-        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
+        [ProducesResponseType(typeof(CommentDto), 201)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, string commentsId, [FromBody] UpsertCommentDto request)
@@ -131,7 +131,11 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, string commentsId, Guid commentId)
         {
-            await CommandBus.PublishAsync(new DeleteComment { CommentsId = commentsId, CommentId = commentId });
+            await CommandBus.PublishAsync(new DeleteComment
+            {
+                CommentsId = commentsId,
+                CommentId = commentId
+            });
 
             return NoContent();
         }

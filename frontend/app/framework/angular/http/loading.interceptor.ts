@@ -22,6 +22,12 @@ export class LoadingInterceptor implements HttpInterceptor {
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const id = MathHelper.guid();
 
+        const silent = req.headers.has('X-Silent');
+
+        if (silent) {
+            return next.handle(req);
+        }
+
         this.loadingService.startLoading(id);
 
         return next.handle(req).pipe(finalize(() => {

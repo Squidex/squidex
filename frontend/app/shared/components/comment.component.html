@@ -7,14 +7,24 @@
             <div class="user-row">
                 <div class="user-ref">{{comment.user | sqxUserNameRef}}</div>
 
-                <button *ngIf="comment.user === userId" type="button" class="btn btn-sm btn-text-danger item-remove" (click)="emitDelete()!">
+                <button *ngIf="comment.user === userToken || canDelete" type="button" class="btn btn-sm btn-text-danger item-remove"
+                    (sqxConfirmClick)="emitDelete()"
+                    confirmTitle="Delete comment"
+                    confirmText="Do you really want to delete the comment?"
+                    [confirmRequired]="confirmDelete">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
 
             <div [innerHTML]="comment.text | sqxMarkdown"></div>
 
-            <div class="comment-created text-muted">{{comment.time | sqxFromNow}}</div>
+            <div class="comment-created text-muted">
+                <ng-container *ngIf="canFollow && comment.url">
+                    <a [routerLink]="comment.url">Follow</a>&nbsp;
+                </ng-container>
+
+                {{comment.time | sqxFromNow}} 
+            </div>
         </div>
     </div>
 </div>

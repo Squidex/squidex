@@ -48,6 +48,9 @@ export class ConfirmClickDirective implements OnDestroy {
     @Input()
     public confirmText: string;
 
+    @Input()
+    public confirmRequired = true;
+
     @Output('sqxConfirmClick')
     public clickConfirmed = new DelayEventEmitter();
 
@@ -66,7 +69,8 @@ export class ConfirmClickDirective implements OnDestroy {
 
     @HostListener('click', ['$event'])
     public onClick(event: Event) {
-        if (this.confirmTitle &&
+        if (this.confirmRequired &&
+            this.confirmTitle &&
             this.confirmTitle.length > 0 &&
             this.confirmText &&
             this.confirmText.length > 0) {

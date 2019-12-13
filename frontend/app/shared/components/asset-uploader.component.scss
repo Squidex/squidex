@@ -1,24 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.nav {
-    & {
-        padding-right: .5rem;
-    }
-
-    .nav-item {
-        & {
-            line-height: 2rem;
-        }
-
-        .nav-link {
-            color: $color-dark-foreground;
-            padding-bottom: 0;
-            padding-top: 0;
-        }
-    }
-}
-
 .icon-upload-3 {
     font-size: 1.4rem;
     font-weight: lighter;

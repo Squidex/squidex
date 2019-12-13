@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public class CommentsCommandHandlerTests
+    public class CommentsCommandMiddlewareTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
@@ -28,14 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Comments
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly Guid commentsId = Guid.NewGuid();
         private readonly Guid commentId = Guid.NewGuid();
-        private readonly CommentsCommandHandler sut;
+        private readonly CommentsCommandMiddleware sut;
 
-        public CommentsCommandHandlerTests()
+        public CommentsCommandMiddlewareTests()
         {
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
                 .Returns(Task.FromResult<IUser?>(null));
 
-            sut = new CommentsCommandHandler(grainFactory, userResolver);
+            sut = new CommentsCommandMiddleware(grainFactory, userResolver);
         }
 
         [Fact]

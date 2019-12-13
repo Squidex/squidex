@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// <summary>
         /// The url where the comment is created.
         /// </summary>
-        public string? Url { get; set; }
+        public Uri? Url { get; set; }
 
         public CreateComment ToCreateCommand(string commentsId)
         {
