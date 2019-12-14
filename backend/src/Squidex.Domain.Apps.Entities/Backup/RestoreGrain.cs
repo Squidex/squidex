@@ -378,7 +378,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (replace && CurrentJob.Log.Count > 0)
             {
-                CurrentJob.Log[CurrentJob.Log.Count - 1] = $"{clock.GetCurrentInstant()}: {message}";
+                CurrentJob.Log[^1] = $"{clock.GetCurrentInstant()}: {message}";
             }
             else
             {

@@ -186,9 +186,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (customFormatters != null)
             {
-                foreach (var kvp in customFormatters)
+                foreach (var (key, value) in customFormatters)
                 {
-                    engine.SetValue(kvp.Key, Safe(kvp.Value));
+                    engine.SetValue(key, Safe(value));
                 }
             }
 

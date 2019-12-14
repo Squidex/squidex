@@ -210,7 +210,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected abstract Task ReadAsync(Type type, Guid id);
 
-        protected abstract Task WriteAsync(Envelope<IEvent>[] events, long previousVersion);
+        protected abstract Task WriteAsync(Envelope<IEvent>[] newEvents, long previousVersion);
 
         public async Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command)
         {

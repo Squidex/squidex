@@ -97,8 +97,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
-            var schema = CreateSchema(false);
-
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
@@ -111,8 +109,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
         {
-            var schema = CreateSchema(false);
-
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft, false);
@@ -135,8 +131,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanPatch_should_throw_exception_if_data_is_null()
         {
-            var schema = CreateSchema(false);
-
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
@@ -149,8 +143,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
         {
-            var schema = CreateSchema(false);
-
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft, false);

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return assetStore.DeleteAsync(fileName);
         }
 
-        private string GetFileName(Guid backupId)
+        private static string GetFileName(Guid backupId)
         {
             return $"{backupId}_0";
         }

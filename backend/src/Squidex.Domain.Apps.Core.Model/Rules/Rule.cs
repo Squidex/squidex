@@ -51,11 +51,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         }
 
         [Pure]
-        public Rule Rename(string name)
+        public Rule Rename(string newName)
         {
             return Clone(clone =>
             {
-                clone.name = name;
+                clone.name = newName;
             });
         }
 

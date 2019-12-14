@@ -71,16 +71,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     }
                     else
                     {
-                        foreach (var transition in step.Value.Transitions)
+                        foreach (var (status, transition) in step.Value.Transitions)
                         {
-                            var transitionPrefix = $"{stepPrefix}.{nameof(step.Value.Transitions)}.{transition.Key}";
+                            var transitionPrefix = $"{stepPrefix}.{nameof(step.Value.Transitions)}.{status}";
 
-                            if (!workflow.Steps.ContainsKey(transition.Key))
+                            if (!workflow.Steps.ContainsKey(status))
                             {
                                 e("Transition has an invalid target.", transitionPrefix);
                             }
 
-                            if (transition.Value == null)
+                            if (transition == null)
                             {
                                 e(Not.Defined("Transition"), transitionPrefix);
                             }

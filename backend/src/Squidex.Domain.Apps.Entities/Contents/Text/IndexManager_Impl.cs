@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            internal void ThrowIfReleased()
+            private void ThrowIfReleased()
             {
                 if (isReleased)
                 {

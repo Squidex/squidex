@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             Name = $"{schemaType}DataFlatDto";
 
-            foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
+            foreach (var (field, fieldName, _) in schema.SchemaDef.Fields.SafeFields())
             {
                 var (resolvedType, valueResolver) = model.GetGraphType(schema, field, fieldName);
 

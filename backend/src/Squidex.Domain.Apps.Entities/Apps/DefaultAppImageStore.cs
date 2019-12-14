@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        private string GetFileName(Guid backupId)
+        private static string GetFileName(Guid backupId)
         {
             return backupId.ToString();
         }

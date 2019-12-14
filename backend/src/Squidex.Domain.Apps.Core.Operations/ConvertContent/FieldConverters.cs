@@ -141,11 +141,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                             {
                                 if (array[i] is JsonObject arrayItem)
                                 {
-                                    foreach (var kvp in arrayItem)
+                                    foreach (var (key, value) in arrayItem)
                                     {
-                                        if (arrayField.FieldsByName.TryGetValue(kvp.Key, out var nestedField) && ShouldHandle(nestedField, field))
+                                        if (arrayField.FieldsByName.TryGetValue(key, out var nestedField) && ShouldHandle(nestedField, field))
                                         {
-                                            Resolve(kvp.Value);
+                                            Resolve(value);
                                         }
                                     }
                                 }
@@ -332,9 +332,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var partition in data)
+                    foreach (var (partitionKey, partitionValue) in data)
                     {
-                        if (!(partition.Value is JsonArray array))
+                        if (!(partitionValue is JsonArray array))
                         {
                             continue;
                         }
@@ -345,16 +345,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         {
                             var newItem = JsonValue.Object();
 
-                            foreach (var kvp in item)
+                            foreach (var (key, value) in item)
                             {
-                                var nestedField = fieldResolver(arrayField, kvp.Key);
+                                var nestedField = fieldResolver(arrayField, key);
 
                                 if (nestedField == null)
                                 {
                                     continue;
                                 }
 
-                                var newValue = kvp.Value;
+                                var newValue = value;
 
                                 var isUnset = false;
 
@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                             newArray.Add(newItem);
                         }
 
-                        result.Add(partition.Key, newArray);
+                        result.Add(partitionKey, newArray);
                     }
 
                     return result;
@@ -399,9 +399,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var partition in data)
+                    foreach (var (key, value) in data)
                     {
-                        var newValue = partition.Value;
+                        var newValue = value;
 
                         var isUnset = false;
 
@@ -421,7 +421,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                         if (!isUnset)
                         {
-                            result.Add(partition.Key, newValue);
+                            result.Add(key, newValue);
                         }
                     }
 

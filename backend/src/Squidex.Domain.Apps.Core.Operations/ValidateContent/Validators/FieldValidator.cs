@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             try
             {
-                object? typedValue = value;
+                var typedValue = value;
 
                 if (value is IJsonValue jsonValue)
                 {

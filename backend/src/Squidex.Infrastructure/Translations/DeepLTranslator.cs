@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Translations
     {
         private const string Url = "https://api.deepl.com/v2/translate";
         private readonly HttpClient httpClient = new HttpClient();
-        private readonly DeepLTranslatorOptions deepLOptions;
+        private readonly DeepLTranslatorOptions deeplOptions;
         private readonly IJsonSerializer jsonSerializer;
 
         private sealed class Response
@@ -36,12 +36,12 @@ namespace Squidex.Infrastructure.Translations
             public string Text { get; set; }
         }
 
-        public DeepLTranslator(IOptions<DeepLTranslatorOptions> deepLOptions, IJsonSerializer jsonSerializer)
+        public DeepLTranslator(IOptions<DeepLTranslatorOptions> deeplOptions, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(deepLOptions);
+            Guard.NotNull(deeplOptions);
             Guard.NotNull(jsonSerializer);
 
-            this.deepLOptions = deepLOptions.Value;
+            this.deeplOptions = deeplOptions.Value;
 
             this.jsonSerializer = jsonSerializer;
         }
@@ -53,14 +53,14 @@ namespace Squidex.Infrastructure.Translations
                 return new Translation(TranslationResult.NotTranslated, sourceText);
             }
 
-            if (string.IsNullOrWhiteSpace(deepLOptions.AuthKey))
+            if (string.IsNullOrWhiteSpace(deeplOptions.AuthKey))
             {
                 return new Translation(TranslationResult.NotImplemented);
             }
 
             var parameters = new Dictionary<string, string>
             {
-                ["auth_key"] = deepLOptions.AuthKey,
+                ["auth_key"] = deeplOptions.AuthKey,
                 ["text"] = sourceText,
                 ["target_lang"] = GetLanguageCode(targetLanguage)
             };

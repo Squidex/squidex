@@ -57,9 +57,9 @@ namespace Squidex.Web.Pipeline
                 {
                     w.WriteObject("routeValues", actionContext.ActionDescriptor.RouteValues, (routeValues, r) =>
                     {
-                        foreach (var kvp in routeValues)
+                        foreach (var (key, value) in routeValues)
                         {
-                            r.WriteProperty(kvp.Key, kvp.Value);
+                            r.WriteProperty(key, value);
                         }
                     });
                 }

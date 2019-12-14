@@ -56,22 +56,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     }
                 }
 
-                foreach (var field in data)
+                foreach (var value in data.Values)
                 {
-                    if (field.Value != null)
+                    if (value != null)
                     {
-                        foreach (var fieldValue in field.Value)
+                        foreach (var (key, jsonValue) in value)
                         {
-                            var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
+                            var appendText = new Action<string>(text => AppendText(key, text));
 
-                            AppendJsonText(fieldValue.Value, appendText);
+                            AppendJsonText(jsonValue, appendText);
                         }
                     }
                 }
 
-                foreach (var kvp in languages)
+                foreach (var (key, value) in languages)
                 {
-                    result[kvp.Key] = kvp.Value.ToString();
+                    result[key] = value.ToString();
                 }
             }
 

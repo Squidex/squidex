@@ -55,9 +55,9 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 if (texts.TryGetValue(item.Message, out var result))
                 {
-                    foreach (var kvp in item.Parameters)
+                    foreach (var (key, value) in item.Parameters)
                     {
-                        result = result.Replace("[" + kvp.Key + "]", kvp.Value);
+                        result = result.Replace("[" + key + "]", value);
                     }
 
                     return result;

@@ -48,11 +48,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     private isLoadingContent: boolean;
     private autoSaveKey: AutoSaveKey;
 
+    @ViewChild('dueTimeSelector', { static: false })
+    public dueTimeSelector: DueTimeSelectorComponent;
+
     public schema: SchemaDetailsDto;
 
     public formContext: any;
 
-    public content: ContentDto;
+    public content?: ContentDto | null;
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
@@ -62,14 +65,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public get hasContent() {
-        return !!this.content;
-    }
-
     public trackByFieldFn: (index: number, field: FieldDto) => any;
-
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly contentsState: ContentsState,
@@ -118,9 +114,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     const autosaved = this.autoSaveService.get(this.autoSaveKey);
 
                     if (content) {
-                        this.content = content;
-
-                        this.loadContent(this.content.dataDraft, true);
+                        this.loadContent(content.dataDraft, true);
                     }
 
                     if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
@@ -133,6 +127,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                                 }
                             });
                     }
+
+                    this.content = content;
                 }));
 
         this.own(
@@ -237,32 +233,48 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public discardChanges() {
-        this.contentsState.discardDraft(this.content);
+        const content = this.content;
+
+        if (content) {
+            this.contentsState.discardDraft(content);
+        }
     }
 
     public delete() {
-        this.contentsState.deleteMany([this.content]).pipe(onErrorResumeNext())
-            .subscribe(() => {
-                this.back();
-            });
+        const content = this.content;
+
+        if (content) {
+            this.contentsState.deleteMany([content]).pipe(onErrorResumeNext())
+                .subscribe(() => {
+                    this.back();
+                });
+        }
     }
 
     public publishChanges() {
-        this.checkPendingChanges('publish your changes').pipe(
-                filter(x => !!x),
-                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
-                switchMap(d => this.contentsState.publishDraft(this.content, d)),
-                onErrorResumeNext())
-            .subscribe();
+        const content = this.content;
+
+        if (content) {
+            this.checkPendingChanges('publish your changes').pipe(
+                    filter(x => !!x),
+                    switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                    switchMap(d => this.contentsState.publishDraft(content, d)),
+                    onErrorResumeNext())
+                .subscribe();
+        }
     }
 
     public changeStatus(status: string) {
-        this.checkPendingChanges('change the status').pipe(
-                filter(x => !!x),
-                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
-                switchMap(d => this.contentsState.changeStatus(this.content, status, d)),
-                onErrorResumeNext())
-            .subscribe();
+        const content = this.content;
+
+        if (content) {
+            this.checkPendingChanges('change the status').pipe(
+                    filter(x => !!x),
+                    switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
+                    switchMap(d => this.contentsState.changeStatus(content, status, d)),
+                    onErrorResumeNext())
+                .subscribe();
+        }
     }
 
     private checkPendingChanges(action: string) {
@@ -276,12 +288,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadVersion(version: Version | null, compare: boolean) {
-        if (!this.content || version === null || version.eq(this.content.version)) {
+        const content = this.content;
+
+        if (!content || version === null || version.eq(content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.loadContent(this.content.dataDraft, true);
+            this.loadContent(content ? content.dataDraft : {}, true);
         } else {
-            this.contentsState.loadVersion(this.content, version)
+            this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
                         this.contentFormCompare = new EditContentForm(this.languages, this.schema);
@@ -289,7 +303,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
 
-                        this.loadContent(this.content.dataDraft, false);
+                        this.loadContent(content.dataDraft, false);
                     } else {
                         this.contentFormCompare = null;
 

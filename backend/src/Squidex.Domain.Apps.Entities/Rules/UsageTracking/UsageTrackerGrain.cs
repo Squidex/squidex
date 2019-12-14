@@ -78,28 +78,26 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             var today = DateTime.Today;
 
-            foreach (var kvp in state.Value.Targets)
+            foreach (var (key, target) in state.Value.Targets)
             {
-                var target = kvp.Value;
-
                 var from = GetFromDate(today, target.NumDays);
 
                 if (!target.Triggered.HasValue || target.Triggered < from)
                 {
                     var usage = await usageTracker.GetMonthlyCallsAsync(target.AppId.Id.ToString(), today);
 
-                    var limit = kvp.Value.Limits;
+                    var limit = target.Limits;
 
                     if (usage > limit)
                     {
-                        kvp.Value.Triggered = today;
+                        target.Triggered = today;
 
                         var @event = new AppUsageExceeded
                         {
                             AppId = target.AppId,
                             CallsCurrent = usage,
                             CallsLimit = limit,
-                            RuleId = kvp.Key
+                            RuleId = key
                         };
 
                         await state.WriteEventAsync(Envelope.Create<IEvent>(@event));

@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
         {
             var json = new Dictionary<Guid, Workflow>(value.Count);
 
-            foreach (var workflow in value)
+            foreach (var (key, workflow) in value)
             {
-                json.Add(workflow.Key, workflow.Value);
+                json.Add(key, workflow);
             }
 
             serializer.Serialize(writer, json);

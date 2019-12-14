@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             GuardAsset.CanDelete(command);
         }
 
-        private IAssetFolderEntity CreateFolder(Guid id = default)
+        private static IAssetFolderEntity CreateFolder(Guid id = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 

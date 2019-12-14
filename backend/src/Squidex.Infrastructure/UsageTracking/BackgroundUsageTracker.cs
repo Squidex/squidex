@@ -69,16 +69,16 @@ namespace Squidex.Infrastructure.UsageTracking
                     var updates = new UsageUpdate[localUsages.Count];
                     var updateIndex = 0;
 
-                    foreach (var kvp in localUsages)
+                    foreach (var (key, value) in localUsages)
                     {
                         var counters = new Counters
                         {
-                            [CounterTotalCalls] = kvp.Value.Count,
-                            [CounterTotalElapsedMs] = kvp.Value.ElapsedMs
+                            [CounterTotalCalls] = value.Count,
+                            [CounterTotalElapsedMs] = value.ElapsedMs
                         };
 
-                        updates[updateIndex].Key = kvp.Key.Key;
-                        updates[updateIndex].Category = kvp.Key.Category;
+                        updates[updateIndex].Key = key.Key;
+                        updates[updateIndex].Category = key.Category;
                         updates[updateIndex].Counters = counters;
                         updates[updateIndex].Date = today;
 
