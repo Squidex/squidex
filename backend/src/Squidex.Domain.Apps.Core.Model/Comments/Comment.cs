@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Comments
 
         public string Text { get; }
 
-        public Comment(Guid id, Instant time, RefToken user, string text, Uri? url)
+        public Comment(Guid id, Instant time, RefToken user, string text, Uri? url = null)
         {
             Guard.NotEmpty(id);
             Guard.NotNull(user);
