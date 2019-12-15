@@ -109,33 +109,35 @@ namespace Squidex.Config.Web
 
         public static void UseSquidexForwardingRules(this IApplicationBuilder app, IConfiguration config)
         {
+            app.UseForwardedHeaders(GetForwardingOptions(config));
+
+            app.UseMiddleware<EnforceHttpsMiddleware>();
+            app.UseMiddleware<CleanupHostMiddleware>();
+        }
+
+        private static ForwardedHeadersOptions GetForwardingOptions(IConfiguration config)
+        {
             var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-            var forwardedHeadersOptions = new ForwardedHeadersOptions();
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl) && urlsOptions.EnableXForwardedHost)
             {
-                forwardedHeadersOptions = new ForwardedHeadersOptions()
+                return new ForwardedHeadersOptions()
                 {
+                    AllowedHosts = new List<string> { new Uri(urlsOptions.BaseUrl).Host },
                     ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
-                    AllowedHosts = new List<string>() { new Uri(urlsOptions.BaseUrl).Host },
                     ForwardLimit = null,
                     RequireHeaderSymmetry = false
                 };
             }
             else
             {
-                forwardedHeadersOptions = new ForwardedHeadersOptions()
+                return new ForwardedHeadersOptions()
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedProto,
                     ForwardLimit = null,
                     RequireHeaderSymmetry = false
                 };
             }
-
-            app.UseForwardedHeaders(forwardedHeadersOptions);
-
-            app.UseMiddleware<EnforceHttpsMiddleware>();
-            app.UseMiddleware<CleanupHostMiddleware>();
         }
     }
 }
