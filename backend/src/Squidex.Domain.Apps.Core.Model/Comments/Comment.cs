@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Comments
 
         public RefToken User { get; }
 
-        public Uri? Url { get; }
-
         public string Text { get; }
+
+        public Uri? Url { get; }
 
         public Comment(Guid id, Instant time, RefToken user, string text, Uri? url = null)
         {
@@ -30,12 +30,9 @@ namespace Squidex.Domain.Apps.Core.Comments
             Guard.NotNull(text);
 
             Id = id;
-
-            Time = time;
             Text = text;
-
+            Time = time;
             User = user;
-
             Url = url;
         }
     }

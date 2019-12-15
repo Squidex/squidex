@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -61,14 +62,14 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 CreatedComments = new List<Comment>
                 {
-                    new Comment(command.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), command.Actor, "text1")
+                    new Comment(command.CommentId, GetTime(), command.Actor, "text1", command.Url)
                 },
                 Version = 0
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = new Uri("http://uri") })
+                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = command.Url })
                 );
         }
 
@@ -87,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 CreatedComments = new List<Comment>
                 {
-                    new Comment(commentId, LastEvents.ElementAt(0).Headers.Timestamp(), updateCommand.Actor, "text2")
+                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 UpdatedComments = new List<Comment>
                 {
-                    new Comment(commentId, LastEvents.ElementAt(0).Headers.Timestamp(), updateCommand.Actor, "text2")
+                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
@@ -169,6 +170,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
             command.CommentId = commentId;
 
             return command;
+        }
+
+        private Instant GetTime()
+        {
+            return LastEvents.ElementAt(0).Headers.Timestamp();
         }
     }
 }
