@@ -55,7 +55,7 @@ export class CommentsService {
     }
 
     public getComments(commentsUrl: string, version: Version): Observable<CommentsDto> {
-        const url = this.apiUrl.buildUrl(`${commentsUrl}?version=${version.value}`);
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}?version=${version.value}`);
 
         const options = {
             headers: new HttpHeaders({
@@ -92,7 +92,7 @@ export class CommentsService {
     }
 
     public postComment(commentsUrl: string, dto: UpsertCommentDto): Observable<CommentDto> {
-        const url = this.apiUrl.buildUrl(`${commentsUrl}`);
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}`);
 
         return this.http.post<any>(url, dto).pipe(
             map(body => {
@@ -109,14 +109,14 @@ export class CommentsService {
     }
 
     public putComment(commentsUrl: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`${commentsUrl}/${commentId}`);
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
             pretifyError('Failed to update comment.'));
     }
 
     public deleteComment(commentsUrl: string, commentId: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`${commentsUrl}/${commentId}`);
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.delete(url).pipe(
             pretifyError('Failed to delete comment.'));

@@ -67,7 +67,7 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
     }
 
     public ngOnInit() {
-        this.commentsUrl = `api/users/${this.userId}/notifications`;
+        this.commentsUrl = `users/${this.userId}/notifications`;
         this.commentsState = new CommentsState(this.commentsUrl, this.commentsService, this.dialogs);
 
         this.own(

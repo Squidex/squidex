@@ -83,12 +83,12 @@ describe('CommentsState', () => {
         it('should add comment to snapshot when created', () => {
             const newComment = new CommentDto('3', modified, 'text3', undefined, creator);
 
-            const request = { text: 'text3' };
+            const request = { text: 'text3', url: 'url3' };
 
             commentsService.setup(x => x.postComment(commentsUrl, request))
                 .returns(() => of(newComment)).verifiable();
 
-            commentsState.create('text3').subscribe();
+            commentsState.create('text3', 'url3').subscribe();
 
             expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', undefined, creator),

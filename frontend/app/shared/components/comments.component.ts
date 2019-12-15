@@ -58,7 +58,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.contributorsState.load();
 
-        this.commentsUrl = `api/apps/${this.appsState.appName}/comments/${this.commentsId}`;
+        this.commentsUrl = `apps/${this.appsState.appName}/comments/${this.commentsId}`;
         this.commentsState = new CommentsState(this.commentsUrl, this.commentsService, this.dialogs);
 
         this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
