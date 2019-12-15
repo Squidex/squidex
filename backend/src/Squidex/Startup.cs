@@ -54,7 +54,7 @@ namespace Squidex
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory();
             services.AddSquidexIdentity(config);
-            services.AddSquidexIdentityServer(config);
+            services.AddSquidexIdentityServer();
             services.AddSquidexInfrastructure(config);
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);
@@ -76,7 +76,7 @@ namespace Squidex
             app.UseSquidexTracking();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
-            app.UseSquidexForwardingRules();
+            app.UseSquidexForwardingRules(config);
 
             app.ConfigureApi();
             app.ConfigurePortal();
