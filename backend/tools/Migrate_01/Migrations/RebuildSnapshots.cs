@@ -27,6 +27,7 @@ namespace Migrate_01.Migrations
             await rebuilder.RebuildRulesAsync();
             await rebuilder.RebuildContentAsync();
             await rebuilder.RebuildAssetsAsync();
+            await rebuilder.RebuildAssetFoldersAsync();
         }
     }
 }

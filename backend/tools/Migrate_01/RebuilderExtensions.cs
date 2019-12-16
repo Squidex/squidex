@@ -43,6 +43,11 @@ namespace Migrate_01
             return rebuilder.RebuildAsync<AssetState, AssetGrain>("^asset\\-", ct);
         }
 
+        public static Task RebuildAssetFoldersAsync(this Rebuilder rebuilder, CancellationToken ct = default)
+        {
+            return rebuilder.RebuildAsync<AssetFolderState, AssetFolderGrain>("^assetfolder\\-", ct);
+        }
+
         public static Task RebuildContentAsync(this Rebuilder rebuilder, CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<ContentState, ContentGrain>("^content\\-", ct);

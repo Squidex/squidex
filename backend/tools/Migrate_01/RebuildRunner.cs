@@ -51,6 +51,7 @@ namespace Migrate_01
             if (rebuildOptions.Assets)
             {
                 await rebuilder.RebuildAssetsAsync(ct);
+                await rebuilder.RebuildAssetFoldersAsync(ct);
             }
 
             if (rebuildOptions.Contents)
