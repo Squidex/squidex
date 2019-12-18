@@ -20,6 +20,11 @@
     }
 }
 
+.col-right {
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+}
+
 .comment {
     & {
         font-size: .9rem;
