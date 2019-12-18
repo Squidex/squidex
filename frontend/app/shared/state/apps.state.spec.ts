@@ -80,7 +80,7 @@ describe('AppsState', () => {
         });
 
         expect(selectedApp!).toEqual(newApp);
-        expect(appsState.snapshot.selectedApp).toEqual(newApp);
+        expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
     it('should return new app when reloaded', () => {
@@ -89,7 +89,7 @@ describe('AppsState', () => {
         appsService.setup(x => x.getApp(app1.name))
             .returns(() => of(newApp));
 
-        appsState.select(app1.name);
+        appsState.select(app1.name).subscribe();
         appsState.reloadSelected();
 
         expect(appsState.snapshot.selectedApp).toEqual(newApp);
