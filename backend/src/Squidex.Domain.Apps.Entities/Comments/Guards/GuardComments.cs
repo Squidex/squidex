@@ -30,15 +30,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             });
         }
 
-        public static void CanUpdate(List<Envelope<CommentsEvent>> events, UpdateComment command)
+        public static void CanUpdate(string commentsId, List<Envelope<CommentsEvent>> events, UpdateComment command)
         {
             Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another actor.");
+                throw new DomainException("Comment is created by another user.");
             }
 
             Validate.It(() => "Cannot update comment.", e =>
@@ -50,15 +50,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             });
         }
 
-        public static void CanDelete(List<Envelope<CommentsEvent>> events, DeleteComment command)
+        public static void CanDelete(string commentsId, List<Envelope<CommentsEvent>> events, DeleteComment command)
         {
             Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another actor.");
+                throw new DomainException("Comment is created by another user.");
             }
         }
 

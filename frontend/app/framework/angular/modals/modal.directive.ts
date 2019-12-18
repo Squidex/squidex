@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { timer } from 'rxjs';
 
 import {
     DialogModel,
@@ -25,6 +24,7 @@ declare type Model = DialogModel | ModalModel | any;
 export class ModalDirective implements OnDestroy {
     private readonly eventsView = new ResourceOwner();
     private readonly eventsModel = new ResourceOwner();
+    private static backdrop: any;
     private currentModel: DialogModel | ModalModel | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
     private renderRoots: ReadonlyArray<HTMLElement> | null;
@@ -75,7 +75,9 @@ export class ModalDirective implements OnDestroy {
 
         if (isOpen) {
             if (!this.renderedView) {
-                this.renderedView = this.getContainer().createEmbeddedView(this.templateRef);
+                const container = this.getContainer();
+
+                this.renderedView = container.createEmbeddedView(this.templateRef);
                 this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
 
                 this.setupStyles();
@@ -88,6 +90,8 @@ export class ModalDirective implements OnDestroy {
                 this.renderedView.destroy();
                 this.renderedView = null;
                 this.renderRoots = null;
+
+                remove(this.renderer, ModalDirective.backdrop);
 
                 this.changeDetector.detectChanges();
             }
@@ -104,6 +108,7 @@ export class ModalDirective implements OnDestroy {
         if (this.renderRoots) {
             for (const node of this.renderRoots) {
                 this.renderer.setStyle(node, 'display', 'block');
+                this.renderer.setStyle(node, 'z-index', 2000);
             }
         }
     }
@@ -112,9 +117,7 @@ export class ModalDirective implements OnDestroy {
         if (isModel(value)) {
             this.currentModel = value;
 
-            this.eventsModel.own(value.isOpen.subscribe(update => {
-                this.update(update);
-            }));
+            this.eventsModel.own(value.isOpen.subscribe(isOpen => this.update(isOpen)));
         } else {
             this.update(value === true);
         }
@@ -125,12 +128,25 @@ export class ModalDirective implements OnDestroy {
             return;
         }
 
-        if (this.closeAuto) {
-            document.addEventListener('mousedown', this.documentClickListener, true);
+        if (this.closeAuto && this.renderRoots && this.renderRoots.length > 0) {
+            let backdrop = ModalDirective.backdrop;
 
-            this.eventsView.own(() => {
-                document.removeEventListener('mousedown', this.documentClickListener, true);
-            });
+            if (!backdrop) {
+                backdrop = this.renderer.createElement('div');
+
+                this.renderer.setStyle(backdrop, 'position', 'fixed');
+                this.renderer.setStyle(backdrop, 'top', 0);
+                this.renderer.setStyle(backdrop, 'left', 0);
+                this.renderer.setStyle(backdrop, 'right', 0);
+                this.renderer.setStyle(backdrop, 'bottom', 0);
+                this.renderer.setStyle(backdrop, 'z-index', 1500);
+
+                ModalDirective.backdrop = backdrop;
+            }
+
+            insertBefore(this.renderer, this.renderRoots[0], backdrop);
+
+            this.eventsView.own(this.renderer.listen(backdrop, 'click', this.backdropListener));
         }
 
         if (this.closeAlways && this.renderRoots) {
@@ -146,13 +162,9 @@ export class ModalDirective implements OnDestroy {
         }
     }
 
-    private documentClickListener = (event: MouseEvent) => {
-        const model = this.currentModel;
-
+    private backdropListener = (event: MouseEvent) => {
         if (!this.isClickedInside(event)) {
-            this.eventsView.own(timer(100).subscribe(() => {
-                this.hideModal(model);
-            }));
+            this.hideModal(this.currentModel);
         }
     }
 
@@ -179,6 +191,26 @@ export class ModalDirective implements OnDestroy {
             model.hide();
 
             this.eventsView.unsubscribeAll();
+        }
+    }
+}
+
+function insertBefore(renderer: Renderer2, refElement: any, element: any) {
+    if (element && refElement) {
+        const parent = renderer.parentNode(refElement);
+
+        if (parent) {
+            renderer.insertBefore(parent, element, refElement);
+        }
+    }
+}
+
+function remove(renderer: Renderer2, element: any) {
+    if (element) {
+        const parent = renderer.parentNode(element);
+
+        if (parent) {
+            renderer.removeChild(parent, element);
         }
     }
 }

@@ -1,0 +1,13 @@
+@import '_vars';
+@import '_mixins';
+
+.dropdown-menu {
+    left: auto;
+    max-height: 500px;
+    min-height: 5rem;
+    overflow-y: scroll;
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+    right: 0;
+    width: 300px;
+}

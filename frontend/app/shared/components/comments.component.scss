@@ -1,6 +1,16 @@
 @import '_vars';
 @import '_mixins';
 
+:host ::ng-deep {
+    .mention-menu {
+        border-color: $color-border !important;
+    }
+
+    .mention-active > a {
+        background: $color-theme-blue !important;
+    }
+}
+
 .comments {
     &-list {
         flex-grow: 1;
@@ -11,6 +21,7 @@
     }
 
     &-footer {
+        border: 0;
         border-top: 1px solid $color-border;
         flex-shrink: 0;
     }

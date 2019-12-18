@@ -17,17 +17,15 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
-#pragma warning disable IDE0019 // Use pattern matching
-
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public abstract class HandlerTestBase<TState>
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<TState> persistence1 = A.Fake<IPersistence<TState>>();
-        private readonly IPersistence persistence2 = A.Fake<IPersistence>();
+        private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
+        private readonly IPersistence persistence = A.Fake<IPersistence>();
 
-        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, Guid.NewGuid().ToString());
+        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, "me");
 
         protected Guid AppId { get; } = Guid.NewGuid();
 
@@ -61,15 +59,15 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected HandlerTestBase()
         {
             A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<HandleSnapshot<TState>>.Ignored, A<HandleEvent>.Ignored))
-                .Returns(persistence1);
+                .Returns(persistenceWithState);
 
             A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<HandleEvent>.Ignored))
-                .Returns(persistence2);
+                .Returns(persistence);
 
-            A.CallTo(() => persistence1.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
 
-            A.CallTo(() => persistence2.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
         }
 
@@ -137,5 +135,3 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         }
     }
 }
-
-#pragma warning restore IDE0019 // Use pattern matching

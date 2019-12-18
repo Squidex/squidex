@@ -13,8 +13,10 @@ namespace Squidex.Domain.Apps.Events.Comments
     [EventType(nameof(CommentCreated))]
     public sealed class CommentCreated : CommentsEvent
     {
-        public Guid CommentId { get; set; }
-
         public string Text { get; set; }
+
+        public string[]? Mentions { get; set; }
+
+        public Uri? Url { get; set; }
     }
 }

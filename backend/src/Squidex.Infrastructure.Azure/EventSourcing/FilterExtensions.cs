@@ -17,6 +17,11 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal static class FilterExtensions
     {
+        private static readonly FeedOptions CrossPartition = new FeedOptions
+        {
+            EnableCrossPartitionQuery = true
+        };
+
         public static async Task<T> FirstOrDefaultAsync<T>(this IQueryable<T> queryable, CancellationToken ct = default)
         {
             var documentQuery = queryable.AsDocumentQuery();
@@ -36,7 +41,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)
         {
-            var query = documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri, querySpec);
+            var query = documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri, querySpec, CrossPartition);
 
             return query.QueryAsync(handler, ct);
         }

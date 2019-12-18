@@ -7,8 +7,9 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import { timer } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -16,6 +17,7 @@ import {
     CommentDto,
     CommentsService,
     CommentsState,
+    ContributorsState,
     DialogService,
     ResourceOwner,
     UpsertCommentForm
@@ -30,27 +32,36 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     @Input()
     public commentsId: string;
 
+    public commentsUrl: string;
     public commentsState: CommentsState;
     public commentForm = new UpsertCommentForm(this.formBuilder);
 
-    public userId: string;
+    public mentionUsers = this.contributorsState.contributors.pipe(map(x => x.map(c => c.contributorEmail)));
+    public mentionConfig = { dropUp: true };
+
+    public userToken: string;
 
     constructor(authService: AuthService,
         private readonly appsState: AppsState,
         private readonly commentsService: CommentsService,
+        private readonly contributorsState: ContributorsState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
+        private readonly router: Router
     ) {
         super();
 
-        this.userId = authService.user!.token;
+        this.userToken = authService.user!.token;
     }
 
     public ngOnInit() {
-        this.commentsState = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
+        this.contributorsState.load();
 
-        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load())));
+        this.commentsUrl = `apps/${this.appsState.appName}/comments/${this.commentsId}`;
+        this.commentsState = new CommentsState(this.commentsUrl, this.commentsService, this.dialogs);
+
+        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
     }
 
     public delete(comment: CommentDto) {
@@ -65,11 +76,12 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
         const value = this.commentForm.submit();
 
         if (value && value.text && value.text.length > 0) {
-            this.commentsState.create(value.text);
-            this.commentForm.submitCompleted();
+            this.commentsState.create(value.text, this.router.url);
 
             this.changeDetector.detectChanges();
         }
+
+        this.commentForm.submitCompleted();
     }
 
     public trackByComment(index: number, comment: CommentDto) {

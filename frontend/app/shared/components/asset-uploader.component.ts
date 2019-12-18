@@ -10,11 +10,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
     AssetsState,
     AssetUploaderState,
-    DialogModel,
     fadeAnimation,
+    ModalModel,
     Upload
 } from '@app/shared/internal';
-import { AppsState } from '../state/apps.state';
+
+import { AppsState } from './../state/apps.state';
 
 @Component({
     selector: 'sqx-asset-uploader',
@@ -26,7 +27,7 @@ import { AppsState } from '../state/apps.state';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetUploaderComponent {
-    public modalMenu = new DialogModel();
+    public modalMenu = new ModalModel();
 
     constructor(
         public readonly appsState: AppsState,

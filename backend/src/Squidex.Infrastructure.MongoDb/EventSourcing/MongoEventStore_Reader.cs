@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -21,6 +22,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
+        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+
         public Task CreateIndexAsync(string property)
         {
             Guard.NotNullOrEmpty(property);
@@ -35,6 +38,53 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotNull(subscriber);
 
             return new PollingSubscription(this, subscriber, streamFilter, position);
+        }
+
+        public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
+        {
+            Guard.NotNullOrEmpty(streamName);
+
+            if (count <= 0)
+            {
+                return EmptyEvents;
+            }
+
+            using (Profiler.TraceMethod<MongoEventStore>())
+            {
+                var commits =
+                    await Collection.Find(
+                            Filter.Eq(EventStreamField, streamName))
+                        .Sort(Sort.Descending(TimestampField)).Limit(count).ToListAsync();
+
+                var result = new List<StoredEvent>();
+
+                foreach (var commit in commits)
+                {
+                    var eventStreamOffset = (int)commit.EventStreamOffset;
+
+                    var commitTimestamp = commit.Timestamp;
+                    var commitOffset = 0;
+
+                    foreach (var @event in commit.Events)
+                    {
+                        eventStreamOffset++;
+
+                        var eventData = @event.ToEventData();
+                        var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
+
+                        result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
+                    }
+                }
+
+                IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
+
+                if (result.Count > count)
+                {
+                    ordered = ordered.Skip(result.Count - count);
+                }
+
+                return ordered.ToList();
+            }
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)

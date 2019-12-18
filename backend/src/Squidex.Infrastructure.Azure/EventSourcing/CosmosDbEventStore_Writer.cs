@@ -29,11 +29,16 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var query = FilterBuilder.AllIds(streamName);
 
+            var deleteOptions = new RequestOptions
+            {
+                PartitionKey = new PartitionKey(streamName)
+            };
+
             return documentClient.QueryAsync(collectionUri, query, commit =>
             {
                 var documentUri = UriFactory.CreateDocumentUri(databaseId, Constants.Collection, commit.Id.ToString());
 
-                return documentClient.DeleteDocumentAsync(documentUri);
+                return documentClient.DeleteDocumentAsync(documentUri, deleteOptions);
             });
         }
 

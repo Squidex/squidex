@@ -1,24 +1,22 @@
 @import '_vars';
 @import '_mixins';
 
-.user-ref {
-    font-weight: bold;
-}
-
 .item-remove {
     @include absolute(-5px, -15px, auto, auto);
     display: none;
 }
 
+.user-ref {
+    font-weight: bold;
+}
+
+.user-picture {
+    margin-top: .25rem;
+}
+
 .user-row {
     & {
         position: relative;
-    }
-
-    &:hover {
-        .item-remove {
-            display: block;
-        }
     }
 }
 
@@ -26,6 +24,7 @@
     & {
         font-size: .9rem;
         font-weight: normal;
+        line-height: 1.25rem;
         margin-bottom: .75rem;
     }
 
@@ -35,5 +34,19 @@
 
     &-created {
         font-size: .75rem;
+    }
+
+    &:hover {
+        .item-remove {
+            display: block;
+        }
+    }
+}
+
+:host ::ng-deep {
+    p {
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 }

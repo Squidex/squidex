@@ -11,38 +11,47 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
-using Squidex.Domain.Apps.Entities.Comments.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Comments;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public class CommentsGrainTests : HandlerTestBase<CommentsState>
+    public class CommentsGrainTests
     {
+        private readonly IEventStore eventStore = A.Fake<IEventStore>();
+        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly Guid commentsId = Guid.NewGuid();
+        private readonly Guid commentId = Guid.NewGuid();
+        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
         private readonly CommentsGrain sut;
 
-        protected override Guid Id
+        private string Id
         {
-            get { return commentsId; }
+            get { return commentsId.ToString(); }
         }
+
+        public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
 
         public CommentsGrainTests()
         {
-            sut = new CommentsGrain(Store, A.Dummy<ISemanticLog>());
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
+                .Invokes(x => LastEvents = sut.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
+
+            sut = new CommentsGrain(eventStore, eventDataFormatter);
             sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]
         public async Task Create_should_create_events()
         {
-            var command = new CreateComment { Text = "text1" };
+            var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
 
@@ -53,24 +62,23 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 CreatedComments = new List<Comment>
                 {
-                    new Comment(command.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), command.Actor, "text1")
+                    new Comment(command.CommentId, GetTime(), command.Actor, "text1", command.Url)
                 },
                 Version = 0
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentCreated { CommentId = command.CommentId, Text = command.Text })
+                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = command.Url })
                 );
         }
 
         [Fact]
         public async Task Update_should_create_events_and_update_state()
         {
-            var createCommand = new CreateComment { Text = "text1" };
-            var updateCommand = new UpdateComment { Text = "text2", CommentId = createCommand.CommentId };
+            await ExecuteCreateAsync();
 
-            await sut.ExecuteAsync(CreateCommentsCommand(createCommand));
+            var updateCommand = new UpdateComment { Text = "text2" };
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
 
@@ -80,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 CreatedComments = new List<Comment>
                 {
-                    new Comment(createCommand.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), createCommand.Actor, "text2")
+                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
@@ -89,26 +97,24 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 UpdatedComments = new List<Comment>
                 {
-                    new Comment(createCommand.CommentId, LastEvents.ElementAt(0).Headers.Timestamp(), createCommand.Actor, "text2")
+                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
                 },
                 Version = 1
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentUpdated { CommentId = createCommand.CommentId, Text = updateCommand.Text })
+                    CreateCommentsEvent(new CommentUpdated { Text = updateCommand.Text })
                 );
         }
 
         [Fact]
         public async Task Delete_should_create_events_and_update_state()
         {
-            var createCommand = new CreateComment { Text = "text1" };
-            var updateCommand = new UpdateComment { Text = "text2", CommentId = createCommand.CommentId };
-            var deleteCommand = new DeleteComment { CommentId = createCommand.CommentId };
+            await ExecuteCreateAsync();
+            await ExecuteUpdateAsync();
 
-            await sut.ExecuteAsync(CreateCommentsCommand(createCommand));
-            await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
+            var deleteCommand = new DeleteComment();
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
 
@@ -119,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 DeletedComments = new List<Guid>
                 {
-                    deleteCommand.CommentId
+                    commentId
                 },
                 Version = 2
             });
@@ -127,29 +133,48 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 DeletedComments = new List<Guid>
                 {
-                    deleteCommand.CommentId
+                    commentId
                 },
                 Version = 2
             });
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentDeleted { CommentId = createCommand.CommentId })
+                    CreateCommentsEvent(new CommentDeleted())
                 );
+        }
+
+        private Task ExecuteCreateAsync()
+        {
+            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }));
+        }
+
+        private Task ExecuteUpdateAsync()
+        {
+            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }));
         }
 
         protected T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
         {
-            @event.CommentsId = commentsId;
+            @event.Actor = actor;
+            @event.CommentsId = commentsId.ToString();
+            @event.CommentId = commentId;
 
-            return CreateEvent(@event);
+            return @event;
         }
 
         protected T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
-            command.CommentsId = commentsId;
+            command.Actor = actor;
+            command.CommentsId = commentsId.ToString();
+            command.CommentId = commentId;
 
-            return CreateCommand(command);
+            return command;
+        }
+
+        private Instant GetTime()
+        {
+            return LastEvents.ElementAt(0).Headers.Timestamp();
         }
     }
 }

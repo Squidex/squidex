@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -13,6 +12,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
 {
     public interface ICommentsLoader
     {
-        Task<CommentsResult> GetCommentsAsync(Guid id, long version = EtagVersion.Any);
+        Task<CommentsResult> GetCommentsAsync(string id, long version = EtagVersion.Any);
     }
 }

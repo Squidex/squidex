@@ -40,6 +40,11 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         [Required]
         public string Text { get; set; }
 
+        /// <summary>
+        /// The url where the comment is created.
+        /// </summary>
+        public Uri? Url { get; set; }
+
         public static CommentDto FromComment(Comment comment)
         {
             return SimpleMapper.Map(comment, new CommentDto());

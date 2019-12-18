@@ -7,73 +7,71 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Comments.Guards;
-using Squidex.Domain.Apps.Entities.Comments.State;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public sealed class CommentsGrain : DomainObjectGrainBase<CommentsState>, ICommentsGrain
+    public sealed class CommentsGrain : GrainOfString, ICommentsGrain
     {
-        private readonly IStore<Guid> store;
+        private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
-        private CommentsState snapshot = new CommentsState { Version = EtagVersion.Empty };
-        private IPersistence persistence;
+        private readonly IEventStore eventStore;
+        private readonly IEventDataFormatter eventDataFormatter;
+        private long version = EtagVersion.Empty;
+        private string streamName;
 
-        public override CommentsState Snapshot
+        private long Version
         {
-            get { return snapshot; }
+            get { return version; }
         }
 
-        public CommentsGrain(IStore<Guid> store, ISemanticLog log)
-            : base(log)
+        public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(store);
+            Guard.NotNull(eventStore);
+            Guard.NotNull(eventDataFormatter);
 
-            this.store = store;
+            this.eventStore = eventStore;
+            this.eventDataFormatter = eventDataFormatter;
         }
 
-        protected override void ApplyEvent(Envelope<IEvent> @event)
+        protected override async Task OnActivateAsync(string key)
         {
-            snapshot = new CommentsState { Version = snapshot.Version + 1 };
+            streamName = $"comments-{key}";
 
-            events.Add(@event.To<CommentsEvent>());
-        }
+            var storedEvents = await eventStore.QueryLatestAsync(streamName, 100);
 
-        protected override void RestorePreviousSnapshot(CommentsState previousSnapshot, long previousVersion)
-        {
-            snapshot = previousSnapshot;
-        }
-
-        protected override Task ReadAsync(Type type, Guid id)
-        {
-            persistence = store.WithEventSourcing(GetType(), id, ApplyEvent);
-
-            return persistence.ReadAsync();
-        }
-
-        protected override async Task WriteAsync(Envelope<IEvent>[] newEvents, long previousVersion)
-        {
-            if (newEvents.Length > 0)
+            foreach (var @event in storedEvents)
             {
-                await persistence.WriteEventsAsync(newEvents);
+                var parsedEvent = eventDataFormatter.Parse(@event.Data);
+
+                version = @event.EventStreamNumber;
+
+                events.Add(parsedEvent.To<CommentsEvent>());
             }
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public async Task<J<object>> ExecuteAsync(J<CommentsCommand> command)
+        {
+            var result = await ExecuteAsync(command.Value);
+
+            return result.AsJ();
+        }
+
+        private Task<object> ExecuteAsync(CommentsCommand command)
         {
             switch (command)
             {
                 case CreateComment createComment:
-                    return UpsertReturn(createComment, c =>
+                    return Upsert(createComment, c =>
                     {
                         GuardComments.CanCreate(c);
 
@@ -85,21 +83,66 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
                     {
-                        GuardComments.CanUpdate(events, c);
+                        GuardComments.CanUpdate(Key, events, c);
 
                         Update(c);
+
+                        return new EntitySavedResult(Version);
                     });
 
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
                     {
-                        GuardComments.CanDelete(events, c);
+                        GuardComments.CanDelete(Key, events, c);
 
                         Delete(c);
+
+                        return new EntitySavedResult(Version);
                     });
 
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        private async Task<object> Upsert<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : CommentsCommand
+        {
+            Guard.NotNull(command);
+            Guard.NotNull(handler);
+
+            if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
+            {
+                throw new DomainObjectVersionException(Key, GetType(), Version, command.ExpectedVersion);
+            }
+
+            var prevVersion = version;
+
+            try
+            {
+                var result = handler(command);
+
+                if (uncommittedEvents.Count > 0)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
+
+                    await eventStore.AppendAsync(commitId, streamName, prevVersion, eventData);
+                }
+
+                events.AddRange(uncommittedEvents);
+
+                return result;
+            }
+            catch
+            {
+                version = prevVersion;
+
+                throw;
+            }
+            finally
+            {
+                uncommittedEvents.Clear();
             }
         }
 
@@ -116,6 +159,18 @@ namespace Squidex.Domain.Apps.Entities.Comments
         public void Delete(DeleteComment command)
         {
             RaiseEvent(SimpleMapper.Map(command, new CommentDeleted()));
+        }
+
+        private void RaiseEvent(CommentsEvent @event)
+        {
+            uncommittedEvents.Add(Envelope.Create(@event));
+
+            version++;
+        }
+
+        public List<Envelope<CommentsEvent>> GetUncommittedEvents()
+        {
+            return uncommittedEvents;
         }
 
         public Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any)

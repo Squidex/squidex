@@ -1,0 +1,28 @@
+<ul class="nav navbar-nav">
+    <li class="nav-item nav-icon dropdown">
+        <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
+            <i class="icon-comments"></i>
+
+            <span class="badge badge-pill" *ngIf="unread">{{unread}}</span>
+        </span>
+
+        <ng-container *sqxModal="modalMenu;onRoot:false">
+            <div class="dropdown-menu" #scrollMe [scrollTop]="scrollMe.scrollHeight" @fade>
+                <ng-container *ngIf="commentsState.comments | async; let comments">
+                    <small class="text-muted" *ngIf="comments.length === 0">
+                        No notifications yet.
+                    </small>
+
+                    <sqx-comment *ngFor="let comment of comments; trackBy: trackByComment"
+                        [comment]="comment"
+                        [confirmDelete]="false"
+                        [canDelete]="true"
+                        [canFollow]="true"
+                        (delete)="delete(comment)"
+                        [userToken]="userToken">
+                    </sqx-comment>
+                </ng-container>
+            </div>
+        </ng-container>
+    </li>
+</ul>

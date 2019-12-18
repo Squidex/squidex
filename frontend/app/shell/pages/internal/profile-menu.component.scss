@@ -1,28 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.nav {
-    .nav-item {
-        & {
-            line-height: 2rem;
-        }
-
-        .nav-link {
-            color: $color-dark-foreground;
-            padding-bottom: 0;
-            padding-top: 0;
-        }
-    }
-
-    &-item-help {
-        font-size: 1.4rem;
-        font-weight: lighter;
-        padding-right: 1rem;
-        padding-top: 2px;
-        vertical-align: middle;
-    }
-}
-
 .user-picture {
     margin-right: .5rem;
 }

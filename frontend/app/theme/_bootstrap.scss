@@ -154,6 +154,36 @@ a {
     .nav-link {
         cursor: pointer;
     }
+
+    .nav-icon {
+        & {
+            line-height: 2rem;
+            margin-left: .5rem;
+            margin-right: 0;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .nav-link {
+            color: $color-dark-foreground;
+            padding-bottom: 0;
+            padding-top: 0;
+
+            i {
+                font-size: 1.5rem;
+                font-weight: lighter;
+                vertical-align: middle;
+            }
+        }
+
+        .badge {
+            @include absolute(-.5rem, auto, auto, -.375rem);
+            background: $color-theme-error;
+            font-size: .75rem;
+            font-weight: normal;
+            padding: .25rem .5rem;
+        }
+    }
 }
 
 //

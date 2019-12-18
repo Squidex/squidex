@@ -59,7 +59,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
                                 created.CommentId,
                                 @event.Headers.Timestamp(),
                                 @event.Payload.Actor,
-                                created.Text);
+                                created.Text,
+                                created.Url);
 
                             result.CreatedComments.Add(comment);
                             break;
@@ -73,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
                                 id,
                                 @event.Headers.Timestamp(),
                                 @event.Payload.Actor,
-                                updated.Text);
+                                updated.Text,
+                                null);
 
                             if (result.CreatedComments.Any(x => x.Id == id))
                             {

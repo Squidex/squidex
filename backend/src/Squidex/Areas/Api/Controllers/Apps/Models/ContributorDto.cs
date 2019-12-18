@@ -30,6 +30,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string ContributorName { get; set; }
 
         /// <summary>
+        /// The email address.
+        /// </summary>
+        [Required]
+        public string ContributorEmail { get; set; }
+
+        /// <summary>
         /// The role of the contributor.
         /// </summary>
         public string? Role { get; set; }
@@ -46,6 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (users.TryGetValue(ContributorId, out var user))
             {
                 ContributorName = user.DisplayName()!;
+                ContributorEmail = user.Email;
             }
             else
             {

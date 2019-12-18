@@ -17,7 +17,6 @@ import {
 } from '@app/framework';
 
 import { CommentDto, CommentsService } from './../services/comments.service';
-import { AppsState } from './apps.state';
 
 interface Snapshot {
     // The current comments.
@@ -39,17 +38,20 @@ export class CommentsState extends State<Snapshot> {
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
+    public versionNumber =
+        this.project(x => parseInt(x.version.value, 10));
+
     constructor(
-        private readonly appsState: AppsState,
-        private readonly commentsId: string,
+        private readonly commentsUrl: string,
         private readonly commentsService: CommentsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
+        initialVersion = -1
     ) {
-        super({ comments: [], version: new Version('-1') });
+        super({ comments: [], version: new Version(initialVersion.toString()) });
     }
 
-    public load(): Observable<any> {
-        return this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
+    public load(silent = false): Observable<any> {
+        return this.commentsService.getComments(this.commentsUrl, this.version).pipe(
             tap(payload => {
                 this.next(s => {
                     let comments = s.comments;
@@ -71,11 +73,11 @@ export class CommentsState extends State<Snapshot> {
                     return { ...s, comments, isLoaded: true, version: payload.version };
                 });
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, { silent }));
     }
 
-    public create(text: string): Observable<CommentDto> {
-        return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
+    public create(text: string, url?: string): Observable<CommentDto> {
+        return this.commentsService.postComment(this.commentsUrl, { text, url }).pipe(
             tap(created => {
                 this.next(s => {
                     const comments = [...s.comments, created];
@@ -87,7 +89,7 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public delete(comment: CommentDto): Observable<any> {
-        return this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
+        return this.commentsService.deleteComment(this.commentsUrl, comment.id).pipe(
             tap(() => {
                 this.next(s => {
                     const comments = s.comments.removeBy('id', comment);
@@ -99,7 +101,7 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
-        return this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
+        return this.commentsService.putComment(this.commentsUrl, comment.id, { text }).pipe(
             map(() => update(comment, text, now || DateTime.now())),
             tap(updated => {
                 this.next(s => {
@@ -113,10 +115,6 @@ export class CommentsState extends State<Snapshot> {
 
     private get version() {
         return this.snapshot.version;
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }
 

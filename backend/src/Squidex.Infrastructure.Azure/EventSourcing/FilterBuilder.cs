@@ -70,6 +70,23 @@ namespace Squidex.Infrastructure.EventSourcing
             return new SqlQuerySpec(query, parameters);
         }
 
+        public static SqlQuerySpec ByStreamNameDesc(string streamName, long count)
+        {
+            var query =
+                $"SELECT TOP {count}* " +
+                $"FROM {Constants.Collection} e " +
+                $"WHERE " +
+                $"    e.eventStream = @name " +
+                $"ORDER BY e.eventStreamOffset DESC";
+
+            var parameters = new SqlParameterCollection
+            {
+                new SqlParameter("@name", streamName)
+            };
+
+            return new SqlQuerySpec(query, parameters);
+        }
+
         public static SqlQuerySpec CreateByProperty(string property, object value, StreamPosition streamPosition)
         {
             var filters = new List<string>();

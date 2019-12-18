@@ -6,9 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 
-import { CommentDto, UpsertCommentForm } from '@app/shared/internal';
+import { CommentDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-comment',
@@ -20,21 +19,20 @@ export class CommentComponent {
     @Output()
     public delete = new EventEmitter();
 
-    @Output()
-    public update = new EventEmitter<string>();
+    @Input()
+    public canDelete = false;
+
+    @Input()
+    public canFollow = false;
+
+    @Input()
+    public confirmDelete = true;
 
     @Input()
     public comment: CommentDto;
 
     @Input()
-    public userId: string;
-
-    public editForm = new UpsertCommentForm(this.formBuilder);
-
-    constructor(
-        private readonly formBuilder: FormBuilder
-    ) {
-    }
+    public userToken: string;
 
     public emitDelete() {
         this.delete.emit();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -34,6 +34,7 @@ export class CommentDto extends Model<CommentDto> {
         public readonly id: string,
         public readonly time: DateTime,
         public readonly text: string,
+        public readonly url: string | undefined,
         public readonly user: string
     ) {
         super();
@@ -42,6 +43,7 @@ export class CommentDto extends Model<CommentDto> {
 
 export interface UpsertCommentDto {
     readonly text: string;
+    readonly url?: string;
 }
 
 @Injectable()
@@ -52,10 +54,16 @@ export class CommentsService {
     ) {
     }
 
-    public getComments(appName: string, commentsId: string, version: Version): Observable<CommentsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
+    public getComments(commentsUrl: string, version: Version): Observable<CommentsDto> {
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}?version=${version.value}`);
 
-        return this.http.get<any>(url).pipe(
+        const options = {
+            headers: new HttpHeaders({
+                'X-Silent': '1'
+            })
+        };
+
+        return this.http.get<any>(url, options).pipe(
             map(body => {
                 const comments = new CommentsDto(
                     body.createdComments.map((item: any) => {
@@ -63,6 +71,7 @@ export class CommentsService {
                             item.id,
                             DateTime.parseISO_UTC(item.time),
                             item.text,
+                            item.url,
                             item.user);
                     }),
                     body.updatedComments.map((item: any) => {
@@ -70,6 +79,7 @@ export class CommentsService {
                             item.id,
                             DateTime.parseISO_UTC(item.time),
                             item.text,
+                            item.url,
                             item.user);
                     }),
                     body.deletedComments,
@@ -81,8 +91,8 @@ export class CommentsService {
             pretifyError('Failed to load comments.'));
     }
 
-    public postComment(appName: string, commentsId: string, dto: UpsertCommentDto): Observable<CommentDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
+    public postComment(commentsUrl: string, dto: UpsertCommentDto): Observable<CommentDto> {
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}`);
 
         return this.http.post<any>(url, dto).pipe(
             map(body => {
@@ -90,6 +100,7 @@ export class CommentsService {
                     body.id,
                     DateTime.parseISO_UTC(body.time),
                     body.text,
+                    body.url,
                     body.user);
 
                 return comment;
@@ -97,15 +108,15 @@ export class CommentsService {
             pretifyError('Failed to create comment.'));
     }
 
-    public putComment(appName: string, commentsId: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
+    public putComment(commentsUrl: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
             pretifyError('Failed to update comment.'));
     }
 
-    public deleteComment(appName: string, commentsId: string, commentId: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
+    public deleteComment(commentsUrl: string, commentId: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.delete(url).pipe(
             pretifyError('Failed to delete comment.'));

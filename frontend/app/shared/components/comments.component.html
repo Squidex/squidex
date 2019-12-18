@@ -7,19 +7,21 @@
         <div class="comments-list" #scrollMe [scrollTop]="scrollMe.scrollHeight">
             <sqx-comment *ngFor="let comment of commentsState.comments | async; trackBy: trackByComment"
                 [comment]="comment"
-                [userId]="userId"
-                (update)="update(comment, $event)"
-                (delete)="delete(comment)">
+                [canDelete]="true"
+                [canFollow]="false"
+                (delete)="delete(comment)"
+                [userToken]="userToken">
             </sqx-comment>
         </div>
         
         <div class="comments-footer">
             <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment"
+                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" 
+                    [mention]="mentionUsers | async" 
+                    [mentionConfig]="mentionConfig"
                     autocomplete="off" 
                     autocorrect="off"
-                    autocapitalize="off"
-                />
+                    autocapitalize="off" />
             </form>
         </div>
     </ng-container>

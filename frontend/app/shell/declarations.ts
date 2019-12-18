@@ -12,6 +12,7 @@ export * from './pages/home/home-page.component';
 export * from './pages/internal/apps-menu.component';
 export * from './pages/internal/internal-area.component';
 export * from './pages/internal/logo.component';
+export * from './pages/internal/notifications-menu.component';
 export * from './pages/internal/profile-menu.component';
 export * from './pages/login/login-page.component';
 export * from './pages/logout/logout-page.component';

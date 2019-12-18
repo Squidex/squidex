@@ -160,8 +160,6 @@ namespace Squidex.Infrastructure.Commands
 
             if (mode == Mode.Update && Version < 0)
             {
-                TryDeactivateOnIdle();
-
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
 

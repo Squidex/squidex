@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         Paths = new Collection<string>
                         {
-                            "/PartitionId"
+                            "/id"
                         }
                     },
                     Id = Constants.LeaseCollection
