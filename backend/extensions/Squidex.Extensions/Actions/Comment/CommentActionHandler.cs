@@ -47,7 +47,7 @@ namespace Squidex.Extensions.Actions.Comment
                 {
                     AppId = contentEvent.AppId,
                     Actor = actor,
-                    CommentsId = contentEvent.Id,
+                    CommentsId = contentEvent.Id.ToString(),
                     Text = text
                 };
 
@@ -59,7 +59,7 @@ namespace Squidex.Extensions.Actions.Comment
 
         protected override async Task<Result> ExecuteJobAsync(CommentJob job, CancellationToken ct = default)
         {
-            if (job.CommentsId == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(job.CommentsId))
             {
                 return Result.Ignored();
             }
@@ -78,7 +78,7 @@ namespace Squidex.Extensions.Actions.Comment
 
         public RefToken Actor { get; set; }
 
-        public Guid CommentsId { get; set; }
+        public string CommentsId { get; set; }
 
         public string Text { get; set; }
     }

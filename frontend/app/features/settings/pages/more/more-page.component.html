@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label for="email">Name</label>
         
-                        <input type="text" class="form-control" readonly [value]="app.name" />
+                        <input type="text" class="form-control" readonly [value]="app?.name" />
                     </div>
 
                     <div class="form-group">
@@ -55,9 +55,9 @@
 
                             <ng-template #notUploading>
                                 <div>
-                                    <sqx-avatar [image]="app.image" [identifier]="app.name" [size]="150"></sqx-avatar>
+                                    <sqx-avatar [image]="app?.image" [identifier]="app?.name" [size]="150"></sqx-avatar>
 
-                                    <ng-container *ngIf="isImageEditable && app.image">
+                                    <ng-container *ngIf="isImageEditable && app?.image">
                                         <button class="btn btn-danger btn-sm app-image-remove" title="Remove image" (click)="removeImage()">
                                             <i class="icon-bin2"></i>
                                         </button>
