@@ -8,6 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 import {
     AppDto,
@@ -44,7 +45,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.appsState.selectedApp
+            this.appsState.reloadSelected().pipe(map(x => x!))
                 .subscribe(app => {
                     this.app = app;
 
@@ -66,8 +67,8 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
 
         if (value) {
             this.appsState.update(this.app, value)
-                .subscribe(user => {
-                    this.updateForm.submitCompleted({ newValue: user });
+                .subscribe(app => {
+                    this.updateForm.submitCompleted({ newValue: app });
                 }, error => {
                     this.updateForm.submitFailed(error);
                 });

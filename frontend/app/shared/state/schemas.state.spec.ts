@@ -236,7 +236,7 @@ describe('SchemasState', () => {
             expect().nothing();
         });
 
-        it('should return null on select  when loading failed', () => {
+        it('should return null on select when loading failed', () => {
             schemasService.setup(x => x.getSchema(app, 'failed'))
                 .returns(() => throwError({})).verifiable();
 

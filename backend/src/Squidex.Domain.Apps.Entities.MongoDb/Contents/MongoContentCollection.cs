@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             foreach (var entity in contentItems)
             {
-                var schema = schemas.FirstOrDefault(x => x.Id == entity.IndexedSchemaId);
+                var schema = schemas.FirstOrDefault(x => x?.Id == entity.IndexedSchemaId);
 
                 if (schema != null)
                 {

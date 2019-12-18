@@ -119,6 +119,18 @@ export class AppsService {
             pretifyError('Failed to load apps. Please reload.'));
     }
 
+    public getApp(name: string): Observable<AppDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${name}`);
+
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                const app = parseApp(body);
+
+                return app;
+            }),
+            pretifyError('Failed to load app. Please reload.'));
+    }
+
     public postApp(dto: CreateAppDto): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
