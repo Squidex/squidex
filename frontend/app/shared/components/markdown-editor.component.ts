@@ -95,6 +95,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                 previewRender: (text: string) => {
                     return marked(text, { pedantic: true });
                 },
+                autoDownloadFontAwesome: true,
                 toolbar: [
                     {
                         name: 'bold',

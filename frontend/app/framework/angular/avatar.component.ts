@@ -12,7 +12,7 @@ import { picasso } from '@app/framework/internal';
 @Component({
     selector: 'sqx-avatar',
     template: `
-        <img
+        <img *ngIf="imageSource"
             [style.width]="sizeInPx"
             [style.height]="sizeInPx"
             [src]="imageSource | sqxSafeUrl"
@@ -20,9 +20,6 @@ import { picasso } from '@app/framework/internal';
     `
 })
 export class AvatarComponent implements OnChanges {
-    public imageSource: string;
-    public sizeInPx: string;
-
     @Input()
     public identifier: string;
 
@@ -32,6 +29,9 @@ export class AvatarComponent implements OnChanges {
     @Input()
     public size = 50;
 
+    public imageSource: string | null;
+    public sizeInPx: string;
+
     public ngOnChanges() {
         this.imageSource = this.image || this.createSvg();
 
@@ -39,6 +39,10 @@ export class AvatarComponent implements OnChanges {
     }
 
     private createSvg() {
+        if (!this.identifier) {
+            return null;
+        }
+
         const svg = picasso(this.identifier);
 
         return `data:image/svg+xml;utf8,${svg}`;

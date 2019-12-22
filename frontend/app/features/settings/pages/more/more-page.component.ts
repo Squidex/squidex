@@ -45,7 +45,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.appsState.reloadSelected().pipe(map(x => x!))
+            this.appsState.selectedApp
                 .subscribe(app => {
                     this.app = app;
 
@@ -56,6 +56,8 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                     this.updateForm.load(app);
                     this.updateForm.setEnabled(this.isEditable);
                 }));
+
+        this.appsState.reloadSelected();
     }
 
     public save() {
