@@ -49,7 +49,7 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
 }
 
 export class ImportContributorsForm extends Form<FormGroup, ReadonlyArray<AssignContributorDto>> {
-    public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
+    public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(200), map(v => extractEmails(v).length), shareReplay(1));
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 

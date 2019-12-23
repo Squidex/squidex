@@ -309,7 +309,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
-export type StringEditor = 'Color' | 'Dropdown' | 'Html' | 'Input' | 'Markdown' | 'Radio' | 'RichText' | 'Slug' | 'TextArea';
+export type StringEditor = 'Color' | 'Dropdown' | 'Html' | 'Input' | 'Markdown' | 'Radio' | 'RichText' | 'Slug' | 'StockPhoto' | 'TextArea';
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
