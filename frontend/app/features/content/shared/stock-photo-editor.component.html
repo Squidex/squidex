@@ -25,6 +25,12 @@
                     <ng-container *ngIf="stockPhotos | async; let photos">
                         <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
                             <img [src]="photo.thumbUrl" />
+
+                            <div class="photo-user">
+                                <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
+                                    {{photo.user}}
+                                </a>
+                            </div>
                         </div>
                     </ng-container>
                 </div>

@@ -13,7 +13,9 @@ import { catchError, map } from 'rxjs/operators';
 export class StockPhotoDto {
     constructor (
         public readonly url: string,
-        public readonly thumbUrl: string
+        public readonly thumbUrl: string,
+        public readonly user: string,
+        public readonly userProfileUrl: string
     ) {
     }
 }
@@ -26,14 +28,16 @@ export class StockPhotoService {
     }
 
     public getImages(query: string): Observable<ReadonlyArray<StockPhotoDto>> {
-        const url = `https://stockphoto.squidex.io/images?query=${query}&pageSize=100`;
+        const url = `https://stockphoto.squidex.io/?query=${query}&pageSize=100`;
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
                 return body.map(x =>
                     new StockPhotoDto(
                         x.url,
-                        x.thumbUrl
+                        x.thumbUrl,
+                        x.user,
+                        x.userProfileUrl
                     ));
             }),
             catchError(() => of([])));

@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+$user-background: rgba(0, 0, 0, .5);
+
 .col-image {
     @include force-width(400px);
 
@@ -60,6 +62,7 @@ sqx-list-view {
         display: inline-block;
         margin-bottom: .5rem;
         margin-right: .5rem;
+        position: relative;
     }
 
     &:hover {
@@ -68,5 +71,19 @@ sqx-list-view {
 
     &.selected {
         border-color: $color-theme-blue;
+    }
+
+    &-user {
+        @include absolute(auto, 0, 0, 0);
+        background: $user-background;
+        border: 0;
+        padding: .5rem .75rem;
+    }
+
+    &-user-link {
+        @include truncate;
+        color: $color-dark-foreground;
+        font-size: 90%;
+        font-weight: normal;
     }
 }

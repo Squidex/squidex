@@ -35,22 +35,26 @@ describe('StockPhotoService', () => {
             images = result;
         });
 
-        const req = httpMock.expectOne('https://stockphoto.squidex.io/images?query=my-query&pageSize=100');
+        const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&pageSize=100');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([{
             url: 'url1',
-            thumbUrl: 'thumb1'
+            thumbUrl: 'thumb1',
+            user: 'user1',
+            userProfileUrl: 'user1-url'
         }, {
             url: 'url2',
-            thumbUrl: 'thumb2'
+            thumbUrl: 'thumb2',
+            user: 'user2',
+            userProfileUrl: 'user2-url'
         }]);
 
         expect(images!).toEqual([
-            new StockPhotoDto('url1', 'thumb1'),
-            new StockPhotoDto('url2', 'thumb2')
+            new StockPhotoDto('url1', 'thumb1', 'user1', 'user1-url'),
+            new StockPhotoDto('url2', 'thumb2', 'user2', 'user2-url')
         ]);
     }));
 
@@ -63,7 +67,7 @@ describe('StockPhotoService', () => {
             images = result;
         });
 
-        const req = httpMock.expectOne('https://stockphoto.squidex.io/images?query=my-query&pageSize=100');
+        const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&pageSize=100');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
