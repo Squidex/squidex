@@ -24,11 +24,12 @@ namespace Squidex.Infrastructure.Assets
         private readonly string secretKey;
         private readonly string bucketName;
         private readonly string? bucketFolder;
+        private readonly bool forcePathStyle;
         private readonly RegionEndpoint bucketRegion;
         private TransferUtility transferUtility;
         private IAmazonS3 s3Client;
 
-        public AmazonS3AssetStore(string? serviceUrl, string? regionName, string bucketName, string? bucketFolder, string accessKey, string secretKey)
+        public AmazonS3AssetStore(string? serviceUrl, string? regionName, string bucketName, string? bucketFolder, string accessKey, string secretKey, bool forcePathStyle)
         {
             Guard.NotNullOrEmpty(bucketName);
             Guard.NotNullOrEmpty(accessKey);
@@ -39,6 +40,7 @@ namespace Squidex.Infrastructure.Assets
             this.bucketFolder = bucketFolder;
             this.accessKey = accessKey;
             this.secretKey = secretKey;
+            this.forcePathStyle = forcePathStyle;
 
             bucketRegion = RegionEndpoint.GetBySystemName(regionName);
         }
@@ -62,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
                     s3Client = new AmazonS3Client(
                         accessKey,
                         secretKey,
-                        new AmazonS3Config { ServiceURL = serviceUrl });
+                        new AmazonS3Config { ServiceURL = serviceUrl, ForcePathStyle = forcePathStyle });
                 }
                 else
                 {

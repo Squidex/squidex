@@ -97,7 +97,9 @@ namespace Squidex.Config.Domain
                     var accessKey = config.GetRequiredValue("assetStore:amazonS3:accessKey");
                     var secretKey = config.GetRequiredValue("assetStore:amazonS3:secretKey");
 
-                    services.AddSingletonAs(c => new AmazonS3AssetStore(serviceUrl, regionName, bucketName, bucketFolder, accessKey, secretKey))
+                    var forcePathStyle = config.GetOptionalValue<bool>("assetStore:amazonS3:forcePathStyle", false);
+
+                    services.AddSingletonAs(c => new AmazonS3AssetStore(serviceUrl, regionName, bucketName, bucketFolder, accessKey, secretKey, forcePathStyle))
                         .As<IAssetStore>();
                 },
                 ["MongoDb"] = () =>
