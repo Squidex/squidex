@@ -13,7 +13,16 @@ namespace Squidex.Infrastructure.Assets
 
         public AmazonS3AssetStoreFixture()
         {
-            AssetStore = new AmazonS3AssetStore(null, "eu-central-1", "squidex-test", "squidex-assets", "secret", "secret");
+            AssetStore = new AmazonS3AssetStore(new MyAmazonS3Options
+            {
+                ServiceUrl = null,
+                RegionName = "eu-central-1",
+                Bucket = "squidex-test",
+                BucketFolder = "squidex-assets",
+                AccessKey = "secret",
+                SecretKey = "secret",
+                ForcePathStyle = false
+            });
             AssetStore.InitializeAsync().Wait();
         }
     }

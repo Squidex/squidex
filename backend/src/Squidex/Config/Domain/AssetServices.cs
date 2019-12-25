@@ -88,16 +88,9 @@ namespace Squidex.Config.Domain
                 },
                 ["AmazonS3"] = () =>
                 {
-                    var serviceUrl = config.GetOptionalValue<string>("assetStore:amazonS3:serviceUrl");
-                    var regionName = config.GetOptionalValue<string>("assetStore:amazonS3:regionName");
+                    var amazonS3Options = config.GetOptionalValue<MyAmazonS3Options>("assetStore:amazonS3");
 
-                    var bucketName = config.GetRequiredValue("assetStore:amazonS3:bucket");
-                    var bucketFolder = config.GetRequiredValue("assetStore:amazonS3:bucketFolder");
-
-                    var accessKey = config.GetRequiredValue("assetStore:amazonS3:accessKey");
-                    var secretKey = config.GetRequiredValue("assetStore:amazonS3:secretKey");
-
-                    services.AddSingletonAs(c => new AmazonS3AssetStore(serviceUrl, regionName, bucketName, bucketFolder, accessKey, secretKey))
+                    services.AddSingletonAs(c => new AmazonS3AssetStore(amazonS3Options))
                         .As<IAssetStore>();
                 },
                 ["MongoDb"] = () =>
