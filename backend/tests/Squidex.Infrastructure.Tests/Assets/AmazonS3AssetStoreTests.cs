@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_throw_exception_for_invalid_config()
         {
-            var sut = new AmazonS3AssetStore("invalid", "invalid", null, "invalid", "invalid");
+            var sut = new AmazonS3AssetStore(null, "invalid", "invalid", null, "invalid", "invalid");
 
             await Assert.ThrowsAsync<ConfigurationException>(() => sut.InitializeAsync());
         }
