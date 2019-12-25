@@ -19,6 +19,7 @@ namespace Squidex.Infrastructure.Assets
     public sealed class AmazonS3AssetStore : DisposableObjectBase, IAssetStore, IInitializable
     {
         private const int BufferSize = 81920;
+        private readonly string? serviceUrl;
         private readonly string accessKey;
         private readonly string secretKey;
         private readonly string bucketName;
@@ -27,12 +28,13 @@ namespace Squidex.Infrastructure.Assets
         private TransferUtility transferUtility;
         private IAmazonS3 s3Client;
 
-        public AmazonS3AssetStore(string regionName, string bucketName, string? bucketFolder, string accessKey, string secretKey)
+        public AmazonS3AssetStore(string? serviceUrl, string? regionName, string bucketName, string? bucketFolder, string accessKey, string secretKey)
         {
             Guard.NotNullOrEmpty(bucketName);
             Guard.NotNullOrEmpty(accessKey);
             Guard.NotNullOrEmpty(secretKey);
 
+            this.serviceUrl = serviceUrl;
             this.bucketName = bucketName;
             this.bucketFolder = bucketFolder;
             this.accessKey = accessKey;
@@ -55,10 +57,20 @@ namespace Squidex.Infrastructure.Assets
         {
             try
             {
-                s3Client = new AmazonS3Client(
-                    accessKey,
-                    secretKey,
-                    bucketRegion);
+                if (!string.IsNullOrWhiteSpace(serviceUrl))
+                {
+                    s3Client = new AmazonS3Client(
+                        accessKey,
+                        secretKey,
+                        new AmazonS3Config { ServiceURL = serviceUrl });
+                }
+                else
+                {
+                    s3Client = new AmazonS3Client(
+                        accessKey,
+                        secretKey,
+                        bucketRegion);
+                }
 
                 transferUtility = new TransferUtility(s3Client);
 
