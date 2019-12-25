@@ -88,7 +88,7 @@ namespace Squidex.Config.Domain
                 },
                 ["AmazonS3"] = () =>
                 {
-                    var amazonS3Options = config.GetOptionalValue<MyAmazonS3Options>("assetStore:amazonS3");
+                    var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<MyAmazonS3Options>();
 
                     services.AddSingletonAs(c => new AmazonS3AssetStore(amazonS3Options))
                         .As<IAssetStore>();
