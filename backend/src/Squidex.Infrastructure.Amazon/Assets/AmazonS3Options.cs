@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Assets
 {
-    public class MyAmazonS3Options
+    public sealed class AmazonS3Options
     {
         public string? ServiceUrl { get; set; }
 

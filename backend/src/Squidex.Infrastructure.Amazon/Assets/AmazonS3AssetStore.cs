@@ -19,11 +19,11 @@ namespace Squidex.Infrastructure.Assets
     public sealed class AmazonS3AssetStore : DisposableObjectBase, IAssetStore, IInitializable
     {
         private const int BufferSize = 81920;
-        private readonly MyAmazonS3Options options;
+        private readonly AmazonS3Options options;
         private TransferUtility transferUtility;
         private IAmazonS3 s3Client;
 
-        public AmazonS3AssetStore(MyAmazonS3Options options)
+        public AmazonS3AssetStore(AmazonS3Options options)
         {
             Guard.NotNullOrEmpty(options.Bucket);
             Guard.NotNullOrEmpty(options.AccessKey);
