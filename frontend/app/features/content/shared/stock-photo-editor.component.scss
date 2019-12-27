@@ -1,7 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
-$user-background: rgba(0, 0, 0, .5);
+$color-user-background: rgba(0, 0, 0, .5);
+$color-background: #000;
+
+$height: 300px;
 
 .col-image {
     @include force-width(400px);
@@ -27,26 +30,39 @@ $user-background: rgba(0, 0, 0, .5);
 
 .preview {
     & {
+        @include force-height($height);
+        align-items: center;
+        background: $color-background;
+        border: 0;
+        border-radius: .25rem;
+        color: $color-dark-foreground;
+        display: flex;
+        justify-content: center;
+        margin: 0;
         margin-top: .5rem;
     }
 
     &-empty {
-        border: 1px solid $color-input;
-        border-radius: .25rem;
-        color: $color-text-decent;
-        height: 300px;
-        line-height: 280px;
         padding: 1rem;
-        text-align: center;
-        text-decoration: none;
+    }
+
+    img {
+        max-height: $height;
     }
 }
 
 sqx-list-view {
     border: 1px solid $color-input;
     border-radius: .25rem;
-    height: 300px;
+    height: $height;
     margin-top: .5rem;
+}
+
+.icon {
+    @include absolute($height * .5, auto, auto, 5px);
+    color: $color-border;
+    font-size: 30px;
+    font-weight: lighter;
 }
 
 .photos {
@@ -76,7 +92,7 @@ sqx-list-view {
 
     &-user {
         @include absolute(auto, 0, 0, 0);
-        background: $user-background;
+        background: $color-user-background;
         border: 0;
         padding: .5rem .75rem;
     }
