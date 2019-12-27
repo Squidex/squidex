@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         addError(path, "Invalid file extension.");
                     }
 
-                    if (!asset.IsImage)
+                    if (asset.Type != AssetType.Image)
                     {
                         if (properties.MustBeImage)
                         {
@@ -71,12 +72,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         continue;
                     }
 
-                    if (asset.PixelWidth.HasValue &&
-                        asset.PixelHeight.HasValue)
-                    {
-                        var w = asset.PixelWidth.Value;
-                        var h = asset.PixelHeight.Value;
+                    var w = asset.Metadata.GetPixelWidth();
+                    var h = asset.Metadata.GetPixelHeight();
 
+                    if (w > 0 && h > 0)
+                    {
                         var actualRatio = (double)w / h;
 
                         if (properties.MinWidth.HasValue && w < properties.MinWidth)

@@ -123,12 +123,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             AddProperty(nameof(IAssetEntity.FileHash), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.FileSize), JsonObjectType.Integer);
             AddProperty(nameof(IAssetEntity.FileVersion), JsonObjectType.Integer);
-            AddProperty(nameof(IAssetEntity.IsImage), JsonObjectType.Boolean);
             AddProperty(nameof(IAssetEntity.MimeType), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.PixelHeight), JsonObjectType.Integer);
-            AddProperty(nameof(IAssetEntity.PixelWidth), JsonObjectType.Integer);
             AddProperty(nameof(IAssetEntity.Slug), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Tags), JsonObjectType.String);
+            AddProperty(nameof(IAssetEntity.Type), JsonObjectType.String);
 
             return schema;
         }
@@ -152,12 +150,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             AddProperty(nameof(IAssetEntity.FileHash), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.FileSize), EdmPrimitiveTypeKind.Int64);
             AddProperty(nameof(IAssetEntity.FileVersion), EdmPrimitiveTypeKind.Int64);
-            AddProperty(nameof(IAssetEntity.IsImage), EdmPrimitiveTypeKind.Boolean);
             AddProperty(nameof(IAssetEntity.MimeType), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.PixelHeight), EdmPrimitiveTypeKind.Int32);
-            AddProperty(nameof(IAssetEntity.PixelWidth), EdmPrimitiveTypeKind.Int32);
             AddProperty(nameof(IAssetEntity.Slug), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.Tags), EdmPrimitiveTypeKind.String);
+            AddProperty(nameof(IAssetEntity.Type), EdmPrimitiveTypeKind.String);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

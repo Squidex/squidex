@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;
 using Xunit;
@@ -14,56 +17,66 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class ImageTagGeneratorTests
     {
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly HashSet<string> tags = new HashSet<string>();
-        private readonly ImageTagGenerator sut = new ImageTagGenerator();
+        private readonly MemoryStream stream = new MemoryStream();
+        private readonly AssetFile file;
+        private readonly ImageMetadataSource sut;
+
+        public ImageTagGeneratorTests()
+        {
+            file = new AssetFile("MyImage.png", "image/png", 1024, () => stream);
+
+            sut = new ImageMetadataSource(assetThumbnailGenerator);
+        }
 
         [Fact]
-        public void Should_not_add_tag_if_no_image()
+        public async Task Should_not_add_tag_if_no_image()
         {
-            var command = new CreateAsset();
+            var command = new CreateAsset { File = file };
 
-            sut.GenerateTags(command, tags);
+            await sut.EnhanceAsync(command, tags);
 
             Assert.Empty(tags);
         }
 
         [Fact]
-        public void Should_add_image_tag_if_small()
+        public async Task Should_add_image_tag_if_small()
         {
-            var command = new CreateAsset
-            {
-                ImageInfo = new ImageInfo(100, 100)
-            };
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(new ImageInfo(100, 100));
 
-            sut.GenerateTags(command, tags);
+            var command = new CreateAsset { File = file };
+
+            await sut.EnhanceAsync(command, tags);
 
             Assert.Contains("image", tags);
             Assert.Contains("image/small", tags);
         }
 
         [Fact]
-        public void Should_add_image_tag_if_medium()
+        public async Task Should_add_image_tag_if_medium()
         {
-            var command = new CreateAsset
-            {
-                ImageInfo = new ImageInfo(800, 600)
-            };
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(new ImageInfo(800, 600));
 
-            sut.GenerateTags(command, tags);
+            var command = new CreateAsset { File = file };
+
+            await sut.EnhanceAsync(command, tags);
 
             Assert.Contains("image", tags);
             Assert.Contains("image/medium", tags);
         }
 
         [Fact]
-        public void Should_add_image_tag_if_large()
+        public async Task Should_add_image_tag_if_large()
         {
-            var command = new CreateAsset
-            {
-                ImageInfo = new ImageInfo(1200, 1400)
-            };
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(new ImageInfo(1200, 1400));
 
-            sut.GenerateTags(command, tags);
+            var command = new CreateAsset { File = file };
+
+            await sut.EnhanceAsync(command, tags);
 
             Assert.Contains("image", tags);
             Assert.Contains("image/large", tags);

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
@@ -68,20 +69,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public long FileVersion { get; set; }
 
         [BsonRequired]
-        [BsonElement("im")]
-        public bool IsImage { get; set; }
-
-        [BsonRequired]
         [BsonElement("vs")]
         public long Version { get; set; }
 
         [BsonRequired]
-        [BsonElement("pw")]
-        public int? PixelWidth { get; set; }
+        [BsonElement("md")]
+        public AssetMetadata Metadata { get; set; }
 
         [BsonRequired]
-        [BsonElement("ph")]
-        public int? PixelHeight { get; set; }
+        [BsonElement("at")]
+        public AssetType Type { get; set; }
 
         [BsonRequired]
         [BsonElement("cb")]

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -47,19 +48,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public long TotalSize { get; set; }
 
         [DataMember]
-        public bool IsImage { get; set; }
+        public HashSet<string> Tags { get; set; }
 
         [DataMember]
-        public int? PixelWidth { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
         [DataMember]
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         [DataMember]
         public bool IsDeleted { get; set; }
-
-        [DataMember]
-        public HashSet<string> Tags { get; set; }
 
         public Guid AssetId
         {

@@ -8,6 +8,7 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
@@ -143,24 +144,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "isImage",
                 ResolvedType = AllTypes.NonNullBoolean,
-                Resolver = Resolve(x => x.IsImage),
-                Description = "Determines of the created file is an image."
+                Resolver = Resolve(x => x.Type == AssetType.Image),
+                Description = "Determines if the uploaded file is an image.",
+                DeprecationReason = "Use 'type' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelWidth",
                 ResolvedType = AllTypes.Int,
-                Resolver = Resolve(x => x.PixelWidth),
-                Description = "The width of the image in pixels if the asset is an image."
+                Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
+                Description = "The width of the image in pixels if the asset is an image.",
+                DeprecationReason = "Use 'metadata' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelHeight",
                 ResolvedType = AllTypes.Int,
-                Resolver = Resolve(x => x.PixelHeight),
-                Description = "The height of the image in pixels if the asset is an image."
+                Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
+                Description = "The height of the image in pixels if the asset is an image.",
+                DeprecationReason = "Use 'metadata' field instead."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "type",
+                ResolvedType = AllTypes.NonNullAssetType,
+                Resolver = Resolve(x => x.Type),
+                Description = "The type of the image."
             });
 
             AddField(new FieldType

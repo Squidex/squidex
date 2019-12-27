@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Collections;
@@ -39,6 +40,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             public int? PixelWidth { get; set; }
 
             public int? PixelHeight { get; set; }
+
+            public AssetMetadata Metadata { get; set; }
+
+            public AssetType Type { get; set; }
         }
 
         private readonly AssetInfo document = new AssetInfo
@@ -46,9 +51,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             AssetId = Guid.NewGuid(),
             FileName = "MyDocument.pdf",
             FileSize = 1024 * 4,
-            IsImage = false,
-            PixelWidth = null,
-            PixelHeight = null
+            Type = AssetType.Unknown
         };
 
         private readonly AssetInfo image1 = new AssetInfo
@@ -56,9 +59,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             AssetId = Guid.NewGuid(),
             FileName = "MyImage.png",
             FileSize = 1024 * 8,
-            IsImage = true,
-            PixelWidth = 800,
-            PixelHeight = 600
+            Type = AssetType.Image,
+            Metadata =
+                new AssetMetadata()
+                    .SetPixelWidth(800)
+                    .SetPixelHeight(600)
         };
 
         private readonly AssetInfo image2 = new AssetInfo
@@ -66,9 +71,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             AssetId = Guid.NewGuid(),
             FileName = "MyImage.png",
             FileSize = 1024 * 8,
-            IsImage = true,
-            PixelWidth = 800,
-            PixelHeight = 600
+            Type = AssetType.Image,
+            Metadata =
+                new AssetMetadata()
+                    .SetPixelWidth(800)
+                    .SetPixelHeight(600)
         };
 
         private readonly ValidationContext ctx;

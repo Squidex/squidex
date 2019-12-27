@@ -51,7 +51,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
 
-            services.AddSingletonAs<ImageTagGenerator>()
+            services.AddSingletonAs<ImageMetadataSource>()
                 .As<ITagGenerator<CreateAsset>>();
         }
 

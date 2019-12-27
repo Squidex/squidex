@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
@@ -13,7 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public AssetFile File { get; set; }
 
-        public ImageInfo? ImageInfo { get; set; }
+        public AssetMetadata Metadata { get; } = new AssetMetadata();
+
+        public AssetType Type { get; set; }
 
         public string FileHash { get; set; }
     }

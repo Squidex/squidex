@@ -7,6 +7,7 @@
 
 using System;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -30,6 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType String = new StringGraphType();
 
         public static readonly IGraphType Boolean = new BooleanGraphType();
+        
+        public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
 
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
@@ -42,6 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullString = new NonNullGraphType(String);
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
+
+        public static readonly IGraphType NonNullAssetType = new NonNullGraphType(AssetType);
 
         public static readonly IGraphType NoopDate = new NoopGraphType(Date);
 

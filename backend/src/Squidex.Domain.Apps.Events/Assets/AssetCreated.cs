@@ -7,11 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [EventType(nameof(AssetCreated))]
+    [EventType(nameof(AssetCreated), 2)]
     public sealed class AssetCreated : AssetEvent
     {
         public Guid ParentId { get; set; }
@@ -28,11 +29,9 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public long FileSize { get; set; }
 
-        public bool IsImage { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
-        public int? PixelWidth { get; set; }
-
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         public HashSet<string>? Tags { get; set; }
     }
