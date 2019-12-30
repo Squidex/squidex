@@ -58,28 +58,23 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetByPath(IEnumerable<string>? path, [MaybeNullWhen(false)] out object result)
         {
+            result = this;
+
             if (path == null || !path.Any())
             {
-                result = this;
                 return false;
             }
+
+            result = null!;
 
             if (!TryGetValue(path.First(), out var json))
             {
-                result = null!;
                 return false;
             }
 
-            foreach (var pathSegment in path.Skip(1))
-            {
-                if (json == null || !json.TryGet(pathSegment, out json))
-                {
-                    result = null!;
-                    return false;
-                }
-            }
+            json.TryGetByPath(path.Skip(1), out var temp);
 
-            result = json;
+            result = temp!;
 
             return true;
         }
