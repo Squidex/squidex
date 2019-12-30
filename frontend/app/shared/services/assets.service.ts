@@ -67,14 +67,13 @@ export class AssetDto {
         public readonly fileVersion: number,
         public readonly parentId: string,
         public readonly mimeType: string,
-        public readonly isImage: boolean,
-        public readonly pixelWidth: number | null | undefined,
-        public readonly pixelHeight: number | null | undefined,
+        public readonly metadata: any,
         public readonly slug: string,
+        public readonly type: string,
         public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
-        this.canPreview = this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
+        this.canPreview = this.type === 'Image' || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
 
         this._links = links;
 
@@ -376,10 +375,9 @@ function parseAsset(response: any) {
         response.fileVersion,
         response.parentId,
         response.mimeType,
-        response.isImage,
-        response.pixelWidth,
-        response.pixelHeight,
+        response.metadata,
         response.slug,
+        response.type,
         response.tags || [],
         new Version(response.version.toString()));
 }

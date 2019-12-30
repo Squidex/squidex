@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
-
-namespace Squidex.Infrastructure.Queries.Json
+namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public static class SchemaExtensions
+    public sealed class AssetMeta
     {
-        public static bool IsDynamic(this JsonSchema schema)
-        {
-            return schema.Type == JsonObjectType.Object && schema.Properties.Count == 0 && schema.AllowAdditionalProperties == true;
-        }
+        /// <summary>
+        /// Indicates whether the asset is a duplicate.
+        /// </summary>
+        public string IsDuplicate { get; set; }
     }
 }

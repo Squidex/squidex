@@ -52,13 +52,10 @@ namespace Squidex.Infrastructure.Queries.Json
 
         public static bool IsAllowedOperator(JsonSchema schema, CompareOperator compareOperator)
         {
-            if (schema.IsDynamic())
-            {
-                return true;
-            }
-
             switch (schema.Type)
             {
+                case JsonObjectType.None:
+                    return true;
                 case JsonObjectType.Boolean:
                     return BooleanOperators.Contains(compareOperator);
                 case JsonObjectType.Integer:

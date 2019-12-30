@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public static JsonSchemaProperty JsonProperty(string? description = null, bool isRequired = false)
         {
-            return Enrich(new JsonSchemaProperty { Type = JsonObjectType.Object, AllowAdditionalProperties = true }, description, isRequired);
+            return Enrich(new JsonSchemaProperty(), description, isRequired);
         }
 
         private static JsonSchemaProperty Enrich(JsonSchemaProperty property, string? description = null, bool isRequired = false)

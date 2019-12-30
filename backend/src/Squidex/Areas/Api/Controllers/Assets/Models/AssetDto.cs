@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -75,19 +76,14 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public long FileVersion { get; set; }
 
         /// <summary>
-        /// Determines of the created file is an image.
+        /// The asset metadata.
         /// </summary>
-        public bool IsImage { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
         /// <summary>
-        /// The width of the image in pixels if the asset is an image.
+        /// The type of the asset.
         /// </summary>
-        public int? PixelWidth { get; set; }
-
-        /// <summary>
-        /// The height of the image in pixels if the asset is an image.
-        /// </summary>
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         /// <summary>
         /// The user that has created the schema.
@@ -120,7 +116,34 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The metadata.
         /// </summary>
         [JsonProperty("_meta")]
-        public AssetMetadata Metadata { get; set; }
+        public AssetMeta Meta { get; set; }
+
+        /// <summary>
+        /// Determines of the created file is an image.
+        /// </summary>
+        [Obsolete]
+        public bool IsImage
+        {
+            get { return Type == AssetType.Image; }
+        }
+
+        /// <summary>
+        /// The width of the image in pixels if the asset is an image.
+        /// </summary>
+        [Obsolete]
+        public int? PixelWidth
+        {
+            get { return Metadata.GetPixelWidth(); }
+        }
+
+        /// <summary>
+        /// The height of the image in pixels if the asset is an image.
+        /// </summary>
+        [Obsolete]
+        public int? PixelHeight
+        {
+            get { return Metadata.GetPixelHeight(); }
+        }
 
         public static AssetDto FromAsset(IEnrichedAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
         {
@@ -130,7 +153,10 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (isDuplicate)
             {
-                response.Metadata = new AssetMetadata { IsDuplicate = "true" };
+                response.Meta = new AssetMeta
+                {
+                    IsDuplicate = "true"
+                };
             }
 
             return CreateLinks(response, controller, app);

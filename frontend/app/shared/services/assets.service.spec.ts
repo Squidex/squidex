@@ -418,10 +418,12 @@ describe('AssetsService', () => {
             fileVersion: id * 4,
             parentId,
             mimeType: 'image/png',
-            isImage: true,
-            pixelWidth: id * 3,
-            pixelHeight: id * 5,
+            metadata: {
+                pixelWidth: id * 3,
+                pixelHeight: id * 5
+            },
             slug: `my-name${id}${suffix}.png`,
+            type: `my-type${id}${suffix}`,
             tags: ['tag1', 'tag2'],
             version: id,
             _links: {
@@ -471,10 +473,12 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         id * 4,
         parentId,
         'image/png',
-        true,
-        id * 3,
-        id * 5,
+        {
+            pixelWidth: id * 3,
+            pixelHeight: id * 5
+        },
         `my-name${id}${suffix}.png`,
+        `my-type${id}${suffix}`,
         tags || ['tag1', 'tag2'],
         new Version(`${id}`));
 }

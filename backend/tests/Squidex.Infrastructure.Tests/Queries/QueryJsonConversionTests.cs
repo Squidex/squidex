@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Queries
 
         public QueryJsonConversionTests()
         {
-            var nested = new JsonSchemaProperty { Title = "nested" };
+            var nested = new JsonSchemaProperty { Title = "nested", Type = JsonObjectType.Object };
 
             nested.Properties["property"] = new JsonSchemaProperty
             {
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.Queries
 
             schema.Properties["json"] = new JsonSchemaProperty
             {
-                Type = JsonObjectType.Object
+                Type = JsonObjectType.None
             };
 
             schema.Properties["string"] = new JsonSchemaProperty

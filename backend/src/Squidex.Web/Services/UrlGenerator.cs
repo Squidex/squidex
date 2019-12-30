@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
@@ -36,7 +37,7 @@ namespace Squidex.Web.Services
 
         public string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
         {
-            if (!asset.IsImage)
+            if (asset.Type != AssetType.Image)
             {
                 return null;
             }

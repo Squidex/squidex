@@ -49,10 +49,10 @@ namespace Squidex.Config.Domain
                 .As<IAssetUsageTracker>().As<IEventConsumer>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
-                .As<ITagGenerator<CreateAsset>>();
+                .As<IAssetMetadataSource>();
 
             services.AddSingletonAs<ImageMetadataSource>()
-                .As<ITagGenerator<CreateAsset>>();
+                .As<IAssetMetadataSource>();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)

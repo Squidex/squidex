@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class ImageTagGeneratorTests
+    public class ImageMetadataSourceTests
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly HashSet<string> tags = new HashSet<string>();
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly AssetFile file;
         private readonly ImageMetadataSource sut;
 
-        public ImageTagGeneratorTests()
+        public ImageMetadataSourceTests()
         {
             file = new AssetFile("MyImage.png", "image/png", 1024, () => stream);
 

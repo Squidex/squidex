@@ -30,24 +30,24 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             ClrValue? result = null;
 
-            if (schema.IsDynamic())
-            {
-                if (value is JsonArray jsonArray)
-                {
-                    var array = ParseArray<ClrValue?>(errors, path, jsonArray, TryParseDynamic);
-
-                    result = array.Select(x => x?.Value).ToList();
-                }
-                else if (TryParseDynamic(errors, path, value, out var temp))
-                {
-                    result = temp;
-                }
-
-                return result;
-            }
-
             switch (GetType(schema))
             {
+                case JsonObjectType.None:
+                    {
+                        if (value is JsonArray jsonArray)
+                        {
+                            var array = ParseArray<ClrValue?>(errors, path, jsonArray, TryParseDynamic);
+
+                            result = array.Select(x => x?.Value).ToList();
+                        }
+                        else if (TryParseDynamic(errors, path, value, out var temp))
+                        {
+                            result = temp;
+                        }
+
+                        break;
+                    }
+
                 case JsonObjectType.Boolean:
                     {
                         if (value is JsonArray jsonArray)
