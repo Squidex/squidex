@@ -5,51 +5,44 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Assets
 {
-    public sealed class AssetMetadata : Dictionary<string, string>
+    public sealed class AssetMetadata : JsonObject
     {
-        public AssetMetadata()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
-
         public AssetMetadata SetPixelWidth(int value)
         {
-            this["pixelWidth"] = value.ToString(CultureInfo.InvariantCulture);
+            Add("pixelWidth", value);
 
             return this;
         }
 
         public AssetMetadata SetPixelHeight(int value)
         {
-            this["pixelHeight"] = value.ToString(CultureInfo.InvariantCulture);
+            Add("pixelHeight", value);
 
             return this;
         }
 
-        public int GetPixelWidth()
+        public int? GetPixelWidth()
         {
-            if (TryGetValue("pixelWidth", out var w) && int.TryParse(w, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+            if (TryGetValue("pixelWidth", out var n) && n is JsonNumber number)
             {
-                return result;
+                return (int)number.Value;
             }
 
-            return 0;
+            return null;
         }
 
-        public int GetPixelHeight()
+        public int? GetPixelHeight()
         {
-            if (TryGetValue("pixelHeight", out var w) && int.TryParse(w, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+            if (TryGetValue("pixelHeight", out var n) && n is JsonNumber number)
             {
-                return result;
+                return (int)number.Value;
             }
 
-            return 0;
+            return null;
         }
     }
 }

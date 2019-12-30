@@ -72,11 +72,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         continue;
                     }
 
-                    var w = asset.Metadata.GetPixelWidth();
-                    var h = asset.Metadata.GetPixelHeight();
+                    var pixelWidth = asset.Metadata.GetPixelWidth();
+                    var pixelHeight = asset.Metadata.GetPixelHeight();
 
-                    if (w > 0 && h > 0)
+                    if (pixelWidth.HasValue && pixelHeight.HasValue)
                     {
+                        var w = pixelWidth.Value;
+                        var h = pixelHeight.Value;
+
                         var actualRatio = (double)w / h;
 
                         if (properties.MinWidth.HasValue && w < properties.MinWidth)

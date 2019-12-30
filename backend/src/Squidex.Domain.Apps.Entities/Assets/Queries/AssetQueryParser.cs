@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Web.Http.OData.Builder;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;

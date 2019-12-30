@@ -11,6 +11,7 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -184,6 +185,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Type = AllTypes.NonNullTagsType
             });
 
+            AddField(new FieldType
+            {
+                Name = "metadata",
+                Arguments = AllTypes.PathArguments,
+                ResolvedType = AllTypes.NoopJson,
+                Resolver = ResolveMetadata(),
+                Description = "The asset tags.",
+            });
+
             if (model.CanGenerateAssetSourceUrl)
             {
                 AddField(new FieldType
@@ -196,6 +206,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             Description = "An asset";
+        }
+
+        private static IFieldResolver ResolveMetadata()
+        {
+            return new FuncFieldResolver<IEnrichedAssetEntity, object?>(c =>
+            {
+                var path = c.Arguments.GetOrDefault(AllTypes.PathName);
+
+                c.Source.Metadata.TryGetByPath(path as string, out var result);
+
+                return result;
+            });
         }
 
         private static IFieldResolver Resolve(Func<IEnrichedAssetEntity, object?> action)

@@ -5,19 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+using NJsonSchema;
+
+namespace Squidex.Infrastructure.Queries.Json
 {
-    public enum ClrValueType
+    public static class SchemaExtensions
     {
-        Boolean,
-        Dynamic,
-        Guid,
-        Double,
-        Instant,
-        Int32,
-        Int64,
-        Single,
-        String,
-        Null
+        public static bool IsDynamic(this JsonSchema schema)
+        {
+            return schema.Type == JsonObjectType.Object && schema.Properties.Count == 0 && schema.AllowAdditionalProperties == true;
+        }
     }
 }

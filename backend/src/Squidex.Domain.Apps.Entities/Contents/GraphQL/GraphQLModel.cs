@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
-        public (IGraphType? ResolveType, ValueResolver? Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
+        public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
             return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, this, assetListType, fieldName));
         }

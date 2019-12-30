@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -29,7 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
-        private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly Guid parentId = Guid.NewGuid();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Create_should_create_events_and_update_state()
         {
-            var command = new CreateAsset { File = file, ImageInfo = image, FileHash = "NewHash", Tags = new HashSet<string>() };
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
@@ -84,14 +84,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetCreated
                     {
-                        IsImage = true,
                         FileName = file.FileName,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,
                         FileVersion = 0,
+                        Metadata = new AssetMetadata(),
                         MimeType = file.MimeType,
-                        PixelWidth = image.PixelWidth,
-                        PixelHeight = image.PixelHeight,
                         Tags = new HashSet<string>(),
                         Slug = file.FileName.ToAssetSlug()
                     })
@@ -101,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Update_should_create_events_and_update_state()
         {
-            var command = new UpdateAsset { File = file, ImageInfo = image, FileHash = "NewHash" };
+            var command = new UpdateAsset { File = file, FileHash = "NewHash" };
 
             await ExecuteCreateAsync();
 
@@ -116,13 +114,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetUpdated
                     {
-                        IsImage = true,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,
                         FileVersion = 1,
-                        MimeType = file.MimeType,
-                        PixelWidth = image.PixelWidth,
-                        PixelHeight = image.PixelHeight
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType
                     })
                 );
         }

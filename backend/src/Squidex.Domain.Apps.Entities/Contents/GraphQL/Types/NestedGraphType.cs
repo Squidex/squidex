@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields())
             {
-                var (resolveType, valueResolver) = model.GetGraphType(schema, nestedField, nestedName);
+                var (resolveType, valueResolver, args) = model.GetGraphType(schema, nestedField, nestedName);
 
                 if (resolveType != null && valueResolver != null)
                 {
@@ -35,6 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     AddField(new FieldType
                     {
                         Name = nestedName,
+                        Arguments = args,
                         Resolver = resolver,
                         ResolvedType = resolveType,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
