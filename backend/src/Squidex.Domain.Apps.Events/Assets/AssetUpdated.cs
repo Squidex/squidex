@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public long FileVersion { get; set; }
 
-        public AssetMetadata Metadata { get; set; }
-
         public AssetType Type { get; set; }
+
+        public AssetMetadata Metadata { get; set; }
     }
 }

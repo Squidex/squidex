@@ -12,7 +12,7 @@ import {
     AddPermissionForm,
     AutocompleteComponent,
     AutocompleteSource,
-    EditPermissionsForm,
+    EditRoleForm,
     RoleDto,
     RolesState
 } from '@app/shared';
@@ -47,7 +47,7 @@ export class RoleComponent implements OnChanges {
 
     public addPermissionForm = new AddPermissionForm(this.formBuilder);
 
-    public editForm = new EditPermissionsForm();
+    public editForm = new EditRoleForm();
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -58,7 +58,7 @@ export class RoleComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.role.canUpdate;
 
-        this.editForm.load(this.role.permissions);
+        this.editForm.load(this.role);
         this.editForm.setEnabled(this.isEditable);
     }
 
@@ -89,9 +89,7 @@ export class RoleComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = { permissions: value };
-
-            this.rolesState.update(this.role, request)
+            this.rolesState.update(this.role, value)
                 .subscribe(() => {
                     this.editForm.submitCompleted();
 

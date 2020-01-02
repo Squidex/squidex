@@ -13,7 +13,9 @@ import {
     hasValue$
 } from '@app/framework';
 
-export class EditPermissionsForm extends Form<FormArray, ReadonlyArray<string>> {
+import { CreateRoleDto, UpdateRoleDto } from './../services/roles.service';
+
+export class EditRoleForm extends Form<FormArray, UpdateRoleDto> {
     public get controls() {
         return this.form.controls as FormControl[];
     }
@@ -30,20 +32,26 @@ export class EditPermissionsForm extends Form<FormArray, ReadonlyArray<string>> 
         this.form.removeAt(index);
     }
 
-    public load(permissions: ReadonlyArray<string>) {
-        while (this.form.controls.length < permissions.length) {
+    public transformSubmit(value: any) {
+        return { permissions: value };
+    }
+
+    public transformLoad(value: UpdateRoleDto) {
+        while (this.form.controls.length < value.permissions.length) {
             this.add();
         }
 
-        while (permissions.length > this.form.controls.length) {
+        while (value.permissions.length > this.form.controls.length) {
             this.form.removeAt(this.form.controls.length - 1);
         }
 
-        super.load(permissions);
+        return value.permissions;
     }
 }
 
-export class AddPermissionForm extends Form<FormGroup, { permission: string }> {
+type AddPermissionFormType = { permission: string };
+
+export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
     public hasPermission = hasValue$(this.form.controls['permission']);
 
     constructor(formBuilder: FormBuilder) {
@@ -57,7 +65,7 @@ export class AddPermissionForm extends Form<FormGroup, { permission: string }> {
     }
 }
 
-export class AddRoleForm extends Form<FormGroup, { name: string }> {
+export class AddRoleForm extends Form<FormGroup, CreateRoleDto> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {

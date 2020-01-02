@@ -15,11 +15,18 @@ import {
     value$
 } from '@app/framework';
 
-import { AddFieldDto } from './../services/schemas.service';
+import {
+    AddFieldDto,
+    CreateSchemaDto,
+    SynchronizeSchemaDto,
+    UpdateSchemaDto
+} from './../services/schemas.service';
 
 import { createProperties } from './../services/schemas.types';
 
-export class CreateCategoryForm extends Form<FormGroup, { name: string }> {
+type CreateCategoryFormType = { name: string };
+
+export class CreateCategoryForm extends Form<FormGroup, CreateCategoryFormType> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['']
@@ -27,7 +34,7 @@ export class CreateCategoryForm extends Form<FormGroup, { name: string }> {
     }
 }
 
-export class CreateSchemaForm extends Form<FormGroup, { name: string, isSingleton?: boolean, import: any }> {
+export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
@@ -40,6 +47,30 @@ export class CreateSchemaForm extends Form<FormGroup, { name: string, isSingleto
             isSingleton: false,
             import: {}
         }));
+    }
+
+    public transformSubmit(value: any) {
+        const result = Object.assign(value.import || {}, { name: value.name, isSingleton: value.isSingleton });
+
+        return result;
+    }
+}
+
+export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            json: {},
+            fieldsDelete: false,
+            fieldsRecreate: false
+        }));
+    }
+
+    public transformSubmit(value: any) {
+        return {
+            ...value,
+            noFieldDeletion: !value.fieldsDelete,
+            noFieldRecreation: !value.fieldsDelete
+        };
     }
 }
 
@@ -60,17 +91,9 @@ export class AddPreviewUrlForm extends Form<FormGroup, { name: string, url: stri
     }
 }
 
-export class SynchronizeSchemaForm extends Form<FormGroup, { json: any, fieldsDelete: boolean, fieldsRecreate: boolean }> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            json: {},
-            fieldsDelete: false,
-            fieldsRecreate: false
-        }));
-    }
-}
+type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
-export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: string }> {
+export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType> {
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
@@ -97,8 +120,8 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: 
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: { [name: string]: string }) {
-        const result: { name: string, url: string }[] = [];
+    public transformLoad(value: ConfigurePreviewUrlsFormType) {
+        const result = [];
 
         if (Types.isObject(value)) {
             const length = Object.keys(value).length;
@@ -121,8 +144,8 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: 
         return result;
     }
 
-    public transformSubmit(value: ReadonlyArray<{ name: string, url: string }>): { [name: string]: string } {
-        const result: { [name: string]: string } = {};
+    public transformSubmit(value: any) {
+        const result = {};
 
         for (const item of value) {
             result[item.name] = item.url;
@@ -132,7 +155,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, { [name: string]: 
     }
 }
 
-export class EditScriptsForm extends Form<FormGroup, { query?: string, create?: string, change?: string, delete?: string, update?: string }> {
+export class EditScriptsForm extends Form<FormGroup, {}> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             query: '',
@@ -144,7 +167,7 @@ export class EditScriptsForm extends Form<FormGroup, { query?: string, create?: 
     }
 }
 
-export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: string, placeholder?: string, editorUrl?: string, isRequired: boolean }> {
+export class EditFieldForm extends Form<FormGroup, {}> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',
@@ -169,7 +192,7 @@ export class EditFieldForm extends Form<FormGroup, { label?: string, hints?: str
     }
 }
 
-export class EditSchemaForm extends Form<FormGroup, { label?: string, hints?: string }> {
+export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',

@@ -15,6 +15,10 @@ import { ErrorDto } from './utils/error';
 import { ResourceLinks } from './utils/hateos';
 import { Types } from './utils/types';
 
+export type Mutable<T> = {
+    -readonly [P in keyof T ]: T[P]
+};
+
 export interface FormState {
     submitted: boolean;
 

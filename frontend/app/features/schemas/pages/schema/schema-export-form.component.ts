@@ -49,13 +49,7 @@ export class SchemaExportFormComponent implements OnChanges {
         const value = this.synchronizeForm.submit();
 
         if (value) {
-            const request = {
-                ...value.json,
-                noFieldDeletion: !value.fieldsDelete,
-                noFieldRecreation: !value.fieldsDelete
-            };
-
-            this.schemasState.synchronize(this.schema, request)
+            this.schemasState.synchronize(this.schema, value)
                 .subscribe(() => {
                     this.dialogs.notifyInfo('Schema synchronized successfully.');
 

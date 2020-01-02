@@ -121,6 +121,7 @@ export interface AnnotateAssetDto {
     readonly fileName?: string;
     readonly slug?: string;
     readonly tags?: ReadonlyArray<string>;
+    readonly metadata?: { [key: string]: any };
 }
 
 export interface CreateAssetFolderDto {

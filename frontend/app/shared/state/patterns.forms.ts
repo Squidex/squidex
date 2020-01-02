@@ -9,7 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form, ValidatorsEx } from '@app/framework';
 
-export class EditPatternForm extends Form<FormGroup, { name: string, pattern: string, message?: string }> {
+import { EditPatternDto } from './../services/patterns.service';
+
+export class EditPatternForm extends Form<FormGroup, EditPatternDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',

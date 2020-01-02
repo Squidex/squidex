@@ -46,6 +46,8 @@ namespace Migrate_01.OldEvents
         {
             var result = SimpleMapper.Map(this, new AssetCreatedV2());
 
+            result.Metadata = new AssetMetadata();
+
             if (IsImage && PixelWidth.HasValue && PixelHeight.HasValue)
             {
                 result.Type = AssetType.Image;
