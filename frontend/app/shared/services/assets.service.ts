@@ -27,6 +27,8 @@ import {
     Versioned
 } from '@app/framework';
 
+const SVG_PREVIEW_LIMIT = 10 * 1024;
+
 import { encodeQuery, Query } from './../state/query';
 
 export class AssetsDto extends ResultSet<AssetDto> {
@@ -74,7 +76,7 @@ export class AssetDto {
         public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
-        this.canPreview = this.type === 'Image' || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
+        this.canPreview = this.type === 'Image' || (this.mimeType === 'image/svg+xml' && this.fileSize < SVG_PREVIEW_LIMIT);
 
         this._links = links;
 
