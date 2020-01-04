@@ -104,14 +104,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             };
 
             A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>.Ignored))
-                .Returns("metadata1");
+                .Returns(new[] { "metadata1" });
 
             A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>.Ignored))
-                .Returns("metadata2");
+                .Returns(new[] { "metadata2", "metadata3" });
 
             var result = await sut.EnrichAsync(source, requestContext);
 
-            Assert.Equal("metadata1, metadata2, 2 kB", result.MetadataText);
+            Assert.Equal("metadata1, metadata2, metadata3, 2 kB", result.MetadataText);
         }
 
         [Fact]

@@ -83,7 +83,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 foreach (var source in assetMetadataSources)
                 {
-                    Append(source.Format(asset));
+                    foreach (var metadata in source.Format(asset))
+                    {
+                        Append(metadata);
+                    }
                 }
 
                 Append(asset.FileSize.ToReadableSize());

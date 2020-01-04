@@ -56,13 +56,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_always_format_to_null()
+        public void Should_always_format_to_empty()
         {
             var source = new AssetEntity();
 
             var formatted = sut.Format(source);
 
-            Assert.Null(formatted);
+            Assert.Empty(formatted);
         }
     }
 }

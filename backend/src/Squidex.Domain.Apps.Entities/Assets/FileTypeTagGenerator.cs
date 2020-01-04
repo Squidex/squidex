@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return TaskHelper.Done;
         }
 
-        public string? Format(IAssetEntity asset)
+        public IEnumerable<string> Format(IAssetEntity asset)
         {
-            return null;
+            yield break;
         }
     }
 }

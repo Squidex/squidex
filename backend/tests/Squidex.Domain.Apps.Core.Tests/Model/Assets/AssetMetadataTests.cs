@@ -84,5 +84,87 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
             Assert.True(found);
             Assert.Equal(JsonValue.Create(12), result);
         }
+
+        [Fact]
+        public void Should_get_string_if_found()
+        {
+            var value = "Hello";
+
+            var sut = new AssetMetadata
+            {
+                ["string"] = JsonValue.Create(value)
+            };
+
+            var found = sut.TryGetString("string", out var result);
+
+            Assert.True(found);
+            Assert.Equal(value, result);
+        }
+
+        [Fact]
+        public void Should_get_null_if_property_is_not_string()
+        {
+            var sut = new AssetMetadata
+            {
+                ["string"] = JsonValue.Create(12)
+            };
+
+            var found = sut.TryGetString("string", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_get_null_if_string_property_not_found()
+        {
+            var sut = new AssetMetadata();
+
+            var found = sut.TryGetString("other", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_get_number_if_found()
+        {
+            var value = 12.5;
+
+            var sut = new AssetMetadata
+            {
+                ["number"] = JsonValue.Create(value)
+            };
+
+            var found = sut.TryGetNumber("number", out var result);
+
+            Assert.True(found);
+            Assert.Equal(value, result);
+        }
+
+        [Fact]
+        public void Should_get_null_if_property_is_not_number()
+        {
+            var sut = new AssetMetadata
+            {
+                ["number"] = JsonValue.Create(true)
+            };
+
+            var found = sut.TryGetNumber("number", out var result);
+
+            Assert.False(found);
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void Should_get_null_if_number_property_not_found()
+        {
+            var sut = new AssetMetadata();
+
+            var found = sut.TryGetNumber("other", out var result);
+
+            Assert.False(found);
+            Assert.Equal(0, result);
+        }
     }
 }

@@ -51,6 +51,34 @@ namespace Squidex.Domain.Apps.Core.Assets
             return null;
         }
 
+        public bool TryGetNumber(string name, out double result)
+        {
+            if (TryGetValue(name, out var v) && v is JsonNumber n)
+            {
+                result = n.Value;
+
+                return true;
+            }
+
+            result = 0;
+
+            return false;
+        }
+
+        public bool TryGetString(string name, [MaybeNullWhen(false)] out string result)
+        {
+            if (TryGetValue(name, out var v) && v is JsonString s)
+            {
+                result = s.Value;
+
+                return true;
+            }
+
+            result = null!;
+
+            return false;
+        }
+
         public bool TryGetByPath(string? path, [MaybeNullWhen(false)] out object result)
         {
             return TryGetByPath(path?.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries), out result!);

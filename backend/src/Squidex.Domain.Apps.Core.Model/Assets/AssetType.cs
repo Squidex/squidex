@@ -10,6 +10,8 @@ namespace Squidex.Domain.Apps.Core.Assets
     public enum AssetType
     {
         Unknown,
-        Image
+        Image,
+        Audio,
+        Video
     }
 }

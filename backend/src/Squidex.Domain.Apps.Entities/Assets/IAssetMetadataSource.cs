@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags);
 
-        string? Format(IAssetEntity asset);
+        IEnumerable<string> Format(IAssetEntity asset);
     }
 }

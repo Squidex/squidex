@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -103,7 +102,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonToken.Boolean:
                     return JsonValue.Create((bool)reader.Value!);
                 case JsonToken.Date:
-                    return JsonValue.Create(((DateTime)reader.Value!).ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
+                    return JsonValue.Create(((DateTime)reader.Value!).ToIso8601());
                 case JsonToken.String:
                     return JsonValue.Create(reader.Value!.ToString());
                 case JsonToken.Null:
