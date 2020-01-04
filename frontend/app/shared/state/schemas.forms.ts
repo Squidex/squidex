@@ -10,7 +10,6 @@ import { map } from 'rxjs/operators';
 
 import {
     Form,
-    Types,
     ValidatorsEx,
     value$
 } from '@app/framework';
@@ -18,11 +17,13 @@ import {
 import {
     AddFieldDto,
     CreateSchemaDto,
+    SchemaDetailsDto,
+    SchemaPropertiesDto,
     SynchronizeSchemaDto,
     UpdateSchemaDto
 } from './../services/schemas.service';
 
-import { createProperties } from './../services/schemas.types';
+import { createProperties, FieldPropertiesDto } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
 
@@ -50,7 +51,7 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
     }
 
     public transformSubmit(value: any) {
-        const result = Object.assign(value.import || {}, { name: value.name, isSingleton: value.isSingleton });
+        const result = { ...value.import || {}, name: value.name, isSingleton: value.isSingleton };
 
         return result;
     }
@@ -65,6 +66,10 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
         }));
     }
 
+    public loadSchema(schema: SchemaDetailsDto) {
+        this.form.get('json')!.setValue(schema.export());
+    }
+
     public transformSubmit(value: any) {
         return {
             ...value,
@@ -74,7 +79,9 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 }
 
-export class AddPreviewUrlForm extends Form<FormGroup, { name: string, url: string }> {
+type AddPreviewUrlFormType = { name: string, url: string };
+
+export class AddPreviewUrlForm extends Form<FormGroup, AddPreviewUrlFormType> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
@@ -93,7 +100,7 @@ export class AddPreviewUrlForm extends Form<FormGroup, { name: string, url: stri
 
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
-export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType> {
+export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDetailsDto> {
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
@@ -120,24 +127,24 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: ConfigurePreviewUrlsFormType) {
+    public transformLoad(value: Partial<SchemaDetailsDto>) {
         const result = [];
 
-        if (Types.isObject(value)) {
-            const length = Object.keys(value).length;
+        const previewUrls = value.previewUrls || {};
 
-            while (this.form.controls.length < length) {
-                this.add({});
-            }
+        const length = Object.keys(previewUrls).length;
 
-            while (this.form.controls.length > length) {
-                this.remove(this.form.controls.length - 1);
-            }
+        while (this.form.controls.length < length) {
+            this.add({});
+        }
 
-            for (const key in value) {
-                if (value.hasOwnProperty(key)) {
-                    result.push({ name: key, url: value[key] });
-                }
+        while (this.form.controls.length > length) {
+            this.remove(this.form.controls.length - 1);
+        }
+
+        for (const key in previewUrls) {
+            if (previewUrls.hasOwnProperty(key)) {
+                result.push({ name: key, url: previewUrls[key] });
             }
         }
 
@@ -155,7 +162,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
     }
 }
 
-export class EditScriptsForm extends Form<FormGroup, {}> {
+export class EditScriptsForm extends Form<FormGroup, {}, SchemaDetailsDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             query: '',
@@ -167,7 +174,7 @@ export class EditScriptsForm extends Form<FormGroup, {}> {
     }
 }
 
-export class EditFieldForm extends Form<FormGroup, {}> {
+export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',
@@ -192,7 +199,7 @@ export class EditFieldForm extends Form<FormGroup, {}> {
     }
 }
 
-export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto> {
+export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',
@@ -231,13 +238,18 @@ export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
         }));
     }
 
-    public transformLoad(value: AddFieldDto) {
+    public transformLoad(value: Partial<AddFieldDto>) {
         const isLocalizable = value.partitioning === 'language';
 
-        return { name: value.name, isLocalizable, type: value.properties.fieldType };
+        const type =
+            value.properties ?
+            value.properties.fieldType :
+            'String';
+
+        return { name: value.name, isLocalizable, type };
     }
 
-    public transformSubmit(value: any): AddFieldDto {
+    public transformSubmit(value: any) {
         const properties = createProperties(value.type);
         const partitioning = value.isLocalizable ? 'language' : 'invariant';
 

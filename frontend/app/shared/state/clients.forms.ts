@@ -13,9 +13,13 @@ import {
     ValidatorsEx
 } from '@app/framework';
 
-import { CreateClientDto, UpdateClientDto } from './../services/clients.service';
+import {
+    ClientDto,
+    CreateClientDto,
+    UpdateClientDto
+} from './../services/clients.service';
 
-export class RenameClientForm extends Form<FormGroup, UpdateClientDto> {
+export class RenameClientForm extends Form<FormGroup, UpdateClientDto, ClientDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',

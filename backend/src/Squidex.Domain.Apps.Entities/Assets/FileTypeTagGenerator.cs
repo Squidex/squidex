@@ -29,5 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             return TaskHelper.Done;
         }
+
+        public string? Format(IAssetEntity asset)
+        {
+            return null;
+        }
     }
 }

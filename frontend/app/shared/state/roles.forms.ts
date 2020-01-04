@@ -13,9 +13,13 @@ import {
     hasValue$
 } from '@app/framework';
 
-import { CreateRoleDto, UpdateRoleDto } from './../services/roles.service';
+import {
+    CreateRoleDto,
+    RoleDto,
+    UpdateRoleDto
+} from './../services/roles.service';
 
-export class EditRoleForm extends Form<FormArray, UpdateRoleDto> {
+export class EditRoleForm extends Form<FormArray, UpdateRoleDto, RoleDto> {
     public get controls() {
         return this.form.controls as FormControl[];
     }
@@ -36,12 +40,14 @@ export class EditRoleForm extends Form<FormArray, UpdateRoleDto> {
         return { permissions: value };
     }
 
-    public transformLoad(value: UpdateRoleDto) {
-        while (this.form.controls.length < value.permissions.length) {
+    public transformLoad(value: Partial<UpdateRoleDto>) {
+        const permissions = value.permissions || [];
+
+        while (this.form.controls.length < permissions.length) {
             this.add();
         }
 
-        while (value.permissions.length > this.form.controls.length) {
+        while (permissions.length > this.form.controls.length) {
             this.form.removeAt(this.form.controls.length - 1);
         }
 

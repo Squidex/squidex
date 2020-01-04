@@ -230,6 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 FileVersion = 123,
                 MimeType = "image/png",
                 Type = AssetType.Image,
+                MetadataText = "metadata-text",
                 Metadata =
                     new AssetMetadata()
                         .SetPixelWidth(800)

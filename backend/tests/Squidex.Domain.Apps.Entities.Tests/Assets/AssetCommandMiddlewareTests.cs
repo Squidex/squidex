@@ -16,7 +16,6 @@ using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
-using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;

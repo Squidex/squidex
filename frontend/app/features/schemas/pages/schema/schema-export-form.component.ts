@@ -38,7 +38,7 @@ export class SchemaExportFormComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdateScripts;
 
-        this.synchronizeForm.form.get('json')!.setValue(this.schema.export());
+        this.synchronizeForm.loadSchema(this.schema);
     }
 
     public synchronize() {

@@ -41,7 +41,7 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdateUrls;
 
-        this.editForm.load(this.schema.previewUrls);
+        this.editForm.load(this.schema);
         this.editForm.setEnabled(this.isEditable);
     }
 

@@ -54,5 +54,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Contains("type/blob", tags);
         }
+
+        [Fact]
+        public void Should_always_format_to_null()
+        {
+            var source = new AssetEntity();
+
+            var formatted = sut.Format(source);
+
+            Assert.Null(formatted);
+        }
     }
 }

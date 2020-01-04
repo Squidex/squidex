@@ -43,6 +43,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string Slug { get; set; }
 
+        public string MetadataText { get; set; }
+
         public long FileSize { get; set; }
 
         public long FileVersion { get; set; }

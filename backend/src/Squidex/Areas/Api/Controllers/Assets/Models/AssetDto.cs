@@ -61,6 +61,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FileType { get; set; }
 
         /// <summary>
+        /// The formatted text representation of the metadata.
+        /// </summary>
+        [Required]
+        public string MetadataText { get; set; }
+
+        /// <summary>
         /// The asset tags.
         /// </summary>
         public HashSet<string>? Tags { get; set; }

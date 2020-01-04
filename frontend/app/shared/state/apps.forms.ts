@@ -9,7 +9,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form, ValidatorsEx } from '@app/framework';
 
-import { CreateAppDto, UpdateAppDto } from './../services/apps.service';
+import {
+    AppDto,
+    CreateAppDto,
+    UpdateAppDto
+} from './../services/apps.service';
 
 export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
     constructor(formBuilder: FormBuilder) {
@@ -25,7 +29,7 @@ export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
     }
 }
 
-export class UpdateAppForm extends Form<FormGroup, UpdateAppDto> {
+export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             label: ['',

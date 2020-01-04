@@ -14,7 +14,6 @@ import { map } from 'rxjs/operators';
 import {
     ApiUrlConfig,
     AssetDto,
-    calculateFileSize,
     formatHistoryMessage,
     HistoryEventDto,
     MathHelper,
@@ -232,24 +231,6 @@ export class AssetUrlPipe implements PipeTransform {
 
     public transform(asset: AssetDto): string {
         return `${asset.fullUrl(this.apiUrl)}&sq=${MathHelper.guid()}`;
-    }
-}
-
-@Pipe({
-    name: 'sqxAssetInfos',
-    pure: true
-})
-export class AssetInfosPipe implements PipeTransform {
-    public transform(asset: AssetDto): string {
-        let result = '';
-
-        if (asset.type === 'Image') {
-            result = `${asset.metadata.pixelWidth}x${asset.metadata.pixelHeight}px, `;
-        }
-
-        result += calculateFileSize(asset.fileSize);
-
-        return result;
     }
 }
 

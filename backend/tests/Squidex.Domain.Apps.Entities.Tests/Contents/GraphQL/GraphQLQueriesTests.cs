@@ -149,6 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     pixelWidth
                     pixelHeight
                     type
+                    metadataText
                     metadataPixelWidth: metadata(path: ""pixelWidth"")
                     metadataUnknown: metadata(path: ""unknown"")
                     metadata
@@ -190,6 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             pixelWidth = 800,
                             pixelHeight = 600,
                             type = "IMAGE",
+                            metadataText = "metadata-text",
                             metadataPixelWidth = 800,
                             metadataUnknown = (string?)null,
                             metadata = new
@@ -237,6 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       pixelWidth
                       pixelHeight
                       type
+                      metadataText
                       metadataPixelWidth: metadata(path: ""pixelWidth"")
                       metadataUnknown: metadata(path: ""unknown"")
                       metadata
@@ -282,6 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 pixelWidth = 800,
                                 pixelHeight = 600,
                                 type = "IMAGE",
+                                metadataText = "metadata-text",
                                 metadataPixelWidth = 800,
                                 metadataUnknown = (string?)null,
                                 metadata = new

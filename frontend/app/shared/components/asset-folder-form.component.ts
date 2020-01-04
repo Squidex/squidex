@@ -37,7 +37,7 @@ export class AssetFolderFormComponent implements OnInit {
 
     public ngOnInit() {
         if (this.assetFolder) {
-            this.editForm.load({ folderName: this.assetFolder.folderName });
+            this.editForm.load(this.assetFolder);
         }
     }
 

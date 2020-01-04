@@ -18,10 +18,11 @@ import {
 import {
     AnnotateAssetDto,
     AssetDto,
+    AssetFolderDto,
     RenameAssetFolderDto
 } from './../services/assets.service';
 
-export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto> {
+export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
         return this.form.get('metadata')! as FormArray;
     }
@@ -122,7 +123,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto> {
         return result;
     }
 
-    public transformLoad(value: AnnotateAssetDto) {
+    public transformLoad(value: Partial<AssetDto>) {
         const result = { ...value };
 
         let fileName = value.fileName;
@@ -189,7 +190,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto> {
     }
 }
 
-export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto> {
+export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             folderName: ['',

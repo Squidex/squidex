@@ -25,7 +25,7 @@ export interface FormState {
     error?: ErrorDto | null;
 }
 
-export class Form<T extends AbstractControl, V> {
+export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     private readonly state = new State<FormState>({ submitted: false });
 
     public submitted =
@@ -55,7 +55,7 @@ export class Form<T extends AbstractControl, V> {
         this.form.disable();
     }
 
-    protected setValue(value?: V) {
+    protected setValue(value?: Partial<TIn>) {
         if (value) {
             this.form.reset(this.transformLoad(value));
         } else {
@@ -63,21 +63,21 @@ export class Form<T extends AbstractControl, V> {
         }
     }
 
-    protected transformLoad(value: V): any {
+    protected transformLoad(value: Partial<TIn>): any {
         return value;
     }
 
-    protected transformSubmit(value: any): V {
+    protected transformSubmit(value: any): TOut {
         return value;
     }
 
-    public load(value: V | undefined) {
+    public load(value: Partial<TIn> | undefined) {
         this.state.next({ submitted: false, error: null });
 
         this.setValue(value);
     }
 
-    public submit(): V | null {
+    public submit(): TOut | null {
         this.state.next({ submitted: true, error: null });
 
         if (this.form.valid) {
@@ -93,7 +93,7 @@ export class Form<T extends AbstractControl, V> {
         }
     }
 
-    public submitCompleted(options?: { newValue?: V, noReset?: boolean }) {
+    public submitCompleted(options?: { newValue?: TOut, noReset?: boolean }) {
         this.state.next({ submitted: false, error: null });
 
         this.enable();

@@ -67,9 +67,10 @@ export class AssetDto {
         public readonly fileVersion: number,
         public readonly parentId: string,
         public readonly mimeType: string,
+        public readonly type: string,
+        public readonly metadataText: string,
         public readonly metadata: any,
         public readonly slug: string,
-        public readonly type: string,
         public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
@@ -376,9 +377,10 @@ function parseAsset(response: any) {
         response.fileVersion,
         response.parentId,
         response.mimeType,
+        response.type,
+        response.metadataText,
         response.metadata,
         response.slug,
-        response.type,
         response.tags || [],
         new Version(response.version.toString()));
 }

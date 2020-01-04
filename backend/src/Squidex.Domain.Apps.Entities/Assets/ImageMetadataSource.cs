@@ -57,5 +57,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 }
             }
         }
+
+        public string? Format(IAssetEntity asset)
+        {
+            if (asset.Type == AssetType.Image)
+            {
+                return $"{asset.Metadata.GetPixelWidth()}x{asset.Metadata.GetPixelHeight()}px";
+            }
+
+            return null;
+        }
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;
 using Xunit;
@@ -80,6 +81,33 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Contains("image", tags);
             Assert.Contains("image/large", tags);
+        }
+
+        [Fact]
+        public void Should_format_with_dimensions_if_image()
+        {
+            var source = new AssetEntity
+            {
+                Metadata =
+                    new AssetMetadata()
+                        .SetPixelWidth(800)
+                        .SetPixelHeight(600),
+                Type = AssetType.Image
+            };
+
+            var formatted = sut.Format(source);
+
+            Assert.Equal("800x600px", formatted);
+        }
+
+        [Fact]
+        public void Should_format_to_null_if_not_an_image()
+        {
+            var source = new AssetEntity();
+
+            var formatted = sut.Format(source);
+
+            Assert.Null(formatted);
         }
     }
 }
