@@ -114,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                             Tags = e.Tags;
                         }
 
+                        if (e.Metadata != null)
+                        {
+                            Metadata = e.Metadata;
+                        }
+
                         break;
                     }
 

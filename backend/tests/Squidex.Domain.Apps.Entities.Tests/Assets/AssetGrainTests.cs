@@ -134,11 +134,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("My New Image.png", sut.Snapshot.FileName);
+            Assert.Equal(command.FileName, sut.Snapshot.FileName);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { FileName = "My New Image.png" })
+                    CreateAssetEvent(new AssetAnnotated { FileName = command.FileName })
                 );
         }
 
@@ -153,18 +153,37 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("my-new-image.png", sut.Snapshot.Slug);
+            Assert.Equal(command.Slug, sut.Snapshot.Slug);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { Slug = "my-new-image.png" })
+                    CreateAssetEvent(new AssetAnnotated { Slug = command.Slug })
                 );
         }
 
         [Fact]
-        public async Task AnnotateTag_should_create_events_and_update_state()
+        public async Task AnnotateMetadata_should_create_events_and_update_state()
         {
-            var command = new AnnotateAsset { Tags = new HashSet<string>() };
+            var command = new AnnotateAsset { Metadata = new AssetMetadata().SetPixelWidth(800) };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetAnnotated { Metadata = command.Metadata })
+                );
+        }
+
+        [Fact]
+        public async Task AnnotateTags_should_create_events_and_update_state()
+        {
+            var command = new AnnotateAsset { Tags = new HashSet<string> { "tag1" } };
 
             await ExecuteCreateAsync();
 

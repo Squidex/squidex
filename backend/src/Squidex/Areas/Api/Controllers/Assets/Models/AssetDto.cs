@@ -67,8 +67,15 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string MetadataText { get; set; }
 
         /// <summary>
+        /// The asset metadata.
+        /// </summary>
+        [Required]
+        public AssetMetadata Metadata { get; set; }
+
+        /// <summary>
         /// The asset tags.
         /// </summary>
+        [Required]
         public HashSet<string>? Tags { get; set; }
 
         /// <summary>
@@ -80,11 +87,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The version of the file.
         /// </summary>
         public long FileVersion { get; set; }
-
-        /// <summary>
-        /// The asset metadata.
-        /// </summary>
-        public AssetMetadata Metadata { get; set; }
 
         /// <summary>
         /// The type of the asset.

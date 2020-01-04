@@ -96,8 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new AnnotateAsset();
 
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command, "asset-name", "asset-slug"),
-                new ValidationError("Either file name, slug or tags must be defined.", "FileName", "Slug", "Tags"));
+            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command),
+                new ValidationError("Either file name, slug, tags or metadata must be defined.", "FileName", "Slug", "Tags", "Metadata"));
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new AnnotateAsset { FileName = "new-name", Slug = "new-slug" };
 
-            GuardAsset.CanAnnotate(command, "asset-name", "asset-slug");
+            GuardAsset.CanAnnotate(command);
         }
 
         [Fact]

@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case AnnotateAsset annotateAsset:
                     return UpdateReturnAsync(annotateAsset, async c =>
                     {
-                        GuardAsset.CanAnnotate(c, Snapshot.FileName!, Snapshot.Slug);
+                        GuardAsset.CanAnnotate(c);
 
                         var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
 
