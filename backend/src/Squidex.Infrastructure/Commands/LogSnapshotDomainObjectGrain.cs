@@ -56,9 +56,11 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override void ApplyEvent(Envelope<IEvent> @event)
         {
+            var newVersion = Version + 1;
+
             var snapshot = OnEvent(@event);
 
-            snapshot.Version = Version + 1;
+            snapshot.Version = newVersion;
             snapshots.Add(snapshot);
         }
 

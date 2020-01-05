@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using DeepEqual.Syntax;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -35,6 +36,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override RootField Update(FieldProperties newProperties)
         {
             var typedProperties = ValidateProperties(newProperties);
+
+            newProperties.Freeze();
+
+            if (typedProperties.IsDeepEqual(newProperties))
+            {
+                return this;
+            }
 
             return Clone<RootField<T>>(clone =>
             {

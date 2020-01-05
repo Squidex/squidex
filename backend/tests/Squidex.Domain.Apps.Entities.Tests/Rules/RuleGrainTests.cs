@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var command = MakeCreateCommand();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -97,13 +97,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Enable_should_handle_command()
-        {
-            await sut.ExecuteAsync(CreateRuleCommand(MakeCreateCommand()));
-            await sut.ExecuteAsync(CreateRuleCommand(new DisableRule()));
-        }
-
-        [Fact]
         public async Task Enable_should_create_events_and_update_state()
         {
             var command = new EnableRule();
@@ -111,9 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             await ExecuteCreateAsync();
             await ExecuteDisableAsync();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -130,9 +123,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -168,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await ExecuteAsync(command);
 
-            Assert.Null(result.Value);
+            Assert.Null(result);
 
             A.CallTo(() => ruleEnqueuer.Enqueue(sut.Snapshot.RuleDef, sut.Id,
                 A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
@@ -220,6 +213,28 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var newAction = new TestAction { Value = 123 };
 
             return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
+        }
+
+        private async Task<object?> ExecuteIdempotentAsync(RuleCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+
+            var previousSnapshot = sut.Snapshot;
+            var previousVersion = sut.Snapshot.Version;
+
+            await sut.ExecuteAsync(CreateRuleCommand(command));
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+            Assert.Equal(previousVersion, sut.Snapshot.Version);
+
+            return result.Value;
+        }
+
+        private async Task<object?> ExecuteAsync(RuleCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+
+            return result.Value;
         }
     }
 }

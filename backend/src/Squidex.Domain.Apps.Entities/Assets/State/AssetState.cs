@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             get { return Id; }
         }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
-                        break;
+                        return true;
                     }
 
                 case AssetUpdated e:
@@ -94,53 +94,56 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
-                        break;
+                        return true;
                     }
 
                 case AssetAnnotated e:
                     {
-                        if (!string.IsNullOrWhiteSpace(e.FileName))
+                        var hasChanged = false;
+
+                        if (!string.IsNullOrWhiteSpace(e.FileName) && !string.Equals(e.FileName, FileName))
                         {
                             FileName = e.FileName;
+
+                            hasChanged = true;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(e.Slug))
+                        if (!string.IsNullOrWhiteSpace(e.Slug) && !string.Equals(e.Slug, Slug))
                         {
                             Slug = e.Slug;
                         }
 
-                        if (e.Tags != null)
+                        if (e.Tags != null && !e.Tags.SetEquals(Tags))
                         {
                             Tags = e.Tags;
+
+                            hasChanged = true;
                         }
 
-                        if (e.Metadata != null)
+                        if (e.Metadata != null && !e.Metadata.EqualsDictionary(Metadata))
                         {
                             Metadata = e.Metadata;
                         }
 
-                        break;
+                        return hasChanged;
                     }
 
-                case AssetMoved e:
+                case AssetMoved e when e.ParentId != ParentId:
                     {
                         ParentId = e.ParentId;
 
-                        break;
+                        return true;
                     }
 
                 case AssetDeleted _:
                     {
                         IsDeleted = true;
 
-                        break;
+                        return true;
                     }
             }
-        }
 
-        public override AssetState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return false;
         }
     }
 }

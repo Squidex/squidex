@@ -73,9 +73,19 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(id);
 
+            var previousSnapshot = Snapshot;
+            var previousVersion = Version;
+
             ApplyEvent(@event);
 
-            uncomittedEvents.Add(@event);
+            if (!ReferenceEquals(previousSnapshot, Snapshot))
+            {
+                uncomittedEvents.Add(@event);
+            }
+            else
+            {
+                previousSnapshot.Version = previousVersion;
+            }
         }
 
         public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()

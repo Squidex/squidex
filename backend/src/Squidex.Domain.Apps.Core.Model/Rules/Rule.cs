@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using DeepEqual.Syntax;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -53,6 +54,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Rename(string newName)
         {
+            if (string.Equals(name, newName))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.name = newName;
@@ -62,6 +68,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Enable()
         {
+            if (isEnabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isEnabled = true;
@@ -71,6 +82,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Disable()
         {
+            if (!isEnabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isEnabled = false;
@@ -85,6 +101,11 @@ namespace Squidex.Domain.Apps.Core.Rules
             if (newTrigger.GetType() != trigger.GetType())
             {
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
+            }
+
+            if (trigger.IsDeepEqual(newTrigger))
+            {
+                return this;
             }
 
             newTrigger.Freeze();
@@ -103,6 +124,11 @@ namespace Squidex.Domain.Apps.Core.Rules
             if (newAction.GetType() != action.GetType())
             {
                 throw new ArgumentException("New action has another type.", nameof(newAction));
+            }
+
+            if (action.IsDeepEqual(newAction))
+            {
+                return this;
             }
 
             newAction.Freeze();

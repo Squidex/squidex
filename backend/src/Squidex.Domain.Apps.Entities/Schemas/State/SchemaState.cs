@@ -19,7 +19,7 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Schemas.State
 {
     [CollectionName("Schemas")]
-    public class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
+    public sealed class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
@@ -33,8 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         [DataMember]
         public Schema SchemaDef { get; set; }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
+            var previousSchema = SchemaDef;
+
             switch (@event)
             {
                 case SchemaCreated e:
@@ -44,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
                         AppId = e.AppId;
 
-                        break;
+                        return true;
                     }
 
                 case FieldAdded e:
@@ -187,14 +189,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                     {
                         IsDeleted = true;
 
-                        break;
+                        return true;
                     }
             }
-        }
 
-        public override SchemaState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return !ReferenceEquals(previousSchema, SchemaDef);
         }
     }
 }

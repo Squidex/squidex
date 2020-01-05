@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 value.TryGetByPath(path as string, out var result);
 
-                return result;
+                return result!;
             });
 
             return (AllTypes.NoopJson, resolver, AllTypes.PathArguments);

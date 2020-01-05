@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -99,9 +99,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Fields = fields };
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             var @event = (SchemaCreated)LastEvents.Single().Payload;
 
@@ -119,9 +119,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Properties, sut.Snapshot.SchemaDef.Properties);
 
@@ -144,9 +144,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -165,9 +165,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.FieldsInLists, sut.Snapshot.SchemaDef.FieldsInLists);
 
@@ -188,9 +188,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.FieldsInReferences, sut.Snapshot.SchemaDef.FieldsInReferences);
 
@@ -207,9 +207,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(sut.Snapshot.SchemaDef.IsPublished);
 
@@ -227,9 +227,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(sut.Snapshot.SchemaDef.IsPublished);
 
@@ -246,9 +246,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Name, sut.Snapshot.SchemaDef.Category);
 
@@ -271,9 +271,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.PreviewUrls, sut.Snapshot.SchemaDef.PreviewUrls);
 
@@ -290,9 +290,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -311,9 +311,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync("field1");
             await ExecuteAddFieldAsync("field2");
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -331,9 +331,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync("field1", 1);
             await ExecuteAddFieldAsync("field2", 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -348,9 +348,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Properties, GetField(1).RawProperties);
 
@@ -368,9 +368,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddArrayFieldAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
 
@@ -388,9 +388,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Properties, GetField(1).RawProperties);
 
@@ -409,9 +409,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
 
@@ -429,9 +429,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(GetField(1).IsDisabled);
 
@@ -450,9 +450,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(GetNestedField(1, 2).IsLocked);
 
@@ -470,9 +470,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(GetField(1).IsHidden);
 
@@ -491,9 +491,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(GetNestedField(1, 2).IsHidden);
 
@@ -512,9 +512,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteHideFieldAsync(1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(GetField(1).IsHidden);
 
@@ -534,9 +534,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName, 1);
             await ExecuteHideFieldAsync(2, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(GetNestedField(1, 2).IsHidden);
 
@@ -554,9 +554,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(GetField(1).IsDisabled);
 
@@ -575,9 +575,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(GetNestedField(1, 2).IsDisabled);
 
@@ -596,9 +596,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteDisableFieldAsync(1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(GetField(1).IsDisabled);
 
@@ -618,9 +618,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName, 1);
             await ExecuteDisableFieldAsync(2, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(GetNestedField(1, 2).IsDisabled);
 
@@ -638,9 +638,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Null(GetField(1));
 
@@ -659,9 +659,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Null(GetNestedField(1, 2));
 
@@ -681,9 +681,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await ExecuteIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Category, sut.Snapshot.SchemaDef.Category);
 
@@ -741,6 +741,28 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private static StringFieldProperties ValidProperties()
         {
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
+        }
+
+        private async Task<object?> ExecuteIdempotentAsync(SchemaCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            var previousSnapshot = sut.Snapshot;
+            var previousVersion = sut.Snapshot.Version;
+
+            await sut.ExecuteAsync(CreateCommand(command));
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+            Assert.Equal(previousVersion, sut.Snapshot.Version);
+
+            return result.Value;
+        }
+
+        private async Task<object?> ExecuteAsync(SchemaCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            return result.Value;
         }
     }
 }

@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ReorderFields reorderFields:
                     return UpdateReturn(reorderFields, c =>
                     {
-                        GuardSchema.CanReorder(Snapshot.SchemaDef, c);
+                        GuardSchema.CanReorder(c, Snapshot.SchemaDef);
 
                         Reorder(c);
 
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case UpdateSchema updateSchema:
                     return UpdateReturn(updateSchema, c =>
                     {
-                        GuardSchema.CanUpdate(Snapshot.SchemaDef, c);
+                        GuardSchema.CanUpdate(c);
 
                         Update(c);
 
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ConfigureScripts configureScripts:
                     return UpdateReturn(configureScripts, c =>
                     {
-                        GuardSchema.CanConfigureScripts(Snapshot.SchemaDef, c);
+                        GuardSchema.CanConfigureScripts(c);
 
                         ConfigureScripts(c);
 
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ChangeCategory changeCategory:
                     return UpdateReturn(changeCategory, c =>
                     {
-                        GuardSchema.CanChangeCategory(Snapshot.SchemaDef, c);
+                        GuardSchema.CanChangeCategory(c);
 
                         ChangeCategory(c);
 
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ConfigureUIFields configureUIFields:
                     return UpdateReturn(configureUIFields, c =>
                     {
-                        GuardSchema.CanConfigureUIFields(Snapshot.SchemaDef, c);
+                        GuardSchema.CanConfigureUIFields(c, Snapshot.SchemaDef);
 
                         ConfigureUIFields(c);
 
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
-                        GuardSchema.CanDelete(Snapshot.SchemaDef, c);
+                        GuardSchema.CanDelete(c);
 
                         Delete(c);
                     });

@@ -88,43 +88,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
-            if (field.IsHidden)
-            {
-                throw new DomainException("Schema field is already hidden.");
-            }
-
             if (!field.IsForApi())
             {
                 throw new DomainException("UI field cannot be hidden.");
-            }
-        }
-
-        public static void CanShow(Schema schema, ShowField command)
-        {
-            Guard.NotNull(command);
-
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
-
-            if (!field.IsHidden)
-            {
-                throw new DomainException("Schema field is already visible.");
-            }
-        }
-
-        public static void CanDisable(Schema schema, DisableField command)
-        {
-            Guard.NotNull(command);
-
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
-
-            if (field.IsDisabled)
-            {
-                throw new DomainException("Schema field is already disabled.");
-            }
-
-            if (!field.IsForApi(true))
-            {
-                throw new DomainException("UI field cannot be disabled.");
             }
         }
 
@@ -132,36 +98,35 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command);
 
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
+        }
 
-            if (field.IsLocked)
-            {
-                throw new DomainException("Schema field is locked.");
-            }
+        public static void CanShow(Schema schema, ShowField command)
+        {
+            Guard.NotNull(command);
+
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
+        }
+
+        public static void CanDisable(Schema schema, DisableField command)
+        {
+            Guard.NotNull(command);
+
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
         }
 
         public static void CanEnable(Schema schema, EnableField command)
         {
             Guard.NotNull(command);
 
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
-
-            if (!field.IsDisabled)
-            {
-                throw new DomainException("Schema field is already enabled.");
-            }
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
         }
 
         public static void CanLock(Schema schema, LockField command)
         {
             Guard.NotNull(command);
 
-            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
-
-            if (field.IsLocked)
-            {
-                throw new DomainException("Schema field is already locked.");
-            }
+            GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, true);
         }
     }
 }

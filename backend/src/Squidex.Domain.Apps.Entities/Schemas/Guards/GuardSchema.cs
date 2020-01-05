@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             });
         }
 
-        public static void CanReorder(Schema schema, ReorderFields command)
+        public static void CanReorder(ReorderFields command, Schema schema)
         {
             Guard.NotNull(command);
 
@@ -91,24 +91,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         public static void CanPublish(Schema schema, PublishSchema command)
         {
             Guard.NotNull(command);
-
-            if (schema.IsPublished)
-            {
-                throw new DomainException("Schema is already published.");
-            }
         }
 
         public static void CanUnpublish(Schema schema, UnpublishSchema command)
         {
             Guard.NotNull(command);
-
-            if (!schema.IsPublished)
-            {
-                throw new DomainException("Schema is not published.");
-            }
         }
 
-        public static void CanConfigureUIFields(Schema schema, ConfigureUIFields command)
+        public static void CanConfigureUIFields(ConfigureUIFields command, Schema schema)
         {
             Guard.NotNull(command);
 
@@ -119,22 +109,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             });
         }
 
-        public static void CanUpdate(Schema schema, UpdateSchema command)
+        public static void CanUpdate(UpdateSchema command)
         {
             Guard.NotNull(command);
         }
 
-        public static void CanConfigureScripts(Schema schema, ConfigureScripts command)
+        public static void CanConfigureScripts(ConfigureScripts command)
         {
             Guard.NotNull(command);
         }
 
-        public static void CanChangeCategory(Schema schema, ChangeCategory command)
+        public static void CanChangeCategory(ChangeCategory command)
         {
             Guard.NotNull(command);
         }
 
-        public static void CanDelete(Schema schema, DeleteSchema command)
+        public static void CanDelete(DeleteSchema command)
         {
             Guard.NotNull(command);
         }

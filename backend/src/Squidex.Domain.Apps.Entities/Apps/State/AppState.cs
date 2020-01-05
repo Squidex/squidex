@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         [DataMember]
         public bool IsArchived { get; set; }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -64,38 +64,38 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     {
                         SimpleMapper.Map(e, this);
 
-                        break;
+                        return true;
                     }
 
-                case AppUpdated e:
+                case AppUpdated e when !string.Equals(e.Label, Label) || !string.Equals(e.Description, Description):
                     {
                         SimpleMapper.Map(e, this);
 
-                        break;
+                        return true;
                     }
 
                 case AppImageUploaded e:
                     {
                         Image = e.Image;
 
-                        break;
+                        return true;
                     }
 
-                case AppImageRemoved _:
+                case AppImageRemoved _ when Image != null:
                     {
                         Image = null;
 
                         break;
                     }
 
-                case AppPlanChanged e:
+                case AppPlanChanged e when !string.Equals(Plan?.PlanId, e.PlanId):
                     {
                         Plan = AppPlan.Build(e.Actor, e.PlanId);
 
                         break;
                     }
 
-                case AppPlanReset _:
+                case AppPlanReset _ when Plan != null:
                     {
                         Plan = null;
 
@@ -242,11 +242,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                         break;
                     }
             }
-        }
 
-        public override AppState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return false;
         }
     }
 }
