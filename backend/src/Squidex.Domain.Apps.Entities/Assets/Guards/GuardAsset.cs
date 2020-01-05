@@ -51,11 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
-                if (command.ParentId == oldParentId)
-                {
-                    e("Asset is already part of this folder.", nameof(command.ParentId));
-                }
-                else
+                if (command.ParentId != oldParentId)
                 {
                     await CheckPathAsync(command.ParentId, assetQuery, e);
                 }

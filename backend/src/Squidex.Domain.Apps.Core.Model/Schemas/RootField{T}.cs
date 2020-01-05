@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using DeepEqual.Syntax;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -37,9 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            newProperties.Freeze();
-
-            if (typedProperties.IsDeepEqual(newProperties))
+            if (properties.DeepEquals(typedProperties))
             {
                 return this;
             }

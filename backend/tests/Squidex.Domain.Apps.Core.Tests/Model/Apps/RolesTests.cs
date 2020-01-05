@@ -68,6 +68,14 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_return_same_roles_if_role_is_updated_with_same_values()
+        {
+            var roles_1 = roles_0.Update(firstRole);
+
+            Assert.Same(roles_0, roles_1);
+        }
+
+        [Fact]
         public void Should_return_same_roles_if_role_not_found()
         {
             var roles_1 = roles_0.Update(role, "P1", "P2");
@@ -88,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Remove(role);
 
-            Assert.True(roles_1.CustomCount > 0);
+            Assert.Same(roles_0, roles_1);
         }
 
         [Fact]

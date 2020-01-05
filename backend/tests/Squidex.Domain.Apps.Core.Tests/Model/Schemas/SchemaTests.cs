@@ -35,12 +35,16 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_update_schema()
         {
-            var properties = new SchemaProperties { Hints = "my-hint", Label = "my-label" };
+            var properties1 = new SchemaProperties { Hints = "my-hint", Label = "my-label" };
+            var properties2 = new SchemaProperties { Hints = "my-hint", Label = "my-label" };
 
-            var schema_1 = schema_0.Update(properties);
+            var schema_1 = schema_0.Update(properties1);
+            var schema_2 = schema_1.Update(properties2);
 
-            Assert.NotSame(properties, schema_0.Properties);
-            Assert.Same(properties, schema_1.Properties);
+            Assert.NotSame(properties1, schema_0.Properties);
+            Assert.Same(properties1, schema_1.Properties);
+            Assert.Same(properties1, schema_2.Properties);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
@@ -79,7 +83,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_3 = schema_2.UpdateField(1, f => f.Hide());
 
             Assert.False(schema_1.FieldsById[1].IsHidden);
+            Assert.True(schema_2.FieldsById[1].IsHidden);
             Assert.True(schema_3.FieldsById[1].IsHidden);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -100,7 +106,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_4 = schema_3.UpdateField(1, f => f.Show());
 
             Assert.True(schema_2.FieldsById[1].IsHidden);
+            Assert.False(schema_3.FieldsById[1].IsHidden);
             Assert.False(schema_4.FieldsById[1].IsHidden);
+            Assert.Same(schema_3, schema_4);
         }
 
         [Fact]
@@ -120,7 +128,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_3 = schema_2.UpdateField(1, f => f.Disable());
 
             Assert.False(schema_1.FieldsById[1].IsDisabled);
+            Assert.True(schema_2.FieldsById[1].IsDisabled);
             Assert.True(schema_3.FieldsById[1].IsDisabled);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -141,7 +151,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_4 = schema_3.UpdateField(1, f => f.Enable());
 
             Assert.True(schema_2.FieldsById[1].IsDisabled);
+            Assert.False(schema_3.FieldsById[1].IsDisabled);
             Assert.False(schema_4.FieldsById[1].IsDisabled);
+            Assert.Same(schema_3, schema_4);
         }
 
         [Fact]
@@ -161,7 +173,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_3 = schema_2.UpdateField(1, f => f.Lock());
 
             Assert.False(schema_1.FieldsById[1].IsLocked);
+            Assert.True(schema_2.FieldsById[1].IsLocked);
             Assert.True(schema_3.FieldsById[1].IsLocked);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -175,13 +189,23 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_update_field()
         {
-            var properties = new NumberFieldProperties();
+            var properties1 = new NumberFieldProperties
+            {
+                MinValue = 10
+            };
+            var properties2 = new NumberFieldProperties
+            {
+                MinValue = 10
+            };
 
             var schema_1 = schema_0.AddField(CreateField(1));
-            var schema_2 = schema_1.UpdateField(1, f => f.Update(properties));
+            var schema_2 = schema_1.UpdateField(1, f => f.Update(properties1));
+            var schema_3 = schema_2.UpdateField(1, f => f.Update(properties2));
 
-            Assert.NotSame(properties, schema_1.FieldsById[1].RawProperties);
-            Assert.Same(properties, schema_2.FieldsById[1].RawProperties);
+            Assert.NotSame(properties1, schema_1.FieldsById[1].RawProperties);
+            Assert.Same(properties1, schema_2.FieldsById[1].RawProperties);
+            Assert.Same(properties1, schema_3.FieldsById[1].RawProperties);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -205,8 +229,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
             var schema_2 = schema_1.DeleteField(1);
+            var schema_3 = schema_2.DeleteField(1);
 
             Assert.Empty(schema_2.FieldsById);
+            Assert.Empty(schema_3.FieldsById);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -237,9 +264,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_publish_schema()
         {
             var schema_1 = schema_0.Publish();
+            var schema_2 = schema_1.Publish();
 
             Assert.False(schema_0.IsPublished);
             Assert.True(schema_1.IsPublished);
+            Assert.True(schema_2.IsPublished);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
@@ -247,9 +277,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.Publish();
             var schema_2 = schema_1.Unpublish();
+            var schema_3 = schema_2.Unpublish();
 
             Assert.True(schema_1.IsPublished);
             Assert.False(schema_2.IsPublished);
+            Assert.False(schema_3.IsPublished);
+            Assert.Same(schema_2, schema_3);
         }
 
         [Fact]
@@ -263,8 +296,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_2 = schema_1.AddField(field2);
             var schema_3 = schema_2.AddField(field3);
             var schema_4 = schema_3.ReorderFields(new List<long> { 3, 2, 1 });
+            var schema_5 = schema_4.ReorderFields(new List<long> { 3, 2, 1 });
 
             Assert.Equal(new List<RootField> { field3, field2, field1 }, schema_4.Fields.ToList());
+            Assert.Equal(new List<RootField> { field3, field2, field1 }, schema_5.Fields.ToList());
+            Assert.Same(schema_4, schema_5);
         }
 
         [Fact]
@@ -295,54 +331,77 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_change_category()
         {
             var schema_1 = schema_0.ChangeCategory("Category");
+            var schema_2 = schema_1.ChangeCategory("Category");
 
             Assert.Equal("Category", schema_1.Category);
+            Assert.Equal("Category", schema_2.Category);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
         public void Should_set_list_fields()
         {
-            var schema_1 = schema_0.ConfigureFieldsInLists("1");
+            var schema_1 = schema_0.ConfigureFieldsInLists("2");
+            var schema_2 = schema_1.ConfigureFieldsInLists("2");
 
-            Assert.Equal(new[] { "1" }, schema_1.FieldsInLists);
+            Assert.Equal(new[] { "2" }, schema_1.FieldsInLists);
+            Assert.Equal(new[] { "2" }, schema_2.FieldsInLists);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
         public void Should_set_reference_fields()
         {
             var schema_1 = schema_0.ConfigureFieldsInReferences("2");
+            var schema_2 = schema_1.ConfigureFieldsInReferences("2");
 
             Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
+            Assert.Equal(new[] { "2" }, schema_2.FieldsInReferences);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
         public void Should_configure_scripts()
         {
-            var scripts = new SchemaScripts
+            var scripts1 = new SchemaScripts
+            {
+                Query = "<query-script>"
+            };
+            var scripts2 = new SchemaScripts
             {
                 Query = "<query-script>"
             };
 
-            var schema_1 = schema_0.ConfigureScripts(scripts);
-
-            Assert.Equal(scripts, schema_1.Scripts);
+            var schema_1 = schema_0.ConfigureScripts(scripts1);
+            var schema_2 = schema_1.ConfigureScripts(scripts2);
 
             Assert.Equal("<query-script>", schema_1.Scripts.Query);
+
+            Assert.Equal(scripts1, schema_1.Scripts);
+            Assert.Equal(scripts1, schema_2.Scripts);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]
         public void Should_configure_preview_urls()
         {
-            var urls = new Dictionary<string, string>
+            var urls1 = new Dictionary<string, string>
+            {
+                ["web"] = "Url"
+            };
+            var urls2 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
             };
 
-            var schema_1 = schema_0.ConfigurePreviewUrls(urls);
-
-            Assert.Equal(urls, schema_1.PreviewUrls);
+            var schema_1 = schema_0.ConfigurePreviewUrls(urls1);
+            var schema_2 = schema_1.ConfigurePreviewUrls(urls2);
 
             Assert.Equal("Url", schema_1.PreviewUrls["web"]);
+
+            Assert.Equal(urls1, schema_1.PreviewUrls);
+            Assert.Equal(urls1, schema_2.PreviewUrls);
+            Assert.Same(schema_1, schema_2);
         }
 
         [Fact]

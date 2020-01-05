@@ -118,6 +118,19 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_return_same_languages_if_master_language_is_already_master()
+        {
+            var config_0 = LanguagesConfig.Build(Language.DE);
+
+            var config_1 = config_0.Set(Language.UK);
+            var config_2 = config_1.Set(Language.IT);
+            var config_3 = config_2.MakeMaster(Language.IT);
+            var config_4 = config_3.MakeMaster(Language.IT);
+
+            Assert.Same(config_3, config_4);
+        }
+
+        [Fact]
         public void Should_throw_exception_if_language_to_make_master_is_not_found()
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
@@ -168,11 +181,12 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_not_throw_exception_if_language_to_remove_is_not_found()
+        public void Should_do_nothing_if_language_to_remove_is_not_found()
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
+            var config_1 = config_0.Remove(Language.EN);
 
-            config_0.Remove(Language.EN);
+            Assert.Equal(config_0, config_1);
         }
 
         [Fact]

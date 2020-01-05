@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;

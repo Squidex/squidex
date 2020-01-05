@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(language);
 
-            return new LanguagesConfig(languages, languages[language]);
+            return Create(languages, languages[language]);
         }
 
         [Pure]
@@ -109,12 +109,11 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(config);
 
-            var newLanguages =
-                new ArrayDictionary<Language, LanguageConfig>(languages.With(config.Language, config));
+            var newLanguages = languages.With(config.Language, config);
 
             var newMaster = Master?.Language == config.Language ? config : Master;
 
-            return new LanguagesConfig(newLanguages, newMaster!);
+            return Create(newLanguages, newMaster!);
         }
 
         [Pure]
@@ -133,6 +132,16 @@ namespace Squidex.Domain.Apps.Core.Apps
             var newMaster =
                 newLanguages.Values.FirstOrDefault(x => x.Language == Master.Language) ??
                 newLanguages.Values.FirstOrDefault();
+
+            return Create(newLanguages, newMaster);
+        }
+
+        private LanguagesConfig Create(ArrayDictionary<Language, LanguageConfig> newLanguages, LanguageConfig newMaster)
+        {
+            if (newLanguages.EqualsDictionary(languages, EqualityComparer<Language>.Default, DeepComparer<LanguageConfig>.Instance) && newMaster.Language.Equals(master.Language))
+            {
+                return this;
+            }
 
             return new LanguagesConfig(newLanguages, newMaster);
         }

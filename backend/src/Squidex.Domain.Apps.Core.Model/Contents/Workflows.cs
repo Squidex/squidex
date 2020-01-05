@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Remove(Guid id)
         {
-            return new Workflows(Without(id));
+            return Without<Workflows>(id);
         }
 
         [Pure]
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNullOrEmpty(name);
 
-            return new Workflows(With(workflowId, Workflow.CreateDefault(name)));
+            return With<Workflows>(workflowId, Workflow.CreateDefault(name));
         }
 
         [Pure]
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return new Workflows(With(Guid.Empty, workflow));
+            return With<Workflows>(Guid.Empty, workflow, DeepComparer<Workflow>.Instance);
         }
 
         [Pure]
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return new Workflows(With(id, workflow));
+            return With<Workflows>(id, workflow, DeepComparer<Workflow>.Instance);
         }
 
         [Pure]
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 return this;
             }
 
-            return new Workflows(With(id, workflow));
+            return With<Workflows>(id, workflow, DeepComparer<Workflow>.Instance);
         }
 
         public Workflow GetFirst()

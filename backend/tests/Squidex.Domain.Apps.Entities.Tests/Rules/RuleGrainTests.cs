@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var command = MakeCreateCommand();
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             await ExecuteCreateAsync();
             await ExecuteDisableAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -142,9 +142,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             Assert.Null(result);
 
@@ -172,17 +172,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateRuleCommand(MakeCreateCommand()));
+            return PublishAsync(MakeCreateCommand());
         }
 
         private Task ExecuteDisableAsync()
         {
-            return sut.ExecuteAsync(CreateRuleCommand(new DisableRule()));
+            return PublishAsync(new DisableRule());
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateRuleCommand(new DeleteRule()));
+            return PublishAsync(new DeleteRule());
         }
 
         protected T CreateRuleEvent<T>(T @event) where T : RuleEvent
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static CreateRule MakeCreateCommand()
         {
-            var newTrigger = new ManualTrigger();
+            var newTrigger = new ContentChangedTriggerV2();
             var newAction = new TestAction { Value = 123 };
 
             return new CreateRule { Trigger = newTrigger, Action = newAction };
@@ -209,28 +209,28 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static UpdateRule MakeUpdateCommand()
         {
-            var newTrigger = new ManualTrigger();
-            var newAction = new TestAction { Value = 123 };
+            var newTrigger = new ContentChangedTriggerV2 { HandleAll = true };
+            var newAction = new TestAction { Value = 456 };
 
             return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }
 
-        private async Task<object?> ExecuteIdempotentAsync(RuleCommand command)
+        private async Task<object?> PublishIdempotentAsync(RuleCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await PublishAsync(command);
 
             var previousSnapshot = sut.Snapshot;
             var previousVersion = sut.Snapshot.Version;
 
-            await sut.ExecuteAsync(CreateRuleCommand(command));
+            await PublishAsync(command);
 
             Assert.Same(previousSnapshot, sut.Snapshot);
             Assert.Equal(previousVersion, sut.Snapshot.Version);
 
-            return result.Value;
+            return result;
         }
 
-        private async Task<object?> ExecuteAsync(RuleCommand command)
+        private async Task<object?> PublishAsync(RuleCommand command)
         {
             var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 

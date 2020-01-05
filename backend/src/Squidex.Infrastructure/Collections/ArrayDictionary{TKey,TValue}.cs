@@ -11,12 +11,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+#pragma warning disable IDE0044 // Add readonly modifier
+
 namespace Squidex.Infrastructure.Collections
 {
     public class ArrayDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> where TKey : notnull
     {
         private readonly IEqualityComparer<TKey> keyComparer;
-        private readonly KeyValuePair<TKey, TValue>[] items;
+        private KeyValuePair<TKey, TValue>[] items;
 
         public TValue this[TKey key]
         {
@@ -66,85 +68,131 @@ namespace Squidex.Infrastructure.Collections
             this.keyComparer = keyComparer;
         }
 
-        public KeyValuePair<TKey, TValue>[] With(TKey key, TValue value)
+        public bool IsUnchanged(KeyValuePair<TKey, TValue>[] values)
         {
-            var result = new List<KeyValuePair<TKey, TValue>>(Math.Max(items.Length, 1));
-
-            var wasReplaced = false;
-
-            for (var i = 0; i < items.Length; i++)
-            {
-                var item = items[i];
-
-                if (wasReplaced || !keyComparer.Equals(item.Key, key))
-                {
-                    result.Add(item);
-                }
-                else
-                {
-                    result.Add(new KeyValuePair<TKey, TValue>(key, value));
-                    wasReplaced = true;
-                }
-            }
-
-            if (!wasReplaced)
-            {
-                result.Add(new KeyValuePair<TKey, TValue>(key, value));
-            }
-
-            return result.ToArray();
+            return ReferenceEquals(values, items);
         }
 
-        public KeyValuePair<TKey, TValue>[] Without(TKey key)
+        public ArrayDictionary<TKey, TValue> With(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null)
         {
-            var result = new List<KeyValuePair<TKey, TValue>>(Math.Max(items.Length, 1));
+            return With<ArrayDictionary<TKey, TValue>>(key, value, valueComparer);
+        }
 
-            var wasRemoved = false;
+        public TArray With<TArray>(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null) where TArray : ArrayDictionary<TKey, TValue>
+        {
+            var index = IndexOf(key);
 
-            for (var i = 0; i < items.Length; i++)
+            if (index < 0)
             {
-                var item = items[i];
+                var result = new KeyValuePair<TKey, TValue>[items.Length + 1];
 
-                if (wasRemoved || !keyComparer.Equals(item.Key, key))
-                {
-                    result.Add(item);
-                }
-                else
-                {
-                    wasRemoved = true;
-                }
+                Array.Copy(items, 0, result, 0, items.Length);
+
+                result[^1] = new KeyValuePair<TKey, TValue>(key, value);
+
+                return Create<TArray>(result);
             }
 
-            return result.ToArray();
+            var existing = items[index].Value;
+
+            if (valueComparer == null || !valueComparer.Equals(value, existing))
+            {
+                var result = new KeyValuePair<TKey, TValue>[items.Length];
+
+                Array.Copy(items, 0, result, 0, items.Length);
+
+                result[index] = new KeyValuePair<TKey, TValue>(key, value);
+
+                return Create<TArray>(result);
+            }
+
+            return Self<TArray>();
+        }
+
+        public ArrayDictionary<TKey, TValue> Without(TKey key)
+        {
+            return Without<ArrayDictionary<TKey, TValue>>(key);
+        }
+
+        public TArray Without<TArray>(TKey key) where TArray : ArrayDictionary<TKey, TValue>
+        {
+            var index = IndexOf(key);
+
+            if (index < 0)
+            {
+                return Self<TArray>();
+            }
+
+            var result = Array.Empty<KeyValuePair<TKey, TValue>>();
+
+            if (items.Length > 1)
+            {
+                result = new KeyValuePair<TKey, TValue>[items.Length - 1];
+
+                var afterIndex = items.Length - index - 1;
+
+                Array.Copy(items, 0, result, 0, index);
+                Array.Copy(items, index, result, index, afterIndex);
+            }
+
+            return Create<TArray>(result);
+        }
+
+        private TArray Self<TArray>() where TArray : ArrayDictionary<TKey, TValue>
+        {
+            return (this as TArray)!;
+        }
+
+        private TArray Create<TArray>(KeyValuePair<TKey, TValue>[] newItems) where TArray : ArrayDictionary<TKey, TValue>
+        {
+            if (ReferenceEquals(items, newItems))
+            {
+                return Self<TArray>();
+            }
+
+            var newClone = (TArray)MemberwiseClone();
+
+            newClone.items = newItems;
+
+            return newClone;
         }
 
         public bool ContainsKey(TKey key)
         {
-            for (var i = 0; i < items.Length; i++)
-            {
-                if (keyComparer.Equals(items[i].Key, key))
-                {
-                    return true;
-                }
-            }
+            var index = IndexOf(key);
 
-            return false;
+            return index >= 0;
         }
 
         public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            var index = IndexOf(key);
+
+            if (index >= 0)
+            {
+                value = items[index].Value;
+
+                return true;
+            }
+            else
+            {
+                value = default!;
+
+                return false;
+            }
+        }
+
+        private int IndexOf(TKey key)
         {
             for (var i = 0; i < items.Length; i++)
             {
                 if (keyComparer.Equals(items[i].Key, key))
                 {
-                    value = items[i].Value;
-                    return true;
+                    return i;
                 }
             }
 
-            value = default!;
-
-            return false;
+            return -1;
         }
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()

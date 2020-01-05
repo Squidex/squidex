@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Assets;
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
-                .Returns(new Dictionary<string, string>());
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
 
             sut = new AssetGrain(Store, tagService, assetQuery, limit, A.Dummy<ISemanticLog>());
             sut.ActivateAsync(Id).Wait();
@@ -73,9 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -103,9 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -130,9 +131,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.FileName, sut.Snapshot.FileName);
 
@@ -149,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Slug, sut.Snapshot.Slug);
 
@@ -168,9 +169,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
 
@@ -187,13 +188,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string>() })
+                    CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string> { "tag1" } })
                 );
         }
 
@@ -204,9 +205,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -224,9 +225,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent2(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -238,17 +239,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new CreateAsset { File = file }));
+            return PublishAsync(new CreateAsset { File = file });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new UpdateAsset { File = file }));
+            return PublishAsync(new UpdateAsset { File = file });
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new DeleteAsset()));
+            return PublishAsync(new DeleteAsset());
         }
 
         protected T CreateAssetEvent<T>(T @event) where T : AssetEvent
@@ -263,6 +264,28 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.AssetId = assetId;
 
             return CreateCommand(command);
+        }
+
+        private async Task<object?> PublishIdempotentAsync(AssetCommand command)
+        {
+            var result = await PublishAsync(command);
+
+            var previousSnapshot = sut.Snapshot;
+            var previousVersion = sut.Snapshot.Version;
+
+            await PublishAsync(command);
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+            Assert.Equal(previousVersion, sut.Snapshot.Version);
+
+            return result;
+        }
+
+        private async Task<object?> PublishAsync(AssetCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            return result.Value;
         }
     }
 }

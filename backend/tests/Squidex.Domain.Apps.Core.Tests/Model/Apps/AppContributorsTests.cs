@@ -36,6 +36,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_return_same_contributors_if_contributor_is_updated_with_same_role()
+        {
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
+            var contributors_2 = contributors_1.Assign("1", Role.Developer);
+
+            Assert.Same(contributors_1, contributors_2);
+        }
+
+        [Fact]
         public void Should_remove_contributor()
         {
             var contributors_1 = contributors_0.Assign("1", Role.Developer);
@@ -49,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var contributors_1 = contributors_0.Remove("2");
 
-            Assert.Empty(contributors_1);
+            Assert.Same(contributors_0, contributors_1);
         }
     }
 }

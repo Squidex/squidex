@@ -111,6 +111,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         if (!string.IsNullOrWhiteSpace(e.Slug) && !string.Equals(e.Slug, Slug))
                         {
                             Slug = e.Slug;
+
+                            hasChanged = true;
                         }
 
                         if (e.Tags != null && !e.Tags.SetEquals(Tags))
@@ -123,6 +125,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         if (e.Metadata != null && !e.Metadata.EqualsDictionary(Metadata))
                         {
                             Metadata = e.Metadata;
+
+                            hasChanged = true;
                         }
 
                         return hasChanged;

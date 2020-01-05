@@ -64,12 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_when_folder_has_not_changed()
+        public async Task CanMove_should_not_throw_exception_when_folder_has_not_changed()
         {
             var command = new MoveAsset { ParentId = Guid.NewGuid() };
 
-            await ValidationAssert.ThrowsAsync(() => GuardAsset.CanMove(command, assetQuery, command.ParentId),
-                new ValidationError("Asset is already part of this folder.", "ParentId"));
+            await GuardAsset.CanMove(command, assetQuery, command.ParentId);
         }
 
         [Fact]

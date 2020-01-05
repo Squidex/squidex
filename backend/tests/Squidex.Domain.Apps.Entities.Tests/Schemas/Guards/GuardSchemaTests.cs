@@ -570,39 +570,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
-        public void CanPublish_should_throw_exception_if_already_published()
+        public void CanPublish_should_not_throw_exception()
         {
             var command = new PublishSchema();
 
-            var schema_1 = schema_0.Publish();
-
-            Assert.Throws<DomainException>(() => GuardSchema.CanPublish(schema_1, command));
+            GuardSchema.CanPublish(command);
         }
 
         [Fact]
-        public void CanPublish_should_not_throw_exception_if_not_published()
-        {
-            var command = new PublishSchema();
-
-            GuardSchema.CanPublish(schema_0, command);
-        }
-
-        [Fact]
-        public void CanUnpublish_should_throw_exception_if_already_unpublished()
+        public void CanUnpublish_should_not_throw_exception()
         {
             var command = new UnpublishSchema();
 
-            Assert.Throws<DomainException>(() => GuardSchema.CanUnpublish(schema_0, command));
-        }
-
-        [Fact]
-        public void CanUnpublish_should_not_throw_exception_if_already_published()
-        {
-            var command = new UnpublishSchema();
-
-            var schema_1 = schema_0.Publish();
-
-            GuardSchema.CanUnpublish(schema_1, command);
+            GuardSchema.CanUnpublish(command);
         }
 
         [Fact]

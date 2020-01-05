@@ -88,16 +88,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             });
         }
 
-        public static void CanPublish(Schema schema, PublishSchema command)
-        {
-            Guard.NotNull(command);
-        }
-
-        public static void CanUnpublish(Schema schema, UnpublishSchema command)
-        {
-            Guard.NotNull(command);
-        }
-
         public static void CanConfigureUIFields(ConfigureUIFields command, Schema schema)
         {
             Guard.NotNull(command);
@@ -107,6 +97,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
                 ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
             });
+        }
+
+        public static void CanPublish(PublishSchema command)
+        {
+            Guard.NotNull(command);
+        }
+
+        public static void CanUnpublish(UnpublishSchema command)
+        {
+            Guard.NotNull(command);
         }
 
         public static void CanUpdate(UpdateSchema command)

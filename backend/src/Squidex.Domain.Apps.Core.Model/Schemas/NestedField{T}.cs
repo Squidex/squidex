@@ -36,6 +36,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
+            typedProperties.Freeze();
+
+            if (properties.DeepEquals(typedProperties))
+            {
+                return this;
+            }
+
             return Clone<NestedField<T>>(clone =>
             {
                 clone.SetProperties(typedProperties);

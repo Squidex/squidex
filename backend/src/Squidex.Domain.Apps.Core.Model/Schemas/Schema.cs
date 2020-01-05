@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using DeepEqual.Syntax;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -117,11 +116,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema Update(SchemaProperties newProperties)
         {
-            Guard.NotNull(newProperties);
+            newProperties ??= new SchemaProperties();
 
-            newProperties.Freeze();
-
-            if (properties.IsDeepEqual(newProperties))
+            if (properties.DeepEquals(newProperties))
             {
                 return this;
             }
@@ -129,6 +126,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.properties = newProperties;
+                clone.Properties.Freeze();
             });
         }
 
@@ -136,9 +134,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public Schema ConfigureScripts(SchemaScripts newScripts)
         {
             newScripts ??= new SchemaScripts();
-            newScripts.Freeze();
 
-            if (scripts.IsDeepEqual(newScripts))
+            if (scripts.DeepEquals(newScripts))
             {
                 return this;
             }
@@ -146,6 +143,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.scripts = newScripts;
+                clone.scripts.Freeze();
             });
         }
 
@@ -154,7 +152,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInLists.IsDeepEqual(name))
+            if (fieldsInLists.DeepEquals(names))
             {
                 return this;
             }
@@ -176,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInReferences.IsDeepEqual(name))
+            if (fieldsInReferences.DeepEquals(names))
             {
                 return this;
             }
@@ -240,7 +238,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             previewUrls ??= EmptyPreviewUrls;
 
-            if (previewUrls.IsDeepEqual(newPreviewUrls))
+            if (previewUrls.EqualsDictionary(newPreviewUrls))
             {
                 return this;
             }

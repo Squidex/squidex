@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using DeepEqual.Syntax;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -44,11 +43,8 @@ namespace Squidex.Domain.Apps.Core.Rules
             Guard.NotNull(trigger);
             Guard.NotNull(action);
 
-            this.trigger = trigger;
-            this.trigger.Freeze();
-
-            this.action = action;
-            this.action.Freeze();
+            SetTrigger(trigger);
+            SetAction(action);
         }
 
         [Pure]
@@ -103,16 +99,14 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
-            if (trigger.IsDeepEqual(newTrigger))
+            if (trigger.DeepEquals(newTrigger))
             {
                 return this;
             }
 
-            newTrigger.Freeze();
-
             return Clone(clone =>
             {
-                clone.trigger = newTrigger;
+                clone.SetTrigger(newTrigger);
             });
         }
 
@@ -126,17 +120,27 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New action has another type.", nameof(newAction));
             }
 
-            if (action.IsDeepEqual(newAction))
+            if (action.DeepEquals(newAction))
             {
                 return this;
             }
 
-            newAction.Freeze();
-
             return Clone(clone =>
             {
-                clone.action = newAction;
+                clone.SetAction(newAction);
             });
+        }
+
+        private void SetAction(RuleAction newAction)
+        {
+            action = newAction;
+            action.Freeze();
+        }
+
+        private void SetTrigger(RuleTrigger newTrigger)
+        {
+            trigger = newTrigger;
+            trigger.Freeze();
         }
     }
 }

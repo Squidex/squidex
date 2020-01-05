@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaGrainTests()
         {
-            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), TestUtils.DefaultSerializer);
+            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>());
             sut.ActivateAsync(Id).Wait();
         }
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Fields = fields };
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -115,11 +115,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Update_should_create_events_and_update_state()
         {
-            var command = new UpdateSchema { Properties = new SchemaProperties() };
+            var command = new UpdateSchema { Properties = new SchemaProperties { Label = "My Properties" } };
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -271,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -290,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
@@ -305,13 +305,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Reorder_should_create_events_and_update_state()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
+            var command = new ReorderFields { FieldIds = new List<long> { 2, 1 } };
 
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync("field1");
             await ExecuteAddFieldAsync("field2");
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -324,14 +324,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Reorder_should_create_events_and_update_state_for_array()
         {
-            var command = new ReorderFields { ParentFieldId = 1, FieldIds = new List<long> { 2, 3 } };
+            var command = new ReorderFields { ParentFieldId = 1, FieldIds = new List<long> { 3, 2 } };
 
             await ExecuteCreateAsync();
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync("field1", 1);
             await ExecuteAddFieldAsync("field2", 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -348,7 +348,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -368,7 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddArrayFieldAsync();
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -388,7 +388,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -409,7 +409,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -429,7 +429,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -470,7 +470,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -491,7 +491,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -512,7 +512,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteHideFieldAsync(1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -534,7 +534,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName, 1);
             await ExecuteHideFieldAsync(2, 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -554,7 +554,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -575,7 +575,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -596,7 +596,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteDisableFieldAsync(1);
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -618,7 +618,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName, 1);
             await ExecuteDisableFieldAsync(2, 1);
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -638,7 +638,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -659,7 +659,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddArrayFieldAsync();
             await ExecuteAddFieldAsync(fieldName, 1);
 
-            var result = await ExecuteAsync(command);
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -681,7 +681,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await ExecuteIdempotentAsync(command);
+            var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent2(sut.Snapshot);
 
@@ -695,37 +695,37 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new CreateSchema { Name = SchemaName }));
+            return PublishAsync(new CreateSchema { Name = SchemaName });
         }
 
         private Task ExecuteAddArrayFieldAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new AddField { Properties = new ArrayFieldProperties(), Name = arrayName }));
+            return PublishAsync(new AddField { Properties = new ArrayFieldProperties(), Name = arrayName });
         }
 
         private Task ExecuteAddFieldAsync(string name, long? parentId = null)
         {
-            return sut.ExecuteAsync(CreateCommand(new AddField { ParentFieldId = parentId, Properties = ValidProperties(), Name = name }));
+            return PublishAsync(new AddField { ParentFieldId = parentId, Properties = ValidProperties(), Name = name });
         }
 
         private Task ExecuteHideFieldAsync(long id, long? parentId = null)
         {
-            return sut.ExecuteAsync(CreateCommand(new HideField { ParentFieldId = parentId, FieldId = id }));
+            return PublishAsync(new HideField { ParentFieldId = parentId, FieldId = id });
         }
 
         private Task ExecuteDisableFieldAsync(long id, long? parentId = null)
         {
-            return sut.ExecuteAsync(CreateCommand(new DisableField { ParentFieldId = parentId, FieldId = id }));
+            return PublishAsync(new DisableField { ParentFieldId = parentId, FieldId = id });
         }
 
         private Task ExecutePublishAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new PublishSchema()));
+            return PublishAsync(new PublishSchema());
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new DeleteSchema()));
+            return PublishAsync(new DeleteSchema());
         }
 
         private IField GetField(int id)
@@ -743,22 +743,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
         }
 
-        private async Task<object?> ExecuteIdempotentAsync(SchemaCommand command)
+        private async Task<object?> PublishIdempotentAsync(SchemaCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await PublishAsync(command);
 
             var previousSnapshot = sut.Snapshot;
             var previousVersion = sut.Snapshot.Version;
 
-            await sut.ExecuteAsync(CreateCommand(command));
+            await PublishAsync(command);
 
             Assert.Same(previousSnapshot, sut.Snapshot);
             Assert.Equal(previousVersion, sut.Snapshot.Version);
 
-            return result.Value;
+            return result;
         }
 
-        private async Task<object?> ExecuteAsync(SchemaCommand command)
+        private async Task<object?> PublishAsync(SchemaCommand command)
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
