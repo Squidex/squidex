@@ -62,9 +62,11 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-success" (click)="annotateForm.addMetadata()" [disabled]="!isEditable">
-                    Add Metadata
-                </button>
+                <div class="form-group">
+                    <button type="button" class="btn btn-success" (click)="annotateForm.addMetadata()" [disabled]="!isEditable">
+                        Add Metadata
+                    </button>
+                </div>
             </div>
         </ng-container>
 

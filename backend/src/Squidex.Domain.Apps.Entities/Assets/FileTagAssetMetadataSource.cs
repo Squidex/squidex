@@ -66,6 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 using (var file = Create(new FileAbstraction(command.File), ReadStyle.Average))
                 {
+                    if (file.Properties == null)
+                    {
+                        return;
+                    }
+
                     var type = file.Properties.MediaTypes;
 
                     if (type == MediaTypes.Audio)
