@@ -9,7 +9,6 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
-    DialogService,
     SchemaDetailsDto,
     SchemasState,
     SynchronizeSchemaForm
@@ -29,7 +28,6 @@ export class SchemaExportFormComponent implements OnChanges {
     public isEditable = false;
 
     constructor(
-        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
@@ -51,8 +49,6 @@ export class SchemaExportFormComponent implements OnChanges {
         if (value) {
             this.schemasState.synchronize(this.schema, value)
                 .subscribe(() => {
-                    this.dialogs.notifyInfo('Schema synchronized successfully.');
-
                     this.synchronizeForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.synchronizeForm.submitFailed(error);

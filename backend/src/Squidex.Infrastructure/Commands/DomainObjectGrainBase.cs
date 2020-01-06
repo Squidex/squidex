@@ -73,18 +73,9 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(id);
 
-            var previousSnapshot = Snapshot;
-            var previousVersion = Version;
-
-            ApplyEvent(@event);
-
-            if (!ReferenceEquals(previousSnapshot, Snapshot))
+            if (ApplyEvent(@event, false))
             {
                 uncomittedEvents.Add(@event);
-            }
-            else
-            {
-                previousSnapshot.Version = previousVersion;
             }
         }
 
@@ -216,7 +207,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected abstract void RestorePreviousSnapshot(T previousSnapshot, long previousVersion);
 
-        protected abstract void ApplyEvent(Envelope<IEvent> @event);
+        protected abstract bool ApplyEvent(Envelope<IEvent> @event, bool isLoading);
 
         protected abstract Task ReadAsync(Type type, Guid id);
 

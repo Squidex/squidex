@@ -482,7 +482,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         },
         `my-name${id}${suffix}.png`,
         tags || ['tag1', 'tag2'],
-        new Version(`${id}`));
+        new Version(`${id}${suffix}`));
 }
 
 export function createAssetFolder(id: number, suffix = '', parentId?: string) {
