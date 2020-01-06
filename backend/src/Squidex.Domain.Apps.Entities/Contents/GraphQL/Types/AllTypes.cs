@@ -60,16 +60,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NoopBoolean = new NoopGraphType(Boolean);
 
-        public static readonly IGraphType NoopTags = new NoopGraphType("Tags");
+        public static readonly IGraphType NoopTags = new NoopGraphType("TagsScalar");
 
-        public static readonly IGraphType NoopGeolocation = new NoopGraphType("Geolocation");
+        public static readonly IGraphType NoopGeolocation = new NoopGraphType("GeolocationScalar");
 
         public static readonly QueryArguments PathArguments = new QueryArguments(new QueryArgument(None)
         {
             Name = PathName,
             Description = $"The path to the json value",
             DefaultValue = null,
-            ResolvedType = NoopJson
+            ResolvedType = String
         });
     }
 }

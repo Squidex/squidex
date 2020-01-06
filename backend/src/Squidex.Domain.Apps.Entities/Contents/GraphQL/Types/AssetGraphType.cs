@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Arguments = AllTypes.PathArguments,
                 ResolvedType = AllTypes.NoopJson,
                 Resolver = ResolveMetadata(),
-                Description = "The asset tags.",
+                Description = "The asset metadata.",
             });
 
             if (model.CanGenerateAssetSourceUrl)

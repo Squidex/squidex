@@ -116,17 +116,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String, JsonFormatStrings.Guid);
             AddProperty(nameof(IAssetEntity.Created), JsonObjectType.String, JsonFormatStrings.DateTime);
             AddProperty(nameof(IAssetEntity.CreatedBy), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.LastModified), JsonObjectType.String, JsonFormatStrings.DateTime);
-            AddProperty(nameof(IAssetEntity.LastModifiedBy), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Version), JsonObjectType.Integer);
-            AddProperty(nameof(IAssetEntity.FileName), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.FileHash), JsonObjectType.String);
+            AddProperty(nameof(IAssetEntity.FileName), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.FileSize), JsonObjectType.Integer);
             AddProperty(nameof(IAssetEntity.FileVersion), JsonObjectType.Integer);
+            AddProperty(nameof(IAssetEntity.LastModified), JsonObjectType.String, JsonFormatStrings.DateTime);
+            AddProperty(nameof(IAssetEntity.LastModifiedBy), JsonObjectType.String);
+            AddProperty(nameof(IAssetEntity.Metadata), JsonObjectType.None);
             AddProperty(nameof(IAssetEntity.MimeType), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Slug), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Tags), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Type), JsonObjectType.String);
+            AddProperty(nameof(IAssetEntity.Version), JsonObjectType.Integer);
 
             return schema;
         }
@@ -140,20 +141,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 entityType.AddStructuralProperty(name.ToCamelCase(), type);
             }
 
+            void AddPropertyReference(string name, IEdmTypeReference reference)
+            {
+                entityType.AddStructuralProperty(name.ToCamelCase(), reference);
+            }
+
+            var jsonType = new EdmComplexType("Squidex", "Json", null, false, true);
+
+            AddPropertyReference(nameof(IAssetEntity.Metadata), new EdmComplexTypeReference(jsonType, false));
+
             AddProperty(nameof(IAssetEntity.Id), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.Created), EdmPrimitiveTypeKind.DateTimeOffset);
             AddProperty(nameof(IAssetEntity.CreatedBy), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
-            AddProperty(nameof(IAssetEntity.LastModifiedBy), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Version), EdmPrimitiveTypeKind.Int64);
-            AddProperty(nameof(IAssetEntity.FileName), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.FileHash), EdmPrimitiveTypeKind.String);
+            AddProperty(nameof(IAssetEntity.FileName), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.FileSize), EdmPrimitiveTypeKind.Int64);
             AddProperty(nameof(IAssetEntity.FileVersion), EdmPrimitiveTypeKind.Int64);
+            AddProperty(nameof(IAssetEntity.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
+            AddProperty(nameof(IAssetEntity.LastModifiedBy), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.MimeType), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.Slug), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.Tags), EdmPrimitiveTypeKind.String);
             AddProperty(nameof(IAssetEntity.Type), EdmPrimitiveTypeKind.String);
+            AddProperty(nameof(IAssetEntity.Version), EdmPrimitiveTypeKind.Int64);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 
