@@ -64,6 +64,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public NestedField Lock()
         {
+            if (isLocked)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isLocked = true;
@@ -73,6 +78,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public NestedField Hide()
         {
+            if (isHidden)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isHidden = true;
@@ -82,6 +92,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public NestedField Show()
         {
+            if (!isHidden)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isHidden = false;
@@ -91,6 +106,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public NestedField Disable()
         {
+            if (isDisabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isDisabled = true;
@@ -100,6 +120,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public NestedField Enable()
         {
+            if (!isDisabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isDisabled = false;

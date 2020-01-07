@@ -1,16 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Core.Assets
 {
-    public interface IUpdateableEntityWithCreatedBy
+    public enum AssetType
     {
-        RefToken CreatedBy { get; set; }
+        Unknown,
+        Image,
+        Audio,
+        Video
     }
 }

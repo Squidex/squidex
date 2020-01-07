@@ -217,7 +217,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to lock.</param>
         /// <returns>
         /// 200 => Schema field shown.
-        /// 400 => Schema field already locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -246,7 +245,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to lock.</param>
         /// <returns>
         /// 200 => Schema field hidden.
-        /// 400 => Schema field already hidden.
         /// 404 => Field, schema, or app not found.
         /// </returns>
         /// <remarks>
@@ -274,7 +272,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
         /// 200 => Schema field hidden.
-        /// 400 => Schema field already hidden.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -303,7 +300,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
         /// 200 => Schema field hidden.
-        /// 400 => Schema field already hidden.
         /// 404 => Field, schema, or app not found.
         /// </returns>
         /// <remarks>
@@ -331,7 +327,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to show.</param>
         /// <returns>
         /// 200 => Schema field shown.
-        /// 400 => Schema field already visible.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -360,7 +355,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to show.</param>
         /// <returns>
         /// 200 => Schema field shown.
-        /// 400 => Schema field already visible.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -388,7 +382,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
         /// 200 => Schema field enabled.
-        /// 400 => Schema field already enabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -417,7 +410,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
         /// 200 => Schema field enabled.
-        /// 400 => Schema field already enabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -445,7 +437,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field disabled.
-        /// 400 => Schema field already disabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
@@ -474,7 +465,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field disabled.
-        /// 400 => Schema field already disabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>

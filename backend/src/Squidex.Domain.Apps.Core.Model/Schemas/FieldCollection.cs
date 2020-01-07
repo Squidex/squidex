@@ -113,6 +113,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 throw new ArgumentException("Ids must cover all fields.", nameof(ids));
             }
 
+            if (ids.SequenceEqual(fieldsOrdered.Select(x => x.Id)))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToArray();

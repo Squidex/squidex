@@ -73,9 +73,10 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(id);
 
-            ApplyEvent(@event);
-
-            uncomittedEvents.Add(@event);
+            if (ApplyEvent(@event, false))
+            {
+                uncomittedEvents.Add(@event);
+            }
         }
 
         public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()
@@ -206,7 +207,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected abstract void RestorePreviousSnapshot(T previousSnapshot, long previousVersion);
 
-        protected abstract void ApplyEvent(Envelope<IEvent> @event);
+        protected abstract bool ApplyEvent(Envelope<IEvent> @event, bool isLoading);
 
         protected abstract Task ReadAsync(Type type, Guid id);
 

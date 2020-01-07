@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -19,19 +18,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
     public static class FindExtensions
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
-        private static readonly SortDefinitionBuilder<MongoAssetEntity> Sorting = Builders<MongoAssetEntity>.Sort;
 
         public static ClrQuery AdjustToModel(this ClrQuery query)
         {
             if (query.Filter != null)
             {
-                query.Filter = PascalCasePathConverter<ClrValue>.Transform(query.Filter);
+                query.Filter = FirstPascalPathConverter<ClrValue>.Transform(query.Filter);
             }
 
             query.Sort = query.Sort
                 .Select(x =>
                     new SortNode(
-                        x.Path.Select(p => p.ToPascalCase()).ToList(),
+                        x.Path.ToFirstPascalCase(),
                         x.Order))
                     .ToList();
 

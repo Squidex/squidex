@@ -64,9 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAssetFolder { FolderName = "New Name" };
 
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
@@ -86,18 +86,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetFolderEvent(new AssetFolderRenamed
-                    {
-                        FolderName = command.FolderName
-                    })
+                    CreateAssetFolderEvent(new AssetFolderRenamed { FolderName = command.FolderName })
                 );
         }
 
@@ -108,9 +105,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -127,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -141,17 +138,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetFolderCommand(new CreateAssetFolder { FolderName = "My Folder" }));
+            return PublishAsync(new CreateAssetFolder { FolderName = "My Folder" });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetFolderCommand(new RenameAssetFolder { FolderName = "My Folder" }));
+            return PublishAsync(new RenameAssetFolder { FolderName = "My Folder" });
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateAssetFolderCommand(new DeleteAssetFolder()));
+            return PublishAsync(new DeleteAssetFolder());
         }
 
         protected T CreateAssetFolderEvent<T>(T @event) where T : AssetFolderEvent
@@ -166,6 +163,28 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.AssetFolderId = assetFolderId;
 
             return CreateCommand(command);
+        }
+
+        private async Task<object?> PublishIdempotentAsync(AssetFolderCommand command)
+        {
+            var result = await PublishAsync(command);
+
+            var previousSnapshot = sut.Snapshot;
+            var previousVersion = sut.Snapshot.Version;
+
+            await PublishAsync(command);
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+            Assert.Equal(previousVersion, sut.Snapshot.Version);
+
+            return result;
+        }
+
+        private async Task<object?> PublishAsync(AssetFolderCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+
+            return result.Value;
         }
     }
 }

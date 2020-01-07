@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Remove(string name)
         {
-            return new Roles(inner.Without(name));
+            return Create(inner.Without(name));
         }
 
         [Pure]
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new Roles(inner.With(name, newRole));
+            return Create(inner.With(name, newRole));
         }
 
         [Pure]
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new Roles(inner.With(name, role.Update(permissions)));
+            return Create(inner.With(name, role.Update(permissions), DeepComparer<Role>.Instance));
         }
 
         public static bool IsDefault(string role)
@@ -175,6 +175,11 @@ namespace Squidex.Domain.Apps.Core.Apps
         private static KeyValuePair<string, Role>[] Cleaned(IEnumerable<KeyValuePair<string, Role>> items)
         {
             return items.Where(x => !Defaults.ContainsKey(x.Key)).ToArray();
+        }
+
+        private Roles Create(ArrayDictionary<string, Role> newRoles)
+        {
+            return ReferenceEquals(inner, newRoles) ? this : new Roles(newRoles);
         }
     }
 }

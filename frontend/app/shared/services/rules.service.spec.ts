@@ -426,7 +426,7 @@ export function createRule(id: number, suffix = '') {
         `id${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
-        new Version(`${id}`),
+        new Version(`${id}${suffix}`),
         id % 2 === 0,
         {
             param1: 1,

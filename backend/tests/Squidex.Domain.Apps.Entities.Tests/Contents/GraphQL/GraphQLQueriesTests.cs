@@ -148,6 +148,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     isImage
                     pixelWidth
                     pixelHeight
+                    type
+                    metadataText
+                    metadataPixelWidth: metadata(path: ""pixelWidth"")
+                    metadataUnknown: metadata(path: ""unknown"")
+                    metadata
                     tags
                     slug
                   }
@@ -185,7 +190,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             isImage = true,
                             pixelWidth = 800,
                             pixelHeight = 600,
-                            tags = new[] { "tag1", "tag2" },
+                            type = "IMAGE",
+                            metadataText = "metadata-text",
+                            metadataPixelWidth = 800,
+                            metadataUnknown = (string?)null,
+                            metadata = new
+                            {
+                                pixelWidth = 800,
+                                pixelHeight = 600,
+                            },
+                            tags = new[]
+                            {
+                                "tag1",
+                                "tag2"
+                            },
                             slug = "myfile.png"
                         }
                     }
@@ -220,6 +238,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       isImage
                       pixelWidth
                       pixelHeight
+                      type
+                      metadataText
+                      metadataPixelWidth: metadata(path: ""pixelWidth"")
+                      metadataUnknown: metadata(path: ""unknown"")
+                      metadata
                       tags
                       slug
                     }   
@@ -261,7 +284,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 isImage = true,
                                 pixelWidth = 800,
                                 pixelHeight = 600,
-                                tags = new[] { "tag1", "tag2" },
+                                type = "IMAGE",
+                                metadataText = "metadata-text",
+                                metadataPixelWidth = 800,
+                                metadataUnknown = (string?)null,
+                                metadata = new
+                                {
+                                    pixelWidth = 800,
+                                    pixelHeight = 600,
+                                },
+                                tags = new[]
+                                {
+                                    "tag1",
+                                    "tag2"
+                                },
                                 slug = "myfile.png"
                             }
                         }
@@ -388,6 +424,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       myNumber
                       myBoolean
                       myDatetime
+                      myJsonValue: myJson(path: ""value"")
                       myJson
                       myGeolocation
                       myTags
@@ -430,6 +467,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 myNumber = 1,
                                 myBoolean = true,
                                 myDatetime = content.LastModified,
+                                myJsonValue = 1,
                                 myJson = new
                                 {
                                     value = 1

@@ -6,12 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
     public interface IJsonValue : IEquatable<IJsonValue>
     {
         JsonValueType Type { get; }
+
+        bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result);
 
         string ToJsonString();
 

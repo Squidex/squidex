@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Json.Objects
             get { return JsonValueType.Array; }
         }
 
-        internal JsonObject()
+        public JsonObject()
         {
             inner = new Dictionary<string, IJsonValue>();
         }
@@ -131,6 +131,13 @@ namespace Squidex.Infrastructure.Json.Objects
         public override string ToString()
         {
             return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value.ToJsonString()}"))}}}";
+        }
+
+        public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
+        {
+            Guard.NotNull(pathSegment);
+
+            return TryGetValue(pathSegment, out result!);
         }
     }
 }

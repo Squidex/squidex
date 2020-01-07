@@ -11,7 +11,9 @@ import { Form } from '@app/framework';
 
 import { LanguageDto } from './../services/languages.service';
 
-export class EditLanguageForm extends Form<FormGroup, { isMaster: boolean, isOptional: boolean }> {
+import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
+
+export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppLanguageDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             isMaster: false,
@@ -34,7 +36,9 @@ export class EditLanguageForm extends Form<FormGroup, { isMaster: boolean, isOpt
     }
 }
 
-export class AddLanguageForm extends Form<FormGroup, { language: LanguageDto }> {
+type AddLanguageFormType = { language: LanguageDto };
+
+export class AddLanguageForm extends Form<FormGroup, AddLanguageFormType> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             language: [null,

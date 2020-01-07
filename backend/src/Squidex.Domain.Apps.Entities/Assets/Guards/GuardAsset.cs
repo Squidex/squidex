@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 {
     public static class GuardAsset
     {
-        public static void CanAnnotate(AnnotateAsset command, string oldFileName, string oldSlug)
+        public static void CanAnnotate(AnnotateAsset command)
         {
             Guard.NotNull(command);
 
@@ -23,9 +23,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.FileName) &&
                     string.IsNullOrWhiteSpace(command.Slug) &&
-                    command.Tags == null)
+                    command.Tags == null &&
+                    command.Metadata == null)
                 {
-                   e("Either file name, slug or tags must be defined.", nameof(command.FileName), nameof(command.Slug), nameof(command.Tags));
+                   e("Either file name, slug, tags or metadata must be defined.",
+                       nameof(command.FileName),
+                       nameof(command.Slug),
+                       nameof(command.Tags),
+                       nameof(command.Metadata));
                 }
             });
         }
@@ -46,11 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
-                if (command.ParentId == oldParentId)
-                {
-                    e("Asset is already part of this folder.", nameof(command.ParentId));
-                }
-                else
+                if (command.ParentId != oldParentId)
                 {
                     await CheckPathAsync(command.ParentId, assetQuery, e);
                 }

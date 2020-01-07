@@ -593,7 +593,7 @@ a {
         }
 
         &-secondary2 {
-            @include build-text-button(#777c7b);
+            @include build-text-button($color-text);
         }
     }
 }

@@ -83,8 +83,14 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var rule_2 = rule_1.Enable();
             var rule_3 = rule_2.Enable();
 
+            Assert.NotSame(rule_1, rule_2);
+
             Assert.False(rule_1.IsEnabled);
+
+            Assert.True(rule_2.IsEnabled);
             Assert.True(rule_3.IsEnabled);
+
+            Assert.Same(rule_2, rule_3);
         }
 
         [Fact]
@@ -93,27 +99,41 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var rule_1 = rule_0.Disable();
             var rule_2 = rule_1.Disable();
 
-            Assert.True(rule_0.IsEnabled);
+            Assert.NotSame(rule_0, rule_1);
+
+            Assert.False(rule_1.IsEnabled);
             Assert.False(rule_2.IsEnabled);
+
+            Assert.Same(rule_1, rule_2);
         }
 
         [Fact]
         public void Should_replace_name_when_renaming()
         {
             var rule_1 = rule_0.Rename("MyName");
+            var rule_2 = rule_1.Rename("MyName");
+
+            Assert.NotSame(rule_0, rule_1);
 
             Assert.Equal("MyName", rule_1.Name);
+            Assert.Equal("MyName", rule_2.Name);
+            Assert.Same(rule_1, rule_2);
         }
 
         [Fact]
         public void Should_replace_trigger_when_updating()
         {
-            var newTrigger = new ContentChangedTriggerV2();
+            var newTrigger1 = new ContentChangedTriggerV2 { HandleAll = true };
+            var newTrigger2 = new ContentChangedTriggerV2 { HandleAll = true };
 
-            var rule_1 = rule_0.Update(newTrigger);
+            var rule_1 = rule_0.Update(newTrigger1);
+            var rule_2 = rule_1.Update(newTrigger2);
 
-            Assert.NotSame(newTrigger, rule_0.Trigger);
-            Assert.Same(newTrigger, rule_1.Trigger);
+            Assert.NotSame(rule_0.Action, newTrigger1);
+            Assert.NotSame(rule_0, rule_1);
+            Assert.Same(newTrigger1, rule_1.Trigger);
+            Assert.Same(newTrigger1, rule_2.Trigger);
+            Assert.Same(rule_1, rule_2);
         }
 
         [Fact]
@@ -125,12 +145,17 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_replace_action_when_updating()
         {
-            var newAction = new TestAction1();
+            var newAction1 = new TestAction1 { Property = "NewValue" };
+            var newAction2 = new TestAction1 { Property = "NewValue" };
 
-            var rule_1 = rule_0.Update(newAction);
+            var rule_1 = rule_0.Update(newAction1);
+            var rule_2 = rule_1.Update(newAction2);
 
-            Assert.NotSame(newAction, rule_0.Action);
-            Assert.Same(newAction, rule_1.Action);
+            Assert.NotSame(rule_0.Action, newAction1);
+            Assert.NotSame(rule_0, rule_1);
+            Assert.Same(newAction1, rule_1.Action);
+            Assert.Same(newAction1, rule_2.Action);
+            Assert.Same(rule_1, rule_2);
         }
 
         [Fact]

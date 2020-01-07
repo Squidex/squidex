@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -47,26 +48,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public long TotalSize { get; set; }
 
         [DataMember]
-        public bool IsImage { get; set; }
+        public HashSet<string> Tags { get; set; }
 
         [DataMember]
-        public int? PixelWidth { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
         [DataMember]
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         [DataMember]
         public bool IsDeleted { get; set; }
-
-        [DataMember]
-        public HashSet<string> Tags { get; set; }
 
         public Guid AssetId
         {
             get { return Id; }
         }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -87,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
-                        break;
+                        return true;
                     }
 
                 case AssetUpdated e:
@@ -96,48 +94,60 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
-                        break;
+                        return true;
                     }
 
                 case AssetAnnotated e:
                     {
-                        if (!string.IsNullOrWhiteSpace(e.FileName))
+                        var hasChanged = false;
+
+                        if (!string.IsNullOrWhiteSpace(e.FileName) && !string.Equals(e.FileName, FileName))
                         {
                             FileName = e.FileName;
+
+                            hasChanged = true;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(e.Slug))
+                        if (!string.IsNullOrWhiteSpace(e.Slug) && !string.Equals(e.Slug, Slug))
                         {
                             Slug = e.Slug;
+
+                            hasChanged = true;
                         }
 
-                        if (e.Tags != null)
+                        if (e.Tags != null && !e.Tags.SetEquals(Tags))
                         {
                             Tags = e.Tags;
+
+                            hasChanged = true;
                         }
 
-                        break;
+                        if (e.Metadata != null && !e.Metadata.EqualsDictionary(Metadata))
+                        {
+                            Metadata = e.Metadata;
+
+                            hasChanged = true;
+                        }
+
+                        return hasChanged;
                     }
 
-                case AssetMoved e:
+                case AssetMoved e when e.ParentId != ParentId:
                     {
                         ParentId = e.ParentId;
 
-                        break;
+                        return true;
                     }
 
                 case AssetDeleted _:
                     {
                         IsDeleted = true;
 
-                        break;
+                        return true;
                     }
             }
-        }
 
-        public override AssetState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return false;
         }
     }
 }

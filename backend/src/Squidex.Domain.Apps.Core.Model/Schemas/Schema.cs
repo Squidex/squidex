@@ -116,21 +116,33 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema Update(SchemaProperties newProperties)
         {
-            Guard.NotNull(newProperties);
+            newProperties ??= new SchemaProperties();
+
+            if (properties.DeepEquals(newProperties))
+            {
+                return this;
+            }
 
             return Clone(clone =>
             {
                 clone.properties = newProperties;
-                clone.properties.Freeze();
+                clone.Properties.Freeze();
             });
         }
 
         [Pure]
         public Schema ConfigureScripts(SchemaScripts newScripts)
         {
+            newScripts ??= new SchemaScripts();
+
+            if (scripts.DeepEquals(newScripts))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
-                clone.scripts = newScripts ?? new SchemaScripts();
+                clone.scripts = newScripts;
                 clone.scripts.Freeze();
             });
         }
@@ -138,42 +150,55 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema ConfigureFieldsInLists(FieldNames names)
         {
+            names ??= FieldNames.Empty;
+
+            if (fieldsInLists.DeepEquals(names))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
-                clone.fieldsInLists = names ?? FieldNames.Empty;
+                clone.fieldsInLists = names;
             });
         }
 
         [Pure]
         public Schema ConfigureFieldsInLists(params string[] names)
         {
-            return Clone(clone =>
-            {
-                clone.fieldsInLists = new FieldNames(names);
-            });
+            return ConfigureFieldsInLists(new FieldNames(names));
         }
 
         [Pure]
         public Schema ConfigureFieldsInReferences(FieldNames names)
         {
+            names ??= FieldNames.Empty;
+
+            if (fieldsInReferences.DeepEquals(names))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
-                clone.fieldsInReferences = names ?? FieldNames.Empty;
+                clone.fieldsInReferences = names;
             });
         }
 
         [Pure]
         public Schema ConfigureFieldsInReferences(params string[] names)
         {
-            return Clone(clone =>
-            {
-                clone.fieldsInReferences = new FieldNames(names);
-            });
+            return ConfigureFieldsInReferences(new FieldNames(names));
         }
 
         [Pure]
         public Schema Publish()
         {
+            if (isPublished)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isPublished = true;
@@ -183,6 +208,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema Unpublish()
         {
+            if (!isPublished)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isPublished = false;
@@ -192,6 +222,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema ChangeCategory(string newCategory)
         {
+            if (string.Equals(category, newCategory))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.category = newCategory;
@@ -201,9 +236,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema ConfigurePreviewUrls(IReadOnlyDictionary<string, string> newPreviewUrls)
         {
+            previewUrls ??= EmptyPreviewUrls;
+
+            if (previewUrls.EqualsDictionary(newPreviewUrls))
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
-                clone.previewUrls = newPreviewUrls ?? EmptyPreviewUrls;
+                clone.previewUrls = newPreviewUrls;
             });
         }
 

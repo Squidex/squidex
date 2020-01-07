@@ -37,13 +37,18 @@ export class KNumberPipe implements PipeTransform {
 })
 export class FileSizePipe implements PipeTransform {
     public transform(value: number) {
-        let u = 0, s = 1024;
-
-        while (value >= s || -value >= s) {
-            value /= s;
-            u++;
-        }
-
-        return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
+        return calculateFileSize(value);
     }
+}
+
+export function calculateFileSize(value: number) {
+    let u = 0, s = 1024;
+
+    while (value >= s || -value >= s) {
+        value /= s;
+        u++;
+    }
+
+    return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
+
 }

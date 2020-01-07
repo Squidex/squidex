@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             });
         }
 
-        public static void CanRename(RenameAssetFolder command, string olderFolderName)
+        public static void CanRename(RenameAssetFolder command)
         {
             Guard.NotNull(command);
 
@@ -39,10 +39,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
                     e(Not.Defined("Folder name"), nameof(command.FolderName));
-                }
-                else if (string.Equals(command.FolderName, olderFolderName))
-                {
-                    e(Not.New("Asset folder", "name"), nameof(command.FolderName));
                 }
             });
         }
@@ -53,11 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
-                if (command.ParentId == oldParentId)
-                {
-                    e("Asset folder is already part of this folder.", nameof(command.ParentId));
-                }
-                else
+                if (command.ParentId != oldParentId)
                 {
                     await CheckPathAsync(command.ParentId, assetQuery, id, e);
                 }

@@ -64,12 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_when_folder_has_not_changed()
+        public async Task CanMove_should_not_throw_exception_when_folder_has_not_changed()
         {
             var command = new MoveAsset { ParentId = Guid.NewGuid() };
 
-            await ValidationAssert.ThrowsAsync(() => GuardAsset.CanMove(command, assetQuery, command.ParentId),
-                new ValidationError("Asset is already part of this folder.", "ParentId"));
+            await GuardAsset.CanMove(command, assetQuery, command.ParentId);
         }
 
         [Fact]
@@ -96,8 +95,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new AnnotateAsset();
 
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command, "asset-name", "asset-slug"),
-                new ValidationError("Either file name, slug or tags must be defined.", "FileName", "Slug", "Tags"));
+            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command),
+                new ValidationError("Either file name, slug, tags or metadata must be defined.", "FileName", "Slug", "Tags", "Metadata"));
         }
 
         [Fact]
@@ -105,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new AnnotateAsset { FileName = "new-name", Slug = "new-slug" };
 
-            GuardAsset.CanAnnotate(command, "asset-name", "asset-slug");
+            GuardAsset.CanAnnotate(command);
         }
 
         [Fact]

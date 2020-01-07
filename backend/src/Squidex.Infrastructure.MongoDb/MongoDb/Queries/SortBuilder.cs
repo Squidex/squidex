@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;

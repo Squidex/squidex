@@ -262,5 +262,5 @@ export function createApp(id: number, suffix = '') {
         id % 2 === 0,
         id % 2 === 0,
         'Free', 'Basic',
-        new Version(`${id}`));
+        new Version(`${id}${suffix}`));
 }

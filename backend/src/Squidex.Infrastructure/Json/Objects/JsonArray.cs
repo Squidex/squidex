@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 
 namespace Squidex.Infrastructure.Json.Objects
@@ -91,6 +93,22 @@ namespace Squidex.Infrastructure.Json.Objects
         public override string ToString()
         {
             return $"[{string.Join(", ", this.Select(x => x.ToJsonString()))}]";
+        }
+
+        public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
+        {
+            Guard.NotNull(pathSegment);
+
+            if (pathSegment != null && int.TryParse(pathSegment, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) && index >= 0 && index < Count)
+            {
+                result = this[index];
+
+                return true;
+            }
+
+            result = null!;
+
+            return false;
         }
     }
 }

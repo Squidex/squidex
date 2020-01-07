@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(id);
 
-            return new AppClients(Without(id));
+            return Without<AppClients>(id);
         }
 
         [Pure]
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return new AppClients(With(id, client));
+            return With<AppClients>(id, client);
         }
 
         [Pure]
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return new AppClients(With(id, new AppClient(id, secret, Role.Editor)));
+            return With<AppClients>(id, new AppClient(id, secret, Role.Editor));
         }
 
         [Pure]
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppClients(With(id, client.Rename(newName)));
+            return With<AppClients>(id, client.Rename(newName), DeepComparer<AppClient>.Instance);
         }
 
         [Pure]
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppClients(With(id, client.Update(role)));
+            return With<AppClients>(id, client.Update(role), DeepComparer<AppClient>.Instance);
         }
     }
 }

@@ -70,14 +70,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public async Task CanAssign_should_throw_exception_if_user_already_exists_with_same_role()
+        public async Task CanAssign_should_not_throw_exception_if_user_already_exists_with_same_role()
         {
             var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
-            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan),
-                new ValidationError("Contributor has already this role.", "Role"));
+            await GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
         }
 
         [Fact]

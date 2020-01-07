@@ -20,13 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (field, fieldName, _) in schema.SchemaDef.Fields.SafeFields())
             {
-                var (resolvedType, valueResolver) = model.GetGraphType(schema, field, fieldName);
+                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, field, fieldName);
 
                 if (valueResolver != null)
                 {
                     AddField(new FieldType
                     {
                         Name = fieldName,
+                        Arguments = args,
                         Resolver = PartitionResolver(valueResolver, field.Name),
                         ResolvedType = resolvedType,
                         Description = field.RawProperties.Hints

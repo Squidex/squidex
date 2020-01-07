@@ -76,7 +76,7 @@
                     <sqx-tag-editor [ngModel]="asset.tags" disabled="true" styleBlank="true" placeholder="+Tag"></sqx-tag-editor>
                 </div>
                 <div class="file-info">
-                    <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+                    {{asset.metadataText}}
                 </div>
             </ng-container>
         </div>
@@ -112,7 +112,7 @@
 
                     <ng-container *ngIf="!isCompact">
                         <td class="col-info">
-                            <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+                            {{asset.metadataText}}
                         </td>
                         <td class="col-user">
                             <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef" />
