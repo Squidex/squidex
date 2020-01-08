@@ -145,9 +145,13 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             if (controller.HasPermission(Permissions.AppAssetsUpdate))
             {
                 response.AddPutLink("update", controller.Url<AssetsController>(x => nameof(x.PutAsset), values));
-                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
 
                 response.AddPutLink("move", controller.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppAssetsUpload))
+            {
+                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
             }
 
             if (controller.HasPermission(Permissions.AppAssetsDelete))
@@ -160,12 +164,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
                 response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, version, more = response.Slug }));
-
                 response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug, version }));
             }
             else
             {
-                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, id = response.Id, version }));
+                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, version }));
             }
 
             return response;
