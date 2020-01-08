@@ -195,11 +195,11 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var appId = dataProtector.Unprotect(token);
 
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
 
             return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", false, stream =>
             {
-                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, stream);
+                return appLogStore.ReadLogAsync(Guid.Parse(appId), today.AddDays(-30), today, stream);
             });
         }
     }
