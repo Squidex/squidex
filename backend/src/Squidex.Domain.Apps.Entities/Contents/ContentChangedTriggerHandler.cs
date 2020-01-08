@@ -38,7 +38,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = new EnrichedContentEvent();
 
-            var content = await contentLoader.GetAsync(@event.Headers.AggregateId(), @event.Headers.EventStreamNumber());
+            var content =
+                await contentLoader.GetAsync(
+                    @event.Headers.AggregateId(),
+                    @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(content, result);
 
@@ -53,24 +56,39 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
                 case ContentChangesPublished _:
-                case ContentUpdated _:
                     result.Type = EnrichedContentEventType.Updated;
                     break;
+
                 case ContentStatusChanged contentStatusChanged:
-                    switch (contentStatusChanged.Change)
                     {
-                        case StatusChange.Published:
-                            result.Type = EnrichedContentEventType.Published;
-                            break;
-                        case StatusChange.Unpublished:
-                            result.Type = EnrichedContentEventType.Unpublished;
-                            break;
-                        default:
-                            result.Type = EnrichedContentEventType.StatusChanged;
-                            break;
+                        switch (contentStatusChanged.Change)
+                        {
+                            case StatusChange.Published:
+                                result.Type = EnrichedContentEventType.Published;
+                                break;
+                            case StatusChange.Unpublished:
+                                result.Type = EnrichedContentEventType.Unpublished;
+                                break;
+                            default:
+                                result.Type = EnrichedContentEventType.StatusChanged;
+                                break;
+                        }
+
+                        break;
                     }
 
-                    break;
+                case ContentUpdated _:
+                    {
+                        result.Type = EnrichedContentEventType.Updated;
+
+                        var previousContent =
+                            await contentLoader.GetAsync(
+                                content.Id,
+                                content.Version - 1);
+
+                        result.DataOld = previousContent.Data ?? previousContent.DataDraft;
+                        break;
+                    }
             }
 
             result.Name = $"{content.SchemaId.Name.ToPascalCase()}{result.Type}";

@@ -72,6 +72,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_enrich_with_old_data_when_updated()
+        {
+            var @event = new ContentUpdated();
+
+            var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
+
+            var dataNow = new NamedContentData();
+            var dataOld = new NamedContentData();
+
+            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
+                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 12, Data = dataNow });
+
+            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 11))
+                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 11, Data = dataOld });
+
+            var result = await sut.CreateEnrichedEventAsync(envelope) as EnrichedContentEvent;
+
+            Assert.Same(dataNow, result!.Data);
+            Assert.Same(dataOld, result!.DataOld);
+        }
+
+        [Fact]
         public void Should_not_trigger_precheck_when_event_type_not_correct()
         {
             TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
