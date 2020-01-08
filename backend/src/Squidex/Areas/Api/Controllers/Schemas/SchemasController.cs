@@ -256,7 +256,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema to publish.</param>
         /// <returns>
         /// 200 => Schema has been published.
-        /// 400 => Schema is already published.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -280,7 +279,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema to unpublish.</param>
         /// <returns>
         /// 200 => Schema has been unpublished.
-        /// 400 => Schema is not published.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]

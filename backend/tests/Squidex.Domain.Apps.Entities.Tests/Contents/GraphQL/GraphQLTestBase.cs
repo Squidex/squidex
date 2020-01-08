@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -228,9 +229,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 FileHash = "ABC123",
                 FileVersion = 123,
                 MimeType = "image/png",
-                IsImage = true,
-                PixelWidth = 800,
-                PixelHeight = 600,
+                Type = AssetType.Image,
+                MetadataText = "metadata-text",
+                Metadata =
+                    new AssetMetadata()
+                        .SetPixelWidth(800)
+                        .SetPixelHeight(600),
                 TagNames = new[] { "tag1", "tag2" }.ToHashSet()
             };
 

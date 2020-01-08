@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
@@ -19,7 +18,6 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
     public class SchemaSynchronizerTests
     {
         private readonly Func<long> idGenerator;
-        private readonly IJsonSerializer jsonSerializer = TestUtils.DefaultSerializer;
         private readonly NamedId<long> stringId = NamedId.Of(13L, "my-value");
         private readonly NamedId<long> nestedId = NamedId.Of(141L, "my-value");
         private readonly NamedId<long> arrayId = NamedId.Of(14L, "11-array");
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 (Schema?)null;
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaDeleted()
@@ -56,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .ChangeCategory("Category");
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaCategoryChanged { Name = "Category" }
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target").ConfigureScripts(scripts);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaScriptsConfigured { Scripts = scripts }
@@ -99,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .ConfigurePreviewUrls(previewUrls);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaPreviewUrlsConfigured { PreviewUrls = previewUrls }
@@ -116,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .Publish();
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaPublished()
@@ -133,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target");
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaUnpublished()
@@ -151,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .ConfigureFieldsInLists("2", "1");
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaUIFieldsConfigured { FieldsInLists = new FieldNames("2", "1") }
@@ -169,7 +167,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .ConfigureFieldsInReferences("2", "1");
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaUIFieldsConfigured { FieldsInReferences = new FieldNames("2", "1") }
@@ -188,7 +186,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldDeleted { FieldId = nestedId, ParentFieldId = arrayId }
@@ -205,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var targetSchema =
                 new Schema("target");
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldDeleted { FieldId = stringId }
@@ -227,7 +225,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
                         .AddString(nestedId.Id, nestedId.Name, properties));
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldUpdated { Properties = properties, FieldId = nestedId, ParentFieldId = arrayId }
@@ -247,7 +245,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant, properties);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldUpdated { Properties = properties, FieldId = stringId }
@@ -268,7 +266,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                         .AddString(nestedId.Id, nestedId.Name))
                             .LockField(nestedId.Id, arrayId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldLocked { FieldId = nestedId, ParentFieldId = arrayId }
@@ -287,7 +285,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
                         .LockField(stringId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldLocked { FieldId = stringId }
@@ -308,7 +306,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                         .AddString(nestedId.Id, nestedId.Name))
                             .HideField(nestedId.Id, arrayId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldHidden { FieldId = nestedId, ParentFieldId = arrayId }
@@ -327,7 +325,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
                         .HideField(stringId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldHidden { FieldId = stringId }
@@ -348,7 +346,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
                         .AddString(nestedId.Id, nestedId.Name));
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldShown { FieldId = nestedId, ParentFieldId = arrayId }
@@ -367,7 +365,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldShown { FieldId = stringId }
@@ -388,7 +386,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                         .AddString(nestedId.Id, nestedId.Name))
                             .DisableField(nestedId.Id, arrayId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldDisabled { FieldId = nestedId, ParentFieldId = arrayId }
@@ -407,7 +405,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
                         .DisableField(stringId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldDisabled { FieldId = stringId }
@@ -428,7 +426,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddArray(arrayId.Id, arrayId.Name, Partitioning.Invariant, f => f
                         .AddString(nestedId.Id, nestedId.Name));
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldEnabled { FieldId = nestedId, ParentFieldId = arrayId }
@@ -447,7 +445,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldEnabled { FieldId = stringId }
@@ -465,7 +463,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(stringId.Id, stringId.Name, Partitioning.Invariant)
                         .HideField(stringId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             var createdId = NamedId.Of(50L, stringId.Name);
 
@@ -486,7 +484,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddTags(stringId.Id, stringId.Name, Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             var createdId = NamedId.Of(50L, stringId.Name);
 
@@ -507,7 +505,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("target")
                     .AddString(stringId.Id, stringId.Name, Partitioning.Language);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             var createdId = NamedId.Of(50L, stringId.Name);
 
@@ -529,7 +527,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                         .AddString(nestedId.Id, nestedId.Name))
                             .HideField(nestedId.Id, arrayId.Id);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             var id1 = NamedId.Of(50L, arrayId.Name);
             var id2 = NamedId.Of(51L, stringId.Name);
@@ -559,7 +557,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                         .AddString(1, "f2")
                         .AddString(2, "f1"));
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaFieldsReordered { FieldIds = new List<long> { 11, 10 }, ParentFieldId = arrayId }
@@ -579,7 +577,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(1, "f2", Partitioning.Invariant)
                     .AddString(2, "f1", Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new SchemaFieldsReordered { FieldIds = new List<long> { 11, 10 } }
@@ -599,7 +597,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(1, "f3", Partitioning.Invariant)
                     .AddString(2, "f1", Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldDeleted { FieldId = NamedId.Of(11L, "f2") },
@@ -622,7 +620,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                     .AddString(2, "f3", Partitioning.Invariant)
                     .AddString(3, "f2", Partitioning.Invariant);
 
-            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
                 new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },

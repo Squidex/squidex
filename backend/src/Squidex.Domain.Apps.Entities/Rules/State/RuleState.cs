@@ -18,7 +18,7 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Rules.State
 {
     [CollectionName("Rules")]
-    public class RuleState : DomainObjectState<RuleState>, IRuleEntity
+    public sealed class RuleState : DomainObjectState<RuleState>, IRuleEntity
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
@@ -29,8 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
         [DataMember]
         public bool IsDeleted { get; set; }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
+            var previousRule = RuleDef;
+
             switch (@event)
             {
                 case RuleCreated e:
@@ -40,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
 
                         AppId = e.AppId;
 
-                        break;
+                        return true;
                     }
 
                 case RuleUpdated e:
@@ -81,14 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
                     {
                         IsDeleted = true;
 
-                        break;
+                        return true;
                     }
             }
-        }
 
-        public override RuleState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return !ReferenceEquals(previousRule, RuleDef);
         }
     }
 }

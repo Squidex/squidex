@@ -26,9 +26,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             patterns = patterns.Add(guid1, "Name1", "Pattern1", "Default");
             patterns = patterns.Add(guid2, "Name2", "Pattern2", "Default");
             patterns = patterns.Add(guid3, "Name3", "Pattern3", "Default");
-
             patterns = patterns.Update(guid2, "Name2 Update", "Pattern2 Update", "Default2");
-
+            patterns = patterns.Update(guid3, "Name3 Update", "Pattern3 Update", "Default3");
             patterns = patterns.Remove(guid1);
 
             var serialized = patterns.SerializeAndDeserialize();

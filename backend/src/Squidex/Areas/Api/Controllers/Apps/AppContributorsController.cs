@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => User assigned to app.
-        /// 400 => User is already assigned to the app or not found.
+        /// 400 => User is not found.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -93,7 +93,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="id">The id of the contributor.</param>
         /// <returns>
         /// 200 => User removed from app.
-        /// 400 => User is not assigned to the app.
         /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
@@ -18,12 +19,26 @@ namespace Squidex.Infrastructure.Queries
 {
     public sealed class QueryJsonConversionTests
     {
+        private static readonly (string Operator, string Output)[] AllOps =
+        {
+            ("contains", "contains($FIELD, $VALUE)"),
+            ("empty", "empty($FIELD)"),
+            ("endswith", "endsWith($FIELD, $VALUE)"),
+            ("eq", "$FIELD == $VALUE"),
+            ("ge", "$FIELD >= $VALUE"),
+            ("gt", "$FIELD > $VALUE"),
+            ("le", "$FIELD <= $VALUE"),
+            ("lt", "$FIELD < $VALUE"),
+            ("ne", "$FIELD != $VALUE"),
+            ("startswith", "startsWith($FIELD, $VALUE)"),
+        };
+
         private readonly List<string> errors = new List<string>();
         private readonly JsonSchema schema = new JsonSchema();
 
         public QueryJsonConversionTests()
         {
-            var nested = new JsonSchemaProperty { Title = "nested" };
+            var nested = new JsonSchemaProperty { Title = "nested", Type = JsonObjectType.Object };
 
             nested.Properties["property"] = new JsonSchemaProperty
             {
@@ -53,6 +68,11 @@ namespace Squidex.Infrastructure.Queries
             schema.Properties["number"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number
+            };
+
+            schema.Properties["json"] = new JsonSchemaProperty
+            {
+                Type = JsonObjectType.None
             };
 
             schema.Properties["string"] = new JsonSchemaProperty
@@ -93,20 +113,18 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "'notfound' is not a property of 'nested'.");
         }
 
-        [Theory]
-        [InlineData("contains", "contains(datetime, 2012-11-10T09:08:07Z)")]
-        [InlineData("empty", "empty(datetime)")]
-        [InlineData("endswith", "endsWith(datetime, 2012-11-10T09:08:07Z)")]
-        [InlineData("eq", "datetime == 2012-11-10T09:08:07Z")]
-        [InlineData("ge", "datetime >= 2012-11-10T09:08:07Z")]
-        [InlineData("gt", "datetime > 2012-11-10T09:08:07Z")]
-        [InlineData("le", "datetime <= 2012-11-10T09:08:07Z")]
-        [InlineData("lt", "datetime < 2012-11-10T09:08:07Z")]
-        [InlineData("ne", "datetime != 2012-11-10T09:08:07Z")]
-        [InlineData("startswith", "startsWith(datetime, 2012-11-10T09:08:07Z)")]
-        public void Should_parse_datetime_string_filter(string op, string expected)
+        public static IEnumerable<object[]> DateTimeTests()
         {
-            var json = new { path = "datetime", op, value = "2012-11-10T09:08:07Z" };
+            const string value = "2012-11-10T09:08:07Z";
+
+            return BuildTests("datetime", x => true, value, value);
+        }
+
+        [Theory]
+        [MemberData(nameof(DateTimeTests))]
+        public void Should_parse_datetime_string_filter(string field, string op, string value, string expected)
+        {
+            var json = new { path = field, op, value };
 
             AssertFilter(json, expected);
         }
@@ -127,20 +145,18 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "Expected ISO8601 DateTime String for path 'datetime', but got Number.");
         }
 
-        [Theory]
-        [InlineData("contains", "contains(guid, bf57d32c-d4dd-4217-8c16-6dcb16975cf3)")]
-        [InlineData("empty", "empty(guid)")]
-        [InlineData("endswith", "endsWith(guid, bf57d32c-d4dd-4217-8c16-6dcb16975cf3)")]
-        [InlineData("eq", "guid == bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("ge", "guid >= bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("gt", "guid > bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("le", "guid <= bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("lt", "guid < bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("ne", "guid != bf57d32c-d4dd-4217-8c16-6dcb16975cf3")]
-        [InlineData("startswith", "startsWith(guid, bf57d32c-d4dd-4217-8c16-6dcb16975cf3)")]
-        public void Should_parse_guid_string_filter(string op, string expected)
+        public static IEnumerable<object[]> GuidTests()
         {
-            var json = new { path = "guid", op, value = "bf57d32c-d4dd-4217-8c16-6dcb16975cf3" };
+            const string value = "bf57d32c-d4dd-4217-8c16-6dcb16975cf3";
+
+            return BuildTests("guid", x => true, value, value);
+        }
+
+        [Theory]
+        [MemberData(nameof(GuidTests))]
+        public void Should_parse_guid_string_filter(string field, string op, string value, string expected)
+        {
+            var json = new { path = field, op, value };
 
             AssertFilter(json, expected);
         }
@@ -161,20 +177,34 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "Expected Guid String for path 'guid', but got Number.");
         }
 
-        [Theory]
-        [InlineData("contains", "contains(string, 'Hello')")]
-        [InlineData("empty", "empty(string)")]
-        [InlineData("endswith", "endsWith(string, 'Hello')")]
-        [InlineData("eq", "string == 'Hello'")]
-        [InlineData("ge", "string >= 'Hello'")]
-        [InlineData("gt", "string > 'Hello'")]
-        [InlineData("le", "string <= 'Hello'")]
-        [InlineData("lt", "string < 'Hello'")]
-        [InlineData("ne", "string != 'Hello'")]
-        [InlineData("startswith", "startsWith(string, 'Hello')")]
-        public void Should_parse_string_filter(string op, string expected)
+        public static IEnumerable<object[]> StringTests()
         {
-            var json = new { path = "string", op, value = "Hello" };
+            const string value = "Hello";
+
+            return BuildTests("string", x => true, value, $"'{value}'");
+        }
+
+        [Theory]
+        [MemberData(nameof(StringTests))]
+        public void Should_parse_string_filter(string field, string op, string value, string expected)
+        {
+            var json = new { path = field, op, value };
+
+            AssertFilter(json, expected);
+        }
+
+        public static IEnumerable<object[]> StringInTests()
+        {
+            const string value = "Hello";
+
+            return BuildInTests("string", value, $"'{value}'");
+        }
+
+        [Theory]
+        [MemberData(nameof(StringInTests))]
+        public void Should_parse_string_in_filter(string field, string value, string expected)
+        {
+            var json = new { path = field, op = "in", value = new[] { value } };
 
             AssertFilter(json, expected);
         }
@@ -185,14 +215,6 @@ namespace Squidex.Infrastructure.Queries
             var json = new { path = "string", op = "eq", value = 1 };
 
             AssertErrors(json, "Expected String for path 'string', but got Number.");
-        }
-
-        [Fact]
-        public void Should_parse_string_in_filter()
-        {
-            var json = new { path = "string", op = "in", value = new[] { "Hello" } };
-
-            AssertFilter(json, "string in ['Hello']");
         }
 
         [Fact]
@@ -211,16 +233,34 @@ namespace Squidex.Infrastructure.Queries
             AssertFilter(json, "reference.property in ['Hello']");
         }
 
-        [Theory]
-        [InlineData("eq", "number == 12")]
-        [InlineData("ge", "number >= 12")]
-        [InlineData("gt", "number > 12")]
-        [InlineData("le", "number <= 12")]
-        [InlineData("lt", "number < 12")]
-        [InlineData("ne", "number != 12")]
-        public void Should_parse_number_filter(string op, string expected)
+        public static IEnumerable<object[]> NumberTests()
         {
-            var json = new { path = "number", op, value = 12 };
+            const int value = 12;
+
+            return BuildTests("number", x => x.Length == 2, value, $"{value}");
+        }
+
+        [Theory]
+        [MemberData(nameof(NumberTests))]
+        public void Should_parse_number_filter(string field, string op, int value, string expected)
+        {
+            var json = new { path = field, op, value };
+
+            AssertFilter(json, expected);
+        }
+
+        public static IEnumerable<object[]> NumberInTests()
+        {
+            const int value = 12;
+
+            return BuildInTests("number", value, $"{value}");
+        }
+
+        [Theory]
+        [MemberData(nameof(NumberInTests))]
+        public void Should_parse_number_in_filter(string field, int value, string expected)
+        {
+            var json = new { path = field, op = "in", value = new[] { value } };
 
             AssertFilter(json, expected);
         }
@@ -233,20 +273,34 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "Expected Number for path 'number', but got Boolean.");
         }
 
-        [Fact]
-        public void Should_parse_number_in_filter()
+        public static IEnumerable<object[]> BooleanTests()
         {
-            var json = new { path = "number", op = "in", value = new[] { 12 } };
+            const bool value = true;
 
-            AssertFilter(json, "number in [12]");
+            return BuildTests("boolean", x => x == "eq" || x == "ne", value, $"{value}");
         }
 
         [Theory]
-        [InlineData("eq", "boolean == True")]
-        [InlineData("ne", "boolean != True")]
-        public void Should_parse_boolean_filter(string op, string expected)
+        [MemberData(nameof(BooleanTests))]
+        public void Should_parse_boolean_filter(string field, string op, bool value, string expected)
         {
-            var json = new { path = "boolean", op, value = true };
+            var json = new { path = field, op, value };
+
+            AssertFilter(json, expected);
+        }
+
+        public static IEnumerable<object[]> BooleanInTests()
+        {
+            const bool value = true;
+
+            return BuildInTests("boolean", value, $"{value}");
+        }
+
+        [Theory]
+        [MemberData(nameof(BooleanInTests))]
+        public void Should_parse_boolean_in_filter(string field, bool value, string expected)
+        {
+            var json = new { path = field, op = "in", value = new[] { value } };
 
             AssertFilter(json, expected);
         }
@@ -259,31 +313,36 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "Expected Boolean for path 'boolean', but got Number.");
         }
 
-        [Fact]
-        public void Should_parse_boolean_in_filter()
+        public static IEnumerable<object[]> ArrayTests()
         {
-            var json = new { path = "boolean", op = "in", value = new[] { true } };
+            const string value = "Hello";
 
-            AssertFilter(json, "boolean in [True]");
+            return BuildTests("stringArray", x => x == "eq" || x == "ne" || x == "empty", value, $"'{value}'");
         }
 
         [Theory]
-        [InlineData("empty", "empty(stringArray)")]
-        [InlineData("eq", "stringArray == 'Hello'")]
-        [InlineData("ne", "stringArray != 'Hello'")]
-        public void Should_parse_array_filter(string op, string expected)
+        [MemberData(nameof(ArrayTests))]
+        public void Should_parse_array_filter(string field, string op, string value, string expected)
         {
-            var json = new { path = "stringArray", op, value = "Hello" };
+            var json = new { path = field, op, value };
 
             AssertFilter(json, expected);
         }
 
-        [Fact]
-        public void Should_parse_array_in_filter()
+        public static IEnumerable<object[]> ArrayInTests()
         {
-            var json = new { path = "stringArray", op = "in", value = new[] { "Hello" } };
+            const string value = "Hello";
 
-            AssertFilter(json, "stringArray in ['Hello']");
+            return BuildInTests("stringArray", value, $"'{value}'");
+        }
+
+        [Theory]
+        [MemberData(nameof(ArrayInTests))]
+        public void Should_parse_array_in_filter(string field, string value, string expected)
+        {
+            var json = new { path = field, op = "in", value = new[] { value } };
+
+            AssertFilter(json, expected);
         }
 
         [Fact]
@@ -369,6 +428,46 @@ namespace Squidex.Infrastructure.Queries
             var jsonFilter = schema.Parse(json, JsonHelper.DefaultSerializer);
 
             return jsonFilter.ToString();
+        }
+
+        public static IEnumerable<object[]> BuildInTests(string field, object value, string valueString)
+        {
+            var fields = new string[]
+            {
+                $"{field}",
+                $"json.{field}",
+                $"json.nested.{field}"
+            };
+
+            foreach (var f in fields)
+            {
+                var expected = $"{f} in [{valueString}]";
+
+                yield return new object[] { f, value, expected };
+            }
+        }
+
+        public static IEnumerable<object[]> BuildTests(string field, Predicate<string> opFilter, object value, string valueString)
+        {
+            var fields = new string[]
+            {
+                $"{field}",
+                $"json.{field}",
+                $"json.nested.{field}"
+            };
+
+            foreach (var f in fields)
+            {
+                foreach (var op in AllOps.Where(x => opFilter(x.Operator)))
+                {
+                    var expected =
+                        op.Output
+                            .Replace("$FIELD", f)
+                            .Replace("$VALUE", valueString);
+
+                    yield return new object[] { f, op.Operator, value, expected };
+                }
+            }
         }
     }
 }

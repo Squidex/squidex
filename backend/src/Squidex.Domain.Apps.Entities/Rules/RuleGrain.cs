@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case UpdateRule updateRule:
                     return UpdateReturnAsync(updateRule, async c =>
                     {
-                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider, Snapshot.RuleDef);
+                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
 
                         Update(c);
 
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case EnableRule enableRule:
                     return UpdateReturn(enableRule, c =>
                     {
-                        GuardRule.CanEnable(c, Snapshot.RuleDef);
+                        GuardRule.CanEnable(c);
 
                         Enable(c);
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case DisableRule disableRule:
                     return UpdateReturn(disableRule, c =>
                     {
-                        GuardRule.CanDisable(c, Snapshot.RuleDef);
+                        GuardRule.CanDisable(c);
 
                         Disable(c);
 

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -796,6 +797,11 @@ namespace Squidex.Infrastructure
             }
 
             return string.Join(separator, parts.Where(x => !string.IsNullOrWhiteSpace(x)));
+        }
+
+        public static string ToIso8601(this DateTime value)
+        {
+            return value.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
         }
     }
 }

@@ -8,8 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -29,7 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
-        private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly Guid parentId = Guid.NewGuid();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
-                .Returns(new Dictionary<string, string>());
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
 
             sut = new AssetGrain(Store, tagService, assetQuery, limit, A.Dummy<ISemanticLog>());
             sut.ActivateAsync(Id).Wait();
@@ -71,11 +72,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Create_should_create_events_and_update_state()
         {
-            var command = new CreateAsset { File = file, ImageInfo = image, FileHash = "NewHash", Tags = new HashSet<string>() };
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -84,14 +85,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetCreated
                     {
-                        IsImage = true,
                         FileName = file.FileName,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,
                         FileVersion = 0,
+                        Metadata = new AssetMetadata(),
                         MimeType = file.MimeType,
-                        PixelWidth = image.PixelWidth,
-                        PixelHeight = image.PixelHeight,
                         Tags = new HashSet<string>(),
                         Slug = file.FileName.ToAssetSlug()
                     })
@@ -101,13 +100,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Update_should_create_events_and_update_state()
         {
-            var command = new UpdateAsset { File = file, ImageInfo = image, FileHash = "NewHash" };
+            var command = new UpdateAsset { File = file, FileHash = "NewHash" };
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -116,13 +115,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetUpdated
                     {
-                        IsImage = true,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,
                         FileVersion = 1,
-                        MimeType = file.MimeType,
-                        PixelWidth = image.PixelWidth,
-                        PixelHeight = image.PixelHeight
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType
                     })
                 );
         }
@@ -134,15 +131,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
-            Assert.Equal("My New Image.png", sut.Snapshot.FileName);
+            Assert.Equal(command.FileName, sut.Snapshot.FileName);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { FileName = "My New Image.png" })
+                    CreateAssetEvent(new AssetAnnotated { FileName = command.FileName })
                 );
         }
 
@@ -153,32 +150,51 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
-            Assert.Equal("my-new-image.png", sut.Snapshot.Slug);
+            Assert.Equal(command.Slug, sut.Snapshot.Slug);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { Slug = "my-new-image.png" })
+                    CreateAssetEvent(new AssetAnnotated { Slug = command.Slug })
                 );
         }
 
         [Fact]
-        public async Task AnnotateTag_should_create_events_and_update_state()
+        public async Task AnnotateMetadata_should_create_events_and_update_state()
         {
-            var command = new AnnotateAsset { Tags = new HashSet<string>() };
+            var command = new AnnotateAsset { Metadata = new AssetMetadata().SetPixelWidth(800) };
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
+
+            Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string>() })
+                    CreateAssetEvent(new AssetAnnotated { Metadata = command.Metadata })
+                );
+        }
+
+        [Fact]
+        public async Task AnnotateTags_should_create_events_and_update_state()
+        {
+            var command = new AnnotateAsset { Tags = new HashSet<string> { "tag1" } };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent2(sut.Snapshot);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string> { "tag1" } })
                 );
         }
 
@@ -189,9 +205,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -209,9 +225,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();
 
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent2(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -223,17 +239,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new CreateAsset { File = file }));
+            return PublishAsync(new CreateAsset { File = file });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new UpdateAsset { File = file }));
+            return PublishAsync(new UpdateAsset { File = file });
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateAssetCommand(new DeleteAsset()));
+            return PublishAsync(new DeleteAsset());
         }
 
         protected T CreateAssetEvent<T>(T @event) where T : AssetEvent
@@ -248,6 +264,28 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.AssetId = assetId;
 
             return CreateCommand(command);
+        }
+
+        private async Task<object?> PublishIdempotentAsync(AssetCommand command)
+        {
+            var result = await PublishAsync(command);
+
+            var previousSnapshot = sut.Snapshot;
+            var previousVersion = sut.Snapshot.Version;
+
+            await PublishAsync(command);
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+            Assert.Equal(previousVersion, sut.Snapshot.Version);
+
+            return result;
+        }
+
+        private async Task<object?> PublishAsync(AssetCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            return result.Value;
         }
     }
 }

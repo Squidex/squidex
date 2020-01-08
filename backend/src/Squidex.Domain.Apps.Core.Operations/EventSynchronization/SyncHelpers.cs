@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
@@ -25,14 +24,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static bool TypeEquals(this object lhs, object rhs)
         {
             return lhs.GetType() == rhs.GetType();
-        }
-
-        public static bool EqualsJson<T>(this T lhs, T rhs, IJsonSerializer serializer)
-        {
-            var lhsJson = serializer.Serialize(lhs);
-            var rhsJson = serializer.Serialize(rhs);
-
-            return string.Equals(lhsJson, rhsJson);
         }
     }
 }

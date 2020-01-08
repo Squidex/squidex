@@ -12,18 +12,27 @@ namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed class MyDomainState : IDomainState<MyDomainState>
     {
+        public const long Unchanged = 13;
+
         public long Version { get; set; }
 
-        public int Value { get; set; }
+        public long Value { get; set; }
 
         public MyDomainState Apply(Envelope<IEvent> @event)
         {
-            return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
+            var value = @event.To<ValueChanged>().Payload.Value;
+
+            if (value == Unchanged)
+            {
+                return this;
+            }
+
+            return new MyDomainState { Value = value };
         }
     }
 
     public sealed class ValueChanged : IEvent
     {
-        public int Value { get; set; }
+        public long Value { get; set; }
     }
 }

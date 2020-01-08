@@ -53,6 +53,11 @@ namespace Squidex.Infrastructure.Queries.OData
             }
         }
 
+        public override ImmutableList<string> Visit(SingleValueOpenPropertyAccessNode nodeIn)
+        {
+            return nodeIn.Source.Accept(this).Add(nodeIn.Name);
+        }
+
         private static string UnescapeEdmField(IEdmNamedElement property)
         {
             return property.Name;

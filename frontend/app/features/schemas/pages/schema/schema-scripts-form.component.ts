@@ -9,7 +9,6 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
-    DialogService,
     EditScriptsForm,
     SchemaDetailsDto,
     SchemasState
@@ -31,7 +30,6 @@ export class SchemaScriptsFormComponent implements OnChanges {
     public isEditable = false;
 
     constructor(
-        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
@@ -58,8 +56,6 @@ export class SchemaScriptsFormComponent implements OnChanges {
         if (value) {
             this.schemasState.configureScripts(this.schema, value)
                 .subscribe(() => {
-                    this.dialogs.notifyInfo('Scripts saved successfully.');
-
                     this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);

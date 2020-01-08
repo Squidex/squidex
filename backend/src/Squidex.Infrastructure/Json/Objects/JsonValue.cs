@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using NodaTime;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
@@ -14,6 +16,8 @@ namespace Squidex.Infrastructure.Json.Objects
 {
     public static class JsonValue
     {
+        private static readonly char[] PathSeparators = { '.', '[', ']' };
+
         public static readonly IJsonValue Empty = new JsonString(string.Empty);
 
         public static readonly IJsonValue True = JsonBoolean.True;
@@ -131,6 +135,29 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return new JsonString(value);
+        }
+
+        public static bool TryGetByPath(this IJsonValue value, string? path, [MaybeNullWhen(false)] out IJsonValue result)
+        {
+            return TryGetByPath(value, path?.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries), out result!);
+        }
+
+        public static bool TryGetByPath(this IJsonValue? value, IEnumerable<string>? path, [MaybeNullWhen(false)] out IJsonValue result)
+        {
+            result = value!;
+
+            if (path != null)
+            {
+                foreach (var pathSegment in path)
+                {
+                    if (result == null || !result.TryGet(pathSegment, out result!))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return result != null && !ReferenceEquals(result, value);
         }
     }
 }

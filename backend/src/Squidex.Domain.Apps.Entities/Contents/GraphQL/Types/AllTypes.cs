@@ -7,12 +7,15 @@
 
 using System;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class AllTypes
     {
+        public const string PathName = "path";
+
         public static readonly Type None = typeof(NoopGraphType);
 
         public static readonly Type NonNullTagsType = typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>);
@@ -31,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Boolean = new BooleanGraphType();
 
+        public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
+
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
         public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
@@ -43,6 +48,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
 
+        public static readonly IGraphType NonNullAssetType = new NonNullGraphType(AssetType);
+
         public static readonly IGraphType NoopDate = new NoopGraphType(Date);
 
         public static readonly IGraphType NoopJson = new NoopGraphType(Json);
@@ -53,8 +60,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NoopBoolean = new NoopGraphType(Boolean);
 
-        public static readonly IGraphType NoopTags = new NoopGraphType("Tags");
+        public static readonly IGraphType NoopTags = new NoopGraphType("TagsScalar");
 
-        public static readonly IGraphType NoopGeolocation = new NoopGraphType("Geolocation");
+        public static readonly IGraphType NoopGeolocation = new NoopGraphType("GeolocationScalar");
+
+        public static readonly QueryArguments PathArguments = new QueryArguments(new QueryArgument(None)
+        {
+            Name = PathName,
+            Description = $"The path to the json value",
+            DefaultValue = null,
+            ResolvedType = String
+        });
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -18,13 +19,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public class AssetEnricherTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IAssetMetadataSource assetMetadataSource1 = A.Fake<IAssetMetadataSource>();
+        private readonly IAssetMetadataSource assetMetadataSource2 = A.Fake<IAssetMetadataSource>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly AssetEnricher sut;
 
         public AssetEnricherTests()
         {
-            sut = new AssetEnricher(tagService);
+            var assetMetadataSources = new[]
+            {
+                assetMetadataSource1,
+                assetMetadataSource2
+            };
+
+            sut = new AssetEnricher(tagService, assetMetadataSources);
         }
 
         [Fact]
@@ -50,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2")))
+            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Has("id1", "id2")))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id1"] = "name1",
@@ -81,6 +90,31 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
+        public async Task Should_enrich_asset_with_metadata()
+        {
+            var source = new AssetEntity
+            {
+                FileSize = 2 * 1024,
+                Tags = new HashSet<string>
+                {
+                    "id1",
+                    "id2"
+                },
+                AppId = appId
+            };
+
+            A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>.Ignored))
+                .Returns(new[] { "metadata1" });
+
+            A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>.Ignored))
+                .Returns(new[] { "metadata2", "metadata3" });
+
+            var result = await sut.EnrichAsync(source, requestContext);
+
+            Assert.Equal("metadata1, metadata2, metadata3, 2 kB", result.MetadataText);
+        }
+
+        [Fact]
         public async Task Should_enrich_multiple_assets_with_tag_names()
         {
             var source1 = new AssetEntity
@@ -103,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2", "id3")))
+            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Has("id1", "id2", "id3")))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id1"] = "name1",

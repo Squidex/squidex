@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using DeepEqual.Syntax;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -36,6 +37,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         protected virtual IEnumerable<ValidationError> CustomValidate()
         {
             yield break;
+        }
+
+        public bool DeepEquals(RuleAction action)
+        {
+            return this.WithDeepEqual(action).IgnoreProperty<Freezable>(x => x.IsFrozen).Compare();
         }
     }
 }

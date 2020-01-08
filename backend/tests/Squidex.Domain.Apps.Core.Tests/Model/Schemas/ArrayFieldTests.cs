@@ -55,7 +55,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var parent_3 = parent_2.UpdateField(1, f => f.Hide());
 
             Assert.False(parent_1.FieldsById[1].IsHidden);
+            Assert.True(parent_2.FieldsById[1].IsHidden);
             Assert.True(parent_3.FieldsById[1].IsHidden);
+            Assert.Same(parent_2, parent_3);
         }
 
         [Fact]
@@ -76,7 +78,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var parent_4 = parent_3.UpdateField(1, f => f.Show());
 
             Assert.True(parent_2.FieldsById[1].IsHidden);
+            Assert.False(parent_3.FieldsById[1].IsHidden);
             Assert.False(parent_4.FieldsById[1].IsHidden);
+            Assert.Same(parent_3, parent_4);
         }
 
         [Fact]
@@ -96,7 +100,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var parent_3 = parent_2.UpdateField(1, f => f.Disable());
 
             Assert.False(parent_1.FieldsById[1].IsDisabled);
+            Assert.True(parent_2.FieldsById[1].IsDisabled);
             Assert.True(parent_3.FieldsById[1].IsDisabled);
+            Assert.Same(parent_2, parent_3);
         }
 
         [Fact]
@@ -117,7 +123,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var parent_4 = parent_3.UpdateField(1, f => f.Enable());
 
             Assert.True(parent_2.FieldsById[1].IsDisabled);
+            Assert.False(parent_3.FieldsById[1].IsDisabled);
             Assert.False(parent_4.FieldsById[1].IsDisabled);
+            Assert.Same(parent_3, parent_4);
         }
 
         [Fact]
@@ -131,13 +139,23 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_update_field()
         {
-            var properties = new NumberFieldProperties();
+            var properties1 = new NumberFieldProperties
+            {
+                MinValue = 10
+            };
+            var properties2 = new NumberFieldProperties
+            {
+                MinValue = 10
+            };
 
             var parent_1 = parent_0.AddField(CreateField(1));
-            var parent_2 = parent_1.UpdateField(1, f => f.Update(properties));
+            var parent_2 = parent_1.UpdateField(1, f => f.Update(properties1));
+            var parent_3 = parent_2.UpdateField(1, f => f.Update(properties2));
 
-            Assert.NotSame(properties, parent_1.FieldsById[1].RawProperties);
-            Assert.Same(properties, parent_2.FieldsById[1].RawProperties);
+            Assert.NotSame(properties1, parent_1.FieldsById[1].RawProperties);
+            Assert.Same(properties1, parent_2.FieldsById[1].RawProperties);
+            Assert.Same(properties1, parent_3.FieldsById[1].RawProperties);
+            Assert.Same(parent_2, parent_3);
         }
 
         [Fact]
@@ -161,8 +179,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var parent_1 = parent_0.AddField(CreateField(1));
             var parent_2 = parent_1.DeleteField(1);
+            var parent_3 = parent_2.DeleteField(1);
 
             Assert.Empty(parent_2.FieldsById);
+            Assert.Empty(parent_3.FieldsById);
+            Assert.Same(parent_2, parent_3);
         }
 
         [Fact]
@@ -184,8 +205,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var parent_2 = parent_1.AddField(field2);
             var parent_3 = parent_2.AddField(field3);
             var parent_4 = parent_3.ReorderFields(new List<long> { 3, 2, 1 });
+            var parent_5 = parent_4.ReorderFields(new List<long> { 3, 2, 1 });
 
             Assert.Equal(new List<NestedField> { field3, field2, field1 }, parent_4.Fields.ToList());
+            Assert.Equal(new List<NestedField> { field3, field2, field1 }, parent_5.Fields.ToList());
+            Assert.Same(parent_4, parent_5);
         }
 
         [Fact]

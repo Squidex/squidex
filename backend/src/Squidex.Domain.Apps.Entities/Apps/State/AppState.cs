@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         [DataMember]
         public bool IsArchived { get; set; }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -64,174 +65,91 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     {
                         SimpleMapper.Map(e, this);
 
-                        break;
+                        return true;
                     }
 
-                case AppUpdated e:
+                case AppUpdated e when !string.Equals(e.Label, Label) || !string.Equals(e.Description, Description):
                     {
                         SimpleMapper.Map(e, this);
 
-                        break;
+                        return true;
                     }
 
                 case AppImageUploaded e:
-                    {
-                        Image = e.Image;
+                    return UpdateImage(e, ev => ev.Image);
 
-                        break;
-                    }
+                case AppImageRemoved e when Image != null:
+                    return UpdateImage(e, ev => null);
 
-                case AppImageRemoved _:
-                    {
-                        Image = null;
+                case AppPlanChanged e when !string.Equals(Plan?.PlanId, e.PlanId):
+                    return UpdatePlan(e, ev => AppPlan.Build(ev.Actor, ev.PlanId));
 
-                        break;
-                    }
-
-                case AppPlanChanged e:
-                    {
-                        Plan = AppPlan.Build(e.Actor, e.PlanId);
-
-                        break;
-                    }
-
-                case AppPlanReset _:
-                    {
-                        Plan = null;
-
-                        break;
-                    }
+                case AppPlanReset e when Plan != null:
+                    return UpdatePlan(e, ev => null);
 
                 case AppContributorAssigned e:
-                    {
-                        Contributors = Contributors.Assign(e.ContributorId, e.Role);
-
-                        break;
-                    }
+                    return UpdateContributors(e, (ev, c) => c.Assign(ev.ContributorId, ev.Role));
 
                 case AppContributorRemoved e:
-                    {
-                        Contributors = Contributors.Remove(e.ContributorId);
-
-                        break;
-                    }
+                    return UpdateContributors(e, (ev, c) => c.Remove(ev.ContributorId));
 
                 case AppClientAttached e:
-                    {
-                        Clients = Clients.Add(e.Id, e.Secret);
-
-                        break;
-                    }
+                    return UpdateClients(e, (ev, c) => c.Add(ev.Id, ev.Secret));
 
                 case AppClientUpdated e:
-                    {
-                        Clients = Clients.Update(e.Id, e.Role);
-
-                        break;
-                    }
+                    return UpdateClients(e, (ev, c) => c.Update(ev.Id, ev.Role));
 
                 case AppClientRenamed e:
-                    {
-                        Clients = Clients.Rename(e.Id, e.Name);
-
-                        break;
-                    }
+                    return UpdateClients(e, (ev, c) => c.Rename(ev.Id, ev.Name));
 
                 case AppClientRevoked e:
-                    {
-                        Clients = Clients.Revoke(e.Id);
-
-                        break;
-                    }
+                    return UpdateClients(e, (ev, c) => c.Revoke(ev.Id));
 
                 case AppWorkflowAdded e:
-                    {
-                        Workflows = Workflows.Add(e.WorkflowId, e.Name);
-
-                        break;
-                    }
+                    return UpdateWorkflows(e, (ev, w) => w.Add(ev.WorkflowId, ev.Name));
 
                 case AppWorkflowUpdated e:
-                    {
-                        Workflows = Workflows.Update(e.WorkflowId, e.Workflow);
-
-                        break;
-                    }
+                    return UpdateWorkflows(e, (ev, w) => w.Update(ev.WorkflowId, ev.Workflow));
 
                 case AppWorkflowDeleted e:
-                    {
-                        Workflows = Workflows.Remove(e.WorkflowId);
-
-                        break;
-                    }
+                    return UpdateWorkflows(e, (ev, w) => w.Remove(ev.WorkflowId));
 
                 case AppPatternAdded e:
-                    {
-                        Patterns = Patterns.Add(e.PatternId, e.Name, e.Pattern, e.Message);
-
-                        break;
-                    }
+                    return UpdatePatterns(e, (ev, p) => p.Add(ev.PatternId, ev.Name, ev.Pattern, ev.Message));
 
                 case AppPatternDeleted e:
-                    {
-                        Patterns = Patterns.Remove(e.PatternId);
-
-                        break;
-                    }
+                    return UpdatePatterns(e, (ev, p) => p.Remove(ev.PatternId));
 
                 case AppPatternUpdated e:
-                    {
-                        Patterns = Patterns.Update(e.PatternId, e.Name, e.Pattern, e.Message);
-
-                        break;
-                    }
+                    return UpdatePatterns(e, (ev, p) => p.Update(ev.PatternId, ev.Name, ev.Pattern, ev.Message));
 
                 case AppRoleAdded e:
-                    {
-                        Roles = Roles.Add(e.Name);
-
-                        break;
-                    }
-
-                case AppRoleDeleted e:
-                    {
-                        Roles = Roles.Remove(e.Name);
-
-                        break;
-                    }
+                    return UpdateRoles(e, (ev, r) => r.Add(ev.Name));
 
                 case AppRoleUpdated e:
-                    {
-                        Roles = Roles.Update(e.Name, e.Permissions);
+                    return UpdateRoles(e, (ev, r) => r.Update(ev.Name, ev.Permissions));
 
-                        break;
-                    }
+                case AppRoleDeleted e:
+                    return UpdateRoles(e, (ev, r) => r.Remove(ev.Name));
 
                 case AppLanguageAdded e:
-                    {
-                        LanguagesConfig = LanguagesConfig.Set(e.Language);
-
-                        break;
-                    }
+                    return UpdateLanguages(e, (ev, l) => l.Set(ev.Language));
 
                 case AppLanguageRemoved e:
-                    {
-                        LanguagesConfig = LanguagesConfig.Remove(e.Language);
-
-                        break;
-                    }
+                    return UpdateLanguages(e, (ev, l) => l.Remove(ev.Language));
 
                 case AppLanguageUpdated e:
+                    return UpdateLanguages(e, (ev, l) =>
                     {
-                        LanguagesConfig = LanguagesConfig.Set(e.Language, e.IsOptional, e.Fallback);
+                        l = l.Set(ev.Language, ev.IsOptional, ev.Fallback);
 
-                        if (e.IsMaster)
+                        if (ev.IsMaster)
                         {
-                            LanguagesConfig = LanguagesConfig.MakeMaster(e.Language);
+                            LanguagesConfig = LanguagesConfig.MakeMaster(ev.Language);
                         }
 
-                        break;
-                    }
+                        return l;
+                    });
 
                 case AppArchived _:
                     {
@@ -239,14 +157,79 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
                         IsArchived = true;
 
-                        break;
+                        return true;
                     }
             }
+
+            return false;
         }
 
-        public override AppState Apply(Envelope<IEvent> @event)
+        private bool UpdateContributors<T>(T @event, Func<T, AppContributors, AppContributors> update)
         {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            var previous = Contributors;
+
+            Contributors = update(@event, previous);
+
+            return !ReferenceEquals(previous, Contributors);
+        }
+
+        private bool UpdateClients<T>(T @event, Func<T, AppClients, AppClients> update)
+        {
+            var previous = Clients;
+
+            Clients = update(@event, previous);
+
+            return !ReferenceEquals(previous, Clients);
+        }
+
+        private bool UpdateLanguages<T>(T @event, Func<T, LanguagesConfig, LanguagesConfig> update)
+        {
+            var previous = LanguagesConfig;
+
+            LanguagesConfig = update(@event, previous);
+
+            return !ReferenceEquals(previous, LanguagesConfig);
+        }
+
+        private bool UpdatePatterns<T>(T @event, Func<T, AppPatterns, AppPatterns> update)
+        {
+            var previous = Patterns;
+
+            Patterns = update(@event, previous);
+
+            return !ReferenceEquals(previous, Patterns);
+        }
+
+        private bool UpdateRoles<T>(T @event, Func<T, Roles, Roles> update)
+        {
+            var previous = Roles;
+
+            Roles = update(@event, previous);
+
+            return !ReferenceEquals(previous, Roles);
+        }
+
+        private bool UpdateWorkflows<T>(T @event, Func<T, Workflows, Workflows> update)
+        {
+            var previous = Workflows;
+
+            Workflows = update(@event, previous);
+
+            return !ReferenceEquals(previous, Workflows);
+        }
+
+        private bool UpdateImage<T>(T @event, Func<T, AppImage?> update)
+        {
+            Image = update(@event);
+
+            return true;
+        }
+
+        private bool UpdatePlan<T>(T @event, Func<T, AppPlan?> update)
+        {
+            Plan = update(@event);
+
+            return true;
         }
     }
 }

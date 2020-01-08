@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
@@ -16,5 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
         public string? Slug { get; set; }
 
         public HashSet<string> Tags { get; set; }
+
+        public AssetMetadata Metadata { get; set; }
     }
 }

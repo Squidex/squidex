@@ -72,12 +72,6 @@ namespace Squidex.Infrastructure.Validation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string New(string type, string property)
-        {
-            return $"{Upper(type)} has already this {Lower(property)}.";
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string DefinedOr(string property1, string property2)
         {
             return $"Either {Lower(property1)} or {Lower(property2)} must be defined.";

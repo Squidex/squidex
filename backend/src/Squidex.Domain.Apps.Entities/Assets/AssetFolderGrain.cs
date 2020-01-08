@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case RenameAssetFolder renameAssetFolder:
                     return UpdateReturn(renameAssetFolder, c =>
                     {
-                        GuardAssetFolder.CanRename(c, Snapshot.FolderName);
+                        GuardAssetFolder.CanRename(c);
 
                         Rename(c);
 

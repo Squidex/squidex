@@ -12,9 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
-using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
@@ -49,10 +47,10 @@ namespace Squidex.Config.Domain
                 .As<IAssetUsageTracker>().As<IEventConsumer>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
-                .As<ITagGenerator<CreateAsset>>();
+                .As<IAssetMetadataSource>();
 
-            services.AddSingletonAs<ImageTagGenerator>()
-                .As<ITagGenerator<CreateAsset>>();
+            services.AddSingletonAs<FileTagAssetMetadataSource>()
+                .As<IAssetMetadataSource>();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)

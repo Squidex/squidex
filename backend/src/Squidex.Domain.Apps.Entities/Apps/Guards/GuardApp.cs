@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -72,11 +71,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
                 {
                     e("Plan can only changed from the user who configured the plan initially.");
-                }
-
-                if (string.Equals(command.PlanId, plan?.PlanId, StringComparison.OrdinalIgnoreCase))
-                {
-                    e("App has already this plan.");
                 }
             });
         }

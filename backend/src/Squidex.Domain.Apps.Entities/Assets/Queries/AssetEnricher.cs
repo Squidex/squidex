@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
@@ -18,12 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public sealed class AssetEnricher : IAssetEnricher
     {
         private readonly ITagService tagService;
+        private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
 
-        public AssetEnricher(ITagService tagService)
+        public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources)
         {
             Guard.NotNull(tagService);
+            Guard.NotNull(assetMetadataSources);
 
             this.tagService = tagService;
+            this.assetMetadataSources = assetMetadataSources;
         }
 
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context)
@@ -48,9 +52,46 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 if (ShouldEnrich(context))
                 {
                     await EnrichTagsAsync(results);
+
+                    EnrichWithMetadataText(results);
                 }
 
                 return results;
+            }
+        }
+
+        private void EnrichWithMetadataText(List<AssetEntity> results)
+        {
+            var sb = new StringBuilder();
+
+            void Append(string? text)
+            {
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    if (sb.Length > 0)
+                    {
+                        sb.Append(", ");
+                    }
+
+                    sb.Append(text);
+                }
+            }
+
+            foreach (var asset in results)
+            {
+                sb.Clear();
+
+                foreach (var source in assetMetadataSources)
+                {
+                    foreach (var metadata in source.Format(asset))
+                    {
+                        Append(metadata);
+                    }
+                }
+
+                Append(asset.FileSize.ToReadableSize());
+
+                asset.MetadataText = sb.ToString();
             }
         }
 

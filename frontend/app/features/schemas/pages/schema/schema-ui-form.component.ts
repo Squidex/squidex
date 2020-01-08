@@ -7,11 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 
-import {
-    DialogService,
-    SchemaDetailsDto,
-    SchemasState
-} from '@app/shared';
+import { SchemaDetailsDto, SchemasState } from '@app/shared';
 
 type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };
 
@@ -35,7 +31,6 @@ export class SchemaUIFormComponent implements OnChanges {
     };
 
     constructor(
-        private readonly dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
     }
@@ -66,9 +61,6 @@ export class SchemaUIFormComponent implements OnChanges {
             return;
         }
 
-        this.schemasState.configureUIFields(this.schema, this.state)
-            .subscribe(() => {
-                this.dialogs.notifyInfo('UI fields updated successfully.');
-            });
+        this.schemasState.configureUIFields(this.schema, this.state);
     }
 }

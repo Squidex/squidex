@@ -37,6 +37,11 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllRuntimeProperties());
         }
 
+        public static void ShouldBeEquivalent2<T>(this T lhs, T rhs)
+        {
+            lhs.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());
+        }
+
         public static void ShouldBeEquivalent<T>(this J<T> lhs, T rhs)
         {
             lhs.Value.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());

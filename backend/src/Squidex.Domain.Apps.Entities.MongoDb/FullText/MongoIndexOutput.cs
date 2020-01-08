@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
                         try
                         {
-                            indexDirectory.Bucket.UploadFromStream(fullName, indexFileName, fs, options);
+                         indexDirectory.Bucket.UploadFromStream(fullName, indexFileName, fs, options);
                         }
                         catch (MongoBulkWriteException ex) when (ex.WriteErrors.Any(x => x.Code == 11000))
                         {

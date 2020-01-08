@@ -8,22 +8,20 @@
 using System;
 using System.Runtime.Serialization;
 using NodaTime;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class DomainObjectState<T> : Cloneable<T>,
+    public abstract class DomainObjectState<T> :
         IDomainState<T>,
         IEntity,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
-        IEntityWithVersion,
-        IUpdateableEntity,
-        IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy
-        where T : Cloneable
+        IEntityWithVersion
+        where T : class
     {
         [DataMember]
         public Guid Id { get; set; }
@@ -43,11 +41,38 @@ namespace Squidex.Domain.Apps.Entities
         [DataMember]
         public long Version { get; set; } = EtagVersion.Empty;
 
-        public abstract T Apply(Envelope<IEvent> @event);
+        public abstract bool ApplyEvent(IEvent @event);
 
-        public T Clone()
+        public T Apply(Envelope<IEvent> @event)
         {
-            return Clone(x => { });
+            var payload = (SquidexEvent)@event.Payload;
+
+            var clone = (DomainObjectState<T>)MemberwiseClone();
+
+            if (!clone.ApplyEvent(@event.Payload))
+            {
+                return (this as T)!;
+            }
+
+            var headers = @event.Headers;
+
+            if (clone.Id == default)
+            {
+                clone.Id = headers.AggregateId();
+            }
+
+            if (clone.CreatedBy == null)
+            {
+                clone.Created = headers.Timestamp();
+                clone.CreatedBy = payload.Actor;
+            }
+
+            clone.LastModified = headers.Timestamp();
+            clone.LastModifiedBy = payload.Actor;
+
+            clone.Version = headers.EventStreamNumber();
+
+            return (clone as T)!;
         }
     }
 }

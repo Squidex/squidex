@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
@@ -27,14 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public sealed class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
     {
-        private readonly IJsonSerializer serializer;
-
-        public SchemaGrain(IStore<Guid> store, ISemanticLog log, IJsonSerializer serializer)
+        public SchemaGrain(IStore<Guid> store, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(serializer);
-
-            this.serializer = serializer;
         }
 
         protected override Task<object?> ExecuteAsync(IAggregateCommand command)
@@ -46,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case AddField addField:
                     return UpdateReturn(addField, c =>
                     {
-                        GuardSchemaField.CanAdd(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanAdd(c, Snapshot.SchemaDef);
 
                         Add(c);
 
@@ -87,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case DeleteField deleteField:
                     return UpdateReturn(deleteField, c =>
                     {
-                        GuardSchemaField.CanDelete(Snapshot.SchemaDef, deleteField);
+                        GuardSchemaField.CanDelete(deleteField, Snapshot.SchemaDef);
 
                         DeleteField(c);
 
@@ -97,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case LockField lockField:
                     return UpdateReturn(lockField, c =>
                     {
-                        GuardSchemaField.CanLock(Snapshot.SchemaDef, lockField);
+                        GuardSchemaField.CanLock(lockField, Snapshot.SchemaDef);
 
                         LockField(c);
 
@@ -107,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case HideField hideField:
                     return UpdateReturn(hideField, c =>
                     {
-                        GuardSchemaField.CanHide(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanHide(c, Snapshot.SchemaDef);
 
                         HideField(c);
 
@@ -117,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ShowField showField:
                     return UpdateReturn(showField, c =>
                     {
-                        GuardSchemaField.CanShow(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanShow(c, Snapshot.SchemaDef);
 
                         ShowField(c);
 
@@ -127,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case DisableField disableField:
                     return UpdateReturn(disableField, c =>
                     {
-                        GuardSchemaField.CanDisable(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanDisable(c, Snapshot.SchemaDef);
 
                         DisableField(c);
 
@@ -137,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case EnableField enableField:
                     return UpdateReturn(enableField, c =>
                     {
-                        GuardSchemaField.CanEnable(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanEnable(c, Snapshot.SchemaDef);
 
                         EnableField(c);
 
@@ -147,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case UpdateField updateField:
                     return UpdateReturn(updateField, c =>
                     {
-                        GuardSchemaField.CanUpdate(Snapshot.SchemaDef, c);
+                        GuardSchemaField.CanUpdate(c, Snapshot.SchemaDef);
 
                         UpdateField(c);
 
@@ -157,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ReorderFields reorderFields:
                     return UpdateReturn(reorderFields, c =>
                     {
-                        GuardSchema.CanReorder(Snapshot.SchemaDef, c);
+                        GuardSchema.CanReorder(c, Snapshot.SchemaDef);
 
                         Reorder(c);
 
@@ -167,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case UpdateSchema updateSchema:
                     return UpdateReturn(updateSchema, c =>
                     {
-                        GuardSchema.CanUpdate(Snapshot.SchemaDef, c);
+                        GuardSchema.CanUpdate(c);
 
                         Update(c);
 
@@ -177,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case PublishSchema publishSchema:
                     return UpdateReturn(publishSchema, c =>
                     {
-                        GuardSchema.CanPublish(Snapshot.SchemaDef, c);
+                        GuardSchema.CanPublish(c);
 
                         Publish(c);
 
@@ -187,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case UnpublishSchema unpublishSchema:
                     return UpdateReturn(unpublishSchema, c =>
                     {
-                        GuardSchema.CanUnpublish(Snapshot.SchemaDef, c);
+                        GuardSchema.CanUnpublish(c);
 
                         Unpublish(c);
 
@@ -197,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ConfigureScripts configureScripts:
                     return UpdateReturn(configureScripts, c =>
                     {
-                        GuardSchema.CanConfigureScripts(Snapshot.SchemaDef, c);
+                        GuardSchema.CanConfigureScripts(c);
 
                         ConfigureScripts(c);
 
@@ -207,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ChangeCategory changeCategory:
                     return UpdateReturn(changeCategory, c =>
                     {
-                        GuardSchema.CanChangeCategory(Snapshot.SchemaDef, c);
+                        GuardSchema.CanChangeCategory(c);
 
                         ChangeCategory(c);
 
@@ -227,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case ConfigureUIFields configureUIFields:
                     return UpdateReturn(configureUIFields, c =>
                     {
-                        GuardSchema.CanConfigureUIFields(Snapshot.SchemaDef, c);
+                        GuardSchema.CanConfigureUIFields(c, Snapshot.SchemaDef);
 
                         ConfigureUIFields(c);
 
@@ -237,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
-                        GuardSchema.CanDelete(Snapshot.SchemaDef, c);
+                        GuardSchema.CanDelete(c);
 
                         Delete(c);
                     });
@@ -258,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var schemaSource = Snapshot.SchemaDef;
             var schemaTarget = command.ToSchema(schemaSource.Name, schemaSource.IsSingleton);
 
-            var events = schemaSource.Synchronize(schemaTarget, serializer, () => Snapshot.SchemaFieldsTotal + 1, options);
+            var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.SchemaFieldsTotal + 1, options);
 
             foreach (var @event in events)
             {

@@ -94,15 +94,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_when_folder_has_not_changed()
-        {
-            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
-
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), command.ParentId),
-                new ValidationError("Asset folder is already part of this folder.", "ParentId"));
-        }
-
-        [Fact]
         public async Task CanMove_should_not_throw_exception_when_folder_found()
         {
             var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
@@ -111,6 +102,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 .Returns(new List<IAssetFolderEntity> { CreateFolder() });
 
             await GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), Guid.NewGuid());
+        }
+
+        [Fact]
+        public async Task CanMove_should_not_throw_exception_when_folder_has_not_changed()
+        {
+            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
+
+            await GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), command.ParentId);
         }
 
         [Fact]
@@ -126,17 +125,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new RenameAssetFolder();
 
-            ValidationAssert.Throws(() => GuardAssetFolder.CanRename(command, "My Folder"),
+            ValidationAssert.Throws(() => GuardAssetFolder.CanRename(command),
                 new ValidationError("Folder name is required.", "FolderName"));
-        }
-
-        [Fact]
-        public void CanRename_should_throw_exception_if_names_are_the_same()
-        {
-            var command = new RenameAssetFolder { FolderName = "My Folder" };
-
-            ValidationAssert.Throws(() => GuardAssetFolder.CanRename(command, "My Folder"),
-                new ValidationError("Asset folder has already this name.", "FolderName"));
         }
 
         [Fact]
@@ -144,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new RenameAssetFolder { FolderName = "New Folder Name" };
 
-            GuardAssetFolder.CanRename(command, "My Folder");
+            GuardAssetFolder.CanRename(command);
         }
 
         [Fact]
