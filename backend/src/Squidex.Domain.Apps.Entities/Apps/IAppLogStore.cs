@@ -7,12 +7,16 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppLogStore
     {
-        Task ReadLogAsync(string appId, DateTime from, DateTime to, Stream stream);
+        Task LogAsync(Guid appId, Instant timestamp, string? requestMethod, string? requestPath, string? userId, string? clientId, long elapsedMs, double costs);
+
+        Task ReadLogAsync(Guid appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default);
     }
 }
