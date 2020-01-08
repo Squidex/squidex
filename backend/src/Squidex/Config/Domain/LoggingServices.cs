@@ -36,6 +36,9 @@ namespace Squidex.Config.Domain
             services.Configure<RequestLogOptions>(
                 config.GetSection("logging"));
 
+            services.Configure<RequestLogStoreOptions>(
+                config.GetSection("logging"));
+
             services.Configure<SemanticLogOptions>(
                 config.GetSection("logging"));
 

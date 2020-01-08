@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.Log.Store;
@@ -20,10 +21,14 @@ namespace Squidex.Infrastructure.Log
     public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest>, IRequestLogRepository
     {
         private static readonly InsertManyOptions Unordered = new InsertManyOptions { IsOrdered = false };
+        private readonly RequestLogStoreOptions options;
 
-        public MongoRequestLogRepository(IMongoDatabase database)
+        public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
             : base(database)
         {
+            Guard.NotNull(options);
+
+            this.options = options.Value;
         }
 
         protected override string CollectionName()
@@ -44,7 +49,7 @@ namespace Squidex.Infrastructure.Log
                         .Ascending(x => x.Timestamp),
                     new CreateIndexOptions
                     {
-                        ExpireAfter = TimeSpan.FromDays(90)
+                        ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
                     }),
             }, ct);
         }
