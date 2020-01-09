@@ -20,6 +20,21 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
     {
         private readonly Schema schema_0 = new Schema("my-schema");
 
+        public static IEnumerable<object[]> FieldProperyTypes()
+        {
+            return typeof(Schema).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties)).Select(x => new object[] { x });
+        }
+
+        [Theory]
+        [MemberData(nameof(FieldProperyTypes))]
+        public void Should_make_deep_equal_test(Type type)
+        {
+            var lhs = (FieldProperties)Activator.CreateInstance(type)!;
+            var rhs = (FieldProperties)Activator.CreateInstance(type)!;
+
+            Assert.True(lhs.DeepEquals(rhs));
+        }
+
         [Fact]
         public void Should_instantiate_schema()
         {

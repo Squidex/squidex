@@ -63,8 +63,8 @@ export class PatternComponent implements OnChanges {
         if (value) {
             if (this.pattern) {
                 this.patternsState.update(this.pattern, value)
-                    .subscribe(newPattern => {
-                        this.editForm.submitCompleted(newPattern);
+                    .subscribe(() => {
+                        this.editForm.submitCompleted({ noReset: true });
                     }, error => {
                         this.editForm.submitFailed(error);
                     });

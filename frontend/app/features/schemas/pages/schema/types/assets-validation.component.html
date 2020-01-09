@@ -38,12 +38,15 @@
             <label class="col-form-label">bytes</label>
         </div>
     </div>
-    
-    <div class="form-group2 row">
-        <label class="col-3 col-form-checkbox-label" for="{{field.fieldId}}_fieldMustBeImage">Must be Image</label>
 
-        <div class="col-6">
-            <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldMustBeImage" formControlName="mustBeImage" />
+    <div class="form-group row">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldMustBeImage" formControlName="mustBeImage" />
+                <label class="form-check-label" for="{{field.fieldId}}_fieldMustBeImage">
+                    Must be Image
+                </label>
+            </div>
         </div>
     </div>
     

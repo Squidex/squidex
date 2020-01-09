@@ -118,7 +118,7 @@ export class FieldComponent implements OnChanges {
 
             this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {
-                    this.editForm.submitCompleted();
+                    this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

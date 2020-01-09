@@ -78,7 +78,7 @@ export class LanguageComponent implements OnChanges {
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {
-                    this.editForm.submitCompleted();
+                    this.editForm.submitCompleted({ noReset: true });
 
                     this.toggleEditing();
                 }, error => {
