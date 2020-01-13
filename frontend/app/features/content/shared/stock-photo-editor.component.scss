@@ -1,0 +1,106 @@
+@import '_vars';
+@import '_mixins';
+
+$color-user-background: rgba(0, 0, 0, .5);
+$color-background: #000;
+
+$height: 300px;
+
+.col-image {
+    @include force-width(400px);
+
+    &.expand {
+        @include force-width(100%);
+    }
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.value {
+    & {
+        padding-right: 2.5rem;
+    }
+
+    &-clear {
+        @include absolute(0, 0, auto, auto);
+    }
+}
+
+.preview {
+    & {
+        @include force-height($height);
+        align-items: center;
+        background: $color-background;
+        border: 0;
+        border-radius: .25rem;
+        color: $color-dark-foreground;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        margin-top: .5rem;
+    }
+
+    &-empty {
+        padding: 1rem;
+    }
+
+    img {
+        max-height: $height;
+    }
+}
+
+sqx-list-view {
+    border: 1px solid $color-input;
+    border-radius: .25rem;
+    height: $height;
+    margin-top: .5rem;
+}
+
+.icon {
+    @include absolute($height * .5, auto, auto, 5px);
+    color: $color-border;
+    font-size: 30px;
+    font-weight: lighter;
+}
+
+.photos {
+    column-gap: 0;
+    column-width: 200px;
+    margin-left: -1rem;
+    margin-right: -1rem;
+}
+
+.photo {
+    & {
+        border: 2px solid $color-border;
+        border-radius: 0;
+        display: inline-block;
+        margin-bottom: .5rem;
+        margin-right: .5rem;
+        position: relative;
+    }
+
+    &:hover {
+        border-color: $color-theme-blue;
+    }
+
+    &.selected {
+        border-color: $color-theme-blue;
+    }
+
+    &-user {
+        @include absolute(auto, 0, 0, 0);
+        background: $color-user-background;
+        border: 0;
+        padding: .5rem .75rem;
+    }
+
+    &-user-link {
+        @include truncate;
+        color: $color-dark-foreground;
+        font-size: 90%;
+        font-weight: normal;
+    }
+}

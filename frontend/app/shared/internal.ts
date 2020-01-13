@@ -28,6 +28,7 @@ export * from './services/roles.service';
 export * from './services/rules.service';
 export * from './services/schemas.service';
 export * from './services/schemas.types';
+export * from './services/stock-photo.service';
 export * from './services/translations.service';
 export * from './services/ui.service';
 export * from './services/usages.service';
