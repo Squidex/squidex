@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.UsageTracking;
@@ -26,9 +27,11 @@ namespace Squidex.Web.Pipeline
     {
         private readonly IActionContextAccessor actionContextAccessor = A.Fake<IActionContextAccessor>();
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
-        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
-        private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
+        private readonly IAppLogStore appLogStore = A.Fake<IAppLogStore>();
+        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
+        private readonly IClock clock = A.Fake<IClock>();
+        private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly ActionExecutingContext actionContext;
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ActionExecutionDelegate next;
@@ -67,7 +70,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult<ActionExecutedContext?>(null);
             };
 
-            sut = new ApiCostsFilter(appPlansProvider, usageTracker);
+            sut = new ApiCostsFilter(appLogStore, appPlansProvider, clock, usageTracker);
         }
 
         [Fact]
@@ -157,6 +160,27 @@ namespace Squidex.Web.Pipeline
 
             A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_log_request_event_if_weight_is_zero()
+        {
+            sut.FilterDefinition = new ApiCostsAttribute(0);
+
+            SetupApp();
+
+            httpContext.Request.Method = "GET";
+            httpContext.Request.Path = "/my-path";
+
+            var instant = SystemClock.Instance.GetCurrentInstant();
+
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(instant);
+
+            await sut.OnActionExecutionAsync(actionContext, next);
+
+            A.CallTo(() => appLogStore.LogAsync(appEntity.Id, instant, "GET", "/my-path", null, null, A<long>.Ignored, 0))
+                .MustHaveHappened();
         }
 
         private void SetupApp()

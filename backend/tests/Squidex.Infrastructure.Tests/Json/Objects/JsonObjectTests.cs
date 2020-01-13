@@ -152,7 +152,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_boolean_from_object()
+        public void Should_create_boolean_from_object()
         {
             Assert.Equal(JsonValue.True, JsonValue.Create((object)true));
         }
@@ -352,6 +352,124 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_throw_exception_when_creation_value_from_invalid_type()
         {
             Assert.Throws<ArgumentException>(() => JsonValue.Create(Guid.Empty));
+        }
+
+        [Fact]
+        public void Should_return_null_when_getting_value_by_path_segment_from_null()
+        {
+            var json = JsonValue.Null;
+
+            var found = json.TryGet("path", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_getting_value_by_path_segment_from_string()
+        {
+            var json = JsonValue.Create("string");
+
+            var found = json.TryGet("path", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_getting_value_by_path_segment_from_boolean()
+        {
+            var json = JsonValue.True;
+
+            var found = json.TryGet("path", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_getting_value_by_path_segment_from_number()
+        {
+            var json = JsonValue.Create(12);
+
+            var found = json.TryGet("path", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_same_object_when_path_is_null()
+        {
+            var json = JsonValue.Object().Add("property", 12);
+
+            var found = json.TryGetByPath((string?)null, out var result);
+
+            Assert.False(found);
+            Assert.Same(json, result);
+        }
+
+        [Fact]
+        public void Should_return_same_object_when_path_is_empty()
+        {
+            var json = JsonValue.Object().Add("property", 12);
+
+            var found = json.TryGetByPath(string.Empty, out var result);
+
+            Assert.False(found);
+            Assert.Same(json, result);
+        }
+
+        [Fact]
+        public void Should_return_from_nested_array()
+        {
+            var json =
+                JsonValue.Object()
+                    .Add("property",
+                        JsonValue.Array(
+                            JsonValue.Create(12),
+                            JsonValue.Object()
+                                .Add("nested", 13)));
+
+            var found = json.TryGetByPath("property[1].nested", out var result);
+
+            Assert.True(found);
+            Assert.Equal(JsonValue.Create(13), result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_property_not_found()
+        {
+            var json =
+                JsonValue.Object()
+                    .Add("property", 12);
+
+            var found = json.TryGetByPath("notfound", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_out_of_index1()
+        {
+            var json = JsonValue.Array(12, 14);
+
+            var found = json.TryGetByPath("-1", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Should_return_null_when_out_of_index2()
+        {
+            var json = JsonValue.Array(12, 14);
+
+            var found = json.TryGetByPath("2", out var result);
+
+            Assert.False(found);
+            Assert.Null(result);
         }
     }
 }

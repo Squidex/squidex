@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field)
         {
-            return Builder.StringProperty();
+            return Builder.JsonProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field)

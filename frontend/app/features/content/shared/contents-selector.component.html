@@ -18,7 +18,7 @@
             <ng-container *ngIf="schema">
                 <div class="col-auto">
                     <button type="button" class="btn btn-text-secondary" (click)="reload()">
-                        <i class="icon-reset"></i> Refresh
+                        <i class="icon-reset"></i>
                     </button>
                 </div>
                 <div class="col pl-1">
@@ -31,6 +31,12 @@
                     
                 <div class="-auto pl-1" *ngIf="languages.length > 1">
                     <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                </div>
+                    
+                <div class="-auto pl-1">
+                    <a class="btn btn-success" [routerLink]="['../..', schema.name]" target="_blank">
+                        <i class="icon-plus"></i>
+                    </a>
                 </div>
             </ng-container>
         </div>

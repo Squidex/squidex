@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
     public sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference?>
     {
+        private static readonly EdmComplexType JsonType = new EdmComplexType("Squidex", "Json", null, false, true);
         private readonly EdmTypeFactory typeFactory;
 
         internal EdmTypeVisitor(EdmTypeFactory typeFactory)
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IField<JsonFieldProperties> field)
         {
-            return null;
+            return new EdmComplexTypeReference(JsonType, !field.RawProperties.IsRequired);
         }
 
         public IEdmTypeReference? Visit(IField<NumberFieldProperties> field)

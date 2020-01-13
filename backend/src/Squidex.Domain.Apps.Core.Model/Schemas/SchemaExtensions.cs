@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private static bool IsListField(this IField field, Schema schema)
         {
-            return schema.FieldsInLists.Contains(field.Name) || schema.Fields.Count == 1;
+            return schema.FieldsInLists.Contains(field.Name) || schema.Fields.Count == 1 || (schema.FieldsInLists.Count == 0 && field == schema.Fields.FirstOrDefault());
         }
     }
 }

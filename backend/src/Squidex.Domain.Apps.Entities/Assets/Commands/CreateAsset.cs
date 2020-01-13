@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public Guid ParentId { get; set; }
 
-        public HashSet<string> Tags { get; set; }
+        public HashSet<string> Tags { get; } = new HashSet<string>();
 
         public CreateAsset()
         {

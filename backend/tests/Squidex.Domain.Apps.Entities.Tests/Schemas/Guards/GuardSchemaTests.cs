@@ -508,7 +508,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 FieldsInReferences = null
             };
 
-            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is required.",
                     "FieldsInLists[1]"),
                 new ValidationError("Field is required.",
@@ -530,7 +530,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4")
             };
 
-            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is required.",
                     "FieldsInReferences[1]"),
                 new ValidationError("Field is required.",
@@ -552,7 +552,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 FieldsInReferences = new FieldNames("meta.id")
             };
 
-            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is not part of the schema.",
                     "FieldsInReferences[1]"));
         }
@@ -566,43 +566,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 FieldsInReferences = new FieldNames("field2")
             };
 
-            GuardSchema.CanConfigureUIFields(schema_0, command);
+            GuardSchema.CanConfigureUIFields(command, schema_0);
         }
 
         [Fact]
-        public void CanPublish_should_throw_exception_if_already_published()
+        public void CanPublish_should_not_throw_exception()
         {
             var command = new PublishSchema();
 
-            var schema_1 = schema_0.Publish();
-
-            Assert.Throws<DomainException>(() => GuardSchema.CanPublish(schema_1, command));
+            GuardSchema.CanPublish(command);
         }
 
         [Fact]
-        public void CanPublish_should_not_throw_exception_if_not_published()
-        {
-            var command = new PublishSchema();
-
-            GuardSchema.CanPublish(schema_0, command);
-        }
-
-        [Fact]
-        public void CanUnpublish_should_throw_exception_if_already_unpublished()
+        public void CanUnpublish_should_not_throw_exception()
         {
             var command = new UnpublishSchema();
 
-            Assert.Throws<DomainException>(() => GuardSchema.CanUnpublish(schema_0, command));
-        }
-
-        [Fact]
-        public void CanUnpublish_should_not_throw_exception_if_already_published()
-        {
-            var command = new UnpublishSchema();
-
-            var schema_1 = schema_0.Publish();
-
-            GuardSchema.CanUnpublish(schema_1, command);
+            GuardSchema.CanUnpublish(command);
         }
 
         [Fact]
@@ -610,7 +590,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 3 } };
 
-            ValidationAssert.Throws(() => GuardSchema.CanReorder(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
                 new ValidationError("Field ids do not cover all fields.", "FieldIds"));
         }
 
@@ -619,7 +599,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1 } };
 
-            ValidationAssert.Throws(() => GuardSchema.CanReorder(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
                 new ValidationError("Field ids do not cover all fields.", "FieldIds"));
         }
 
@@ -628,7 +608,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = null! };
 
-            ValidationAssert.Throws(() => GuardSchema.CanReorder(schema_0, command),
+            ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
                 new ValidationError("Field ids is required.", "FieldIds"));
         }
 
@@ -637,7 +617,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2 }, ParentFieldId = 99 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(schema_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(command, schema_0));
         }
 
         [Fact]
@@ -645,7 +625,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2, 4 } };
 
-            GuardSchema.CanReorder(schema_0, command);
+            GuardSchema.CanReorder(command, schema_0);
         }
 
         [Fact]
@@ -670,7 +650,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ChangeCategory();
 
-            GuardSchema.CanChangeCategory(schema_0, command);
+            GuardSchema.CanChangeCategory(command);
         }
 
         [Fact]
@@ -678,7 +658,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new DeleteSchema();
 
-            GuardSchema.CanDelete(schema_0, command);
+            GuardSchema.CanDelete(command);
         }
 
         private static StringFieldProperties ValidProperties()

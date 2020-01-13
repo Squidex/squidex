@@ -111,15 +111,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         }
 
         [Fact]
-        public void Should_make_query_with_isImage()
-        {
-            var i = F(ClrFilter.Eq("isImage", true));
-            var o = C("{ 'im' : true }");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
         public void Should_make_query_with_mimeType()
         {
             var i = F(ClrFilter.Eq("mimeType", "text/json"));
@@ -140,8 +131,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_pixelHeight()
         {
-            var i = F(ClrFilter.Eq("pixelHeight", 600));
-            var o = C("{ 'ph' : 600 }");
+            var i = F(ClrFilter.Eq("metadata.pixelHeight", 600));
+            var o = C("{ 'md.pixelHeight' : 600 }");
 
             Assert.Equal(o, i);
         }
@@ -149,8 +140,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_pixelWidth()
         {
-            var i = F(ClrFilter.Eq("pixelWidth", 800));
-            var o = C("{ 'pw' : 800 }");
+            var i = F(ClrFilter.Eq("metadata.pixelWidth", 800));
+            var o = C("{ 'md.pixelWidth' : 800 }");
 
             Assert.Equal(o, i);
         }

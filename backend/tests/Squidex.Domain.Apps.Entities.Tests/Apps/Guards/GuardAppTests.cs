@@ -109,14 +109,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanChangePlan_should_throw_exception_if_plan_is_the_same()
+        public void CanChangePlan_should_not_throw_exception_if_plan_is_the_same()
         {
             var command = new ChangePlan { PlanId = "basic", Actor = new RefToken("user", "me") };
 
             var plan = new AppPlan(command.Actor, "basic");
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
-                new ValidationError("App has already this plan."));
+            GuardApp.CanChangePlan(command, plan, appPlans);
         }
 
         [Fact]

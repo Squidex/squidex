@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
@@ -31,6 +32,22 @@ namespace Squidex.Infrastructure.Queries.Json
 
             switch (GetType(schema))
             {
+                case JsonObjectType.None:
+                    {
+                        if (value is JsonArray jsonArray)
+                        {
+                            var array = ParseArray<ClrValue?>(errors, path, jsonArray, TryParseDynamic);
+
+                            result = array.Select(x => x?.Value).ToList();
+                        }
+                        else if (TryParseDynamic(errors, path, value, out var temp))
+                        {
+                            result = temp;
+                        }
+
+                        break;
+                    }
+
                 case JsonObjectType.Boolean:
                     {
                         if (value is JsonArray jsonArray)
@@ -221,6 +238,52 @@ namespace Squidex.Infrastructure.Queries.Json
             {
                 errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got {value.Type}.");
             }
+
+            return false;
+        }
+
+        private static bool TryParseDynamic(List<string> errors, PropertyPath path, IJsonValue value, out ClrValue? result)
+        {
+            result = null;
+
+            switch (value)
+            {
+                case JsonNull _:
+                    return true;
+                case JsonNumber jsonNumber:
+                    result = jsonNumber.Value;
+                    return true;
+                case JsonBoolean jsonBoolean:
+                    result = jsonBoolean.Value;
+                    return true;
+                case JsonString jsonString:
+                    {
+                        if (Guid.TryParse(jsonString.Value, out var guid))
+                        {
+                            result = guid;
+
+                            return true;
+                        }
+
+                        foreach (var pattern in InstantPatterns)
+                        {
+                            var parsed = pattern.Parse(jsonString.Value);
+
+                            if (parsed.Success)
+                            {
+                                result = parsed.Value;
+
+                                return true;
+                            }
+                        }
+
+                        result = jsonString.Value;
+
+                        return true;
+                    }
+            }
+
+            errors.Add($"Expected primitive for path '{path}', but got {value.Type}.");
 
             return false;
         }

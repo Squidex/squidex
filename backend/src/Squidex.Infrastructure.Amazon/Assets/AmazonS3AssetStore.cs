@@ -19,26 +19,17 @@ namespace Squidex.Infrastructure.Assets
     public sealed class AmazonS3AssetStore : DisposableObjectBase, IAssetStore, IInitializable
     {
         private const int BufferSize = 81920;
-        private readonly string accessKey;
-        private readonly string secretKey;
-        private readonly string bucketName;
-        private readonly string? bucketFolder;
-        private readonly RegionEndpoint bucketRegion;
+        private readonly AmazonS3Options options;
         private TransferUtility transferUtility;
         private IAmazonS3 s3Client;
 
-        public AmazonS3AssetStore(string regionName, string bucketName, string? bucketFolder, string accessKey, string secretKey)
+        public AmazonS3AssetStore(AmazonS3Options options)
         {
-            Guard.NotNullOrEmpty(bucketName);
-            Guard.NotNullOrEmpty(accessKey);
-            Guard.NotNullOrEmpty(secretKey);
+            Guard.NotNullOrEmpty(options.Bucket);
+            Guard.NotNullOrEmpty(options.AccessKey);
+            Guard.NotNullOrEmpty(options.SecretKey);
 
-            this.bucketName = bucketName;
-            this.bucketFolder = bucketFolder;
-            this.accessKey = accessKey;
-            this.secretKey = secretKey;
-
-            bucketRegion = RegionEndpoint.GetBySystemName(regionName);
+            this.options = options;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -55,23 +46,31 @@ namespace Squidex.Infrastructure.Assets
         {
             try
             {
-                s3Client = new AmazonS3Client(
-                    accessKey,
-                    secretKey,
-                    bucketRegion);
+                var amazonS3Config = new AmazonS3Config { ForcePathStyle = options.ForcePathStyle };
+
+                if (!string.IsNullOrWhiteSpace(options.ServiceUrl))
+                {
+                    amazonS3Config.ServiceURL = options.ServiceUrl;
+                }
+                else
+                {
+                    amazonS3Config.RegionEndpoint = RegionEndpoint.GetBySystemName(options.RegionName);
+                }
+
+                s3Client = new AmazonS3Client(options.AccessKey, options.SecretKey, amazonS3Config);
 
                 transferUtility = new TransferUtility(s3Client);
 
-                var exists = await s3Client.DoesS3BucketExistAsync(bucketName);
+                var exists = await s3Client.DoesS3BucketExistAsync(options.Bucket);
 
                 if (!exists)
                 {
-                    throw new ConfigurationException($"Cannot connect to Amazon S3 bucket '${bucketName}'.");
+                    throw new ConfigurationException($"Cannot connect to Amazon S3 bucket '${options.Bucket}'.");
                 }
             }
             catch (AmazonS3Exception ex)
             {
-                throw new ConfigurationException($"Cannot connect to Amazon S3 bucket '${bucketName}'.", ex);
+                throw new ConfigurationException($"Cannot connect to Amazon S3 bucket '${options.Bucket}'.", ex);
             }
         }
 
@@ -91,9 +90,9 @@ namespace Squidex.Infrastructure.Assets
 
                 var request = new CopyObjectRequest
                 {
-                    SourceBucket = bucketName,
+                    SourceBucket = options.Bucket,
                     SourceKey = GetKey(sourceFileName),
-                    DestinationBucket = bucketName,
+                    DestinationBucket = options.Bucket,
                     DestinationKey = GetKey(targetFileName)
                 };
 
@@ -116,7 +115,7 @@ namespace Squidex.Infrastructure.Assets
 
             try
             {
-                var request = new GetObjectRequest { BucketName = bucketName, Key = GetKey(fileName) };
+                var request = new GetObjectRequest { BucketName = options.Bucket, Key = GetKey(fileName) };
 
                 using (var response = await s3Client.GetObjectAsync(request, ct))
                 {
@@ -144,7 +143,7 @@ namespace Squidex.Infrastructure.Assets
                 var request = new TransferUtilityUploadRequest
                 {
                     AutoCloseStream = false,
-                    BucketName = bucketName,
+                    BucketName = options.Bucket,
                     InputStream = stream,
                     Key = GetKey(fileName)
                 };
@@ -163,7 +162,7 @@ namespace Squidex.Infrastructure.Assets
 
             try
             {
-                var request = new DeleteObjectRequest { BucketName = bucketName, Key = fileName };
+                var request = new DeleteObjectRequest { BucketName = options.Bucket, Key = fileName };
 
                 await s3Client.DeleteObjectAsync(request);
             }
@@ -175,9 +174,9 @@ namespace Squidex.Infrastructure.Assets
 
         private string GetKey(string fileName)
         {
-            if (!string.IsNullOrWhiteSpace(bucketFolder))
+            if (!string.IsNullOrWhiteSpace(options.BucketFolder))
             {
-                return $"{bucketFolder}/{fileName}";
+                return $"{options.BucketFolder}/{fileName}";
             }
             else
             {
@@ -189,7 +188,7 @@ namespace Squidex.Infrastructure.Assets
         {
             try
             {
-                await s3Client.GetObjectAsync(bucketName, GetKey(fileName), ct);
+                await s3Client.GetObjectAsync(options.Bucket, GetKey(fileName), ct);
             }
             catch
             {

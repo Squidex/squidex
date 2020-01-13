@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
             {
-                var (resolvedType, valueResolver) = model.GetGraphType(schema, field, fieldName);
+                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, field, fieldName);
 
                 if (valueResolver != null)
                 {
@@ -44,6 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         fieldGraphType.AddField(new FieldType
                         {
                             Name = key.EscapePartition(),
+                            Arguments = args,
                             Resolver = PartitionResolver(valueResolver, key),
                             ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints

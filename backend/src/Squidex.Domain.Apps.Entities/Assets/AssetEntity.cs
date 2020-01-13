@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -42,17 +43,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string Slug { get; set; }
 
+        public string MetadataText { get; set; }
+
         public long FileSize { get; set; }
 
         public long FileVersion { get; set; }
 
-        public bool IsImage { get; set; }
-
         public bool IsDeleted { get; set; }
 
-        public int? PixelWidth { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         public Guid AssetId
         {

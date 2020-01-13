@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -23,33 +22,29 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IContextProvider contextProvider;
-        private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
+        private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
             IAssetEnricher assetEnricher,
-            IAssetQueryService assetQuery,
             IAssetFileStore assetFileStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator,
+            IAssetQueryService assetQuery,
             IContextProvider contextProvider,
-            IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
+            IEnumerable<IAssetMetadataSource> assetMetadataSources)
             : base(grainFactory)
         {
             Guard.NotNull(assetEnricher);
             Guard.NotNull(assetFileStore);
             Guard.NotNull(assetQuery);
-            Guard.NotNull(assetThumbnailGenerator);
+            Guard.NotNull(assetMetadataSources);
             Guard.NotNull(contextProvider);
-            Guard.NotNull(tagGenerators);
 
             this.assetFileStore = assetFileStore;
             this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.contextProvider = contextProvider;
-            this.tagGenerators = tagGenerators;
+            this.assetMetadataSources = assetMetadataSources;
         }
 
         public override async Task HandleAsync(CommandContext context, Func<Task> next)
@@ -60,7 +55,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 case CreateAsset createAsset:
                     {
-                        await EnrichWithImageInfosAsync(createAsset);
                         await EnrichWithHashAndUploadAsync(createAsset, tempFile);
 
                         try
@@ -82,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                 }
                             }
 
-                            GenerateTags(createAsset);
+                            await EnrichWithMetadataAsync(createAsset, createAsset.Tags);
 
                             await HandleCoreAsync(context, next);
 
@@ -102,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 case UpdateAsset updateAsset:
                     {
-                        await EnrichWithImageInfosAsync(updateAsset);
+                        await EnrichWithMetadataAsync(updateAsset);
                         await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
 
                         try
@@ -144,11 +138,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return asset?.FileName == file.FileName && asset.FileSize == file.FileSize;
         }
 
-        private async Task EnrichWithImageInfosAsync(UploadAssetCommand command)
-        {
-            command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
-        }
-
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
         {
             using (var hashStream = new HasherStream(command.File.OpenRead(), HashAlgorithmName.SHA256))
@@ -159,16 +148,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private void GenerateTags(CreateAsset createAsset)
+        private async Task EnrichWithMetadataAsync(UploadAssetCommand command, HashSet<string>? tags = null)
         {
-            if (createAsset.Tags == null)
+            foreach (var metadataSource in assetMetadataSources)
             {
-                createAsset.Tags = new HashSet<string>();
-            }
-
-            foreach (var tagGenerator in tagGenerators)
-            {
-                tagGenerator.GenerateTags(createAsset, createAsset.Tags);
+                await metadataSource.EnhanceAsync(command, tags);
             }
         }
     }

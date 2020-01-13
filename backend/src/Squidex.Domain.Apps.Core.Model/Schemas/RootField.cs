@@ -73,6 +73,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public RootField Lock()
         {
+            if (isLocked)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isLocked = true;
@@ -82,6 +87,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public RootField Hide()
         {
+            if (isHidden)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isHidden = true;
@@ -91,6 +101,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public RootField Show()
         {
+            if (!isHidden)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isHidden = false;
@@ -100,6 +115,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public RootField Disable()
         {
+            if (isDisabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isDisabled = true;
@@ -109,6 +129,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public RootField Enable()
         {
+            if (!isDisabled)
+            {
+                return this;
+            }
+
             return Clone(clone =>
             {
                 clone.isDisabled = false;

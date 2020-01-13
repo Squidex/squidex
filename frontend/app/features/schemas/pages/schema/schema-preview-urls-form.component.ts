@@ -11,7 +11,6 @@ import { FormBuilder } from '@angular/forms';
 import {
     AddPreviewUrlForm,
     ConfigurePreviewUrlsForm,
-    DialogService,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -32,7 +31,6 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
     public isEditable = false;
 
     constructor(
-        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
@@ -41,7 +39,7 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdateUrls;
 
-        this.editForm.load(this.schema.previewUrls);
+        this.editForm.load(this.schema);
         this.editForm.setEnabled(this.isEditable);
     }
 
@@ -72,9 +70,7 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
 
         if (value) {
             this.schemasState.configurePreviewUrls(this.schema, value)
-                .subscribe(() => {
-                    this.dialogs.notifyInfo('Preview URLs successfully.');
-
+                .subscribe(update => {
                     this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);

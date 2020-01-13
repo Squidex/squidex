@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Assets;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -15,16 +16,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         long FileSize { get; }
 
-        bool IsImage { get; }
-
-        int? PixelWidth { get; }
-
-        int? PixelHeight { get; }
-
         string FileName { get; }
 
         string FileHash { get; }
 
         string Slug { get; }
+
+        AssetMetadata Metadata { get; }
+
+        AssetType Type { get; }
     }
 }

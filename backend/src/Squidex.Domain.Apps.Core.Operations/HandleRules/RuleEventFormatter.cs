@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.Contents;
@@ -286,26 +287,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return Fallback;
             }
 
-            for (var j = 2; j < path.Length; j++)
+            if (path.Skip(2).Any())
             {
-                if (value is JsonObject obj && obj.TryGetValue(path[j], out value))
-                {
-                    continue;
-                }
-
-                if (value is JsonArray array && int.TryParse(path[j], out var idx) && idx >= 0 && idx < array.Count)
-                {
-                    value = array[idx];
-                }
-                else
+                if (!value.TryGetByPath(path.Skip(2), out value) || value == null || value.Type == JsonValueType.Null)
                 {
                     return Fallback;
                 }
-            }
-
-            if (value == null || value.Type == JsonValueType.Null)
-            {
-                return Fallback;
             }
 
             return value.ToString() ?? Fallback;

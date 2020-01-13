@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -60,8 +61,21 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FileType { get; set; }
 
         /// <summary>
+        /// The formatted text representation of the metadata.
+        /// </summary>
+        [Required]
+        public string MetadataText { get; set; }
+
+        /// <summary>
+        /// The asset metadata.
+        /// </summary>
+        [Required]
+        public AssetMetadata Metadata { get; set; }
+
+        /// <summary>
         /// The asset tags.
         /// </summary>
+        [Required]
         public HashSet<string>? Tags { get; set; }
 
         /// <summary>
@@ -75,19 +89,9 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public long FileVersion { get; set; }
 
         /// <summary>
-        /// Determines of the created file is an image.
+        /// The type of the asset.
         /// </summary>
-        public bool IsImage { get; set; }
-
-        /// <summary>
-        /// The width of the image in pixels if the asset is an image.
-        /// </summary>
-        public int? PixelWidth { get; set; }
-
-        /// <summary>
-        /// The height of the image in pixels if the asset is an image.
-        /// </summary>
-        public int? PixelHeight { get; set; }
+        public AssetType Type { get; set; }
 
         /// <summary>
         /// The user that has created the schema.
@@ -120,7 +124,34 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The metadata.
         /// </summary>
         [JsonProperty("_meta")]
-        public AssetMetadata Metadata { get; set; }
+        public AssetMeta Meta { get; set; }
+
+        /// <summary>
+        /// Determines of the created file is an image.
+        /// </summary>
+        [Obsolete]
+        public bool IsImage
+        {
+            get { return Type == AssetType.Image; }
+        }
+
+        /// <summary>
+        /// The width of the image in pixels if the asset is an image.
+        /// </summary>
+        [Obsolete]
+        public int? PixelWidth
+        {
+            get { return Metadata.GetPixelWidth(); }
+        }
+
+        /// <summary>
+        /// The height of the image in pixels if the asset is an image.
+        /// </summary>
+        [Obsolete]
+        public int? PixelHeight
+        {
+            get { return Metadata.GetPixelHeight(); }
+        }
 
         public static AssetDto FromAsset(IEnrichedAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
         {
@@ -130,7 +161,10 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (isDuplicate)
             {
-                response.Metadata = new AssetMetadata { IsDuplicate = "true" };
+                response.Meta = new AssetMeta
+                {
+                    IsDuplicate = "true"
+                };
             }
 
             return CreateLinks(response, controller, app);
@@ -145,9 +179,13 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             if (controller.HasPermission(Permissions.AppAssetsUpdate))
             {
                 response.AddPutLink("update", controller.Url<AssetsController>(x => nameof(x.PutAsset), values));
-                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
 
                 response.AddPutLink("move", controller.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppAssetsUpload))
+            {
+                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
             }
 
             if (controller.HasPermission(Permissions.AppAssetsDelete))
@@ -160,12 +198,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
                 response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, version, more = response.Slug }));
-
                 response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug, version }));
             }
             else
             {
-                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, id = response.Id, version }));
+                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, version }));
             }
 
             return response;

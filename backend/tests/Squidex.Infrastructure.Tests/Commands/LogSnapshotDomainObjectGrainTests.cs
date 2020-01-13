@@ -178,6 +178,25 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_not_update_when_snapshot_is_not_changed()
+        {
+            await SetupCreatedAsync();
+
+            var previousSnapshot = sut.Snapshot;
+
+            var result = await sut.ExecuteAsync(C(new UpdateAuto { Value = MyDomainState.Unchanged }));
+
+            Assert.True(result.Value is EntitySavedResult);
+
+            Assert.Empty(sut.GetUncomittedEvents());
+
+            Assert.Equal(4, sut.Snapshot.Value);
+            Assert.Equal(0, sut.Snapshot.Version);
+
+            Assert.Same(previousSnapshot, sut.Snapshot);
+        }
+
+        [Fact]
         public async Task Should_throw_exception_when_already_created()
         {
             await SetupCreatedAsync();

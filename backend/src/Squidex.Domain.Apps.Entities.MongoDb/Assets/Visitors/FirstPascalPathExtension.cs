@@ -5,17 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Domain.Apps.Entities.Apps;
+using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 {
-    public static class EntityExtensions
+    public static class FirstPascalPathExtension
     {
-        public static NamedId<Guid> NamedId(this IAppEntity entity)
+        public static PropertyPath ToFirstPascalCase(this PropertyPath path)
         {
-            return new NamedId<Guid>(entity.Id, entity.Name);
+            var result = path.ToList();
+
+            result[0] = result[0].ToPascalCase();
+
+            return new PropertyPath(result);
         }
     }
 }

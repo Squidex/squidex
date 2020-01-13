@@ -430,5 +430,5 @@ export function createContent(id: number, suffix = '') {
         'MySchema',
         {},
         [],
-        new Version(`${id}`));
+        new Version(`${id}${suffix}`));
 }

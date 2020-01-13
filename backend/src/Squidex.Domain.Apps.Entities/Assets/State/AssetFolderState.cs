@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
-    public class AssetFolderState : DomainObjectState<AssetFolderState>, IAssetFolderEntity
+    public sealed class AssetFolderState : DomainObjectState<AssetFolderState>, IAssetFolderEntity
     {
         [DataMember]
         public NamedId<Guid> AppId { get; set; }
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         [DataMember]
         public Guid ParentId { get; set; }
 
-        public void ApplyEvent(IEvent @event)
+        public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
@@ -38,35 +38,32 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                     {
                         SimpleMapper.Map(e, this);
 
-                        break;
+                        return true;
                     }
 
-                case AssetFolderRenamed e:
+                case AssetFolderRenamed e when e.FolderName != FolderName:
                     {
-                        SimpleMapper.Map(e, this);
+                        FolderName = e.FolderName;
 
-                        break;
+                        return true;
                     }
 
-                case AssetFolderMoved e:
+                case AssetFolderMoved e when e.ParentId != ParentId:
                     {
                         ParentId = e.ParentId;
 
-                        break;
+                        return true;
                     }
 
                 case AssetFolderDeleted _:
                     {
                         IsDeleted = true;
 
-                        break;
+                        return true;
                     }
             }
-        }
 
-        public override AssetFolderState Apply(Envelope<IEvent> @event)
-        {
-            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
+            return false;
         }
     }
 }

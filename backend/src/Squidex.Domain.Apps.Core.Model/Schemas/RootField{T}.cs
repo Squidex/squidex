@@ -36,6 +36,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
+            if (properties.DeepEquals(typedProperties))
+            {
+                return this;
+            }
+
             return Clone<RootField<T>>(clone =>
             {
                 clone.SetProperties(typedProperties);

@@ -9,7 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form, hasNoValue$ } from '@app/framework';
 
-export class AddWorkflowForm extends Form<FormGroup, { name: string}> {
+import { CreateWorkflowDto } from './../services/workflows.service';
+
+export class AddWorkflowForm extends Form<FormGroup, CreateWorkflowDto> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {

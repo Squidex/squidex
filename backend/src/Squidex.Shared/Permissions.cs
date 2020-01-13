@@ -102,6 +102,7 @@ namespace Squidex.Shared
         public const string AppAssets = "squidex.apps.{app}.assets";
         public const string AppAssetsRead = "squidex.apps.{app}.assets.read";
         public const string AppAssetsCreate = "squidex.apps.{app}.assets.create";
+        public const string AppAssetsUpload = "squidex.apps.{app}.assets.upload";
         public const string AppAssetsUpdate = "squidex.apps.{app}.assets.update";
         public const string AppAssetsDelete = "squidex.apps.{app}.assets.delete";
 

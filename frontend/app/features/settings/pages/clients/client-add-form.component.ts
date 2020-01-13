@@ -19,10 +19,10 @@ import { AddClientForm, ClientsState } from '@app/shared';
                     <div class="col">
                         <sqx-control-errors for="name" [submitted]="addClientForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxTransformInput="LowerCase" />
+                        <input type="text" class="form-control" formControlName="id" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxTransformInput="LowerCase" />
                     </div>
                     <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoName | async">Add Client</button>
+                        <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoId | async">Add Client</button>
                     </div>
                     <div class="col-auto pl-1">
                         <button type="reset" class="btn btn-text-secondary2" (click)="cancel()">Cancel</button>
@@ -45,7 +45,7 @@ export class ClientAddFormComponent {
         const value = this.addClientForm.submit();
 
         if (value) {
-            this.clientsState.attach({ id: value.name })
+            this.clientsState.attach(value)
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {

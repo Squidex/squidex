@@ -138,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/assets/{id}/")]
-        [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
@@ -213,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
         [ProducesResponseType(typeof(AssetDto), 200)]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermission(Permissions.AppAssetsUpload)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, [OpenApiIgnore] List<IFormFile> file)
         {

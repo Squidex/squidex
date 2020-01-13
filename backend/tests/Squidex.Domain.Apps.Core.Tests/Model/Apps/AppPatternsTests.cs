@@ -50,7 +50,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_return_same_patterns_if_pattern_not_found()
+        public void Should_return_same_patterns_if_pattern_is_updated_with_same_values()
+        {
+            var patterns_1 = patterns_0.Update(firstId, "Default", "Default Pattern", "Message");
+
+            Assert.Same(patterns_0, patterns_1);
+        }
+
+        [Fact]
+        public void Should_return_same_patterns_if_pattern_to_update_not_found()
         {
             var patterns_1 = patterns_0.Update(id, "NewPattern", "NewPattern", "Message");
 
@@ -70,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns_1 = patterns_0.Remove(id);
 
-            Assert.NotEmpty(patterns_1);
+            Assert.Same(patterns_0, patterns_1);
         }
     }
 }

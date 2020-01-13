@@ -112,6 +112,11 @@ namespace Squidex.Infrastructure.Queries
             return value != null ? new ClrValue(value, ClrValueType.String, true) : Null;
         }
 
+        public static implicit operator ClrValue(List<object?> value)
+        {
+            return value != null ? new ClrValue(value, ClrValueType.Dynamic, true) : Null;
+        }
+
         public override string ToString()
         {
             if (Value is IList list)

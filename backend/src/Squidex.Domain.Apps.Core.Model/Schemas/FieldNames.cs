@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DeepEqual.Syntax;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -43,6 +44,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             list.Remove(field);
 
             return new FieldNames(list);
+        }
+
+        public bool DeepEquals(FieldNames names)
+        {
+            return this.IsDeepEqual(names);
         }
     }
 }

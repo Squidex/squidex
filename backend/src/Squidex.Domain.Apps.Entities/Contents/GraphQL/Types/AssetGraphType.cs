@@ -8,6 +8,7 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
@@ -143,24 +144,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "isImage",
                 ResolvedType = AllTypes.NonNullBoolean,
-                Resolver = Resolve(x => x.IsImage),
-                Description = "Determines of the created file is an image."
+                Resolver = Resolve(x => x.Type == AssetType.Image),
+                Description = "Determines if the uploaded file is an image.",
+                DeprecationReason = "Use 'type' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelWidth",
                 ResolvedType = AllTypes.Int,
-                Resolver = Resolve(x => x.PixelWidth),
-                Description = "The width of the image in pixels if the asset is an image."
+                Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
+                Description = "The width of the image in pixels if the asset is an image.",
+                DeprecationReason = "Use 'metadata' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelHeight",
                 ResolvedType = AllTypes.Int,
-                Resolver = Resolve(x => x.PixelHeight),
-                Description = "The height of the image in pixels if the asset is an image."
+                Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
+                Description = "The height of the image in pixels if the asset is an image.",
+                DeprecationReason = "Use 'metadata' field instead."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "type",
+                ResolvedType = AllTypes.NonNullAssetType,
+                Resolver = Resolve(x => x.Type),
+                Description = "The type of the image."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "metadataText",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.MetadataText),
+                Description = "The text representation of the metadata."
             });
 
             AddField(new FieldType
@@ -170,6 +190,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Resolver = Resolve(x => x.TagNames),
                 Description = "The asset tags.",
                 Type = AllTypes.NonNullTagsType
+            });
+
+            AddField(new FieldType
+            {
+                Name = "metadata",
+                Arguments = AllTypes.PathArguments,
+                ResolvedType = AllTypes.NoopJson,
+                Resolver = ResolveMetadata(),
+                Description = "The asset metadata.",
             });
 
             if (model.CanGenerateAssetSourceUrl)
@@ -184,6 +213,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             Description = "An asset";
+        }
+
+        private static IFieldResolver ResolveMetadata()
+        {
+            return new FuncFieldResolver<IEnrichedAssetEntity, object?>(c =>
+            {
+                var path = c.Arguments.GetOrDefault(AllTypes.PathName);
+
+                c.Source.Metadata.TryGetByPath(path as string, out var result);
+
+                return result;
+            });
         }
 
         private static IFieldResolver Resolve(Func<IEnrichedAssetEntity, object?> action)

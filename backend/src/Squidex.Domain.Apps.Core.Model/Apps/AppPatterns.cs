@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppPatterns Remove(Guid id)
         {
-            return new AppPatterns(Without(id));
+            return Without<AppPatterns>(id);
         }
 
         [Pure]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return new AppPatterns(With(id, newPattern));
+            return With<AppPatterns>(id, newPattern);
         }
 
         [Pure]
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppPatterns(With(id, appPattern.Update(name, pattern, message)));
+            return With<AppPatterns>(id, appPattern.Update(name, pattern, message), DeepComparer<AppPattern>.Instance);
         }
     }
 }
