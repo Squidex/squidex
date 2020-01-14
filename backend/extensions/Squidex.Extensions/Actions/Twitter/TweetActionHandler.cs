@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using CoreTweet;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Twitter

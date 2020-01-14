@@ -68,9 +68,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Guard.NotNull(rule);
             Guard.NotNull(@event);
 
-            var job = await ruleService.CreateJobAsync(rule, ruleId, @event);
+            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
 
-            if (job != null)
+            foreach (var job in jobs)
             {
                 await ruleEventRepository.EnqueueAsync(job, job.Created);
             }

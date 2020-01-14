@@ -6,21 +6,12 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public abstract class EnrichedEvent
+    public abstract class EnrichedSchemaEventBase : EnrichedUserEventBase
     {
-        public NamedId<Guid> AppId { get; set; }
-
-        public Instant Timestamp { get; set; }
-
-        public string Name { get; set; }
-
-        public long Version { get; set; }
-
-        public abstract long Partition { get; }
+        public NamedId<Guid> SchemaId { get; set; }
     }
 }

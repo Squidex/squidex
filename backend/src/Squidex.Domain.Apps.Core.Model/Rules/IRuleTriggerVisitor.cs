@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         T Visit(ContentChangedTriggerV2 trigger);
 
+        T Visit(CommentTrigger trigger);
+
         T Visit(ManualTrigger trigger);
 
         T Visit(SchemaChangedTrigger trigger);

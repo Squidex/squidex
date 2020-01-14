@@ -5,30 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public sealed class ManualTriggerHandler : RuleTriggerHandler<ManualTrigger, RuleManuallyTriggered, EnrichedManualEvent>
+    public sealed class CommentTriggerHandler : RuleTriggerHandler<CommentTrigger, CommentCreated, EnrichedCommentEvent>
     {
-        protected override Task<EnrichedManualEvent?> CreateEnrichedEventAsync(Envelope<RuleManuallyTriggered> @event)
+        public override Task<List<EnrichedEvent>> CreateEnrichedEventsAsync(Envelope<AppEvent> @event)
         {
-            var result = new EnrichedManualEvent
-            {
-                Name = "Manual"
-            };
-
-            return Task.FromResult<EnrichedManualEvent?>(result);
+            return base.CreateEnrichedEventsAsync(@event);
         }
 
-        protected override bool Trigger(EnrichedManualEvent @event, ManualTrigger trigger)
+        protected override bool Trigger(EnrichedCommentEvent @event, CommentTrigger trigger)
         {
-            return true;
+            throw new NotImplementedException();
         }
     }
 }

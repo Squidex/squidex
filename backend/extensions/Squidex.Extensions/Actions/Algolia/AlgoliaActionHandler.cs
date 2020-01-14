@@ -12,7 +12,7 @@ using Algolia.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using AlgoliaIndex = Algolia.Search.Index;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used

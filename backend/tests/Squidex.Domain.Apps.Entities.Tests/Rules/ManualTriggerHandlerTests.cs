@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
@@ -25,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var envelope = Envelope.Create<AppEvent>(new RuleManuallyTriggered());
 
-            var result = await sut.CreateEnrichedEventAsync(envelope);
+            var result = await sut.CreateEnrichedEventsAsync(envelope);
 
-            Assert.Equal("Manual", result!.Name);
+            Assert.Equal("Manual", result.Single().Name);
         }
 
         [Fact]
