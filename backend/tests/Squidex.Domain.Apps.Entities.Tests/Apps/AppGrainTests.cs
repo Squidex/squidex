@@ -245,14 +245,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .Returns(new PlanChangedResult());
 
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdFree))
-                .Returns(new PlanResetResult());
+                .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            Assert.True(result is PlanResetResult);
+            Assert.True(result is PlanChangedResult);
 
             Assert.Null(sut.Snapshot.Plan);
 
