@@ -1,0 +1,42 @@
+<div class="row no-gutters">
+    <div class="col-auto col-image" [class.expand]="isCompact">
+        <input class="form-control value" [formControl]="valueControl" readonly />
+
+        <button type="button" class="btn btn-text-secondary value-clear" (click)="reset()">
+            <i class="icon-close"></i>
+        </button>
+
+        <div *ngIf="valueThumb | async; let thumbUrl; else noThumb" class="preview">
+            <img [src]="thumbUrl" />
+        </div>
+
+        <ng-template #noThumb>
+            <div class="preview preview-empty">
+                Nothing selected
+            </div>
+        </ng-template>
+    </div>
+    <div class="col pl-4" *ngIf="!isCompact">
+        <i class="icon-angle-left icon"></i>
+
+        <input class="form-control" [formControl]="stockPhotoSearch" placeholder="Search for Photos by Unsplash" />
+
+        <sqx-list-view [isLoading]="snapshot.isLoading" table="true">
+            <div content>
+                <div class="photos">
+                    <ng-container *ngIf="stockPhotos | async; let photos">
+                        <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
+                            <img [src]="photo.thumbUrl" />
+
+                            <div class="photo-user">
+                                <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
+                                    {{photo.user}}
+                                </a>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </sqx-list-view>
+    </div>
+</div>

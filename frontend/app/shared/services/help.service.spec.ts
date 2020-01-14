@@ -10,7 +10,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import { HelpService } from '@app/shared/internal';
 
-describe('ClientsService', () => {
+describe('HelpService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [

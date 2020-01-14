@@ -206,10 +206,6 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
     }
 
-    public visitString(_: StringFieldPropertiesDto): any {
-        return this.value;
-    }
-
     public visitTags(_: TagsFieldPropertiesDto): string {
         if (this.value.length) {
             return this.value.join(', ');
@@ -218,9 +214,35 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
     }
 
+    public visitString(properties: StringFieldPropertiesDto): any {
+        if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
+            const src = thumbnail(this.value, undefined, 50);
+
+            if (src) {
+                return new HtmlValue(`<img src="${src}" />`);
+            }
+        }
+
+        return this.value;
+    }
+
     public visitUI(_: UIFieldPropertiesDto): any {
         return '';
     }
+}
+
+export function thumbnail(url: string, width?: number, height?: number) {
+    if (url && url.startsWith('https://images.unsplash.com')) {
+        if (width) {
+            return `${url}&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=${width}&fit=max`;
+        }
+
+        if (height) {
+            return `${url}&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=${height}&fit=max`;
+        }
+    }
+
+    return undefined;
 }
 
 export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValidatorFn>> {

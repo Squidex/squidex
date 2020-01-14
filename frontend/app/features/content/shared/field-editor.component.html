@@ -124,6 +124,9 @@
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-markdown-editor [formControl]="editorControl"></sqx-markdown-editor>
 						</ng-container>
+						<ng-container *ngSwitchCase="'StockPhoto'">
+							<sqx-stock-photo-editor [formControl]="editorControl" [isCompact]="isCompact"></sqx-stock-photo-editor>
+						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-control" [formControl]="editorControl">
 								<option [ngValue]="null"></option>

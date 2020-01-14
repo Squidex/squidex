@@ -46,7 +46,8 @@ import {
     PreviewButtonComponent,
     ReferenceItemComponent,
     ReferencesEditorComponent,
-    SchemasPageComponent
+    SchemasPageComponent,
+    StockPhotoEditorComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -106,9 +107,9 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
+        RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule,
-        RouterModule.forChild(routes)
+        SqxSharedModule
     ],
     declarations: [
         ArrayEditorComponent,
@@ -137,7 +138,8 @@ const routes: Routes = [
         PreviewButtonComponent,
         ReferenceItemComponent,
         ReferencesEditorComponent,
-        SchemasPageComponent
+        SchemasPageComponent,
+        StockPhotoEditorComponent
     ]
 })
 export class SqxFeatureContentModule {}

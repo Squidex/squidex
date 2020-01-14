@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         Radio,
         RichText,
         Slug,
+        StockPhoto,
         TextArea
     }
 }

@@ -88,6 +88,13 @@
 
                 <span class="radio-label">HTML</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'StockPhoto'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="StockPhoto" />
+
+                <i class="icon-media"></i>
+
+                <span class="radio-label">StockPhoto</span>
+            </label>
         </div>
     </div>
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
