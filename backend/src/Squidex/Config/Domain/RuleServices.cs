@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Queries;
@@ -31,6 +32,9 @@ namespace Squidex.Config.Domain
                 .As<IEventEnricher>();
 
             services.AddSingletonAs<AssetChangedTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
+            services.AddSingletonAs<CommentTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()

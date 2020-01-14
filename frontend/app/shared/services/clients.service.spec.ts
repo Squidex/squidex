@@ -96,7 +96,7 @@ describe('ClientsService', () => {
 
         const resource: Resource = {
             _links: {
-                'update': { method: 'PUT', href: '/api/apps/my-app/clients/client1' }
+                update: { method: 'PUT', href: '/api/apps/my-app/clients/client1' }
             }
         };
 
@@ -125,7 +125,7 @@ describe('ClientsService', () => {
 
         const resource: Resource = {
             _links: {
-                'delete': { method: 'DELETE', href: '/api/apps/my-app/clients/client1' }
+                delete: { method: 'DELETE', href: '/api/apps/my-app/clients/client1' }
             }
         };
 

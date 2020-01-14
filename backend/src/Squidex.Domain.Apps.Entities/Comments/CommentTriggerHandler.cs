@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -55,6 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
                         {
                             MentionedUser = user
                         };
+
+                        enrichedEvent.Name = "UserMentioned";
 
                         SimpleMapper.Map(commentCreated, enrichedEvent);
 

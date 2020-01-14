@@ -70,7 +70,7 @@ export class ContributorAddFormComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.defaultValue = { role: this.roles[0].name, contributorId: '' };
+        this.defaultValue = { role: this.roles ? this.roles[0].name : null, user: '' };
 
         this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
     }

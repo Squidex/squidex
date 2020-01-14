@@ -18,7 +18,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         IconImage = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 28'><path d='M13.427 17.436H4.163C3.827 16.354 3.636 15.2 3.636 14s.182-2.355.527-3.436h15.245c1.891 0 3.418 1.545 3.418 3.445a3.421 3.421 0 0 1-3.418 3.427h-5.982zm-.436 1.146H4.6a11.508 11.508 0 0 0 4.2 4.982 11.443 11.443 0 0 0 15.827-3.209 5.793 5.793 0 0 0-4.173-1.773H12.99zm7.464-9.164a5.794 5.794 0 0 0 4.173-1.773 11.45 11.45 0 0 0-9.536-5.1c-2.327 0-4.491.7-6.3 1.891a11.554 11.554 0 0 0-4.2 4.982h15.864z'/></svg>",
         IconColor = "#1e5470",
         Display = "Populate Elasticsearch index",
-        Description = "Populate and synchronize indexes in ElasticSearch for full text search.",
+        Description = "Populate a full text search index in ElasticSearch.",
         ReadMore = "https://www.elastic.co/")]
     public sealed class ElasticSearchAction : RuleAction
     {

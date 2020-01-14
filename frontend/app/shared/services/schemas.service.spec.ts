@@ -626,11 +626,13 @@ describe('SchemasService', () => {
             version: `${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`,
-                tags: [`tags${id}${suffix}`]
+                tags: [
+                    `tags${id}${suffix}`
+                ],
+                hints: `hints${id}${suffix}`
             },
             previewUrls: {
-                'Default': 'url'
+                Default: 'url'
             },
             fields: [
                 {
@@ -851,6 +853,6 @@ export function createSchemaDetails(id: number, suffix = '') {
             update: '<script-update>'
         },
         {
-            'Default': 'url'
+            Default: 'url'
         });
 }

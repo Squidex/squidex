@@ -8,6 +8,7 @@
 export * from './pages/rules/actions/generic-action.component';
 
 export * from './pages/rules/triggers/asset-changed-trigger.component';
+export * from './pages/rules/triggers/comment-trigger.component';
 export * from './pages/rules/triggers/content-changed-trigger.component';
 export * from './pages/rules/triggers/schema-changed-trigger.component';
 export * from './pages/rules/triggers/usage-trigger.component';
