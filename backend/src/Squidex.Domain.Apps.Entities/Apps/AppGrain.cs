@@ -276,7 +276,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                         if (c.FromCallback)
                         {
-                            ChangePlan(c);
+                            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, c.PlanId))
+                            {
+                                ResetPlan(c);
+                            }
+                            else
+                            {
+                                ChangePlan(c);
+                            }
 
                             return null;
                         }

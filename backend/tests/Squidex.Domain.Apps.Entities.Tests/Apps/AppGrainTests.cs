@@ -59,8 +59,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
                 .Returns(user);
 
-            A.CallTo(() => appPlansProvider.GetPlan(A<string>.Ignored))
-                .Returns(new ConfigAppLimitsPlan { MaxContributors = 10 });
+            A.CallTo(() => appPlansProvider.GetFreePlan())
+                .Returns(new ConfigAppLimitsPlan { Id = planIdFree, MaxContributors = 10 });
+
+            A.CallTo(() => appPlansProvider.GetPlan(planIdFree))
+                .Returns(new ConfigAppLimitsPlan { Id = planIdFree, MaxContributors = 10 });
+
+            A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
+                .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
             initialPatterns = new InitialPatterns
             {
@@ -180,6 +186,54 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
+        }
+
+        [Fact]
+        public async Task ChangePlan_from_callback_should_create_events_and_update_state()
+        {
+            var command = new ChangePlan { PlanId = planIdPaid, FromCallback = true };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent2(new EntitySavedResult(4));
+
+            Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
+                );
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>.Ignored, A<NamedId<Guid>>.Ignored, A<string?>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task ChangePlan_from_callback_should_reset_plan_for_free_plan()
+        {
+            var command = new ChangePlan { PlanId = planIdFree, FromCallback = true };
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+                .Returns(new PlanChangedResult());
+
+            await ExecuteCreateAsync();
+            await ExecuteChangePlanAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent2(new EntitySavedResult(5));
+
+            Assert.Null(sut.Snapshot.Plan);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPlanReset())
+                );
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>.Ignored, A<NamedId<Guid>>.Ignored, planIdFree))
+                .MustNotHaveHappened();
         }
 
         [Fact]
