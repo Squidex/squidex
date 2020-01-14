@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         [Theory]
         [MemberData(nameof(TestEvents))]
-        public async Task Should_enrich_events(AssetEvent @event, EnrichedAssetEventType type)
+        public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
         {
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
