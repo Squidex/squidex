@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 
 import { PanelComponent } from './panel.component';
@@ -13,7 +15,6 @@ import { PanelComponent } from './panel.component';
     selector: '[sqxPanelContainer]'
 })
 export class PanelContainerDirective implements AfterViewInit {
-    // tslint:disable-next-line: readonly-array
     private readonly panels: PanelComponent[] = [];
     private isViewInit = false;
     private containerWidth = 0;

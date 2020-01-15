@@ -1,28 +1,47 @@
 <sqx-title message="Contents"></sqx-title>
 
-<sqx-panel theme="dark" desiredWidth="16rem" showSecondHeader="true">
+<sqx-panel theme="dark" [desiredWidth]="width" [showClose]="!isCollapsed" showSecondHeader="true">
     <ng-container title>
-        Schemas
+        <ng-container *ngIf="!isCollapsed">
+            Schemas
+        </ng-container>
+    </ng-container>
+
+    <ng-container header>
+        <a class="panel-close btn-collapse" [class.collapsed]="isCollapsed" (click)="toggle()">
+            <i 
+                [class.icon-angle-double-left]="!isCollapsed"
+                [class.icon-angle-double-right]="isCollapsed">
+            </i>
+        </a>
     </ng-container>
 
     <ng-container secondHeader>
-        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+        <ng-container *ngIf="!isCollapsed">
+            <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
-        <div class="search-form">
-            <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
+            <div class="search-form">
+                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
 
-            <i class="icon-search"></i>
-        </div>
+                <i class="icon-search"></i>
+            </div>
+        </ng-container>
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
-            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                [schemaCategory]="category"
-                [schemasFilter]="schemasFilter.valueChanges | async"
-                [forContent]="true">
-            </sqx-schema-category>
-        </ng-container>
+        <div [class.hidden]="isCollapsed">
+            <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
+                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                    [schemaCategory]="category"
+                    [schemasFilter]="schemasFilter.valueChanges | async"
+                    [forContent]="true">
+                </sqx-schema-category>
+            </ng-container>
+        </div>
+
+        <div class="headline" [class.hidden]="!isCollapsed">
+            Schemas
+        </div>
     </ng-container>
 </sqx-panel>
 

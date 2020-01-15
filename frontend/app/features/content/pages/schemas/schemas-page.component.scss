@@ -1,2 +1,26 @@
 @import '_vars';
 @import '_mixins';
+
+.btn-collapse {
+    & {
+        font-size: 1.2rem;
+        font-weight: 300;
+        line-height: 1rem;
+        right: 3rem;
+    }
+
+    &:hover {
+        color: $color-dark-foreground;
+    }
+
+    &.collapsed {
+        right: 1rem;
+    }
+}
+
+.headline {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-top: 50px;
+    transform: rotate(-90deg);
+}

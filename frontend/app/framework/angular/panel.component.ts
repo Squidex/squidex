@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 
 import { slideRightAnimation } from '@app/framework/internal';
 
@@ -20,8 +20,18 @@ import { PanelContainerDirective } from './panel-container.directive';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
+export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
     private styleWidth: string;
+    private renderWidthField = 0;
+    private isViewInitField = false;
+
+    public get renderWidth() {
+        return this.renderWidthField;
+    }
+
+    public get isViewInit() {
+        return this.isViewInitField;
+    }
 
     @Output()
     public close = new EventEmitter();
@@ -60,25 +70,28 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public showClose = true;
 
     @Input()
-    public grid = false;
+    public contentClass = '';
 
     @Input()
-    public noPadding = false;
-
-    @Input()
-    public customClose = false;
+    public sidebarClass = '';
 
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;
 
-    public renderWidth = 0;
-
-    public isViewInit = false;
+    public get customClose() {
+        return this.close.observers.length > 0;
+    }
 
     constructor(
         private readonly container: PanelContainerDirective,
         private readonly renderer: Renderer2
     ) {
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['desiredWidth'] && this.isViewInitField) {
+            this.container.invalidate();
+        }
     }
 
     public ngOnDestroy() {
@@ -90,13 +103,13 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public ngAfterViewInit() {
-        this.isViewInit = true;
+        this.isViewInitField = true;
 
         this.container.invalidate();
     }
 
     public measure(size: string) {
-        if (this.styleWidth !== size && this.isViewInit) {
+        if (this.styleWidth !== size && this.isViewInitField) {
             this.styleWidth = size;
 
             const element = this.panel.nativeElement;
@@ -105,7 +118,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
                 this.renderer.setStyle(element, 'width', size);
                 this.renderer.setStyle(element, 'minWidth', this.minWidth);
 
-                this.renderWidth = element.offsetWidth;
+                this.renderWidthField = element.offsetWidth;
             }
         }
     }
