@@ -83,6 +83,50 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
+        public void Should_make_query_with_id()
+        {
+            var id = Guid.NewGuid();
+
+            var i = F(ClrFilter.Eq("id", id));
+            var o = C($"{{ '_id' : '{id}' }}");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_id_string()
+        {
+            var id = Guid.NewGuid().ToString();
+
+            var i = F(ClrFilter.Eq("id", id));
+            var o = C($"{{ '_id' : '{id}' }}");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_id_list()
+        {
+            var id = Guid.NewGuid();
+
+            var i = F(ClrFilter.In("id", new List<Guid> { id }));
+            var o = C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_id_string_list()
+        {
+            var id = Guid.NewGuid().ToString();
+
+            var i = F(ClrFilter.In("id", new List<string> { id }));
+            var o = C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_make_query_with_lastModified()
         {
             var i = F(ClrFilter.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
