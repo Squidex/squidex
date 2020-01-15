@@ -63,6 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Equal(user1, enrichedEvent1!.MentionedUser);
             Assert.Equal(user2, enrichedEvent2!.MentionedUser);
+            Assert.Equal("UserMentioned", enrichedEvent1.Name);
+            Assert.Equal("UserMentioned", enrichedEvent2.Name);
         }
 
         [Fact]
@@ -199,13 +201,75 @@ namespace Squidex.Domain.Apps.Entities.Comments
             });
         }
 
-        private IUser CreateUser(string id)
+        [Fact]
+        public void Should_trigger_check_when_email_is_correct()
+        {
+            TestForRealCondition("event.mentionedUser.email == 'sebastian@squidex.io'", (handler, trigger) =>
+            {
+                var user = CreateUser("1");
+
+                var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
+
+                Assert.True(result);
+            });
+        }
+
+        [Fact]
+        public void Should_not_trigger_check_when_email_is_correct()
+        {
+            TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, trigger) =>
+            {
+                var user = CreateUser("1");
+
+                var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
+
+                Assert.False(result);
+            });
+        }
+
+        [Fact]
+        public void Should_trigger_check_when_text_is_urgent()
+        {
+            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
+            {
+                var text = "Hey man, this is really urgent.";
+
+                var result = handler.Trigger(new EnrichedCommentEvent { Text = text }, trigger);
+
+                Assert.True(result);
+            });
+        }
+
+        [Fact]
+        public void Should_not_trigger_check_when_text_is_not_urgent()
+        {
+            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
+            {
+                var text = "Hey man, just an information for you.";
+
+                var result = handler.Trigger(new EnrichedCommentEvent { Text = text }, trigger);
+
+                Assert.False(result);
+            });
+        }
+
+        private IUser CreateUser(string id, string email = "sebastian@squidex.io")
         {
             var user = A.Fake<IUser>();
 
             A.CallTo(() => user.Id).Returns(id);
+            A.CallTo(() => user.Email).Returns(email);
 
             return user;
+        }
+
+        private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, CommentTrigger> action)
+        {
+            var trigger = new CommentTrigger { Condition = condition };
+
+            var handler = new CommentTriggerHandler(new JintScriptEngine(), userResolver);
+
+            action(handler, trigger);
         }
 
         private void TestForCondition(string condition, Action<CommentTrigger> action)
