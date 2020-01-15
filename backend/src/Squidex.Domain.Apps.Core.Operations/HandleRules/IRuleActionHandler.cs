@@ -8,8 +8,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {

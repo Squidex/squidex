@@ -63,6 +63,13 @@
                                 [triggerFormSubmitted]="triggerForm.submitted | async">
                             </sqx-asset-changed-trigger>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'Comment'">
+                            <sqx-comment-trigger
+                                [trigger]="trigger"
+                                [triggerForm]="triggerForm.form"
+                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                            </sqx-comment-trigger>
+                        </ng-container>
                         <ng-container *ngSwitchCase="'ContentChanged'">
                             <sqx-content-changed-trigger
                                 [schemas]="schemas"

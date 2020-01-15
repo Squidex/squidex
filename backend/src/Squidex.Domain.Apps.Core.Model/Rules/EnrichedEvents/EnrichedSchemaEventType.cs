@@ -5,17 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
-using Squidex.Infrastructure;
-using Squidex.Shared.Users;
-
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public abstract class EnrichedUserEventBase : EnrichedEvent
+    public enum EnrichedSchemaEventType
     {
-        public RefToken Actor { get; set; }
-
-        [IgnoreDataMember]
-        public IUser? User { get; set; }
+        Created,
+        Deleted,
+        Published,
+        Unpublished,
+        Updated
     }
 }

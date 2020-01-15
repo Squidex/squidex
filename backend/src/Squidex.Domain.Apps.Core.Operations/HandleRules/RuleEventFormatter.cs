@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -50,6 +50,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             AddPattern("CONTENT_ACTION", ContentAction);
             AddPattern("CONTENT_STATUS", ContentStatus);
             AddPattern("CONTENT_URL", ContentUrl);
+            AddPattern("MENTIONED_ID", MentionedId);
+            AddPattern("MENTIONED_NAME", MentionedName);
+            AddPattern("MENTIONED_EMAIL", MentionedEmail);
             AddPattern("SCHEMA_ID", SchemaId);
             AddPattern("SCHEMA_NAME", SchemaName);
             AddPattern("TIMESTAMP_DATETIME", TimestampTime);
@@ -261,6 +264,36 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (@event is EnrichedUserEventBase userEvent)
             {
                 return userEvent.User?.Email ?? Fallback;
+            }
+
+            return Fallback;
+        }
+
+        private static string MentionedName(EnrichedEvent @event)
+        {
+            if (@event is EnrichedCommentEvent commentEvent)
+            {
+                return commentEvent.MentionedUser.DisplayName() ?? Fallback;
+            }
+
+            return Fallback;
+        }
+
+        private static string MentionedId(EnrichedEvent @event)
+        {
+            if (@event is EnrichedCommentEvent commentEvent)
+            {
+                return commentEvent.MentionedUser.Id ?? Fallback;
+            }
+
+            return Fallback;
+        }
+
+        private static string MentionedEmail(EnrichedEvent @event)
+        {
+            if (@event is EnrichedCommentEvent commentEvent)
+            {
+                return commentEvent.MentionedUser.Email ?? Fallback;
             }
 
             return Fallback;

@@ -93,7 +93,7 @@ describe('ContributorsService', () => {
 
         const resource: Resource = {
             _links: {
-                'delete': { method: 'DELETE', href: '/api/apps/my-app/contributors/123' }
+                delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/123' }
             }
         };
 

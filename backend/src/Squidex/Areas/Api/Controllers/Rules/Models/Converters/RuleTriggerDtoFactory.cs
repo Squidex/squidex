@@ -31,6 +31,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return SimpleMapper.Map(trigger, new AssetChangedRuleTriggerDto());
         }
 
+        public RuleTriggerDto Visit(CommentTrigger trigger)
+        {
+            return SimpleMapper.Map(trigger, new CommentRuleTriggerDto());
+        }
+
         public RuleTriggerDto Visit(ManualTrigger trigger)
         {
             return SimpleMapper.Map(trigger, new ManualRuleTriggerDto());

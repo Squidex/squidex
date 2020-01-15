@@ -6,9 +6,10 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -59,10 +60,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
 
-            var result = await sut.CreateEnrichedEventAsync(Envelope.Create<AppEvent>(@event)) as EnrichedUsageExceededEvent;
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event));
 
-            Assert.Equal(@event.CallsCurrent, result!.CallsCurrent);
-            Assert.Equal(@event.CallsLimit, result!.CallsLimit);
+            var enrichedEvent = result.Single() as EnrichedUsageExceededEvent;
+
+            Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
+            Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
         }
     }
 }

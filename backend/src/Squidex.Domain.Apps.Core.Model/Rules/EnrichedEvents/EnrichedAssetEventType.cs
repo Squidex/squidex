@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public interface IEventEnricher
+    public enum EnrichedAssetEventType
     {
-        Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent> @event);
+        Created,
+        Deleted,
+        Annotated,
+        Updated
     }
 }

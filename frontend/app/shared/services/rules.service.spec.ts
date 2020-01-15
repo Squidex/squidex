@@ -59,7 +59,7 @@ describe('RulesService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
-            'action2': {
+            action2: {
                 title: 'title2',
                 display: 'display2',
                 description: 'description2',
@@ -82,7 +82,7 @@ describe('RulesService', () => {
                     isFormattable: true
                 }]
             },
-            'action1': {
+            action1: {
                 title: 'title1',
                 display: 'display1',
                 description: 'description1',
@@ -101,8 +101,8 @@ describe('RulesService', () => {
         ]);
 
         expect(actions!).toEqual({
-            'action1': action1,
-            'action2': action2
+            action1,
+            action2
         });
     }));
 

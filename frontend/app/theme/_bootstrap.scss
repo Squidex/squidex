@@ -177,7 +177,7 @@ a {
         }
 
         .badge {
-            @include absolute(-.5rem, auto, auto, -.375rem);
+            @include absolute(-.25rem, auto, auto, -.375rem);
             background: $color-theme-error;
             font-size: .75rem;
             font-weight: normal;

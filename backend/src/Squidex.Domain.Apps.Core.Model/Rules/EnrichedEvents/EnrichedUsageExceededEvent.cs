@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure;
-
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public abstract class EnrichedSchemaEventBase : EnrichedUserEventBase
+    public sealed class EnrichedUsageExceededEvent : EnrichedEvent
     {
-        public NamedId<Guid> SchemaId { get; set; }
+        public long CallsCurrent { get; set; }
+
+        public long CallsLimit { get; set; }
+
+        public override long Partition
+        {
+            get { return AppId.GetHashCode(); }
+        }
     }
 }

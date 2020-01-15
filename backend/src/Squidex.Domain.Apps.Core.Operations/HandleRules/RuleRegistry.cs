@@ -10,8 +10,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 

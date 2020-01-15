@@ -5,12 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    public interface IEnrichedEntityEvent
+    [TypeName(nameof(CommentTrigger))]
+    public sealed class CommentTrigger : RuleTrigger
     {
-        Guid Id { get; }
+        public string Condition { get; set; }
+
+        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

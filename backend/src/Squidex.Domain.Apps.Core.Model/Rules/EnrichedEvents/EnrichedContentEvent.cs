@@ -10,7 +10,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public sealed class EnrichedContentEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
     {

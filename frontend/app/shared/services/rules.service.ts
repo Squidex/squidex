@@ -34,6 +34,7 @@ export type RuleElementMetadataDto = {
 
 export type TriggerType =
     'AssetChanged' |
+    'Comment' |
     'ContentChanged' |
     'Manual' |
     'SchemaChanged' |
@@ -42,35 +43,42 @@ export type TriggerType =
 export type TriggersDto = Record<TriggerType, RuleElementMetadataDto>;
 
 export const ALL_TRIGGERS: TriggersDto = {
-    'AssetChanged': {
+    AssetChanged: {
         description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
         display: 'Asset changed',
         iconColor: '#3389ff',
         iconCode: 'assets',
         title: 'Asset changed'
     },
-    'ContentChanged': {
+    Comment: {
+        description: 'When a user is mentioned in any comment...',
+        display: 'User mentioned',
+        iconColor: '#3389ff',
+        iconCode: 'comments',
+        title: 'User mentioned'
+    },
+    ContentChanged: {
         description: 'For content changes like created, updated, published, unpublished...',
         display: 'Content changed',
         iconColor: '#3389ff',
         iconCode: 'contents',
         title: 'Content changed'
     },
-    'Manual': {
+    Manual: {
         description: 'To invoke processes manually, for example to update your static site...',
         display: 'Manually triggered',
         iconColor: '#3389ff',
         iconCode: 'play-line',
         title: 'Manually triggered'
     },
-    'SchemaChanged': {
+    SchemaChanged: {
         description: 'When a schema definition has been created, updated, published or deleted...',
         display: 'Schema changed',
         iconColor: '#3389ff',
         iconCode: 'schemas',
         title: 'Schema changed'
     },
-    'Usage': {
+    Usage: {
         description: 'When monthly API calls exceed a specified limit for one time a month...',
         display: 'Usage exceeded',
         iconColor: '#3389ff',
