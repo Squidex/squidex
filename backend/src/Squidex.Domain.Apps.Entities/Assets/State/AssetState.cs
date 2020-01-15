@@ -86,6 +86,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
+                        EnsureProperties();
+
                         return true;
                     }
 
@@ -95,6 +97,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
                         TotalSize += e.FileSize;
 
+                        EnsureProperties();
+
                         return true;
                     }
 
@@ -102,33 +106,35 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                     {
                         var hasChanged = false;
 
-                        if (Is.ChangeWhenDefined(FileName, e.FileName))
+                        if (Is.OptionalChange(FileName, e.FileName))
                         {
                             FileName = e.FileName;
 
                             hasChanged = true;
                         }
 
-                        if (Is.ChangeWhenDefined(Slug, e.Slug))
+                        if (Is.OptionalChange(Slug, e.Slug))
                         {
                             Slug = e.Slug;
 
                             hasChanged = true;
                         }
 
-                        if (Is.Change(Tags, e.Tags))
+                        if (Is.OptionalChange(Tags, e.Tags))
                         {
                             Tags = e.Tags;
 
                             hasChanged = true;
                         }
 
-                        if (Is.Change(Metadata, e.Metadata))
+                        if (Is.OptionalChange(Metadata, e.Metadata))
                         {
                             Metadata = e.Metadata;
 
                             hasChanged = true;
                         }
+
+                        EnsureProperties();
 
                         return hasChanged;
                     }
@@ -149,6 +155,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             }
 
             return false;
+        }
+
+        private void EnsureProperties()
+        {
+            if (Tags == null)
+            {
+                Tags = new HashSet<string>();
+            }
+
+            if (Metadata == null)
+            {
+                Metadata = new AssetMetadata();
+            }
         }
     }
 }

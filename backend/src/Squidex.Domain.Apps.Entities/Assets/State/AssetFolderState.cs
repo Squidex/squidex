@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         return true;
                     }
 
-                case AssetFolderRenamed e when Is.ChangeWhenDefined(FolderName, e.FolderName):
+                case AssetFolderRenamed e when Is.OptionalChange(FolderName, e.FolderName):
                     {
                         FolderName = e.FolderName;
 
