@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
                         if (ev.IsMaster)
                         {
-                            LanguagesConfig = LanguagesConfig.MakeMaster(ev.Language);
+                            l = LanguagesConfig.MakeMaster(ev.Language);
                         }
 
                         return l;

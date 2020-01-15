@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -101,28 +102,28 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                     {
                         var hasChanged = false;
 
-                        if (!string.IsNullOrWhiteSpace(e.FileName) && !string.Equals(e.FileName, FileName))
+                        if (Is.Change(FileName, e.FileName))
                         {
                             FileName = e.FileName;
 
                             hasChanged = true;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(e.Slug) && !string.Equals(e.Slug, Slug))
+                        if (Is.Change(Slug, e.Slug))
                         {
                             Slug = e.Slug;
 
                             hasChanged = true;
                         }
 
-                        if (e.Tags != null && !e.Tags.SetEquals(Tags))
+                        if (Is.Change(Tags, e.Tags))
                         {
                             Tags = e.Tags;
 
                             hasChanged = true;
                         }
 
-                        if (e.Metadata != null && !e.Metadata.EqualsDictionary(Metadata))
+                        if (Is.Change(Metadata, e.Metadata))
                         {
                             Metadata = e.Metadata;
 
