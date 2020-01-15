@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,7 +13,17 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class Is
     {
-        public static bool Change(string? oldValue, string? newValue)
+        public static bool Change(Guid oldValue, Guid newValue)
+        {
+            return !Equals(oldValue, newValue);
+        }
+
+        public static bool Change(string? oldValue, string newValue)
+        {
+            return !Equals(oldValue, newValue);
+        }
+
+        public static bool ChangeWhenDefined(string? oldValue, string? newValue)
         {
             return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue);
         }

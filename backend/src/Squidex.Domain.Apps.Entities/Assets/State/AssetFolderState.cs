@@ -9,6 +9,7 @@ using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -41,14 +42,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         return true;
                     }
 
-                case AssetFolderRenamed e when e.FolderName != FolderName:
+                case AssetFolderRenamed e when Is.ChangeWhenDefined(FolderName, e.FolderName):
                     {
                         FolderName = e.FolderName;
 
                         return true;
                     }
 
-                case AssetFolderMoved e when e.ParentId != ParentId:
+                case AssetFolderMoved e when Is.Change(ParentId, e.ParentId):
                     {
                         ParentId = e.ParentId;
 

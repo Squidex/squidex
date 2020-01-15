@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                         return true;
                     }
 
-                case AppUpdated e when !string.Equals(e.Label, Label) || !string.Equals(e.Description, Description):
+                case AppUpdated e when Is.Change(Label, e.Label) || Is.Change(Description, e.Description):
                     {
                         SimpleMapper.Map(e, this);
 
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                 case AppImageRemoved e when Image != null:
                     return UpdateImage(e, ev => null);
 
-                case AppPlanChanged e when !string.Equals(Plan?.PlanId, e.PlanId):
+                case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
                     return UpdatePlan(e, ev => AppPlan.Build(ev.Actor, ev.PlanId));
 
                 case AppPlanReset e when Plan != null:

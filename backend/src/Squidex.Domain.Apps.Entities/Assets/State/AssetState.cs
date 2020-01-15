@@ -102,14 +102,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                     {
                         var hasChanged = false;
 
-                        if (Is.Change(FileName, e.FileName))
+                        if (Is.ChangeWhenDefined(FileName, e.FileName))
                         {
                             FileName = e.FileName;
 
                             hasChanged = true;
                         }
 
-                        if (Is.Change(Slug, e.Slug))
+                        if (Is.ChangeWhenDefined(Slug, e.Slug))
                         {
                             Slug = e.Slug;
 
