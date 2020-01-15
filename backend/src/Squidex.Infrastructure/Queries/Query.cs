@@ -19,6 +19,11 @@ namespace Squidex.Infrastructure.Queries
 
         public long Take { get; set; } = long.MaxValue;
 
+        public long Top
+        {
+            set { Take = value; }
+        }
+
         public List<SortNode> Sort { get; set; } = new List<SortNode>();
 
         public override string ToString()
