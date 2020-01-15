@@ -25,14 +25,6 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     private renderWidthField = 0;
     private isViewInitField = false;
 
-    public get renderWidth() {
-        return this.renderWidthField;
-    }
-
-    public get isViewInit() {
-        return this.isViewInitField;
-    }
-
     @Output()
     public close = new EventEmitter();
 
@@ -75,11 +67,25 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     @Input()
     public sidebarClass = '';
 
+    @Input()
+    public grid = false;
+
+    @Input()
+    public noPadding = false;
+
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;
 
     public get customClose() {
         return this.close.observers.length > 0;
+    }
+
+    public get renderWidth() {
+        return this.renderWidthField;
+    }
+
+    public get isViewInit() {
+        return this.isViewInitField;
     }
 
     constructor(

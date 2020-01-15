@@ -41,9 +41,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 result = new CompareFilter<ClrValue>(path, nodeIn.Operator, nodeIn.Value);
             }
 
-            if (path.Count == 1 && path[0] == "_id" && result.Value.Value is List<Guid> guidList)
+            if (path.Count == 1 && path[0] == "_id")
             {
-                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
+                if (result.Value.Value is List<Guid> guidList)
+                {
+                    result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
+                }
+                else if (result.Value.Value is Guid guid)
+                {
+                    result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guid.ToString());
+                }
             }
 
             return result;
