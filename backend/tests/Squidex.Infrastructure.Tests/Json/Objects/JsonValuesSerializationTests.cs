@@ -71,6 +71,16 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
+        public void Should_serialize_and_deserialize_double_number()
+        {
+            var value = JsonValue.Create(123.5);
+
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
+        }
+
+        [Fact]
         public void Should_serialize_and_deserialize_array()
         {
             var value = JsonValue.Array(1, 2);
