@@ -95,16 +95,18 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                         throw new JsonSerializationException("Unexpected end when reading Object.");
                     }
 
-                case JsonToken.Integer:
-                    return JsonValue.Create((long)reader.Value!);
-                case JsonToken.Float:
-                    return JsonValue.Create((double)reader.Value!);
-                case JsonToken.Boolean:
-                    return JsonValue.Create((bool)reader.Value!);
-                case JsonToken.Date:
-                    return JsonValue.Create(((DateTime)reader.Value!).ToIso8601());
-                case JsonToken.String:
-                    return JsonValue.Create(reader.Value!.ToString());
+                case JsonToken.Integer when reader.Value is int i:
+                    return JsonValue.Create(i);
+                case JsonToken.Integer when reader.Value is long l:
+                    return JsonValue.Create(l);
+                case JsonToken.Float when reader.Value is float f:
+                    return JsonValue.Create(f);
+                case JsonToken.Boolean when reader.Value is bool b:
+                    return JsonValue.Create(b);
+                case JsonToken.Date when reader.Value is DateTime d:
+                    return JsonValue.Create(d.ToIso8601());
+                case JsonToken.String when reader.Value is string s:
+                    return JsonValue.Create(s);
                 case JsonToken.Null:
                 case JsonToken.Undefined:
                     return JsonValue.Null;

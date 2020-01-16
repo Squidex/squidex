@@ -25,18 +25,36 @@ namespace Migrate_01.Migrations.MongoDb
         {
             var collection = database.GetCollection<BsonDocument>("States_Assets");
 
-            var update1 =
+            var createMetadata =
                 Builders<BsonDocument>.Update
                     .Set("md", new BsonDocument());
 
-            await collection.UpdateManyAsync(new BsonDocument(), update1);
+            await collection.UpdateManyAsync(new BsonDocument(), createMetadata);
 
-            var update2 =
+            var setPixelDimensions =
                 Builders<BsonDocument>.Update
-                    .Rename("ph", "md.PixelHeight")
-                    .Rename("pw", "md.PixelWidth");
+                    .Rename("ph", "md.pixelHeight")
+                    .Rename("pw", "md.pixelWidth");
 
-            await collection.UpdateManyAsync(new BsonDocument(), update2);
+            await collection.UpdateManyAsync(new BsonDocument(), setPixelDimensions);
+
+            var setTypeToImage =
+                Builders<BsonDocument>.Update
+                    .Set("at", "Image");
+
+            await collection.UpdateManyAsync(new BsonDocument("im", true), setTypeToImage);
+
+            var setTypeToUnknown =
+                Builders<BsonDocument>.Update
+                    .Set("at", "Unknown");
+
+            await collection.UpdateManyAsync(new BsonDocument("im", false), setTypeToUnknown);
+
+            var removeIsImage =
+                Builders<BsonDocument>.Update
+                    .Unset("im");
+
+            await collection.UpdateManyAsync(new BsonDocument(), removeIsImage);
         }
     }
 }
