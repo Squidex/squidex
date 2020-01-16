@@ -7,14 +7,12 @@
 
 using System;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class HasherStream : Stream
+    public sealed class SeekFakerStream : Stream
     {
         private readonly Stream inner;
-        private readonly IncrementalHash hasher;
 
         public override bool CanRead
         {
@@ -23,7 +21,7 @@ namespace Squidex.Infrastructure.Assets
 
         public override bool CanSeek
         {
-            get { return false; }
+            get { return true; }
         }
 
         public override bool CanWrite
@@ -42,7 +40,7 @@ namespace Squidex.Infrastructure.Assets
             set { throw new NotSupportedException(); }
         }
 
-        public HasherStream(Stream inner, HashAlgorithmName hashAlgorithmName)
+        public SeekFakerStream(Stream inner)
         {
             Guard.NotNull(inner);
 
@@ -52,30 +50,11 @@ namespace Squidex.Infrastructure.Assets
             }
 
             this.inner = inner;
-
-            hasher = IncrementalHash.CreateHash(hashAlgorithmName);
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var read = inner.Read(buffer, offset, count);
-
-            if (read > 0)
-            {
-                hasher.AppendData(buffer, offset, read);
-            }
-
-            return read;
-        }
-
-        public byte[] GetHashAndReset()
-        {
-            return hasher.GetHashAndReset();
-        }
-
-        public string GetHashStringAndReset()
-        {
-            return Convert.ToBase64String(GetHashAndReset());
+            return inner.Read(buffer, offset, count);
         }
 
         public override void Flush()
@@ -85,7 +64,12 @@ namespace Squidex.Infrastructure.Assets
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotSupportedException();
+            if (offset != 0 || origin != SeekOrigin.Begin)
+            {
+                throw new NotSupportedException();
+            }
+
+            return 0;
         }
 
         public override void SetLength(long value)

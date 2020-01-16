@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (MongoException ex)
             {
-                throw new ConfigurationException($"Cannot connect to Mongo GridFS bucket '${bucket.Options.BucketName}'.", ex);
+                throw new ConfigurationException($"Cannot connect to Mongo GridFS bucket '{bucket.Options.BucketName}'.", ex);
             }
         }
 

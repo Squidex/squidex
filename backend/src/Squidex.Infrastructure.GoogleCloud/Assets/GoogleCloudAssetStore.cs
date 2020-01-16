@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException($"Cannot connect to google cloud bucket '${bucketName}'.", ex);
+                throw new ConfigurationException($"Cannot connect to google cloud bucket '{bucketName}'.", ex);
             }
         }
 

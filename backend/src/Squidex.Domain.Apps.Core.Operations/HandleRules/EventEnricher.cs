@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private Task<IUser?> FindUserAsync(RefToken actor)
         {
-            var key = $"EventEnrichers_Users_${actor.Identifier}";
+            var key = $"EventEnrichers_Users_{actor.Identifier}";
 
             return userCache.GetOrCreateAsync(key, async x =>
             {
