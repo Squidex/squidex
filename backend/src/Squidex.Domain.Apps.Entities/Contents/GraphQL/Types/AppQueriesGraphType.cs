@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 string.Join("&",
                     c.Arguments
                         .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => $"{x.Key}={x.Value}"));
+                        .Select(x => $"${x.Key}={x.Value}"));
 
             return odataQuery;
         }
