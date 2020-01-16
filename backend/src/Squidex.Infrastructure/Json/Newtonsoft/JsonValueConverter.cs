@@ -99,10 +99,10 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     return JsonValue.Create(i);
                 case JsonToken.Integer when reader.Value is long l:
                     return JsonValue.Create(l);
-                case JsonToken.Float when reader.Value is double d:
-                    return JsonValue.Create(d);
                 case JsonToken.Float when reader.Value is float f:
                     return JsonValue.Create(f);
+                case JsonToken.Float when reader.Value is double d:
+                    return JsonValue.Create(d);
                 case JsonToken.Boolean when reader.Value is bool b:
                     return JsonValue.Create(b);
                 case JsonToken.Date when reader.Value is DateTime d:
