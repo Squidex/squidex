@@ -69,7 +69,7 @@ namespace Squidex.Web.Json
             return result;
         });
 
-        private readonly IReadOnlyDictionary<string, Type> maping;
+        private readonly IReadOnlyDictionary<string, Type> mapping;
 
         public TypedJsonInheritanceConverter(string discriminator)
             : this(discriminator, DefaultMapping.Value)
@@ -79,17 +79,17 @@ namespace Squidex.Web.Json
         public TypedJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
             : base(typeof(T), discriminator)
         {
-            maping = mapping ?? DefaultMapping.Value;
+            this.mapping = mapping ?? TypedJsonInheritanceConverter<T>.DefaultMapping.Value;
         }
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
         {
-            return maping.GetOrDefault(discriminatorValue) ?? throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+            return mapping.GetOrDefault(discriminatorValue) ?? throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
         }
 
         public override string GetDiscriminatorValue(Type type)
         {
-            return maping.FirstOrDefault(x => x.Value == type).Key ?? type.Name;
+            return mapping.FirstOrDefault(x => x.Value == type).Key ?? type.Name;
         }
     }
 }

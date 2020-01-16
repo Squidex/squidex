@@ -31,6 +31,13 @@ namespace Migrate_01.Migrations.MongoDb
 
             await collection.UpdateManyAsync(new BsonDocument(), createMetadata);
 
+            var removeNullPixelInfos =
+                Builders<BsonDocument>.Update
+                    .Unset("ph")
+                    .Unset("pw");
+
+            await collection.UpdateManyAsync(new BsonDocument("ph", BsonValue.Create(null)), removeNullPixelInfos);
+
             var setPixelDimensions =
                 Builders<BsonDocument>.Update
                     .Rename("ph", "md.pixelHeight")
