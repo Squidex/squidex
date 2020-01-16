@@ -148,6 +148,7 @@ namespace Squidex.Infrastructure.Assets
 
                 ConfigureDefaults(request);
 
+                // Amazon S3 requires a seekable stream, but does not seek anything.
                 request.InputStream = new SeekFakerStream(stream);
 
                 await transferUtility.UploadAsync(request, ct);
