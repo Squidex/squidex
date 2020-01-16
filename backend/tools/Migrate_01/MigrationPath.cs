@@ -108,16 +108,24 @@ namespace Migrate_01
                 yield return serviceProvider.GetRequiredService<RestructureContentCollection>();
             }
 
-            // Version 17: Rename slug field.
-            if (version < 17)
-            {
-                yield return serviceProvider.GetService<RenameAssetSlugField>();
-            }
-
-            // Version 20: Rebuild assets.
-            if (version < 20)
+            // Version 18: Rebuild assets.
+            if (version < 18)
             {
                 yield return serviceProvider.GetService<RebuildAssets>();
+            }
+            else
+            {
+                // Version 17: Rename slug field.
+                if (version < 17)
+                {
+                    yield return serviceProvider.GetService<RenameAssetSlugField>();
+                }
+
+                // Version 20: Rename slug field.
+                if (version < 20)
+                {
+                    yield return serviceProvider.GetService<RenameAssetMetadata>();
+                }
             }
 
             // Version 16: Introduce file name slugs for assets.

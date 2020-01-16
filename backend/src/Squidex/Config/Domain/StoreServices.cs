@@ -81,6 +81,9 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<RenameAssetSlugField>()
                         .As<IMigration>();
 
+                    services.AddTransientAs<RenameAssetMetadata>()
+                        .As<IMigration>();
+
                     services.AddHealthChecks()
                         .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 

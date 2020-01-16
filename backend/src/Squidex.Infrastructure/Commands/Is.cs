@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Commands
             return !Equals(oldValue, newValue);
         }
 
-        public static bool Change(string oldValue, string newValue)
+        public static bool Change(string? oldValue, string? newValue)
         {
             return !Equals(oldValue, newValue);
         }

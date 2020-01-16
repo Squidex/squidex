@@ -70,8 +70,6 @@ namespace Squidex.Domain.Apps.Entities
             clone.LastModified = headers.Timestamp();
             clone.LastModifiedBy = payload.Actor;
 
-            clone.Version = headers.EventStreamNumber();
-
             return (clone as T)!;
         }
     }

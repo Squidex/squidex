@@ -56,12 +56,12 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)
         {
-            var newVersion = Version + 1;
-
             var snapshot = OnEvent(@event);
 
             if (!ReferenceEquals(Snapshot, snapshot) || isLoading)
             {
+                var newVersion = Version + 1;
+
                 snapshot.Version = newVersion;
                 snapshots.Add(snapshot);
 
