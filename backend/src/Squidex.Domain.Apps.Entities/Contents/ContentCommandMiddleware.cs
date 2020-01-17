@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contextProvider = contextProvider;
         }
 
-        public override async Task HandleAsync(CommandContext context, Func<Task> next)
+        public override async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             await base.HandleAsync(context, next);
 

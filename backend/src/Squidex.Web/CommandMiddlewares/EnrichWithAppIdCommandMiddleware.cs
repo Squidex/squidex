@@ -23,7 +23,7 @@ namespace Squidex.Web.CommandMiddlewares
             this.contextProvider = contextProvider;
         }
 
-        public Task HandleAsync(CommandContext context, Func<Task> next)
+        public Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.Command is IAppCommand appCommand && appCommand.AppId == null)
             {
@@ -39,7 +39,7 @@ namespace Squidex.Web.CommandMiddlewares
                 appSelfCommand.AppId = appId.Id;
             }
 
-            return next();
+            return next(context);
         }
 
         private NamedId<Guid> GetAppId()

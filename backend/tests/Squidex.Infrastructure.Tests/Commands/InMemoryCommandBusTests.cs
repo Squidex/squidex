@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, Func<Task> next)
+            public Task HandleAsync(CommandContext context, NextDelegate next)
             {
                 LastCommand = context.Command;
 
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, Func<Task> next)
+            public Task HandleAsync(CommandContext context, NextDelegate next)
             {
                 LastCommand = context.Command;
 
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, Func<Task> next)
+            public Task HandleAsync(CommandContext context, NextDelegate next)
             {
                 LastCommand = context.Command;
 

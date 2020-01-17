@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -24,11 +23,11 @@ namespace Squidex.Web.CommandMiddlewares
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task HandleAsync(CommandContext context, Func<Task> next)
+        public Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (httpContextAccessor.HttpContext == null)
             {
-                return next();
+                return next(context);
             }
 
             if (context.Command is SquidexCommand squidexCommand)
@@ -48,7 +47,7 @@ namespace Squidex.Web.CommandMiddlewares
                 }
             }
 
-            return next();
+            return next(context);
         }
     }
 }

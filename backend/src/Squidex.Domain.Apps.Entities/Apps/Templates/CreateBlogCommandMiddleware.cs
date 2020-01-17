@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private const string TemplateName = "Blog";
 
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     CreatePostsAsync(publish));
             }
 
-            await next();
+            await next(context);
         }
 
         private static bool IsRightTemplate(CreateApp createApp)

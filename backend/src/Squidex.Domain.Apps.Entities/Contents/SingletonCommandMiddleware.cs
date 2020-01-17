@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -18,9 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class SingletonCommandMiddleware : ICommandMiddleware
     {
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            await next();
+            await next(context);
 
             if (context.IsCompleted &&
                 context.Command is CreateSchema createSchema &&

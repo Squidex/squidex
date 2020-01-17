@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.contextProvider = contextProvider;
         }
 
-        public override async Task HandleAsync(CommandContext context, Func<Task> next)
+        public override async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.Command is UploadAppImage uploadImage)
             {
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 contextProvider.Context.App = app;
             }
 
-            await next();
+            await next(context);
         }
 
         private async Task UploadAsync(UploadAppImage uploadImage)

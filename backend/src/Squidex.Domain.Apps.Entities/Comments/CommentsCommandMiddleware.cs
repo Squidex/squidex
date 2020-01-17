@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             this.userResolver = userResolver;
         }
 
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.Command is CommentsCommand commentsCommand)
             {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 await ExecuteCommandAsync(context, commentsCommand);
             }
 
-            await next();
+            await next(context);
         }
 
         private async Task ExecuteCommandAsync(CommandContext context, CommentsCommand commentsCommand)

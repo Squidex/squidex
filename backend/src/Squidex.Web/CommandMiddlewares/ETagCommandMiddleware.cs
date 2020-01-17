@@ -25,13 +25,13 @@ namespace Squidex.Web.CommandMiddlewares
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             var httpContext = httpContextAccessor.HttpContext;
 
             if (httpContext == null)
             {
-                await next();
+                await next(context);
 
                 return;
             }
@@ -50,7 +50,7 @@ namespace Squidex.Web.CommandMiddlewares
                 }
             }
 
-            await next();
+            await next(context);
 
             if (context.PlainResult is EntitySavedResult result)
             {

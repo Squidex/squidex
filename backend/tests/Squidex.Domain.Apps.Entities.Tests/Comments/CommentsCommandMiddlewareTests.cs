@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var isNextCalled = false;
 
-            await sut.HandleAsync(context, () =>
+            await sut.HandleAsync(context, c =>
             {
                 isNextCalled = true;
 

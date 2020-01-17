@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetMetadataSources = assetMetadataSources;
         }
 
-        public override async Task HandleAsync(CommandContext context, Func<Task> next)
+        public override async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             var tempFile = context.ContextId.ToString();
 
@@ -71,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                                     context.Complete(result);
 
-                                    await next();
+                                    await next(context);
                                     return;
                                 }
                             }
@@ -121,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task HandleCoreAsync(CommandContext context, Func<Task> next)
+        private async Task HandleCoreAsync(CommandContext context, NextDelegate next)
         {
             await base.HandleAsync(context, next);
 

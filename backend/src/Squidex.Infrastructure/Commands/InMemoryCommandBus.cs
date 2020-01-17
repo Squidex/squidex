@@ -9,19 +9,58 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {
-        private readonly List<ICommandMiddleware> middlewares;
+        private readonly IStep pipeline;
+
+        private interface IStep
+        {
+            Task InvokeAsync(CommandContext context);
+        }
+
+        private class NoopStep : IStep
+        {
+            public Task InvokeAsync(CommandContext context)
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        private class DefaultStep : IStep
+        {
+            private readonly IStep next;
+            private readonly ICommandMiddleware middleware;
+
+            public DefaultStep(ICommandMiddleware middleware, IStep next)
+            {
+                this.middleware = middleware;
+
+                this.next = next;
+            }
+
+            public Task InvokeAsync(CommandContext context)
+            {
+                return middleware.HandleAsync(context, next.InvokeAsync);
+            }
+        }
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
             Guard.NotNull(middlewares);
 
-            this.middlewares = middlewares.Reverse().ToList();
+            var reverseMiddlewares = middlewares.Reverse().ToList();
+
+            IStep next = new NoopStep();
+
+            foreach (var middleware in reverseMiddlewares)
+            {
+                next = new DefaultStep(middleware, next);
+            }
+
+            pipeline = next;
         }
 
         public async Task<CommandContext> PublishAsync(ICommand command)
@@ -30,21 +69,9 @@ namespace Squidex.Infrastructure.Commands
 
             var context = new CommandContext(command, this);
 
-            var next = new Func<Task>(() => TaskHelper.Done);
-
-            foreach (var handler in middlewares)
-            {
-                next = Join(handler, context, next);
-            }
-
-            await next();
+            await pipeline.InvokeAsync(context);
 
             return context;
-        }
-
-        private static Func<Task> Join(ICommandMiddleware handler, CommandContext context, Func<Task> next)
-        {
-            return () => handler.HandleAsync(context, next);
         }
     }
 }

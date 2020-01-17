@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -25,13 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             this.userResolver = userResolver;
         }
 
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.Command is AssignContributor assignContributor && ShouldInvite(assignContributor))
             {
                 var created = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true);
 
-                await next();
+                await next(context);
 
                 if (created && context.PlainResult is IAppEntity app)
                 {
@@ -40,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             }
             else
             {
-                await next();
+                await next(context);
             }
         }
 

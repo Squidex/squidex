@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             var logContext = (id: context.ContextId.ToString(), command: context.Command.GetType().Name);
 
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Commands
                     .WriteProperty("status", "Completed")
                     .WriteProperty("commandType", ctx.command)))
                 {
-                    await next();
+                    await next(context);
                 }
 
                 log.LogInformation(logContext, (ctx, w) => w
