@@ -26,6 +26,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string? Slug { get; set; }
 
         /// <summary>
+        /// True, when the asset is not public.
+        /// </summary>
+        public bool? IsProtected { get; set; }
+
+        /// <summary>
         /// The new asset tags.
         /// </summary>
         public HashSet<string>? Tags { get; set; }

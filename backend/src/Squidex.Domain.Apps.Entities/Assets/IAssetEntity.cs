@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         string MimeType { get; }
 
+        bool IsProtected { get; }
+
         long FileVersion { get; }
     }
 }

@@ -89,6 +89,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("td")]
         public HashSet<string> Tags { get; set; }
 
+        [BsonIgnoreIfDefault]
+        [BsonElement("pt")]
+        public bool IsProtected { get; set; }
+
         [BsonRequired]
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }

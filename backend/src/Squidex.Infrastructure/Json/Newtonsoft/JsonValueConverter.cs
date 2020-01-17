@@ -142,7 +142,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     writer.WriteValue(s.Value);
                     break;
                 case JsonNumber s:
-
                     if (s.Value % 1 == 0)
                     {
                         writer.WriteValue((long)s.Value);
