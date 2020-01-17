@@ -14,9 +14,11 @@ namespace Squidex.Domain.Apps.Events.Assets
     [EventType(nameof(AssetAnnotated))]
     public sealed class AssetAnnotated : AssetEvent
     {
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
+
+        public bool? IsProtected { get; set; }
 
         public AssetMetadata? Metadata { get; set; }
 

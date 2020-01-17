@@ -19,18 +19,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command);
 
-            Validate.It(() => "Cannot rename asset.", e =>
+            Validate.It(() => "Cannot annotate asset.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FileName) &&
                     string.IsNullOrWhiteSpace(command.Slug) &&
-                    command.Tags == null &&
-                    command.Metadata == null)
+                    command.IsProtected == null &&
+                    command.Metadata == null &&
+                    command.Tags == null)
                 {
-                   e("Either file name, slug, tags or metadata must be defined.",
+                   e("At least one property must be defined.",
                        nameof(command.FileName),
+                       nameof(command.IsProtected),
+                       nameof(command.Metadata),
                        nameof(command.Slug),
-                       nameof(command.Tags),
-                       nameof(command.Metadata));
+                       nameof(command.Tags));
                 }
             });
         }

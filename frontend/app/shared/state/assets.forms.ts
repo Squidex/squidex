@@ -31,6 +31,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
         private readonly formBuilder: FormBuilder
     ) {
         super(formBuilder.group({
+            isProtected: false,
             fileName: ['',
                 [
                     Validators.required
@@ -41,7 +42,11 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
                     Validators.required
                 ]
             ],
-            tags: [[]],
+            tags: [[],
+                [
+                    Validators.required
+                ]
+            ],
             metadata: formBuilder.array([])
         }));
     }
@@ -104,6 +109,10 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
 
             if (result.slug === asset.slug) {
                 delete result.slug;
+            }
+
+            if (result.isProtected === asset.isProtected) {
+                delete result.isProtected;
             }
 
             if (Types.jsJsonEquals(result.metadata, asset.metadata)) {

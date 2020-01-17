@@ -49,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public long FileVersion { get; set; }
 
+        public bool IsProtected { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public AssetMetadata Metadata { get; set; }

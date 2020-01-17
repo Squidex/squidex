@@ -49,6 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public long TotalSize { get; set; }
 
         [DataMember]
+        public bool IsProtected { get; set; }
+
+        [DataMember]
         public HashSet<string> Tags { get; set; }
 
         [DataMember]
@@ -116,6 +119,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                         if (Is.OptionalChange(Slug, e.Slug))
                         {
                             Slug = e.Slug;
+
+                            hasChanged = true;
+                        }
+
+                        if (Is.OptionalChange(IsProtected, e.IsProtected))
+                        {
+                            IsProtected = e.IsProtected.Value;
 
                             hasChanged = true;
                         }

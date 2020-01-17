@@ -67,6 +67,7 @@ export class AssetDto {
         public readonly fileType: string,
         public readonly fileSize: number,
         public readonly fileVersion: number,
+        public readonly isProtected: boolean,
         public readonly parentId: string,
         public readonly mimeType: string,
         public readonly type: string,
@@ -122,6 +123,7 @@ export class AssetFolderDto {
 
 export interface AnnotateAssetDto {
     readonly fileName?: string;
+    readonly isProtected?: boolean;
     readonly slug?: string;
     readonly tags?: ReadonlyArray<string>;
     readonly metadata?: { [key: string]: any };
@@ -377,6 +379,7 @@ function parseAsset(response: any) {
         response.fileType,
         response.fileSize,
         response.fileVersion,
+        response.isProtected,
         response.parentId,
         response.mimeType,
         response.type,

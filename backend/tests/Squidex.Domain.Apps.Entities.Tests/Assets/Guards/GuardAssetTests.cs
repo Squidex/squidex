@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             var command = new AnnotateAsset();
 
             ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command),
-                new ValidationError("Either file name, slug, tags or metadata must be defined.", "FileName", "Slug", "Tags", "Metadata"));
+                new ValidationError("At least one property must be defined.", "FileName", "IsProtected", "Metadata", "Slug", "Tags"));
         }
 
         [Fact]

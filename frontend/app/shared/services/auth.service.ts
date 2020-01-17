@@ -39,6 +39,10 @@ export class Profile {
         return this.user.expired || false;
     }
 
+    public get accessKey(): string {
+        return this.user.access_token;
+    }
+
     public get authToken(): string {
         return `${this.user!.token_type} ${this.user.access_token}`;
     }
