@@ -18,6 +18,7 @@ describe('AnnotateAssetForm', () => {
             'Tag1',
             'Tag2'
         ],
+        isProtected: false,
         metadata: {
             key1: null,
             key2: 'String',

@@ -31,7 +31,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
         private readonly formBuilder: FormBuilder
     ) {
         super(formBuilder.group({
-            isProtected: [false],
+            isProtected: false,
             fileName: ['',
                 [
                     Validators.required
@@ -112,7 +112,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
             }
 
             if (result.isProtected === asset.isProtected) {
-                delete result.slug;
+                delete result.isProtected;
             }
 
             if (Types.jsJsonEquals(result.metadata, asset.metadata)) {
