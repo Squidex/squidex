@@ -1,5 +1,46 @@
 # Changelog
 
+## 4.1.0 Beta 1 - 2020-01-17
+
+### Features
+
+* **Assets**: Folders to organized your assets.
+* **Assets**: Asset metadata with built in editor in the management UI.
+* **Assets**: Better detection of asset type, including videos and extracting of more metadata.
+* **Assets**: Protect assets.
+* **Assets**: Amazon S3 support for assets.
+* **Assets**: Dedicated permission to upload new version of asset.
+* **GraphQL**: Flat data to provide content with default language rules.
+* **Logging**: Increased log levels and performance improvements.
+* **Logging**: Store request logs in MongoDB for fast download (also in hosted version).
+* **Geolocation**: Search by location in OpenStreetMap-Editor.
+* **Geolocation**: General UX approvements for Editor.
+* **Comments**: Mention other contributors by email address.
+* **Comments**: Notification when you get mentioned.
+* **Comments**: Markdown support.
+* **Comments**: Rule action to create comments for content items.
+* **Comments**: Trigger to handle notifications, for example to forward them to slack.
+* **References**: Tag editor for references.
+* **References**: Added button to open contents view in a new browser tab.
+* **UI**: Page size for contents view.
+* **UI**: Less forgiving markdown preview.
+* **UI**: Video support for rich text editor.
+* **UI**: Clearer link to API documentation.
+* **Strings**: StockImage editor with photes provided by Unsplash.
+* **Performance**: Performance improvements and reduced memory allocations.
+* **Performance**: Faster full text index.
+
+### Bugfixes
+
+* **Backups**: Fixed several minor bugs in backups and increased the test coverage.
+* **Infrastructure**: Fixed a bug when resetting plans (Cloud only).
+* **Infrastructure**: Fixed header handling when Squidex is hosted behind a proxy.
+* **Content**: Use proper MongoDB indices for default sorting.
+* **UI**: Fixed image positioning in Safari in content list.
+* **UI**: Fix for autosaving content.
+* **Translation**: Fix for deepl translation.
+* **Authentication**: Better logout.
+
 ## 4.0.3 - 2019-11-18
 
 ### Features
