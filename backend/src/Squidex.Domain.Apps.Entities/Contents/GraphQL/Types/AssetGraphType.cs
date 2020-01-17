@@ -142,6 +142,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "isProtected",
+                ResolvedType = AllTypes.NonNullBoolean,
+                Resolver = Resolve(x => x.IsProtected),
+                Description = "True, when the asset is not public."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "isImage",
                 ResolvedType = AllTypes.NonNullBoolean,
                 Resolver = Resolve(x => x.Type == AssetType.Image),

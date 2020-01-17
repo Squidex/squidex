@@ -43,6 +43,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string? FileHash { get; set; }
 
         /// <summary>
+        /// True, when the asset is not public.
+        /// </summary>
+        public bool IsProtected { get; set; }
+
+        /// <summary>
         /// The slug.
         /// </summary>
         [Required]

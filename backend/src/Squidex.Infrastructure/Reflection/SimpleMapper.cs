@@ -149,8 +149,10 @@ namespace Squidex.Infrastructure.Reflection
 
             public static TTarget MapClass(TSource source, TTarget destination, CultureInfo culture)
             {
-                foreach (var mapper in Mappers)
+                for (var i = 0; i < Mappers.Count; i++)
                 {
+                    var mapper = Mappers[i];
+
                     mapper.MapProperty(source, destination, culture);
                 }
 

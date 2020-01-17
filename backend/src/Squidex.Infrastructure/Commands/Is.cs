@@ -23,7 +23,12 @@ namespace Squidex.Infrastructure.Commands
             return !Equals(oldValue, newValue);
         }
 
-        public static bool OptionalChange(string oldValue, string? newValue)
+        public static bool OptionalChange(bool oldValue, [NotNullWhen(true)] bool? newValue)
+        {
+            return newValue.HasValue && oldValue != newValue.Value;
+        }
+
+        public static bool OptionalChange(string oldValue, [NotNullWhen(true)] string? newValue)
         {
             return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue);
         }

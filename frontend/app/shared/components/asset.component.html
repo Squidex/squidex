@@ -11,7 +11,7 @@
                 
                 <ng-container *ngIf="asset.canPreview; else noPreview">
                     <div class="file-image">
-                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
+                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" [accessToken]="authService.user?.accessKey" class="bg" layoutKey="asset-large">
                     </div>
                 </ng-container>
                 <ng-template #noPreview>

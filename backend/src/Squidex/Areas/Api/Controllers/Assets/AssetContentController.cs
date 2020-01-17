@@ -19,6 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Shared;
 using Squidex.Web;
 
 #pragma warning disable 1573
@@ -64,6 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("assets/{app}/{idOrSlug}/{*more}")]
         [ProducesResponseType(typeof(FileResult), 200)]
+        [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetQuery query)
@@ -94,7 +96,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("assets/{id}/")]
         [ProducesResponseType(typeof(FileResult), 200)]
+        [ApiPermission]
         [ApiCosts(0.5)]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] AssetQuery query)
         {
             var asset = await assetRepository.FindAssetAsync(id);
@@ -109,6 +113,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
             if (asset == null || asset.FileVersion < query.Version)
             {
                 return NotFound();
+            }
+
+            if (asset.IsProtected && !this.HasPermission(Permissions.AppAssetsRead))
+            {
+                return StatusCode(403);
             }
 
             var fileVersion = query.Version;

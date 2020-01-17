@@ -163,6 +163,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task AnnotateProtected_should_create_events_and_update_state()
+        {
+            var command = new AnnotateAsset { IsProtected = true };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent2(sut.Snapshot);
+
+            Assert.Equal(command.IsProtected, sut.Snapshot.IsProtected);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetAnnotated { IsProtected = command.IsProtected })
+                );
+        }
+
+        [Fact]
         public async Task AnnotateMetadata_should_create_events_and_update_state()
         {
             var command = new AnnotateAsset { Metadata = new AssetMetadata().SetPixelWidth(800) };

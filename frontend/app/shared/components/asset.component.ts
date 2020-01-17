@@ -11,6 +11,7 @@ import {
     AssetDto,
     AssetsState,
     AssetUploaderState,
+    AuthService,
     DialogModel,
     DialogService,
     Types,
@@ -74,6 +75,7 @@ export class AssetComponent implements OnInit {
     public editDialog = new DialogModel();
 
     constructor(
+        public readonly authService: AuthService,
         private readonly assetUploader: AssetUploaderState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
