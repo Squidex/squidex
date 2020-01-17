@@ -72,7 +72,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
 
     public transformSubmit(value: any) {
         return {
-            ...value,
+            ...value.json,
             noFieldDeletion: !value.fieldsDelete,
             noFieldRecreation: !value.fieldsDelete
         };
