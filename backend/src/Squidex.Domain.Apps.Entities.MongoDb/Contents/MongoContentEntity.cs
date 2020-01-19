@@ -19,7 +19,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public sealed class MongoContentEntity : IContentEntity
+    public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Guid>
     {
         private NamedContentData? data;
         private NamedContentData dataDraft;
