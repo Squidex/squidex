@@ -24,7 +24,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -263,30 +262,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.DeleteOneAsync(x => x.Id == id);
         }
 
-        public async Task UpsertAsync(MongoContentEntity content, long oldVersion)
+        public Task UpsertAsync(MongoContentEntity content, long oldVersion)
         {
-            try
-            {
-                await Collection.ReplaceOneAsync(x => x.Id == content.Id && x.Version == oldVersion, content, Upsert);
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    var existingVersion =
-                        await Collection.Find(x => x.Id == content.Id).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
-
-                    if (existingVersion != null)
-                    {
-                        throw new InconsistentStateException(existingVersion["vs"].AsInt64, oldVersion, ex);
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return Collection.UpsertVersionedAsync(content.Id, oldVersion, content);
         }
     }
 }

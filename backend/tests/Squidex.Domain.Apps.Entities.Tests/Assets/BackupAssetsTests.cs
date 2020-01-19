@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return TaskHelper.Done;
             });
 
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetState, AssetGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetState, AssetDomainObject>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
                 .Invokes((IdSource source, CancellationToken _) => source(add));
 
             await sut.RestoreAsync(context);
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return TaskHelper.Done;
             });
 
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderState, AssetFolderGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderState, AssetFolderDomainObject>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
                 .Invokes((IdSource source, CancellationToken _) => source(add));
 
             await sut.RestoreAsync(context);

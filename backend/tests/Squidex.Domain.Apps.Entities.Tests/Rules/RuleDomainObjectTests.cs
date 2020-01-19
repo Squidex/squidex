@@ -22,12 +22,12 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleGrainTests : HandlerTestBase<RuleState>
+    public class RuleDomainObjectTests : HandlerTestBase<RuleState>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
         private readonly Guid ruleId = Guid.NewGuid();
-        private readonly RuleGrain sut;
+        private readonly RuleDomainObject sut;
 
         protected override Guid Id
         {
@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
             public int Value { get; set; }
         }
 
-        public RuleGrainTests()
+        public RuleDomainObjectTests()
         {
-            sut = new RuleGrain(Store, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
-            sut.ActivateAsync(Id).Wait();
+            sut = new RuleDomainObject(Store, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
-            return result.Value;
+            return result;
         }
     }
 }

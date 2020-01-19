@@ -14,14 +14,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    public sealed class MyDomainObject : DomainObjectGrain<MyDomainState>
+    public sealed class MyDomainObject : DomainObject<MyDomainState>
     {
         public MyDomainObject(IStore<Guid> store)
            : base(store, A.Dummy<ISemanticLog>())
         {
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {

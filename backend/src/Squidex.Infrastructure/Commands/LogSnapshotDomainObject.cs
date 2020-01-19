@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class LogSnapshotDomainObjectGrain<T> : DomainObjectGrainBase<T> where T : class, IDomainState<T>, new()
+    public abstract class LogSnapshotDomainObject<T> : DomainObjectBase<T> where T : class, IDomainState<T>, new()
     {
         private readonly IStore<Guid> store;
         private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
@@ -26,12 +26,17 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshots.Last(); }
         }
 
-        protected LogSnapshotDomainObjectGrain(IStore<Guid> store, ISemanticLog log)
+        protected LogSnapshotDomainObject(IStore<Guid> store, ISemanticLog log)
             : base(log)
         {
             Guard.NotNull(log);
 
             this.store = store;
+        }
+
+        protected override void OnSetup()
+        {
+            persistence = store.WithEventSourcing(GetType(), Id, x => ApplyEvent(x, true));
         }
 
         public T GetSnapshot(long version)
@@ -71,13 +76,6 @@ namespace Squidex.Infrastructure.Commands
             return false;
         }
 
-        protected sealed override Task ReadAsync(Type type, Guid id)
-        {
-            persistence = store.WithEventSourcing(type, id, x => ApplyEvent(x, true));
-
-            return persistence.ReadAsync();
-        }
-
         protected sealed override async Task WriteAsync(Envelope<IEvent>[] newEvents, long previousVersion)
         {
             if (newEvents.Length > 0 && persistence != null)
@@ -85,7 +83,25 @@ namespace Squidex.Infrastructure.Commands
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
                 await persistence.WriteEventsAsync(newEvents);
-                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, previousVersion + newEvents.Length);
+                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, Snapshot.Version);
+            }
+        }
+
+        protected async sealed override Task ReadAsync()
+        {
+            if (persistence != null)
+            {
+                await persistence.ReadAsync();
+            }
+        }
+
+        public async sealed override Task RebuildStateAsync()
+        {
+            if (persistence != null)
+            {
+                var persistedSnapshots = store.GetSnapshotStore<T>();
+
+                await persistedSnapshots.WriteAsync(Id, Snapshot, EtagVersion.Any, Snapshot.Version);
             }
         }
 

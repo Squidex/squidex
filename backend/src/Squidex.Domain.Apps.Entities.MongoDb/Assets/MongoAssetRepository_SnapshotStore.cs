@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 entity.Version = newVersion;
                 entity.IndexedAppId = value.AppId.Id;
 
-                await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
+                await Collection.UpsertVersionedAsync(key, oldVersion, entity);
             }
         }
 

@@ -7,23 +7,24 @@
 
 using System;
 using System.Threading.Tasks;
-using FakeItEasy;
+using Squidex.Domain.Apps.Entities.Schemas.State;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Infrastructure.TestHelpers
+namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class MyGrain : DomainObjectGrain<MyDomainState>
+    public sealed class SchemaDomainObjectGrain : DomainObjectGrain<SchemaDomainObject, SchemaState>, ISchemaGrain
     {
-        public MyGrain(IStore<Guid> store)
-            : base(store, A.Dummy<ISemanticLog>())
+        public SchemaDomainObjectGrain(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public async Task<J<ISchemaEntity>> GetStateAsync()
         {
-            return Task.FromResult<object?>(null);
+            await DomainObject.EnsureLoadedAsync();
+
+            return Snapshot;
         }
     }
 }

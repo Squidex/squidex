@@ -23,24 +23,24 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaGrainTests : HandlerTestBase<SchemaState>
+    public class SchemaDomainObjectTests : HandlerTestBase<SchemaState>
     {
         private readonly string fieldName = "age";
         private readonly string arrayName = "array";
         private readonly NamedId<long> fieldId = NamedId.Of(1L, "age");
         private readonly NamedId<long> arrayId = NamedId.Of(1L, "array");
         private readonly NamedId<long> nestedId = NamedId.Of(2L, "age");
-        private readonly SchemaGrain sut;
+        private readonly SchemaDomainObject sut;
 
         protected override Guid Id
         {
             get { return SchemaId; }
         }
 
-        public SchemaGrainTests()
+        public SchemaDomainObjectTests()
         {
-            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>());
-            sut.ActivateAsync(Id).Wait();
+            sut = new SchemaDomainObject(Store, A.Dummy<ISemanticLog>());
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -762,7 +762,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            return result.Value;
+            return result;
         }
     }
 }

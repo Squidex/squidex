@@ -19,21 +19,20 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppGrain : DomainObjectGrain<AppState>, IAppGrain
+    public sealed class AppDomainObject : DomainObject<AppState>
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppGrain(
+        public AppDomainObject(
             InitialPatterns initialPatterns,
             IStore<Guid> store,
             ISemanticLog log,
@@ -53,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotArchived();
 
@@ -499,11 +498,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
-        }
-
-        public Task<J<IAppEntity>> GetStateAsync()
-        {
-            return J.AsTask<IAppEntity>(Snapshot);
         }
     }
 }

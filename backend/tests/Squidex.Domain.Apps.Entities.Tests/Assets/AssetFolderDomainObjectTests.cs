@@ -16,38 +16,29 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetFolderGrainTests : HandlerTestBase<AssetFolderState>
+    public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderState>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly Guid parentId = Guid.NewGuid();
         private readonly Guid assetFolderId = Guid.NewGuid();
-        private readonly AssetFolderGrain sut;
+        private readonly AssetFolderDomainObject sut;
 
         protected override Guid Id
         {
             get { return assetFolderId; }
         }
 
-        public AssetFolderGrainTests()
+        public AssetFolderDomainObjectTests()
         {
             A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            sut = new AssetFolderGrain(Store, assetQuery, limit, A.Dummy<ISemanticLog>());
-            sut.ActivateAsync(Id).Wait();
-        }
-
-        [Fact]
-        public void Should_set_limit()
-        {
-            A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
-                .MustHaveHappened();
+            sut = new AssetFolderDomainObject(Store, assetQuery, A.Dummy<ISemanticLog>());
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -184,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
 
-            return result.Value;
+            return result;
         }
     }
 }

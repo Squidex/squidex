@@ -24,16 +24,14 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrainTests : HandlerTestBase<ContentState>
+    public class ContentDomainObjectTests : HandlerTestBase<ContentState>
     {
         private readonly Guid contentId = Guid.NewGuid();
-        private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentRepository contentRepository = A.Dummy<IContentRepository>();
@@ -68,14 +66,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentFieldData()
                         .AddValue("iv", 2));
         private readonly NamedContentData patched;
-        private readonly ContentGrain sut;
+        private readonly ContentDomainObject sut;
 
         protected override Guid Id
         {
             get { return contentId; }
         }
 
-        public ContentGrainTests()
+        public ContentDomainObjectTests()
         {
             app = Mocks.App(AppNamedId, Language.DE);
 
@@ -108,15 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            sut = new ContentGrain(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, contentWorkflow, contentRepository, limit);
-            sut.ActivateAsync(Id).Wait();
-        }
-
-        [Fact]
-        public void Should_set_limit()
-        {
-            A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
-                .MustHaveHappened();
+            sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, contentWorkflow, contentRepository);
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -133,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data };
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
 
@@ -155,9 +146,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data, Publish = true };
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Published, sut.Snapshot.Status);
 
@@ -178,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = invalidData };
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(CreateContentCommand(command)));
+            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(CreateContentCommand(command)));
         }
 
         [Fact]
@@ -188,9 +179,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -209,9 +200,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(sut.Snapshot.IsPending);
 
@@ -231,9 +222,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Single(LastEvents);
 
@@ -248,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(CreateContentCommand(command)));
+            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(CreateContentCommand(command)));
         }
 
         [Fact]
@@ -258,9 +249,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -279,9 +270,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.True(sut.Snapshot.IsPending);
 
@@ -301,9 +292,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Single(LastEvents);
 
@@ -318,9 +309,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Published, sut.Snapshot.Status);
 
@@ -340,9 +331,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
 
@@ -363,9 +354,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
 
@@ -386,9 +377,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecuteArchiveAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
 
@@ -410,9 +401,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteProposeUpdateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.False(sut.Snapshot.IsPending);
 
@@ -434,9 +425,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
             Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob!.Status);
@@ -462,9 +453,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, Status.Published, User))
                 .Returns(false);
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            result.ShouldBeEquivalent2(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.ScheduleJob);
 
@@ -484,9 +475,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent2(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -508,9 +499,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteProposeUpdateAsync();
 
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent2(new EntitySavedResult(3));
 
             Assert.False(sut.Snapshot.IsPending);
 
@@ -522,37 +513,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new CreateContent { Data = data }));
+            return PublishAsync(CreateContentCommand(new CreateContent { Data = data }));
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new UpdateContent { Data = otherData }));
+            return PublishAsync(CreateContentCommand(new UpdateContent { Data = otherData }));
         }
 
         private Task ExecuteProposeUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new UpdateContent { Data = otherData, AsDraft = true }));
+            return PublishAsync(CreateContentCommand(new UpdateContent { Data = otherData, AsDraft = true }));
         }
 
         private Task ExecuteChangeStatusAsync(Status status, Instant? dueTime = null)
         {
-            return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = status, DueTime = dueTime }));
+            return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = status, DueTime = dueTime }));
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new DeleteContent()));
+            return PublishAsync(CreateContentCommand(new DeleteContent()));
         }
 
         private Task ExecuteArchiveAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Archived }));
+            return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Archived }));
         }
 
         private Task ExecutePublishAsync()
         {
-            return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
+            return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
         }
 
         private ScriptContext ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus)
@@ -587,6 +578,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             command.ContentId = contentId;
 
             return CreateCommand(command);
+        }
+
+        private async Task<object?> PublishAsync(ContentCommand command)
+        {
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+
+            return result;
         }
     }
 }

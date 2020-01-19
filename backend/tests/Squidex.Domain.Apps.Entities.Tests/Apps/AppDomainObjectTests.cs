@@ -27,7 +27,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppGrainTests : HandlerTestBase<AppState>
+    public class AppDomainObjectTests : HandlerTestBase<AppState>
     {
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string roleName = "My Role";
         private readonly string planIdPaid = "premium";
         private readonly string planIdFree = "free";
-        private readonly AppGrain sut;
+        private readonly AppDomainObject sut;
         private readonly Guid workflowId = Guid.NewGuid();
         private readonly Guid patternId1 = Guid.NewGuid();
         private readonly Guid patternId2 = Guid.NewGuid();
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             get { return AppId; }
         }
 
-        public AppGrainTests()
+        public AppDomainObjectTests()
         {
             A.CallTo(() => user.Id)
                 .Returns(contributorId);
@@ -74,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
-            sut.ActivateAsync(Id).Wait();
+            sut = new AppDomainObject(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -734,7 +734,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            return result.Value;
+            return result;
         }
     }
 }

@@ -24,14 +24,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
+    public sealed class SchemaDomainObject : DomainObject<SchemaState>
     {
-        public SchemaGrain(IStore<Guid> store, ISemanticLog log)
+        public SchemaDomainObject(IStore<Guid> store, ISemanticLog log)
             : base(store, log)
         {
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

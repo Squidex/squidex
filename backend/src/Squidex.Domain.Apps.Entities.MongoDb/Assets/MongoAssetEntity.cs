@@ -17,7 +17,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity : IAssetEntity
+    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<Guid>
     {
         [BsonId]
         [BsonElement("_id")]
