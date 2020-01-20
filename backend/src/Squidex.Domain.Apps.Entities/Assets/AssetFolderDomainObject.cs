@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetFolderDomainObject : DomainObject<AssetFolderState>
+    public class AssetFolderDomainObject : DomainObject<AssetFolderState>
     {
         private readonly IAssetQueryService assetQuery;
 

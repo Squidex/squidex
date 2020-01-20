@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -261,7 +262,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The full data for the content item.</param>
-        /// <param name="publish">Indicates whether the content should be published immediately.</param>
+        /// <param name="publish">True to automatically publish the content.</param>
         /// <returns>
         /// 201 => Content created.
         /// 404 => Content, schema or app not found.
@@ -287,6 +288,39 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
+        /// Import content items.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The import request.</param>
+        /// <returns>
+        /// 201 => Contents created.
+        /// 404 => Content references, schema or app not found.
+        /// 400 => Content data is not valid.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/{name}/import")]
+        [ProducesResponseType(typeof(ImportResultDto[]), 200)]
+        [ApiPermission(Permissions.AppContentsCreate)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> PostContent(string app, string name, [FromBody] ImportContentsDto request)
+        {
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
+
+            var command = request.ToCommand();
+
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<ImportResult>();
+            var response = result.Select(x => ImportResultDto.FromImportResult(x, HttpContext)).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Update a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -296,7 +330,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="asDraft">Indicates whether the update is a proposal.</param>
         /// <returns>
         /// 200 => Content updated.
-        /// 404 => Content, schema or app not found.
+        /// 404 => Content references, schema or app not found.
         /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>

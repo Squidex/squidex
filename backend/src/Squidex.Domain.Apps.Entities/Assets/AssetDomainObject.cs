@@ -23,7 +23,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetDomainObject : LogSnapshotDomainObject<AssetState>
+    public class AssetDomainObject : LogSnapshotDomainObject<AssetState>
     {
         private readonly ITagService tagService;
         private readonly IAssetQueryService assetQuery;

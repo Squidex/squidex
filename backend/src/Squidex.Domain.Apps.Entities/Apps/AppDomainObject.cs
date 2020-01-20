@@ -25,7 +25,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppDomainObject : DomainObject<AppState>
+    public class AppDomainObject : DomainObject<AppState>
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IAppPlansProvider appPlansProvider;

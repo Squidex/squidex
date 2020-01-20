@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaDomainObject : DomainObject<SchemaState>
+    public class SchemaDomainObject : DomainObject<SchemaState>
     {
         public SchemaDomainObject(IStore<Guid> store, ISemanticLog log)
             : base(store, log)

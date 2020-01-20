@@ -40,14 +40,14 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public void Setup(Guid id)
+        public virtual void Setup(Guid id)
         {
             this.id = id;
 
             OnSetup();
         }
 
-        public async Task EnsureLoadedAsync()
+        public virtual async Task EnsureLoadedAsync()
         {
             if (isLoaded)
             {
@@ -67,12 +67,12 @@ namespace Squidex.Infrastructure.Commands
             isLoaded = true;
         }
 
-        public void RaiseEvent(IEvent @event)
+        protected void RaiseEvent(IEvent @event)
         {
             RaiseEvent(Envelope.Create(@event));
         }
 
-        public virtual void RaiseEvent(Envelope<IEvent> @event)
+        protected virtual void RaiseEvent(Envelope<IEvent> @event)
         {
             Guard.NotNull(@event);
 

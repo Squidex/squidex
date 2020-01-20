@@ -195,8 +195,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, isDeleted);
 
+            var command = new DeleteSchema { SchemaId = schema.Id };
+
             var context =
-                new CommandContext(new DeleteSchema { SchemaId = schema.Id }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);

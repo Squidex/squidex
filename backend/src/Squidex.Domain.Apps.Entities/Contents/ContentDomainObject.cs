@@ -25,7 +25,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentDomainObject : LogSnapshotDomainObject<ContentState>
+    public class ContentDomainObject : LogSnapshotDomainObject<ContentState>
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
