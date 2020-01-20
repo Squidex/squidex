@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
+            if (context.Mode == ValidationMode.Optimized)
+            {
+                return;
+            }
+
             if (value is ICollection<Guid> assetIds && assetIds.Count > 0)
             {
                 var assets = await context.GetAssetInfosAsync(assetIds);
