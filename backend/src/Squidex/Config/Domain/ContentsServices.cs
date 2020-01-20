@@ -30,6 +30,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentQueryParser>()
                 .AsSelf();
 
+            services.AddTransientAs<ContentDomainObject>()
+                .AsSelf();
+
             services.AddSingletonAs<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 

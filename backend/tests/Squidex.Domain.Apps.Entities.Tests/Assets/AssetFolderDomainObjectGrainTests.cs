@@ -21,7 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public void Should_set_limit()
         {
-            new AssetFolderDomainObjectGrain(A.Fake<IServiceProvider>(), limit);
+            var serviceProvider = A.Fake<IServiceProvider>();
+
+            A.CallTo(() => serviceProvider.GetService(typeof(AssetFolderDomainObject)))
+                .Returns(A.Dummy<AssetFolderDomainObject>());
+
+            new AssetFolderDomainObjectGrain(serviceProvider, limit);
 
             A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
                 .MustHaveHappened();

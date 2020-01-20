@@ -41,9 +41,7 @@ namespace Squidex.Infrastructure.Commands
             this.store = store;
         }
 
-        public Task RebuildAsync<T, TState>(string filter, CancellationToken ct)
-            where T : DomainObjectBase<TState>
-            where TState : class, IDomainState<TState>, new()
+        public Task RebuildAsync<T, TState>(string filter, CancellationToken ct) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
         {
             return RebuildAsync<T, TState>(async target =>
             {
@@ -56,9 +54,7 @@ namespace Squidex.Infrastructure.Commands
             }, ct);
         }
 
-        public virtual async Task RebuildAsync<T, TState>(IdSource source, CancellationToken ct = default)
-            where T : DomainObjectBase<TState>
-            where TState : class, IDomainState<TState>, new()
+        public virtual async Task RebuildAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
         {
             Guard.NotNull(source);
 
@@ -67,9 +63,7 @@ namespace Squidex.Infrastructure.Commands
             await InsertManyAsync<T, TState>(source, ct);
         }
 
-        public virtual async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default)
-            where T : DomainObjectBase<TState>
-            where TState : class, IDomainState<TState>, new()
+        public virtual async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
         {
             Guard.NotNull(source);
 
@@ -78,6 +72,8 @@ namespace Squidex.Infrastructure.Commands
                 try
                 {
                     var domainObject = (T)serviceProvider.GetService(typeof(T));
+
+                    domainObject.Setup(id);
 
                     await domainObject.EnsureLoadedAsync();
                     await domainObject.RebuildStateAsync();

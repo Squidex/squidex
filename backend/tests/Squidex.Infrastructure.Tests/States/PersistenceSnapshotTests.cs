@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
@@ -118,6 +119,17 @@ namespace Squidex.Infrastructure.States
             await persistence.WriteSnapshotAsync(100);
 
             A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_write_snapshot_to_store_with_empty_version()
+        {
+            var persistence = sut.WithSnapshots<int>(None.Type, key, null);
+
+            await persistence.WriteSnapshotAsync(100);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0))
                 .MustHaveHappened();
         }
 

@@ -7,13 +7,12 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class DomainObjectGrain<T, TState> : GrainOfGuid
-        where T : DomainObjectBase<TState>
-        where TState : class, IDomainState<TState>, new()
+    public abstract class DomainObjectGrain<T, TState> : GrainOfGuid where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
     {
         private readonly T domainObject;
 
@@ -27,11 +26,11 @@ namespace Squidex.Infrastructure.Commands
             get { return domainObject; }
         }
 
-        public DomainObjectGrain(IServiceProvider serviceProvider)
+        protected DomainObjectGrain(IServiceProvider serviceProvider)
         {
             Guard.NotNull(serviceProvider);
 
-            domainObject = (serviceProvider.GetService(typeof(T)) as T)!;
+            domainObject = serviceProvider.GetRequiredService<T>();
         }
 
         protected override Task OnActivateAsync(Guid key)

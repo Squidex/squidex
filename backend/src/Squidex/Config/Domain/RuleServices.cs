@@ -28,6 +28,9 @@ namespace Squidex.Config.Domain
             services.Configure<RuleOptions>(
                 config.GetSection("rules"));
 
+            services.AddTransientAs<RuleDomainObject>()
+                .AsSelf();
+
             services.AddSingletonAs<EventEnricher>()
                 .As<IEventEnricher>();
 

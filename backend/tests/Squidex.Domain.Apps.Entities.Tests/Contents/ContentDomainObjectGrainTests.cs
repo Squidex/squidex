@@ -21,7 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_set_limit()
         {
-            new ContentDomainObjectGrain(A.Fake<IServiceProvider>(), limit);
+            var serviceProvider = A.Fake<IServiceProvider>();
+
+            A.CallTo(() => serviceProvider.GetService(typeof(ContentDomainObject)))
+                .Returns(A.Dummy<ContentDomainObject>());
+
+            new ContentDomainObjectGrain(serviceProvider, limit);
 
             A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
                 .MustHaveHappened();
