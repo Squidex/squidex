@@ -71,20 +71,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
 
-                        c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
-                            new ScriptContext
-                            {
-                                Operation = "Create",
-                                Data = c.Data,
-                                Status = status,
-                                StatusOld = default
-                            });
+                        if (!c.DoNotScript)
+                        {
+                            c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
+                                new ScriptContext
+                                {
+                                    Operation = "Create",
+                                    Data = c.Data,
+                                    Status = status,
+                                    StatusOld = default
+                                });
+                        }
 
                         await ctx.EnrichAsync(c.Data);
 
                         if (!c.DoNotValidate)
                         {
-                            await ctx.ValidateAsync(c.Data);
+                            await ctx.ValidateAsync(c.Data, c.OptimizeValidation);
                         }
 
                         if (c.Publish)
@@ -226,11 +229,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (partial)
                 {
-                    await ctx.ValidatePartialAsync(command.Data);
+                    await ctx.ValidatePartialAsync(command.Data, false);
                 }
                 else
                 {
-                    await ctx.ValidateAsync(command.Data);
+                    await ctx.ValidateAsync(command.Data, false);
                 }
 
                 newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update,

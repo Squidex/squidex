@@ -87,8 +87,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             IsOptional = isOptional;
         }
 
-        public ValidationContext Optimized(ValidationMode mode = ValidationMode.Optimized)
+        public ValidationContext Optimized(bool isOptimized = true)
         {
+            var mode = isOptimized ? ValidationMode.Optimized : ValidationMode.Default;
+
             if (Mode == mode)
             {
                 return this;
