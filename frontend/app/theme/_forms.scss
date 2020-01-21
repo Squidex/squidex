@@ -32,28 +32,19 @@
 
     // Small triangle under the error tooltip with the border trick.
     &::after {
-        @include absolute(auto, auto, -.75rem, .625rem);
-        border-color: $color-theme-error transparent transparent;
-        border-style: solid;
-        border-width: .4rem;
-        content: '';
-        height: 0;
-        width: 0;
+        @include absolute(null, null, -.75rem, .625rem);
+        @include caret-bottom($color-theme-error, .4rem);
     }
 
     // The tooltip rectangle itself.
     & {
-        @include absolute(auto, auto, .4rem, 0);
+        @include absolute(null, null, .4rem, 0);
         @include border-radius(2px);
         background: $color-theme-error;
         color: $color-dark-foreground;
-        cursor: none;
-        display: inline-block;
         font-size: .9rem;
         font-weight: normal;
-        line-height: 1.1rem;
-        padding: .25rem .4rem;
-        padding-bottom: .5rem;
+        padding: .25rem .5rem;
     }
 }
 
@@ -74,7 +65,7 @@
         color: $color-dark-foreground;
         font-size: .9rem;
         font-weight: normal;
-        margin-bottom: .8rem;
+        margin-bottom: .75rem;
         margin-top: .25rem;
         padding: .5rem;
         padding-right: 1.5rem;
@@ -185,10 +176,10 @@
         }
 
         &:hover {
-            background: $color-theme-blue-dark;
+            background: $color-theme-blue;
 
             &.separated {
-                border-color: $color-theme-blue-dark;
+                border-color: $color-theme-blue;
             }
         }
 

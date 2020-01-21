@@ -11,7 +11,7 @@
         </ng-container>
 
         <ng-container content>
-            <sqx-form-error closeable="true" [error]="createForm.error | async"></sqx-form-error>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
                 <label for="schemaName">Name <small class="hint">(required)</small></label>
