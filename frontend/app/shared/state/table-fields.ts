@@ -23,6 +23,7 @@ const META_FIELD_NAMES = Object.values(MetaFields);
 export class TableFields {
     private readonly listField$ = new BehaviorSubject<ReadonlyArray<TableField>>([]);
     private readonly listFieldName$ = new BehaviorSubject<ReadonlyArray<string>>([]);
+    private readonly settingsKey: string;
 
     public readonly allFields: ReadonlyArray<string>;
 
@@ -40,7 +41,9 @@ export class TableFields {
     ) {
         this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sorted();
 
-        this.uiState.getUser<string[]>(`${this.schema.id}.view`, []).pipe(take(1))
+        this.settingsKey = `${this.schema.id}.view`;
+
+        this.uiState.getUser<string[]>(this.settingsKey, []).pipe(take(1))
             .subscribe(fieldNames => {
                 this.updateFields(fieldNames, false);
             });
@@ -51,10 +54,14 @@ export class TableFields {
 
         if (fieldNames.length === 0) {
             fieldNames = this.schema.defaultListFields.map(x => x['name'] || x);
-        }
 
-        if (save) {
-            this.uiState.set(`${this.schema.id}.view`, fieldNames, true);
+            if (save) {
+                this.uiState.removeUser(this.settingsKey);
+            }
+        } else {
+            if (save) {
+                this.uiState.set(this.settingsKey, fieldNames, true);
+            }
         }
 
         const fields: ReadonlyArray<TableField> = fieldNames.map(n => this.schema.fields.find(f => f.name === n) || n);
