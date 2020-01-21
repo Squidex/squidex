@@ -7,6 +7,8 @@
 
 import { Injectable } from '@angular/core';
 
+import { Types } from './../utils/types';
+
 export const LocalStoreServiceFactory = () => {
     return new LocalStoreService();
 };
@@ -37,7 +39,17 @@ export class LocalStoreService {
     public getInt(key: string, fallback = 0): number {
         const value = this.get(key);
 
-        return value ? (parseInt(value, 10) || fallback) : fallback;
+        let result = fallback;
+
+        if (Types.isString(value)) {
+            result = parseInt(value, 10);
+        }
+
+        if (!Types.isNumber(result)) {
+            result = fallback;
+        }
+
+        return result;
     }
 
     public set(key: string, value: string) {
