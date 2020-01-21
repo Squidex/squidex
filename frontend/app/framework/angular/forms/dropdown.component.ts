@@ -45,6 +45,9 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
     @Input()
     public canSearch = true;
 
+    @Input()
+    public separated = false;
+
     @ContentChildren(TemplateRef)
     public templates: QueryList<any>;
 

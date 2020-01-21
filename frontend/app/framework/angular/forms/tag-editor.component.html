@@ -35,6 +35,7 @@
         <div class="control-dropdown" [sqxAnchoredTo]="form" position="bottom-left" #container @fade>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
+                [class.separated]="separated"
                 (mousedown)="selectValue(item)" 
                 (mouseover)="selectIndex(i)"
                 [sqxScrollActive]="i === snapshot.suggestedIndex"

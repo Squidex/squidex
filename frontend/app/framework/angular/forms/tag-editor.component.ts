@@ -170,6 +170,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public dashed = false;
 
     @Input()
+    public separated = false;
+
+    @Input()
     public singleLine = false;
 
     @Input()

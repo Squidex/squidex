@@ -1,6 +1,6 @@
 <div class="row no-gutters mb-1" *ngIf="fieldModel">
     <div class="col-auto path">
-        <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="filter.path" (ngModelChange)="changePath($event)" [canSearch]="false">
+        <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="filter.path" (ngModelChange)="changePath($event)" [canSearch]="false" separated="true">
             <ng-template let-field="$implicit">
                 <div>{{model.fields[field].displayName}}</div>
                 

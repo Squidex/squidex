@@ -56,7 +56,7 @@ export class SearchFormComponent implements OnChanges {
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
-    public searchDialog = new DialogModel(true);
+    public searchDialog = new DialogModel(false);
 
     public hasFilter: boolean;
 

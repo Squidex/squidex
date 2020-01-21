@@ -21,7 +21,10 @@
             </div>
 
             <div class="control-dropdown-items" #container>
-                <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === snapshot.selectedIndex" (mousedown)="selectIndexAndClose(i)"
+                <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" 
+                    [class.active]="i === snapshot.selectedIndex"
+                    [class.separated]="separated"
+                    (mousedown)="selectIndexAndClose(i)"
                     [sqxScrollActive]="i === snapshot.selectedIndex"
                     [sqxScrollContainer]="container">
                     <ng-container *ngIf="!templateItem">{{item}}</ng-container>

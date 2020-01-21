@@ -15,7 +15,7 @@ import { QueryModel, QuerySorting } from '@app/shared/internal';
         <div class="row">
             <div class="col">
                 <div class="form-inline">
-                    <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="sorting.path" (ngModelChange)="changePath($event)" [canSearch]="false">
+                    <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="sorting.path" (ngModelChange)="changePath($event)" [canSearch]="false" separated="true">
                         <ng-template let-field="$implicit">
                             <div>{{model.fields[field].displayName}}</div>
 
