@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import {
     DialogModel,
@@ -21,7 +21,7 @@ declare type Model = DialogModel | ModalModel | any;
 @Directive({
     selector: '[sqxModal]'
 })
-export class ModalDirective implements OnDestroy, AfterViewInit {
+export class ModalDirective implements OnDestroy {
     private readonly eventsView = new ResourceOwner();
     private readonly eventsModel = new ResourceOwner();
     private static backdrop: any;
@@ -50,9 +50,6 @@ export class ModalDirective implements OnDestroy, AfterViewInit {
     @Input('sqxModalCloseAlways')
     public closeAlways = false;
 
-    @Input('sqxModalHide')
-    public hide = false;
-
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
@@ -69,17 +66,6 @@ export class ModalDirective implements OnDestroy, AfterViewInit {
         this.eventsModel.unsubscribeAll();
     }
 
-    public ngAfterViewInit() {
-        if (this.hide) {
-            const container = this.getContainer();
-
-            this.renderedView = container.createEmbeddedView(this.templateRef);
-            this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
-
-            this.hideAll();
-        }
-    }
-
     private update(isOpen: boolean) {
         if (!this.templateRef || this.isOpen === isOpen) {
             return;
@@ -88,13 +74,11 @@ export class ModalDirective implements OnDestroy, AfterViewInit {
         this.eventsView.unsubscribeAll();
 
         if (isOpen) {
-            if (!this.renderedView || this.hide) {
-                if (!this.hide) {
-                    const container = this.getContainer();
+            if (!this.renderedView) {
+                const container = this.getContainer();
 
-                    this.renderedView = container.createEmbeddedView(this.templateRef);
-                    this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
-                }
+                this.renderedView = container.createEmbeddedView(this.templateRef);
+                this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
 
                 this.setupStyles();
                 this.subscribeToView();
@@ -103,13 +87,9 @@ export class ModalDirective implements OnDestroy, AfterViewInit {
             }
         } else {
             if (this.renderedView) {
-                if (!this.hide) {
-                    this.renderedView.destroy();
-                    this.renderedView = null;
-                    this.renderRoots = null;
-                } else {
-                    this.hideAll();
-                }
+                this.renderedView.destroy();
+                this.renderedView = null;
+                this.renderRoots = null;
 
                 remove(this.renderer, ModalDirective.backdrop);
 
@@ -122,14 +102,6 @@ export class ModalDirective implements OnDestroy, AfterViewInit {
 
     private getContainer() {
         return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
-    }
-
-    private hideAll() {
-        if (this.renderRoots) {
-            for (const node of this.renderRoots) {
-                this.renderer.setStyle(node, 'display', 'none');
-            }
-        }
     }
 
     private setupStyles() {

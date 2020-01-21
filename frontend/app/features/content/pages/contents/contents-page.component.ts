@@ -12,6 +12,7 @@ import {
     AppLanguageDto,
     ContentDto,
     ContentsState,
+    fadeAnimation,
     LanguagesState,
     ModalModel,
     Queries,
@@ -21,7 +22,7 @@ import {
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
-    TableField,
+    TableView,
     UIState
 } from '@app/shared';
 
@@ -30,13 +31,16 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
-    templateUrl: './contents-page.component.html'
+    templateUrl: './contents-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
 
-    public listFields: ReadonlyArray<TableField> = [];
-    public listFieldsModal = new ModalModel();
+    public tableView: TableView;
+    public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
 
@@ -78,6 +82,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.updateQueries();
                     this.updateModel();
+                    this.updateTable();
                 }));
 
         this.own(
@@ -105,10 +110,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public reload() {
         this.contentsState.load(true);
-    }
-
-    public setListFields(fields: ReadonlyArray<TableField>) {
-        this.listFields = fields;
     }
 
     public deleteSelected() {
@@ -223,6 +224,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     private updateQueries() {
         if (this.schema) {
             this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+        }
+    }
+
+    private updateTable() {
+        if (this.schema) {
+            this.tableView = new TableView(this.uiState, this.schema);
         }
     }
 

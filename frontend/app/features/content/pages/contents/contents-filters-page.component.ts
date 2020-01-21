@@ -41,7 +41,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
                 }));
     }
 
-    public isQueryUsed = (query: SavedQuery) => {
+    public isQueryUsed(query: SavedQuery) {
         return this.contentsState.isQueryUsed(query);
     }
 

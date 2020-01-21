@@ -15,7 +15,6 @@ import {
     ModalModel,
     PatchContentForm,
     RootFieldDto,
-    SchemaDetailsDto,
     TableField,
     Types
 } from '@app/shared';

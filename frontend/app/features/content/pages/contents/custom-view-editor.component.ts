@@ -8,18 +8,9 @@
 // tslint:disable: readonly-array
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { take } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
-import {
-    MetaFields,
-    ResourceOwner,
-    SchemaDetailsDto,
-    TableField,
-    UIState
-} from '@app/shared';
-
-const META_FIELD_NAMES = Object.values(MetaFields);
+import { TableView } from '@app/shared';
 
 @Component({
     selector: 'sqx-custom-view-editor',
@@ -27,78 +18,19 @@ const META_FIELD_NAMES = Object.values(MetaFields);
     templateUrl: './custom-view-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CustomViewEditorComponent extends ResourceOwner implements OnChanges {
-    private allFields: string[];
+export class CustomViewEditorComponent implements OnChanges {
+    @Input()
+    public table: TableView;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public fieldNames: ReadonlyArray<string>;
 
-    @Output()
-    public fieldsChange = new EventEmitter<ReadonlyArray<TableField>>();
+    public fieldsNotAdded: ReadonlyArray<string>;
 
-    public fieldsAdded: string[];
-    public fieldsNotAdded: string[];
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly uiState: UIState
-    ) {
-        super();
-    }
-
-    public ngOnChanges() {
-        this.fieldsChange.emit([]);
-
-        this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sorted();
-
-        this.unsubscribeAll();
-
-        this.own(
-            this.uiState.getUser<string[]>(`${this.schema.id}.view`, []).pipe(take(1))
-                .subscribe(fieldNames => {
-                    this.updateFields(fieldNames, true);
-
-                    this.changeDetector.detectChanges();
-                }));
-    }
-
-    private updateFields(fieldNames: string[], save: boolean) {
-        if (fieldNames.length === 0) {
-            fieldNames = this.schema.defaultListFields.map(x => x['name'] || x);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fieldNames']) {
+            this.fieldsNotAdded = this.table.allFields.filter(n => this.fieldNames.indexOf(n) < 0);
         }
-
-        this.fieldsAdded = fieldNames.filter(n => this.allFields.indexOf(n) >= 0);
-        this.fieldsNotAdded = this.allFields.filter(n => fieldNames.indexOf(n) < 0);
-
-        if (save) {
-            this.uiState.set(`${this.schema.id}.view`, this.fieldsAdded, true);
-        }
-
-        this.emitFields();
-    }
-
-    private emitFields() {
-        if (this.fieldsAdded.length === 0) {
-            const fields = this.schema.defaultListFields;
-
-            this.fieldsChange.emit(fields);
-        } else {
-            let fields: ReadonlyArray<TableField> = this.fieldsAdded.map(n => this.schema.fields.find(f => f.name === n) || n);
-
-            this.fieldsChange.emit(fields);
-        }
-    }
-
-    public resetDefault() {
-        this.updateFields([], true);
-    }
-
-    public addField(field: string) {
-        this.updateFields([...this.fieldsAdded, field], true);
-    }
-
-    public removeField(field: string) {
-        this.updateFields(this.fieldsAdded.filter(x => x !== field), true);
     }
 
     public random() {
@@ -108,6 +40,6 @@ export class CustomViewEditorComponent extends ResourceOwner implements OnChange
     public drop(event: CdkDragDrop<string[]>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
-        this.updateFields(this.fieldsAdded, true);
+        this.table.updateFields(event.container.data);
     }
 }
