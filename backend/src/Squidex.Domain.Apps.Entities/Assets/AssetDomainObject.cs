@@ -18,19 +18,17 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetGrain : LogSnapshotDomainObjectGrain<AssetState>, IAssetGrain
+    public class AssetDomainObject : LogSnapshotDomainObject<AssetState>
     {
-        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetGrain(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, IActivationLimit limit, ISemanticLog log)
+        public AssetDomainObject(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(tagService);
@@ -39,18 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
 
             this.assetQuery = assetQuery;
-
-            limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task OnActivateAsync(Guid key)
-        {
-            TryDelayDeactivation(Lifetime);
-
-            return base.OnActivateAsync(key);
-        }
-
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -185,11 +174,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 throw new DomainException("Asset has already been deleted");
             }
-        }
-
-        public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
-        {
-            return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }
 }

@@ -83,16 +83,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.Done;
         }
 
-        public Task ValidateAsync(NamedContentData data)
+        public Task ValidateAsync(NamedContentData data, bool optimized)
         {
-            var ctx = CreateValidationContext();
+            var ctx = CreateValidationContext(optimized);
 
             return data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task ValidatePartialAsync(NamedContentData data)
+        public Task ValidatePartialAsync(NamedContentData data, bool optimized)
         {
-            var ctx = CreateValidationContext();
+            var ctx = CreateValidationContext(optimized);
 
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
@@ -122,12 +122,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             context.User = command.User;
         }
 
-        private ValidationContext CreateValidationContext()
+        private ValidationContext CreateValidationContext(bool optimized)
         {
             return new ValidationContext(command.ContentId, schemaId,
-                QueryContentsAsync,
-                QueryContentsAsync,
-                QueryAssetsAsync);
+                    QueryContentsAsync,
+                    QueryContentsAsync,
+                    QueryAssetsAsync)
+                .Optimized(optimized);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)

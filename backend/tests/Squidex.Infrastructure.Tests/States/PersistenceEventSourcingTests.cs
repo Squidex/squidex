@@ -176,7 +176,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_write_to_store_with_previous_position()
+        public async Task Should_write_to_store_with_previous_version()
         {
             SetupEventStore(3);
 
@@ -197,7 +197,18 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_wrap_exception_when_writing_to_store_with_previous_position()
+        public async Task Should_write_events_to_store_with_empty_version()
+        {
+            var persistence = sut.WithEventSourcing(None.Type, key, null);
+
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, EtagVersion.Empty, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
             SetupEventStore(3);
 

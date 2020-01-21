@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return TaskHelper.Done;
             });
 
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentState, ContentGrain>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IdSource>.Ignored, A<CancellationToken>.Ignored))
                 .Invokes((IdSource source, CancellationToken _) => source(add));
 
             await sut.RestoreAsync(context);

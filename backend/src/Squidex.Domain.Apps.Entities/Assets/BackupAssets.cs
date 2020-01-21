@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetState, AssetGrain>(async target =>
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(async target =>
                 {
                     foreach (var id in assetIds)
                     {
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderState, AssetFolderGrain>(async target =>
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(async target =>
                 {
                     foreach (var id in assetFolderIds)
                     {

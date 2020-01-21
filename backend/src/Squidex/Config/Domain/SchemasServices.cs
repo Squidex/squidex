@@ -15,6 +15,9 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexSchemas(this IServiceCollection services)
         {
+            services.AddTransientAs<SchemaDomainObject>()
+                .AsSelf();
+
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
         }

@@ -21,6 +21,8 @@ import {
     ResourceOwner
 } from '@app/shared';
 
+const CONFIG_KEY = 'notifications.version';
+
 @Component({
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
@@ -32,44 +34,42 @@ import {
 })
 export class NotificationsMenuComponent extends ResourceOwner implements OnInit {
     private isOpen: boolean;
-    private configKey: string;
 
     public modalMenu = new ModalModel();
 
-    public commentsUrl: string;
     public commentsState: CommentsState;
-
-    public userId: string;
-    public userToken: string;
 
     public versionRead = -1;
     public versionReceived = -1;
+
+    public userToken: string;
 
     public get unread() {
         return Math.max(0, this.versionReceived - this.versionRead);
     }
 
-    constructor(authService: AuthService,
+    constructor(authService: AuthService, commentsService: CommentsService, dialogs: DialogService,
         private readonly changeDetector: ChangeDetectorRef,
-        private readonly commentsService: CommentsService,
-        private readonly dialogs: DialogService,
         private readonly localStore: LocalStoreService
     ) {
         super();
 
         this.userToken = authService.user!.token;
-        this.userId = authService.user!.id;
 
-        this.configKey = `users.${this.userId}.notifications`;
-
-        this.versionRead = localStore.getInt(this.configKey, -1);
+        this.versionRead = localStore.getInt(CONFIG_KEY, -1);
         this.versionReceived = this.versionRead;
+
+        const commentsUrl = `users/${authService.user!.id}/notifications`;
+
+        this.commentsState =
+            new CommentsState(
+                commentsUrl,
+                commentsService,
+                dialogs,
+                this.versionRead);
     }
 
     public ngOnInit() {
-        this.commentsUrl = `users/${this.userId}/notifications`;
-        this.commentsState = new CommentsState(this.commentsUrl, this.commentsService, this.dialogs);
-
         this.own(
             this.modalMenu.isOpen.pipe(
                 tap(isOpen => {
@@ -104,7 +104,7 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
         if (this.isOpen) {
             this.versionRead = this.versionReceived;
 
-            this.localStore.setInt(this.configKey, this.versionRead);
+            this.localStore.setInt(CONFIG_KEY, this.versionRead);
         }
     }
 }

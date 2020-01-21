@@ -15,6 +15,12 @@ namespace Squidex.Web
         [Display(Description = "Error message.")]
         public string Message { get; set; }
 
+        [Display(Description = "The optional trace id.")]
+        public string? TraceId { get; set; }
+
+        [Display(Description = "Link to the error details.")]
+        public string? Type { get; set; }
+
         [Display(Description = "Detailed error messages.")]
         public string[]? Details { get; set; }
 

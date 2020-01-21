@@ -16,18 +16,17 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
+    public class RuleDomainObject : DomainObject<RuleState>
     {
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
+        public RuleDomainObject(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
             Guard.NotNull(appProvider);
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -144,11 +143,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 throw new DomainException("Rule has already been deleted.");
             }
-        }
-
-        public Task<J<IRuleEntity>> GetStateAsync()
-        {
-            return J.AsTask<IRuleEntity>(Snapshot);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (contentIdsBySchemaId.Count > 0)
             {
-                await rebuilder.InsertManyAsync<ContentState, ContentGrain>(async target =>
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(async target =>
                 {
                     foreach (var contentId in contentIdsBySchemaId.Values.SelectMany(x => x))
                     {

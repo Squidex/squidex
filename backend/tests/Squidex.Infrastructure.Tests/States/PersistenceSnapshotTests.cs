@@ -122,6 +122,17 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_write_snapshot_to_store_with_empty_version()
+        {
+            var persistence = sut.WithSnapshots<int>(None.Type, key, null);
+
+            await persistence.WriteSnapshotAsync(100);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_wrap_exception_when_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))

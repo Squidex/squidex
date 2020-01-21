@@ -16,6 +16,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
     {
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
+            if (context.Mode == ValidationMode.Optimized)
+            {
+                return;
+            }
+
             var count = context.Path.Count();
 
             if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))

@@ -16,35 +16,24 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetFolderGrain : DomainObjectGrain<AssetFolderState>, IAssetFolderGrain
+    public class AssetFolderDomainObject : DomainObject<AssetFolderState>
     {
-        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly IAssetQueryService assetQuery;
 
-        public AssetFolderGrain(IStore<Guid> store, IAssetQueryService assetQuery, IActivationLimit limit, ISemanticLog log)
+        public AssetFolderDomainObject(IStore<Guid> store, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(assetQuery);
 
             this.assetQuery = assetQuery;
-
-            limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task OnActivateAsync(Guid key)
-        {
-            TryDelayDeactivation(Lifetime);
-
-            return base.OnActivateAsync(key);
-        }
-
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

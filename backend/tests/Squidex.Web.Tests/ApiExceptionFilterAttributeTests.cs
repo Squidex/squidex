@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -62,7 +63,7 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(400, context);
+            Validate(400, context.Result, context.Exception);
         }
 
         [Fact]
@@ -72,7 +73,7 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(412, context);
+            Validate(412, context.Result, context.Exception);
         }
 
         [Fact]
@@ -82,7 +83,7 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(403, context);
+            Validate(403, context.Result, context.Exception);
         }
 
         [Fact]
@@ -92,10 +93,44 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(403, context);
+            Validate(403, context.Result, context.Exception);
+        }
+
+        [Fact]
+        public async Task Should_unify_errror()
+        {
+            var context = R(new ProblemDetails { Status = 403, Type = "type" });
+
+            await sut.OnResultExecutionAsync(context, () => Task.FromResult(Result(context)));
+
+            Validate(403, context.Result, null);
+        }
+
+        private static ResultExecutedContext Result(ResultExecutingContext context)
+        {
+            var actionContext = ActionContext();
+
+            return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), context.Result, context.Controller);
+        }
+
+        private static ResultExecutingContext R(ProblemDetails problem)
+        {
+            var actionContext = ActionContext();
+
+            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), new ObjectResult(problem) { StatusCode = problem.Status }, null);
         }
 
         private static ExceptionContext E(Exception exception)
+        {
+            var actionContext = ActionContext();
+
+            return new ExceptionContext(actionContext, new List<IFilterMetadata>())
+            {
+                Exception = exception
+            };
+        }
+
+        private static ActionContext ActionContext()
         {
             var httpContext = new DefaultHttpContext();
 
@@ -104,20 +139,24 @@ namespace Squidex.Web
                 FilterDescriptors = new List<FilterDescriptor>()
             });
 
-            return new ExceptionContext(actionContext, new List<IFilterMetadata>())
-            {
-                Exception = exception
-            };
+            return actionContext;
         }
 
-        private static void Validate(int statusCode, ExceptionContext context)
+        private static void Validate(int statusCode, IActionResult actionResult, Exception? exception)
         {
-            var result = (ObjectResult)context.Result!;
+            var result = (ObjectResult)actionResult;
+
+            var error = (ErrorDto)result.Value;
+
+            Assert.NotNull(error.Type);
 
             Assert.Equal(statusCode, result.StatusCode);
-            Assert.Equal(statusCode, (result.Value as ErrorDto)?.StatusCode);
+            Assert.Equal(statusCode, error.StatusCode);
 
-            Assert.Equal(context.Exception.Message, (result.Value as ErrorDto)!.Message);
+            if (exception != null)
+            {
+                Assert.Equal(exception.Message, error.Message);
+            }
         }
     }
 }

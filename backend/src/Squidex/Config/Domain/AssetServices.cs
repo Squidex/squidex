@@ -28,6 +28,12 @@ namespace Squidex.Config.Domain
             services.Configure<AssetOptions>(
                 config.GetSection("assets"));
 
+            services.AddTransientAs<AssetDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<AssetFolderDomainObject>()
+                .AsSelf();
+
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 

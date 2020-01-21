@@ -32,8 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_invite_user_and_change_result()
         {
+            var command = new AssignContributor { ContributorId = "me@email.com", Invite = true };
+
             var context =
-                new CommandContext(new AssignContributor { ContributorId = "me@email.com", Invite = true }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete(app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
@@ -50,8 +52,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_invite_user_and_not_change_result_if_not_added()
         {
+            var command = new AssignContributor { ContributorId = "me@email.com", Invite = true };
+
             var context =
-                new CommandContext(new AssignContributor { ContributorId = "me@email.com", Invite = true }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete(app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
@@ -68,8 +72,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_not_call_user_resolver_if_not_email()
         {
+            var command = new AssignContributor { ContributorId = "123", Invite = true };
+
             var context =
-                new CommandContext(new AssignContributor { ContributorId = "123", Invite = true }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete(app);
 
             await sut.HandleAsync(context);
@@ -81,8 +87,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_not_call_user_resolver_if_not_inviting()
         {
+            var command = new AssignContributor { ContributorId = "123", Invite = false };
+
             var context =
-                new CommandContext(new AssignContributor { ContributorId = "123", Invite = false }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete(app);
 
             await sut.HandleAsync(context);

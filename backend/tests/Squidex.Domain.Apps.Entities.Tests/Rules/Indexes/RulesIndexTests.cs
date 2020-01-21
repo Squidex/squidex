@@ -78,8 +78,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var ruleId = Guid.NewGuid();
 
+            var command = new CreateRule { RuleId = ruleId, AppId = appId };
+
             var context =
-                new CommandContext(new CreateRule { RuleId = ruleId, AppId = appId }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -93,8 +95,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(0, false);
 
+            var command = new DeleteRule { RuleId = rule.Id };
+
             var context =
-                new CommandContext(new DeleteRule { RuleId = rule.Id }, commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);

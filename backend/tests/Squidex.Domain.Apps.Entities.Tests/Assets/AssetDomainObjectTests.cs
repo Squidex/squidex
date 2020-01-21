@@ -21,27 +21,25 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetGrainTests : HandlerTestBase<AssetState>
+    public class AssetDomainObjectTests : HandlerTestBase<AssetState>
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly Guid parentId = Guid.NewGuid();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
-        private readonly AssetGrain sut;
+        private readonly AssetDomainObject sut;
 
         protected override Guid Id
         {
             get { return assetId; }
         }
 
-        public AssetGrainTests()
+        public AssetDomainObjectTests()
         {
             A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
@@ -49,15 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
 
-            sut = new AssetGrain(Store, tagService, assetQuery, limit, A.Dummy<ISemanticLog>());
-            sut.ActivateAsync(Id).Wait();
-        }
-
-        [Fact]
-        public void Should_set_limit()
-        {
-            A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
-                .MustHaveHappened();
+            sut = new AssetDomainObject(Store, tagService, assetQuery, A.Dummy<ISemanticLog>());
+            sut.Setup(Id);
         }
 
         [Fact]
@@ -304,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            return result.Value;
+            return result;
         }
     }
 }

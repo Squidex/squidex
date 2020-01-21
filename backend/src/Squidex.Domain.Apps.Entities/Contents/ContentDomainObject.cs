@@ -20,30 +20,27 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentGrain : LogSnapshotDomainObjectGrain<ContentState>, IContentGrain
+    public class ContentDomainObject : LogSnapshotDomainObject<ContentState>
     {
-        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly IScriptEngine scriptEngine;
         private readonly IContentWorkflow contentWorkflow;
 
-        public ContentGrain(
+        public ContentDomainObject(
             IStore<Guid> store,
             ISemanticLog log,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentWorkflow contentWorkflow,
-            IContentRepository contentRepository,
-            IActivationLimit limit)
+            IContentRepository contentRepository)
             : base(store, log)
         {
             Guard.NotNull(appProvider);
@@ -57,11 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.assetRepository = assetRepository;
             this.contentWorkflow = contentWorkflow;
             this.contentRepository = contentRepository;
-
-            limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -76,20 +71,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
 
-                        c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
-                            new ScriptContext
-                            {
-                                Operation = "Create",
-                                Data = c.Data,
-                                Status = status,
-                                StatusOld = default
-                            });
+                        if (!c.DoNotScript)
+                        {
+                            c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
+                                new ScriptContext
+                                {
+                                    Operation = "Create",
+                                    Data = c.Data,
+                                    Status = status,
+                                    StatusOld = default
+                                });
+                        }
 
                         await ctx.EnrichAsync(c.Data);
 
                         if (!c.DoNotValidate)
                         {
-                            await ctx.ValidateAsync(c.Data);
+                            await ctx.ValidateAsync(c.Data, c.OptimizeValidation);
                         }
 
                         if (c.Publish)
@@ -231,11 +229,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (partial)
                 {
-                    await ctx.ValidatePartialAsync(command.Data);
+                    await ctx.ValidatePartialAsync(command.Data, false);
                 }
                 else
                 {
-                    await ctx.ValidateAsync(command.Data);
+                    await ctx.ValidateAsync(command.Data, false);
                 }
 
                 newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update,
@@ -367,11 +365,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;
-        }
-
-        public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)
-        {
-            return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }
 }

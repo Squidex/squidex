@@ -77,6 +77,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<ContentImporterCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

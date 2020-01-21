@@ -111,7 +111,14 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var update = updater(Builders<T>.Update.Set(x => x.Version, newVersion));
 
-                await collection.UpdateOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, update, Upsert);
+                if (oldVersion > EtagVersion.Any)
+                {
+                    await collection.UpdateOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, update, Upsert);
+                }
+                else
+                {
+                    await collection.UpdateOneAsync(x => x.Id.Equals(key), update, Upsert);
+                }
             }
             catch (MongoWriteException ex)
             {
@@ -137,7 +144,14 @@ namespace Squidex.Infrastructure.MongoDb
         {
             try
             {
-                await collection.ReplaceOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, doc, Upsert);
+                if (oldVersion > EtagVersion.Any)
+                {
+                    await collection.ReplaceOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, doc, Upsert);
+                }
+                else
+                {
+                    await collection.ReplaceOneAsync(x => x.Id.Equals(key), doc, Upsert);
+                }
             }
             catch (MongoWriteException ex)
             {

@@ -20,6 +20,9 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexApps(this IServiceCollection services)
         {
+            services.AddTransientAs<AppDomainObject>()
+                .AsSelf();
+
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
 

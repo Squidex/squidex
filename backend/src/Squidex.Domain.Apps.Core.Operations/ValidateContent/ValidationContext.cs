@@ -46,13 +46,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool IsOptional { get; }
 
+        public ValidationMode Mode { get; }
+
         public ValidationContext(
             Guid contentId,
             Guid schemaId,
             CheckContents checkContent,
             CheckContentsByIds checkContentsByIds,
-            CheckAssets checkAsset)
-            : this(contentId, schemaId, checkContent, checkContentsByIds, checkAsset, ImmutableQueue<string>.Empty, false)
+            CheckAssets checkAsset,
+            ValidationMode mode = ValidationMode.Default)
+            : this(contentId, schemaId, checkContent, checkContentsByIds, checkAsset, ImmutableQueue<string>.Empty, false, mode)
         {
         }
 
@@ -63,7 +66,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             CheckContentsByIds checkContentByIds,
             CheckAssets checkAsset,
             ImmutableQueue<string> propertyPath,
-            bool isOptional)
+            bool isOptional,
+            ValidationMode mode = ValidationMode.Default)
         {
             Guard.NotNull(checkAsset);
             Guard.NotNull(checkContent);
@@ -78,15 +82,39 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             this.schemaId = schemaId;
 
+            Mode = mode;
+
             IsOptional = isOptional;
+        }
+
+        public ValidationContext Optimized(bool isOptimized = true)
+        {
+            var mode = isOptimized ? ValidationMode.Optimized : ValidationMode.Default;
+
+            if (Mode == mode)
+            {
+                return this;
+            }
+
+            return Clone(propertyPath, IsOptional, mode);
         }
 
         public ValidationContext Optional(bool isOptional)
         {
-            return isOptional == IsOptional ? this : OptionalCore(isOptional);
+            if (IsOptional == isOptional)
+            {
+                return this;
+            }
+
+            return Clone(propertyPath, isOptional, Mode);
         }
 
-        private ValidationContext OptionalCore(bool isOptional)
+        public ValidationContext Nested(string property)
+        {
+            return Clone(propertyPath.Enqueue(property), IsOptional, Mode);
+        }
+
+        private ValidationContext Clone(ImmutableQueue<string> path, bool isOptional, ValidationMode mode)
         {
             return new ValidationContext(
                 contentId,
@@ -94,19 +122,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 checkContent,
                 checkContentByIds,
                 checkAsset,
-                propertyPath,
-                isOptional);
-        }
-
-        public ValidationContext Nested(string property)
-        {
-            return new ValidationContext(
-                contentId, schemaId,
-                checkContent,
-                checkContentByIds,
-                checkAsset,
-                propertyPath.Enqueue(property),
-                IsOptional);
+                path, isOptional, mode);
         }
 
         public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> GetContentIdsAsync(HashSet<Guid> ids)

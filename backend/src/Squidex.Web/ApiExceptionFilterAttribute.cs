@@ -5,113 +5,46 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
 {
-    public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
+    public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter, IAsyncActionFilter
     {
-        private static readonly List<Func<Exception, IActionResult?>> Handlers = new List<Func<Exception, IActionResult?>>();
-
-        private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
+        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            Handlers.Add(ex => ex is T typed ? handler(typed) : null);
-        }
+            var resultContext = await next();
 
-        static ApiExceptionFilterAttribute()
-        {
-            AddHandler<ValidationException>(OnValidationException);
-            AddHandler<DecoderFallbackException>(OnDecoderException);
-            AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
-            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
-            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
-            AddHandler<DomainException>(OnDomainException);
-            AddHandler<SecurityException>(OnSecurityException);
-        }
+            if (resultContext.Result is ObjectResult objectResult && objectResult.Value is ProblemDetails problem)
+            {
+                var error = new ErrorDto { Message = problem.Title, Type = problem.Type, StatusCode = problem.Status };
 
-        private static IActionResult OnDecoderException(DecoderFallbackException ex)
-        {
-            return ErrorResult(400, new ErrorDto { Message = ex.Message });
-        }
+                if (problem.Extensions.TryGetValue("traceId", out var temp) && temp is string traceId)
+                {
+                    error.TraceId = traceId;
+                }
 
-        private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
-        {
-            return new NotFoundResult();
-        }
-
-        private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
-        {
-            return ErrorResult(412, new ErrorDto { Message = ex.Message });
-        }
-
-        private static IActionResult OnDomainException(DomainException ex)
-        {
-            return ErrorResult(400, new ErrorDto { Message = ex.Message });
-        }
-
-        private static IActionResult OnDomainForbiddenException(DomainForbiddenException ex)
-        {
-            return ErrorResult(403, new ErrorDto { Message = ex.Message });
-        }
-
-        private static IActionResult OnSecurityException(SecurityException ex)
-        {
-            return ErrorResult(403, new ErrorDto { Message = ex.Message });
-        }
-
-        private static IActionResult OnValidationException(ValidationException ex)
-        {
-            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ToDetails(ex) });
-        }
-
-        private static IActionResult ErrorResult(int statusCode, ErrorDto error)
-        {
-            error.StatusCode = statusCode;
-
-            return new ObjectResult(error) { StatusCode = statusCode };
+                objectResult.Value = error;
+            }
         }
 
         public void OnException(ExceptionContext context)
         {
-            IActionResult? result = null;
+            var error = context.Exception.ToErrorDto(context.HttpContext);
 
-            foreach (var handler in Handlers)
+            if (error.StatusCode == 404)
             {
-                result = handler(context.Exception);
-
-                if (result != null)
-                {
-                    break;
-                }
+                context.Result = new NotFoundResult();
             }
-
-            if (result != null)
+            else
             {
-                context.Result = result;
+                context.Result = new ObjectResult(error)
+                {
+                    StatusCode = error.StatusCode
+                };
             }
-        }
-
-        private static string[] ToDetails(ValidationException ex)
-        {
-            return ex.Errors?.Select(e =>
-            {
-                if (e.PropertyNames?.Any() == true)
-                {
-                    return $"{string.Join(", ", e.PropertyNames)}: {e.Message}";
-                }
-                else
-                {
-                    return e.Message;
-                }
-            }).ToArray() ?? new string[0];
         }
     }
 }

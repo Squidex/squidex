@@ -149,6 +149,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_reference_are_not_valid_but_in_optimized_mode()
+        {
+            var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
+
+            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References().Optimized());
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_error_if_reference_schema_is_not_valid()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
