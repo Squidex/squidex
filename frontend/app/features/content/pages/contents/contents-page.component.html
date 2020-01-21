@@ -16,10 +16,10 @@
             </div>
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Fulltext search"
+                    (queryChange)="search($event)"
                     [query]="contentsState.contentsQuery | async"
                     [queries]="queries"
                     [queryModel]="queryModel"
-                    (queryChange)="search($event)"
                     [language]="languageMaster"
                     enableShortcut="true">
                 </sqx-search-form>
@@ -87,8 +87,8 @@
                                 <th *ngFor="let field of listFields" [sqxContentListCell]="field">
                                     <sqx-content-list-header
                                         [field]="field"
-                                        [query]="contentsState.contentsQuery | async"
                                         (queryChange)="search($event)"
+                                        [query]="contentsState.contentsQuery | async"
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>
@@ -107,10 +107,10 @@
                                 (selectedChange)="selectItem(content, $event)"
                                 (statusChange)="changeStatus(content, $event)"
                                 (clone)="clone(content)"
-                                [link]="[content.id]"
-                                [listFields]="listFields"
+                                [canClone]="contentsState.snapshot.canCreate"
                                 [language]="language"
-                                [canClone]="contentsState.snapshot.canCreate">
+                                [link]="[content.id]"
+                                [listFields]="listFields">
                             </tbody>
                         </table>
                     </div>
