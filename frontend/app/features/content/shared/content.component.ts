@@ -53,7 +53,7 @@ export class ContentComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public listFields: ReadonlyArray<TableField>;
 
     @Input()
     public canClone: boolean;
@@ -87,8 +87,8 @@ export class ContentComponent implements OnChanges {
             this.patchAllowed = this.content.canUpdate;
         }
 
-        if (this.patchAllowed && (changes['schema'] || changes['language'])) {
-            this.patchForm = new PatchContentForm(this.schema, this.language);
+        if (this.patchAllowed && (changes['listFields'] || changes['language'])) {
+            this.patchForm = new PatchContentForm(this.listFields, this.language);
         }
     }
 

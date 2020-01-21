@@ -59,10 +59,22 @@
                         Delete
                     </button>
                 </div>
+
+                <div class="settings-container">
+                    <button type="button" class="btn btn-sm settings-button" (click)="listFieldsModal.toggle()" #buttonSettings>
+                        <i class="icon-settings"></i>
+                    </button>
+
+                    <ng-container *sqxModal="listFieldsModal;hide:true">
+                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" position="bottom-right">
+                            <sqx-custom-view-editor (fieldsChange)="setListFields($event)" [schema]="schema"></sqx-custom-view-editor>
+                        </div>
+                    </ng-container>
+                </div>
             </ng-container>
 
             <ng-container syncedHeader>
-                <table class="table table-items table-fixed" [style.minWidth]="schema.listFields | sqxContentListWidth" #header>
+                <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" #header>
                     <thead>
                         <tr>
                             <th class="cell-select">
@@ -71,7 +83,7 @@
                             <th class="cell-actions cell-actions-left">
                                 Actions
                             </th>
-                            <th *ngFor="let field of schema.listFields" [sqxContentListCell]="field">
+                            <th *ngFor="let field of listFields" [sqxContentListCell]="field">
                                 <sqx-content-list-header
                                     [field]="field"
                                     [query]="contentsState.contentsQuery | async"
@@ -86,7 +98,7 @@
 
             <ng-container syncedContent>
                 <div class="table-container">
-                    <table class="table table-items table-fixed" [style.minWidth]="schema.listFields | sqxContentListWidth" [sqxSyncWidth]="header">
+                    <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" [sqxSyncWidth]="header">
                         <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent"
                             [sqxContent]="content"
                             (delete)="delete(content)"
@@ -95,9 +107,9 @@
                             (statusChange)="changeStatus(content, $event)"
                             (clone)="clone(content)"
                             [link]="[content.id]"
+                            [listFields]="listFields"
                             [language]="language"
-                            [canClone]="contentsState.snapshot.canCreate"
-                            [schema]="schema">
+                            [canClone]="contentsState.snapshot.canCreate">
                         </tbody>
                     </table>
                 </div>

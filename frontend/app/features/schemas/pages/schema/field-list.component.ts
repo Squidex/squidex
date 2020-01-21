@@ -12,7 +12,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 
 import { MetaFields, SchemaDetailsDto } from '@app/shared';
 
-const MetaFieldNames = Object.values(MetaFields);
+const META_FIELD_NAMES = Object.values(MetaFields);
 
 @Component({
     selector: 'sqx-field-list',
@@ -43,7 +43,7 @@ export class FieldListComponent implements OnChanges {
         let allFields = this.schema.contentFields.map(x => x.name);
 
         if (this.withMetaFields) {
-            allFields = [...allFields, ...MetaFieldNames];
+            allFields = [...allFields, ...META_FIELD_NAMES];
         }
 
         this.fieldsAdded = this.fieldNames.filter(n => allFields.indexOf(n) >= 0);

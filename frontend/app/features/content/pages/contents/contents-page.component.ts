@@ -21,6 +21,7 @@ import {
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
+    TableField,
     UIState
 } from '@app/shared';
 
@@ -33,6 +34,9 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
+
+    public listFields: ReadonlyArray<TableField> = [];
+    public listFieldsModal = new ModalModel();
 
     public searchModal = new ModalModel();
 
@@ -101,6 +105,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public reload() {
         this.contentsState.load(true);
+    }
+
+    public setListFields(fields: ReadonlyArray<TableField>) {
+        this.listFields = fields;
     }
 
     public deleteSelected() {
