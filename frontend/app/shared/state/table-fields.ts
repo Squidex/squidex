@@ -20,7 +20,7 @@ import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
 
-export class TableView {
+export class TableFields {
     private readonly listField$ = new BehaviorSubject<ReadonlyArray<TableField>>([]);
     private readonly listFieldName$ = new BehaviorSubject<ReadonlyArray<string>>([]);
 
@@ -61,17 +61,5 @@ export class TableView {
 
         this.listField$.next(fields);
         this.listFieldName$.next(fieldNames);
-    }
-
-    public resetDefault() {
-        this.updateFields([]);
-    }
-
-    public addField(field: string) {
-        this.updateFields([...this.listFieldName$.value, field]);
-    }
-
-    public removeField(field: string) {
-        this.updateFields(this.listFieldName$.value.filter(x => x !== field));
     }
 }

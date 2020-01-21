@@ -29,7 +29,7 @@ export class AssetsFiltersPageComponent {
     ) {
     }
 
-    public isQueryUsed(query: SavedQuery) {
+    public isQueryUsed = (query: SavedQuery) => {
         return this.assetsState.isQueryUsed(query);
     }
 

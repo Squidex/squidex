@@ -8,9 +8,7 @@
 // tslint:disable: readonly-array
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-
-import { TableView } from '@app/shared';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 @Component({
     selector: 'sqx-custom-view-editor',
@@ -20,17 +18,18 @@ import { TableView } from '@app/shared';
 })
 export class CustomViewEditorComponent implements OnChanges {
     @Input()
-    public table: TableView;
+    public allFields: ReadonlyArray<string>;
 
     @Input()
     public fieldNames: ReadonlyArray<string>;
 
+    @Output()
+    public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
+
     public fieldsNotAdded: ReadonlyArray<string>;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldNames']) {
-            this.fieldsNotAdded = this.table.allFields.filter(n => this.fieldNames.indexOf(n) < 0);
-        }
+    public ngOnChanges() {
+        this.fieldsNotAdded = this.allFields.filter(n => this.fieldNames.indexOf(n) < 0);
     }
 
     public random() {
@@ -40,6 +39,22 @@ export class CustomViewEditorComponent implements OnChanges {
     public drop(event: CdkDragDrop<string[]>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
-        this.table.updateFields(event.container.data);
+        this.updateFields(event.container.data);
+    }
+
+    public updateFields(fieldNames: ReadonlyArray<string>) {
+        this.fieldNamesChange.emit(fieldNames);
+    }
+
+    public resetDefault() {
+        this.updateFields([]);
+    }
+
+    public addField(field: string) {
+        this.updateFields([...this.fieldNames, field]);
+    }
+
+    public removeField(field: string) {
+        this.updateFields(this.fieldNames.filter(x => x !== field));
     }
 }

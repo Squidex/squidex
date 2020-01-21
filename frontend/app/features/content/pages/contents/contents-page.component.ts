@@ -22,7 +22,7 @@ import {
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
-    TableView,
+    TableFields,
     UIState
 } from '@app/shared';
 
@@ -39,7 +39,7 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
 
-    public tableView: TableView;
+    public tableView: TableFields;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
@@ -229,7 +229,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateTable() {
         if (this.schema) {
-            this.tableView = new TableView(this.uiState, this.schema);
+            this.tableView = new TableFields(this.uiState, this.schema);
         }
     }
 
