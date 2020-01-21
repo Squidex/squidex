@@ -10,7 +10,6 @@ import { Directive, ElementRef, Input, OnChanges, Pipe, PipeTransform, Renderer2
 import {
     MetaFields,
     RootFieldDto,
-    SchemaDetailsDto,
     TableField,
     Types
 } from '@app/shared';
@@ -63,26 +62,12 @@ export function getCellWidth(field: TableField) {
     pure: true
 })
 export class ContentListWidthPipe implements PipeTransform {
-    public transform(value: SchemaDetailsDto) {
+    public transform(value: ReadonlyArray<TableField>) {
         if (!value) {
             return 0;
         }
 
-        return `${getTableWidth(value.listFields) + 100}px`;
-    }
-}
-
-@Pipe({
-    name: 'sqxContentReferencesWidth',
-    pure: true
-})
-export class ContentReferencesWidthPipe implements PipeTransform {
-    public transform(value: SchemaDetailsDto) {
-        if (!value) {
-            return 0;
-        }
-
-        return `${getTableWidth(value.referenceFields) + 300}px`;
+        return `${getTableWidth(value) + 100}px`;
     }
 }
 

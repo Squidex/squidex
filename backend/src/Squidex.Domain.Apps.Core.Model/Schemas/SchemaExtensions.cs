@@ -102,23 +102,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static IEnumerable<IField<ReferencesFieldProperties>> ResolvingReferences(this Schema schema)
         {
             return schema.Fields.OfType<IField<ReferencesFieldProperties>>()
-                .Where(x =>
-                    x.Properties.ResolveReference &&
-                    x.Properties.MaxItems == 1 &&
-                    x.IsListField(schema));
+                .Where(x => x.Properties.ResolveReference && x.Properties.MaxItems == 1);
         }
 
         public static IEnumerable<IField<AssetsFieldProperties>> ResolvingAssets(this Schema schema)
         {
             return schema.Fields.OfType<IField<AssetsFieldProperties>>()
-                .Where(x =>
-                    x.Properties.ResolveImage &&
-                    x.IsListField(schema));
-        }
-
-        private static bool IsListField(this IField field, Schema schema)
-        {
-            return schema.FieldsInLists.Contains(field.Name) || schema.Fields.Count == 1 || (schema.FieldsInLists.Count == 0 && field == schema.Fields.FirstOrDefault());
+                .Where(x => x.Properties.ResolveImage);
         }
     }
 }
