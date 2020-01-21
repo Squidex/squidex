@@ -11,8 +11,6 @@ import {
     selector: 'sqx-query',
     template: `
         <div>
-            <h4>Filter</h4>
-
             <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
                 (change)="emitQueryChange()">
             </sqx-filter-logical>
