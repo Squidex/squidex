@@ -43,11 +43,19 @@ export interface QueryFieldModel {
 
     // Extra values.
     extra?: any;
+
+    // The optional display name for the field.
+    displayName?: string;
+
+    // The optional description for the field.
+    description?: string;
 }
+
+type QueryModelFields = { [name: string]: QueryFieldModel };
 
 export interface QueryModel {
     // All available fields.
-    fields: { [name: string]: QueryFieldModel };
+    fields: QueryModelFields;
 }
 
 export type FilterNode = FilterComparison | FilterLogical;
@@ -121,25 +129,25 @@ export function hasFilter(query?: Query) {
 }
 
 const EqualOperators: ReadonlyArray<FilterOperator> = [
-    { name: '==', value: 'eq' },
-    { name: '!=', value: 'ne' }
+    { name: 'is equals to', value: 'eq' },
+    { name: 'is not equals to', value: 'ne' }
 ];
 
 const CompareOperator: ReadonlyArray<FilterOperator> = [
-    { name: '<', value: 'lt' },
-    { name: '<=', value: 'le' },
-    { name: '>', value: 'gt' },
-    { name: '>=', value: 'ge' }
+    { name: 'is less than', value: 'lt' },
+    { name: 'is less than or equals to', value: 'le' },
+    { name: 'is greater than', value: 'gt' },
+    { name: 'is greater than or equals to', value: 'ge' }
 ];
 
 const StringOperators: ReadonlyArray<FilterOperator> = [
-    { name: 'T*', value: 'startsWith' },
-    { name: '*T', value: 'endsWith' },
-    { name: '*T*', value: 'contains' }
+    { name: 'starts with', value: 'startsWith' },
+    { name: 'ends with', value: 'endsWith' },
+    { name: 'contains', value: 'contains' }
 ];
 
 const ArrayOperators: ReadonlyArray<FilterOperator> = [
-    { value: 'empty', noValue: true }
+    { value: 'is empty', noValue: true }
 ];
 
 const TypeBoolean: QueryFieldModel = {
@@ -177,23 +185,48 @@ const TypeTags: QueryFieldModel = {
     operators: EqualOperators
 };
 
+const DEFAULT_FIELDS: QueryModelFields = {
+    created: {
+        ...TypeDateTime,
+        displayName: 'Created',
+        description: 'The date time when the content item was created.'
+    },
+    createdBy: {
+        ...TypeString,
+        displayName: 'Created by',
+        description: 'The user who created the content item.'
+    },
+    lastModified: {
+        ...TypeDateTime,
+        displayName: 'Updated',
+        description: 'The date time when the content item was updated the last time.'
+    },
+    lastModifiedBy: {
+        ...TypeString,
+        displayName: 'Updated by',
+        description: 'The user who updated the content item the last time.'
+    },
+    version: {
+        ...TypeNumber,
+        displayName: 'Version',
+        description: 'The version of the content item'
+    }
+};
+
 export function queryModelFromSchema(schema: SchemaDetailsDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
     const languagesCodes = languages.map(x => x.iso2Code);
 
-    const invariantCodes = ['iv'];
-
     const model: QueryModel = {
-        fields: {}
+        fields: { ...DEFAULT_FIELDS }
     };
 
-    model.fields['created'] = TypeDateTime;
-    model.fields['createdBy'] = TypeString;
-    model.fields['lastModified'] = TypeDateTime;
-    model.fields['lastModifiedBy'] = TypeString;
-    model.fields['version'] = TypeNumber;
-
     if (statuses) {
-        model.fields['status'] = { ...TypeStatus, extra: statuses };
+        model.fields['status'] = {
+             ...TypeStatus,
+             displayName: 'Status',
+             description: 'The status of the content item.',
+             extra: statuses
+        };
     }
 
     for (const field of schema.fields) {
@@ -216,10 +249,22 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
         }
 
         if (type) {
-            const codes = field.isLocalizable ? languagesCodes : invariantCodes;
+            if (field.isLocalizable) {
+                for (const code of languagesCodes) {
+                    const infos = {
+                        displayName: `${field.displayName} (${code})`,
+                        description: `The '${field.displayName}' field of the content item (localized).`
+                    };
 
-            for (const code of codes) {
-                model.fields[`data.${field.name}.${code}`] = type;
+                    model.fields[`data.${field.name}.${code}`] = { ...type, ...infos };
+                }
+            } else {
+                const infos = {
+                    displayName: field.displayName,
+                    description: `The '${field.displayName}' field of the content item.`
+                };
+
+                model.fields[`data.${field.name}.iv`] = { ...type, ...infos };
             }
         }
     }

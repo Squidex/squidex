@@ -15,11 +15,19 @@ import { QueryModel, QuerySorting } from '@app/shared/internal';
         <div class="row">
             <div class="col">
                 <div class="form-inline">
-                    <select class="form-control mr-2" [ngModel]="sorting.path" (ngModelChange)="changePath($event)">
-                        <option *ngFor="let fieldName of model.fields | sqxKeys" [ngValue]="fieldName">{{fieldName}}</option>
-                    </select>
+                    <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="sorting.path" (ngModelChange)="changePath($event)" [canSearch]="false">
+                        <ng-template let-field="$implicit">
+                            <div>{{model.fields[field].displayName}}</div>
 
-                    <select class="form-control mr-2" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
+                            <sqx-form-hint>{{model.fields[field].description}}</sqx-form-hint>
+                        </ng-template>
+
+                        <ng-template let-field="$implicit">
+                            {{model.fields[field].displayName}}
+                        </ng-template>
+                    </sqx-dropdown>
+
+                    <select class="form-control ml-1" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
                         <option>ascending</option>
                         <option>descending</option>
                     </select>

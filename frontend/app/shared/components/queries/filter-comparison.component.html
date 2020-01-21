@@ -1,15 +1,23 @@
 <div class="row no-gutters mb-1" *ngIf="fieldModel">
     <div class="col-auto path">
-        <select class="form-control" [ngModel]="filter.path" (ngModelChange)="changePath($event)">
-            <option *ngFor="let fieldName of model.fields | sqxKeys" [ngValue]="fieldName">{{fieldName}}</option>
-        </select>
+        <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="filter.path" (ngModelChange)="changePath($event)" [canSearch]="false">
+            <ng-template let-field="$implicit">
+                <div>{{model.fields[field].displayName}}</div>
+                
+                <sqx-form-hint>{{model.fields[field].description}}</sqx-form-hint>
+            </ng-template>
+
+            <ng-template let-field="$implicit">
+                {{model.fields[field].displayName}}
+            </ng-template>
+        </sqx-dropdown>
     </div>
-    <div class="col-auto pl-2">
+    <div class="col-auto operator pl-1">
         <select class="form-control" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
             <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
         </select>
     </div>
-    <div class="col pl-2" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
+    <div class="col pl-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
         <ng-container *ngSwitchCase="'boolean'">
             <input type="checkbox" class="form-control"
                 [ngModel]="filter.value"
@@ -17,12 +25,14 @@
         </ng-container>
         <ng-container *ngSwitchCase="'date'">
             <sqx-date-time-editor mode="Date"
+                [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
         <ng-container *ngSwitchCase="'datetime'">
             <sqx-date-time-editor mode="DateTime"
+                [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>

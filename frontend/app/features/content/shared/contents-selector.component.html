@@ -22,7 +22,7 @@
                     </button>
                 </div>
                 <div class="col pl-1">
-                    <sqx-search-form formClass="form" placeholder="Search for content"
+                    <sqx-search-form formClass="form" placeholder="Fulltext search"
                         [query]="contentsState.contentsQuery | async"
                         [queryModel]="queryModel"
                         (queryChange)="search($event)">

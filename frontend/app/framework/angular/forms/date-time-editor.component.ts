@@ -36,6 +36,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     private picker: any;
     private timeValue: moment.Moment | null = null;
     private dateValue: moment.Moment | null = null;
+    private hideDateButtonsSettings: boolean;
     private suppressEvents = false;
 
     @Input()
@@ -47,13 +48,18 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     @Input()
     public hideClear: boolean;
 
+    @Input()
+    public hideDateButtons: boolean;
+
     @ViewChild('dateInput', { static: false })
     public dateInput: ElementRef;
 
     public timeControl = new FormControl();
     public dateControl = new FormControl();
 
-    public hideDateButtons: boolean;
+    public get shouldShowDateButtons() {
+        return !this.hideDateButtonsSettings && !this.hideDateButtons;
+    }
 
     public get showTime() {
         return this.mode === 'DateTime';
@@ -66,7 +72,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
         super(changeDetector, {});
 
-        this.hideDateButtons = !!uiOptions.get('hideDateButtons');
+        this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
     }
 
     public ngOnInit() {

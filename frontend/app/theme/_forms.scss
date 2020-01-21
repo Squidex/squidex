@@ -165,6 +165,10 @@
             background: $color-theme-blue;
             border: 0;
             color: $color-dark-foreground;
+
+            & * {
+                color: $color-dark-foreground !important;
+            }
         }
     }
 }
