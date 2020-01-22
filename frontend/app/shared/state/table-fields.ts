@@ -41,7 +41,7 @@ export class TableFields {
     ) {
         this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sorted();
 
-        this.settingsKey = `${this.schema.id}.view`;
+        this.settingsKey = `schemas.${this.schema.name}.view`;
 
         this.uiState.getUser<string[]>(this.settingsKey, []).pipe(take(1))
             .subscribe(fieldNames => {

@@ -107,7 +107,9 @@ describe('AuthInterceptor', () => {
         authService.verify(x => x.logoutRedirect(), Times.once());
     }));
 
-    [403].forEach(statusCode => {
+    const AUTH_ERRORS = [403];
+
+    AUTH_ERRORS.forEach(statusCode => {
         it(`should redirect for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
@@ -125,7 +127,9 @@ describe('AuthInterceptor', () => {
         }));
     });
 
-    [500, 404, 405].forEach(statusCode => {
+    const SERVER_ERRORS = [500, 404, 405];
+
+    SERVER_ERRORS.forEach(statusCode => {
         it(`should not logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
