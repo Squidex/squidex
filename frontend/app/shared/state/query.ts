@@ -11,7 +11,7 @@ import { Types } from '@app/framework';
 
 import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
-import { SchemaDetailsDto } from './../services/schemas.service';
+import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';
 
 export type QueryValueType =
     'boolean' |
@@ -188,27 +188,27 @@ const TypeTags: QueryFieldModel = {
 const DEFAULT_FIELDS: QueryModelFields = {
     created: {
         ...TypeDateTime,
-        displayName: 'Created',
+        displayName: MetaFields.created,
         description: 'The date time when the content item was created.'
     },
     createdBy: {
         ...TypeString,
-        displayName: 'Created by',
+        displayName: 'meta.createdBy',
         description: 'The user who created the content item.'
     },
     lastModified: {
         ...TypeDateTime,
-        displayName: 'Updated',
-        description: 'The date time when the content item was updated the last time.'
+        displayName: MetaFields.lastModified,
+        description: 'The date time when the content item was modified the last time.'
     },
     lastModifiedBy: {
         ...TypeString,
-        displayName: 'Updated by',
-        description: 'The user who updated the content item the last time.'
+        displayName: 'meta.lastModifiedBy',
+        description: 'The user who modified the content item the last time.'
     },
     version: {
         ...TypeNumber,
-        displayName: 'Version',
+        displayName: MetaFields.version,
         description: 'The version of the content item'
     }
 };
@@ -223,7 +223,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
     if (statuses) {
         model.fields['status'] = {
              ...TypeStatus,
-             displayName: 'Status',
+             displayName: MetaFields.status,
              description: 'The status of the content item.',
              extra: statuses
         };
@@ -252,7 +252,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
             if (field.isLocalizable) {
                 for (const code of languagesCodes) {
                     const infos = {
-                        displayName: `${field.displayName} (${code})`,
+                        displayName: `${field.name} (${code})`,
                         description: `The '${field.displayName}' field of the content item (localized).`
                     };
 
@@ -260,7 +260,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
                 }
             } else {
                 const infos = {
-                    displayName: field.displayName,
+                    displayName: field.name,
                     description: `The '${field.displayName}' field of the content item.`
                 };
 

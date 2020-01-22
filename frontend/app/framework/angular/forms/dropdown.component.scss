@@ -29,6 +29,7 @@ $color-input-disabled: #eef1f4;
 
 .control-dropdown-items {
     max-height: 15rem;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
