@@ -157,16 +157,16 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.search(query);
     }
 
-    public selectLanguage(language: AppLanguageDto) {
-        this.language = language;
-    }
-
     public isItemSelected(content: ContentDto): boolean {
         return this.selectedItems[content.id] === true;
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+    }
+
+    public selectLanguage(language: AppLanguageDto) {
+        this.language = language;
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
