@@ -30,7 +30,7 @@ import { ContentVersionSelected } from './../messages';
 })
 export class ContentHistoryPageComponent {
     public get channel(): string {
-        let channelPath = this.route.snapshot.data['channel'];
+        let channelPath = this.route.snapshot.data.channel;
 
         if (channelPath) {
             const params = allParams(this.route);

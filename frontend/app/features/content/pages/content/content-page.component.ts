@@ -31,6 +31,7 @@ import {
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
+    TempService,
     Version
 } from '@app/shared';
 
@@ -75,7 +76,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
+        private readonly tempService: TempService
     ) {
         super();
 
@@ -111,21 +113,27 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         contentId: content ? content.id : undefined
                     };
 
-                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
-
                     if (content) {
                         this.loadContent(content.dataDraft, true);
                     }
 
-                    if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
-                        this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
-                            .subscribe(shouldLoad => {
-                                if (shouldLoad) {
-                                    this.loadContent(autosaved, false);
-                                } else {
-                                    this.autoSaveService.remove(this.autoSaveKey);
-                                }
-                            });
+                    const clone = this.tempService.fetch();
+
+                    if (clone) {
+                        this.loadContent(clone, true);
+                    } else {
+                        const autosaved = this.autoSaveService.get(this.autoSaveKey);
+
+                        if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
+                            this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
+                                .subscribe(shouldLoad => {
+                                    if (shouldLoad) {
+                                        this.loadContent(autosaved, false);
+                                    } else {
+                                        this.autoSaveService.remove(this.autoSaveKey);
+                                    }
+                                });
+                        }
                     }
 
                     this.content = content;

@@ -90,6 +90,7 @@ import {
     SyncWidthDirective,
     TagEditorComponent,
     TemplateWrapperDirective,
+    TempService,
     TitleComponent,
     TitleService,
     ToggleComponent,
@@ -267,6 +268,7 @@ export class SqxFrameworkModule {
                 OnboardingService,
                 ResourceLoaderService,
                 ShortcutService,
+                TempService,
                 TitleService,
                 {
                     provide: HTTP_INTERCEPTORS,

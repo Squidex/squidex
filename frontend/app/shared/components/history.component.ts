@@ -45,7 +45,7 @@ export class HistoryComponent {
     }
 
     private calculateChannel(): string {
-        let channel = this.route.snapshot.data['channel'];
+        let channel = this.route.snapshot.data.channel;
 
         if (channel) {
             const params = allParams(this.route);

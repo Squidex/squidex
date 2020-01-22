@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
@@ -23,6 +24,7 @@ import {
     SchemaDetailsDto,
     SchemasState,
     TableFields,
+    TempService,
     UIState
 } from '@app/shared';
 
@@ -63,8 +65,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     constructor(
         public readonly contentsState: ContentsState,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly languagesState: LanguagesState,
         private readonly schemasState: SchemasState,
+        private readonly tempService: TempService,
         private readonly uiState: UIState
     ) {
         super();
@@ -128,10 +133,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.changeContentItems(this.selectItems(c => c.status !== status), status);
     }
 
-    public clone(content: ContentDto) {
-        this.contentsState.create(content.dataDraft, false);
-    }
-
     private changeContentItems(contents: ReadonlyArray<ContentDto>, action: string) {
         if (contents.length === 0) {
             return;
@@ -144,6 +145,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
                 onErrorResumeNext())
             .subscribe();
+    }
+
+    public clone(content: ContentDto) {
+        this.tempService.put(content.dataDraft);
+
+        this.router.navigate(['new'], { relativeTo: this.route });
     }
 
     public search(query: Query) {
