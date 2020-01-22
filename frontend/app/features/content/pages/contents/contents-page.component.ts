@@ -107,6 +107,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.find(x => x.isMaster)!;
+                    this.languageMaster = this.language;
 
                     this.updateModel();
                 }));
