@@ -93,7 +93,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
-                    this.language = this.languages[0];
+                    this.language = this.languages.find(x => x.isMaster)!;
                 }));
 
         this.own(
