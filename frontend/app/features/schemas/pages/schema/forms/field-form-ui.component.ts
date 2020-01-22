@@ -41,7 +41,8 @@ import { FieldDto } from '@app/shared';
             <ng-container *ngSwitchCase="'Tags'">
                 <sqx-tags-ui [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-tags-ui>
             </ng-container>
-        </ng-container>`
+        </ng-container>
+    `
 })
 export class FieldFormUIComponent {
     @Input()

@@ -28,7 +28,8 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
                     Please remember to check all languages when you see validation errors.
                 </sqx-onboarding-tooltip>
             </ng-container>
-        </ng-container>`,
+        </ng-container>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FieldLanguagesComponent {

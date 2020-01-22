@@ -1,16 +1,10 @@
 <div class="row no-gutters mb-1" *ngIf="fieldModel">
     <div class="col-auto path">
-        <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="filter.path" (ngModelChange)="changePath($event)" [canSearch]="false" separated="true">
-            <ng-template let-field="$implicit">
-                <div>{{model.fields[field].displayName}}</div>
-                
-                <sqx-form-hint>{{model.fields[field].description}}</sqx-form-hint>
-            </ng-template>
-
-            <ng-template let-field="$implicit">
-                {{model.fields[field].displayName}}
-            </ng-template>
-        </sqx-dropdown>
+        <sqx-query-path 
+            (pathChange)="changePath($event)"
+            [path]="filter.path"
+            [model]="model">
+        </sqx-query-path>
     </div>
     <div class="col-auto operator pl-1">
         <select class="form-control" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">

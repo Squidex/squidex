@@ -9,6 +9,11 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-alert',
+    template: `
+        <div class="alert alert-hint mt-{{marginTop}} mb-{{marginBottom}} {{class}}" [class.light]="light">
+            <i class="icon-info-outline"></i> <ng-content></ng-content>
+        </div>
+    `,
     styles: [`
         :host {
             display: block;
@@ -20,10 +25,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
             background: #fcfeff;
         }
     `],
-    template: `
-        <div class="alert alert-hint mt-{{marginTop}} mb-{{marginBottom}} {{class}}" [class.light]="light">
-            <i class="icon-info-outline"></i> <ng-content></ng-content>
-        </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormAlertComponent {

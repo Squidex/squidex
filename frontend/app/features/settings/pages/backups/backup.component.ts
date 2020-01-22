@@ -65,7 +65,8 @@ import {
                     </button>
                 </div>
             </div>
-        </div>`,
+        </div>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BackupComponent {

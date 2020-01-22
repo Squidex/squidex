@@ -25,8 +25,8 @@ import { AssetPathItem } from '@app/shared/internal';
             </ng-container>
         </ng-template>
     `,
-    styles: [
-        `i {
+    styles: [`
+        i {
             vertical-align: middle;
         }`
     ],

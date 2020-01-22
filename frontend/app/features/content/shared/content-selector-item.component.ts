@@ -30,12 +30,12 @@ import {
                 <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
             </td>
 
-            <td *ngFor="let field of schema.referenceFields" [sqxContentListCell]="field">
+            <td *ngFor="let field of schema.defaultReferenceFields" [sqxContentListCell]="field">
                 <sqx-content-list-field [field]="field" [content]="content" [language]="language"></sqx-content-list-field>
             </td>
         </tr>
         <tr class="spacer"></tr>
-        `,
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentSelectorItemComponent {

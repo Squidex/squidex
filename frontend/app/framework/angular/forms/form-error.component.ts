@@ -21,7 +21,8 @@ import { ErrorDto } from '@app/framework/internal';
                     <div [innerHTML]="error?.displayMessage | sqxMarkdown"></div>
                 </div>
             </div>
-        </ng-container>`,
+        </ng-container>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormErrorComponent implements OnChanges {

@@ -161,7 +161,7 @@
         &:hover {
             color: $color-dark-foreground;
 
-            & * {
+            .text-muted {
                 color: $color-dark-foreground !important;
             }
         }

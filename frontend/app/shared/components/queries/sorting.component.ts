@@ -15,17 +15,11 @@ import { QueryModel, QuerySorting } from '@app/shared/internal';
         <div class="row">
             <div class="col">
                 <div class="form-inline">
-                    <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="sorting.path" (ngModelChange)="changePath($event)" [canSearch]="false" separated="true">
-                        <ng-template let-field="$implicit">
-                            <div>{{model.fields[field].displayName}}</div>
-
-                            <sqx-form-hint>{{model.fields[field].description}}</sqx-form-hint>
-                        </ng-template>
-
-                        <ng-template let-field="$implicit">
-                            {{model.fields[field].displayName}}
-                        </ng-template>
-                    </sqx-dropdown>
+                    <sqx-query-path
+                        (pathChange)="changePath($event)"
+                        [path]="sorting.path"
+                        [model]="model">
+                    </sqx-query-path>
 
                     <select class="form-control ml-1" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
                         <option>ascending</option>
@@ -38,7 +32,8 @@ import { QueryModel, QuerySorting } from '@app/shared/internal';
                     <i class="icon-bin2"></i>
                 </button>
             </div>
-        </div>`,
+        </div>
+    `,
      changeDetection: ChangeDetectionStrategy.OnPush
  })
 export class SortingComponent {

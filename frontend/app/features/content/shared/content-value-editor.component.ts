@@ -60,7 +60,8 @@ import { FieldDto } from '@app/shared';
                     </ng-container>
                 </ng-container>
             </ng-container>
-        </div>`,
+        </div>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentValueEditorComponent {
