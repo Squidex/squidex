@@ -63,37 +63,37 @@ describe('SchemaDetailsDto', () => {
     it('should return configured fields as list fields if fields are declared', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInLists: ['field1', 'field3'] });
 
-        expect(schema.listFields).toEqual([field1, field3]);
+        expect(schema.defaultListFields).toEqual([field1, field3]);
     });
 
     it('should return first fields as list fields if no field is declared', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
-        expect(schema.listFields).toEqual([MetaFields.lastModifiedByAvatar, field1, MetaFields.statusColor, MetaFields.lastModified]);
+        expect(schema.defaultListFields).toEqual([MetaFields.lastModifiedByAvatar, field1, MetaFields.statusColor, MetaFields.lastModified]);
     });
 
     it('should return preset with empty content field as list fields if fields is empty', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto() });
 
-        expect(schema.listFields).toEqual([MetaFields.lastModifiedByAvatar, '', MetaFields.statusColor, MetaFields.lastModified]);
+        expect(schema.defaultListFields).toEqual([MetaFields.lastModifiedByAvatar, '', MetaFields.statusColor, MetaFields.lastModified]);
     });
 
     it('should return configured fields as references fields if fields are declared', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInReferences: ['field1', 'field3'] });
 
-        expect(schema.referenceFields).toEqual([field1, field3]);
+        expect(schema.defaultReferenceFields).toEqual([field1, field3]);
     });
 
     it('should return first field as reference fields if no field is declared', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
-        expect(schema.referenceFields).toEqual([field1]);
+        expect(schema.defaultReferenceFields).toEqual([field1]);
     });
 
     it('should return noop field as reference field if list is empty', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto() });
 
-        expect(schema.referenceFields).toEqual(['']);
+        expect(schema.defaultReferenceFields).toEqual(['']);
     });
 });
 

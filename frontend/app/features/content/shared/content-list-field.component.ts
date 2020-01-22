@@ -82,7 +82,8 @@ import {
                     <sqx-content-value [value]="value"></sqx-content-value>
                 </ng-template>
             </ng-container>
-        </ng-container>`,
+        </ng-container>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentListFieldComponent implements OnChanges {

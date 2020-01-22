@@ -29,7 +29,8 @@ import { AddClientForm, ClientsState } from '@app/shared';
                     </div>
                 </div>
             </form>
-        </div>`,
+        </div>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientAddFormComponent {

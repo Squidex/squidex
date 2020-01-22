@@ -27,7 +27,8 @@ import {
 
         <ng-template #notSortable>
             <span class="truncate">{{text}}</span>
-        </ng-template>`,
+        </ng-template>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableHeaderComponent implements OnChanges {

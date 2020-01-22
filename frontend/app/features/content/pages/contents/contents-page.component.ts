@@ -12,6 +12,7 @@ import {
     AppLanguageDto,
     ContentDto,
     ContentsState,
+    fadeAnimation,
     LanguagesState,
     ModalModel,
     Queries,
@@ -21,6 +22,7 @@ import {
     ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
+    TableFields,
     UIState
 } from '@app/shared';
 
@@ -29,10 +31,16 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
-    templateUrl: './contents-page.component.html'
+    templateUrl: './contents-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
+
+    public tableView: TableFields;
+    public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
 
@@ -74,6 +82,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.updateQueries();
                     this.updateModel();
+                    this.updateTable();
                 }));
 
         this.own(
@@ -215,6 +224,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     private updateQueries() {
         if (this.schema) {
             this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+        }
+    }
+
+    private updateTable() {
+        if (this.schema) {
+            this.tableView = new TableFields(this.uiState, this.schema);
         }
     }
 

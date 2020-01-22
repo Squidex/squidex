@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="header">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="resetDefault()">
+            Reset Default View
+        </button>
+    </div>
+    
+    <hr />
+
+    <div
+        cdkDropList
+        [cdkDropListData]="fieldNames"
+        (cdkDropListDropped)="drop($event)">
+    
+        <div *ngFor="let field of fieldNames; trackBy: random" cdkDrag>
+            <i class="icon-drag2 drag-handle"></i> 
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked (change)="removeField(field)" id="field_{{field}}">
+                <label class="form-check-label" for="field_{{field}}">
+                    {{field}}
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <hr />
+    
+    <div>
+        <div *ngFor="let field of fieldsNotAdded">    
+            <i class="icon-drag2 drag-handle invisible"></i> 
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" (change)="addField(field)" id="field_{{field}}">
+                <label class="form-check-label" for="field_{{field}}">
+                    {{field}}
+                </label>
+            </div>
+        </div>
+    </div>
+</div>

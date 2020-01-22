@@ -28,7 +28,8 @@ import {
             <sqx-filter-comparison [model]="model" [filter]="comparison" [language]="language"
                 (remove)="remove.emit()" (change)="change.emit()">
             </sqx-filter-comparison>
-        </ng-container>`,
+        </ng-container>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterNodeComponent {

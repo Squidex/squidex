@@ -1,3 +1,10 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
@@ -10,23 +17,22 @@ import {
 @Component({
     selector: 'sqx-query',
     template: `
-        <div>
-            <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
-                (change)="emitQueryChange()">
-            </sqx-filter-logical>
+        <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
+            (change)="emitQueryChange()">
+        </sqx-filter-logical>
 
-            <h4 class="mt-4">Sorting</h4>
+        <h4 class="mt-4">Sorting</h4>
 
-            <div class="mb-2" *ngFor="let sorting of queryValue.sort">
-                <sqx-sorting [sorting]="sorting" [model]="model"
-                    (remove)="removeSorting(sorting)" (change)="emitQueryChange()">
-                </sqx-sorting>
-            </div>
+        <div class="mb-2" *ngFor="let sorting of queryValue.sort">
+            <sqx-sorting [sorting]="sorting" [model]="model"
+                (remove)="removeSorting(sorting)" (change)="emitQueryChange()">
+            </sqx-sorting>
+        </div>
 
-            <button class="btn btn-outline-success btn-sm mr-2" (click)="addSorting()">
-                Add Sorting
-            </button>
-        </div>`,
+        <button class="btn btn-outline-success btn-sm mr-2" (click)="addSorting()">
+            Add Sorting
+        </button>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QueryComponent {

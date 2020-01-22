@@ -12,6 +12,7 @@ export * from './pages/content/content-page.component';
 export * from './pages/content/field-languages.component';
 export * from './pages/contents/contents-filters-page.component';
 export * from './pages/contents/contents-page.component';
+export * from './pages/contents/custom-view-editor.component';
 export * from './pages/schemas/schemas-page.component';
 
 export * from './shared/array-editor.component';

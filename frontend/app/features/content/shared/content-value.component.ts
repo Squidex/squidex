@@ -17,7 +17,8 @@ import { HtmlValue, Types } from '@app/shared';
         </ng-container>
         <ng-template #html>
             <span class="html-value" [innerHTML]="value.html"></span>
-        </ng-template>`,
+        </ng-template>
+    `,
     styles: [`
         .html-value {
             position: relative;

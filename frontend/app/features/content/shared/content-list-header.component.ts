@@ -74,7 +74,8 @@ import {
                     [language]="language">
                 </sqx-table-header>
             </ng-container>
-        </ng-container>`,
+        </ng-container>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentListHeaderComponent {

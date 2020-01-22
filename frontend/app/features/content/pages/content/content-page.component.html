@@ -20,7 +20,7 @@
         </ng-container>
 
         <ng-container menu>
-            <ng-container *ngIf="content; else noContent">
+            <ng-container *ngIf="content; let c; else noContent">
                 <div class="dropdown dropdown-options ml-1">
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
@@ -100,12 +100,12 @@
         <ng-container content>
             <sqx-list-view>
                 <ng-container topHeader>
-                    <div class="panel-alert panel-alert-danger" *ngIf="contentVersion; let version">
+                    <div class="panel-alert panel-alert-danger" *ngIf="contentVersion">
                         <div class="float-right">
                             <a class="force" (click)="showLatest()">View latest</a>
                         </div>
         
-                        Viewing <strong>version {{version.value}}</strong>.
+                        Viewing <strong>version {{contentVersion.value}}</strong>.
                     </div>
                 </ng-container>
 

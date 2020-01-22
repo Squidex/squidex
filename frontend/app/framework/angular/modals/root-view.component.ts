@@ -12,7 +12,8 @@ import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from 
     template: `
         <div #element></div>
 
-        <ng-content></ng-content>`,
+        <ng-content></ng-content>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RootViewComponent {

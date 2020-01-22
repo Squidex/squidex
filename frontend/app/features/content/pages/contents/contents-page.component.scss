@@ -16,6 +16,20 @@
     font-size: .8rem;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.settings {
+    &-container {
+        position: relative;
+    }
+
+    &-button {
+        @include absolute(null, 1rem, -2.375rem);
+    }
+}
+
 .btn-status {
     background: $color-dark-foreground;
 }

@@ -21,7 +21,7 @@ import {
 import { ContentDto, ContentReferencesValue } from '../services/contents.service';
 import { LanguageDto } from '../services/languages.service';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, RootFieldDto, SchemaDetailsDto } from './../services/schemas.service';
+import { FieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import {
     ArrayFieldPropertiesDto,
     AssetsFieldPropertiesDto,
@@ -659,13 +659,17 @@ export class EditContentForm extends Form<FormGroup, any> {
 }
 
 export class PatchContentForm extends Form<FormGroup, any> {
+    private readonly editableFields: ReadonlyArray<RootFieldDto>;
+
     constructor(
-        private readonly schema: SchemaDetailsDto,
+        private readonly listFields: ReadonlyArray<TableField>,
         private readonly language: AppLanguageDto
     ) {
         super(new FormGroup({}));
 
-        for (const field of this.schema.listFieldsEditable) {
+        this.editableFields = <any>this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable);
+
+        for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
             this.form.setControl(field.name, new FormControl(undefined, validators));
@@ -678,7 +682,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         if (result) {
             const request = {};
 
-            for (const field of this.schema.listFieldsEditable) {
+            for (const field of this.editableFields) {
                 const value = result[field.name];
 
                 if (field.isLocalizable) {

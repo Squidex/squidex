@@ -12,7 +12,8 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     template: `
         <small class="text-muted form-text mt-{{marginTop}} mb-{{marginBottom}} {{class}}">
             <ng-content></ng-content>
-        </small>`,
+        </small>
+    `,
     styles: [`
         :host {
             display: block;

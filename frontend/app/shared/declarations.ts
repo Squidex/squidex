@@ -35,6 +35,7 @@ export * from './components/table-header.component';
 export * from './components/queries/filter-comparison.component';
 export * from './components/queries/filter-logical.component';
 export * from './components/queries/filter-node.component';
+export * from './components/queries/query-path.component';
 export * from './components/queries/query.component';
 export * from './components/queries/sorting.component';
 

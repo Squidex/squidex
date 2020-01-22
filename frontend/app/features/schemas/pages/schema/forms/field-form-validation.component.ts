@@ -44,7 +44,8 @@ import { FieldDto, PatternDto } from '@app/shared';
             <ng-container *ngSwitchCase="'Tags'">
                 <sqx-tags-validation [editForm]="editForm" [field]="field" [properties]="field.rawProperties"></sqx-tags-validation>
             </ng-container>
-        </ng-container>`
+        </ng-container>
+    `
 })
 export class FieldFormValidationComponent {
     @Input()

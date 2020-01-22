@@ -20,9 +20,10 @@ import { RuleElementDto } from '@app/shared';
             <ng-template #svgIcon>
                 <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
             </ng-template>
-        </span>`,
-    styles: [
-        `.svg-icon {
+        </span>
+    `,
+    styles: [`
+        .svg-icon {
             display: inline-block;
         }
 
