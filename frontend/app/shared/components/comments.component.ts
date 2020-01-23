@@ -9,7 +9,7 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { timer } from 'rxjs';
-import { map, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -36,7 +36,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     public commentsState: CommentsState;
     public commentForm = new UpsertCommentForm(this.formBuilder);
 
-    public mentionUsers = this.contributorsState.contributors.pipe(map(x => x.map(c => c.contributorEmail)));
+    public mentionUsers = this.contributorsState.contributors.pipe(map(x => x.map(c => c.contributorEmail), filter(x => !!x)));
     public mentionConfig = { dropUp: true };
 
     public userToken: string;

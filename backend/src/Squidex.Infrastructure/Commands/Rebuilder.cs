@@ -75,7 +75,6 @@ namespace Squidex.Infrastructure.Commands
 
                     domainObject.Setup(id);
 
-                    await domainObject.EnsureLoadedAsync();
                     await domainObject.RebuildStateAsync();
                 }
                 catch (DomainObjectNotFoundException)

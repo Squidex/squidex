@@ -83,6 +83,8 @@ namespace Squidex.Infrastructure.Commands
 
         public async sealed override Task RebuildStateAsync()
         {
+            await EnsureLoadedAsync();
+
             if (persistence != null)
             {
                 await persistence.WriteSnapshotAsync(Snapshot);

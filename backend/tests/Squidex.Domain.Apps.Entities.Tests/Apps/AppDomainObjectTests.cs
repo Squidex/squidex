@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Create_should_create_events_and_update_state()
         {
-            var command = new CreateApp { Name = AppName, Actor = Actor, AppId = AppId };
+            var command = new CreateApp { Name = AppName, AppId = AppId };
 
             var result = await PublishAsync(command);
 
@@ -104,6 +104,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
+                );
+        }
+
+        [Fact]
+        public async Task Create_should_not_assign_client_as_contributor()
+        {
+            var command = new CreateApp { Name = AppName, Actor = ActorClient, AppId = AppId };
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent2(sut.Snapshot);
+
+            Assert.Equal(AppName, sut.Snapshot.Name);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppCreated { Name = AppName }, true),
+                    CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }, true),
+                    CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" }, true)
                 );
         }
 

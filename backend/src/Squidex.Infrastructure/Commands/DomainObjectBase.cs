@@ -176,6 +176,8 @@ namespace Squidex.Infrastructure.Commands
                     }
                 }
 
+                isLoaded = true;
+
                 return result;
             }
             catch

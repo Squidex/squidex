@@ -27,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, "me");
 
+        protected RefToken ActorClient { get; } = new RefToken(RefTokenType.Client, "client");
+
         protected Guid AppId { get; } = Guid.NewGuid();
 
         protected Guid SchemaId { get; } = Guid.NewGuid();
@@ -85,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 command.Actor = Actor;
             }
 
-            if (command.User == null)
+            if (command.User == null && command.Actor.IsSubject)
             {
                 command.User = User;
             }
@@ -108,30 +110,21 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return command.AsJ();
         }
 
-        protected TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
+        protected TEvent CreateEvent<TEvent>(TEvent @event, bool fromClient = false) where TEvent : SquidexEvent
         {
-            @event.Actor = Actor;
+            @event.Actor = fromClient ? ActorClient : Actor;
 
-            EnrichAppInfo(@event);
-            EnrichSchemaInfo(@event);
-
-            return @event;
-        }
-
-        private void EnrichAppInfo(IEvent @event)
-        {
             if (@event is AppEvent appEvent)
             {
                 appEvent.AppId = AppNamedId;
             }
-        }
 
-        private void EnrichSchemaInfo(IEvent @event)
-        {
             if (@event is SchemaEvent schemaEvent)
             {
                 schemaEvent.SchemaId = SchemaNamedId;
             }
+
+            return @event;
         }
     }
 }

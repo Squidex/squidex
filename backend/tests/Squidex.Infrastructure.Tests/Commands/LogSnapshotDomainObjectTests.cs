@@ -73,9 +73,6 @@ namespace Squidex.Infrastructure.Commands
 
         public LogSnapshotDomainObjectTests()
         {
-            A.CallTo(() => store.WithEventSourcing(typeof(MyLogDomainObject), id, A<HandleEvent>.Ignored))
-                .Returns(persistence);
-
             A.CallTo(() => store.GetSnapshotStore<MyDomainState>())
                 .Returns(snapshotStore);
 
@@ -85,7 +82,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_get_latestet_version_when_requesting_state_with_any()
         {
-            await SetupUpdatedAsync();
+            await SetupUpdatedAsync(4, 8);
 
             var result = sut.GetSnapshot(EtagVersion.Any);
 
@@ -95,7 +92,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_get_latestet_version_when_requesting_state_with_auto()
         {
-            await SetupUpdatedAsync();
+            await SetupUpdatedAsync(4, 8);
 
             var result = sut.GetSnapshot(EtagVersion.Auto);
 
@@ -105,7 +102,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_get_empty_version_when_requesting_state_with_empty_version()
         {
-            await SetupUpdatedAsync();
+            await SetupUpdatedAsync(4, 8);
 
             var result = sut.GetSnapshot(EtagVersion.Empty);
 
@@ -115,7 +112,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_get_specific_version_when_requesting_state_with_specific_version()
         {
-            await SetupUpdatedAsync();
+            await SetupUpdatedAsync(4, 8);
 
             sut.GetSnapshot(0).Should().BeEquivalentTo(new MyDomainState { Value = 4, Version = 0 });
             sut.GetSnapshot(1).Should().BeEquivalentTo(new MyDomainState { Value = 8, Version = 1 });
@@ -124,7 +121,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_get_null_state_when_requesting_state_with_invalid_version()
         {
-            await SetupUpdatedAsync();
+            await SetupUpdatedAsync(4, 8);
 
             Assert.Null(sut.GetSnapshot(-4));
             Assert.Null(sut.GetSnapshot(2));
@@ -139,7 +136,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_write_state_and_events_when_created()
         {
-            await SetupEmptyAsync();
+            SetupEmpty();
 
             var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 });
 
@@ -147,6 +144,8 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
+            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+                .MustNotHaveHappened();
 
             Assert.True(result is EntityCreatedResult<Guid>);
 
@@ -157,16 +156,20 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_updated()
+        public async Task Should_write_state_and_events_when_updated_after_creation()
         {
-            await SetupCreatedAsync();
+            SetupEmpty();
 
-            var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8 });
+            await sut.ExecuteAsync(new CreateAuto { Value = 4 });
+
+            var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
 
             A.CallTo(() => snapshotStore.WriteAsync(id, A<MyDomainState>.That.Matches(x => x.Value == 8), 0, 1))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
+            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+                .MustNotHaveHappened();
 
             Assert.True(result is EntitySavedResult);
 
@@ -177,24 +180,59 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_write_state_and_events_when_updated()
+        {
+            SetupCreated(4);
+
+            var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
+
+            A.CallTo(() => snapshotStore.WriteAsync(id, A<MyDomainState>.That.Matches(x => x.Value == 8), 0, 1))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+                .MustHaveHappenedOnceExactly();
+
+            Assert.True(result is EntitySavedResult);
+
+            Assert.Empty(sut.GetUncomittedEvents());
+
+            Assert.Equal(8, sut.Snapshot.Value);
+            Assert.Equal(1, sut.Snapshot.Version);
+        }
+
+        [Fact]
+        public async Task Should_only_load_once_on_update()
+        {
+            SetupCreated(4);
+
+            await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 9, ExpectedVersion = 1 });
+
+            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+                .MustHaveHappenedOnceExactly();
+
+            Assert.Equal(9, sut.Snapshot.Value);
+            Assert.Equal(2, sut.Snapshot.Version);
+        }
+
+        [Fact]
         public async Task Should_rebuild_state_async()
         {
-            await SetupCreatedAsync();
+            SetupCreated(4);
 
             await sut.RebuildStateAsync();
 
             A.CallTo(() => snapshotStore.WriteAsync(id, A<MyDomainState>.That.Matches(x => x.Value == 4), EtagVersion.Any, 0))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
-                .MustHaveHappenedOnceExactly();
+                .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_not_update_when_snapshot_is_not_changed()
         {
-            await SetupCreatedAsync();
-
-            var previousSnapshot = sut.Snapshot;
+            SetupCreated(4);
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged });
 
@@ -204,14 +242,12 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(4, sut.Snapshot.Value);
             Assert.Equal(0, sut.Snapshot.Version);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
         }
 
         [Fact]
         public async Task Should_not_throw_exception_when_already_created()
         {
-            await SetupCreatedAsync();
+            SetupCreated(4);
 
             await sut.ExecuteAsync(new CreateAuto());
         }
@@ -219,7 +255,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_throw_exception_when_not_created()
         {
-            await SetupEmptyAsync();
+            SetupEmpty();
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ExecuteAsync(new UpdateAuto()));
         }
@@ -227,7 +263,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_return_custom_result_on_create()
         {
-            await SetupEmptyAsync();
+            SetupEmpty();
 
             var result = await sut.ExecuteAsync(new CreateCustom());
 
@@ -237,7 +273,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_return_custom_result_on_update()
         {
-            await SetupCreatedAsync();
+            SetupCreated(4);
 
             var result = await sut.ExecuteAsync(new UpdateCustom());
 
@@ -247,7 +283,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_throw_exception_when_other_verison_expected()
         {
-            await SetupCreatedAsync();
+            SetupCreated(4);
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.ExecuteAsync(new UpdateCustom { ExpectedVersion = 3 }));
         }
@@ -255,7 +291,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_reset_state_when_writing_snapshot_for_create_failed()
         {
-            await SetupEmptyAsync();
+            SetupEmpty();
 
             A.CallTo(() => snapshotStore.WriteAsync(A<Guid>.Ignored, A<MyDomainState>.Ignored, -1, 0))
                 .Throws(new InvalidOperationException());
@@ -271,7 +307,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_reset_state_when_writing_snapshot_for_update_failed()
         {
-            await SetupCreatedAsync();
+            SetupCreated(4);
 
             A.CallTo(() => snapshotStore.WriteAsync(A<Guid>.Ignored, A<MyDomainState>.Ignored, 0, 1))
                 .Throws(new InvalidOperationException());
@@ -284,25 +320,49 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(0, sut.Snapshot.Version);
         }
 
-        private async Task SetupCreatedAsync()
+        private async Task SetupUpdatedAsync(int value, int updatedValue)
         {
-            sut.Setup(id);
+            SetupCreated(value);
 
-            await sut.ExecuteAsync(new CreateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = updatedValue });
         }
 
-        private async Task SetupUpdatedAsync()
+        private void SetupCreated(int value)
         {
-            await SetupCreatedAsync();
+            HandleEvent handleEvent = x => { };
 
-            await sut.ExecuteAsync(new UpdateAuto { Value = 8 });
+            var version = -1;
+
+            A.CallTo(() => persistence.ReadAsync(-2))
+                .Invokes(() =>
+                {
+                    version = 0;
+
+                    handleEvent(Envelope.Create(new ValueChanged { Value = value }));
+                });
+
+            A.CallTo(() => store.WithEventSourcing(typeof(MyLogDomainObject), id, A<HandleEvent>.Ignored))
+                .Invokes(args =>
+                {
+                    handleEvent = args.GetArgument<HandleEvent>(2);
+                })
+                .Returns(persistence);
+
+            A.CallTo(() => persistence.Version)
+                .ReturnsLazily(() => version);
+
+            sut.Setup(id);
         }
 
-        private async Task SetupEmptyAsync()
+        private void SetupEmpty()
         {
-            sut.Setup(id);
+            A.CallTo(() => store.WithEventSourcing(typeof(MyLogDomainObject), id, A<HandleEvent>.Ignored))
+                .Returns(persistence);
 
-            await Task.Yield();
+            A.CallTo(() => persistence.Version)
+                .Returns(-1);
+
+            sut.Setup(id);
         }
     }
 }

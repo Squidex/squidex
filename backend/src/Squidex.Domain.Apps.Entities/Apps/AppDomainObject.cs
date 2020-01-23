@@ -319,9 +319,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var events = new List<AppEvent>
             {
                 CreateInitalEvent(command.Name),
-                CreateInitialOwner(command.Actor),
                 CreateInitialLanguage()
             };
+
+            if (command.Actor.IsSubject)
+            {
+                events.Add(CreateInitialOwner(command.Actor));
+            }
 
             foreach (var (key, value) in initialPatterns)
             {
