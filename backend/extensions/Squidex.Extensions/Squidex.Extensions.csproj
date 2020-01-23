@@ -11,6 +11,7 @@
     <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="Confluent.Kafka" Version="1.2.1" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
+    <PackageReference Include="Datadog.Trace" Version="1.11.0" />
     <PackageReference Include="Elasticsearch.Net" Version="6.8.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.2" />
