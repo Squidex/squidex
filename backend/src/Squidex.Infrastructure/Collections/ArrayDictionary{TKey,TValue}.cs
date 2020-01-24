@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Collections
                 var afterIndex = items.Length - index - 1;
 
                 Array.Copy(items, 0, result, 0, index);
-                Array.Copy(items, index, result, index, afterIndex);
+                Array.Copy(items, index + 1, result, index, afterIndex);
             }
 
             return Create<TArray>(result);

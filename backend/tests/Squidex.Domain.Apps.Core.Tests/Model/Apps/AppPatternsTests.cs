@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
@@ -68,9 +69,10 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_remove_pattern()
         {
-            var patterns_1 = patterns_0.Remove(firstId);
+            var patterns_1 = patterns_0.Add(id, "Name1", "Pattern1");
+            var patterns_2 = patterns_1.Remove(firstId);
 
-            Assert.Empty(patterns_1);
+            Assert.Equal(id, patterns_2.Keys.Single());
         }
 
         [Fact]
