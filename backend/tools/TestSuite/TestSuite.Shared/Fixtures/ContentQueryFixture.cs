@@ -13,7 +13,12 @@ namespace TestSuite.Fixtures
 {
     public class ContentQueryFixture : ContentFixture
     {
-        public ContentQueryFixture(string schemaName = "my-schema")
+        public ContentQueryFixture()
+               : this("my-reads")
+        {
+        }
+
+        protected ContentQueryFixture(string schemaName = "my-schema")
             : base(schemaName)
         {
             Task.Run(async () =>
@@ -37,7 +42,7 @@ namespace TestSuite.Fixtures
                 {
                     await Contents.DeleteAsync(content);
                 }
-            });
+            }).Wait();
         }
     }
 }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSuite.Shared", "TestSuite.Shared\TestSuite.Shared.csproj", "{37484845-5542-4E52-AB00-C4576B84FE75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSuite.Shared", "TestSuite.Shared\TestSuite.Shared.csproj", "{37484845-5542-4E52-AB00-C4576B84FE75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSuite.ApiTests", "TestSuite.ApiTests\TestSuite.ApiTests.csproj", "{E5F048CB-5307-4E4C-8DAB-2F1C0E5CACF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSuite.ApiTests", "TestSuite.ApiTests\TestSuite.ApiTests.csproj", "{E5F048CB-5307-4E4C-8DAB-2F1C0E5CACF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSuite.LoadTests", "TestSuite.LoadTests\TestSuite.LoadTests.csproj", "{F37572D9-4880-40F4-B3CB-83F58A40CA48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSuite.LoadTests", "TestSuite.LoadTests\TestSuite.LoadTests.csproj", "{F37572D9-4880-40F4-B3CB-83F58A40CA48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

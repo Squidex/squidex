@@ -41,7 +41,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -57,7 +60,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -73,7 +79,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -90,7 +99,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -108,7 +120,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -127,7 +142,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -147,7 +165,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 
@@ -167,7 +188,10 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                await _.Contents.DeleteAsync(content.Id);
+                if (content.Id != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
             }
         }
 

@@ -5,17 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Xunit;
 
-namespace TestSuite.Fixtures
-{
-    public class AssetFixture : CreatedAppFixture
-    {
-        public IAssetsClient Assets { get; }
-
-        public AssetFixture()
-        {
-            Assets = ClientManager.CreateAssetsClient();
-        }
-    }
-}
+[assembly: CollectionBehavior(CollectionBehavior.CollectionPerAssembly)]

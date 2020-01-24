@@ -23,7 +23,12 @@ namespace TestSuite.Fixtures
 
         public string FieldString { get; } = "string";
 
-        public ContentFixture(string schemaName = "my-schema")
+        public ContentFixture()
+            : this("my-writes")
+        {
+        }
+
+        protected ContentFixture(string schemaName)
         {
             SchemaName = schemaName;
 
@@ -65,7 +70,7 @@ namespace TestSuite.Fixtures
                         throw;
                     }
                 }
-            });
+            }).Wait();
 
             Contents = ClientManager.GetClient<TestEntity, TestEntityData>(SchemaName);
         }
