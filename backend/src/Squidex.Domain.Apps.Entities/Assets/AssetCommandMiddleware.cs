@@ -75,15 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                 }
                             }
 
-                            await EnrichWithMetadataAsync(createAsset, createAsset.Tags);
-
-                            await HandleCoreAsync(context, next);
-
-                            var asset = context.Result<IEnrichedAssetEntity>();
-
-                            context.Complete(new AssetCreatedResult(asset, false));
-
-                            await assetFileStore.CopyAsync(tempFile, createAsset.AssetId, asset.FileVersion);
+                            await UploadAsync(context, tempFile, createAsset, true, next);
                         }
                         finally
                         {
@@ -95,16 +87,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 case UpdateAsset updateAsset:
                     {
-                        await EnrichWithMetadataAsync(updateAsset);
                         await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
 
                         try
                         {
-                            await HandleCoreAsync(context, next);
-
-                            var asset = context.Result<IEnrichedAssetEntity>();
-
-                            await assetFileStore.CopyAsync(tempFile, updateAsset.AssetId, asset.FileVersion);
+                            await UploadAsync(context, tempFile, updateAsset, false, next);
                         }
                         finally
                         {
@@ -115,12 +102,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     }
 
                 default:
-                    await HandleCoreAsync(context, next);
+                    await HandleCoreAsync(context, false, next);
                     break;
             }
         }
 
-        private async Task HandleCoreAsync(CommandContext context, NextDelegate next)
+        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, bool created, NextDelegate next)
+        {
+            await EnrichWithMetadataAsync(command);
+
+            var asset = await HandleCoreAsync(context, created, next);
+
+            if (asset != null)
+            {
+                await assetFileStore.CopyAsync(tempFile, command.AssetId, asset.FileVersion);
+            }
+        }
+
+        private async Task<IEnrichedAssetEntity?> HandleCoreAsync(CommandContext context, bool created, NextDelegate next)
         {
             await base.HandleAsync(context, next);
 
@@ -128,8 +127,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 var enriched = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
 
-                context.Complete(enriched);
+                if (created)
+                {
+                    context.Complete(new AssetCreatedResult(enriched, false));
+                }
+                else
+                {
+                    context.Complete(enriched);
+                }
+
+                return enriched;
             }
+
+            return null;
         }
 
         private static bool IsDuplicate(IAssetEntity asset, AssetFile file)

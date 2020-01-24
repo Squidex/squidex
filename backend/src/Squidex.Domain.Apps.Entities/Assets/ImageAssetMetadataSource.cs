@@ -14,11 +14,11 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class ImageMetadataSource : IAssetMetadataSource
+    public sealed class ImageAssetMetadataSource : IAssetMetadataSource
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
-        public ImageMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
+        public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
         {
             Guard.NotNull(assetThumbnailGenerator);
 
@@ -27,32 +27,35 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
         {
-            var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
-
-            if (imageInfo != null)
+            if (command.Type == AssetType.Unknown)
             {
-                command.Type = AssetType.Image;
+                var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
 
-                command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
-                command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
-
-                if (tags != null)
+                if (imageInfo != null)
                 {
-                    tags.Add("image");
+                    command.Type = AssetType.Image;
 
-                    var wh = imageInfo.PixelWidth + imageInfo.PixelHeight;
+                    command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
+                    command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
 
-                    if (wh > 2000)
+                    if (tags != null)
                     {
-                        tags.Add("image/large");
-                    }
-                    else if (wh > 1000)
-                    {
-                        tags.Add("image/medium");
-                    }
-                    else
-                    {
-                        tags.Add("image/small");
+                        tags.Add("image");
+
+                        var wh = imageInfo.PixelWidth + imageInfo.PixelHeight;
+
+                        if (wh > 2000)
+                        {
+                            tags.Add("image/large");
+                        }
+                        else if (wh > 1000)
+                        {
+                            tags.Add("image/medium");
+                        }
+                        else
+                        {
+                            tags.Add("image/small");
+                        }
                     }
                 }
             }
@@ -60,10 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public IEnumerable<string> Format(IAssetEntity asset)
         {
-            if (asset.Type == AssetType.Image)
-            {
-                yield return $"{asset.Metadata.GetPixelWidth()}x{asset.Metadata.GetPixelHeight()}px";
-            }
+            yield break;
         }
     }
 }

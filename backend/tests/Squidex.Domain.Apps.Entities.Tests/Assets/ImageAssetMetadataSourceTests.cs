@@ -17,19 +17,30 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class ImageMetadataSourceTests
+    public class ImageAssetMetadataSourceTests
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly HashSet<string> tags = new HashSet<string>();
         private readonly MemoryStream stream = new MemoryStream();
         private readonly AssetFile file;
-        private readonly ImageMetadataSource sut;
+        private readonly ImageAssetMetadataSource sut;
 
-        public ImageMetadataSourceTests()
+        public ImageAssetMetadataSourceTests()
         {
             file = new AssetFile("MyImage.png", "image/png", 1024, () => stream);
 
-            sut = new ImageMetadataSource(assetThumbnailGenerator);
+            sut = new ImageAssetMetadataSource(assetThumbnailGenerator);
+        }
+
+        [Fact]
+        public async Task Should_not_enhance_if_type_already_found()
+        {
+            var command = new CreateAsset { File = file, Type = AssetType.Image };
+
+            await sut.EnhanceAsync(command, tags);
+
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -85,24 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_format_with_dimensions_if_image()
-        {
-            var source = new AssetEntity
-            {
-                Metadata =
-                    new AssetMetadata()
-                        .SetPixelWidth(800)
-                        .SetPixelHeight(600),
-                Type = AssetType.Image
-            };
-
-            var formatted = sut.Format(source).First();
-
-            Assert.Equal("800x600px", formatted);
-        }
-
-        [Fact]
-        public void Should_format_to_empty_if_not_an_image()
+        public void Should_format_to_empty()
         {
             var source = new AssetEntity();
 

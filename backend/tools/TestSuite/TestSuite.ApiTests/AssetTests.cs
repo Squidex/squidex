@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using TestSuite.Fixtures;
@@ -27,9 +28,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image()
         {
+            var fileName = $"{Guid.NewGuid()}.png";
+
             using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var asset = await _.Assets.CreateAssetAsync("logo.png", "image/png", stream);
+                var asset = await _.Assets.CreateAssetAsync(fileName, "image/png", stream);
 
                 Assert.True(asset.IsImage);
                 Assert.Equal(600, asset.PixelHeight);
@@ -40,11 +43,15 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_without_extension()
         {
+            var fileName = $"{Guid.NewGuid()}.png";
+
             using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var asset = await _.Assets.CreateAssetAsync("logo", "image/png", stream);
+                var asset = await _.Assets.CreateAssetAsync(fileName, "image/png", stream);
 
-                Assert.False(asset.IsImage);
+                Assert.True(asset.IsImage);
+                Assert.Equal(600, asset.PixelHeight);
+                Assert.Equal(600, asset.PixelWidth);
             }
         }
     }

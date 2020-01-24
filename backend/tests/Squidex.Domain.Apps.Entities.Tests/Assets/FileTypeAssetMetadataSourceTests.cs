@@ -14,10 +14,10 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class FileTypeTagGeneratorTests
+    public class FileTypeAssetMetadataSourceTests
     {
         private readonly HashSet<string> tags = new HashSet<string>();
-        private readonly FileTypeTagGenerator sut = new FileTypeTagGenerator();
+        private readonly FileTypeAssetMetadataSource sut = new FileTypeAssetMetadataSource();
 
         [Fact]
         public async Task Should_not_add_tag_if_no_file_info()
