@@ -22,4 +22,12 @@
   <ItemGroup>
     <ProjectReference Include="..\TestSuite.Shared\TestSuite.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\logo-squared.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
