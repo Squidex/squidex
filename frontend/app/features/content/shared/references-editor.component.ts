@@ -68,7 +68,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.snapshot.contentItems.map(x => x.id))) {
+            if (!Types.equals(obj, this.snapshot.contentItems.map(x => x.id))) {
                 const contentIds: string[] = obj;
 
                 this.contentsService.getContentsByIds(this.appsState.appName, contentIds)

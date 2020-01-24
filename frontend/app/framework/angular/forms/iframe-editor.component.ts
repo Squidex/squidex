@@ -82,7 +82,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
                     } else if (type === 'valueChanged') {
                         const { value } = event.data;
 
-                        if (!Types.jsJsonEquals(this.value, value)) {
+                        if (!Types.equals(this.value, value)) {
                             this.value = value;
 
                             this.callChange(value);

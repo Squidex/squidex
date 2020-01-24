@@ -12,7 +12,6 @@ import {
     Queries,
     Query,
     ResourceOwner,
-    SavedQuery,
     SchemasState,
     UIState
 } from '@app/shared';
@@ -39,10 +38,6 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
                 .subscribe(schema => {
                     this.schemaQueries = new Queries(this.uiState, `schemas.${schema.name}`);
                 }));
-    }
-
-    public isQueryUsed = (query: SavedQuery) => {
-        return this.contentsState.isQueryUsed(query);
     }
 
     public search(query: Query) {

@@ -12,7 +12,8 @@ import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
     AssetsFiltersPageComponent,
-    AssetsPageComponent
+    AssetsPageComponent,
+    AssetTagsComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -36,7 +37,8 @@ const routes: Routes = [
     ],
     declarations: [
         AssetsFiltersPageComponent,
-        AssetsPageComponent
+        AssetsPageComponent,
+        AssetTagsComponent
     ]
 })
 export class SqxFeatureAssetsModule {}

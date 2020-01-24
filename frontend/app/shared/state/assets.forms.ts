@@ -115,11 +115,11 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
                 delete result.isProtected;
             }
 
-            if (Types.jsJsonEquals(result.metadata, asset.metadata)) {
+            if (Types.equals(result.metadata, asset.metadata)) {
                 delete result.metadata;
             }
 
-            if (Types.jsJsonEquals(result.tags, asset.tags)) {
+            if (Types.equals(result.tags, asset.tags)) {
                 delete result.tags;
             }
 

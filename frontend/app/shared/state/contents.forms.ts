@@ -500,13 +500,13 @@ export class EditContentForm extends Form<FormGroup, any> {
     public hasChanged() {
         const currentValue = this.form.getRawValue();
 
-        return !Types.jsJsonEquals(this.initialData, currentValue);
+        return !Types.equals(this.initialData, currentValue);
     }
 
     public hasChanges(changes: any) {
         const currentValue = this.form.getRawValue();
 
-        return !Types.jsJsonEquals(changes, currentValue);
+        return !Types.equals(changes, currentValue);
     }
 
     public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {

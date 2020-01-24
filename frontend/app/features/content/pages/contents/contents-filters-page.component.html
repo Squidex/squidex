@@ -4,29 +4,30 @@
     </ng-container>
 
     <ng-container content>
-        <a class="sidebar-item" *ngFor="let default of schemaQueries.defaultQueries; trackBy: trackByQuery" (click)="search(default.query)"
-            [class.active]="isQueryUsed(default)">
-            {{default.name}}
-        </a>
+        <sqx-query-list
+            [queryUsed]="contentsState.contentsQuery | async"
+            [queries]="schemaQueries.defaultQueries"
+            (search)="search($event)">
+        </sqx-query-list>
 
         <hr />
 
         <div class="sidebar-section">
             <h3>Status Queries</h3>
 
-            <a class="sidebar-item status" *ngFor="let status of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(status.query)"
-                [class.active]="isQueryUsed(status)">
-                
-                <i class="icon-circle" [style.color]="status.color"></i> {{status.name}}
-            </a>
+            <sqx-query-list
+                [queryUsed]="contentsState.contentsQuery | async"
+                [queries]="contentsState.statusQueries | async"
+                (search)="search($event)">
+            </sqx-query-list>
         </div>
 
         <hr />
 
         <sqx-shared-queries types="contents"
+            [queryUsed]="contentsState.contentsQuery | async"
             [queries]="schemaQueries"
-            [queryUsed]="isQueryUsed"
-            (search)="search($event.query)">
+            (search)="search($event)">
         </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

@@ -70,7 +70,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.snapshot.assets.map(x => x.id))) {
+            if (!Types.equals(obj, this.snapshot.assets.map(x => x.id))) {
                 const assetIds: string[] = obj;
 
                 this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)

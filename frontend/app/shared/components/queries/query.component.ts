@@ -11,7 +11,8 @@ import {
     LanguageDto,
     Query,
     QueryModel,
-    QuerySorting
+    QuerySorting,
+    Types
 } from '@app/shared/internal';
 
 @Component({
@@ -47,30 +48,10 @@ export class QueryComponent {
 
     @Input()
     public set query(query: Query) {
-        if (!query) {
-            query = {};
-        }
-
-        if (query) {
-            if (!query.filter) {
-                query.filter = {
-                    and: []
-                };
-            }
-
-            if (!query.sort) {
-                query.sort = [];
-            }
-
-            this.queryValue = query;
-        }
+        this.queryValue = Types.clone(query);
     }
 
-    public queryValue: Query;
-
-    constructor() {
-        this.query = {};
-    }
+    public queryValue: Query = {};
 
     public addSorting() {
         this.queryValue.sort!.push({ path: Object.keys(this.model.fields)[0], order: 'ascending' });
