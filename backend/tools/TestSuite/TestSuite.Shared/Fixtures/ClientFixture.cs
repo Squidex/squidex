@@ -18,11 +18,17 @@ namespace TestSuite.Fixtures
 
         public IAppsClient Apps { get; }
 
+        public IBackupsClient Backups { get; }
+
+        public string ServerUrl { get; } = TestClient.ServerUrl;
+
         public ClientFixture()
         {
             ClientManager = TestClient.ClientManager;
 
             Apps = ClientManager.CreateAppsClient();
+
+            Backups = ClientManager.CreateBackupsClient();
         }
 
         public virtual void Dispose()
