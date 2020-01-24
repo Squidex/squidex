@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class FileTypeTagGenerator : IAssetMetadataSource
+    public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
     {
         public Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
         {

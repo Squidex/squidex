@@ -8,18 +8,21 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LoadTest.Model;
+using TestSuite.Model;
 using Xunit;
 
-namespace LoadTest
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
+
+namespace TestSuite.LoadTests
 {
     public class WritingBenchmarks : IClassFixture<WritingFixture>
     {
-        public WritingFixture Fixture { get; }
+        public WritingFixture _ { get; }
 
         public WritingBenchmarks(WritingFixture fixture)
         {
-            Fixture = fixture;
+            _ = fixture;
         }
 
         public static IEnumerable<object[]> Loads()
@@ -62,7 +65,7 @@ namespace LoadTest
 
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.CreateAsync(new TestEntityData { Number = random.Next() }, true);
+                await _.Contents.CreateAsync(new TestEntityData { Number = random.Next() }, true);
             });
         }
     }

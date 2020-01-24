@@ -5,24 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using TestSuite.Fixtures;
 
-namespace LoadTest.Utils
+namespace TestSuite.LoadTests
 {
-    public static class RandomString
+    public sealed class WritingFixture : ContentFixture
     {
-        private static readonly Random Random = new Random();
-
-        public static string Create(int length)
+        public WritingFixture()
+            : base("benchmark_writing")
         {
-            var chars = new char[length];
-
-            for (var i = 0; i < length; i++)
-            {
-                chars[i] = (char)Random.Next(48, 122);
-            }
-
-            return new string(chars);
         }
     }
 }

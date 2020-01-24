@@ -7,19 +7,21 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LoadTest.Model;
 using Squidex.ClientLibrary;
 using Xunit;
 
-namespace LoadTest
-{
-    public class ReadingBenchmarks : IClassFixture<ReadingFixture>
-{
-        public ReadingFixture Fixture { get; }
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-        public ReadingBenchmarks(ReadingFixture fixture)
+namespace TestSuite.LoadTests
+{
+    public class ReadingContentBenchmarks : IClassFixture<ReadingFixture>
+{
+        public ReadingFixture _ { get; }
+
+        public ReadingContentBenchmarks(ReadingFixture fixture)
         {
-            Fixture = fixture;
+            _ = fixture;
         }
 
         public static IEnumerable<object[]> Loads()
@@ -62,7 +64,7 @@ namespace LoadTest
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.GetAsync(new ODataQuery { OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ODataQuery { OrderBy = "data/value/iv asc" });
             });
         }
 
@@ -72,7 +74,7 @@ namespace LoadTest
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.GetAsync(new ODataQuery { Skip = 5, OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ODataQuery { Skip = 5, OrderBy = "data/value/iv asc" });
             });
         }
 
@@ -82,7 +84,7 @@ namespace LoadTest
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.GetAsync(new ODataQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ODataQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv asc" });
             });
         }
 
@@ -92,7 +94,7 @@ namespace LoadTest
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.GetAsync(new ODataQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv desc" });
+                await _.Contents.GetAsync(new ODataQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv desc" });
             });
         }
 
@@ -102,17 +104,7 @@ namespace LoadTest
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await Fixture.Client.GetAsync(new ODataQuery { Filter = "data/value/iv gt 3 and data/value/iv lt 7", OrderBy = "data/value/iv asc" });
-            });
-        }
-
-        [Theory]
-        [MemberData(nameof(Loads))]
-        public async Task Should_return_clients(int numUsers, int numIterationsPerUser)
-        {
-            await Run.Parallel(numUsers, numIterationsPerUser, async () =>
-            {
-                await Fixture.AppsClient.GetClientsAsync(TestClient.TestAppName);
+                await _.Contents.GetAsync(new ODataQuery { Filter = "data/value/iv gt 3 and data/value/iv lt 7", OrderBy = "data/value/iv asc" });
             });
         }
     }

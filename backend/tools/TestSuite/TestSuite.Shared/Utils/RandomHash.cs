@@ -9,7 +9,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LoadTest.Utils
+namespace TestSuite.Utils
 {
     public static class RandomHash
     {

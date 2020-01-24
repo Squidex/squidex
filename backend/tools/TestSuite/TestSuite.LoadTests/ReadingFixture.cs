@@ -5,21 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Squidex.ClientLibrary;
+using TestSuite.Fixtures;
 
-namespace LoadTest.Model
+namespace TestSuite.LoadTests
 {
-    public sealed class TestEntity : SquidexEntityBase<TestEntityData>
+    public sealed class ReadingFixture : ContentFixture
     {
-    }
-
-    public sealed class TestEntityData
-    {
-        [JsonConverter(typeof(InvariantConverter))]
-        public int Number { get; set; }
-
-        [JsonConverter(typeof(InvariantConverter))]
-        public string String { get; set; }
+        public ReadingFixture()
+            : base("benchmark_reading")
+        {
+        }
     }
 }
