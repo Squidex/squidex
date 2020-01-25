@@ -30,6 +30,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_backup_and_restore_app()
         {
+            var timeout = TimeSpan.FromMinutes(2);
+
             var appName = Guid.NewGuid().ToString();
             var appNameRestore = $"{appName}-restore";
 
@@ -44,23 +46,30 @@ namespace TestSuite.ApiTests
 
             BackupJobDto backup = null;
 
-            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
+            try
             {
-                while (true)
+                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
                 {
-                    cts.Token.ThrowIfCancellationRequested();
-
-                    await Task.Delay(1000);
-
-                    var backups = await _.Backups.GetBackupsAsync(appName);
-
-                    if (backups.Items.Count > 0)
+                    while (true)
                     {
-                        backup = backups.Items.FirstOrDefault();
+                        cts.Token.ThrowIfCancellationRequested();
 
-                        break;
+                        await Task.Delay(1000);
+
+                        var backups = await _.Backups.GetBackupsAsync(appName);
+
+                        if (backups.Items.Count > 0)
+                        {
+                            backup = backups.Items.FirstOrDefault();
+
+                            break;
+                        }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Assert.True(false, $"Could not retrieve backup within {timeout}.");
             }
 
 
@@ -71,21 +80,28 @@ namespace TestSuite.ApiTests
 
             await _.Backups.PostRestoreJobAsync(restoreRequest);
 
-            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60)))
+            try
             {
-                while (true)
+                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
                 {
-                    cts.Token.ThrowIfCancellationRequested();
-
-                    await Task.Delay(1000);
-
-                    var job = await _.Backups.GetRestoreJobAsync();
-
-                    if (job != null && job.Url == uri && job.Status == JobStatus.Completed)
+                    while (true)
                     {
-                        break;
+                        cts.Token.ThrowIfCancellationRequested();
+
+                        await Task.Delay(1000);
+
+                        var job = await _.Backups.GetRestoreJobAsync();
+
+                        if (job != null && job.Url == uri && job.Status == JobStatus.Completed)
+                        {
+                            break;
+                        }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Assert.True(false, $"Could not retrieve restored app within {timeout}.");
             }
         }
     }
