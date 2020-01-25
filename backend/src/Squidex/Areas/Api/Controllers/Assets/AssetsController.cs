@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Tags;
@@ -20,7 +19,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -185,7 +183,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [FromQuery] Guid parentId, [OpenApiIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] Guid parentId, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -215,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpload)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, Guid id, [OpenApiIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PutAssetContent(string app, Guid id, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -311,20 +309,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
             }
         }
 
-        private async Task<AssetFile> CheckAssetFileAsync(IReadOnlyList<IFormFile> file)
+        private async Task<AssetFile> CheckAssetFileAsync(IFormFile? file)
         {
-            if (file.Count != 1)
+            if (file == null || Request.Form.Files.Count != 1)
             {
-                var error = new ValidationError($"Can only upload one file, found {file.Count} files.");
-
-                throw new ValidationException("Cannot create asset.", error);
-            }
-
-            var formFile = file[0];
-
-            if (formFile.Length > assetOptions.MaxSize)
-            {
-                var error = new ValidationError($"File cannot be bigger than {assetOptions.MaxSize.ToReadableSize()}.");
+                var error = new ValidationError($"Can only upload one file, found {Request.Form.Files.Count} files.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }
@@ -333,14 +322,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
-            if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + formFile.Length)
+            if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
             {
                 var error = new ValidationError("You have reached your max asset size.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            return formFile.ToAssetFile();
+            return file.ToAssetFile();
         }
     }
 }

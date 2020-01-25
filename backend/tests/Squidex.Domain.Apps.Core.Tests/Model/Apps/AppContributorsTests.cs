@@ -48,9 +48,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         public void Should_remove_contributor()
         {
             var contributors_1 = contributors_0.Assign("1", Role.Developer);
-            var contributors_2 = contributors_1.Remove("1");
+            var contributors_2 = contributors_1.Assign("2", Role.Developer);
+            var contributors_3 = contributors_2.Assign("3", Role.Developer);
+            var contributors_4 = contributors_3.Remove("2");
 
-            Assert.Empty(contributors_2);
+            Assert.Equal(new string[] { "1", "3" }, contributors_4.Keys);
         }
 
         [Fact]
