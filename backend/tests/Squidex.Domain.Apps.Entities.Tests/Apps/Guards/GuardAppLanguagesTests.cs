@@ -106,9 +106,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
+        public void CanUpdateLanguage_should_throw_exception_if_fallback_language_defined_and_master()
+        {
+            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
+
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+
+            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages_1, command),
+                new ValidationError("Master language cannot have fallback languages.", "Fallback"));
+        }
+
+        [Fact]
         public void CanUpdateLanguage_should_throw_exception_if_language_has_invalid_fallback()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.IT } };
+            var command = new UpdateLanguage { Language = Language.EN, Fallback = new List<Language> { Language.IT } };
 
             var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
@@ -129,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_not_throw_exception_if_language_is_valid()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
+            var command = new UpdateLanguage { Language = Language.EN, Fallback = new List<Language> { Language.EN } };
 
             var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 

@@ -149,7 +149,7 @@ namespace Squidex.Infrastructure.Commands
                 throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
             }
 
-            if (isUpdate == true && Version < 0)
+            if (isUpdate && Version < 0)
             {
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }

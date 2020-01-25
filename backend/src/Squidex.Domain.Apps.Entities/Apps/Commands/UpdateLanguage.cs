@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public bool IsMaster { get; set; }
 
-        public List<Language> Fallback { get; set; }
+        public List<Language>? Fallback { get; set; }
     }
 }
