@@ -27,12 +27,12 @@
 </div>
 
 <ng-container *sqxModal="selectorDialog">
-    <sqx-contents-selector 
+    <sqx-content-selector 
         [allowDuplicates]="allowDuplicates"
         [alreadySelected]="snapshot.contentItems"
         [language]="language"
         [languages]="languages"
         [schemaIds]="schemaIds"
         (select)="select($event)">
-    </sqx-contents-selector>
+    </sqx-content-selector>
 </ng-container>

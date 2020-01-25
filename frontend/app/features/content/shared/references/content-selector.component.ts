@@ -24,14 +24,14 @@ import {
 } from '@app/shared';
 
 @Component({
-    selector: 'sqx-contents-selector',
-    styleUrls: ['./contents-selector.component.scss'],
-    templateUrl: './contents-selector.component.html',
+    selector: 'sqx-content-selector',
+    styleUrls: ['./content-selector.component.scss'],
+    templateUrl: './content-selector.component.html',
     providers: [
         ManualContentsState
     ]
 })
-export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
+export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
