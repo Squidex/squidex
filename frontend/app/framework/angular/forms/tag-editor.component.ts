@@ -138,7 +138,9 @@ interface State {
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
-    providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     animations: [
         fadeAnimation
     ],

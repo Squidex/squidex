@@ -34,7 +34,9 @@ interface State {
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line: readonly-array

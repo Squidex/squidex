@@ -26,7 +26,9 @@ interface State {
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
-    providers: [SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line: readonly-array

@@ -35,7 +35,9 @@ interface State {
     selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
-    providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR
+    ],
     animations: [
         fadeAnimation
     ],

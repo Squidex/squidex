@@ -162,7 +162,8 @@ export class AppsState extends State<Snapshot> {
         this.next(s => {
             const apps = s.apps.replaceBy('id', updated);
 
-            const selectedApp = s.selectedApp &&
+            const selectedApp =
+                s.selectedApp &&
                 s.selectedApp.id === app.id ?
                 updated :
                 s.selectedApp;

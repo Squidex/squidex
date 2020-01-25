@@ -28,7 +28,9 @@ interface State {
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
-    providers: [SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> {

@@ -34,7 +34,9 @@ interface State {
     selector: 'sqx-markdown-editor',
     styleUrls: ['./markdown-editor.component.scss'],
     templateUrl: './markdown-editor.component.html',
-    providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {

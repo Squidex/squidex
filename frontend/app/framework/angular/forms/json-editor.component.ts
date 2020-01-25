@@ -22,7 +22,9 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-json-editor',
     styleUrls: ['./json-editor.component.scss'],
     templateUrl: './json-editor.component.html',
-    providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JsonEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit {

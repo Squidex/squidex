@@ -38,7 +38,9 @@ const ImageTypes: ReadonlyArray<any> = [
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
-    providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {

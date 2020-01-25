@@ -39,7 +39,9 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
-    providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {

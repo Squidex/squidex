@@ -13,32 +13,8 @@ import { EventConsumerDto, EventConsumersState } from '@app/features/administrat
 
 @Component({
     selector: '[sqxEventConsumer]',
-    template: `
-        <tr [class.faulted]="eventConsumer.error && eventConsumer.error?.length > 0">
-            <td class="cell-auto">
-                <span class="truncate">
-                    <i class="faulted-icon icon icon-bug" (click)="error.emit()" [class.hidden]="!eventConsumer.error || eventConsumer.error?.length === 0"></i>
-
-                    {{eventConsumer.name}}
-                </span>
-            </td>
-            <td class="cell-auto-right">
-                <span>{{eventConsumer.position}}</span>
-            </td>
-            <td class="cell-actions-lg">
-                <button type="button" class="btn btn-text" (click)="reset()" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
-                    <i class="icon icon-reset"></i>
-                </button>
-                <button type="button" class="btn btn-text" (click)="start()" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
-                    <i class="icon icon-play"></i>
-                </button>
-                <button type="button" class="btn btn-text" (click)="stop()" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
-                    <i class="icon icon-pause"></i>
-                </button>
-            </td>
-        </tr>
-        <tr class="spacer"></tr>
-    `,
+    styleUrls: ['./event-consumer.component.scss'],
+    templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventConsumerComponent {

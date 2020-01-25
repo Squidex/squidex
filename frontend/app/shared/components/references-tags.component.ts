@@ -81,7 +81,9 @@ interface State {
             min-height: 1.5rem;
         }`
     ],
-    providers: [SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {

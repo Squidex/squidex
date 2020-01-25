@@ -31,11 +31,12 @@ interface State {
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
-    providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
-export class DropdownComponent extends StatefulControlComponent<State, any[]> implements AfterContentInit, ControlValueAccessor, OnChanges, OnInit {
+export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, ControlValueAccessor, OnChanges, OnInit {
     @Input()
     public items: ReadonlyArray<any> = [];
 

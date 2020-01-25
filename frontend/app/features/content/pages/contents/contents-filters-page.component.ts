@@ -43,8 +43,4 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     public search(query: Query) {
         this.contentsState.search(query);
     }
-
-    public trackByQuery(index: number, query: { name: string }) {
-        return query.name;
-    }
 }

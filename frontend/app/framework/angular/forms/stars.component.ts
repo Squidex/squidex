@@ -25,7 +25,9 @@ interface State {
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
-    providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_STARS_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StarsComponent extends StatefulControlComponent<State, number | null> {

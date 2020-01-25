@@ -16,7 +16,9 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
 
 @Directive({
     selector: '[sqxIndeterminateValue]',
-    providers: [SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR]
+    providers: [
+        SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR
+    ]
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };

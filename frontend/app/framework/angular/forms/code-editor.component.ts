@@ -26,7 +26,9 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
-    providers: [SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CodeEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit {

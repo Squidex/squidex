@@ -48,7 +48,9 @@ const NO_EMIT = { emitEvent: false };
             min-height: 1.5rem;
         }`
     ],
-    providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {

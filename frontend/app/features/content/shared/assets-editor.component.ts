@@ -45,7 +45,9 @@ interface State {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line: readonly-array

@@ -22,7 +22,9 @@ interface State {
     selector: 'sqx-toggle',
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',
-    providers: [SQX_TOGGLE_CONTROL_VALUE_ACCESSOR]
+    providers: [
+        SQX_TOGGLE_CONTROL_VALUE_ACCESSOR
+    ]
 })
 export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
     @Input()

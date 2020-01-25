@@ -29,7 +29,9 @@ const NO_EMIT = { emitEvent: false };
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
-    providers: [SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit {

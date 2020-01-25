@@ -30,7 +30,9 @@ export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
-    providers: [SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [
+        SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
