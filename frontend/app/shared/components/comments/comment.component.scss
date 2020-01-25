@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .item-remove {
     @include absolute(-5px, -15px, auto, auto);
     display: none;

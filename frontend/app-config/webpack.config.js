@@ -145,6 +145,10 @@ module.exports = function (env) {
                 }, {
                     loader: 'sass-loader', 
                     options: {
+                        prependData: `
+                            @import '_vars';
+                            @import '_mixins';
+                        `,
                         sassOptions: {
                             includePaths: [root('app', 'theme')]
                         }

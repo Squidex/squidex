@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 :host ::ng-deep {
     .mention-menu {
         border-color: $color-border !important;
