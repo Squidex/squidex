@@ -1,0 +1,11 @@
+<ng-container *ngIf="logical">
+    <sqx-filter-logical [model]="model" [filter]="logical" [language]="language" [level]="level"
+        (remove)="remove.emit()" (change)="change.emit()">
+    </sqx-filter-logical>
+</ng-container>
+
+<ng-container *ngIf="comparison">
+    <sqx-filter-comparison [model]="model" [filter]="comparison" [language]="language"
+        (remove)="remove.emit()" (change)="change.emit()">
+    </sqx-filter-comparison>
+</ng-container>

@@ -12,25 +12,8 @@ import { AddRoleForm, RolesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-role-add-form',
-    template: `
-        <div class="table-items-footer">
-            <form [formGroup]="addRoleForm.form" (ngSubmit)="addRole()">
-                <div class="row no-gutters">
-                    <div class="col">
-                        <sqx-control-errors for="name" [submitted]="addRoleForm.submitted | async"></sqx-control-errors>
-
-                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter role name" autocomplete="off" />
-                    </div>
-                    <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success" [disabled]="addRoleForm.hasNoName | async">Add role</button>
-                    </div>
-                    <div class="col-auto pl-1">
-                        <button type="reset" class="btn btn-text-secondary2" (click)="cancel()">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    `,
+    styleUrls: ['./role-add-form.component.scss'],
+    templateUrl: './role-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleAddFormComponent {

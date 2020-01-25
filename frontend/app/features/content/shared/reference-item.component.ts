@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* tslint:disable:component-selector */
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
@@ -13,49 +15,10 @@ import {
     getContentValue
 } from '@app/shared';
 
-/* tslint:disable:component-selector */
-
 @Component({
     selector: '[sqxReferenceItem]',
     styleUrls: ['./reference-item.component.scss'],
-    template: `
-        <tr>
-            <td class="cell-select">
-                <ng-content></ng-content>
-            </td>
-
-            <td sqxContentListCell="meta.lastModifiedBy.avatar">
-                <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
-            </td>
-
-            <td class="cell-auto cell-content" *ngFor="let value of values">
-                <sqx-content-value [value]="value"></sqx-content-value>
-            </td>
-
-            <td class="cell-label" *ngIf="!isCompact">
-                <span class="badge badge-pill truncate-inline badge-primary">{{content.schemaDisplayName}}</span>
-            </td>
-
-            <td class="cell-actions">
-                <div class="reference-edit">
-                    <button type="button" class="btn btn-text-secondary">
-                        <i class="icon-dots"></i>
-                    </button>
-
-                    <div class="reference-menu">
-                        <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]">
-                            <i class="icon-pencil"></i>
-                        </a>
-
-                        <button type="button" class="btn btn-text-secondary" (click)="emitDelete()">
-                            <i class="icon-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr class="spacer"></tr>
-    `,
+    templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferenceItemComponent implements OnChanges {

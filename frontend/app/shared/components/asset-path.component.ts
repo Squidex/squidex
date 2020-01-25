@@ -11,25 +11,8 @@ import { AssetPathItem } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-path',
-    template: `
-        <ng-container *ngIf="path.length === 0; else normalPath">
-            <span class="btn">Search Results</span>
-        </ng-container>
-        <ng-template #normalPath>
-            <ng-container *ngFor="let item of path; let i = index">
-                <i class="icon-angle-right" *ngIf="i > 0"></i>
-
-                <a class="btn" (click)="emitNavigate(item)" [class.force]="i < path.length - 1">
-                    {{item.folderName}}
-                </a>
-            </ng-container>
-        </ng-template>
-    `,
-    styles: [`
-        i {
-            vertical-align: middle;
-        }`
-    ],
+    styleUrls: ['./asset-path.component.scss'],
+    templateUrl: './asset-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetPathComponent {

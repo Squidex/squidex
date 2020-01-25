@@ -17,19 +17,8 @@ import {
 
 @Component({
     selector: 'sqx-filter-node',
-    template: `
-        <ng-container *ngIf="logical">
-            <sqx-filter-logical [model]="model" [filter]="logical" [language]="language" [level]="level"
-                (remove)="remove.emit()" (change)="change.emit()">
-            </sqx-filter-logical>
-        </ng-container>
-
-        <ng-container *ngIf="comparison">
-            <sqx-filter-comparison [model]="model" [filter]="comparison" [language]="language"
-                (remove)="remove.emit()" (change)="change.emit()">
-            </sqx-filter-comparison>
-        </ng-container>
-    `,
+    styleUrls: ['./filter-node.component.scss'],
+    templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterNodeComponent {

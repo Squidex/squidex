@@ -11,33 +11,8 @@ import { Queries, Query } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-shared-queries',
-    template: `
-        <div class="sidebar-section">
-            <h3>Shared queries</h3>
-
-            <sqx-query-list
-                [canRemove]="true"
-                [queryUsed]="queryUsed"
-                [queries]="queries.queriesShared | async"
-                (search)="search.emit($event)"
-                (remove)="queries.removeShared($event)">
-            </sqx-query-list>
-        </div>
-
-        <hr />
-
-        <div class="sidebar-section">
-            <h3>My queries</h3>
-
-            <sqx-query-list
-                [canRemove]="true"
-                [queryUsed]="queryUsed"
-                [queries]="queries.queriesUser | async"
-                (search)="search.emit($event)"
-                (remove)="queries.removeUser($event)">
-            </sqx-query-list>
-        </div>
-    `,
+    styleUrls: ['./shared-queries.component.scss'],
+    templateUrl: './shared-queries.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SavedQueriesComponent {

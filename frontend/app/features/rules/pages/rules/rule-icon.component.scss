@@ -1,0 +1,39 @@
+@import '_vars';
+@import '_mixins';
+
+.svg-icon {
+    display: inline-block;
+}
+
+.icon {
+    color: white;
+}
+
+.sm .icon {
+    font-size: 14px;
+}
+
+.sm .svg-icon {
+    width: 14px;
+}
+
+.md .icon {
+    font-size: 20px;
+}
+
+.md .svg-icon {
+    width: 20px;
+}
+
+.lg .icon {
+    font-size: 30px;
+}
+
+.lg .svg-icon {
+    width: 30px;
+}
+
+::ng-deep svg {
+    fill: white;
+    display: block;
+}

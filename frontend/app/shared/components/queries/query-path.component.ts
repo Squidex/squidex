@@ -11,24 +11,8 @@ import { QueryModel } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query-path',
-    template: `
-        <sqx-dropdown [items]="model.fields | sqxKeys" [ngModel]="path" (ngModelChange)="pathChange.emit($event)" [canSearch]="false" separated="true">
-            <ng-template let-field="$implicit">
-                <div class="row">
-                    <div class="col-auto">
-                        <div class="badge badge-pill badge-primary">{{model.fields[field].displayName}}</div>
-                    </div>
-                    <div class="col text-right">
-                        <small class="text-muted">{{model.fields[field].description}}</small>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template let-field="$implicit">
-                {{model.fields[field].displayName}}
-            </ng-template>
-        </sqx-dropdown>
-    `,
+    styleUrls: ['./query-path.component.scss'],
+    templateUrl: './query-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QueryPathComponent {

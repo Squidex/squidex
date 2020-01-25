@@ -15,20 +15,8 @@ import {
 
 @Component({
     selector: 'sqx-table-header',
-    template: `
-        <a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
-            <span class="truncate">
-                <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
-                <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
-
-                {{text}}
-            </span>
-        </a>
-
-        <ng-template #notSortable>
-            <span class="truncate">{{text}}</span>
-        </ng-template>
-    `,
+    styleUrls: ['./table-header.component.scss'],
+    templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableHeaderComponent implements OnChanges {

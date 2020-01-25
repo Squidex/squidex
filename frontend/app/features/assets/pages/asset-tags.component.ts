@@ -11,26 +11,8 @@ import { Tag, TagsSelected } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-tags',
-    template: `
-        <a class="sidebar-item" (click)="reset.emit()" [class.active]="isEmpty()">
-            <div class="row">
-                <div class="col">
-                    All tags
-                </div>
-            </div>
-        </a>
-
-        <a class="sidebar-item" *ngFor="let tag of tags; trackBy: trackByTag" (click)="toggle.emit(tag.name)" [class.active]="isSelected(tag)">
-            <div class="row">
-                <div class="col">
-                    {{tag.name}}
-                </div>
-                <div class="col-auto">
-                    {{tag.count}}
-                </div>
-            </div>
-        </a>
-    `,
+    styleUrls: ['./asset-tags.component.scss'],
+    templateUrl: './asset-tags.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetTagsComponent {

@@ -16,22 +16,8 @@ import {
 
 @Component({
     selector: 'sqx-language-add-form',
-    template: `
-        <div class="table-items-footer">
-            <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
-                <div class="row no-gutters">
-                    <div class="col">
-                        <select class="form-control" formControlName="language">
-                            <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
-                        </select>
-                    </div>
-                    <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success">Add Language</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    `,
+    styleUrls: ['./language-add-form.component.scss'],
+    templateUrl: './language-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageAddFormComponent implements OnChanges {

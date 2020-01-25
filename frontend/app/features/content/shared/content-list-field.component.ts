@@ -20,70 +20,8 @@ import {
 
 @Component({
     selector: 'sqx-content-list-field',
-    template: `
-        <ng-container [ngSwitch]="fieldName">
-            <ng-container *ngSwitchCase="metaFields.id">
-                <small class="truncate">{{content.id}}</small>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.created">
-                <small class="truncate">{{content.created | sqxFromNow}}</small>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.createdByAvatar">
-                <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [src]="content.createdBy | sqxUserPictureRef" />
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.createdByName">
-                <small class="truncate">{{content.createdBy | sqxUserNameRef}}</small>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.lastModified">
-                <small class="truncate">{{content.lastModified | sqxFromNow}}</small>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.lastModifiedByAvatar">
-                <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [src]="content.lastModifiedBy | sqxUserPictureRef" />
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
-                <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.status">
-                <span class="truncate">
-                    <sqx-content-status
-                        [status]="content.status"
-                        [statusColor]="content.statusColor"
-                        [scheduledTo]="content.scheduleJob?.status"
-                        [scheduledAt]="content.scheduleJob?.dueTime"
-                        [isPending]="content.isPending">
-                    </sqx-content-status>
-
-                    {{content.status}}
-                </span>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.statusNext">
-                <span class="truncate" *ngIf="content.scheduleJob; let job">
-                    {{job.status}} at {{job.dueTime | sqxShortDate}}
-                </span>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.statusColor">
-                <sqx-content-status
-                    [status]="content.status"
-                    [statusColor]="content.statusColor"
-                    [scheduledTo]="content.scheduleJob?.status"
-                    [scheduledAt]="content.scheduleJob?.dueTime"
-                    [isPending]="content.isPending">
-                </sqx-content-status>
-            </ng-container>
-            <ng-container *ngSwitchCase="metaFields.version">
-                <small class="truncate">{{content.version.value}}</small>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-                <ng-container *ngIf="isInlineEditable && patchAllowed; else displayTemplate">
-                    <sqx-content-value-editor [form]="patchForm" [field]="field"></sqx-content-value-editor>
-                </ng-container>
-
-                <ng-template #displayTemplate>
-                    <sqx-content-value [value]="value"></sqx-content-value>
-                </ng-template>
-            </ng-container>
-        </ng-container>
-    `,
+    styleUrls: ['./content-list-field.component.scss'],
+    templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentListFieldComponent implements OnChanges {
