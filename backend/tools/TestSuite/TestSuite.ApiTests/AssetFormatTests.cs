@@ -30,7 +30,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleGIFImage_40kbmb.gif", "image/gif");
 
-            // Should create metadata.
+            // Should parse image metadata.
             Assert.True(asset.IsImage);
             Assert.Equal(312, asset.PixelHeight);
             Assert.Equal(312, asset.PixelWidth);
@@ -44,7 +44,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleGIFImage_40kbmb.gif", "image/gif", Guid.NewGuid().ToString());
 
-            // Should create metadata.
+            // Should parse image metadata.
             Assert.True(asset.IsImage);
             Assert.Equal(312, asset.PixelHeight);
             Assert.Equal(312, asset.PixelWidth);
@@ -58,7 +58,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SamplePNGImage_100kbmb.png", "image/png");
 
-            // Should create metadata.
+            // Should parse image metadata.
             Assert.True(asset.IsImage);
             Assert.Equal(170, asset.PixelHeight);
             Assert.Equal(272, asset.PixelWidth);
@@ -72,7 +72,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleJPGImage_50kbmb.jpg", "image/jpg");
 
-            // Should create metadata.
+            // Should parse image metadata.
             Assert.True(asset.IsImage);
             Assert.Equal(300, asset.PixelHeight);
             Assert.Equal(300, asset.PixelWidth);
@@ -87,7 +87,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleAudio_0.4mb.mp3", "audio/mp3");
 
-            // Should create metadata.
+            // Should parse audio metadata.
             Assert.False(asset.IsImage);
             Assert.Equal("00:00:28.2708750", asset.Metadata["duration"]);
             Assert.Equal(128L, asset.Metadata["audioBitrate"]);
@@ -101,7 +101,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.mp4", "audio/mp4");
 
-            // Should create metadata.
+            // Should parse video metadata.
             Assert.False(asset.IsImage);
             Assert.Equal("00:00:05.3120000", asset.Metadata["duration"]);
             Assert.Equal(384L, asset.Metadata["audioBitrate"]);
@@ -117,7 +117,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/webm");
 
-            // Should create metadata.
+            // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
         }
 
@@ -126,7 +126,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/x-flv");
 
-            // Should create metadata.
+            // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
         }
 
@@ -135,7 +135,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
 
-            // Should create metadata.
+            // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
         }
     }

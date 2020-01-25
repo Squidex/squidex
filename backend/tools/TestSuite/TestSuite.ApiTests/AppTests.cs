@@ -280,7 +280,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Remove pattern.
             var patterns_3 = await _.Apps.DeletePatternAsync(_.AppName, pattern_2.Id.ToString());
 
-            // Should return role with correct number of users and clients.
+            // Should not return deleted pattern.
             Assert.DoesNotContain(patterns_3.Items, x => x.Id == pattern_2.Id);
         }
 
@@ -307,7 +307,7 @@ namespace TestSuite.ApiTests
             Assert.True(languageEN_1.IsMaster);
 
 
-            // STEP 3: Update language.
+            // STEP 3: Update English language.
             var updateRequest1 = new UpdateLanguageDto
             {
                 Fallback = new string[]
@@ -325,7 +325,7 @@ namespace TestSuite.ApiTests
             Assert.True(languageDE_2.IsOptional);
 
 
-            // STEP 4: Update language2.
+            // STEP 4: Update German language.
             var updateRequest2 = new UpdateLanguageDto
             {
                 Fallback = new string[]
