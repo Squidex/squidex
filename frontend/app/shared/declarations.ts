@@ -6,39 +6,47 @@
  */
 
 export * from './components/app-form.component';
-export * from './components/asset-dialog.component';
-export * from './components/asset-folder.component';
-export * from './components/asset-folder-form.component';
-export * from './components/asset-path.component';
-export * from './components/asset-uploader.component';
-export * from './components/asset.component';
-export * from './components/assets-list.component';
-export * from './components/assets-selector.component';
-export * from './components/comment.component';
-export * from './components/comments.component';
-export * from './components/geolocation-editor.component';
-export * from './components/help-markdown.pipe';
-export * from './components/help.component';
-export * from './components/history-list.component';
-export * from './components/history.component';
-export * from './components/language-selector.component';
-export * from './components/markdown-editor.component';
 export * from './components/pipes';
-export * from './components/references-dropdown.component';
-export * from './components/references-tags.component';
-export * from './components/rich-editor.component';
-export * from './components/query-list.component';
-export * from './components/shared-queries.component';
 export * from './components/schema-category.component';
-export * from './components/search-form.component';
 export * from './components/table-header.component';
 
-export * from './components/queries/filter-comparison.component';
-export * from './components/queries/filter-logical.component';
-export * from './components/queries/filter-node.component';
-export * from './components/queries/query-path.component';
-export * from './components/queries/query.component';
-export * from './components/queries/sorting.component';
+export * from './components/assets/asset-dialog.component';
+export * from './components/assets/asset-folder-form.component';
+export * from './components/assets/asset-folder.component';
+export * from './components/assets/asset-path.component';
+export * from './components/assets/asset-uploader.component';
+export * from './components/assets/asset.component';
+export * from './components/assets/assets-list.component';
+export * from './components/assets/assets-selector.component';
+export * from './components/assets/pipes';
+
+export * from './components/comments/comment.component';
+export * from './components/comments/comments.component';
+
+export * from './components/forms/geolocation-editor.component';
+export * from './components/forms/language-selector.component';
+export * from './components/forms/markdown-editor.component';
+export * from './components/forms/references-dropdown.component';
+export * from './components/forms/references-tags.component';
+export * from './components/forms/rich-editor.component';
+
+export * from './components/help/help-markdown.pipe';
+export * from './components/help/help.component';
+
+export * from './components/history/history-list.component';
+export * from './components/history/history.component';
+export * from './components/history/pipes';
+
+export * from './components/search/queries/filter-comparison.component';
+export * from './components/search/queries/filter-logical.component';
+export * from './components/search/queries/filter-node.component';
+export * from './components/search/queries/query-path.component';
+export * from './components/search/queries/query.component';
+export * from './components/search/queries/sorting.component';
+export * from './components/search/query-list.component';
+export * from './components/search/search-form.component';
+export * from './components/search/shared-queries.component';
+
 
 export * from './guards/app-must-exist.guard';
 export * from './guards/content-must-exist.guard';
