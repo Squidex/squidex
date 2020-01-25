@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSuite.ApiTests", "TestS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSuite.LoadTests", "TestSuite.LoadTests\TestSuite.LoadTests.csproj", "{F37572D9-4880-40F4-B3CB-83F58A40CA48}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.ClientLibrary", "..\..\..\..\squidex-samples\csharp\Squidex.ClientLibrary\Squidex.ClientLibrary\Squidex.ClientLibrary.csproj", "{9AF5F7FD-3C82-4A4F-8494-739911E2BB6F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{F37572D9-4880-40F4-B3CB-83F58A40CA48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F37572D9-4880-40F4-B3CB-83F58A40CA48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F37572D9-4880-40F4-B3CB-83F58A40CA48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AF5F7FD-3C82-4A4F-8494-739911E2BB6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AF5F7FD-3C82-4A4F-8494-739911E2BB6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AF5F7FD-3C82-4A4F-8494-739911E2BB6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AF5F7FD-3C82-4A4F-8494-739911E2BB6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
