@@ -26,8 +26,7 @@ export class AvatarComponent implements OnChanges {
     public size = 50;
 
     public imageSource: string | null;
-
-    public sizeInPx = '50px';
+    public imageSize = '50px';
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['image'] || changes['identifier']) {
@@ -35,7 +34,7 @@ export class AvatarComponent implements OnChanges {
         }
 
         if (changes['size']) {
-            this.sizeInPx = `${this.size}px`;
+            this.imageSize = `${this.size}px`;
         }
     }
 
