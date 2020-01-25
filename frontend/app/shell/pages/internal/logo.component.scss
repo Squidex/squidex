@@ -1,0 +1,6 @@
+@import '_vars';
+@import '_mixins';
+
+.loader {
+    @include absolute(12px, null, null, 40px);
+}

@@ -10,12 +10,16 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
-@Component({
-    selector: 'sqx-custom-view-editor',
-    styleUrls: ['./custom-view-editor.component.scss'],
-    templateUrl: './custom-view-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
-})
+export function buildComponent() {
+    return {
+        selector: 'sqx-custom-view-editor',
+        styleUrls: ['./custom-view-editor.component.scss'],
+        templateUrl: './custom-view-editor.component.html',
+        changeDetection: ChangeDetectionStrategy.OnPush
+    };
+}
+
+@Component(buildComponent())
 export class CustomViewEditorComponent implements OnChanges {
     @Input()
     public allFields: ReadonlyArray<string>;

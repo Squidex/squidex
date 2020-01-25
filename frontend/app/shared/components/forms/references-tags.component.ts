@@ -71,16 +71,8 @@ interface State {
 
 @Component({
     selector: 'sqx-references-tags',
-    template: `
-        <sqx-tag-editor placeholder=", to add reference" [converter]="snapshot.converter" [formControl]="selectionControl"
-            [suggestedValues]="snapshot.converter.suggestions">
-        </sqx-tag-editor>
-    `,
-    styles: [`
-        .truncate {
-            min-height: 1.5rem;
-        }`
-    ],
+    styleUrls: ['./references-tags.component.scss'],
+    templateUrl: './references-tags.component.html',
     providers: [
         SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR
     ],

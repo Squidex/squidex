@@ -36,18 +36,8 @@ const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-dropdown',
-    template: `
-        <sqx-dropdown [formControl]="selectionControl" [items]="snapshot.contentNames">
-            <ng-template let-content="$implicit" let-context="context">
-                <span class="truncate" [innerHTML]="content.name | sqxHighlight:context"></span>
-            </ng-template>
-        </sqx-dropdown>
-    `,
-    styles: [`
-        .truncate {
-            min-height: 1.5rem;
-        }`
-    ],
+    styleUrls: ['./references-dropdown.component.scss'],
+    templateUrl: './references-dropdown.component.html',
     providers: [
         SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR
     ],

@@ -15,7 +15,7 @@ import {
     Upload
 } from '@app/shared/internal';
 
-import { AppsState } from './../state/apps.state';
+import { AppsState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-uploader',

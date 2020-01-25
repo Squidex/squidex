@@ -1,0 +1,14 @@
+@import '_vars';
+@import '_mixins';
+
+$color: #fcfeff;
+
+:host {
+    display: block;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.light {
+    background: $color;
+}

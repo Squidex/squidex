@@ -1,0 +1,14 @@
+@import '_vars';
+@import '_mixins';
+
+:host {
+    & {
+        display: block;
+        margin-bottom: .5rem;
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}

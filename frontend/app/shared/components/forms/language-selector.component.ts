@@ -7,8 +7,11 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
-import { fadeAnimation, ModalModel } from '@app/shared/internal';
-import { LanguageDto } from '../services/languages.service';
+import {
+    fadeAnimation,
+    LanguageDto,
+    ModalModel
+} from '@app/shared/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage: true; }
 
