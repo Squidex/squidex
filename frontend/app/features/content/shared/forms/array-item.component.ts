@@ -155,27 +155,19 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
         this.changeDetector.markForCheck();
     }
 
-    public emitClone() {
-        this.clone.emit();
-    }
-
-    public emitRemove() {
-        this.remove.emit();
-    }
-
-    public emitMoveTop() {
+    public moveTop() {
         this.move.emit(0);
     }
 
-    public emitMoveUp() {
+    public moveUp() {
         this.move.emit(this.index - 1);
     }
 
-    public emitMoveDown() {
+    public moveDown() {
         this.move.emit(this.index + 1);
     }
 
-    public emitMoveBottom() {
+    public moveBottom() {
         this.move.emit(99999);
     }
 

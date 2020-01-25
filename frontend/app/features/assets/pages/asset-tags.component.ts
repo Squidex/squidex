@@ -33,7 +33,7 @@ export class AssetTagsComponent {
     }
 
     public isSelected(tag: Tag) {
-        return !!this.tagsSelected[tag.name];
+        return this.tagsSelected[tag.name] === true;
     }
 
     public trackByTag(index: number, tag: Tag) {

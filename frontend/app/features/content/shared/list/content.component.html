@@ -2,7 +2,7 @@
     <td class="cell-select inline-edit" sqxStopClick>
         <input type="checkbox" class="form-check"
             [ngModel]="selected" 
-            (ngModelChange)="emitSelectedChange($event)" />
+            (ngModelChange)="selectedChange.emit($event)" />
 
         <ng-container *ngIf="isDirty">
             <div class="edit-menu">
@@ -25,7 +25,7 @@
     
             <ng-container *sqxModal="dropdown;closeAlways:true">
                 <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
-                    <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
+                    <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                         Change to 
 
                         <sqx-content-status
@@ -35,14 +35,14 @@
                             small="true">
                         </sqx-content-status>
                     </a>
-                    <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
+                    <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
                         Clone
                     </a>
                     
                     <div class="dropdown-divider"></div>
         
                     <a class="dropdown-item dropdown-item-delete"
-                        (sqxConfirmClick)="emitDelete()"
+                        (sqxConfirmClick)="delete.emit()"
                         confirmTitle="Delete content" 
                         confirmText="Do you really want to delete the content?">
                         Delete

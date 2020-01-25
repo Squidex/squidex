@@ -11,8 +11,8 @@ import { picasso } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-avatar',
-    styleUrls: ['./code.component.scss'],
-    templateUrl: './code.component.html',
+    styleUrls: ['./avatar.component.scss'],
+    templateUrl: './avatar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AvatarComponent implements OnChanges {

@@ -85,10 +85,6 @@ export class AssetsListComponent {
         this.state.deleteAssetFolder(assetFolder);
     }
 
-    public emitSelect(asset: AssetDto) {
-        this.select.emit(asset);
-    }
-
     public isSelected(asset: AssetDto) {
         return this.selectedIds && this.selectedIds[asset.id];
     }

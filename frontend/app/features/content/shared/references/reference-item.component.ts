@@ -43,10 +43,6 @@ export class ReferenceItemComponent implements OnChanges {
         this.updateValues();
     }
 
-    public emitDelete() {
-        this.delete.emit();
-    }
-
     private updateValues() {
         const values = [];
 

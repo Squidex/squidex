@@ -1,5 +1,5 @@
 <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="emitSelect()" 
+    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="select.emit()" 
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
         [noDrop]="true">
@@ -31,12 +31,12 @@
                             <i class="icon-download"></i>
                         </a>
                         <a class="file-delete ml-2" *ngIf="!isDisabled && !removeMode && asset.canDelete"
-                            (sqxConfirmClick)="emitDelete()"
+                            (sqxConfirmClick)="delete.emit()"
                             confirmTitle="Delete asset" 
                             confirmText="Do you really want to delete the asset?">
                             <i class="icon-delete"></i>
                         </a>
-                        <a class="file-delete ml-2" (click)="emitRemove()" *ngIf="removeMode">
+                        <a class="file-delete ml-2" (click)="remove.emit()" *ngIf="removeMode">
                             <i class="icon-close"></i>
                         </a>
                     </div>
@@ -84,7 +84,7 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" [class.selectable]="isSelectable" (click)="emitSelect()" 
+    <div class="table-items-row" [class.selectable]="isSelectable" (click)="select.emit()" 
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
         [noDrop]="true">
@@ -126,12 +126,12 @@
 
                     <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
                         <button type="button" class="btn btn-text-danger" *ngIf="!isDisabled && !removeMode && asset.canDelete"
-                            (sqxConfirmClick)="emitDelete()"
+                            (sqxConfirmClick)="remove.emit()"
                             confirmTitle="Delete asset" 
                             confirmText="Do you really want to delete the asset?">
                             <i class="icon-bin2"></i>
                         </button>
-                        <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">
+                        <button type="button" class="btn btn-text-secondary" (click)="remove.emit()" *ngIf="removeMode">
                             <i class="icon-close"></i>
                         </button>
                     </td>

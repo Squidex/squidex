@@ -21,7 +21,7 @@
     </div>
 
     <button *ngIf="comment.user === userToken || canDelete" type="button" class="btn btn-sm btn-text-danger item-remove"
-        (sqxConfirmClick)="emitDelete()"
+        (sqxConfirmClick)="delete.emit()"
         confirmTitle="Delete comment"
         confirmText="Do you really want to delete the comment?"
         [confirmRequired]="confirmDelete">

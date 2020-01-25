@@ -42,11 +42,11 @@ export class ContentSelectorItemComponent {
 
     public toggle() {
         if (this.selectable) {
-            this.emitSelectedChange(!this.selected);
+            this.select(!this.selected);
         }
     }
 
-    public emitSelectedChange(isSelected: boolean) {
+    public select(isSelected: boolean) {
         this.selectedChange.emit(isSelected);
     }
 }

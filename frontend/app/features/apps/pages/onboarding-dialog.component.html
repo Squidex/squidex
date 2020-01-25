@@ -1,6 +1,6 @@
 <sqx-modal-dialog [showHeader]="false">
     <ng-container content>
-        <a class="header-right modal-close" (click)="emitClose()">Skip Tour</a>
+        <a class="header-right modal-close" (click)="close.emit()">Skip Tour</a>
 
         <div class="onboarding-step" *ngIf="step === 0">
             <img @fade class="header-left" src="./images/logo-white-small.png" />

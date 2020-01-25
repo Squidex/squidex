@@ -17,20 +17,24 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
 })
 export class FieldLanguagesComponent {
     @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
-
-    @Output()
     public showAllControlsChange = new EventEmitter<boolean>();
 
     @Input()
-    public field: RootFieldDto;
-
-    @Input()
     public showAllControls: boolean;
+
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
     public language: AppLanguageDto;
 
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
+
+    @Input()
+    public field: RootFieldDto;
+
+    public toggleShowAllControls() {
+        this.showAllControlsChange.emit(this.showAllControls);
+    }
 }

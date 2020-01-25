@@ -95,22 +95,6 @@ export class WorkflowStepComponent implements OnChanges {
         this.update.emit({ noUpdateRoles });
     }
 
-    public emitMakeInitial() {
-        this.makeInitial.emit();
-    }
-
-    public emitTransitionAdd(transition: WorkflowStep) {
-        this.transitionAdd.emit(transition);
-    }
-
-    public emitTransitionRemove(transition: WorkflowTransition) {
-        this.transitionRemove.emit(transition);
-    }
-
-    public emitRemove() {
-        this.remove.emit();
-    }
-
     public trackByTransition(index: number, transition: WorkflowTransition) {
         return transition.to;
     }

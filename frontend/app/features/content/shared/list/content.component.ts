@@ -125,20 +125,4 @@ export class ContentComponent implements OnChanges {
 
         this.fields.forEach(x => x.reset());
     }
-
-    public emitSelectedChange(isSelected: boolean) {
-        this.selectedChange.emit(isSelected);
-    }
-
-    public emitDelete() {
-        this.delete.emit();
-    }
-
-    public emitChangeStatus(status: string) {
-        this.statusChange.emit(status);
-    }
-
-    public emitClone() {
-        this.clone.emit();
-    }
 }

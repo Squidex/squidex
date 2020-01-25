@@ -56,8 +56,4 @@ export class AssetFolderComponent {
     public emitNavigate() {
         this.navigate.emit(this.assetFolder);
     }
-
-    public emitDelete() {
-        this.delete.emit(this.assetFolder);
-    }
 }

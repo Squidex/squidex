@@ -78,8 +78,4 @@ export class ModalDialogComponent implements AfterViewInit {
             }
         }
     }
-
-    public emitClose() {
-        this.close.emit();
-    }
 }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="field.isLocalizable && languages.length > 1">
-    <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="showAllControlsChange.emit(!showAllControls)">
+    <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="toggleShowAllControls()">
         {{showAllControls ? 'Single Language' : 'All Languages'}}
     </button>
 

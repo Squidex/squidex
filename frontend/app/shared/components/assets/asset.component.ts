@@ -134,24 +134,12 @@ export class AssetComponent implements OnInit {
         }
     }
 
-    public emitSelect() {
-        this.select.emit(this.asset);
-    }
-
-    public emitDelete() {
-        this.delete.emit(this.asset);
-    }
-
     public emitLoad(asset: AssetDto) {
         this.load.emit(asset);
     }
 
     public emitLoadError(error: any) {
         this.loadError.emit(error);
-    }
-
-    public emitRemove() {
-        this.remove.emit();
     }
 
     private setProgress(progress: number) {

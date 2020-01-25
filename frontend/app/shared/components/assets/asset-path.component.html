@@ -5,7 +5,7 @@
     <ng-container *ngFor="let item of path; let i = index">
         <i class="icon-angle-right" *ngIf="i > 0"></i>
 
-        <a class="btn" (click)="emitNavigate(item)" [class.force]="i < path.length - 1">
+        <a class="btn" (click)="navigate.emit(item)" [class.force]="i < path.length - 1">
             {{item.folderName}}
         </a>
     </ng-container>

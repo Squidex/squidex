@@ -3,7 +3,7 @@
         <input type="checkbox" class="form-check"
             [disabled]="!selectable"
             [ngModel]="selected || !selectable"
-            (ngModelChange)="emitSelectedChange($event)"
+            (ngModelChange)="select($event)"
         />
     </td>
 

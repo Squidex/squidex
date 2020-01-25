@@ -80,7 +80,7 @@
                         [isSelectable]="!!selectedIds"
                         [isSelected]="isSelected(asset)"
                         [allTags]="tags"
-                        (select)="emitSelect(asset)"
+                        (select)="select.emit(asset)"
                         (delete)="deleteAsset(asset)">
                     </sqx-asset>
                 </div>

@@ -72,10 +72,6 @@ export class ClientConnectFormComponent implements OnInit {
     public go(step: string) {
         this.step = step;
     }
-
-    public emitComplete() {
-        this.complete.emit();
-    }
 }
 
 function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {

@@ -50,8 +50,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
-export class AssetsEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
+export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     @Input()
     public isCompact = false;
 

@@ -33,8 +33,4 @@ export class CommentComponent {
 
     @Input()
     public userToken: string;
-
-    public emitDelete() {
-        this.delete.emit();
-    }
 }

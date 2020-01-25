@@ -21,8 +21,4 @@ export class AssetPathComponent {
 
     @Input()
     public path: ReadonlyArray<AssetPathItem>;
-
-    public emitNavigate(item: AssetPathItem) {
-        this.navigate.emit(item);
-    }
 }

@@ -25,7 +25,7 @@
     
                             <a class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!canDelete"
-                                (sqxConfirmClick)="emitDelete()"
+                                (sqxConfirmClick)="delete.emit()"
                                 confirmTitle="Delete folder" 
                                 confirmText="Do you really want to delete the folder and all assets?">
                                 Delete

@@ -108,10 +108,6 @@ export class FilterLogicalComponent {
         }
     }
 
-    public emitRemove() {
-        this.remove.emit();
-    }
-
     public emitChange() {
         this.change.emit();
     }
