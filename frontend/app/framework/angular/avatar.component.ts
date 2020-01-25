@@ -27,10 +27,10 @@ export class AvatarComponent implements OnChanges {
 
     public imageSource: string | null;
 
-    public sizeInPx: string;
+    public sizeInPx = '50px';
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['image']) {
+        if (changes['image'] || changes['identifier']) {
             this.imageSource = this.image || this.createSvg();
         }
 

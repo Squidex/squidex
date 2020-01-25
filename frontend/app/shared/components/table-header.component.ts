@@ -10,7 +10,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import {
     LanguageDto,
     Query,
-    SortMode
+    SortMode,
+    Types
 } from '@app/shared/internal';
 
 @Component({
@@ -64,11 +65,13 @@ export class TableHeaderComponent implements OnChanges {
                 this.order = 'descending';
             }
 
-            this.queryChange.emit(this.newQuery());
-        }
-    }
+            const newQuery = Types.clone(this.query);
 
-    private newQuery() {
-        return {...this.query, sort: [{ path: this.fieldPath, order: this.order! }] };
+            newQuery.sort = [
+                { path: this.fieldPath, order: this.order! }
+            ];
+
+            this.queryChange.emit(newQuery);
+        }
     }
 }

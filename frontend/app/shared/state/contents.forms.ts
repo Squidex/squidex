@@ -18,9 +18,9 @@ import {
     ValidatorsEx
 } from '@app/framework';
 
-import { ContentDto, ContentReferencesValue } from '../services/contents.service';
-import { LanguageDto } from '../services/languages.service';
 import { AppLanguageDto } from './../services/app-languages.service';
+import { ContentDto, ContentReferencesValue } from './../services/contents.service';
+import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import {
     ArrayFieldPropertiesDto,

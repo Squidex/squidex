@@ -21,7 +21,7 @@ import {
     Version,
     Versioned
 } from '@app/shared/internal';
-import { encodeQuery } from '../state/query';
+import { encodeQuery } from './../state/query';
 
 describe('ContentsService', () => {
     const version = new Version('1');

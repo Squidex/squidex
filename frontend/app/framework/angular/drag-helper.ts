@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: prefer-for-of
+
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { Types } from './../utils/types';
@@ -24,7 +26,6 @@ export function getFiles(files: FileList | ReadonlyArray<File>) {
 
     const result: File[] = [];
 
-    // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < files.length; i++) {
         result.push(files[i]);
     }

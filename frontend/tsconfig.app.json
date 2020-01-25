@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "files": [
+        "app/app.ts",
+        "app/shims.ts"
+    ],
+    "include": [
+        "app/**/*.d.ts"
+    ],
+    "exclude": [
+        "app/**/*.spec.ts"
+    ]
+}

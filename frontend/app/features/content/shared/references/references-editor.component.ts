@@ -39,8 +39,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
-export class ReferencesEditorComponent extends StatefulControlComponent<State, string[]> {
+export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     @Input()
     public schemaIds: ReadonlyArray<string>;
 

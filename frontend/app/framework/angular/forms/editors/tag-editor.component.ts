@@ -146,8 +146,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
-export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnChanges, OnInit {
+export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
     private latestValue: any;
 
     @ViewChild('form', { static: false })

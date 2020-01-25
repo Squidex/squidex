@@ -20,7 +20,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createSchema, createSchemaDetails } from '../services/schemas.service.spec';
+import { createSchema, createSchemaDetails } from './../services/schemas.service.spec';
 
 import { TestValues } from './_test-helpers';
 

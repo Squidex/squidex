@@ -43,8 +43,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
-export class AutocompleteComponent extends StatefulControlComponent<State, any[]> implements OnInit {
+export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit {
     @Input()
     public source: AutocompleteSource;
 

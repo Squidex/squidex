@@ -16,6 +16,7 @@ namespace Squidex.Areas.Frontend.Middlewares
     public sealed class WebpackMiddleware
     {
         private const string WebpackUrl = "http://localhost:3000/index.html";
+
         private readonly RequestDelegate next;
 
         public WebpackMiddleware(RequestDelegate next)
