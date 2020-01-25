@@ -5,34 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
-using TestSuite.Model;
 
 namespace TestSuite.Fixtures
 {
-    public class ClientFixture : IDisposable
+    public class ClientFixture : ClientManagerFixture
     {
-        public SquidexClientManager ClientManager { get; }
+        public IAppsClient Apps => ClientManager.CreateAppsClient();
 
-        public IAppsClient Apps { get; }
+        public IBackupsClient Backups => ClientManager.CreateBackupsClient();
 
-        public IBackupsClient Backups { get; }
+        public ILanguagesClient Languages => ClientManager.CreateLanguagesClient();
 
-        public string ServerUrl { get; } = TestClient.ServerUrl;
+        public IPingClient Ping => ClientManager.CreatePingClient();
 
-        public ClientFixture()
-        {
-            ClientManager = TestClient.ClientManager;
+        public IRulesClient Rules => ClientManager.CreateRulesClient();
 
-            Apps = ClientManager.CreateAppsClient();
-
-            Backups = ClientManager.CreateBackupsClient();
-        }
-
-        public virtual void Dispose()
-        {
-        }
+        public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
     }
 }

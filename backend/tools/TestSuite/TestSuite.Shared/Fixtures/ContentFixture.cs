@@ -38,7 +38,7 @@ namespace TestSuite.Fixtures
                 {
                     var schemas = ClientManager.CreateSchemasClient();
 
-                    await schemas.PostSchemaAsync(TestClient.TestAppName, new CreateSchemaDto
+                    await schemas.PostSchemaAsync(AppName, new CreateSchemaDto
                     {
                         Name = SchemaName,
                         Fields = new List<UpsertSchemaFieldDto>

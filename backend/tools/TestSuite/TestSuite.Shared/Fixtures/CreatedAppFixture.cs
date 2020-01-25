@@ -7,14 +7,11 @@
 
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
-using TestSuite.Model;
 
 namespace TestSuite.Fixtures
 {
     public class CreatedAppFixture : ClientFixture
     {
-        public string AppName { get; } = TestClient.TestAppName;
-
         public CreatedAppFixture()
         {
             Task.Run(async () =>

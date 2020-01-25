@@ -89,19 +89,26 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public LanguagesConfig MakeMaster(Language language)
-        {
-            Guard.NotNull(language);
-
-            return Create(languages, languages[language]);
-        }
-
-        [Pure]
         public LanguagesConfig Set(Language language, bool isOptional = false, IEnumerable<Language>? fallback = null)
         {
             Guard.NotNull(language);
 
             return Set(new LanguageConfig(language, isOptional, fallback));
+        }
+
+        [Pure]
+        public LanguagesConfig MakeMaster(Language language)
+        {
+            Guard.NotNull(language);
+
+            var newMaster = new LanguageConfig(languages[language].Language);
+
+            var newLanguages =
+                languages
+                    .Without(language)
+                    .With(language, newMaster);
+
+            return Create(newLanguages, newMaster);
         }
 
         [Pure]
@@ -111,7 +118,10 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newLanguages = languages.With(config.Language, config);
 
-            var newMaster = Master?.Language == config.Language ? config : Master;
+            var newMaster =
+                Master.Language != config.Language ?
+                Master :
+                config;
 
             return Create(newLanguages, newMaster!);
         }
@@ -122,12 +132,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNull(language);
 
             var newLanguages =
-                languages.Values.Where(x => x.Language != language)
-                    .Select(config => new LanguageConfig(
-                        config.Language,
-                        config.IsOptional,
-                        config.LanguageFallbacks.Except(new[] { language })))
-                    .ToArrayDictionary(x => x.Language);
+                languages.Values.Where(x => x.Language != language).Select(x => x.WithoutFallback(language)).ToArrayDictionary(x => x.Language);
 
             var newMaster =
                 newLanguages.Values.FirstOrDefault(x => x.Language == Master.Language) ??

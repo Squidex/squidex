@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -30,81 +29,18 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_upload_image()
-        {
-            var fileName = $"{Guid.NewGuid()}.png";
-
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                var asset = await _.Assets.PostAssetAsync(_.AppName, file);
-
-                // Should create metadata.
-                Assert.True(asset.IsImage);
-                Assert.Equal(600, asset.PixelHeight);
-                Assert.Equal(600, asset.PixelWidth);
-                Assert.Equal(600L, asset.Metadata["pixelHeight"]);
-                Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-            }
-        }
-
-        [Fact]
-        public async Task Should_upload_image_without_extension()
-        {
-            var fileName = $"{Guid.NewGuid()}.png";
-
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                var asset = await _.Assets.PostAssetAsync(_.AppName, file);
-
-                // Should create metadata.
-                Assert.True(asset.IsImage);
-                Assert.Equal(600, asset.PixelHeight);
-                Assert.Equal(600, asset.PixelWidth);
-                Assert.Equal(600L, asset.Metadata["pixelHeight"]);
-                Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-            }
-        }
-
-        [Fact]
         public async Task Should_replace_asset()
         {
-            var fileName = $"{Guid.NewGuid()}.png";
-
-            AssetDto asset;
-
             // STEP 1: Create asset
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                asset = await _.Assets.PostAssetAsync(_.AppName, file);
-
-                Assert.True(asset.IsImage);
-                Assert.Equal(600, asset.PixelHeight);
-                Assert.Equal(600, asset.PixelWidth);
-            }
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Reupload asset
-            using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                asset = await _.Assets.PutAssetContentAsync(_.AppName, asset.Id.ToString(), file);
-
-                // Should update metadata.
-                Assert.True(asset.IsImage);
-                Assert.Equal(135, asset.PixelHeight);
-                Assert.Equal(600, asset.PixelWidth);
-            }
+            asset = await _.UploadFileAsync("Assets/logo-wide.png", asset);
 
             using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
             {
-                var downloaded = await DownloadAsync(asset);
+                var downloaded = await _.DownloadAsync(asset);
 
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
@@ -114,17 +50,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_annote_asset()
         {
-            var fileName = $"{Guid.NewGuid()}.png";
-
-            AssetDto asset;
-
             // STEP 1: Create asset
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                asset = await _.Assets.PostAssetAsync(_.AppName, file);
-            }
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Annotate metadata.
@@ -166,21 +93,14 @@ namespace TestSuite.ApiTests
         {
             var fileName = $"{Guid.NewGuid()}.png";
 
-            AssetDto asset;
-
             // STEP 1: Create asset
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                asset = await _.Assets.PostAssetAsync(_.AppName, file);
-            }
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Download asset
             using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var downloaded = await DownloadAsync(asset);
+                var downloaded = await _.DownloadAsync(asset);
 
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
@@ -211,7 +131,7 @@ namespace TestSuite.ApiTests
             // STEP 5: Download asset without key.
             using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var ex = await Assert.ThrowsAsync<HttpRequestException>(() => DownloadAsync(asset));
+                var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset));
 
                 // Should return 403 when not authenticated.
                 Assert.Contains("403", ex.Message);
@@ -221,17 +141,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_delete_asset()
         {
-            var fileName = $"{Guid.NewGuid()}.png";
-
-            AssetDto asset;
-
             // STEP 1: Create asset
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
-            {
-                var file = new FileParameter(stream, fileName, "image/png");
-
-                asset = await _.Assets.PostAssetAsync(_.AppName, file);
-            }
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Delete asset
@@ -241,27 +152,6 @@ namespace TestSuite.ApiTests
             var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset.Id.ToString()));
 
             Assert.Equal(404, ex.StatusCode);
-        }
-
-        private async Task<MemoryStream> DownloadAsync(AssetDto asset)
-        {
-            var temp = new MemoryStream();
-
-            using (var client = new HttpClient())
-            {
-                var url = $"{_.ServerUrl}{asset._links["content"].Href}";
-
-                var response = await client.GetAsync(url);
-
-                response.EnsureSuccessStatusCode();
-
-                using (var stream = await response.Content.ReadAsStreamAsync())
-                {
-                    await stream.CopyToAsync(temp);
-                }
-            }
-
-            return temp;
         }
     }
 }

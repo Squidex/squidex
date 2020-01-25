@@ -18,13 +18,21 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public sealed class AppsTests : IClassFixture<CreatedAppFixture>
+    public sealed class AppTests : IClassFixture<CreatedAppFixture>
     {
         public CreatedAppFixture _ { get; }
 
-        public AppsTests(CreatedAppFixture fixture)
+        public AppTests(CreatedAppFixture fixture)
         {
             _ = fixture;
+        }
+
+        [Fact]
+        public async Task Should_get_app()
+        {
+            var app = await _.Apps.GetAppAsync(_.AppName);
+
+            Assert.Equal(_.AppName, app.Name);
         }
 
         [Fact]

@@ -58,5 +58,17 @@ namespace Squidex.Domain.Apps.Core.Apps
             this.language = language;
             this.languageFallbacks = fallback ?? Array.Empty<Language>();
         }
+
+        public LanguageConfig WithoutFallback(Language fallback)
+        {
+            Guard.NotNull(fallback);
+
+            if (languageFallbacks.Contains(fallback))
+            {
+                return new LanguageConfig(Language, IsOptional, LanguageFallbacks.Except(new[] { fallback }));
+            }
+
+            return this;
+        }
     }
 }
