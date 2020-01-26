@@ -29,14 +29,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override AppClients ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader);
+            var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader)!;
 
-            return new AppClients(json.Select(Convert).ToArray());
-        }
-
-        private static KeyValuePair<string, AppClient> Convert(KeyValuePair<string, JsonAppClient> kvp)
-        {
-            return new KeyValuePair<string, AppClient>(kvp.Key, kvp.Value.ToClient());
+            return new AppClients(json.ToDictionary(x => x.Key, x => x.Value.ToClient()));
         }
     }
 }

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppContributors : ArrayDictionary<string, string>
+    public sealed class AppContributors : ImmutableDictionary<string, string>
     {
         public static readonly AppContributors Empty = new AppContributors();
 
@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
-        public AppContributors(KeyValuePair<string, string>[] items)
-            : base(items)
+        public AppContributors(Dictionary<string, string> inner)
+            : base(inner)
         {
         }
 
