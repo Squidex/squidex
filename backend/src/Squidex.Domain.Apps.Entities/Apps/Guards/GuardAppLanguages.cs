@@ -73,9 +73,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     EnsureConfigExists(languages, language);
 
-                    if ((languages.IsMaster(language) || command.IsMaster) && command.IsOptional)
+                    if (languages.IsMaster(language) || command.IsMaster)
                     {
-                        e("Master language cannot be made optional.", nameof(command.IsMaster));
+                        if (command.IsOptional)
+                        {
+                            e("Master language cannot be made optional.", nameof(command.IsMaster));
+                        }
+
+                        if (command.Fallback?.Count > 0)
+                        {
+                            e("Master language cannot have fallback languages.", nameof(command.Fallback));
+                        }
                     }
 
                     if (command.Fallback == null)

@@ -20,6 +20,6 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public bool IsMaster { get; set; }
 
-        public List<Language> Fallback { get; set; }
+        public List<Language>? Fallback { get; set; }
     }
 }
