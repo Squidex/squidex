@@ -46,7 +46,17 @@ $drag-margin: -8px;
 }
 
 .header {
+    line-height: 2rem;
+    margin-bottom: 0;
     margin-left: -1rem;
+
+    h3 {
+        line-height: 2rem;
+    }
+
+    .btn-remove {
+        margin-right: -1rem;
+    }
 }
 
 .nav-link {
