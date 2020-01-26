@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public class GuardAppLanguagesTests
     {
-        private readonly LanguagesConfig languages_0 = LanguagesConfig.Build(Language.DE);
+        private readonly LanguagesConfig languages_0 = LanguagesConfig.English;
 
         [Fact]
         public void CanAddLanguage_should_throw_exception_if_language_is_null()
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanAddLanguage_should_throw_exception_if_language_already_added()
         {
-            var command = new AddLanguage { Language = Language.DE };
+            var command = new AddLanguage { Language = Language.EN };
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanAdd(languages_0, command),
                 new ValidationError("Language has already been added."));
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanAddLanguage_should_not_throw_exception_if_language_valid()
         {
-            var command = new AddLanguage { Language = Language.EN };
+            var command = new AddLanguage { Language = Language.DE };
 
             GuardAppLanguages.CanAdd(languages_0, command);
         }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanRemoveLanguage_should_throw_exception_if_language_not_found()
         {
-            var command = new RemoveLanguage { Language = Language.EN };
+            var command = new RemoveLanguage { Language = Language.DE };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanRemove(languages_0, command));
         }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanRemoveLanguage_should_throw_exception_if_language_is_master()
         {
-            var command = new RemoveLanguage { Language = Language.DE };
+            var command = new RemoveLanguage { Language = Language.EN };
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanRemove(languages_0, command),
                 new ValidationError("Master language cannot be removed."));
@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanRemoveLanguage_should_not_throw_exception_if_language_is_valid()
         {
-            var command = new RemoveLanguage { Language = Language.EN };
+            var command = new RemoveLanguage { Language = Language.DE };
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             GuardAppLanguages.CanRemove(languages_1, command);
         }
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage();
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages_1, command),
                 new ValidationError("Language code is required.", "Language"));
@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_throw_exception_if_language_is_optional_and_master()
         {
-            var command = new UpdateLanguage { Language = Language.DE, IsOptional = true };
+            var command = new UpdateLanguage { Language = Language.EN, IsOptional = true };
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages_1, command),
                 new ValidationError("Master language cannot be made optional.", "IsMaster"));
@@ -108,9 +108,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_throw_exception_if_language_has_invalid_fallback()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.IT } };
+            var command = new UpdateLanguage { Language = Language.EN, Fallback = new List<Language> { Language.IT } };
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages_1, command),
                 new ValidationError("App does not have fallback language 'Italian'.", "Fallback"));
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.IT };
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanUpdate(languages_1, command));
         }
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
 
-            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(Language.DE);
 
             GuardAppLanguages.CanUpdate(languages_1, command);
         }

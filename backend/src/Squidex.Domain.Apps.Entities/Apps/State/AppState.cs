@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                 case AppLanguageUpdated e:
                     return UpdateLanguages(e, (ev, l) =>
                     {
-                        l = l.Set(ev.Language, ev.IsOptional, ev.Fallback);
+                        l = l.Set(ev.Language, ev.IsOptional, ev.Fallback?.ToArray());
 
                         if (ev.IsMaster)
                         {

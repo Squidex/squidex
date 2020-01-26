@@ -307,7 +307,7 @@ namespace TestSuite.ApiTests
             Assert.True(languageEN_1.IsMaster);
 
 
-            // STEP 3: Update English language.
+            // STEP 3: Update German language.
             var updateRequest1 = new UpdateLanguageDto
             {
                 Fallback = new string[]
@@ -325,43 +325,43 @@ namespace TestSuite.ApiTests
             Assert.True(languageDE_2.IsOptional);
 
 
-            // STEP 4: Update German language.
+            // STEP 4: Update Italian language.
             var updateRequest2 = new UpdateLanguageDto
             {
                 Fallback = new string[]
                 {
                     "fr",
-                    "it"
+                    "de"
                 }
             };
 
-            var languages_3 = await _.Apps.PutLanguageAsync(appName, "en", updateRequest2);
-            var languageEN_3 = languages_3.Items.First(x => x.Iso2Code == "en");
+            var languages_3 = await _.Apps.PutLanguageAsync(appName, "it", updateRequest2);
+            var languageDE_3 = languages_3.Items.First(x => x.Iso2Code == "it");
 
-            Assert.Equal(new string[] { "fr", "it" }, languageEN_3.Fallback.ToArray());
+            Assert.Equal(new string[] { "fr", "de" }, languageDE_3.Fallback.ToArray());
 
 
             // STEP 5: Change master language.
             var masterRequest = new UpdateLanguageDto { IsMaster = true };
 
-            var languages_4 = await _.Apps.PutLanguageAsync(appName, "de", masterRequest);
+            var languages_4 = await _.Apps.PutLanguageAsync(appName, "it", masterRequest);
 
-            var languageDE_4 = languages_4.Items.First(x => x.Iso2Code == "de");
+            var languageIT_4 = languages_4.Items.First(x => x.Iso2Code == "it");
             var languageEN_4 = languages_4.Items.First(x => x.Iso2Code == "en");
 
-            Assert.True(languageDE_4.IsMaster);
-            Assert.False(languageDE_4.IsOptional);
+            Assert.True(languageIT_4.IsMaster);
+            Assert.False(languageIT_4.IsOptional);
             Assert.False(languageEN_4.IsMaster);
-            Assert.Empty(languageDE_4.Fallback);
-            Assert.Equal(new string[] { "de", "en", "fr", "it" }, languages_4.Items.Select(x => x.Iso2Code).ToArray());
+            Assert.Empty(languageIT_4.Fallback);
+            Assert.Equal(new string[] { "it", "de", "en", "fr" }, languages_4.Items.Select(x => x.Iso2Code).ToArray());
 
 
             // STEP 6: Remove language.
             var languages_5 = await _.Apps.DeleteLanguageAsync(appName, "fr");
-            var languageEN_5 = languages_5.Items.First(x => x.Iso2Code == "en");
+            var languageDE_5 = languages_5.Items.First(x => x.Iso2Code == "de");
 
-            Assert.Equal(new string[] { "it" }, languageEN_5.Fallback.ToArray());
-            Assert.Equal(new string[] { "de", "en", "it" }, languages_5.Items.Select(x => x.Iso2Code).ToArray());
+            Assert.Equal(new string[] { "it" }, languageDE_5.Fallback.ToArray());
+            Assert.Equal(new string[] { "it", "de", "en" }, languages_5.Items.Select(x => x.Iso2Code).ToArray());
         }
     }
 }

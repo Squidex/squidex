@@ -12,11 +12,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 #pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Infrastructure.Collections
 {
     public class ArrayDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> where TKey : notnull
     {
+        private static readonly KeyValuePair<TKey, TValue>[] EmptyItems = Array.Empty<KeyValuePair<TKey, TValue>>();
         private readonly IEqualityComparer<TKey> keyComparer;
         private KeyValuePair<TKey, TValue>[] items;
 
@@ -49,7 +51,7 @@ namespace Squidex.Infrastructure.Collections
         }
 
         public ArrayDictionary()
-            : this(EqualityComparer<TKey>.Default, Array.Empty<KeyValuePair<TKey, TValue>>())
+            : this(EqualityComparer<TKey>.Default, EmptyItems)
         {
         }
 
@@ -123,17 +125,15 @@ namespace Squidex.Infrastructure.Collections
                 return Self<TArray>();
             }
 
-            var result = Array.Empty<KeyValuePair<TKey, TValue>>();
-
-            if (items.Length > 1)
+            if (Count == 1)
             {
-                result = new KeyValuePair<TKey, TValue>[items.Length - 1];
-
-                var afterIndex = items.Length - index - 1;
-
-                Array.Copy(items, 0, result, 0, index);
-                Array.Copy(items, index + 1, result, index, afterIndex);
+                return Create<TArray>(EmptyItems);
             }
+
+            var result = new KeyValuePair<TKey, TValue>[items.Length - 1];
+
+            Array.Copy(items, 0, result, 0, index);
+            Array.Copy(items, index + 1, result, index, items.Length - index - 1);
 
             return Create<TArray>(result);
         }

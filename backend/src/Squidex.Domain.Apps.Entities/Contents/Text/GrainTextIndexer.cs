@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static SearchContext CreateContext(IAppEntity app, Scope scope)
         {
-            var languages = new HashSet<string>(app.LanguagesConfig.Select(x => x.Key));
+            var languages = new HashSet<string>(app.LanguagesConfig.AllKeys);
 
             return new SearchContext { Languages = languages, Scope = scope };
         }

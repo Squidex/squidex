@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class FieldConvertersTests
     {
         private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
         public FieldConvertersTests()
         {
@@ -357,8 +357,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
-            var config_1 = languagesConfig.Set(new LanguageConfig(Language.IT));
-            var config_2 = config_1.Set(new LanguageConfig(Language.ES, false, Language.IT));
+            var config =
+                LanguagesConfig.English
+                    .Set(Language.DE)
+                    .Set(Language.IT)
+                    .Set(Language.ES, false, Language.IT);
 
             var source =
                 new ContentFieldData()
@@ -372,7 +375,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("it", "IT")
                     .AddValue("es", "IT");
 
-            var result = FieldConverters.ResolveFallbackLanguages(config_2)(source, field);
+            var result = FieldConverters.ResolveFallbackLanguages(config)(source, field);
 
             Assert.Equal(expected, result);
         }

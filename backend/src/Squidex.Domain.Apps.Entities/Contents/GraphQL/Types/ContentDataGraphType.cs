@@ -35,17 +35,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = $"{schemaType}Data{typeName}Dto"
                     };
 
-                    var partition = model.ResolvePartition(field.Partitioning);
+                    var partitioning = model.ResolvePartition(field.Partitioning);
 
-                    foreach (var partitionItem in partition)
+                    foreach (var partitionKey in partitioning.AllKeys)
                     {
-                        var key = partitionItem.Key;
-
                         fieldGraphType.AddField(new FieldType
                         {
-                            Name = key.EscapePartition(),
+                            Name = partitionKey.EscapePartition(),
                             Arguments = args,
-                            Resolver = PartitionResolver(valueResolver, key),
+                            Resolver = PartitionResolver(valueResolver, partitionKey),
                             ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints
                         });

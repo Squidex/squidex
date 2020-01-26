@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     public class JsonLanguageConfig
     {
         [JsonProperty]
-        public Language[] Fallback { get; set; }
+        public Language[]? Fallback { get; set; }
 
         [JsonProperty]
         public bool IsOptional { get; set; }
@@ -28,12 +28,19 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             SimpleMapper.Map(config, this);
 
-            Fallback = config.LanguageFallbacks.ToArray();
+            Fallback = config.Fallbacks.ToArray();
         }
 
-        public LanguageConfig ToConfig(string language)
+        public LanguageConfig ToConfig()
         {
-            return new LanguageConfig(language, IsOptional, Fallback);
+            if (!IsOptional && (Fallback == null || Fallback.Length == 0))
+            {
+                return LanguageConfig.Default;
+            }
+            else
+            {
+                return new LanguageConfig(IsOptional, Fallback);
+            }
         }
     }
 }
