@@ -9,7 +9,6 @@ import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
 import {
-    encodeQuery,
     Queries,
     SavedQuery,
     UIState
@@ -60,17 +59,11 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1',
-                query: { fullText: 'merged1' },
-                queryJson: encodeQuery({ fullText: 'merged1' })
+                name: 'key1', query: { fullText: 'merged1' }
             }, {
-                name: 'key2',
-                query: { fullText: 'merged2' },
-                queryJson: encodeQuery({ fullText: 'merged2' })
+                name: 'key2', query: { fullText: 'merged2' }
             }, {
-                name: 'key3',
-                query: undefined,
-                queryJson: ''
+                name: 'key3', query: undefined
             }
         ]);
     });
@@ -84,9 +77,7 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1',
-                query: { fullText: 'shared1' },
-                queryJson: encodeQuery({ fullText: 'shared1' })
+                name: 'key1', query: { fullText: 'shared1' }
             }
         ]);
     });
@@ -100,9 +91,7 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1',
-                query: { fullText: 'user1' },
-                queryJson: encodeQuery({ fullText: 'user1' })
+                name: 'key1', query: { fullText: 'user1' }
             }
         ]);
     });

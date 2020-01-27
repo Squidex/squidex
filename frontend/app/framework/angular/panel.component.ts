@@ -143,8 +143,4 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
             }
         }
     }
-
-    public emitClose() {
-        this.close.emit();
-    }
 }

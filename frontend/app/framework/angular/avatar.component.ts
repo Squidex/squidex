@@ -5,19 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 import { picasso } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-avatar',
-    template: `
-        <img *ngIf="imageSource"
-            [style.width]="sizeInPx"
-            [style.height]="sizeInPx"
-            [src]="imageSource | sqxSafeUrl"
-        />
-    `
+    styleUrls: ['./avatar.component.scss'],
+    templateUrl: './avatar.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AvatarComponent implements OnChanges {
     @Input()
@@ -30,21 +26,23 @@ export class AvatarComponent implements OnChanges {
     public size = 50;
 
     public imageSource: string | null;
-    public sizeInPx: string;
+    public imageSize = '50px';
 
-    public ngOnChanges() {
-        this.imageSource = this.image || this.createSvg();
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['image'] || changes['identifier']) {
+            this.imageSource = this.image || this.createSvg();
+        }
 
-        this.sizeInPx = `${this.size}px`;
+        if (changes['size']) {
+            this.imageSize = `${this.size}px`;
+        }
     }
 
     private createSvg() {
-        if (!this.identifier) {
+        if (this.identifier) {
+            return `data:image/svg+xml;utf8,${picasso(this.identifier)}`;
+        } else {
             return null;
         }
-
-        const svg = picasso(this.identifier);
-
-        return `data:image/svg+xml;utf8,${svg}`;
     }
 }

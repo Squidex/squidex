@@ -15,7 +15,7 @@ import {
     DialogService
 } from '@app/shared/internal';
 
-import { createApp } from '../services/apps.service.spec';
+import { createApp } from './../services/apps.service.spec';
 
 describe('AppsState', () => {
     const app1 = createApp(1);

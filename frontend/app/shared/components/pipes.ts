@@ -13,57 +13,9 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
-    AssetDto,
-    formatHistoryMessage,
-    HistoryEventDto,
-    MathHelper,
     UserDto,
     UsersProviderService
 } from '@app/shared/internal';
-
-@Pipe({
-    name: 'sqxHistoryMessage',
-    pure: false
-})
-export class HistoryMessagePipe implements OnDestroy, PipeTransform {
-    private subscription: Subscription;
-    private lastMessage: string;
-    private lastValue: string | null = null;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly users: UsersProviderService
-    ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-    }
-
-    public transform(event: HistoryEventDto): string | null {
-        if (!event) {
-            return this.lastValue;
-        }
-
-        if (this.lastMessage !== event.message) {
-            this.lastMessage = event.message;
-
-            if (this.subscription) {
-                this.subscription.unsubscribe();
-            }
-
-            this.subscription =  formatHistoryMessage(event.message, this.users).subscribe(value => {
-                this.lastValue = value;
-
-                this.changeDetector.markForCheck();
-            });
-        }
-
-        return this.lastValue;
-    }
-}
 
 class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;
@@ -216,67 +168,6 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
                 return of('./images/client.png');
             }
         });
-    }
-}
-
-@Pipe({
-    name: 'sqxAssetUrl',
-    pure: true
-})
-export class AssetUrlPipe implements PipeTransform {
-    constructor(
-        private readonly apiUrl: ApiUrlConfig
-    ) {
-    }
-
-    public transform(asset: AssetDto): string {
-        return `${asset.fullUrl(this.apiUrl)}&sq=${MathHelper.guid()}`;
-    }
-}
-
-@Pipe({
-    name: 'sqxAssetPreviewUrl',
-    pure: true
-})
-export class AssetPreviewUrlPipe implements PipeTransform {
-    constructor(
-        private readonly apiUrl: ApiUrlConfig
-    ) {
-    }
-
-    public transform(asset: AssetDto): string {
-        return asset.fullUrl(this.apiUrl);
-    }
-}
-
-@Pipe({
-    name: 'sqxFileIcon',
-    pure: true
-})
-export class FileIconPipe implements PipeTransform {
-    public transform(asset: { mimeType: string, fileType: string }): string {
-        const knownTypes = [
-            'doc',
-            'docx',
-            'pdf',
-            'ppt',
-            'pptx',
-            'video',
-            'xls',
-            'xlsx'
-        ];
-
-        let mimeIcon: string;
-
-        const mimeParts = asset.mimeType.split('/');
-
-        if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
-            mimeIcon = 'video';
-        } else {
-            mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
-        }
-
-        return `./images/asset_${mimeIcon}.svg`;
     }
 }
 

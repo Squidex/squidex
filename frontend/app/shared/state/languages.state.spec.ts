@@ -19,7 +19,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createLanguages } from '../services/app-languages.service.spec';
+import { createLanguages } from './../services/app-languages.service.spec';
 
 import { TestValues } from './_test-helpers';
 

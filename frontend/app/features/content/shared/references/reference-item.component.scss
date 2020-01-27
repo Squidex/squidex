@@ -1,0 +1,18 @@
+.reference-edit {
+    & {
+        @include hover-visible('.reference-menu');
+        position: relative;
+    }
+
+    .reference-menu {
+        @include absolute(0, -.25rem, auto, auto);
+        background: $color-table-background;
+        border-left: 1px solid $color-border;
+        padding-left: 1rem;
+        white-space: nowrap;
+    }
+}
+
+.badge {
+    @include truncate;
+}

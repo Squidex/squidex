@@ -17,7 +17,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createClients } from '../services/clients.service.spec';
+import { createClients } from './../services/clients.service.spec';
 
 import { TestValues } from './_test-helpers';
 

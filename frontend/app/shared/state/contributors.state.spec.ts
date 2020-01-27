@@ -20,7 +20,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createContributors } from '../services/contributors.service.spec';
+import { createContributors } from './../services/contributors.service.spec';
 
 import { ErrorDto } from '@app/framework';
 import { TestValues } from './_test-helpers';

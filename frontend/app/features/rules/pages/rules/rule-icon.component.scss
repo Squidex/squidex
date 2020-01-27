@@ -1,0 +1,45 @@
+:ng-deep {
+    svg {
+        display: block;
+
+        fill: $color-dark-foreground;
+    }
+}
+
+.svg-icon {
+    display: inline-block;
+}
+
+.icon {
+    color: $color-dark-foreground;
+}
+
+.sm {
+    .icon {
+        font-size: 14px;
+    }
+
+    .svg-icon {
+        width: 14px;
+    }
+}
+
+.md {
+    .icon {
+        font-size: 20px;
+    }
+
+    .svg-icon {
+        width: 20px;
+    }
+}
+
+.lg {
+    .icon {
+        font-size: 30px;
+    }
+
+    .svg-icon {
+        width: 30px;
+    }
+}

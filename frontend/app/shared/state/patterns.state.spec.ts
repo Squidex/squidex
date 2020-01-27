@@ -17,7 +17,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createPatterns } from '../services/patterns.service.spec';
+import { createPatterns } from './../services/patterns.service.spec';
 
 import { TestValues } from './_test-helpers';
 

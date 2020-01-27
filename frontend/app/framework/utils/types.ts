@@ -8,14 +8,6 @@
 // tslint:disable: readonly-array
 
 export module Types {
-    export function hash(value: any): string {
-        try {
-            return JSON.stringify(value);
-        } catch (e) {
-            return '';
-        }
-    }
-
     export function isString(value: any): value is string {
         return typeof value === 'string' || value instanceof String;
     }
@@ -82,28 +74,6 @@ export module Types {
         return true;
     }
 
-    export function jsJsonEquals<T>(lhs: T, rhs: T) {
-        return hash(lhs) === hash(rhs);
-    }
-
-    export function isEquals<T>(lhs: ReadonlyArray<T>, rhs: ReadonlyArray<T>) {
-        if (!lhs && !rhs) {
-            return true;
-        }
-
-        if (lhs.length !== rhs.length) {
-            return false;
-        }
-
-        for (let i = 0; i < lhs.length; i++) {
-            if (rhs[i] !== lhs[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     export function isEmpty(value: any): boolean {
         if (Types.isArray(value)) {
             for (const v of value) {
@@ -129,25 +99,91 @@ export module Types {
 
         return Types.isUndefined(value) === true || Types.isNull(value) === true;
     }
-}
 
-export function mergeInto(target: object, source: object) {
-    if (!Types.isObject(target) || !Types.isObject(source)) {
-        return source;
+    export function clone<T>(lhs: T): T {
+        const any: any = lhs;
+
+        if (Types.isArray(lhs)) {
+            const result = [];
+
+            for (let i = 0; i < lhs.length; i++) {
+                result[i] = clone(lhs[i]);
+            }
+
+            return result as any;
+        } else if (Types.isObject(lhs)) {
+            const result = {};
+
+            for (let key in any) {
+                if (any.hasOwnProperty(key)) {
+                    result[key] = clone(lhs[key]);
+                }
+            }
+
+            return result as any;
+        }
+
+        return lhs;
     }
 
-    Object.keys(source).forEach(key => {
-        const targetValue = target[key];
-        const sourceValue = source[key];
-
-        if (Types.isArray(targetValue) && Types.isArray(sourceValue)) {
-            target[key] = targetValue.concat(sourceValue);
-        } else if (Types.isObject(targetValue) && Types.isObject(sourceValue)) {
-            target[key] = mergeInto({ ...targetValue }, sourceValue);
-        } else {
-            target[key] = sourceValue;
+    export function equals(lhs: any, rhs: any) {
+        if (lhs === rhs || (lhs !== lhs && rhs !== rhs)) {
+            return true;
         }
-    });
 
-    return target;
+        if (!lhs || !rhs) {
+            return false;
+        }
+
+        if (Types.isArray(lhs) && Types.isArray(rhs)) {
+            if (lhs.length !== rhs.length) {
+                return false;
+            }
+
+            for (let i = 0; i < lhs.length; i++) {
+                if (!equals(lhs[i], rhs[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else if (Types.isObject(lhs) && Types.isObject(rhs)) {
+            if (Object.keys(lhs).length !== Object.keys(rhs).length) {
+                return false;
+            }
+
+            for (let key in lhs) {
+                if (lhs.hasOwnProperty(key)) {
+                    if (!equals(lhs[key], rhs[key])) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    export function mergeInto(target: object, source: object) {
+        if (!Types.isObject(target) || !Types.isObject(source)) {
+            return source;
+        }
+
+        Object.keys(source).forEach(key => {
+            const targetValue = target[key];
+            const sourceValue = source[key];
+
+            if (Types.isArray(targetValue) && Types.isArray(sourceValue)) {
+                target[key] = targetValue.concat(sourceValue);
+            } else if (Types.isObject(targetValue) && Types.isObject(sourceValue)) {
+                target[key] = mergeInto({ ...targetValue }, sourceValue);
+            } else {
+                target[key] = sourceValue;
+            }
+        });
+
+        return target;
+    }
 }

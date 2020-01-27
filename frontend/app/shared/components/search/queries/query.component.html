@@ -1,0 +1,15 @@
+<sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
+    (change)="queryChange.emit()">
+</sqx-filter-logical>
+
+<h4 class="mt-4">Sorting</h4>
+
+<div class="mb-2" *ngFor="let sorting of queryValue.sort">
+    <sqx-sorting [sorting]="sorting" [model]="model"
+        (remove)="removeSorting(sorting)" (change)="queryChange.emit()">
+    </sqx-sorting>
+</div>
+
+<button class="btn btn-outline-success btn-sm mr-2" (click)="addSorting()">
+    Add Sorting
+</button>

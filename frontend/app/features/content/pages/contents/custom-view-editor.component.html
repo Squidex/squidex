@@ -7,16 +7,16 @@
     
     <hr />
 
-    <div
+    <div 
         cdkDropList
         [cdkDropListData]="fieldNames"
         (cdkDropListDropped)="drop($event)">
     
-        <div *ngFor="let field of fieldNames; trackBy: random" cdkDrag>
+        <div *ngFor="let field of fieldNames" cdkDrag>
             <i class="icon-drag2 drag-handle"></i> 
             
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" checked (change)="removeField(field)" id="field_{{field}}">
+                <input class="form-check-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}">
                 <label class="form-check-label" for="field_{{field}}">
                     {{field}}
                 </label>
@@ -31,7 +31,7 @@
             <i class="icon-drag2 drag-handle invisible"></i> 
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" (change)="addField(field)" id="field_{{field}}">
+                <input class="form-check-input" type="checkbox" (click)="addField(field)" id="field_{{field}}">
                 <label class="form-check-label" for="field_{{field}}">
                     {{field}}
                 </label>

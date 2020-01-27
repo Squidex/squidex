@@ -37,6 +37,8 @@ module.exports = function (env) {
     const isCoverage = env && env.coverage;
     const isAot = isProduction;
 
+    const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
+
     const config = {
         mode: isProduction ? 'production' : 'development',
 
@@ -66,7 +68,9 @@ module.exports = function (env) {
             ],
 
             plugins: [
-                new plugins.TsconfigPathsPlugin()
+                new plugins.TsconfigPathsPlugin({
+                    configFile
+                })
             ]
         },
 
@@ -145,6 +149,10 @@ module.exports = function (env) {
                 }, {
                     loader: 'sass-loader', 
                     options: {
+                        prependData: `
+                            @import '_vars';
+                            @import '_mixins';
+                        `,
                         sassOptions: {
                             includePaths: [root('app', 'theme')]
                         }
@@ -285,7 +293,7 @@ module.exports = function (env) {
                 entryModule: 'app/app.module#AppModule',
                 sourceMap: !isProduction,
                 skipCodeGeneration: !isAot,
-                tsConfigPath: './tsconfig.json'
+                tsConfigPath: configFile
             })
         );
     }

@@ -6,32 +6,19 @@
     <ng-container content>
         <h3>Tags</h3>
 
-        <a class="sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
-            <div class="row">
-                <div class="col">
-                    All tags
-                </div>
-            </div>
-        </a>
-
-        <a class="sidebar-item" *ngFor="let tag of assetsState.tags | async; trackBy: trackByTag" (click)="toggleTag(tag.name)"
-            [class.active]="assetsState.isTagSelected(tag.name)">
-            <div class="row">
-                <div class="col">
-                    {{tag.name}}
-                </div>
-                <div class="col-auto">
-                    {{tag.count}}
-                </div>
-            </div>
-        </a>
+        <sqx-asset-tags
+            (reset)="resetTags()"
+            [tags]="assetsState.tags | async"
+            [tagsSelected]="assetsState.tagsSelected | async"
+            (toggle)="toggleTag($event)">
+        </sqx-asset-tags>
 
         <hr />
 
         <sqx-shared-queries types="contents"
+            [queryUsed]="assetsState.assetsQuery | async"
             [queries]="assetsQueries"
-            [queryUsed]="isQueryUsed"
-            (search)="search($event.query)">
+            (search)="search($event)">
         </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

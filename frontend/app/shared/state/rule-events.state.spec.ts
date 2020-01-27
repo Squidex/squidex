@@ -18,7 +18,7 @@ import {
     RulesService
 } from '@app/shared/internal';
 
-import { createRuleEvent } from '../services/rules.service.spec';
+import { createRuleEvent } from './../services/rules.service.spec';
 
 import { TestValues } from './_test-helpers';
 

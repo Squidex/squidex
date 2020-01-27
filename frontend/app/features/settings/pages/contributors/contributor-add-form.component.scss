@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .autocomplete-user {
     & {
         @include truncate;

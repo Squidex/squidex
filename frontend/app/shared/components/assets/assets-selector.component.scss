@@ -1,0 +1,27 @@
+:host ::ng-deep {
+    .search {
+        .form-control {
+            @include border-radius-right;
+        }
+
+        .tags {
+            & {
+                @include border-radius-left;
+                border-right: 0;
+            }
+
+            &:focus,
+            &.focus {
+                z-index: 1000;
+            }
+        }
+    }
+
+    .modal-body {
+        background: $color-background;
+    }
+
+    .modal-tabs {
+        background: $color-dark-foreground;
+    }
+}

@@ -9,7 +9,7 @@
                 <sqx-field-languages 
                     [field]="field"
                     [language]="language"
-                    (languageChange)="emitLanguageChange($event)"
+                    (languageChange)="languageChange.emit($event)"
                     [languages]="languages"
                     [showAllControls]="showAllControls"
                     (showAllControlsChange)="changeShowAllControls($event)">
@@ -67,7 +67,7 @@
                 <sqx-field-languages 
                     [field]="field"
                     [language]="language"
-                    (languageChange)="emitLanguageChange($event)"
+                    (languageChange)="languageChange.emit($event)"
                     [languages]="languages"
                     [showAllControls]="showAllControls"
                     (showAllControlsChange)="changeShowAllControls($event)">

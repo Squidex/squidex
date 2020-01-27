@@ -10,25 +10,14 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import {
     LanguageDto,
     Query,
-    SortMode
+    SortMode,
+    Types
 } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-table-header',
-    template: `
-        <a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
-            <span class="truncate">
-                <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
-                <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
-
-                {{text}}
-            </span>
-        </a>
-
-        <ng-template #notSortable>
-            <span class="truncate">{{text}}</span>
-        </ng-template>
-    `,
+    styleUrls: ['./table-header.component.scss'],
+    templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableHeaderComponent implements OnChanges {
@@ -76,11 +65,13 @@ export class TableHeaderComponent implements OnChanges {
                 this.order = 'descending';
             }
 
-            this.queryChange.emit(this.newQuery());
-        }
-    }
+            const newQuery = Types.clone(this.query);
 
-    private newQuery() {
-        return {...this.query, sort: [{ path: this.fieldPath, order: this.order! }] };
+            newQuery.sort = [
+                { path: this.fieldPath, order: this.order! }
+            ];
+
+            this.queryChange.emit(newQuery);
+        }
     }
 }

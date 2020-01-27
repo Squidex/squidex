@@ -1,0 +1,14 @@
+.inline-edit {
+    & {
+        position: relative;
+    }
+
+    .edit-menu {
+        @include absolute(.75rem, auto, auto, .25rem);
+        background: $color-table-background;
+        border-right: 1px solid $color-border;
+        padding-right: 1rem;
+        white-space: nowrap;
+        z-index: 100;
+    }
+}

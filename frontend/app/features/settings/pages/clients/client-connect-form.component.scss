@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .badge {
     @include circle(1.3rem);
     font-size: 80%;

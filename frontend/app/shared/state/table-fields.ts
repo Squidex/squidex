@@ -14,7 +14,7 @@ import {
     MetaFields,
     SchemaDetailsDto,
     TableField
-} from '../services/schemas.service';
+} from './../services/schemas.service';
 
 import { UIState } from './ui.state';
 

@@ -1,4 +1,11 @@
-import MersenneTwister from 'mersenne-twister';
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+ import MersenneTwister from 'mersenne-twister';
 
 const ALL_COLORS: ReadonlyArray<string> = [
     'rgb(226,27,12)',

@@ -1,0 +1,34 @@
+:host ::ng-deep {
+    .mention-menu {
+        border-color: $color-border !important;
+    }
+
+    .mention-active > a {
+        background: $color-theme-blue !important;
+    }
+}
+
+.comments {
+    &-list {
+        flex-grow: 1;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 1rem;
+        padding-left: 1.5rem;
+    }
+
+    &-footer {
+        border: 0;
+        border-top: 1px solid $color-border;
+        flex-shrink: 0;
+    }
+}
+
+
+.form-control {
+    border: 0;
+
+    &:focus {
+        box-shadow: none;
+    }
+}

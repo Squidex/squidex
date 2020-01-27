@@ -90,7 +90,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
             this.isDifferent =
                 value$(this.fieldForm).pipe(
                     combineLatest(value$(this.fieldFormCompare),
-                        (lhs, rhs) => !Types.jsJsonEquals(lhs, rhs)));
+                        (lhs, rhs) => !Types.equals(lhs, rhs)));
         }
     }
 
@@ -182,10 +182,6 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         } else {
             return form.controls[fieldInvariant];
         }
-    }
-
-    public emitLanguageChange(language: AppLanguageDto) {
-        this.languageChange.emit(language);
     }
 
     public prefix(language: AppLanguageDto) {

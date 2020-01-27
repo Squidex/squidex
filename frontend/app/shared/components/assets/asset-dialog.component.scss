@@ -1,0 +1,17 @@
+.form-group {
+    position: relative;
+}
+
+.slug {
+    padding-right: 6rem;
+}
+
+.btn-generate {
+    & {
+        @include absolute(auto, 10px, 3px, auto);
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+}

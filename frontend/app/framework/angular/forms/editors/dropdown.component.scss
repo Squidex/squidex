@@ -1,0 +1,61 @@
+$color-input-disabled: #eef1f4;
+
+.form-control {
+    & {
+        width: 100%;
+    }
+
+    &[readonly] {
+        background: $color-input-background;
+    }
+
+    &:disabled {
+        background: $color-input-disabled;
+    }
+}
+
+.search-form {
+    padding: .5rem;
+}
+
+.control-dropdown {
+    max-height: none;
+    max-width: 40rem;
+    overflow-y: hidden;
+}
+
+.control-dropdown-items {
+    max-height: 15rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.selection {
+    & {
+        overflow: hidden;
+        position: relative;
+    }
+
+    .control-dropdown-item {
+        @include absolute(0, 1rem, 0, 0);
+        line-height: 1.2rem;
+        padding-bottom: 0;
+        pointer-events: none;
+        position: absolute;
+    }
+
+    .icon-caret-down {
+        @include absolute(30%, 5px, null, null);
+        font-size: .9rem;
+        font-weight: normal;
+        pointer-events: none;
+    }
+
+    .truncate {
+        min-height: 1.2rem;
+    }
+
+    .form-control {
+        cursor: default;
+    }
+}

@@ -1,0 +1,14 @@
+:ng-deep {
+    .html-value {
+        img {
+            margin-top: -25px;
+            max-height: 50px;
+            min-height: 50px;
+            position: absolute;
+        }
+    }
+}
+
+.html-value {
+    position: relative;
+}

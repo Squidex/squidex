@@ -1,0 +1,7 @@
+<span class="icon {{size}}">
+    <i *ngIf="element.iconCode; else svgIcon" class="icon icon-{{element.iconCode}}"></i>
+
+    <ng-template #svgIcon>
+        <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
+    </ng-template>
+</span>

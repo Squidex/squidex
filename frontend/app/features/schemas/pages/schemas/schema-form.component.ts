@@ -59,10 +59,6 @@ export class SchemaFormComponent implements OnInit {
         this.complete.emit(value);
     }
 
-    public emitCancel() {
-        this.cancel.emit();
-    }
-
     public createSchema() {
         const value = this.createForm.submit();
 

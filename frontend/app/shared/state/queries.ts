@@ -8,21 +8,25 @@
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { compareStrings, Types } from '@app/framework';
+import { compareStrings } from '@app/framework';
+
+import {
+    decodeQuery,
+    equalsQuery,
+    Query
+} from './query';
 
 import { UIState } from './ui.state';
 
-import { encodeQuery, Query } from './query';
-
 export interface SavedQuery {
+    // The optional color.
+    color?: string;
+
     // The name of the query.
     name: string;
 
     // The deserialized value.
     query?: Query;
-
-    // The raw value of the query.
-    queryJson?: string;
 }
 
 const OLDEST_FIRST: Query = {
@@ -37,8 +41,8 @@ export class Queries {
     public queriesUser: Observable<ReadonlyArray<SavedQuery>>;
 
     public defaultQueries: ReadonlyArray<SavedQuery> = [
-        { name: 'All (newest first)', queryJson: '' },
-        { name: 'All (oldest first)', queryJson: encodeQuery(OLDEST_FIRST), query: OLDEST_FIRST }
+        { name: 'All (newest first)' },
+        { name: 'All (oldest first)', query: OLDEST_FIRST }
     ];
 
     constructor(
@@ -78,12 +82,10 @@ export class Queries {
     }
 
     public getSaveKey(query: Query): Observable<string | undefined> {
-        const json = encodeQuery(query);
-
         return this.queries.pipe(
             map(queries => {
                 for (const saved of queries) {
-                    if (saved.queryJson === json) {
+                    if (equalsQuery(saved.query, query)) {
                         return saved.name;
                     }
                 }
@@ -100,17 +102,7 @@ function parseQueries(settings: {}) {
 }
 
 export function parseStored(name: string, raw?: string) {
-    if (Types.isString(raw)) {
-        let query: Query;
+    const query = decodeQuery(raw);
 
-        if (raw.indexOf('{') === 0) {
-            query = JSON.parse(raw);
-        } else {
-            query = { fullText: raw };
-        }
-
-        return { name, query, queryJson: encodeQuery(query) };
-    }
-
-    return { name, query: undefined, queryJson: '' };
+    return { name, query };
 }

@@ -20,7 +20,6 @@ import {
 } from '@app/shared/internal';
 
 describe('WorkflowsService', () => {
-
     const version = new Version('1');
 
     beforeEach(() => {

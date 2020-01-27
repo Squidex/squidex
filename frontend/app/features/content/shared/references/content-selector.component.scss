@@ -1,0 +1,26 @@
+:host ::ng-deep {
+    .modal-body {
+        background: $color-background;
+    }
+
+    .modal-tabs {
+        background: $color-dark-foreground;
+    }
+}
+
+.col-selector {
+    position: relative;
+
+    .form-control {
+        @include absolute(-.4rem, auto, auto, 0);
+        @include force-width(300px);
+        color: $color-dark-foreground;
+    }
+}
+
+.table-container {
+    display: inline-block;
+    min-width: 100%;
+    padding: 0;
+    padding-right: 1.5rem;
+}

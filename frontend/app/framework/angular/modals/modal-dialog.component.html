@@ -6,7 +6,7 @@
                     <ng-content select="[title]"></ng-content>
                 </h4>
 
-                <button type="button" class="close" (click)="emitClose()">
+                <button type="button" class="close" (click)="close.emit()">
                     <i class="icon-close"></i>
                 </button>
             </div>
@@ -28,4 +28,4 @@
     </div>
 </div>
 
-<sqx-shortcut keys="escape" (trigger)="emitClose()"></sqx-shortcut>
+<sqx-shortcut keys="escape" (trigger)="close.emit()"></sqx-shortcut>

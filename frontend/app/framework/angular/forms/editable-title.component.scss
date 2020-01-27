@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .title {
     & {
         @include hover-visible('.title-edit', inline);

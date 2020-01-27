@@ -98,10 +98,6 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
         }
     }
 
-    public emitRemove() {
-        this.remove.emit();
-    }
-
     public trackBySchema(index: number, schema: SchemaDto) {
         return schema.id;
     }
