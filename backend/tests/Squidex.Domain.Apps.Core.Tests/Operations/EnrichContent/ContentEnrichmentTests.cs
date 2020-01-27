@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
     public class ContentEnrichmentTests
     {
         private readonly Instant now = Instant.FromUtc(2017, 10, 12, 16, 30, 10);
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
         private readonly Schema schema;
 
         public ContentEnrichmentTests()

@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateEdmSchema
         [Fact]
         public void Should_build_edm_model()
         {
-            var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
             var typeFactory = new EdmTypeFactory(names =>
             {

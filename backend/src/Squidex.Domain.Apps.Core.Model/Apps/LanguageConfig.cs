@@ -12,51 +12,36 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class LanguageConfig : IFieldPartitionItem
+    public sealed class LanguageConfig
     {
-        private readonly Language language;
-        private readonly Language[] languageFallbacks;
+        public static readonly LanguageConfig Default = new LanguageConfig();
+
+        private readonly Language[] fallbacks;
 
         public bool IsOptional { get; }
 
-        public Language Language
+        public IEnumerable<Language> Fallbacks
         {
-            get { return language; }
+            get { return fallbacks; }
         }
 
-        public IEnumerable<Language> LanguageFallbacks
+        public LanguageConfig(bool isOptional = false, params Language[]? fallbacks)
         {
-            get { return languageFallbacks; }
-        }
-
-        string IFieldPartitionItem.Key
-        {
-            get { return language.Iso2Code; }
-        }
-
-        string IFieldPartitionItem.Name
-        {
-            get { return language.EnglishName; }
-        }
-
-        IEnumerable<string> IFieldPartitionItem.Fallback
-        {
-            get { return LanguageFallbacks.Select(x => x.Iso2Code); }
-        }
-
-        public LanguageConfig(Language language, bool isOptional = false, IEnumerable<Language>? fallback = null)
-            : this(language, isOptional, fallback?.ToArray())
-        {
-        }
-
-        public LanguageConfig(Language language, bool isOptional = false, params Language[]? fallback)
-        {
-            Guard.NotNull(language);
-
             IsOptional = isOptional;
 
-            this.language = language;
-            this.languageFallbacks = fallback ?? Array.Empty<Language>();
+            this.fallbacks = fallbacks ?? Array.Empty<Language>();
+        }
+
+        internal LanguageConfig Cleanup(string self, IReadOnlyDictionary<string, LanguageConfig> allowed)
+        {
+            if (fallbacks.Any(x => x.Iso2Code == self) || fallbacks.Any(x => !allowed.ContainsKey(x)))
+            {
+                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToArray();
+
+                return new LanguageConfig(IsOptional, cleaned);
+            }
+
+            return this;
         }
     }
 }

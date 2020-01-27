@@ -160,9 +160,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public static AssetDto FromAsset(IEnrichedAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
         {
-            var response = SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+            var response = SimpleMapper.Map(asset, new AssetDto());
 
             response.Tags = asset.TagNames;
+
+            response.FileType = asset.FileName.FileType();
 
             if (isDuplicate)
             {

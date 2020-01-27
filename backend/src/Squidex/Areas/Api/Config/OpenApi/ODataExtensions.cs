@@ -20,8 +20,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 operation.AddQuery("$search", JsonObjectType.String, "Optional OData full text search.");
             }
 
-            operation.AddQuery("$top", JsonObjectType.Number, $"Optional number of {entity} to take.");
-            operation.AddQuery("$skip", JsonObjectType.Number, $"Optional number of {entity} to skip.");
+            operation.AddQuery("$top", JsonObjectType.Integer, $"Optional number of {entity} to take.");
+            operation.AddQuery("$skip", JsonObjectType.Integer, $"Optional number of {entity} to skip.");
             operation.AddQuery("$orderby", JsonObjectType.String, "Optional OData order definition.");
             operation.AddQuery("$filter", JsonObjectType.String, "Optional OData filter definition.");
         }

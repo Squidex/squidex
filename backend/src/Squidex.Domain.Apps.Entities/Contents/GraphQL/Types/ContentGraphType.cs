@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return action(c.Source)?.ToFlatten(context.Context.App.LanguagesConfig.Master.Language);
+                return action(c.Source)?.ToFlatten(context.Context.App.LanguagesConfig.Master);
             });
         }
     }

@@ -15,7 +15,14 @@
                 <h3 class="truncate">{{schemaCategory.name}} </h3>
             </div>
             <div class="col-auto">
-                ({{snapshot.filtered.length}})
+                <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
+                    ({{snapshot.filtered.length}})
+                </ng-container>
+                <ng-template #noSchemas>
+                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()">
+                        <i class="icon-bin2"></i> 
+                    </button>
+                </ng-template>
             </div>
         </div>        
     </div>

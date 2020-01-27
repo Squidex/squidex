@@ -26,18 +26,22 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
                 var partitionObject = Builder.Object();
-                var partitionSet = partitionResolver(field.Partitioning);
+                var partitioning = partitionResolver(field.Partitioning);
 
-                foreach (var partitionItem in partitionSet)
+                foreach (var partitionKey in partitioning.AllKeys)
                 {
                     var partitionItemProperty = field.Accept(jsonTypeVisitor);
 
                     if (partitionItemProperty != null)
                     {
-                        partitionItemProperty.Description = partitionItem.Name;
-                        partitionItemProperty.IsRequired = field.RawProperties.IsRequired && !partitionItem.IsOptional;
+                        var isOptional = partitioning.IsOptional(partitionKey);
 
-                        partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);
+                        var name = partitioning.GetName(partitionKey);
+
+                        partitionItemProperty.Description = name;
+                        partitionItemProperty.IsRequired = field.RawProperties.IsRequired && !isOptional;
+
+                        partitionObject.Properties.Add(partitionKey, partitionItemProperty);
                     }
                 }
 

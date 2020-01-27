@@ -38,11 +38,11 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
                 if (fieldData != null)
                 {
-                    var fieldPartition = partitionResolver(field.Partitioning);
+                    var partitioning = partitionResolver(field.Partitioning);
 
-                    foreach (var partitionItem in fieldPartition)
+                    foreach (var partitionKey in partitioning.AllKeys)
                     {
-                        Enrich(field, fieldData, partitionItem);
+                        Enrich(field, fieldData, partitionKey);
                     }
 
                     if (fieldData.Count > 0)
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             }
         }
 
-        private static void Enrich(IField field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
+        private static void Enrich(IField field, ContentFieldData fieldData, string partitionKey)
         {
             Guard.NotNull(fieldData);
 
@@ -64,11 +64,9 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
                 return;
             }
 
-            var key = partitionItem.Key;
-
-            if (!fieldData.TryGetValue(key, out var value) || ShouldApplyDefaultValue(field, value))
+            if (!fieldData.TryGetValue(partitionKey, out var value) || ShouldApplyDefaultValue(field, value))
             {
-                fieldData.AddJsonValue(key, defaultValue);
+                fieldData.AddJsonValue(partitionKey, defaultValue);
             }
         }
 

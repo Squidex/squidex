@@ -37,12 +37,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
                 return Roles.Empty;
             }
 
-            return new Roles(json.Select(Convert));
-        }
-
-        private static KeyValuePair<string, Role> Convert(KeyValuePair<string, string[]> kvp)
-        {
-            return new KeyValuePair<string, Role>(kvp.Key, new Role(kvp.Key, new PermissionSet(kvp.Value)));
+            return new Roles(json.ToDictionary(x => x.Key, x => new Role(x.Key, new PermissionSet(x.Value))));
         }
     }
 }

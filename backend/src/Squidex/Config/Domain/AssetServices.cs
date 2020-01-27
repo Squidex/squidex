@@ -52,10 +52,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetUsageTracker>()
                 .As<IAssetUsageTracker>().As<IEventConsumer>();
 
-            services.AddSingletonAs<FileTypeTagGenerator>()
+            services.AddSingletonAs<FileTypeAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
 
             services.AddSingletonAs<FileTagAssetMetadataSource>()
+                .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<ImageAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
         }
 

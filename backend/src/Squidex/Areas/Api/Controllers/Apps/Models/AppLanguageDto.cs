@@ -10,7 +10,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -46,15 +45,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool IsOptional { get; set; }
 
-        public static AppLanguageDto FromLanguage(LanguageConfig language, IAppEntity app)
+        public static AppLanguageDto FromLanguage(Language language, LanguageConfig config, LanguagesConfig languages)
         {
-            var result = SimpleMapper.Map(language.Language,
-                new AppLanguageDto
-                {
-                    IsMaster = language == app.LanguagesConfig.Master,
-                    IsOptional = language.IsOptional,
-                    Fallback = language.LanguageFallbacks.ToArray()
-                });
+            var result = new AppLanguageDto
+            {
+                EnglishName = language.EnglishName,
+                IsMaster = languages.IsMaster(language),
+                IsOptional = languages.IsOptional(language),
+                Iso2Code = language.Iso2Code,
+                Fallback = config.Fallbacks.ToArray()
+            };
 
             return result;
         }
@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     AddPutLink("update", controller.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
                 }
 
-                if (controller.HasPermission(Permissions.AppLanguagesDelete, app.Name) && app.LanguagesConfig.Count > 1)
+                if (controller.HasPermission(Permissions.AppLanguagesDelete, app.Name) && app.LanguagesConfig.Languages.Count > 1)
                 {
                     AddDeleteLink("delete", controller.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
                 }

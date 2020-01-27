@@ -278,9 +278,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var value = JsonValue.Object();
 
-            foreach (var language in context.App.LanguagesConfig)
+            foreach (var partitionKey in context.App.LanguagesConfig.AllKeys)
             {
-                value.Add(language.Key, text);
+                value.Add(partitionKey, text);
             }
 
             return value;

@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflows : ArrayDictionary<Guid, Workflow>
+    public sealed class Workflows : ImmutableDictionary<Guid, Workflow>
     {
         public static readonly Workflows Empty = new Workflows();
 
@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public Workflows(KeyValuePair<Guid, Workflow>[] items)
-            : base(items)
+        public Workflows(Dictionary<Guid, Workflow> inner)
+            : base(inner)
         {
         }
 

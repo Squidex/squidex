@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         public bool Process(OperationProcessorContext context)
         {
-            if (context.OperationDescription.Path == supportedPath)
+            if (context.OperationDescription.Path == supportedPath && context.OperationDescription.Method == "get")
             {
                 var operation = context.OperationDescription.Operation;
 

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
     public class ContentValidationTests
     {
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
         private readonly List<ValidationError> errors = new List<ValidationError>();
         private readonly ValidationContext context = ValidationTestExtensions.ValidContext;
         private Schema schema = new Schema("my-schema");
@@ -166,9 +166,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         public async Task Should_not_add_error_if_required_field_has_no_value_for_optional_language()
         {
             var optionalConfig =
-                LanguagesConfig.Build(
-                    new LanguageConfig(Language.ES, false),
-                    new LanguageConfig(Language.IT, true));
+                LanguagesConfig.English
+                    .Set(Language.ES)
+                    .Set(Language.IT, true)
+                    .Remove(Language.EN);
 
             schema = schema.AddString(1, "my-field", Partitioning.Language,
                 new StringFieldProperties { IsRequired = true });

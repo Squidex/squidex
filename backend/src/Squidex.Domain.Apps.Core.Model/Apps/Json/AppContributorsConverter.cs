@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 
@@ -29,9 +28,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override AppContributors ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<string, string>>(reader);
+            var json = serializer.Deserialize<Dictionary<string, string>>(reader)!;
 
-            return new AppContributors(json.ToArray());
+            return new AppContributors(json!);
         }
     }
 }

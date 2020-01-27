@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppPatterns : ArrayDictionary<Guid, AppPattern>
+    public sealed class AppPatterns : ImmutableDictionary<Guid, AppPattern>
     {
         public static readonly AppPatterns Empty = new AppPatterns();
 
@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
-        public AppPatterns(KeyValuePair<Guid, AppPattern>[] items)
-            : base(items)
+        public AppPatterns(Dictionary<Guid, AppPattern> inner)
+            : base(inner)
         {
         }
 
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Add(Guid id, string name, string pattern, string? message)
+        public AppPatterns Add(Guid id, string name, string pattern, string? message = null)
         {
             var newPattern = new AppPattern(name, pattern, message);
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Update(Guid id, string name, string pattern, string? message)
+        public AppPatterns Update(Guid id, string name, string pattern, string? message = null)
         {
             Guard.NotNullOrEmpty(name);
             Guard.NotNullOrEmpty(pattern);

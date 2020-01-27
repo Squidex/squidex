@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -91,21 +90,22 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        public static JsonObject FormatReferences(this NamedContentData data, Schema schema, LanguagesConfig languages, string separator = ", ")
+        public static JsonObject FormatReferences(this NamedContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
         {
             Guard.NotNull(schema);
+            Guard.NotNull(partitioning);
 
             var result = JsonValue.Object();
 
-            foreach (var language in languages)
+            foreach (var partitionKey in partitioning.AllKeys)
             {
-                result[language.Key] = JsonValue.Create(data.FormatReferenceFields(schema, language.Key, separator));
+                result[partitionKey] = JsonValue.Create(data.FormatReferenceFields(schema, partitionKey, separator));
             }
 
             return result;
         }
 
-        private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partition, string separator)
+        private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partitionKey, string separator)
         {
             Guard.NotNull(schema);
 
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             {
                 if (data.TryGetValue(referenceField.Name, out var fieldData) && fieldData != null)
                 {
-                    if (fieldData.TryGetValue(partition, out var value))
+                    if (fieldData.TryGetValue(partitionKey, out var value))
                     {
                         AddValue(value);
                     }

@@ -362,6 +362,14 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_query_with_top()
+        {
+            var json = new { skip = 10, top = 20, FullText = "Hello", Filter = new { path = "string", op = "eq", value = "Hello" } };
+
+            AssertQuery(json, "Filter: string == 'Hello'; FullText: 'Hello'; Skip: 10; Take: 20");
+        }
+
+        [Fact]
         public void Should_parse_query_with_sorting()
         {
             var json = new { sort = new[] { new { path = "string", order = "ascending" } } };

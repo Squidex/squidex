@@ -12,8 +12,8 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.ClientLibrary.Management;
 using Squidex.Pipeline.OpenApi;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class Roles
     {
-        private readonly ArrayDictionary<string, Role> inner;
+        private readonly ImmutableDictionary<string, Role> inner;
 
         public static readonly IReadOnlyDictionary<string, Role> Defaults = new Dictionary<string, Role>
         {
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     Clean(Permissions.AppWorkflows)))
         };
 
-        public static readonly Roles Empty = new Roles(new ArrayDictionary<string, Role>());
+        public static readonly Roles Empty = new Roles(new ImmutableDictionary<string, Role>());
 
         public int CustomCount
         {
@@ -70,14 +70,14 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return inner.Values.Union(Defaults.Values); }
         }
 
-        private Roles(ArrayDictionary<string, Role> roles)
+        private Roles(ImmutableDictionary<string, Role> roles)
         {
             inner = roles;
         }
 
-        public Roles(IEnumerable<KeyValuePair<string, Role>> items)
+        public Roles(Dictionary<string, Role> roles)
         {
-            inner = new ArrayDictionary<string, Role>(Cleaned(items));
+            inner = new ImmutableDictionary<string, Role>(Cleaned(roles));
         }
 
         [Pure]
@@ -172,12 +172,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             return permission.Substring(1);
         }
 
-        private static KeyValuePair<string, Role>[] Cleaned(IEnumerable<KeyValuePair<string, Role>> items)
+        private static Dictionary<string, Role> Cleaned(Dictionary<string, Role> inner)
         {
-            return items.Where(x => !Defaults.ContainsKey(x.Key)).ToArray();
+            return inner.Where(x => !Defaults.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        private Roles Create(ArrayDictionary<string, Role> newRoles)
+        private Roles Create(ImmutableDictionary<string, Role> newRoles)
         {
             return ReferenceEquals(inner, newRoles) ? this : new Roles(newRoles);
         }

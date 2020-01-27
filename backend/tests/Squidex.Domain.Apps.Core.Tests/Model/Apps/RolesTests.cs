@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_create_roles_without_defaults()
         {
-            var roles = new Roles(Roles.Defaults.ToArray());
+            var roles = new Roles(new Dictionary<string, Role>(Roles.Defaults));
 
             Assert.Equal(0, roles.CustomCount);
         }
@@ -86,9 +87,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_remove_role()
         {
-            var roles_1 = roles_0.Remove(firstRole);
+            var roles_1 = roles_0.Add("role1");
+            var roles_2 = roles_1.Add("role2");
+            var roles_3 = roles_2.Remove(firstRole);
 
-            Assert.Equal(0, roles_1.CustomCount);
+            Assert.Equal(new string[] { "role1", "role2" }, roles_3.Custom.Select(x => x.Name));
         }
 
         [Fact]

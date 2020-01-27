@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         [Fact]
         public void Should_build_json_schema()
         {
-            var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
             var jsonProperties = AllPropertyNames(jsonSchema);
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         [Fact]
         public void Should_build_data_schema()
         {
-            var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
 

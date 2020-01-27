@@ -93,9 +93,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_revoke_client()
         {
-            var clients_1 = clients_0.Revoke("1");
+            var clients_1 = clients_0.Add("2", "secret2");
+            var clients_2 = clients_1.Add("3", "secret3");
+            var clients_3 = clients_2.Revoke("2");
 
-            Assert.Empty(clients_1);
+            Assert.Equal(new string[] { "1", "3" }, clients_3.Keys);
         }
 
         [Fact]

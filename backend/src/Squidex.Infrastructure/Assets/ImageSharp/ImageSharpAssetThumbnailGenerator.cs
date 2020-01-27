@@ -77,19 +77,23 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
         public Task<ImageInfo?> GetImageInfoAsync(Stream source)
         {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    var image = Image.Load(source);
+            ImageInfo? result = null;
 
-                    return new ImageInfo(image.Width, image.Height);
-                }
-                catch
+            try
+            {
+                var image = Image.Identify(source);
+
+                if (image != null)
                 {
-                    return null;
+                    result = new ImageInfo(image.Width, image.Height);
                 }
-            });
+            }
+            catch
+            {
+                result = null;
+            }
+
+            return Task.FromResult(result);
         }
     }
 }
