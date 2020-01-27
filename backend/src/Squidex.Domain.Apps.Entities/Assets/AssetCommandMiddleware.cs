@@ -149,11 +149,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
         {
-            using (var hashStream = new HasherStream(command.File.OpenRead(), HashAlgorithmName.SHA256))
+            using (var uploadStream = command.File.OpenRead())
             {
-                await assetFileStore.UploadAsync(tempFile, hashStream);
+                using (var hashStream = new HasherStream(uploadStream, HashAlgorithmName.SHA256))
+                {
+                    await assetFileStore.UploadAsync(tempFile, hashStream);
 
-                command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+                    command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+                }
             }
         }
 

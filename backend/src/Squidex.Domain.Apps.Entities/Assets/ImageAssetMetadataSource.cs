@@ -29,32 +29,35 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (command.Type == AssetType.Unknown)
             {
-                var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
-
-                if (imageInfo != null)
+                using (var uploadStream = command.File.OpenRead())
                 {
-                    command.Type = AssetType.Image;
+                    var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
 
-                    command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
-                    command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
-
-                    if (tags != null)
+                    if (imageInfo != null)
                     {
-                        tags.Add("image");
+                        command.Type = AssetType.Image;
 
-                        var wh = imageInfo.PixelWidth + imageInfo.PixelHeight;
+                        command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
+                        command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
 
-                        if (wh > 2000)
+                        if (tags != null)
                         {
-                            tags.Add("image/large");
-                        }
-                        else if (wh > 1000)
-                        {
-                            tags.Add("image/medium");
-                        }
-                        else
-                        {
-                            tags.Add("image/small");
+                            tags.Add("image");
+
+                            var wh = imageInfo.PixelWidth + imageInfo.PixelHeight;
+
+                            if (wh > 2000)
+                            {
+                                tags.Add("image/large");
+                            }
+                            else if (wh > 1000)
+                            {
+                                tags.Add("image/medium");
+                            }
+                            else
+                            {
+                                tags.Add("image/small");
+                            }
                         }
                     }
                 }
