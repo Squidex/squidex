@@ -1,0 +1,57 @@
+<div class="card item" [class.invalid]="isInvalid | async">
+    <div class="card-header drag-handle">
+        <div class="row">
+            <div class="col-auto pr-1">
+                <ng-content></ng-content>
+            </div>
+            <div class="col">
+                <div class="truncate">
+                    <span class="header-index">#{{index + 1}}</span>
+                    <span class="header-title">{{title}}</span>
+                </div>
+            </div>
+            <div class="col-auto pr-4">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()">
+                    <i class="icon-caret-top"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()">
+                    <i class="icon-caret-up"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()">
+                    <i class="icon-caret-down"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()">
+                    <i class="icon-caret-bottom"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="expand()" title="Expand this item">
+                    <i class="icon-plus-square"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isHidden" (click)="collapse()" title="Collapse this item">
+                    <i class="icon-minus-square"></i>
+                </button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()">
+                    <i class="icon-clone"></i>
+                </button>
+        
+                <button type="button" class="btn btn-text-danger" [disabled]="isDisabled" (click)="remove.emit()">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body" [class.hidden]="isHidden">
+        <div class="form-group" *ngFor="let fieldControl of fieldControls; trackBy: trackByField">
+            <sqx-field-editor
+                [form]="form"
+                [formContext]="formContext"
+                [field]="fieldControl.field"
+                [language]="language"
+                [languages]="languages"
+                [control]="fieldControl.control">
+            </sqx-field-editor>
+        </div>
+    </div>
+</div>

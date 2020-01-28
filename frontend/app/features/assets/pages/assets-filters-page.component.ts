@@ -11,7 +11,6 @@ import {
     AssetsState,
     Queries,
     Query,
-    SavedQuery,
     UIState
 } from '@app/shared';
 
@@ -27,10 +26,6 @@ export class AssetsFiltersPageComponent {
         public readonly assetsState: AssetsState,
         private readonly uiState: UIState
     ) {
-    }
-
-    public isQueryUsed = (query: SavedQuery) => {
-        return this.assetsState.isQueryUsed(query);
     }
 
     public search(query: Query) {

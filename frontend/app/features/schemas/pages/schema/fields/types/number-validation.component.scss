@@ -1,0 +1,9 @@
+.minmax {
+    &-col {
+        position: relative;
+    }
+
+    &-label {
+        @include absolute(0, -2rem, auto, auto);
+    }
+}

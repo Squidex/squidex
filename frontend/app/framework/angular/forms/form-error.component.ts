@@ -11,18 +11,8 @@ import { ErrorDto } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-form-error',
-    template: `
-        <ng-container *ngIf="show">
-            <div [class.form-bubble]="bubble">
-                <div class="form-alert form-alert-error" [class.closeable]="closeable">
-                    <a class="form-alert-close" (click)="close()">
-                        <i class="icon-close"></i>
-                    </a>
-                    <div [innerHTML]="error?.displayMessage | sqxMarkdown"></div>
-                </div>
-            </div>
-        </ng-container>
-    `,
+    styleUrls: ['./form-error.component.scss'],
+    templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormErrorComponent implements OnChanges {

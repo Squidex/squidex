@@ -1,0 +1,97 @@
+<sqx-modal-dialog (close)="emitComplete()" size="lg"  fullHeight="true" grid="true" flexBody="true">
+    <ng-container title>
+        <div class="row">
+            <div class="col-selector">
+                <select class="form-control form-control-dark"
+                    [ngModel]="schema?.id"
+                    (ngModelChange)="selectSchema($event)">
+                    <option *ngFor="let schema of schemas" [ngValue]="schema.id">
+                        Select {{schema.displayName}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container tabs>
+        <div class="row no-gutters">
+            <ng-container *ngIf="schema">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-text-secondary" (click)="reload()">
+                        <i class="icon-reset"></i>
+                    </button>
+                </div>
+                <div class="col pl-1">
+                    <sqx-search-form formClass="form" placeholder="Fulltext search"
+                        [query]="contentsState.contentsQuery | async"
+                        [queryModel]="queryModel"
+                        (queryChange)="search($event)">
+                    </sqx-search-form>
+                </div>
+                    
+                <div class="-auto pl-1" *ngIf="languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                </div>
+                    
+                <div class="-auto pl-1">
+                    <a class="btn btn-success" [routerLink]="['../..', schema.name]" target="_blank">
+                        <i class="icon-plus"></i>
+                    </a>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="schema">
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+                <ng-container syncedHeader>
+                    <table class="table table-items table-fixed" [style.minWidth]="schema.defaultReferenceFields | sqxContentListWidth" #header>
+                        <thead>
+                            <tr>
+                                <th class="cell-select">
+                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
+                                </th>
+                                <th sqxContentListCell="meta.lastModifiedBy.avatar">
+                                    <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
+                                </th>
+                                <th *ngFor="let field of schema.defaultReferenceFields" [sqxContentListCell]="field">
+                                    <sqx-content-list-header
+                                        [field]="field"
+                                        [query]="contentsState.contentsQuery | async"
+                                        (queryChange)="search($event)"
+                                        [language]="language">
+                                    </sqx-content-list-header>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </ng-container>
+    
+                <ng-container syncedContent>
+                    <div class="table-container">
+                        <table class="table table-items table-fixed" [style.minWidth]="schema.defaultReferenceFields | sqxContentListWidth" *ngIf="contentsState.contents | async; let contents" [sqxSyncWidth]="header">
+                            <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                                [sqxContentSelectorItem]="content"
+                                [schema]="schema"
+                                [selectable]="!isItemAlreadySelected(content)"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectContent(content)"
+                                [language]="language">
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+    
+                <ng-container footer>
+                    <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+                </ng-container>
+            </sqx-list-view>
+        </ng-container>
+    </ng-container>
+
+    <ng-container footer>
+        <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
+    </ng-container>
+</sqx-modal-dialog>

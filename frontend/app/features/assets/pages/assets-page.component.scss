@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .search ::ng-deep {
     .form-control {
         @include border-radius-right;

@@ -1,0 +1,37 @@
+.minmax {
+    &-col {
+        position: relative;
+    }
+
+    &-label {
+        @include absolute(0, -.2rem, auto, auto);
+    }
+}
+
+.control-dropdown {
+    & {
+        max-width: 285px;
+        min-height: 220px;
+        min-width: 200px;
+    }
+
+    h4 {
+        padding: .5rem 0 0 .5rem;
+    }
+
+    &-item {
+        & {
+            font-size: .85rem;
+        }
+
+        &:hover {
+            .text-muted {
+                color: $color-dark-foreground !important;
+            }
+        }
+    }
+}
+
+.truncate {
+    @include truncate;
+}

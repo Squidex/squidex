@@ -15,7 +15,7 @@ import {
     value$
 } from '@app/framework';
 
-import { AssignContributorDto } from '../services/contributors.service';
+import { AssignContributorDto } from './../services/contributors.service';
 
 import { UserDto } from './../services/users.service';
 

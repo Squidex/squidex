@@ -1,0 +1,11 @@
+$color: #fcfeff;
+
+:host {
+    display: block;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.light {
+    background: $color;
+}

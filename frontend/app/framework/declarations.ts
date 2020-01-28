@@ -5,29 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export * from './angular/forms/autocomplete.component';
-export * from './angular/forms/checkbox-group.component';
-export * from './angular/forms/code-editor.component';
-export * from './angular/forms/color-picker.component';
+export * from './angular/forms/editable-title.component';
+export * from './angular/forms/editors/autocomplete.component';
+export * from './angular/forms/editors/checkbox-group.component';
+export * from './angular/forms/editors/code-editor.component';
+export * from './angular/forms/editors/color-picker.component';
+export * from './angular/forms/editors/date-time-editor.component';
+export * from './angular/forms/editors/dropdown.component';
+export * from './angular/forms/editors/iframe-editor.component';
+export * from './angular/forms/editors/json-editor.component';
+export * from './angular/forms/editors/stars.component';
+export * from './angular/forms/editors/tag-editor.component';
+export * from './angular/forms/editors/toggle.component';
+
 export * from './angular/forms/confirm-click.directive';
 export * from './angular/forms/control-errors.component';
 export * from './angular/forms/copy.directive';
-export * from './angular/forms/date-time-editor.component';
-export * from './angular/forms/dropdown.component';
-export * from './angular/forms/editable-title.component';
 export * from './angular/forms/file-drop.directive';
 export * from './angular/forms/focus-on-init.directive';
 export * from './angular/forms/form-alert.component';
 export * from './angular/forms/form-error.component';
 export * from './angular/forms/form-hint.component';
 export * from './angular/forms/forms-helper';
-export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
-export * from './angular/forms/json-editor.component';
 export * from './angular/forms/progress-bar.component';
-export * from './angular/forms/stars.component';
-export * from './angular/forms/tag-editor.component';
-export * from './angular/forms/toggle.component';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 

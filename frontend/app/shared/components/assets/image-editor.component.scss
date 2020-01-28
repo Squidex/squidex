@@ -1,0 +1,29 @@
+:host {
+    height: 100%;
+}
+
+:host /deep/ {
+    .tui-image-editor-header {
+        display: none;
+    }
+
+    * {
+        box-sizing: content-box;
+    }
+
+    .tie-btn-delete {
+        display: none !important;
+    }
+
+    .tie-btn-delete-all {
+        display: none !important;
+
+        & + li {
+            display: none !important;
+        }
+    }
+
+    svg {
+        vertical-align: baseline;
+    }
+}

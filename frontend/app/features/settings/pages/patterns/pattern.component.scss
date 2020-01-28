@@ -1,6 +1,3 @@
-@import '_vars';
-@import '_mixins';
-
 .col-options {
     @include force-width(6rem);
 }

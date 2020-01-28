@@ -1,0 +1,17 @@
+.minmax {
+    &-col {
+        position: relative;
+    }
+
+    &-label {
+        @include absolute(0, -.2rem, auto, auto);
+    }
+}
+
+.form-group {
+    margin-top: .5rem;
+}
+
+.form-group2 {
+    margin-top: 3rem;
+}

@@ -10,7 +10,6 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import {
     hasAnyLink,
-    mergeInto,
     State,
     Types
 } from '@app/framework';
@@ -272,9 +271,9 @@ function getContainer(settings: object, path: string) {
 function updateSettings(state: Snapshot, update: Partial<Snapshot>) {
     const settings = {};
 
-    mergeInto(settings, update.settingsCommon || state.settingsCommon);
-    mergeInto(settings, update.settingsShared || state.settingsShared);
-    mergeInto(settings, update.settingsUser || state.settingsUser);
+    Types.mergeInto(settings, update.settingsCommon || state.settingsCommon);
+    Types.mergeInto(settings, update.settingsShared || state.settingsShared);
+    Types.mergeInto(settings, update.settingsUser || state.settingsUser);
 
     return { ...state, settings, ...update };
 }

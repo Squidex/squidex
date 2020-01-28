@@ -18,7 +18,7 @@ import {
     versioned
 } from '@app/shared/internal';
 
-import { createRule } from '../services/rules.service.spec';
+import { createRule } from './../services/rules.service.spec';
 
 import { TestValues } from './_test-helpers';
 

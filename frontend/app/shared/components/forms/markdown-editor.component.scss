@@ -1,0 +1,13 @@
+$background: #fff;
+
+:host ::ng-deep {
+    // sass-lint:disable class-name-format
+    .CodeMirror {
+        height: 300px;
+    }
+}
+
+.fullscreen {
+    @include fixed(0, 0, 0, 0);
+    z-index: 1040;
+}

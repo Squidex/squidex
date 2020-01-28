@@ -1,5 +1,5 @@
 <form [formGroup]="importForm.form" (ngSubmit)="detect()">  
-    <sqx-modal-dialog (close)="emitClose()">
+    <sqx-modal-dialog (close)="close.emit()">
         <ng-container title>
             Import contributors
         </ng-container>
@@ -50,7 +50,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitClose()">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="close.emit()">Cancel</button>
 
             <ng-container [ngSwitch]="importStage">
                 <ng-container *ngSwitchCase="'Start'">

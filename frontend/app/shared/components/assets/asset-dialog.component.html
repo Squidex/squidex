@@ -1,0 +1,100 @@
+<form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
+    <sqx-modal-dialog (close)="emitComplete()" size="xl" fullHeight="true" [showHeader]="true" [showFooter]="false">
+        <ng-container title>
+            Update Asset
+        </ng-container>
+
+        <ng-container tabs>
+            <ul class="nav nav-tabs2">
+                <li class="nav-item" *ngFor="let tab of selectableTabs">
+                    <a class="nav-link" [class.active]="tab === selectedTab" (click)="selectTab(tab)">{{tab}}</a>
+                </li>
+            </ul>
+            
+            <button type="submit" class="float-right btn btn-primary" [disabled]="!isEditable">Save</button>
+        </ng-container>
+
+        <ng-container content>
+            <ng-container [ngSwitch]="selectedTab">
+                <ng-container *ngSwitchCase="'Image'">
+                    <div class="image">
+                        <sqx-image-editor [imageUrl]="asset.contentUrl"></sqx-image-editor>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Metadata'">
+                    <div class="metadata">
+                        <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+            
+                        <div class="form-group">
+                            <label for="fileName">Name</label>
+                            
+                            <sqx-control-errors for="fileName" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                    
+                            <input type="text" class="form-control" id="fileName" formControlName="fileName" />
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="slug">Slug</label>
+                            
+                            <sqx-control-errors for="slug" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                    
+                            <input type="text" class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" />
+            
+                            <button type="button" class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()">
+                                Generate
+                            </button>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Tags</label>
+                            
+                            <sqx-control-errors for="tags" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+            
+                            <sqx-tag-editor [suggestions]="allTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
+                        </div>
+            
+                        <div class="form-group">
+                            <label>Metadata</label>
+            
+                            <div class="form-group row no-gutters" *ngFor="let form of annotateForm.metadata.controls; let i = index">
+                                <div class="col col-name pr-1">
+                                    <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                
+                                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Name" />
+                                </div>
+                
+                                <div class="col pr-1">
+                                    <sqx-control-errors [for]="form.get('value')" fieldName="Value" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                
+                                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('value')" placeholder="Value" />
+                                </div>
+            
+                                <div class="col-auto col-options">
+                                    <button type="button" class="btn btn-text-danger"
+                                        [disabled]="!isEditable"
+                                        (sqxConfirmClick)="annotateForm.removeMetadata(i)"
+                                        confirmTitle="Remove url" 
+                                        confirmText="Do you really want to remove this metadata?">
+                                        <i class="icon-bin2"></i>
+                                    </button>
+                                </div>
+                            </div>
+            
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success" (click)="annotateForm.addMetadata()" [disabled]="!isEditable">
+                                    Add Metadata
+                                </button>
+                            </div>
+                        </div>
+                    
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="isProtected" formControlName="isProtected" />
+            
+                            <label class="form-check-label" for="isProtected">Protected</label>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

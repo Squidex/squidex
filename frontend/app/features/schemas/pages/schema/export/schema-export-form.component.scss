@@ -1,0 +1,24 @@
+:host,
+.inner-form,
+.inner-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.inner-header,
+.inner-main {
+    position: relative;
+}
+
+.inner-header {
+    background: $color-theme-secondary;
+    border: 0;
+    padding: 1rem $panel-padding;
+}
+
+:host ::ng-deep {
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
+}

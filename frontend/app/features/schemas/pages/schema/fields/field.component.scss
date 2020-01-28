@@ -1,0 +1,105 @@
+$field-header: #e7ebef;
+$field-line: #c7cfd7;
+
+$padding: 1rem;
+
+.table-items-row-details {
+    & {
+        cursor: default;
+    }
+
+    &::before {
+        right: 4.8rem;
+    }
+}
+
+.table-items-row-summary {
+    padding-left: 3rem;
+    padding-right: 1.25rem;
+    position: relative;
+}
+
+.drag-container {
+    @include absolute(1.6rem, auto, auto, .75rem);
+    line-height: 1px;
+}
+
+.col {
+    &-tags,
+    &-options {
+        white-space: nowrap;
+    }
+
+    &-options {
+        max-width: 140px;
+    }
+}
+
+.nested-fields {
+    background: $color-theme-secondary;
+    border: 1px solid $color-border;
+    border-top-width: 0;
+    padding: $padding;
+    padding-left: 2 * $padding;
+    position: relative;
+}
+
+.nested-field {
+    & {
+        position: relative;
+    }
+
+    &-add {
+        border: 2px dashed $field-line;
+        padding: 1rem;
+        position: relative;
+    }
+
+    &-line-v {
+        @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
+        border: 0;
+        border-left: 2px dashed $field-line;
+        width: 2px;
+    }
+
+    &-line-h {
+        @include absolute(-2px, auto, 50%, -$padding);
+        border: 0;
+        border-bottom: 2px dashed $field-line;
+        width: $padding - .25rem;
+    }
+}
+
+.field {
+    & {
+        position: relative;
+    }
+
+    &-icon {
+        color: $color-border-dark;
+        font-size: 1.2rem;
+        font-weight: normal;
+        margin-right: 1rem;
+        vertical-align: middle;
+    }
+
+    &-name {
+        @include truncate;
+    }
+
+    &-hidden {
+        color: $color-text-decent;
+    }
+
+    &-partitioning {
+        color: $color-text-decent;
+        font-size: .85rem;
+        font-weight: normal;
+    }
+
+    .tag {
+        max-width: 6rem;
+        min-width: 4rem;
+        opacity: .9;
+    }
+}

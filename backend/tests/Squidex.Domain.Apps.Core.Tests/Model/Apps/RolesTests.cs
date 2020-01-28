@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_create_roles_without_defaults()
         {
-            var roles = new Roles(Roles.Defaults.ToArray());
+            var roles = new Roles(new Dictionary<string, Role>(Roles.Defaults));
 
             Assert.Equal(0, roles.CustomCount);
         }

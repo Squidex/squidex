@@ -28,13 +28,13 @@ import {
 } from './../services/assets.service';
 
 import { AppsState } from './apps.state';
-import { SavedQuery } from './queries';
-import { encodeQuery, Query } from './query';
+import { Query } from './query';
 
 export type AssetPathItem = { id: string, folderName: string };
 
-type TagsAvailable = { [name: string]: number };
-type TagsSelected = { [name: string]: boolean };
+export type TagsAvailable = { [name: string]: number };
+export type TagsSelected = { [name: string]: boolean };
+export type Tag = { name: string, count: number; };
 
 const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
 
@@ -58,9 +58,6 @@ interface Snapshot {
 
     // The query to filter assets.
     assetsQuery?: Query;
-
-    // The json of the assets query.
-    assetsQueryJson: string;
 
     // The folder path.
     path: ReadonlyArray<AssetPathItem>;
@@ -144,7 +141,6 @@ export class AssetsState extends State<Snapshot> {
             assetFolders: [],
             assets: [],
             assetsPager: Pager.fromLocalStore('assets', localStore, 30),
-            assetsQueryJson: '',
             path: ROOT_PATH,
             tagsAvailable: {},
             tagsSelected: {}
@@ -354,7 +350,6 @@ export class AssetsState extends State<Snapshot> {
 
             if (query !== null) {
                 newState.assetsQuery = query;
-                newState.assetsQueryJson = encodeQuery(query);
             }
 
             if (tags) {
@@ -420,18 +415,6 @@ export class AssetsState extends State<Snapshot> {
 
     public search(query?: Query): Observable<any> {
         return this.searchInternal(query);
-    }
-
-    public isQueryUsed(saved: SavedQuery) {
-        return this.snapshot.assetsQueryJson === saved.queryJson;
-    }
-
-    public isTagSelected(tag: string) {
-        return this.snapshot.tagsSelected[tag];
-    }
-
-    public isTagSelectionEmpty() {
-        return Object.keys(this.snapshot.tagsSelected).length === 0;
     }
 
     public get parentId() {

@@ -58,14 +58,20 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var file = uploadImage.File;
 
-            var image = await assetThumbnailGenerator.GetImageInfoAsync(file.OpenRead());
-
-            if (image == null)
+            using (var uploadStream = file.OpenRead())
             {
-                throw new ValidationException("File is not an image.");
+                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+
+                if (image == null)
+                {
+                    throw new ValidationException("File is not an image.");
+                }
             }
 
-            await appImageStore.UploadAsync(uploadImage.AppId, file.OpenRead());
+            using (var uploadStream = file.OpenRead())
+            {
+                await appImageStore.UploadAsync(uploadImage.AppId, uploadStream);
+            }
         }
     }
 }

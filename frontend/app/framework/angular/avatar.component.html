@@ -1,0 +1,5 @@
+<img *ngIf="imageSource"
+    [style.width]="imageSize"
+    [style.height]="imageSize"
+    [src]="imageSource | sqxSafeUrl"
+/>

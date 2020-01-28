@@ -17,7 +17,7 @@ import {
     WorkflowsState
 } from '@app/shared/internal';
 
-import { createWorkflows } from '../services/workflows.service.spec';
+import { createWorkflows } from './../services/workflows.service.spec';
 
 import { TestValues } from './_test-helpers';
 

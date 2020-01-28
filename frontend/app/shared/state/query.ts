@@ -75,7 +75,7 @@ export interface FilterLogical {
     // The child filters if the logical filter is a conjunction (AND).
     and?: FilterNode[];
 
-    // The child filters if the logical filter is a disjunction (OR).
+    // The child filters if the logical filter is a conjunction (AND).
     or?: FilterNode[];
 }
 
@@ -106,12 +106,17 @@ export interface Query {
     skip?: number;
 }
 
-export function encodeQuery(query?: Query) {
-    if (Types.isEmpty(query)) {
-        return '';
-    }
+const DEFAULT_QUERY = {
+    filter: {
+        and: []
+    },
+    sort: []
+};
 
-    query = { ...query };
+function santize(query?: Query) {
+    if (!query) {
+        return DEFAULT_QUERY;
+    }
 
     if (!query.sort) {
         query.sort = [];
@@ -121,7 +126,33 @@ export function encodeQuery(query?: Query) {
         query.filter = { and: [] };
     }
 
-    return encodeURIComponent(JSON.stringify(query));
+    return query;
+}
+
+export function equalsQuery(lhs?: Query, rhs?: Query) {
+    return Types.equals(santize(lhs), santize(rhs));
+}
+
+export function encodeQuery(query?: Query) {
+    return encodeURIComponent(JSON.stringify(santize(query)));
+}
+
+export function decodeQuery(raw?: string): Query | undefined {
+    let query: Query | undefined = undefined;
+
+    try {
+        if (Types.isString(raw)) {
+            if (raw.indexOf('{') === 0) {
+                query = JSON.parse(raw);
+            } else {
+                query = { fullText: raw };
+            }
+        }
+    } catch (ex) {
+        query = undefined;
+    }
+
+    return query;
 }
 
 export function hasFilter(query?: Query) {
