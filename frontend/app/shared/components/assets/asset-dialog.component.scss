@@ -3,7 +3,17 @@
 }
 
 .image {
-    @include absolute(0, 0, 0, 0);
+    & {
+        @include absolute(0, 0, 0, 0);
+    }
+
+    &-progress {
+        @include absolute(0, 0, null, 0);
+    }
+}
+
+.invisible {
+    visibility: hidden;
 }
 
 .metadata {

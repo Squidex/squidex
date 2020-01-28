@@ -42,11 +42,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
                     Validators.required
                 ]
             ],
-            tags: [[],
-                [
-                    Validators.required
-                ]
-            ],
+            tags: [],
             metadata: formBuilder.array([])
         }));
     }

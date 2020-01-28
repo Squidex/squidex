@@ -17,7 +17,7 @@ import {
 } from '@app/framework/internal';
 
 export module HTTP {
-    export function upload<T = any>(http: HttpClient, method: string, url: string, file: File, version?: Version): Observable<HttpEvent<T>> {
+    export function upload<T = any>(http: HttpClient, method: string, url: string, file: Blob, version?: Version): Observable<HttpEvent<T>> {
         const req = new HttpRequest(method, url, getFormData(file), { headers: createHeaders(version), reportProgress: true });
 
         return http.request<T>(req);
@@ -59,7 +59,7 @@ export module HTTP {
         return handleVersion(http.request<T>(method, url, { observe: 'response', headers, body }));
     }
 
-    function getFormData(file: File) {
+    function getFormData(file: Blob) {
         const formData = new FormData();
 
         formData.append('file', file);

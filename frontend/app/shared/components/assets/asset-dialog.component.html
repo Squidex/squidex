@@ -11,7 +11,14 @@
                 </li>
             </ul>
             
-            <button type="submit" class="float-right btn btn-primary" [disabled]="!isEditable">Save</button>
+            <ng-container [ngSwitch]="selectedTab">
+                <ng-container *ngSwitchCase="'Image'">
+                    <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isUploadable" [disabled]="progress > 0">Save</button>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Metadata'">
+                    <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+                </ng-container>
+            </ng-container>
         </ng-container>
 
         <ng-container content>
@@ -19,6 +26,15 @@
                 <ng-container *ngSwitchCase="'Image'">
                     <div class="image">
                         <sqx-image-editor [imageUrl]="asset.contentUrl"></sqx-image-editor>
+                        
+                        <div class="image-progress" *ngIf="progress > 0">
+                            <sqx-progress-bar
+                                [strokeWidth]="2"
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0"
+                                [value]="progress">
+                            </sqx-progress-bar>
+                        </div>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Metadata'">

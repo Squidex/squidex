@@ -233,7 +233,7 @@ export class AssetsService {
             pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public postAssetFile(appName: string, file: File, parentId?: string): Observable<number | AssetDto> {
+    public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?parentId=${parentId}`);
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
@@ -266,7 +266,7 @@ export class AssetsService {
             pretifyError('Failed to upload asset. Please reload.'));
     }
 
-    public putAssetFile(appName: string, resource: Resource, file: File, version: Version): Observable<number | AssetDto> {
+    public putAssetFile(appName: string, resource: Resource, file: Blob, version: Version): Observable<number | AssetDto> {
         const link = resource._links['upload'];
 
         const url = this.apiUrl.buildUrl(link.href);

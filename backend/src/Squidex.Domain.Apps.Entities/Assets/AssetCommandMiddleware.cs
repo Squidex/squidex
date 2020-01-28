@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                 }
                             }
 
-                            await UploadAsync(context, tempFile, createAsset, true, next);
+                            await UploadAsync(context, tempFile, createAsset, createAsset.Tags, true, next);
                         }
                         finally
                         {
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            await UploadAsync(context, tempFile, updateAsset, false, next);
+                            await UploadAsync(context, tempFile, updateAsset, null, false, next);
                         }
                         finally
                         {
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, bool created, NextDelegate next)
+        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, HashSet<string>? tags, bool created, NextDelegate next)
         {
-            await EnrichWithMetadataAsync(command);
+            await EnrichWithMetadataAsync(command, tags);
 
             var asset = await HandleCoreAsync(context, created, next);
 
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task EnrichWithMetadataAsync(UploadAssetCommand command, HashSet<string>? tags = null)
+        private async Task EnrichWithMetadataAsync(UploadAssetCommand command, HashSet<string>? tags)
         {
             foreach (var metadataSource in assetMetadataSources)
             {

@@ -115,8 +115,7 @@ export class AssetComponent implements OnInit {
                         this.setProgress(asset);
                     } else {
                         this.setProgress(0);
-
-                        this.asset = asset;
+                        this.setAsset(asset);
                     }
                 }, error => {
                     this.dialogs.notifyError(error);
@@ -142,7 +141,13 @@ export class AssetComponent implements OnInit {
         this.loadError.emit(error);
     }
 
-    private setProgress(progress: number) {
+    public setAsset(asset: AssetDto) {
+        this.asset = asset;
+
+        this.changeDetector.markForCheck();
+    }
+
+    public setProgress(progress: number) {
         this.progress = progress;
 
         this.changeDetector.markForCheck();

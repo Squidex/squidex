@@ -102,6 +102,8 @@ const blackTheme = {
 })
 export class ImageEditorComponent implements AfterViewInit, OnChanges {
     private imageEditor: any;
+    private isChanged = false;
+    private isChangedBefore = false;
 
     @Input()
     public imageUrl: string;
@@ -118,6 +120,29 @@ export class ImageEditorComponent implements AfterViewInit, OnChanges {
         if (this.imageEditor && this.imageUrl) {
             this.imageEditor.loadImageFromURL(this.imageUrl);
         }
+    }
+
+    public toFile(): Blob | null {
+        if (!this.isChanged) {
+            return null;
+        }
+
+        this.isChanged = false;
+
+        const dataURI = this.imageEditor.toDataURL();
+
+        const byteString = atob(dataURI.split(',')[1]);
+        const byteBuffer = new ArrayBuffer(byteString.length);
+
+        const type = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        const array = new Uint8Array(byteBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+            array[i] = byteString.charCodeAt(i);
+        }
+
+        return new Blob([array], { type });
     }
 
     public ngAfterViewInit() {
@@ -152,6 +177,14 @@ export class ImageEditorComponent implements AfterViewInit, OnChanges {
                         'filter'
                     ],
                     theme: blackTheme
+                }
+            });
+
+            this.imageEditor.on('undoStackChanged', () => {
+                if (this.isChangedBefore) {
+                    this.isChanged = true;
+                } else {
+                    this.isChangedBefore = true;
                 }
             });
         });
