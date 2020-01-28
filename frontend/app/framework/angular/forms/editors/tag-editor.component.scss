@@ -34,6 +34,7 @@ $inner-height: 1.75rem;
 
     &.focus {
         border-color: $focus-color;
+        border-width: 1px;
         box-shadow: 0 0 0 .2rem $focus-shadow;
     }
 
@@ -127,7 +128,6 @@ div {
         padding: 1px .5rem;
         vertical-align: top;
         white-space: nowrap;
-        width: auto;
     }
 
     &.disabled {

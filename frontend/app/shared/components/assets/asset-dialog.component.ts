@@ -75,7 +75,7 @@ export class AssetDialogComponent implements OnInit {
         this.annotateForm.setEnabled(this.isEditable);
 
         if (this.asset.type === 'Image') {
-            this.selectableTabs = ['Image', 'Metadata'];
+            this.selectableTabs = ['Metadata', 'Image'];
         } else {
             this.selectableTabs = ['Metadata'];
         }

@@ -49,7 +49,7 @@ describe('AuthInterceptor', () => {
     it('should append headers to request',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
-        authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+        authService.setup(x => x.userChanges).returns(() => of(<any>{ authorization: 'letmein' }));
 
         http.get('http://service/p/apps').subscribe();
 

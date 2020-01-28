@@ -32,7 +32,7 @@ describe('AnnotateAssetForm', () => {
         form = new AnnotateAssetForm(new FormBuilder());
     });
 
-    it('Should remov extension when loading asset file name', () => {
+    it('shoulde remov extension when loading asset file name', () => {
         form.load(asset);
 
         const slug = form.form.get('fileName')!.value;
@@ -40,7 +40,7 @@ describe('AnnotateAssetForm', () => {
         expect(slug).toBe('My File');
     });
 
-    it('Should create slug from file name', () => {
+    it('should create slug from file name', () => {
         form.load(asset);
         form.generateSlug({} as any);
 
@@ -49,7 +49,7 @@ describe('AnnotateAssetForm', () => {
         expect(slug).toBe('my-file');
     });
 
-    it('Should create slug from file name and append extension', () => {
+    it('should create slug from file name and append extension', () => {
         form.form.get('fileName')!.setValue('My New File');
         form.generateSlug(asset);
 
@@ -58,7 +58,7 @@ describe('AnnotateAssetForm', () => {
         expect(slug).toBe('my-new-file.png');
     });
 
-    it('Should convert metadata when loading', () => {
+    it('should convert metadata when loading', () => {
         form.load(asset);
 
         const metadata = form.metadata.value;
@@ -71,7 +71,7 @@ describe('AnnotateAssetForm', () => {
         ]);
     });
 
-    it('Should convert values when submitting', () => {
+    it('should convert values when submitting', () => {
         form.load(asset);
 
         const request = form.submit({ fileName: 'Old File.png' } as any)!;
@@ -80,7 +80,7 @@ describe('AnnotateAssetForm', () => {
         expect(form.form.enabled).toBeFalsy();
     });
 
-    it('Should return null when nothing changed before submit', () => {
+    it('should return null when nothing changed before submit', () => {
         form.load(asset);
 
         const result = form.submit(asset);
@@ -89,7 +89,7 @@ describe('AnnotateAssetForm', () => {
         expect(form.form.enabled).toBeTruthy();
     });
 
-    it('Should remove previous metadata when loaded', () => {
+    it('should remove previous metadata when loaded', () => {
         const newAsset: any = {
             metadata: {
                 key1: 'Value'
