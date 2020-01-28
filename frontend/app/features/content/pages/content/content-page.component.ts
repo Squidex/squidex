@@ -107,6 +107,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
+                    const isNewContent = isOtherContent(content, this.content);
+
+                    this.content = content;
+
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
                         schemaVersion: this.schema.version,
@@ -119,24 +123,20 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                     const clone = this.tempService.fetch();
 
+                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
+
                     if (clone) {
                         this.loadContent(clone, true);
-                    } else {
-                        const autosaved = this.autoSaveService.get(this.autoSaveKey);
-
-                        if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
-                            this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
-                                .subscribe(shouldLoad => {
-                                    if (shouldLoad) {
-                                        this.loadContent(autosaved, false);
-                                    } else {
-                                        this.autoSaveService.remove(this.autoSaveKey);
-                                    }
-                                });
-                        }
+                    } else if (isNewContent && autosaved && this.contentForm.hasChanges(autosaved)) {
+                        this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
+                            .subscribe(shouldLoad => {
+                                if (shouldLoad) {
+                                    this.loadContent(autosaved, false);
+                                } else {
+                                    this.autoSaveService.remove(this.autoSaveKey);
+                                }
+                            });
                     }
-
-                    this.content = content;
                 }));
 
         this.own(
@@ -153,10 +153,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(message => {
                     this.loadVersion(message.version, message.compare);
                 }));
-    }
-
-    private isOtherContent(content: ContentDto | null | undefined) {
-        return !this.content || !content || content.id !== this.content.id;
     }
 
     public canDeactivate(): Observable<boolean> {
@@ -339,4 +335,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public trackByField(index: number, field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
+}
+
+function isOtherContent(lhs: ContentDto | null | undefined, rhs: ContentDto | null | undefined) {
+    return !lhs || !rhs || lhs.id !== rhs.id;
 }

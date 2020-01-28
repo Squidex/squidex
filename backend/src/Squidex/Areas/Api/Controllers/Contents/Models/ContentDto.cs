@@ -165,14 +165,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 if (content.CanUpdate)
                 {
                     AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+
+                    AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
                 }
 
                 if (Status == Status.Published)
                 {
                     AddPutLink("draft/propose", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft=true");
                 }
-
-                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
 
                 if (content.Nexts != null)
                 {
