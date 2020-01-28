@@ -16,6 +16,7 @@ import {
     Pager,
     shareSubscribed,
     State,
+    Types,
     Version,
     Versioned
 } from '@app/framework';
@@ -56,15 +57,11 @@ interface Snapshot {
     canCreateAndPublish?: boolean;
 }
 
-function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
-    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version.eq(rhs.version));
-}
-
 export abstract class ContentsStateBase extends State<Snapshot> {
     private previousId: string;
 
     public selectedContent =
-        this.project(x => x.selectedContent, sameContent);
+        this.project(x => x.selectedContent, Types.equals);
 
     public contents =
         this.project(x => x.contents);
