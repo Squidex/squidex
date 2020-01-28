@@ -136,6 +136,8 @@ export class AssetDialogComponent implements OnInit {
                     }, error => {
                         this.annotateForm.submitFailed(error);
                     });
+            } else {
+                this.dialogs.notifyInfo('Nothing has changed.');
             }
         }
     }

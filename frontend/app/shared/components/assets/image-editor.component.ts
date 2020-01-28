@@ -172,12 +172,13 @@ export class ImageEditorComponent implements AfterViewInit, OnChanges {
                     menu: [
                         'crop',
                         'flip',
-                        'rotate',
                         'mask',
                         'filter'
                     ],
                     theme: blackTheme
-                }
+                },
+                cssMaxWidth: 700,
+                cssMaxHeight: 500
             });
 
             this.imageEditor.on('undoStackChanged', () => {
