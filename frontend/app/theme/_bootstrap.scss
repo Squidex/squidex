@@ -189,7 +189,7 @@ a {
 .dropdown-menu {
     // White dropdown menu without border and shadow.
     & {
-        @include box-shadow(0, 3px, 16px, .2);
+        @include box-shadow-outer(0, 3px, 16px, .2);
         background: $panel-light-background;
         border: 0;
         z-index: 1200;
@@ -675,7 +675,7 @@ $icon-size: 4.5rem;
     }
 
     &-content {
-        @include box-shadow2(0, 8px, 16px, .3);
+        @include box-shadow-outer(0, 8px, 16px, .3);
         border: 0;
         border-radius: .4rem .35rem .35rem .4rem;
         max-height: 100%;

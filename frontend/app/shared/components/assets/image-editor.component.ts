@@ -106,6 +106,9 @@ export class ImageEditorComponent implements AfterViewInit, OnChanges {
     private isChangedBefore = false;
 
     @Input()
+    public accessToken: string;
+
+    @Input()
     public imageUrl: string;
 
     @ViewChild('editor', { static: false })
@@ -159,15 +162,18 @@ export class ImageEditorComponent implements AfterViewInit, OnChanges {
             'https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.js'
         ];
 
+        let path = this.imageUrl;
+
+        if (this.accessToken) {
+            path += `&access_token=${this.accessToken}`;
+        }
+
         styles.forEach(style => this.resourceLoader.loadStyle(style));
-
-        const s = scripts.map(script => this.resourceLoader.loadScript(script));
-
-        Promise.all(s).then(() => {
+        Promise.all(scripts.map(script => this.resourceLoader.loadScript(script))).then(() => {
             this.imageEditor = new tui.ImageEditor(this.editor.nativeElement, {
                 includeUI: {
                     loadImage: {
-                        path: this.imageUrl, name: 'image'
+                        path, name: 'image'
                     },
                     menu: [
                         'crop',

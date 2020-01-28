@@ -8,7 +8,7 @@
 
 .search-control {
     @include absolute(.5rem, auto, auto, .5rem);
-    @include box-shadow;
+    @include box-shadow-outer;
     width: 40%;
 }
 

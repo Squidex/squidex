@@ -13,6 +13,7 @@ import {
     AssetDto,
     AssetsState,
     AssetUploaderState,
+    AuthService,
     DialogService,
     Types,
     UploadCanceled
@@ -32,6 +33,9 @@ export class AssetDialogComponent implements OnInit {
 
     @Output()
     public changed = new EventEmitter<AssetDto>();
+
+    @Input()
+    public accessToken: string;
 
     @Input()
     public asset: AssetDto;
@@ -58,7 +62,8 @@ export class AssetDialogComponent implements OnInit {
         private readonly assetUploader: AssetUploaderState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
+        public readonly authService: AuthService
     ) {
     }
 

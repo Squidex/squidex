@@ -8,7 +8,7 @@
 .field-button {
     & {
         @include circle(5.25rem);
-        @include box-shadow(0, 8px, 16px, .3);
+        @include box-shadow-outer(0, 8px, 16px, .3);
         @include absolute(auto, 6rem, 1rem, auto);
     }
 

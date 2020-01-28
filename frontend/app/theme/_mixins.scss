@@ -166,11 +166,7 @@
     }
 }
 
-@mixin box-shadow($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
-    box-shadow: $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
-}
-
-@mixin box-shadow2($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
+@mixin box-shadow-outer($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
     box-shadow: $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
 }
 

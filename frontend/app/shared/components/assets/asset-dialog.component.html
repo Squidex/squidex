@@ -25,7 +25,7 @@
             <ng-container [ngSwitch]="selectedTab">
                 <ng-container *ngSwitchCase="'Image'">
                     <div class="image">
-                        <sqx-image-editor [imageUrl]="asset.contentUrl"></sqx-image-editor>
+                        <sqx-image-editor [accessToken]="accessToken" [imageUrl]="asset.contentUrl"></sqx-image-editor>
                         
                         <div class="image-progress" *ngIf="progress > 0">
                             <sqx-progress-bar

@@ -131,7 +131,7 @@
     & {
         @include absolute(2px, auto, auto, 0);
         @include border-radius(.25em);
-        @include box-shadow;
+        @include box-shadow-outer;
         background: $color-dark-foreground;
         border: 1px solid $color-input;
         max-height: 15rem;

@@ -49,7 +49,7 @@ $icon-size: 4.5rem;
 
         &.active {
             & {
-                @include box-shadow(0, 0, 10px, .5);
+                @include box-shadow-outer(0, 0, 10px, .5);
                 background: $color-theme-blue;
                 border-color: $color-theme-blue;
                 color: $color-dark-foreground;

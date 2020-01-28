@@ -11,9 +11,9 @@ $color-nav-shadow: rgba(26, 93, 184, .26);
         .nav-link {
             & {
                 @include border-radius;
+                @include box-shadow-outer(0, 2px, 4px $color-nav-shadow);
                 background: $color-theme-blue;
                 border: 1px solid $color-theme-blue-lighter;
-                box-shadow: 0, 2px, 4px $color-nav-shadow;
                 color: $color-dark-foreground;
                 cursor: pointer;
                 line-height: 1.25rem;
@@ -99,7 +99,7 @@ $color-nav-shadow: rgba(26, 93, 184, .26);
     }
 
     .btn-primary {
-        @include box-shadow-inner;
+        @include box-shadow-outer;
         background: $color-theme-blue-dark;
         border: 0;
         pointer-events: none;

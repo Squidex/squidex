@@ -241,7 +241,7 @@
 //
 .panel-dark {
     & {
-        @include box-shadow(2px, 0, 1px, .3);
+        @include box-shadow-outer(2px, 0, 1px, .3);
         background: $color-dark2-background;
         border-right: 1px solid darken($color-dark2-foreground, 15%);
         color: $color-dark2-foreground;
@@ -278,7 +278,7 @@
 .sidebar {
     & {
         @include fixed($size-navbar-height, auto, 0, 0);
-        @include box-shadow(2px, 0, 1px, .1);
+        @include box-shadow-outer(2px, 0, 1px, .1);
         @include force-width($size-sidebar-width);
         background: $color-dark1-background;
         border-right: 1px solid $color-dark1-border1;

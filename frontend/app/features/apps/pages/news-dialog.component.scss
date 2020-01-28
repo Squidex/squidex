@@ -1,6 +1,6 @@
 :host ::ng-deep {
     img {
-        @include box-shadow(0, 4px, 20px, .2);
+        @include box-shadow-outer(0, 4px, 20px, .2);
         display: block;
         margin: 10px auto;
         max-width: 80%;

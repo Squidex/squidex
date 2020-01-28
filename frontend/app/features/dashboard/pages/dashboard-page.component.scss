@@ -73,7 +73,7 @@
         }
 
         &:hover {
-            @include box-shadow(0, 3px, 16px, .2px);
+            @include box-shadow-outer(0, 3px, 16px, .2px);
         }
 
         &:focus {
