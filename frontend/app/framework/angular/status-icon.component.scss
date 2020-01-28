@@ -1,29 +1,17 @@
-$circle-size-sm: 1.6rem;
-
-$circle-size-lg: 2.8rem;
-
 .status {
     & {
         background: $color-border;
         border: 0;
         color: $color-dark-foreground;
         display: inline-block;
-        text-align: center;
-        vertical-align: middle;
     }
 
     &.sm {
-        @include circle($circle-size-sm);
-        font-size: .5 * $circle-size-sm;
-        font-weight: normal;
-        line-height: $circle-size-sm + .1rem;
+        @include circle-icon(1.6rem);
     }
 
     &.lg {
-        @include circle($circle-size-lg);
-        font-size: .5 * $circle-size-lg;
-        font-weight: normal;
-        line-height: $circle-size-lg + .1rem;
+        @include circle-icon(2.8rem);
     }
 
     &-pending {

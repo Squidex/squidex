@@ -48,18 +48,16 @@ $circle-size: 1.6rem;
 
 .upload-status {
     & {
-        @include circle($circle-size);
-        background: $color-border;
-        color: $color-dark-foreground;
-        cursor: none;
-        font-size: .4 * $circle-size;
-        font-weight: normal;
-        line-height: $circle-size + .1rem;
-        text-align: center;
+        @include circle-icon(1.6rem);
     }
 
     &-running {
-        color: inherit;
+        background: $color-border;
+    }
+
+    &-failed,
+    &-success {
+        color: $color-dark-foreground;
     }
 
     &-failed {

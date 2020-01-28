@@ -130,6 +130,15 @@
     display: inline-block;
 }
 
+@mixin circle-icon($size) {
+    @include circle($size);
+    cursor: none;
+    font-size: .5 * $size;
+    font-weight: normal;
+    line-height: $size + .1rem;
+    text-align: center;
+}
+
 @mixin placeholder-color($color) {
     ::placeholder {
         color: $color;
