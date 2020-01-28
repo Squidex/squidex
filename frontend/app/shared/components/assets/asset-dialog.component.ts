@@ -32,6 +32,9 @@ export class AssetDialogComponent implements OnInit {
 
     public isEditable = false;
 
+    public selectableTabs: ReadonlyArray<string> = ['Image', 'Metadata'];
+    public selectedTab = this.selectableTabs[0];
+
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
 
     constructor(
@@ -45,6 +48,10 @@ export class AssetDialogComponent implements OnInit {
 
         this.annotateForm.load(this.asset);
         this.annotateForm.setEnabled(this.isEditable);
+    }
+
+    public selectTab(tab: string) {
+        this.selectedTab = tab;
     }
 
     public generateSlug() {

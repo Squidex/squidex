@@ -2,11 +2,21 @@
     position: relative;
 }
 
+.image {
+    @include absolute(0, 0, 0, 0);
+}
+
+.metadata {
+    margin: 1rem auto;
+    max-width: 500px;
+    min-width: 0;
+}
+
 .slug {
     padding-right: 6rem;
 }
 
-.btn-generate {
+.slug-generate {
     & {
         @include absolute(auto, 10px, 3px, auto);
     }

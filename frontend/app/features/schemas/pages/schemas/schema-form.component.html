@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createSchema()">     
-    <sqx-modal-dialog (close)="cancel.emit()" [large]="false">
+    <sqx-modal-dialog (close)="cancel.emit()">
         <ng-container title>
             <ng-container *ngIf="import; else noImport">
                 Clone Schema
