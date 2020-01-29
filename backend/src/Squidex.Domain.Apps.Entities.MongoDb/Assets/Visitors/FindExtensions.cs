@@ -36,21 +36,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return query;
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSort(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
-        {
-            return cursor.Sort(query.BuildSort<MongoAssetEntity>());
-        }
-
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetTake(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
-        {
-            return cursor.Take(query);
-        }
-
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSkip(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
-        {
-            return cursor.Skip(query);
-        }
-
         public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, Guid appId, Guid? parentId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>

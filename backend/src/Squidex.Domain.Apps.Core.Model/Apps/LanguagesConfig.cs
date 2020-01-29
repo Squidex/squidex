@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public LanguagesConfig Set(Language language, bool isOptional = false, params Language[] fallbacks)
+        public LanguagesConfig Set(Language language, bool isOptional = false, params Language[]? fallbacks)
         {
             Guard.NotNull(language);
 

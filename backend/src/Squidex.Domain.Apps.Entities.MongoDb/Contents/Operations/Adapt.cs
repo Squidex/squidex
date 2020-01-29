@@ -10,17 +10,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public static class Adapt
     {
         private static readonly Dictionary<string, string> PropertyMap =
             typeof(MongoContentEntity).GetProperties()
-                .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(
+                    x => ToElementName(x),
+                    x => ToName(x),
+                    StringComparer.OrdinalIgnoreCase);
+
+        private static string ToName(PropertyInfo x)
+        {
+            return x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name;
+        }
+
+        private static string ToElementName(PropertyInfo x)
+        {
+            return x.Name;
+        }
 
         public static Func<PropertyPath, PropertyPath> Path(Schema schema, bool inDraft)
         {
@@ -78,6 +92,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
                 return result;
             };
+        }
+
+        public static ClrQuery AdjustToModel(this ClrQuery query, Schema schema, bool useDraft)
+        {
+            var pathConverter = Path(schema, useDraft);
+
+            if (query.Filter != null)
+            {
+                query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter));
+            }
+
+            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.Order)).ToList();
+
+            return query;
+        }
+
+        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema, bool useDraft)
+        {
+            var pathConverter = Path(schema, useDraft);
+
+            return filterNode.Accept(new AdaptionVisitor(pathConverter));
         }
     }
 }
