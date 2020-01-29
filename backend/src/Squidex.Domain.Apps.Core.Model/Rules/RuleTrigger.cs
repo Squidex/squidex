@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using DeepEqual.Syntax;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public bool DeepEquals(RuleTrigger action)
         {
-            return this.WithDeepEqual(action).IgnoreProperty<Freezable>(x => x.IsFrozen).Compare();
+            return SimpleEquals.IsEquals(this, action);
         }
     }
 }

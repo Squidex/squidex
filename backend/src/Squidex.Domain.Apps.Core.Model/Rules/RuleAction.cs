@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using DeepEqual.Syntax;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public bool DeepEquals(RuleAction action)
         {
-            return this.WithDeepEqual(action).IgnoreProperty<Freezable>(x => x.IsFrozen).Compare();
+            return SimpleEquals.IsEquals(this, action);
         }
     }
 }

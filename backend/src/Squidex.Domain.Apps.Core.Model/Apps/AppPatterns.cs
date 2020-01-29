@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection.Equality;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppPatterns>(id, appPattern.Update(name, pattern, message), DeepComparer<AppPattern>.Instance);
+            return With<AppPatterns>(id, appPattern.Update(name, pattern, message), DeepEqualityComparer<AppPattern>.Default);
         }
     }
 }

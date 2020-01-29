@@ -7,6 +7,7 @@
 
 using System;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core
 {
@@ -14,6 +15,7 @@ namespace Squidex.Domain.Apps.Core
     {
         private bool isFrozen;
 
+        [IgnoreEquals]
         public bool IsFrozen
         {
             get { return isFrozen; }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection.Equality;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppClients>(id, client.Rename(newName), DeepComparer<AppClient>.Instance);
+            return With<AppClients>(id, client.Rename(newName), DeepEqualityComparer<AppClient>.Default);
         }
 
         [Pure]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppClients>(id, client.Update(role), DeepComparer<AppClient>.Instance);
+            return With<AppClients>(id, client.Update(role), DeepEqualityComparer<AppClient>.Default);
         }
     }
 }

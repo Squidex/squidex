@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection.Equality;
 
 #pragma warning disable IDE0028 // Simplify collection initialization
 
@@ -94,12 +95,17 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             Cleanup(newLanguages, ref newMaster);
 
-            if (newLanguages.EqualsDictionary(languages, EqualityComparer<string>.Default, DeepComparer<LanguageConfig>.Instance) && Equals(newMaster, master))
+            if (EqualLanguages(newLanguages) && Equals(newMaster, master))
             {
                 return this;
             }
 
             return new LanguagesConfig(newLanguages, newMaster);
+        }
+
+        private bool EqualLanguages(Dictionary<string, LanguageConfig> newLanguages)
+        {
+            return newLanguages.EqualsDictionary(languages, EqualityComparer<string>.Default, DeepEqualityComparer<LanguageConfig>.Default);
         }
 
         private void Cleanup(Dictionary<string, LanguageConfig> newLanguages, ref string newMaster)

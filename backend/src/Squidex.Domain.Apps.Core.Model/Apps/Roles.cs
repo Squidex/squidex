@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection.Equality;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -115,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return Create(inner.With(name, role.Update(permissions), DeepComparer<Role>.Instance));
+            return Create(inner.With(name, role.Update(permissions), DeepEqualityComparer<Role>.Default));
         }
 
         public static bool IsDefault(string role)

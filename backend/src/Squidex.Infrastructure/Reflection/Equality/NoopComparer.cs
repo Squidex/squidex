@@ -1,16 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection.Equality
 {
-    public interface IPropertyAccessor
+    internal sealed class NoopComparer : IDeepComparer
     {
-        object? Get(object target);
-
-        void Set(object target, object? value);
+        public bool IsEquals(object? x, object? y)
+        {
+            return false;
+        }
     }
 }

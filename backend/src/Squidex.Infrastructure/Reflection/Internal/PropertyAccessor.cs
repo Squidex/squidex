@@ -8,10 +8,17 @@
 using System;
 using System.Reflection;
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection.Internal
 {
-    public sealed class PropertyAccessor : IPropertyAccessor
+    public sealed class PropertyAccessor
     {
+        private interface IPropertyAccessor
+        {
+            object? Get(object target);
+
+            void Set(object target, object? value);
+        }
+
         private sealed class PropertyWrapper<TObject, TValue> : IPropertyAccessor
         {
             private readonly Func<TObject, TValue> getMethod;
@@ -56,7 +63,9 @@ namespace Squidex.Infrastructure.Reflection
             Guard.NotNull(targetType);
             Guard.NotNull(propertyInfo);
 
-            internalAccessor = (IPropertyAccessor)Activator.CreateInstance(typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType), propertyInfo)!;
+            var type = typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType);
+
+            internalAccessor = (IPropertyAccessor)Activator.CreateInstance(type, propertyInfo)!;
         }
 
         public object? Get(object target)

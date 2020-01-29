@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInLists.DeepEquals(names))
+            if (fieldsInLists.SetEquals(names))
             {
                 return this;
             }
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInReferences.DeepEquals(names))
+            if (fieldsInReferences.SetEquals(names))
             {
                 return this;
             }

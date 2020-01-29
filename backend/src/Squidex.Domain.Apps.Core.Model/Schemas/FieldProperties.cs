@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.ObjectModel;
-using DeepEqual.Syntax;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool DeepEquals(FieldProperties properties)
         {
-            return this.WithDeepEqual(properties).IgnoreProperty<Freezable>(x => x.IsFrozen).Compare();
+            return SimpleEquals.IsEquals(this, properties);
         }
     }
 }
