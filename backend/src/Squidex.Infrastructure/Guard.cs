@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType(object? target, [AllowNull] Type expectedType, [CallerArgumentExpression("target")] string? parameterName = null)
+        public static void HasType(object? target, [AllowNull] Type? expectedType, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && expectedType != null && target.GetType() != expectedType)
             {
