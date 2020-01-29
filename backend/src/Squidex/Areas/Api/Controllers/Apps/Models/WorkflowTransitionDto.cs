@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public WorkflowTransition ToTransition()
         {
-            return new WorkflowTransition(Expression, Roles);
+            return WorkflowTransition.When(Expression, Roles);
         }
     }
 }
