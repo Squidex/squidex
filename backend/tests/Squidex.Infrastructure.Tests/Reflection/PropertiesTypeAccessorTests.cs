@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
+using Squidex.Infrastructure.Reflection.Internal;
 using Xunit;
 
 namespace Squidex.Infrastructure.Reflection
@@ -41,20 +41,13 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         private readonly TestClass target = new TestClass();
-        private readonly PropertiesTypeAccessor accessor = PropertiesTypeAccessor.Create(typeof(TestClass));
-
-        [Fact]
-        public void Should_provide_properties()
-        {
-            var properties = accessor.Properties.Select(x => x.Name).ToArray();
-
-            Assert.Equal(new[] { "ReadWrite", "Read", "Write" }, properties);
-        }
 
         [Fact]
         public void Should_set_read_write_property()
         {
-            accessor.SetValue(target, "ReadWrite", 123);
+            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("ReadWrite")!);
+
+            sut.Set(target, 123);
 
             Assert.Equal(123, target.Read);
         }
@@ -62,49 +55,47 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_set_write_property()
         {
-            accessor.SetValue(target, "Write", 123);
+            var accessor = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Write")!);
+
+            accessor.Set(target, 123);
 
             Assert.Equal(123, target.Read);
         }
 
         [Fact]
-        public void Should_throw_exception_if_setting_unknown_property()
-        {
-            Assert.Throws<ArgumentException>(() => accessor.SetValue(target, "Unknown", 123));
-        }
-
-        [Fact]
         public void Should_throw_exception_if_setting_readonly()
         {
-            Assert.Throws<NotSupportedException>(() => accessor.SetValue(target, "Read", 123));
+            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Read")!);
+
+            Assert.Throws<NotSupportedException>(() => sut.Set(target, 123));
         }
 
         [Fact]
         public void Should_get_read_write_property()
         {
+            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("ReadWrite")!);
+
             target.Write = 123;
 
-            Assert.Equal(123, accessor.GetValue(target, "ReadWrite"));
+            Assert.Equal(123, sut.Get(target));
         }
 
         [Fact]
         public void Should_get_read_property()
         {
+            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Read")!);
+
             target.Write = 123;
 
-            Assert.Equal(123, accessor.GetValue(target, "Read"));
+            Assert.Equal(123, sut.Get(target));
         }
 
         [Fact]
-        public void Should_throw_exception_if_getting_unknown_property()
+        public void Should_throw_exception_if_getting_writeonly_property()
         {
-            Assert.Throws<ArgumentException>(() => accessor.GetValue(target, "Unknown"));
-        }
+            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Write")!);
 
-        [Fact]
-        public void Should_throw_exception_if_getting_readonly_property()
-        {
-            Assert.Throws<NotSupportedException>(() => accessor.GetValue(target, "Write"));
+            Assert.Throws<NotSupportedException>(() => sut.Get(target));
         }
     }
 }

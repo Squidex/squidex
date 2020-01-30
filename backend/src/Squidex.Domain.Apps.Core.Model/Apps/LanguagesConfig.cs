@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public LanguagesConfig Set(Language language, bool isOptional = false, params Language[] fallbacks)
+        public LanguagesConfig Set(Language language, bool isOptional = false, params Language[]? fallbacks)
         {
             Guard.NotNull(language);
 
@@ -94,12 +94,17 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             Cleanup(newLanguages, ref newMaster);
 
-            if (newLanguages.EqualsDictionary(languages, EqualityComparer<string>.Default, DeepComparer<LanguageConfig>.Instance) && Equals(newMaster, master))
+            if (EqualLanguages(newLanguages) && Equals(newMaster, master))
             {
                 return this;
             }
 
             return new LanguagesConfig(newLanguages, newMaster);
+        }
+
+        private bool EqualLanguages(Dictionary<string, LanguageConfig> newLanguages)
+        {
+            return newLanguages.EqualsDictionary(languages);
         }
 
         private void Cleanup(Dictionary<string, LanguageConfig> newLanguages, ref string newMaster)

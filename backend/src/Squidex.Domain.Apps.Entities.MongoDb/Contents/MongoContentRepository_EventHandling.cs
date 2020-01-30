@@ -35,10 +35,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             switch (@event.Payload)
             {
                 case AssetDeleted e:
-                    return contents.CleanupAsync(e.AssetId);
+                    return cleanupReferences.DoAsync(e.AssetId);
 
                 case ContentDeleted e:
-                    return contents.CleanupAsync(e.ContentId);
+                    return cleanupReferences.DoAsync(e.ContentId);
             }
 
             return TaskHelper.Done;

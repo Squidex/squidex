@@ -81,7 +81,9 @@ namespace Squidex.Infrastructure.Collections
 
         private static bool IsEqual(TValue lhs, TValue rhs, IEqualityComparer<TValue>? comparer = null)
         {
-            return comparer == null || comparer.Equals(lhs, rhs);
+            comparer ??= EqualityComparer<TValue>.Default;
+
+            return comparer.Equals(lhs, rhs);
         }
 
         public ImmutableDictionary<TKey, TValue> Without(TKey key)

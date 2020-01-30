@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return Create(inner.With(name, role.Update(permissions), DeepComparer<Role>.Instance));
+            return Create(inner.With(name, role.Update(permissions)));
         }
 
         public static bool IsDefault(string role)

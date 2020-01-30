@@ -29,11 +29,19 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
 
         private readonly IMongoDatabase mongoDatabase;
-        private readonly Lazy<IMongoCollection<TEntity>> mongoCollection;
+        private IMongoCollection<TEntity> mongoCollection;
 
         protected IMongoCollection<TEntity> Collection
         {
-            get { return mongoCollection.Value; }
+            get
+            {
+                if (mongoCollection == null)
+                {
+                    throw new InvalidOperationException("Collection has not been initialized yet.");
+                }
+
+                return mongoCollection;
+            }
         }
 
         protected IMongoDatabase Database
@@ -48,12 +56,16 @@ namespace Squidex.Infrastructure.MongoDb
             InstantSerializer.Register();
         }
 
-        protected MongoRepositoryBase(IMongoDatabase database)
+        protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
         {
             Guard.NotNull(database);
 
             mongoDatabase = database;
-            mongoCollection = CreateCollection();
+
+            if (setup)
+            {
+                CreateCollection();
+            }
         }
 
         protected virtual MongoCollectionSettings CollectionSettings()
@@ -66,14 +78,6 @@ namespace Squidex.Infrastructure.MongoDb
             return string.Format(CultureInfo.InvariantCulture, CollectionFormat, typeof(TEntity).Name);
         }
 
-        private Lazy<IMongoCollection<TEntity>> CreateCollection()
-        {
-            return new Lazy<IMongoCollection<TEntity>>(() =>
-                mongoDatabase.GetCollection<TEntity>(
-                    CollectionName(),
-                    CollectionSettings() ?? new MongoCollectionSettings()));
-        }
-
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default)
         {
             return TaskHelper.Done;
@@ -81,21 +85,40 @@ namespace Squidex.Infrastructure.MongoDb
 
         public virtual async Task ClearAsync()
         {
-            await Database.DropCollectionAsync(CollectionName());
+            try
+            {
+                await Database.DropCollectionAsync(CollectionName());
+            }
+            catch (MongoCommandException ex)
+            {
+                if (ex.Code != 26)
+                {
+                    throw;
+                }
+            }
 
-            await SetupCollectionAsync(Collection);
+            await InitializeAsync();
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
         {
             try
             {
+                CreateCollection();
+
                 await SetupCollectionAsync(Collection, ct);
             }
             catch (Exception ex)
             {
                 throw new ConfigurationException($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}", ex);
             }
+        }
+
+        private void CreateCollection()
+        {
+            mongoCollection = mongoDatabase.GetCollection<TEntity>(
+                CollectionName(),
+                CollectionSettings() ?? new MongoCollectionSettings());
         }
     }
 }

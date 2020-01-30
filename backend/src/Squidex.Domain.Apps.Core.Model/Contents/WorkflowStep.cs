@@ -6,13 +6,18 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Infrastructure;
+
+#pragma warning disable IDE0051 // Remove unused private members
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class WorkflowStep
     {
         private static readonly IReadOnlyDictionary<Status, WorkflowTransition> EmptyTransitions = new Dictionary<Status, WorkflowTransition>();
 
+        [IgnoreDuringEquals]
         public IReadOnlyDictionary<Status, WorkflowTransition> Transitions { get; }
 
         public string? Color { get; }
@@ -26,6 +31,18 @@ namespace Squidex.Domain.Apps.Core.Contents
             Color = color;
 
             NoUpdate = noUpdate;
+        }
+
+        [CustomEqualsInternal]
+        private bool CustomEquals(WorkflowStep other)
+        {
+            return Transitions.EqualsDictionary(other.Transitions);
+        }
+
+        [CustomGetHashCode]
+        private int CustomHashCode()
+        {
+            return Transitions.DictionaryHashCode();
         }
     }
 }

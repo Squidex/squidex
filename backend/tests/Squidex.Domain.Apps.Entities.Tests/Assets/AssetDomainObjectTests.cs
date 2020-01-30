@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FileName, sut.Snapshot.FileName);
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Slug, sut.Snapshot.Slug);
 
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.IsProtected, sut.Snapshot.IsProtected);
 
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
 
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -217,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.IsDeleted);
 

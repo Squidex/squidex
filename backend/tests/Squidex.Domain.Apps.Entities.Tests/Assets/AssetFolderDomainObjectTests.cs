@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 

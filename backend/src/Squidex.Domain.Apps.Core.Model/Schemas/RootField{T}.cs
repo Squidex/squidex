@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            if (properties.DeepEquals(typedProperties))
+            if (properties.Equals(typedProperties))
             {
                 return this;
             }

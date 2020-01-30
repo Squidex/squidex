@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var lhs = (FieldProperties)Activator.CreateInstance(type)!;
             var rhs = (FieldProperties)Activator.CreateInstance(type)!;
 
-            Assert.True(lhs.DeepEquals(rhs));
+            Assert.True(lhs.Equals(rhs));
         }
 
         [Fact]

@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
@@ -65,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     var assetCount = Collection.Find(filter).CountDocumentsAsync();
                     var assetItems =
                         Collection.Find(filter)
-                            .AssetTake(query)
-                            .AssetSkip(query)
-                            .AssetSort(query)
+                            .Take(query)
+                            .Skip(query)
+                            .Sort(query)
                             .ToListAsync();
 
                     await Task.WhenAll(assetItems, assetCount);

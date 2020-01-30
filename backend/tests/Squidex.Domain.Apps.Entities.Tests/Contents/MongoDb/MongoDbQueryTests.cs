@@ -16,8 +16,9 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
+using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -276,7 +277,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var query = new ClrQuery { Take = 3 };
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.ContentTake(query.AdjustToModel(schemaDef, false));
+            cursor.Take(query);
 
             A.CallTo(() => cursor.Limit(3))
                 .MustHaveHappened();
@@ -288,7 +289,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var query = new ClrQuery { Skip = 3 };
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.ContentSkip(query.AdjustToModel(schemaDef, false));
+            cursor.Skip(query);
 
             A.CallTo(() => cursor.Skip(3))
                 .MustHaveHappened();
@@ -316,7 +317,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.ContentSort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef, false));
+            cursor.Sort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef, false));
 
             return i;
         }

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -74,7 +73,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType(object? target, [AllowNull] Type expectedType, [CallerArgumentExpression("target")] string? parameterName = null)
+        public static void HasType(object? target, Type? expectedType, [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && expectedType != null && target.GetType() != expectedType)
             {

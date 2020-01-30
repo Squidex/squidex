@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             typedProperties.Freeze();
 
-            if (properties.DeepEquals(typedProperties))
+            if (properties.Equals(typedProperties))
             {
                 return this;
             }

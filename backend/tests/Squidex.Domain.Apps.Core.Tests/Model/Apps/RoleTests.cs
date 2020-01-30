@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var role = new Role("Custom");
 
-            Assert.False(role.Equals(null!));
+            Assert.False(role.Equals((string)null!));
             Assert.False(role.Equals("Other"));
         }
     }

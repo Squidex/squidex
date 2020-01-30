@@ -10,17 +10,20 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class RefToken : IEquatable<RefToken>
+    [Equals(DoNotAddEqualityOperators = true)]
+    public sealed class RefToken
     {
         public string Type { get; }
 
         public string Identifier { get; }
 
+        [IgnoreDuringEquals]
         public bool IsClient
         {
             get { return string.Equals(Type, RefTokenType.Client, StringComparison.OrdinalIgnoreCase); }
         }
 
+        [IgnoreDuringEquals]
         public bool IsSubject
         {
             get { return string.Equals(Type, RefTokenType.Subject, StringComparison.OrdinalIgnoreCase); }
@@ -39,16 +42,6 @@ namespace Squidex.Infrastructure
         public override string ToString()
         {
             return $"{Type}:{Identifier}";
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as RefToken);
-        }
-
-        public bool Equals(RefToken? other)
-        {
-            return other != null && (ReferenceEquals(this, other) || (Type.Equals(other.Type) && Identifier.Equals(other.Identifier)));
         }
 
         public override int GetHashCode()

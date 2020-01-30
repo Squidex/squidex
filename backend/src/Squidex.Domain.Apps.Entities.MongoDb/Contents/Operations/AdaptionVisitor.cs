@@ -11,7 +11,7 @@ using System.Linq;
 using NodaTime;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class AdaptionVisitor : TransformVisitor<ClrValue>
     {

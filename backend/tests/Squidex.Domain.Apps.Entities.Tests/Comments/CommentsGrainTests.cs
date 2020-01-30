@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(command.CommentId, 0));
+            result.ShouldBeEquivalent((object)EntityCreatedResult.Create(command.CommentId, 0));
 
             sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult { Version = 0 });
             sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent((object)new EntitySavedResult(1));
 
             sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult
             {
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent((object)new EntitySavedResult(2));
 
             sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult { Version = 2 });
             sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult

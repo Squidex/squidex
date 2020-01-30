@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent2(sut.Snapshot);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent2(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 

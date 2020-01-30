@@ -7,11 +7,12 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
     [TypeConverter(typeof(StatusConverter))]
-    public struct Status : IEquatable<Status>
+    public struct Status : IEquatable<Status>, IComparable<Status>
     {
         public static readonly Status Archived = new Status("Archived");
         public static readonly Status Draft = new Status("Draft");
@@ -47,6 +48,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         public override string ToString()
         {
             return Name;
+        }
+
+        public int CompareTo([AllowNull] Status other)
+        {
+            return string.Compare(name, other.name, StringComparison.Ordinal);
         }
 
         public static bool operator ==(Status lhs, Status rhs)

@@ -6,21 +6,22 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using DeepEqual.Syntax;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Infrastructure.Reflection.Equality
 {
-    public sealed class DeepComparer<T> : IEqualityComparer<T>
+    public sealed class DeepEqualityComparer<T> : IEqualityComparer<T>
     {
-        public static readonly DeepComparer<T> Instance = new DeepComparer<T>();
+        public static readonly DeepEqualityComparer<T> Default = new DeepEqualityComparer<T>();
+        private readonly IDeepComparer comparer;
 
-        private DeepComparer()
+        public DeepEqualityComparer(IDeepComparer? comparer = null)
         {
+            this.comparer = comparer ?? SimpleEquals.Build(typeof(T));
         }
 
         public bool Equals(T x, T y)
         {
-            return x.IsDeepEqual(y);
+            return comparer.IsEquals(x, y);
         }
 
         public int GetHashCode(T obj)

@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppClients>(id, client.Rename(newName), DeepComparer<AppClient>.Instance);
+            return With<AppClients>(id, client.Rename(newName));
         }
 
         [Pure]
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppClients>(id, client.Update(role), DeepComparer<AppClient>.Instance);
+            return With<AppClients>(id, client.Update(role));
         }
     }
 }

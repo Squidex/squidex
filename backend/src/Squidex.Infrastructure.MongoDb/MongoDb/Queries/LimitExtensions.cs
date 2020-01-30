@@ -31,5 +31,10 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
             return cursor;
         }
+
+        public static IFindFluent<T, T> Sort<T>(this IFindFluent<T, T> cursor, ClrQuery query)
+        {
+            return cursor.Sort(query.BuildSort<T>());
+        }
     }
 }

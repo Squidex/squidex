@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Squidex.Infrastructure.Reflection.Internal;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -19,8 +20,8 @@ namespace Squidex.Infrastructure.Reflection
         private sealed class StringConversionPropertyMapper : PropertyMapper
         {
             public StringConversionPropertyMapper(
-                IPropertyAccessor sourceAccessor,
-                IPropertyAccessor targetAccessor)
+                PropertyAccessor sourceAccessor,
+                PropertyAccessor targetAccessor)
                 : base(sourceAccessor, targetAccessor)
             {
             }
@@ -38,8 +39,8 @@ namespace Squidex.Infrastructure.Reflection
             private readonly Type targetType;
 
             public ConversionPropertyMapper(
-                IPropertyAccessor sourceAccessor,
-                IPropertyAccessor targetAccessor,
+                PropertyAccessor sourceAccessor,
+                PropertyAccessor targetAccessor,
                 Type targetType)
                 : base(sourceAccessor, targetAccessor)
             {
@@ -70,10 +71,10 @@ namespace Squidex.Infrastructure.Reflection
 
         private class PropertyMapper
         {
-            private readonly IPropertyAccessor sourceAccessor;
-            private readonly IPropertyAccessor targetAccessor;
+            private readonly PropertyAccessor sourceAccessor;
+            private readonly PropertyAccessor targetAccessor;
 
-            public PropertyMapper(IPropertyAccessor sourceAccessor, IPropertyAccessor targetAccessor)
+            public PropertyMapper(PropertyAccessor sourceAccessor, PropertyAccessor targetAccessor)
             {
                 this.sourceAccessor = sourceAccessor;
                 this.targetAccessor = targetAccessor;

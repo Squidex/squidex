@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return With<Workflows>(Guid.Empty, workflow, DeepComparer<Workflow>.Instance);
+            return With<Workflows>(Guid.Empty, workflow);
         }
 
         [Pure]
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return With<Workflows>(id, workflow, DeepComparer<Workflow>.Instance);
+            return With<Workflows>(id, workflow);
         }
 
         [Pure]
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 return this;
             }
 
-            return With<Workflows>(id, workflow, DeepComparer<Workflow>.Instance);
+            return With<Workflows>(id, workflow);
         }
 
         public Workflow GetFirst()
