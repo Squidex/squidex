@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Commands;

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
+using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure.EventSourcing;
@@ -38,6 +39,24 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
+
+            services.AddSingletonAs<ConvertData>()
+                .As<IContentEnricherStep>();
+
+            services.AddSingletonAs<EnrichForCaching>()
+                .As<IContentEnricherStep>();
+
+            services.AddSingletonAs<EnrichWithSchema>()
+                .As<IContentEnricherStep>();
+
+            services.AddSingletonAs<EnrichWithWorkflows>()
+                .As<IContentEnricherStep>();
+
+            services.AddSingletonAs<ResolveAssets>()
+                .As<IContentEnricherStep>();
+
+            services.AddSingletonAs<ResolveReferences>()
+                .As<IContentEnricherStep>();
 
             services.AddSingletonAs<ContentEnricher>()
                 .As<IContentEnricher>();

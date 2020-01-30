@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -29,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private static readonly Status[] StatusPublishedOnly = { Status.Published };
         private static readonly IResultList<IEnrichedContentEntity> EmptyContents = ResultList.CreateFrom<IEnrichedContentEntity>(0);
         private readonly IAppProvider appProvider;
-        private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly IContentEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
         private readonly IContentLoader contentVersionLoader;
@@ -38,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentQueryService(
             IAppProvider appProvider,
-            IAssetUrlGenerator assetUrlGenerator,
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
             IContentLoader contentVersionLoader,
@@ -46,7 +43,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             ContentQueryParser queryParser)
         {
             Guard.NotNull(appProvider);
-            Guard.NotNull(assetUrlGenerator);
             Guard.NotNull(contentEnricher);
             Guard.NotNull(contentRepository);
             Guard.NotNull(contentVersionLoader);
@@ -54,7 +50,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Guard.NotNull(scriptEngine);
 
             this.appProvider = appProvider;
-            this.assetUrlGenerator = assetUrlGenerator;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
@@ -169,8 +164,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var results = new List<IEnrichedContentEntity>();
 
-                var converters = GenerateConverters(context).ToArray();
-
                 var script = schema.SchemaDef.Scripts.Query;
                 var scripting = !string.IsNullOrWhiteSpace(script);
 
@@ -180,68 +173,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 {
                     var result = SimpleMapper.Map(content, new ContentEntity());
 
-                    if (result.Data != null)
+                    if (result.Data != null && !context.IsFrontendClient && scripting)
                     {
-                        if (!context.IsFrontendClient && scripting)
-                        {
-                            var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
+                        var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
 
-                            result.Data = scriptEngine.Transform(ctx, script);
-                        }
-
-                        result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
-                    }
-
-                    if (result.DataDraft != null && (context.IsUnpublished() || context.IsFrontendClient))
-                    {
-                        result.DataDraft = result.DataDraft.ConvertName2Name(schema.SchemaDef, converters);
-                    }
-                    else
-                    {
-                        result.DataDraft = null!;
+                        result.Data = scriptEngine.Transform(ctx, script);
                     }
 
                     results.Add(result);
                 }
 
                 return results;
-            }
-        }
-
-        private IEnumerable<FieldConverter> GenerateConverters(Context context)
-        {
-            if (!context.IsFrontendClient)
-            {
-                yield return FieldConverters.ExcludeHidden();
-                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden());
-            }
-
-            yield return FieldConverters.ExcludeChangedTypes();
-            yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
-
-            yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);
-            yield return FieldConverters.ResolveLanguages(context.App.LanguagesConfig);
-
-            if (!context.IsFrontendClient)
-            {
-                if (!context.IsNoResolveLanguages())
-                {
-                    yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
-                }
-
-                var languages = context.Languages();
-
-                if (languages.Any())
-                {
-                    yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, languages);
-                }
-
-                var assetUrls = context.AssetUrls();
-
-                if (assetUrls.Any())
-                {
-                    yield return FieldConverters.ResolveAssetUrls(assetUrls.ToList(), assetUrlGenerator);
-                }
             }
         }
 

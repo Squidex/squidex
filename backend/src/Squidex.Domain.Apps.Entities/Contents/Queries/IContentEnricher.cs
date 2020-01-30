@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public interface IContentEnricher
     {

@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
