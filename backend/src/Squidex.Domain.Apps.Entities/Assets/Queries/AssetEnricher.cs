@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private static bool ShouldEnrich(Context context)
         {
-            return !context.IsNoAssetEnrichment();
+            return context.ShouldEnrichAsset();
         }
     }
 }

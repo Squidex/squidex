@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static Status[]? GetStatus(Context context)
         {
-            if (context.IsFrontendClient || context.IsUnpublished())
+            if (context.IsFrontendClient || context.ShouldProvideUnpublished())
             {
                 return null;
             }
@@ -280,7 +280,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static bool WithDraft(Context context)
         {
-            return context.IsUnpublished() || context.IsFrontendClient;
+            return context.ShouldProvideUnpublished() || context.IsFrontendClient;
         }
     }
 }

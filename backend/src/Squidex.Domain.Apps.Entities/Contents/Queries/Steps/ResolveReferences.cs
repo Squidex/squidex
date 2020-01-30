@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static bool ShouldEnrich(Context context)
         {
-            return context.IsFrontendClient && !context.IsNoEnrichment();
+            return context.IsFrontendClient && context.ShouldEnrichContent();
         }
     }
 }

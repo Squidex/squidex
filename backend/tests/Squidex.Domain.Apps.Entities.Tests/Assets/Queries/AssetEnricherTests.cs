@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(source, requestContext.Clone().WithNoAssetEnrichment());
+            var result = await sut.EnrichAsync(source, requestContext.Clone().WithoutAssetEnrichment());
 
             Assert.Null(result.TagNames);
         }

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var ctx = contextProvider.Context.Clone().WithNoAssetEnrichment();
+                            var ctx = contextProvider.Context.Clone().WithoutAssetEnrichment();
 
                             var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
 

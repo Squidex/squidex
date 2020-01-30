@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static bool ShouldEnrichWithStatuses(Context context)
         {
-            return context.IsFrontendClient || context.IsResolveFlow();
+            return context.IsFrontendClient || context.ShouldResolveFlow();
         }
     }
 }

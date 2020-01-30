@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            var resolveDataDraft = context.IsUnpublished() || context.IsFrontendClient;
+            var resolveDataDraft = context.ShouldProvideUnpublished() || context.IsFrontendClient;
 
             var referenceCleaner = await CleanReferencesAsync(context, contents, schemas);
 
@@ -67,29 +67,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            var ids = new HashSet<Guid>();
-
-            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            if (context.ShouldCleanup())
             {
-                var schema = await schemas(group.Key);
+                var ids = new HashSet<Guid>();
 
-                foreach (var content in group)
+                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    content.Data?.AddReferencedIds(schema.SchemaDef, ids);
-                    content.DataDraft?.AddReferencedIds(schema.SchemaDef, ids);
+                    var schema = await schemas(group.Key);
+
+                    foreach (var content in group)
+                    {
+                        content.Data?.AddReferencedIds(schema.SchemaDef, ids);
+                        content.DataDraft?.AddReferencedIds(schema.SchemaDef, ids);
+                    }
                 }
-            }
 
-            if (ids.Count > 0)
-            {
-                var taskForAssets = QueryAssetIdsAsync(context, ids);
-                var taskForContents = QueryContentIdsAsync(context, ids);
+                if (ids.Count > 0)
+                {
+                    var taskForAssets = QueryAssetIdsAsync(context, ids);
+                    var taskForContents = QueryContentIdsAsync(context, ids);
 
-                await Task.WhenAll(taskForAssets, taskForContents);
+                    await Task.WhenAll(taskForAssets, taskForContents);
 
-                var foundIds = new HashSet<Guid>(taskForAssets.Result.Union(taskForContents.Result));
+                    var foundIds = new HashSet<Guid>(taskForAssets.Result.Union(taskForContents.Result));
 
-                return ValueReferencesConverter.CleanReferences(foundIds);
+                    return ValueReferencesConverter.CleanReferences(foundIds);
+                }
             }
 
             return null;
@@ -131,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
             if (!context.IsFrontendClient)
             {
-                if (!context.IsNoResolveLanguages())
+                if (context.ShouldResolveLanguages())
                 {
                     yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
                 }
