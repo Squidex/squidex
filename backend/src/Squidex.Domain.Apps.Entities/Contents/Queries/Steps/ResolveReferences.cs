@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             foreach (var (partition, partitionValue) in fieldData)
                             {
                                 var referencedContents =
-                                    field.GetReferencedIds(partitionValue, Ids.ContentOnly)
+                                    field.GetReferencedIds(partitionValue)
                                         .Select(x => references[x])
                                         .SelectMany(x => x)
                                         .ToList();
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             foreach (var content in contents)
             {
-                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef.ResolvingReferences(), Ids.ContentOnly));
+                content.DataDraft.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids);
             }
         }
 

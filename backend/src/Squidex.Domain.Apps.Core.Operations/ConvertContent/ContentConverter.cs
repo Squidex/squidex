@@ -7,11 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
@@ -19,38 +17,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
-
-        private static void AppendText(IJsonValue value, StringBuilder stringBuilder, int maxFieldLength, string separator, bool allowObjects)
-        {
-            if (value.Type == JsonValueType.String)
-            {
-                var text = value.ToString();
-
-                if (text.Length <= maxFieldLength)
-                {
-                    if (stringBuilder.Length > 0)
-                    {
-                        stringBuilder.Append(separator);
-                    }
-
-                    stringBuilder.Append(text);
-                }
-            }
-            else if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    AppendText(item, stringBuilder, maxFieldLength, separator, true);
-                }
-            }
-            else if (value is JsonObject obj && allowObjects)
-            {
-                foreach (var item in obj.Values)
-                {
-                    AppendText(item, stringBuilder, maxFieldLength, separator, true);
-                }
-            }
-        }
 
         public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {

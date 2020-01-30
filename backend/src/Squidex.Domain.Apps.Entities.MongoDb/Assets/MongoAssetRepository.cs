@@ -89,6 +89,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
+            {
+                var find = Collection.Find(x => ids.Contains(x.Id)).Only(x => x.Id);
+
+                var assetItems = await find.ToListAsync();
+
+                return assetItems.Select(x => Guid.Parse(x["_si"].AsString)).ToList();
+            }
+        }
+
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))

@@ -19,6 +19,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
+    [BsonIgnoreExtraElements]
     public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Guid>
     {
         private NamedContentData? data;
@@ -42,12 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRequired]
         [BsonElement("rf")]
         [BsonRepresentation(BsonType.String)]
-        public List<Guid>? ReferencedIds { get; set; }
-
-        [BsonRequired]
-        [BsonElement("rd")]
-        [BsonRepresentation(BsonType.String)]
-        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
+        public HashSet<Guid>? ReferencedIds { get; set; }
 
         [BsonRequired]
         [BsonElement("ss")]
@@ -122,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public void ParseData(Schema schema, IJsonSerializer serializer)
         {
-            data = DataByIds?.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
+            data = DataByIds?.FromMongoModel(schema, serializer);
 
             if (DataDraftByIds != null)
             {
-                dataDraft = DataDraftByIds.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
+                dataDraft = DataDraftByIds.FromMongoModel(schema, serializer);
             }
         }
     }

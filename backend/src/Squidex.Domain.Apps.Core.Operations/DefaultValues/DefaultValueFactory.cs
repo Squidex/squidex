@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.EnrichContent
+namespace Squidex.Domain.Apps.Core.DefaultValues
 {
     public sealed class DefaultValueFactory : IFieldVisitor<IJsonValue>
     {

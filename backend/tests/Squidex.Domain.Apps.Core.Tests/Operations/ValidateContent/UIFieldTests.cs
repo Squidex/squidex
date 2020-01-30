@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new NamedContentData()
                     .AddField("my-array", new ContentFieldData()
-                        .AddValue("iv",
+                        .AddJsonValue(
                             JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("my-ui", null))));

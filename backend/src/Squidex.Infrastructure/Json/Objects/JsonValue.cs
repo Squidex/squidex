@@ -68,11 +68,18 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(i);
                 case long l:
                     return Create(l);
+                case Guid g:
+                    return Create(g);
                 case Instant i:
                     return Create(i);
             }
 
             throw new ArgumentException("Invalid json type");
+        }
+
+        public static IJsonValue Create(Guid value)
+        {
+            return Create(value.ToString());
         }
 
         public static IJsonValue Create(bool value)

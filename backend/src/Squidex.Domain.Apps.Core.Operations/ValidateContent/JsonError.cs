@@ -5,11 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
+namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public enum Ids
+    public sealed class JsonError
     {
-        All,
-        ContentOnly
+        public string Error { get; }
+
+        public JsonError(string error)
+        {
+            Error = error;
+        }
     }
 }

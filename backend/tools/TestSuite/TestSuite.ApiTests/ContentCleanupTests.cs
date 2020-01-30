@@ -66,7 +66,7 @@ namespace TestSuite.ApiTests
 
             var content_1 = await contents.CreateAsync(data);
 
-            Assert.Equal(data.String, content_1.DataDraft.String);
+            Assert.Equal(data.String, content_1.Data.String);
 
 
             // STEP 3: Delete a field from schema.
@@ -77,7 +77,7 @@ namespace TestSuite.ApiTests
             var content_2 = await contents.ChangeStatusAsync(content_1.Id, "Published");
 
             // Should not return deleted field.
-            Assert.Null(content_2.DataDraft.String);
+            Assert.Null(content_2.Data.String);
         }
     }
 }

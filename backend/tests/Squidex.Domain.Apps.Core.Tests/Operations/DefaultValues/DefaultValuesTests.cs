@@ -8,7 +8,7 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.EnrichContent;
+using Squidex.Domain.Apps.Core.DefaultValues;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -16,15 +16,15 @@ using Xunit;
 
 #pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
 
-namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
+namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
 {
-    public class ContentEnrichmentTests
+    public class DefaultValuesTests
     {
         private readonly Instant now = Instant.FromUtc(2017, 10, 12, 16, 30, 10);
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
         private readonly Schema schema;
 
-        public ContentEnrichmentTests()
+        public DefaultValuesTests()
         {
             schema =
                 new Schema("my-schema")
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                         new ContentFieldData()
                             .AddValue("iv", 456));
 
-            data.Enrich(schema, languagesConfig.ToResolver());
+            data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
             Assert.Equal(456, ((JsonScalar<double>)data["my-number"]!["iv"]).Value);
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                         new ContentFieldData()
                             .AddValue("iv", 456));
 
-            data.Enrich(schema, languagesConfig.ToResolver());
+            data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
             Assert.Equal("en-string", data["my-string"]!["de"].ToString());
             Assert.Equal("en-string", data["my-string"]!["en"].ToString());

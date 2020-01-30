@@ -17,77 +17,79 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
-        public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, Schema schema, Ids strategy = Ids.All)
+        public static HashSet<Guid> GetReferencedIds(this NamedContentData source, Schema schema)
         {
             Guard.NotNull(schema);
 
-            foreach (var field in schema.Fields)
-            {
-                var ids = source.GetReferencedIds(field, strategy);
+            var extractor = new ReferencesExtractor(new HashSet<Guid>());
 
-                foreach (var id in ids)
-                {
-                    yield return id;
-                }
-            }
+            AddReferencedIds(source, schema.Fields, extractor);
+
+            return extractor.Result;
         }
 
-        public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, IField field, Ids strategy = Ids.All)
-        {
-            Guard.NotNull(field);
-
-            if (source.TryGetValue(field.Id, out var fieldData) && fieldData != null)
-            {
-                foreach (var partitionValue in fieldData)
-                {
-                    var ids = field.GetReferencedIds(partitionValue.Value, strategy);
-
-                    foreach (var id in ids)
-                    {
-                        yield return id;
-                    }
-                }
-            }
-        }
-
-        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, Schema schema, Ids strategy = Ids.All)
+        public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<Guid> result)
         {
             Guard.NotNull(schema);
 
-            return GetReferencedIds(source, schema.Fields, strategy);
+            var extractor = new ReferencesExtractor(result);
+
+            AddReferencedIds(source, schema.Fields, extractor);
         }
 
-        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IEnumerable<IField> fields, Ids strategy = Ids.All)
+        public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<Guid> result)
         {
             Guard.NotNull(fields);
 
-            foreach (var field in fields)
-            {
-                var ids = source.GetReferencedIds(field, strategy);
+            var extractor = new ReferencesExtractor(result);
 
-                foreach (var id in ids)
-                {
-                    yield return id;
-                }
-            }
+            AddReferencedIds(source, fields, extractor);
         }
 
-        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IField field, Ids strategy = Ids.All)
+        public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<Guid> result)
         {
             Guard.NotNull(field);
 
+            var extractor = new ReferencesExtractor(result);
+
+            AddReferencedIds(source, field, extractor);
+        }
+
+        private static void AddReferencedIds(NamedContentData source, IEnumerable<IField> fields, ReferencesExtractor extractor)
+        {
+            foreach (var field in fields)
+            {
+                AddReferencedIds(source, field, extractor);
+            }
+        }
+
+        private static void AddReferencedIds(NamedContentData source, IField field, ReferencesExtractor extractor)
+        {
             if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
                 foreach (var partitionValue in fieldData)
                 {
-                    var ids = field.GetReferencedIds(partitionValue.Value, strategy);
+                    extractor.SetValue(partitionValue.Value);
 
-                    foreach (var id in ids)
-                    {
-                        yield return id;
-                    }
+                    field.Accept(extractor);
                 }
             }
+        }
+
+        public static HashSet<Guid> GetReferencedIds(this IField field, IJsonValue? value)
+        {
+            var result = new HashSet<Guid>();
+
+            if (value != null)
+            {
+                var extractor = new ReferencesExtractor(result);
+
+                extractor.SetValue(value);
+
+                field.Accept(extractor);
+            }
+
+            return result;
         }
 
         public static JsonObject FormatReferences(this NamedContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -21,39 +22,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 {
     public class ReferenceExtractionTests
     {
-        private readonly Guid schemaId = Guid.NewGuid();
         private readonly Schema schema;
 
         public ReferenceExtractionTests()
         {
             schema =
                 new Schema("my-schema")
-                    .AddNumber(1, "field1", Partitioning.Language)
-                    .AddNumber(2, "field2", Partitioning.Invariant)
-                    .AddNumber(3, "field3", Partitioning.Invariant)
-                    .AddAssets(5, "assets1", Partitioning.Invariant)
-                    .AddAssets(6, "assets2", Partitioning.Invariant)
-                    .AddArray(7, "array", Partitioning.Invariant, a => a
-                        .AddAssets(71, "assets71"))
-                    .AddJson(4, "json", Partitioning.Language)
-                    .UpdateField(3, f => f.Hide());
-        }
-
-        [Fact]
-        public void Should_get_ids_from_id_data()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var input =
-                new IdContentData()
-                    .AddField(5,
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(id1.ToString(), id2.ToString())));
-
-            var ids = input.GetReferencedIds(schema).ToArray();
-
-            Assert.Equal(new[] { id1, id2 }, ids);
+                    .AddReferences(1, "references", Partitioning.Invariant)
+                    .AddAssets(2, "assets", Partitioning.Invariant)
+                    .AddArray(3, "array", Partitioning.Invariant, a => a
+                        .AddAssets(31, "nested"));
         }
 
         [Fact]
@@ -64,11 +42,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var input =
                 new NamedContentData()
-                    .AddField("assets1",
+                    .AddField("assets",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(id1.ToString(), id2.ToString())));
+                            .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
 
-            var ids = input.GetReferencedIds(schema).ToArray();
+            var ids = new HashSet<Guid>();
+
+            input.AddReferencedIds(schema, ids);
 
             Assert.Equal(new[] { id1, id2 }, ids);
         }
@@ -79,53 +59,44 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var input =
-                new IdContentData()
-                    .AddField(5,
+            var source =
+                new NamedContentData()
+                    .AddField("references",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(id1.ToString(), id2.ToString())));
+                            .AddJsonValue(JsonValue.Array(id1, id2)))
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array(id1)))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddJsonValue(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("nested", JsonValue.Array(id1, id2)))));
 
-            var converter = FieldConverters.ForValues(ValueReferencesConverter.CleanReferences(new[] { id2 }));
+            var expected =
+                new NamedContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array(id2)))
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array()))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddJsonValue(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("nested", JsonValue.Array(id2)))));
 
-            var actual = input.ConvertId2Id(schema, converter);
+            var cleaner = ValueReferencesConverter.CleanReferences(new HashSet<Guid> { id2 });
 
-            var cleanedValue = (JsonArray)actual[5]!["iv"];
+            var converter = FieldConverters.ForValues(cleaner);
+            var converterNested = FieldConverters.ForNestedName2Name(cleaner);
 
-            Assert.Equal(1, cleanedValue.Count);
-            Assert.Equal(id1.ToString(), cleanedValue[0].ToString());
-        }
+            var actual = source.ConvertName2Name(schema, converter, converterNested);
 
-        [Fact]
-        public void Should_return_ids_from_assets_field()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var result = sut.GetReferencedIds(CreateValue(id1, id2)).ToArray();
-
-            Assert.Equal(new[] { id1, id2 }, result);
-        }
-
-        [Fact]
-        public void Should_return_empty_list_from_assets_field_for_referenced_ids_when_null()
-        {
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var result = sut.GetReferencedIds(null).ToArray();
-
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void Should_return_empty_list_from_assets_field_for_referenced_ids_when_other_type()
-        {
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var result = sut.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
-
-            Assert.Empty(result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -138,171 +109,127 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             Assert.Empty(result);
         }
 
-        [Fact]
-        public void Should_return_null_from_assets_field_when_removing_references_from_null_array()
-        {
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var result = sut.CleanReferences(JsonValue.Null, null);
-
-            Assert.Equal(JsonValue.Null, result);
-        }
-
-        [Fact]
-        public void Should_remove_deleted_references_from_assets_field()
+        [Theory]
+        [MemberData(nameof(ReferencingNestedFields))]
+        public void Should_return_ids_from_nested_field(NestedField field)
         {
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(id2));
-
-            Assert.Equal(CreateValue(id1), result);
-        }
-
-        [Fact]
-        public void Should_return_same_token_from_assets_field_when_removing_references_and_nothing_to_remove()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
-
-            var token = CreateValue(id1, id2);
-
-            var result = sut.CleanReferences(token, HashSet.Of(Guid.NewGuid()));
-
-            Assert.Same(token, result);
-        }
-
-        [Fact]
-        public void Should_return_ids_from_nested_references_field()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut =
-                Fields.Array(1, "my-array", Partitioning.Invariant,
-                    Fields.References(1, "my-refs",
-                        new ReferencesFieldProperties { SchemaId = schemaId }));
+            var arrayField = Fields.Array(1, "my-array", Partitioning.Invariant, field);
 
             var value =
                 JsonValue.Array(
                     JsonValue.Object()
-                        .Add("my-refs", CreateValue(id1, id2)));
+                        .Add(field.Name, CreateValue(id1, id2)));
 
-            var result = sut.GetReferencedIds(value).ToArray();
-
-            Assert.Equal(new[] { id1, id2, schemaId }, result);
-        }
-
-        [Fact]
-        public void Should_return_ids_from_references_field()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
-
-            var result = sut.GetReferencedIds(CreateValue(id1, id2)).ToArray();
-
-            Assert.Equal(new[] { id1, id2, schemaId }, result);
-        }
-
-        [Fact]
-        public void Should_return_ids_from_references_field_without_schema_id()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
-
-            var result = sut.GetReferencedIds(CreateValue(id1, id2), Ids.ContentOnly).ToArray();
+            var result = arrayField.GetReferencedIds(value).ToArray();
 
             Assert.Equal(new[] { id1, id2 }, result);
         }
 
-        [Fact]
-        public void Should_return_list_from_references_field_with_schema_id_list_for_referenced_ids_when_null()
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_empty_list_from_field_when_value_item_is_invalid(IField field)
         {
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
+            var result = field.GetReferencedIds(JsonValue.Array("invalid")).ToArray();
 
-            var result = sut.GetReferencedIds(JsonValue.Null).ToArray();
-
-            Assert.Equal(new[] { schemaId }, result);
+            Assert.Empty(result);
         }
 
-        [Fact]
-        public void Should_return_list_from_references_field_with_schema_id_for_referenced_ids_when_other_type()
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_empty_list_from_field_when_value_is_invalid(IField field)
         {
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
+            var result = field.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
 
-            var result = sut.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
-
-            Assert.Equal(new[] { schemaId }, result);
+            Assert.Empty(result);
         }
 
-        [Fact]
-        public void Should_return_null_from_references_field_when_removing_references_from_null_array()
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_empty_list_from_field_when_value_is_empty(IField field)
         {
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant);
+            var result = field.GetReferencedIds(JsonValue.Array()).ToArray();
 
-            var result = sut.CleanReferences(JsonValue.Null, null);
+            Assert.Empty(result);
+        }
+
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_empty_list_from_field_when_value_is_json_null(IField field)
+        {
+            var result = field.GetReferencedIds(null).ToArray();
+
+            Assert.Empty(result);
+        }
+
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_empty_list_from_field_when_value_is_null(IField field)
+        {
+            var result = field.GetReferencedIds(null).ToArray();
+
+            Assert.Empty(result);
+        }
+
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_ids_from_field(IField field)
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var value = CreateValue(id1, id2);
+
+            var result = field.GetReferencedIds(value);
+
+            Assert.Equal(new HashSet<Guid> { id1, id2 }, result);
+        }
+
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_return_same_value_from_field_when_value_is_json_null(IField field)
+        {
+            var result = ValueReferencesConverter.CleanReferences(RandomIds())(JsonValue.Null, field);
 
             Assert.Equal(JsonValue.Null, result);
         }
 
-        [Fact]
-        public void Should_remove_deleted_references_from_references_field()
+        [Theory]
+        [MemberData(nameof(ReferencingFields))]
+        public void Should_remove_deleted_ids_from_field(IField field)
         {
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
+            var value = CreateValue(id1, id2);
 
-            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(id2));
+            var result = ValueReferencesConverter.CleanReferences(HashSet.Of(id1))(value, field);
 
             Assert.Equal(CreateValue(id1), result);
         }
 
-        [Fact]
-        public void Should_remove_all_references_from_references_field_when_schema_is_removed()
+        public static IEnumerable<object[]> ReferencingNestedFields()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
-                new ReferencesFieldProperties { SchemaId = schemaId });
-
-            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(schemaId));
-
-            Assert.Equal(CreateValue(), result);
+            yield return new object[] { Fields.References(1, "my-refs") };
+            yield return new object[] { Fields.Assets(1, "my-assets") };
         }
 
-        [Fact]
-        public void Should_return_same_token_from_references_field_when_removing_references_and_nothing_to_remove()
+        public static IEnumerable<object[]> ReferencingFields()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var sut = Fields.References(1, "my-refs", Partitioning.Invariant);
-
-            var value = CreateValue(id1, id2);
-
-            var result = sut.CleanReferences(value, HashSet.Of(Guid.NewGuid()));
-
-            Assert.Same(value, result);
+            yield return new object[] { Fields.References(1, "my-refs", Partitioning.Invariant) };
+            yield return new object[] { Fields.Assets(1, "my-assets", Partitioning.Invariant) };
         }
 
-        private static IJsonValue CreateValue(params Guid[] ids)
+        private static HashSet<Guid> RandomIds()
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
+            return HashSet.Of(Guid.NewGuid());
+        }
+
+        private static IJsonValue CreateValue(params object[] ids)
+        {
+            return JsonValue.Array(ids);
         }
     }
 }

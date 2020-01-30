@@ -74,7 +74,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                     foreach (var step in steps)
                     {
-                        await step.EnrichAsync(context, results, GetSchema);
+                        using (Profiler.TraceMethod(step.ToString()!))
+                        {
+                            await step.EnrichAsync(context, results, GetSchema);
+                        }
                     }
                 }
 

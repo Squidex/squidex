@@ -8,17 +8,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
-using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities.TestHelpers
+namespace Squidex.Domain.Apps.Core.TestHelpers
 {
     public static class AExtensions
     {
-        public static ClrQuery Is(this INegatableArgumentConstraintManager<ClrQuery> that, string query)
-        {
-            return that.Matches(x => x.ToString() == query);
-        }
-
         public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[]? values)
         {
             return values == null ? that.IsNull() : that.IsSameSequenceAs(values);

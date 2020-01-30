@@ -9,6 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                var idData = value.Data!.ToMongoModel(schema.SchemaDef, serializer);
+                var idData = value.Data.ToMongoModel(schema.SchemaDef, serializer);
                 var idDraftData = idData;
 
                 if (!ReferenceEquals(value.Data, value.DataDraft))
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     IsDeleted = value.IsDeleted,
                     IndexedAppId = value.AppId.Id,
                     IndexedSchemaId = value.SchemaId.Id,
-                    ReferencedIds = idData.ToReferencedIds(schema.SchemaDef),
+                    ReferencedIds = value.Data.GetReferencedIds(schema.SchemaDef),
                     ScheduledAt = value.ScheduleJob?.DueTime,
                     Version = newVersion
                 });

@@ -137,8 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new NamedContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv",
-                                $"url/to/{image1.Id}"))
+                            .AddValue("iv", $"url/to/{image1.Id}"))
                     .AddField("asset2",
                         new ContentFieldData()),
                 source[0].ReferenceData);
@@ -149,8 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new ContentFieldData())
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en",
-                                $"url/to/{image2.Id}")),
+                            .AddValue("en", $"url/to/{image2.Id}")),
                 source[1].ReferenceData);
         }
 
