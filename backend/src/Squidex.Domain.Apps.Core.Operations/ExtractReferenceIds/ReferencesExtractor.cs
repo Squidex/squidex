@@ -70,5 +70,45 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             return None.Value;
         }
+
+        public None Visit(IField<BooleanFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<DateTimeFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<GeolocationFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<JsonFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<NumberFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<StringFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<TagsFieldProperties> field)
+        {
+            return None.Value;
+        }
+
+        public None Visit(IField<UIFieldProperties> field)
+        {
+            return None.Value;
+        }
     }
 }
