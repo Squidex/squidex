@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed class JsonValueConverter : IFieldVisitor<object>
+    public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonError? Error)>
     {
         private readonly IJsonValue value;
 
@@ -23,67 +23,67 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             this.value = value;
         }
 
-        public static object ConvertValue(IField field, IJsonValue json)
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue json)
         {
             return field.Accept(new JsonValueConverter(json));
         }
 
-        public object Visit(IArrayField field)
+        public (object? Result, JsonError? Error) Visit(IArrayField field)
         {
             return ConvertToObjectList();
         }
 
-        public object Visit(IField<AssetsFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field)
         {
             return ConvertToGuidList();
         }
 
-        public object Visit(IField<ReferencesFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field)
         {
             return ConvertToGuidList();
         }
 
-        public object Visit(IField<TagsFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field)
         {
             return ConvertToStringList();
         }
 
-        public object Visit(IField<BooleanFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<BooleanFieldProperties> field)
         {
             if (value is JsonScalar<bool> b)
             {
-                return b.Value;
+                return (b.Value, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected boolean.");
+            return (null, new JsonError("Invalid json type, expected boolean."));
         }
 
-        public object Visit(IField<NumberFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field)
         {
-            if (value is JsonScalar<double> b)
+            if (value is JsonScalar<double> n)
             {
-                return b.Value;
+                return (n.Value, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected number.");
+            return (null, new JsonError("Invalid json type, expected number."));
         }
 
-        public object Visit(IField<StringFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field)
         {
-            if (value is JsonScalar<string> b)
+            if (value is JsonScalar<string> s)
             {
-                return b.Value;
+                return (s.Value, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected string.");
+            return (null, new JsonError("Invalid json type, expected string."));
         }
 
-        public object Visit(IField<UIFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<UIFieldProperties> field)
         {
-            return value;
+            return (value, null);
         }
 
-        public object Visit(IField<DateTimeFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<DateTimeFieldProperties> field)
         {
             if (value.Type == JsonValueType.String)
             {
@@ -94,13 +94,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     throw parseResult.Exception;
                 }
 
-                return parseResult.Value;
+                return (parseResult.Value, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected string.");
+            return (null, new JsonError("Invalid json type, expected string."));
         }
 
-        public object Visit(IField<GeolocationFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field)
         {
             if (value is JsonObject geolocation)
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     if (!string.Equals(propertyName, "latitude", StringComparison.OrdinalIgnoreCase) &&
                         !string.Equals(propertyName, "longitude", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new InvalidCastException("Geolocation can only have latitude and longitude property.");
+                        return (null, new JsonError("Geolocation can only have latitude and longitude property."));
                     }
                 }
 
@@ -119,12 +119,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                     if (!lat.IsBetween(-90, 90))
                     {
-                        throw new InvalidCastException("Latitude must be between -90 and 90.");
+                        return (null, new JsonError("Latitude must be between -90 and 90."));
                     }
                 }
                 else
                 {
-                    throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
+                    return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
                 }
 
                 if (geolocation.TryGetValue("longitude", out var lonValue) && lonValue is JsonScalar<double> lonNumber)
@@ -133,26 +133,26 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                     if (!lon.IsBetween(-180, 180))
                     {
-                        throw new InvalidCastException("Longitude must be between -180 and 180.");
+                        return (null, new JsonError("Longitude must be between -180 and 180."));
                     }
                 }
                 else
                 {
-                    throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
+                    return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
                 }
 
-                return value;
+                return (value, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
+            return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
         }
 
-        public object Visit(IField<JsonFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field)
         {
-            return value;
+            return (value, null);
         }
 
-        private object ConvertToGuidList()
+        private (object? Result, JsonError? Error) ConvertToGuidList()
         {
             if (value is JsonArray array)
             {
@@ -166,17 +166,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        throw new InvalidCastException("Invalid json type, expected array of guid strings.");
+                        return (null, new JsonError("Invalid json type, expected array of guid strings."));
                     }
                 }
 
-                return result;
+                return (result, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected array of guid strings.");
+            return (null, new JsonError("Invalid json type, expected array of guid strings."));
         }
 
-        private object ConvertToStringList()
+        private (object? Result, JsonError? Error) ConvertToStringList()
         {
             if (value is JsonArray array)
             {
@@ -194,17 +194,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        throw new InvalidCastException("Invalid json type, expected array of strings.");
+                        return (null, new JsonError("Invalid json type, expected array of strings."));
                     }
                 }
 
-                return result;
+                return (result, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected array of strings.");
+            return (null, new JsonError("Invalid json type, expected array of strings."));
         }
 
-        private object ConvertToObjectList()
+        private (object? Result, JsonError? Error) ConvertToObjectList()
         {
             if (value is JsonArray array)
             {
@@ -218,14 +218,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        throw new InvalidCastException("Invalid json type, expected array of objects.");
+                        return (null, new JsonError("Invalid json type, expected array of objects."));
                     }
                 }
 
-                return result;
+                return (result, null);
             }
 
-            throw new InvalidCastException("Invalid json type, expected array of objects.");
+            return (null, new JsonError("Invalid json type, expected array of objects."));
         }
     }
 }

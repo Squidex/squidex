@@ -20,31 +20,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
 
-        public static string ToFullText<T>(this ContentData<T> data, int maxTotalLength = 1024 * 1024, int maxFieldLength = 1000, string separator = " ") where T : notnull
-        {
-            var stringBuilder = new StringBuilder();
-
-            foreach (var fieldValue in data.Values)
-            {
-                if (fieldValue != null)
-                {
-                    foreach (var value in fieldValue.Values)
-                    {
-                        AppendText(value, stringBuilder, maxFieldLength, separator, false);
-                    }
-                }
-            }
-
-            var result = stringBuilder.ToString();
-
-            if (result.Length > maxTotalLength)
-            {
-                result = result.Substring(0, maxTotalLength);
-            }
-
-            return result;
-        }
-
         private static void AppendText(IJsonValue value, StringBuilder stringBuilder, int maxFieldLength, string separator, bool allowObjects)
         {
             if (value.Type == JsonValueType.String)

@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(JsonValue.Create("invalid"), errors, Context());
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not a valid value." });
+                new[] { "Invalid json type, expected array of guid strings." });
         }
 
         [Fact]
