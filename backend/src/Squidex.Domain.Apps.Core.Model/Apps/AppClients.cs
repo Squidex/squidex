@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Reflection.Equality;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {

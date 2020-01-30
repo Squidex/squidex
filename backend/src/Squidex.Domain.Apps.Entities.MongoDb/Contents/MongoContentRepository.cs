@@ -59,25 +59,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             this.serializer = serializer;
 
+            cleanupReferences = new CleanupReferences();
+            queryContentAsync = new QueryContent(serializer);
+            queryContentsById = new QueryContentsByIds(serializer, appProvider);
+            queryContentsByQuery = new QueryContentsByQuery(serializer, indexer);
+            queryIdsAsync = new QueryIdsAsync(appProvider);
+            queryScheduledItems = new QueryScheduledContents();
+
             typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
             typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
-
-            cleanupReferences = new CleanupReferences(Collection);
-            queryContentAsync = new QueryContent(Collection, serializer);
-            queryContentsById = new QueryContentsByIds(Collection, serializer, appProvider);
-            queryContentsByQuery = new QueryContentsByQuery(Collection, serializer, indexer);
-            queryIdsAsync = new QueryIdsAsync(Collection, appProvider);
-            queryScheduledItems = new QueryScheduledContents(Collection);
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
-            await cleanupReferences.PrepareAsync(ct);
-            await queryContentAsync.PrepareAsync(ct);
-            await queryContentAsync.PrepareAsync(ct);
-            await queryContentsByQuery.PrepareAsync(ct);
-            await queryIdsAsync.PrepareAsync(ct);
-            await queryScheduledItems.PrepareAsync();
+            await cleanupReferences.PrepareAsync(collection, ct);
+            await queryContentAsync.PrepareAsync(collection, ct);
+            await queryContentsById.PrepareAsync(collection, ct);
+            await queryContentsByQuery.PrepareAsync(collection, ct);
+            await queryIdsAsync.PrepareAsync(collection, ct);
+            await queryScheduledItems.PrepareAsync(collection, ct);
         }
 
         protected override string CollectionName()

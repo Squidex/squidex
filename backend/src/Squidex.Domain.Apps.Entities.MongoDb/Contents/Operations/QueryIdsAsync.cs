@@ -22,13 +22,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         private static readonly List<(Guid SchemaId, Guid Id)> EmptyIds = new List<(Guid SchemaId, Guid Id)>();
         private readonly IAppProvider appProvider;
 
-        public QueryIdsAsync(IMongoCollection<MongoContentEntity> collection, IAppProvider appProvider)
-            : base(collection)
+        public QueryIdsAsync(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
         }
 
-        public override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index1 =
                 new CreateIndexModel<MongoContentEntity>(Index

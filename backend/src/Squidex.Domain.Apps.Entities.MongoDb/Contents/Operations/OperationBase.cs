@@ -22,14 +22,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         protected static readonly IndexKeysDefinitionBuilder<MongoContentEntity> Index = Builders<MongoContentEntity>.IndexKeys;
         protected static readonly ProjectionDefinitionBuilder<MongoContentEntity> Projection = Builders<MongoContentEntity>.Projection;
 
-        public IMongoCollection<MongoContentEntity> Collection { get; }
+        public IMongoCollection<MongoContentEntity> Collection { get; private set; }
 
-        protected OperationBase(IMongoCollection<MongoContentEntity> collection)
+        public Task PrepareAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
             Collection = collection;
+
+            return PrepareAsync(ct);
         }
 
-        public virtual Task PrepareAsync(CancellationToken ct = default)
+        protected virtual Task PrepareAsync(CancellationToken ct = default)
         {
             return TaskHelper.Done;
         }

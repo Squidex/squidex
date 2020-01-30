@@ -28,15 +28,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         private readonly IJsonSerializer serializer;
         private readonly ITextIndexer indexer;
 
-        public QueryContentsByQuery(IMongoCollection<MongoContentEntity> collection, IJsonSerializer serializer, ITextIndexer indexer)
-            : base(collection)
+        public QueryContentsByQuery(IJsonSerializer serializer, ITextIndexer indexer)
         {
             this.serializer = serializer;
 
             this.indexer = indexer;
         }
 
-        public override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index1 =
                 new CreateIndexModel<MongoContentEntity>(Index

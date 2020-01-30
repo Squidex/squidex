@@ -8,7 +8,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Squidex.Infrastructure.Reflection.Internal;
 
 namespace Squidex.Infrastructure.Reflection.Equality

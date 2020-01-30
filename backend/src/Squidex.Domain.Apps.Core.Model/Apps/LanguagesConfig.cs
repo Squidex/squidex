@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection.Equality;
 
 #pragma warning disable IDE0028 // Simplify collection initialization
 

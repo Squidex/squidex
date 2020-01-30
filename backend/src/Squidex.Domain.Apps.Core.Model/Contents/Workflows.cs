@@ -11,7 +11,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Reflection.Equality;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return With<Workflows>(Guid.Empty, workflow, DeepEqualityComparer<Workflow>.Default);
+            return With<Workflows>(Guid.Empty, workflow);
         }
 
         [Pure]
@@ -55,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow);
 
-            return With<Workflows>(id, workflow, DeepEqualityComparer<Workflow>.Default);
+            return With<Workflows>(id, workflow);
         }
 
         [Pure]
@@ -73,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 return this;
             }
 
-            return With<Workflows>(id, workflow, DeepEqualityComparer<Workflow>.Default);
+            return With<Workflows>(id, workflow);
         }
 
         public Workflow GetFirst()

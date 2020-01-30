@@ -24,15 +24,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         private readonly IJsonSerializer serializer;
         private readonly IAppProvider appProvider;
 
-        public QueryContentsByIds(IMongoCollection<MongoContentEntity> collection, IJsonSerializer serializer, IAppProvider appProvider)
-            : base(collection)
+        public QueryContentsByIds(IJsonSerializer serializer, IAppProvider appProvider)
         {
             this.serializer = serializer;
 
             this.appProvider = appProvider;
         }
 
-        public override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
@@ -47,7 +46,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids, Status[]? status, bool includeDraft)
         {
             Guard.NotNull(ids);
-            Guard.NotNull(schema);
 
             var find = Collection.Find(CreateFilter(appId, ids, status)).WithoutDraft(includeDraft);
 

@@ -14,12 +14,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class CleanupReferences : OperationBase
     {
-        public CleanupReferences(IMongoCollection<MongoContentEntity> collection)
-            : base(collection)
-        {
-        }
-
-        public override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(

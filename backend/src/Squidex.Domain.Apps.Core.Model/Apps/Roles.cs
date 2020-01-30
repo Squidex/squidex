@@ -12,7 +12,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Reflection.Equality;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 

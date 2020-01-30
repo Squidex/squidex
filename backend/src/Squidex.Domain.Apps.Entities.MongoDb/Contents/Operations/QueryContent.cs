@@ -20,8 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     {
         private readonly IJsonSerializer serializer;
 
-        public QueryContent(IMongoCollection<MongoContentEntity> collection, IJsonSerializer serializer)
-            : base(collection)
+        public QueryContent(IJsonSerializer serializer)
         {
             this.serializer = serializer;
         }

@@ -18,12 +18,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryScheduledContents : OperationBase
     {
-        public QueryScheduledContents(IMongoCollection<MongoContentEntity> collection)
-            : base(collection)
-        {
-        }
-
-        public override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
