@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { DefaultValue = FutureDays(15) });
 
-            Assert.Equal(JsonValue.Create(FutureDays(15).ToString()), DefaultValueFactory.CreateDefaultValue(field, now));
+            Assert.Equal(JsonValue.Create(FutureDays(15)), DefaultValueFactory.CreateDefaultValue(field, now));
         }
 
         [Fact]

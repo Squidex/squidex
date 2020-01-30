@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 if (!parseResult.Success)
                 {
-                    throw parseResult.Exception;
+                    return (null, new JsonError(parseResult.Exception.Message));
                 }
 
                 return (parseResult.Value, null);
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (value is JsonArray array)
             {
-                var result = new List<Guid>();
+                var result = new List<Guid>(array.Count);
 
                 foreach (var item in array)
                 {
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (value is JsonArray array)
             {
-                var result = new List<string?>();
+                var result = new List<string?>(array.Count);
 
                 foreach (var item in array)
                 {
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (value is JsonArray array)
             {
-                var result = new List<JsonObject>();
+                var result = new List<JsonObject>(array.Count);
 
                 foreach (var item in array)
                 {

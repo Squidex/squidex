@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
         {
             if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
             {
-                return JsonValue.Create(now.ToString());
+                return JsonValue.Create(now);
             }
 
             if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
                 return JsonValue.Create($"{now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T00:00:00Z");
             }
 
-            return JsonValue.Create(field.Properties.DefaultValue?.ToString());
+            return JsonValue.Create(field.Properties.DefaultValue);
         }
     }
 }

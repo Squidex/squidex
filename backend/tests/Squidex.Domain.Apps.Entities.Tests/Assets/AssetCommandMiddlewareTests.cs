@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), A<Guid>.Ignored, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<Guid>.Ignored, A<string>.Ignored))
                 .Returns(new List<IEnrichedAssetEntity> { duplicate });
         }
 

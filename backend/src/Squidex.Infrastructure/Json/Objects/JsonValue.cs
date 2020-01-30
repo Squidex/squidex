@@ -82,9 +82,29 @@ namespace Squidex.Infrastructure.Json.Objects
             return Create(value.ToString());
         }
 
-        public static IJsonValue Create(bool value)
+        public static IJsonValue Create(Guid? value)
         {
-            return value ? True : False;
+            if (value == null)
+            {
+                return Null;
+            }
+
+            return Create(value.Value);
+        }
+
+        public static IJsonValue Create(Instant value)
+        {
+            return Create(value.ToString());
+        }
+
+        public static IJsonValue Create(Instant? value)
+        {
+            if (value == null)
+            {
+                return Null;
+            }
+
+            return Create(value.Value);
         }
 
         public static IJsonValue Create(double value)
@@ -99,16 +119,6 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonNumber(value);
         }
 
-        public static IJsonValue Create(Instant? value)
-        {
-            if (value == null)
-            {
-                return Null;
-            }
-
-            return Create(value.Value.ToString());
-        }
-
         public static IJsonValue Create(double? value)
         {
             if (value == null)
@@ -117,6 +127,11 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return Create(value.Value);
+        }
+
+        public static IJsonValue Create(bool value)
+        {
+            return value ? True : False;
         }
 
         public static IJsonValue Create(bool? value)

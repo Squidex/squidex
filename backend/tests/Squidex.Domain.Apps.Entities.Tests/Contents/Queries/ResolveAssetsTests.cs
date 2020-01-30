@@ -26,8 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ResolveAssetsTests
     {
-        private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
-        private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -93,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             await sut.EnrichAsync(requestContext, source, schemaProvider);
@@ -128,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document2.Id, image2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
 
             await sut.EnrichAsync(requestContext, source, schemaProvider);

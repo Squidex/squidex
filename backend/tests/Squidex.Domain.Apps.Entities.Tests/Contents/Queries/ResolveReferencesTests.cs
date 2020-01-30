@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, source, schemaProvider);
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, source, schemaProvider);
