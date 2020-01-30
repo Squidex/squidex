@@ -9,6 +9,7 @@ using NodaTime;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         public Instant? MaxValue { get; set; }

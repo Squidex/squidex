@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class NumberFieldProperties : FieldProperties
     {
         public ReadOnlyCollection<double>? AllowedValues { get; set; }

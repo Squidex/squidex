@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppPatterns>(id, appPattern.Update(name, pattern, message), DeepEqualityComparer<AppPattern>.Default);
+            return With<AppPatterns>(id, appPattern.Update(name, pattern, message));
         }
     }
 }

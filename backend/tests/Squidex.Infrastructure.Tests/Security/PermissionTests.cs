@@ -153,32 +153,6 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            object permission1a = new Permission("app.1");
-            object permission1b = new Permission("app.1");
-            object permission2a = new Permission("app.2");
-
-            Assert.True(permission1a.Equals(permission1b));
-
-            Assert.False(permission1a.Equals(permission2a));
-            Assert.False(permission1b.Equals(permission2a));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var permission1a = new Permission("app.1");
-            var permission1b = new Permission("app.1");
-            var permission2a = new Permission("app.2");
-
-            Assert.Equal(permission1a.GetHashCode(), permission1b.GetHashCode());
-
-            Assert.NotEqual(permission1a.GetHashCode(), permission2a.GetHashCode());
-            Assert.NotEqual(permission1b.GetHashCode(), permission2a.GetHashCode());
-        }
-
-        [Fact]
         public void Should_sort_by_name()
         {
             var source = new List<Permission>

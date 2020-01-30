@@ -35,31 +35,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_make_correct_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var named_id1_name1_a = NamedId.Of(id1, "name1");
-            var named_id1_name1_b = NamedId.Of(id1, "name1");
-
-            var named_id2_name1 = NamedId.Of(id2, "name1");
-            var named_id1_name2 = NamedId.Of(id1, "name2");
-
-            Assert.Equal(named_id1_name1_a, named_id1_name1_b);
-            Assert.Equal(named_id1_name1_a.GetHashCode(), named_id1_name1_b.GetHashCode());
-            Assert.True(named_id1_name1_a.Equals((object)named_id1_name1_b));
-
-            Assert.NotEqual(named_id1_name1_a, named_id2_name1);
-            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id2_name1.GetHashCode());
-            Assert.False(named_id1_name1_a.Equals((object)named_id2_name1));
-
-            Assert.NotEqual(named_id1_name1_a, named_id1_name2);
-            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id1_name2.GetHashCode());
-            Assert.False(named_id1_name1_a.Equals((object)named_id1_name2));
-        }
-
-        [Fact]
         public void Should_serialize_and_deserialize_null_guid_token()
         {
             NamedId<Guid>? value = null;

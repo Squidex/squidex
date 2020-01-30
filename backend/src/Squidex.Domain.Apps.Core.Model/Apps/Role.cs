@@ -15,6 +15,7 @@ using AllPermissions = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class Role : Named
     {
         public const string Editor = "Editor";
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public PermissionSet Permissions { get; }
 
+        [IgnoreDuringEquals]
         public bool IsDefault
         {
             get { return Roles.IsDefault(this); }

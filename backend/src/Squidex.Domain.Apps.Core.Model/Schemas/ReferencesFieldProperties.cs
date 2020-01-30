@@ -12,6 +12,7 @@ using System.Linq;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
         public int? MinItems { get; set; }

@@ -14,7 +14,8 @@ namespace Squidex.Infrastructure
 {
     public delegate bool Parser<T>(string input, out T result);
 
-    public sealed class NamedId<T> : IEquatable<NamedId<T>> where T : notnull
+    [Equals(DoNotAddEqualityOperators = true)]
+    public sealed class NamedId<T> where T : notnull
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
@@ -35,21 +36,6 @@ namespace Squidex.Infrastructure
         public override string ToString()
         {
             return $"{Id},{Name}";
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as NamedId<T>);
-        }
-
-        public bool Equals(NamedId<T>? other)
-        {
-            return other != null && (ReferenceEquals(this, other) || (Id.Equals(other.Id) && Name.Equals(other.Name)));
-        }
-
-        public override int GetHashCode()
-        {
-            return (Id.GetHashCode() * 397) ^ Name.GetHashCode();
         }
 
         public static bool TryParse(string value, Parser<T> parser, [MaybeNullWhen(false)] out NamedId<T> result)

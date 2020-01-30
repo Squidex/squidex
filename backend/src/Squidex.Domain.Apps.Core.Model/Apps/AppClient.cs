@@ -10,6 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class AppClient : Named
     {
         public string Role { get; }

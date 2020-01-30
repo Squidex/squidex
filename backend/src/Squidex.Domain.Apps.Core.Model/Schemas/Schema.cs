@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             newScripts ??= new SchemaScripts();
 
-            if (scripts.DeepEquals(newScripts))
+            if (scripts.Equals(newScripts))
             {
                 return this;
             }

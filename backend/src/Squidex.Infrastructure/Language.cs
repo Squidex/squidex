@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed partial class Language
     {
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
@@ -41,6 +42,7 @@ namespace Squidex.Infrastructure
             get { return AllLanguagesField.Values; }
         }
 
+        [IgnoreDuringEquals]
         public string EnglishName { get; }
 
         public string Iso2Code { get; }

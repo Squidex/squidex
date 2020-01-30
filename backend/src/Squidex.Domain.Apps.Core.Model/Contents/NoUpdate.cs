@@ -10,6 +10,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class NoUpdate : WorkflowCondition
     {
         public static readonly NoUpdate Always = new NoUpdate(null, null);

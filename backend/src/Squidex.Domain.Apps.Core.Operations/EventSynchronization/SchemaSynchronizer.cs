@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return E(new SchemaCategoryChanged { Name = target.Category });
                 }
 
-                if (!source.Scripts.DeepEquals(target.Scripts))
+                if (!source.Scripts.Equals(target.Scripts))
                 {
                     yield return E(new SchemaScriptsConfigured { Scripts = target.Scripts });
                 }
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     if (canUpdate(sourceField, targetField))
                     {
-                        if (!sourceField.RawProperties.DeepEquals(targetField.RawProperties))
+                        if (!sourceField.RawProperties.Equals(targetField.RawProperties))
                         {
                             yield return E(new FieldUpdated { FieldId = id, Properties = targetField.RawProperties });
                         }

@@ -78,28 +78,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_make_correct_equal_comparisons()
-        {
-            var token_type1_id1_a = RefToken.Parse("type1:client1");
-            var token_type1_id1_b = RefToken.Parse("type1:client1");
-
-            var token_type2_id1 = RefToken.Parse("type2:client1");
-            var token_type1_id2 = RefToken.Parse("type1:client2");
-
-            Assert.Equal(token_type1_id1_a, token_type1_id1_b);
-            Assert.Equal(token_type1_id1_a.GetHashCode(), token_type1_id1_b.GetHashCode());
-            Assert.True(token_type1_id1_a.Equals((object)token_type1_id1_b));
-
-            Assert.NotEqual(token_type1_id1_a, token_type2_id1);
-            Assert.NotEqual(token_type1_id1_a.GetHashCode(), token_type2_id1.GetHashCode());
-            Assert.False(token_type1_id1_a.Equals((object)token_type2_id1));
-
-            Assert.NotEqual(token_type1_id1_a, token_type1_id2);
-            Assert.NotEqual(token_type1_id1_a.GetHashCode(), token_type1_id2.GetHashCode());
-            Assert.False(token_type1_id1_a.Equals((object)token_type1_id2));
-        }
-
-        [Fact]
         public void Should_serialize_and_deserialize_null_token()
         {
             RefToken? value = null;

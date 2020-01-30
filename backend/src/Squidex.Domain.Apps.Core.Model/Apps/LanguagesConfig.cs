@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         private bool EqualLanguages(Dictionary<string, LanguageConfig> newLanguages)
         {
-            return newLanguages.EqualsDictionary(languages, EqualityComparer<string>.Default, DeepEqualityComparer<LanguageConfig>.Default);
+            return newLanguages.EqualsDictionary(languages);
         }
 
         private void Cleanup(Dictionary<string, LanguageConfig> newLanguages, ref string newMaster)

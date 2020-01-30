@@ -12,6 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class LanguageConfig
     {
         public static readonly LanguageConfig Default = new LanguageConfig();

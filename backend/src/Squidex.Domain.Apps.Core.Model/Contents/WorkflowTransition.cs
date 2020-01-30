@@ -10,6 +10,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
+    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class WorkflowTransition : WorkflowCondition
     {
         public static readonly WorkflowTransition Always = new WorkflowTransition(null, null);
