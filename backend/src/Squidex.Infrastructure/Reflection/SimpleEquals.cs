@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Reflection
         {
             return Comparers.GetOrAdd(t, type =>
             {
-                if (IsSimpleType(type))
+                if (IsSimpleType(type) || IsEquatable(type))
                 {
                     return NoopComparer;
                 }
@@ -92,6 +92,11 @@ namespace Squidex.Infrastructure.Reflection
         private static bool IsSimpleType(Type type)
         {
             return type.IsValueType || type == typeof(string);
+        }
+
+        private static bool IsEquatable(Type type)
+        {
+            return type.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEquatable<>));
         }
 
         private static bool IsSet(Type type)

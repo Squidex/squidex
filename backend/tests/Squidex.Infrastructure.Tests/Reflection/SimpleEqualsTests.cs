@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure.Collections;
 using Xunit;
 
@@ -22,6 +23,31 @@ namespace Squidex.Infrastructure.Reflection
             public int ReadOnly
             {
                 set { Debug.WriteLine(value); }
+            }
+        }
+
+        public class CustomEquals : IEquatable<CustomEquals>
+        {
+            private readonly int value;
+
+            public CustomEquals(int value)
+            {
+                this.value = value;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return Equals(obj as CustomEquals);
+            }
+
+            public bool Equals([AllowNull] CustomEquals other)
+            {
+                return other != null && other.value == value;
+            }
+
+            public override int GetHashCode()
+            {
+                return value;
             }
         }
 
@@ -69,6 +95,26 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
+        public void Should_compare_equal_customs()
+        {
+            var customA_1 = new CustomEquals(1);
+            var customA_2 = new CustomEquals(1);
+
+            Assert.True(SimpleEquals.IsEquals(customA_1, customA_1));
+            Assert.True(SimpleEquals.IsEquals(customA_1, customA_2));
+        }
+
+        [Fact]
+        public void Should_compare_non_equal_customs()
+        {
+            var customA_1 = new CustomEquals(1);
+            var customB_1 = new CustomEquals(2);
+
+            Assert.False(SimpleEquals.IsEquals(customA_1, customB_1));
+            Assert.False(SimpleEquals.IsEquals(customA_1, null!));
+        }
+
+        [Fact]
         public void Should_compare_equal_strings()
         {
             var stringA_1 = "a";
@@ -82,7 +128,7 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_compare_non_equal_strings()
         {
             var stringA_1 = "a";
-            var stringB_2 = "b";
+            var stringB_2 = new string(new char[] { 'b' });
 
             Assert.False(SimpleEquals.IsEquals(stringA_1, stringB_2));
             Assert.False(SimpleEquals.IsEquals(stringA_1, null!));
