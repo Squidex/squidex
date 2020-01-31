@@ -80,8 +80,8 @@ export class FilterLogicalComponent {
         this.emitChange();
     }
 
-    public removeFilter(node: FilterNode) {
-        this.filters.splice(this.filters.indexOf(node), 1);
+    public removeFilter(index: number) {
+        this.filters.splice(index, 1);
 
         this.emitChange();
     }

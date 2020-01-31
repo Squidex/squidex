@@ -10,9 +10,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import {
     LanguageDto,
     Query,
-    QueryModel,
-    QuerySorting,
-    Types
+    QueryModel
 } from '@app/shared/internal';
 
 @Component({
@@ -33,19 +31,37 @@ export class QueryComponent {
 
     @Input()
     public set query(query: Query) {
-        this.queryValue = Types.clone(query);
+        if (!query) {
+            query = {};
+        }
+
+        if (!query.filter) {
+            query.filter = { and: [] };
+        }
+
+        if (!query.sort) {
+            query.sort = [];
+        }
+
+        this.queryValue = query;
     }
 
     public queryValue: Query = {};
 
     public addSorting() {
-        this.queryValue.sort!.push({ path: Object.keys(this.model.fields)[0], order: 'ascending' });
+        const path = Object.keys(this.model.fields)[0];
+
+        if (this.queryValue.sort) {
+            this.queryValue.sort.push({ path, order: 'ascending' });
+        }
 
         this.emitQueryChange();
     }
 
-    public removeSorting(sorting: QuerySorting) {
-        this.queryValue.sort!.splice(this.queryValue.sort!.indexOf(sorting), 1);
+    public removeSorting(index: number) {
+        if (this.queryValue.sort) {
+            this.queryValue.sort.splice(index, 1);
+        }
 
         this.emitQueryChange();
     }
