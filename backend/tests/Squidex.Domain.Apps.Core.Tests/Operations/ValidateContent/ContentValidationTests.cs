@@ -348,7 +348,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NamedContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddJsonValue(
                                 JsonValue.Array(
                                     JsonValue.Object(),
                                     JsonValue.Object().Add("my-nested", 1),
@@ -387,7 +387,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NamedContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddJsonValue(
                                 JsonValue.Array(
                                     JsonValue.Object())));
 

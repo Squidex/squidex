@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not a valid value." });
+                new[] { "Latitude must be between -90 and 90." });
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not a valid value." });
+                new[] { "Longitude must be between -180 and 180." });
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not a valid value." });
+                new[] { "Geolocation can only have latitude and longitude property." });
         }
 
         [Fact]

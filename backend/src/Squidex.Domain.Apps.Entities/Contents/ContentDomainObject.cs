@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 });
                         }
 
-                        await ctx.EnrichAsync(c.Data);
+                        await ctx.GenerateDefaultValuesAsync(c.Data);
 
                         if (!c.DoNotValidate)
                         {

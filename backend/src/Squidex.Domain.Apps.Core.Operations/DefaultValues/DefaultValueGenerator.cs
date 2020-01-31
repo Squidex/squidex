@@ -11,14 +11,14 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.EnrichContent
+namespace Squidex.Domain.Apps.Core.DefaultValues
 {
-    public sealed class ContentEnricher
+    public sealed class DefaultValueGenerator
     {
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
 
-        public ContentEnricher(Schema schema, PartitionResolver partitionResolver)
+        public DefaultValueGenerator(Schema schema, PartitionResolver partitionResolver)
         {
             Guard.NotNull(schema);
             Guard.NotNull(partitionResolver);

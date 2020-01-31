@@ -351,7 +351,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_throw_exception_when_creation_value_from_invalid_type()
         {
-            Assert.Throws<ArgumentException>(() => JsonValue.Create(Guid.Empty));
+            Assert.Throws<ArgumentException>(() => JsonValue.Create(default(TimeSpan)));
         }
 
         [Fact]

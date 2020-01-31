@@ -25,6 +25,11 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
+        public JsonArray(JsonArray source)
+            : base(source)
+        {
+        }
+
         internal JsonArray(params object?[] values)
             : base(ToList(values))
         {

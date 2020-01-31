@@ -64,7 +64,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 try
                 {
-                    JsonValueConverter.ConvertValue(field, value);
+                    var (_, error) = JsonValueConverter.ConvertValue(field, value);
+
+                    if (error != null)
+                    {
+                        return Value.Unset;
+                    }
                 }
                 catch
                 {

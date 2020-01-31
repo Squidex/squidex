@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            if (context.IsFlatten())
+            if (context.ShouldFlatten())
             {
                 response.Data = content.Data?.ToFlatten();
                 response.DataDraft = content.DataDraft?.ToFlatten();

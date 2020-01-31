@@ -5,11 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public enum Ids
+    public interface IContentEnricher
     {
-        All,
-        ContentOnly
+        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context);
+
+        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context);
     }
 }

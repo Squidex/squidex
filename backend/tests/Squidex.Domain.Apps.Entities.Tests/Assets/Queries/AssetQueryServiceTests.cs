@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var ids = HashSet.Of(found1.Id, found2.Id);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.Is(ids)))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))

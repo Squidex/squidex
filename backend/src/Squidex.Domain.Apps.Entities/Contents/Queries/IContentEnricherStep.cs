@@ -5,15 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public interface IContentEnricher
-    {
-        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context);
+    public delegate Task<ISchemaEntity> ProvideSchema(Guid id);
 
-        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context);
+    public interface IContentEnricherStep
+    {
+        Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas);
     }
 }

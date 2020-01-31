@@ -68,6 +68,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(i);
                 case long l:
                     return Create(l);
+                case Guid g:
+                    return Create(g);
                 case Instant i:
                     return Create(i);
             }
@@ -75,9 +77,34 @@ namespace Squidex.Infrastructure.Json.Objects
             throw new ArgumentException("Invalid json type");
         }
 
-        public static IJsonValue Create(bool value)
+        public static IJsonValue Create(Guid value)
         {
-            return value ? True : False;
+            return Create(value.ToString());
+        }
+
+        public static IJsonValue Create(Guid? value)
+        {
+            if (value == null)
+            {
+                return Null;
+            }
+
+            return Create(value.Value);
+        }
+
+        public static IJsonValue Create(Instant value)
+        {
+            return Create(value.ToString());
+        }
+
+        public static IJsonValue Create(Instant? value)
+        {
+            if (value == null)
+            {
+                return Null;
+            }
+
+            return Create(value.Value);
         }
 
         public static IJsonValue Create(double value)
@@ -92,16 +119,6 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonNumber(value);
         }
 
-        public static IJsonValue Create(Instant? value)
-        {
-            if (value == null)
-            {
-                return Null;
-            }
-
-            return Create(value.Value.ToString());
-        }
-
         public static IJsonValue Create(double? value)
         {
             if (value == null)
@@ -110,6 +127,11 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return Create(value.Value);
+        }
+
+        public static IJsonValue Create(bool value)
+        {
+            return value ? True : False;
         }
 
         public static IJsonValue Create(bool? value)

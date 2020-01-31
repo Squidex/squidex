@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored, requestContext))
                 .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), AppId, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), AppId, A<string>.Ignored))
                 .Returns(new List<IEnrichedAssetEntity>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.IsNoAssetEnrichment()), A<Guid>.Ignored, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<Guid>.Ignored, A<string>.Ignored))
                 .Returns(new List<IEnrichedAssetEntity> { duplicate });
         }
 

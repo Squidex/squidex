@@ -36,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly IJsonSerializer serializer;
         private readonly string typeAssetDeleted;
         private readonly string typeContentDeleted;
-        private readonly CleanupReferences cleanupReferences;
         private readonly QueryContent queryContentAsync;
         private readonly QueryContentsByIds queryContentsById;
         private readonly QueryContentsByQuery queryContentsByQuery;
@@ -59,7 +58,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             this.serializer = serializer;
 
-            cleanupReferences = new CleanupReferences();
             queryContentAsync = new QueryContent(serializer);
             queryContentsById = new QueryContentsByIds(serializer, appProvider);
             queryContentsByQuery = new QueryContentsByQuery(serializer, indexer);
@@ -72,7 +70,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
-            await cleanupReferences.PrepareAsync(collection, ct);
             await queryContentAsync.PrepareAsync(collection, ct);
             await queryContentsById.PrepareAsync(collection, ct);
             await queryContentsByQuery.PrepareAsync(collection, ct);

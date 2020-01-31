@@ -8,13 +8,13 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Core.EnrichContent
+namespace Squidex.Domain.Apps.Core.DefaultValues
 {
-    public static class ContentEnrichmentExtensions
+    public static class DefaultValueExtensions
     {
-        public static void Enrich(this NamedContentData data, Schema schema, PartitionResolver partitionResolver)
+        public static void GenerateDefaultValues(this NamedContentData data, Schema schema, PartitionResolver partitionResolver)
         {
-            var enricher = new ContentEnricher(schema, partitionResolver);
+            var enricher = new DefaultValueGenerator(schema, partitionResolver);
 
             enricher.Enrich(data);
         }

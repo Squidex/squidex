@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.EnrichContent;
+using Squidex.Domain.Apps.Core.DefaultValues;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context;
         }
 
-        public Task EnrichAsync(NamedContentData data)
+        public Task GenerateDefaultValuesAsync(NamedContentData data)
         {
-            data.Enrich(schemaEntity.SchemaDef, appEntity.PartitionResolver());
+            data.GenerateDefaultValues(schemaEntity.SchemaDef, appEntity.PartitionResolver());
 
             return TaskHelper.Done;
         }

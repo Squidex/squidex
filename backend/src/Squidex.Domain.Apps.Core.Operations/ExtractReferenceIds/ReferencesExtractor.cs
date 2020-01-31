@@ -9,31 +9,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public sealed class ReferencesExtractor : IFieldVisitor<IEnumerable<Guid>>
+    internal sealed class ReferencesExtractor : IFieldVisitor<None>
     {
-        private readonly IJsonValue? value;
-        private readonly Ids strategy;
+        private readonly HashSet<Guid> result;
+        private IJsonValue? value;
 
-        private ReferencesExtractor(IJsonValue? value, Ids strategy)
+        public HashSet<Guid> Result
         {
-            this.value = value;
-
-            this.strategy = strategy;
+            get { return result; }
         }
 
-        public static IEnumerable<Guid> ExtractReferences(IField field, IJsonValue? value, Ids strategy)
+        public ReferencesExtractor(HashSet<Guid> result)
         {
-            return field.Accept(new ReferencesExtractor(value, strategy));
+            Guard.NotNull(result);
+
+            this.result = result;
         }
 
-        public IEnumerable<Guid> Visit(IArrayField field)
+        public void SetValue(IJsonValue? newValue)
         {
-            var result = new List<Guid>();
+            value = newValue;
+        }
 
+        public None Visit(IArrayField field)
+        {
             if (value is JsonArray array)
             {
                 foreach (var item in array.OfType<JsonObject>())
@@ -42,75 +46,69 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     {
                         if (item.TryGetValue(nestedField.Name, out var nestedValue))
                         {
-                            result.AddRange(nestedField.Accept(new ReferencesExtractor(nestedValue, strategy)));
+                            SetValue(nestedValue);
+
+                            nestedField.Accept(this);
                         }
                     }
                 }
             }
 
-            return result;
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<AssetsFieldProperties> field)
+        public None Visit(IField<AssetsFieldProperties> field)
         {
-            var ids = value.ToGuidSet();
+            value.AddIds(result);
 
-            return ids;
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<ReferencesFieldProperties> field)
+        public None Visit(IField<ReferencesFieldProperties> field)
         {
-            var ids = value.ToGuidSet();
+            value.AddIds(result);
 
-            if (strategy == Ids.All && field.Properties.SchemaIds != null)
-            {
-                foreach (var schemaId in field.Properties.SchemaIds)
-                {
-                    ids.Add(schemaId);
-                }
-            }
-
-            return ids;
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<BooleanFieldProperties> field)
+        public None Visit(IField<BooleanFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<DateTimeFieldProperties> field)
+        public None Visit(IField<DateTimeFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<GeolocationFieldProperties> field)
+        public None Visit(IField<GeolocationFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<JsonFieldProperties> field)
+        public None Visit(IField<JsonFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<NumberFieldProperties> field)
+        public None Visit(IField<NumberFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<StringFieldProperties> field)
+        public None Visit(IField<StringFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<TagsFieldProperties> field)
+        public None Visit(IField<TagsFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
 
-        public IEnumerable<Guid> Visit(IField<UIFieldProperties> field)
+        public None Visit(IField<UIFieldProperties> field)
         {
-            return Enumerable.Empty<Guid>();
+            return None.Value;
         }
     }
 }

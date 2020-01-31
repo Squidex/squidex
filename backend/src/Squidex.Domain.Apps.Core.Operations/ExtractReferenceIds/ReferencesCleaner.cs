@@ -8,25 +8,26 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public sealed class ReferencesCleaner : IFieldVisitor<IJsonValue>
     {
-        private readonly IJsonValue value;
-        private readonly ICollection<Guid>? oldReferences;
+        private readonly HashSet<Guid> validIds;
+        private IJsonValue value;
 
-        private ReferencesCleaner(IJsonValue value, ICollection<Guid>? oldReferences)
+        public ReferencesCleaner(HashSet<Guid> validIds)
         {
-            this.value = value;
+            Guard.NotNull(validIds);
 
-            this.oldReferences = oldReferences;
+            this.validIds = validIds;
         }
 
-        public static IJsonValue CleanReferences(IField field, IJsonValue value, ICollection<Guid>? oldReferences)
+        public void SetValue(IJsonValue newValue)
         {
-            return field.Accept(new ReferencesCleaner(value, oldReferences));
+            value = newValue;
         }
 
         public IJsonValue Visit(IField<AssetsFieldProperties> field)
@@ -36,29 +37,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            if (oldReferences?.Contains(field.Properties.SingleId()) == true)
-            {
-                return JsonValue.Array();
-            }
-
             return CleanIds();
-        }
-
-        private IJsonValue CleanIds()
-        {
-            var ids = value.ToGuidSet();
-
-            var isRemoved = false;
-
-            if (oldReferences != null)
-            {
-                foreach (var oldReference in oldReferences)
-                {
-                    isRemoved |= ids.Remove(oldReference);
-                }
-            }
-
-            return isRemoved ? ids.ToJsonArray() : value;
         }
 
         public IJsonValue Visit(IField<BooleanFieldProperties> field)
@@ -104,6 +83,32 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         public IJsonValue Visit(IArrayField field)
         {
             return value;
+        }
+
+        private IJsonValue CleanIds()
+        {
+            if (value is JsonArray array)
+            {
+                var result = new JsonArray(array);
+
+                for (var i = 0; i < result.Count; i++)
+                {
+                    if (!IsValidReference(result[i]))
+                    {
+                        result.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                return result;
+            }
+
+            return value;
+        }
+
+        private bool IsValidReference(IJsonValue item)
+        {
+            return item is JsonString s && Guid.TryParse(s.Value, out var guid) && validIds.Contains(guid);
         }
     }
 }

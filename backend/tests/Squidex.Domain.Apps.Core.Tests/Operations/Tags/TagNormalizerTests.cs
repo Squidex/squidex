@@ -12,6 +12,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -44,8 +45,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             var oldData = GenerateData("o_raw");
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
-                A<HashSet<string>>.That.IsSameSequenceAs("n_raw2_1", "n_raw2_2", "n_raw4"),
-                A<HashSet<string>>.That.IsSameSequenceAs("o_raw2_1", "o_raw2_2", "o_raw4")))
+                A<HashSet<string>>.That.Is("n_raw2_1", "n_raw2_2", "n_raw4"),
+                A<HashSet<string>>.That.Is("o_raw2_1", "o_raw2_2", "o_raw4")))
                 .Returns(new Dictionary<string, string>
                 {
                     ["n_raw2_2"] = "id2_2",
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             var newData = GenerateData("name");
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
-                A<HashSet<string>>.That.IsSameSequenceAs("name2_1", "name2_2", "name4"),
+                A<HashSet<string>>.That.Is("name2_1", "name2_2", "name4"),
                 A<HashSet<string>>.That.IsEmpty()))
                 .Returns(new Dictionary<string, string>
                 {
@@ -86,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             var newData = GenerateData("id");
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
-                A<HashSet<string>>.That.IsSameSequenceAs("id2_1", "id2_2", "id4"),
+                A<HashSet<string>>.That.Is("id2_1", "id2_2", "id4"),
                 A<HashSet<string>>.That.IsEmpty()))
                 .Returns(new Dictionary<string, string>
                 {
@@ -114,16 +115,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             return new NamedContentData()
                 .AddField("tags1",
                     new ContentFieldData()
-                        .AddValue("iv", JsonValue.Array($"{prefix}1")))
+                        .AddJsonValue(JsonValue.Array($"{prefix}1")))
                 .AddField("tags2",
                     new ContentFieldData()
-                        .AddValue("iv", JsonValue.Array($"{prefix}2_1", $"{prefix}2_2")))
+                        .AddJsonValue(JsonValue.Array($"{prefix}2_1", $"{prefix}2_2")))
                 .AddField("string",
                     new ContentFieldData()
                         .AddValue("iv", $"{prefix}stringValue"))
                 .AddField("array",
                     new ContentFieldData()
-                        .AddValue("iv",
+                        .AddJsonValue(
                             JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("nestedTags1", JsonValue.Array($"{prefix}3"))

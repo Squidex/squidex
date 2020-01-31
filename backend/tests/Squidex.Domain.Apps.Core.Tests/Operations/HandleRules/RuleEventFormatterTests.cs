@@ -282,7 +282,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JsonValue.Array()))
+                                .AddJsonValue(JsonValue.Array()))
             };
 
             var result = sut.Format(script, @event);
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
+                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format(script, @event);
@@ -339,8 +339,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JsonValue.Array(
-                                    "Berlin")))
+                                .AddJsonValue(JsonValue.Array("Berlin")))
             };
 
             var result = sut.Format(script, @event);
@@ -359,7 +358,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
+                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format(script, @event);
@@ -378,7 +377,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
+                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format(script, @event);
