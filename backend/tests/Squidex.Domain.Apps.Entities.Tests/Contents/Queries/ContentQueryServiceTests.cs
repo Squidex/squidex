@@ -475,7 +475,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, requestContext))
                 .ReturnsLazily(x =>
                 {
-                    var input = (IEnumerable<IContentEntity>)x.Arguments[0];
+                    var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;
 
                     return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(input.Select(c => SimpleMapper.Map(c, new ContentEntity())).ToList());
                 });

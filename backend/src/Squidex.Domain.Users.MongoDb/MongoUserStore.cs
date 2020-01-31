@@ -209,7 +209,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public async Task<IdentityResult> UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            await Collection.ReplaceOneAsync(x => x.Id == user.Id, (MongoUser)user, null, cancellationToken);
+            await Collection.ReplaceOneAsync(x => x.Id == user.Id, (MongoUser)user, cancellationToken: cancellationToken);
 
             return IdentityResult.Success;
         }

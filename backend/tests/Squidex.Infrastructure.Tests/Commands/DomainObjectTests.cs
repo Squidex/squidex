@@ -284,7 +284,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>.Ignored, A<HandleEvent>.Ignored))
                 .Invokes(args =>
                 {
-                    handleEvent = args.GetArgument<HandleEvent>(3);
+                    handleEvent = args.GetArgument<HandleEvent>(3)!;
                 })
                 .Returns(persistence);
 
