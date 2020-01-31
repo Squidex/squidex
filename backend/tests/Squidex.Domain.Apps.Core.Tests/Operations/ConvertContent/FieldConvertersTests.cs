@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", null)
                     .AddValue("de", 1);
 
-            var result = FieldConverters.ForValues(ValueConverters.ExcludeChangedTypes())(source, field);
+            var result = FieldConverters.ExcludeChangedTypes()(source, field);
 
             Assert.Same(source, result);
         }
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", "EN")
                     .AddValue("de", 0);
 
-            var result = FieldConverters.ForValues(ValueConverters.ExcludeChangedTypes())(source, field);
+            var result = FieldConverters.ExcludeChangedTypes()(source, field);
 
             Assert.Null(result);
         }

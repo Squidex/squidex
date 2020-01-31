@@ -120,11 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden());
             }
 
-            if (context.ShouldCleanup())
-            {
-                yield return FieldConverters.ExcludeChangedTypes();
-                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
-            }
+            yield return FieldConverters.ExcludeChangedTypes();
+            yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
 
             if (cleanReferences != null)
             {
