@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Ascending(x => x.Status)
                     .Descending(x => x.LastModified));
 
-            return Collection.Indexes.CreateManyAsync(new[] { index1, index2, }, ct);
+            return Collection.Indexes.CreateManyAsync(new[] { index1, index2 }, ct);
         }
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft, bool includeDraft = true)

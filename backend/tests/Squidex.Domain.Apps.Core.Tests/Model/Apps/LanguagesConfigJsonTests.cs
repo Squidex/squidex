@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var languages =
                 LanguagesConfig.English
                     .Set(Language.FR)
-                    .Set(Language.IT, false)
-                    .Set(Language.DE, true, new Language[] { Language.IT })
+                    .Set(Language.IT)
+                    .Set(Language.DE, true, Language.IT)
                     .MakeMaster(Language.FR);
 
             var serialized = languages.SerializeAndDeserialize();

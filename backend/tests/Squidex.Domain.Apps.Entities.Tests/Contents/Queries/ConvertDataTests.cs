@@ -57,25 +57,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_data_only()
         {
-            var source = PublishedContent();
+            var content = PublishedContent(new NamedContentData());
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(source, 1), schemaProvider);
+            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
-            Assert.NotNull(source.Data);
-            Assert.Null(source.DataDraft);
+            Assert.NotNull(content.Data);
+            Assert.Null(content.DataDraft);
         }
 
         [Fact]
         public async Task Should_convert_data_and_data_draft_when_frontend_user()
         {
-            var source = PublishedContent();
+            var content = PublishedContent(new NamedContentData());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
 
-            Assert.NotNull(source.Data);
-            Assert.NotNull(source.DataDraft);
+            Assert.NotNull(content.Data);
+            Assert.NotNull(content.DataDraft);
         }
 
         [Fact]
@@ -84,20 +84,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var source =
-                new NamedContentData()
-                    .AddField("references",
-                        new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1, id2)))
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1)))
-                    .AddField("array",
-                        new ContentFieldData()
-                            .AddJsonValue(
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add("nested", JsonValue.Array(id1, id2)))));
+            var source = BuildTestData(id1, id2);
+
+            var content = PublishedContent(source);
 
             var expected =
                 new NamedContentData()
@@ -113,10 +102,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 JsonValue.Array(
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));
-            var content = PublishedContent();
-
-            content.Data = source;
-            content.DataDraft = source;
 
             A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2)))
                 .Returns(new List<Guid> { id2 });
@@ -132,13 +117,69 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(expected, content.DataDraft);
         }
 
-        private ContentEntity PublishedContent()
+        [Fact]
+        public async Task Should_cleanup_references_when_everything_deleted()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var source = BuildTestData(id1, id2);
+
+            var content = PublishedContent(source);
+
+            var expected =
+                new NamedContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array()))
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array()))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddJsonValue(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("nested", JsonValue.Array()))));
+
+            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2)))
+                .Returns(new List<Guid>());
+
+            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2)))
+                .Returns(new List<(Guid, Guid)>());
+
+            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
+
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+
+            Assert.Equal(expected, content.Data);
+            Assert.Equal(expected, content.DataDraft);
+        }
+
+        private static NamedContentData BuildTestData(Guid id1, Guid id2)
+        {
+            return new NamedContentData()
+                .AddField("references",
+                    new ContentFieldData()
+                        .AddJsonValue(JsonValue.Array(id1, id2)))
+                .AddField("assets",
+                    new ContentFieldData()
+                        .AddJsonValue(JsonValue.Array(id1)))
+                .AddField("array",
+                    new ContentFieldData()
+                        .AddJsonValue(
+                            JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("nested", JsonValue.Array(id1, id2)))));
+        }
+
+        private ContentEntity PublishedContent(NamedContentData data)
         {
             return new ContentEntity
             {
                 Status = Status.Published,
-                Data = new NamedContentData(),
-                DataDraft = new NamedContentData(),
+                Data = data,
+                DataDraft = data,
                 SchemaId = schemaId
             };
         }

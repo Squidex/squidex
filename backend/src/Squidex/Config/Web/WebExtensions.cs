@@ -121,7 +121,7 @@ namespace Squidex.Config.Web
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl) && urlsOptions.EnableXForwardedHost)
             {
-                return new ForwardedHeadersOptions()
+                return new ForwardedHeadersOptions
                 {
                     AllowedHosts = new List<string> { new Uri(urlsOptions.BaseUrl).Host },
                     ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
@@ -131,7 +131,7 @@ namespace Squidex.Config.Web
             }
             else
             {
-                return new ForwardedHeadersOptions()
+                return new ForwardedHeadersOptions
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedProto,
                     ForwardLimit = null,

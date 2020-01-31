@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Queries;

@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Reflection
             yield return new object[]
             {
                 Guid.NewGuid(),
-                Guid.NewGuid(),
+                Guid.NewGuid()
             };
 
             yield return new object[]
@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_compare_equal_strings()
         {
             var stringA_1 = "a";
-            var stringA_2 = new string(new char[] { 'a' });
+            var stringA_2 = new string(new[] { 'a' });
 
             Assert.True(SimpleEquals.IsEquals(stringA_1, stringA_1));
             Assert.True(SimpleEquals.IsEquals(stringA_1, stringA_2));
@@ -128,7 +128,7 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_compare_non_equal_strings()
         {
             var stringA_1 = "a";
-            var stringB_2 = new string(new char[] { 'b' });
+            var stringB_2 = new string(new[] { 'b' });
 
             Assert.False(SimpleEquals.IsEquals(stringA_1, stringB_2));
             Assert.False(SimpleEquals.IsEquals(stringA_1, null!));

@@ -131,11 +131,11 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 if (streamFilter.Contains("^"))
                 {
-                    filters.Add($"STARTSWITH(e.eventStream, @filter)");
+                    filters.Add("STARTSWITH(e.eventStream, @filter)");
                 }
                 else
                 {
-                    filters.Add($"e.eventStream = @filter");
+                    filters.Add("e.eventStream = @filter");
                 }
 
                 parameters.Add(new SqlParameter("@filter", streamFilter));
@@ -146,11 +146,11 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (streamPosition.IsEndOfCommit)
             {
-                filters.Add($"e.timestamp > @time");
+                filters.Add("e.timestamp > @time");
             }
             else
             {
-                filters.Add($"e.timestamp >= @time");
+                filters.Add("e.timestamp >= @time");
             }
 
             parameters.Add(new SqlParameter("@time", streamPosition.Timestamp));

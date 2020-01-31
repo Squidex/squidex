@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var roles_2 = roles_1.Add("role2");
             var roles_3 = roles_2.Remove(firstRole);
 
-            Assert.Equal(new string[] { "role1", "role2" }, roles_3.Custom.Select(x => x.Name));
+            Assert.Equal(new[] { "role1", "role2" }, roles_3.Custom.Select(x => x.Name));
         }
 
         [Fact]

@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<Guid, IContentEntity> GetContentsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"References",
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>("References",
                 async batch =>
                 {
                     var result = await GetReferencedContentsAsync(new List<Guid>(batch));

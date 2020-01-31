@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
@@ -18,10 +17,6 @@ namespace TestSuite.Fixtures
         public SquidexClient<TestEntity, TestEntityData> Contents { get; }
 
         public string SchemaName { get; }
-
-        public string FieldNumber { get; } = "number";
-
-        public string FieldString { get; } = "string";
 
         public ContentFixture()
             : this("my-writes")
@@ -36,30 +31,7 @@ namespace TestSuite.Fixtures
             {
                 try
                 {
-                    await Schemas.PostSchemaAsync(AppName, new CreateSchemaDto
-                    {
-                        Name = SchemaName,
-                        Fields = new List<UpsertSchemaFieldDto>
-                        {
-                            new UpsertSchemaFieldDto
-                            {
-                                Name = FieldNumber,
-                                Properties = new NumberFieldPropertiesDto
-                                {
-                                    IsRequired = true
-                                }
-                            },
-                            new UpsertSchemaFieldDto
-                            {
-                                Name = FieldString,
-                                Properties = new StringFieldPropertiesDto
-                                {
-                                    IsRequired = false
-                                }
-                            }
-                        },
-                        IsPublished = true
-                    });
+                    await TestEntity.CreateSchemaAsync(Schemas, AppName, schemaName);
                 }
                 catch (SquidexManagementException ex)
                 {

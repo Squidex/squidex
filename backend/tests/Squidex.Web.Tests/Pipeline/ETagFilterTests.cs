@@ -78,7 +78,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(304, (executedContext.Result as StatusCodeResult)!.StatusCode);
+            Assert.Equal(304, ((StatusCodeResult)executedContext.Result).StatusCode);
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(200, (executedContext.Result as StatusCodeResult)!.StatusCode);
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
         }
 
         private ActionExecutionDelegate Next()

@@ -91,13 +91,13 @@ namespace Squidex.Infrastructure.Commands
 
             using (localCache.StartContext())
             {
-                await source(new Func<Guid, Task>(async id =>
+                await source(async id =>
                 {
                     if (handledIds.Add(id))
                     {
                         await worker.SendAsync(id, ct);
                     }
-                }));
+                });
 
                 worker.Complete();
 

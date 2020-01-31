@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             metadata = new
                             {
                                 pixelWidth = 800,
-                                pixelHeight = 600,
+                                pixelHeight = 600
                             },
                             tags = new[]
                             {
@@ -295,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 metadata = new
                                 {
                                     pixelWidth = 800,
-                                    pixelHeight = 600,
+                                    pixelHeight = 600
                                 },
                                 tags = new[]
                                 {

@@ -63,8 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private void ResolveAssetsUrls(ISchemaEntity schema, IGrouping<Guid, ContentEntity> contents, ILookup<Guid, IEnrichedAssetEntity> assets)
         {
-            var temp = new HashSet<Guid>();
-
             foreach (var field in schema.SchemaDef.ResolvingAssets())
             {
                 foreach (var content in contents)

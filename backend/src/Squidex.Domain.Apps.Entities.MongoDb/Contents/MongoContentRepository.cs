@@ -19,14 +19,11 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -34,8 +31,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
-        private readonly string typeAssetDeleted;
-        private readonly string typeContentDeleted;
         private readonly QueryContent queryContentAsync;
         private readonly QueryContentsByIds queryContentsById;
         private readonly QueryContentsByQuery queryContentsByQuery;
@@ -47,12 +42,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer)
             : base(database)
         {
             Guard.NotNull(appProvider);
             Guard.NotNull(serializer);
-            Guard.NotNull(typeNameRegistry);
 
             this.appProvider = appProvider;
 
@@ -63,9 +57,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryContentsByQuery = new QueryContentsByQuery(serializer, indexer);
             queryIdsAsync = new QueryIdsAsync(appProvider);
             queryScheduledItems = new QueryScheduledContents();
-
-            typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
-            typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)

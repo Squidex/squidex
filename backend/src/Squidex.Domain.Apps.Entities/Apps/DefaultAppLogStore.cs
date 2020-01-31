@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 Key = appId.ToString(),
                 Properties = new Dictionary<string, string>
                 {
-                    [FieldCosts] = costs.ToString()
+                    [FieldCosts] = costs.ToString(CultureInfo.InvariantCulture)
                 },
                 Timestamp = timestamp
             };

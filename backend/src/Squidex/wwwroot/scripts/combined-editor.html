@@ -27,13 +27,13 @@
             element.disabled = disabled;
         });
 
-        field.onFormValueChanged(function (value) {
+        field.onFormValueChanged(function(value) {
             if (value.a && value.a.iv && value.b && value.b.iv) {
                 element.value = value.a.iv + value.b.iv;
-                
+
                 field.valueChanged(element.value);
             }
-        })
+        });
     </script>
 </body>
 

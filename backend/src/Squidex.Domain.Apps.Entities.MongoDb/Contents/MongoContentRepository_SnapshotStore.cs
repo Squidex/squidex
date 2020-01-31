@@ -9,7 +9,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -67,25 +66,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                var idData = value.Data.ToMongoModel(schema.SchemaDef, serializer);
-                var idDraftData = idData;
-
-                if (!ReferenceEquals(value.Data, value.DataDraft))
-                {
-                    idDraftData = value.DataDraft.ToMongoModel(schema.SchemaDef, serializer);
-                }
-
                 var content = SimpleMapper.Map(value, new MongoContentEntity
                 {
-                    DataByIds = idData,
-                    DataDraftByIds = idDraftData,
                     IsDeleted = value.IsDeleted,
                     IndexedAppId = value.AppId.Id,
                     IndexedSchemaId = value.SchemaId.Id,
-                    ReferencedIds = value.Data.GetReferencedIds(schema.SchemaDef),
-                    ScheduledAt = value.ScheduleJob?.DueTime,
                     Version = newVersion
                 });
+
+                content.LoadData(value, schema.SchemaDef, serializer);
+
+                if (value.ScheduleJob != null)
+                {
+                    content.ScheduledAt = value.ScheduleJob.DueTime;
+                }
 
                 await Collection.UpsertVersionedAsync(content.Id, oldVersion, content);
             }

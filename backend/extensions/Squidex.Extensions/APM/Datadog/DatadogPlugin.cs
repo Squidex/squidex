@@ -64,7 +64,7 @@ namespace Squidex.Extensions.APM.Datadoq
 
         private static void SetupProfiler()
         {
-            Profiler.SpanStarted += (session) =>
+            Profiler.SpanStarted += session =>
             {
                 session.Listen(Tracer.Instance.StartActive(session.Key));
             };

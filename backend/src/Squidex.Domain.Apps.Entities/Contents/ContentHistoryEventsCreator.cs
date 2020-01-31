@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var channel = $"contents.{@event.Headers.AggregateId()}";
 
-            HistoryEvent? result = ForEvent(@event.Payload, channel);
+            var result = ForEvent(@event.Payload, channel);
 
             if (@event.Payload is SchemaEvent schemaEvent)
             {

@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        protected async sealed override Task ReadAsync()
+        protected sealed override async Task ReadAsync()
         {
             if (persistence != null)
             {
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        public async sealed override Task RebuildStateAsync()
+        public sealed override async Task RebuildStateAsync()
         {
             await EnsureLoadedAsync();
 

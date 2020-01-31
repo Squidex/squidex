@@ -182,7 +182,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
             await AddAsync(id1);
             await AddAsync(id2);
 
-            var result = await sut.GetIdsAsync(new string[] { id1.Name, id2.Name, "not-found" });
+            var result = await sut.GetIdsAsync(new[] { id1.Name, id2.Name, "not-found" });
 
             Assert.Equal(new List<Guid> { id1.Id, id2.Id }, result);
         }

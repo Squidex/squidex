@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new string[] { appId.Name })))
+            A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsForUserAsync(userId, new PermissionSet($"squidex.apps.{appId.Name}"));

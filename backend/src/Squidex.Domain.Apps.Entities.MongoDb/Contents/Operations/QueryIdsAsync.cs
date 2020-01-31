@@ -33,19 +33,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.Id)
-                    .Ascending(x => x.ReferencedIds));
+                    .Ascending(x => x.IsDeleted));
 
             var index2 =
                 new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedSchemaId));
+                    .Ascending(x => x.IndexedSchemaId)
+                    .Ascending(x => x.IsDeleted));
 
-            return Collection.Indexes.CreateManyAsync(new[] { index1, index2, }, ct);
+            return Collection.Indexes.CreateManyAsync(new[] { index1, index2 }, ct);
         }
 
         public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> DoAsync(Guid appId, HashSet<Guid> ids)
         {
+            var filter =
+                Filter.And(
+                    Filter.Eq(x => x.IndexedAppId, appId),
+                    Filter.In(x => x.Id, ids),
+                    Filter.Ne(x => x.IsDeleted, true));
+
             var contentEntities =
-                await Collection.Find(Filter.And(Filter.Eq(x => x.IndexedAppId, appId), Filter.In(x => x.Id, ids))).Only(x => x.Id, x => x.IndexedSchemaId)
+                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
             return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
@@ -74,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
-                Filter.Ne(x => x.IsDeleted, true),
+                Filter.Ne(x => x.IsDeleted, true)
             };
 
             if (filterNode != null)

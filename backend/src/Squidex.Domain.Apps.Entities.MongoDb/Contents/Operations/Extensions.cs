@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -14,7 +13,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public static class Extensions
     {

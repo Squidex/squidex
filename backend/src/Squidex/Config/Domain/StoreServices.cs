@@ -118,8 +118,7 @@ namespace Squidex.Config.Domain
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),
                             c.GetRequiredService<IJsonSerializer>(),
-                            c.GetRequiredService<ITextIndexer>(),
-                            c.GetRequiredService<TypeNameRegistry>()))
+                            c.GetRequiredService<ITextIndexer>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>();

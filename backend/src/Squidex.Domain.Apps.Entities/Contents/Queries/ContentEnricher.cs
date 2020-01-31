@@ -50,8 +50,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Guard.NotNull(contents);
             Guard.NotNull(context);
 
-            var app = context.App;
-
             using (Profiler.TraceMethod<ContentEnricher>())
             {
                 var results = new List<ContentEntity>();

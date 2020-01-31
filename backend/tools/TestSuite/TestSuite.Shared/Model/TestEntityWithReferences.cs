@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Model
 {
-    public sealed class TestEntity : SquidexEntityBase<TestEntityData>
+    public sealed class TestEntityWithReferences : SquidexEntityBase<TestEntityWithReferencesData>
     {
         public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {
@@ -24,16 +25,8 @@ namespace TestSuite.Model
                 {
                     new UpsertSchemaFieldDto
                     {
-                        Name = nameof(TestEntityData.Number).ToLowerInvariant(),
-                        Properties = new NumberFieldPropertiesDto
-                        {
-                            IsRequired = true
-                        }
-                    },
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = nameof(TestEntityData.String).ToLowerInvariant(),
-                        Properties = new StringFieldPropertiesDto
+                        Name = nameof(TestEntityWithReferencesData.References).ToLowerInvariant(),
+                        Properties = new ReferencesFieldPropertiesDto
                         {
                             IsRequired = false
                         }
@@ -46,12 +39,9 @@ namespace TestSuite.Model
         }
     }
 
-    public sealed class TestEntityData
+    public sealed class TestEntityWithReferencesData
     {
         [JsonConverter(typeof(InvariantConverter))]
-        public int Number { get; set; }
-
-        [JsonConverter(typeof(InvariantConverter))]
-        public string String { get; set; }
+        public Guid[] References { get; set; }
     }
 }

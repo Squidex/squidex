@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         public static ValueConverter CleanReferences(HashSet<Guid>? validIds = null)
         {
-            if (validIds == null || validIds.Count == 0)
+            if (validIds == null)
             {
                 return (value, field) => value;
             }

@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Security
         public static readonly string NickName = "nickname";
 
         /// <summary>
-        /// Shorthand name by which the End-User wishes to be referred to at the
+        /// Shorthand name by which the End-User wishes to be referred to.
         /// </summary>
         public static readonly string PreferredUserName = "preferred_username";
 

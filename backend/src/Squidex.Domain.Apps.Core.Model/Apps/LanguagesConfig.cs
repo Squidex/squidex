@@ -66,9 +66,10 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(language);
 
-            var newLanguages = new Dictionary<string, LanguageConfig>(languages);
-
-            newLanguages[language] = new LanguageConfig(isOptional, fallbacks);
+            var newLanguages = new Dictionary<string, LanguageConfig>(languages)
+            {
+                [language] = new LanguageConfig(isOptional, fallbacks)
+            };
 
             return Build(newLanguages, master);
         }
@@ -189,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         yield return fallback;
                     }
 
-                    if (!config.Fallbacks.Any(x => x.Iso2Code == Master))
+                    if (config.Fallbacks.All(x => x.Iso2Code != Master))
                     {
                         yield return Master;
                     }

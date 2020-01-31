@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             return uncommittedEvents;
         }
 
-        public Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any)
+        public Task<CommentsResult> GetCommentsAsync(long sinceVersion = EtagVersion.Any)
         {
-            return Task.FromResult(CommentsResult.FromEvents(events, Version, (int)version));
+            return Task.FromResult(CommentsResult.FromEvents(events, Version, (int)sinceVersion));
         }
     }
 }

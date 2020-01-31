@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 [SemanticLogLevel.Debug] = 1,
                 [SemanticLogLevel.Information] = 1,
-                [SemanticLogLevel.Error] = 1,
+                [SemanticLogLevel.Error] = 1
             });
         }
 
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 [SemanticLogLevel.Debug] = 1,
                 [SemanticLogLevel.Information] = 2,
-                [SemanticLogLevel.Fatal] = 1,
+                [SemanticLogLevel.Fatal] = 1
             });
         }
     }

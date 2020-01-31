@@ -44,44 +44,44 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_content_with_status_color()
         {
-            var source = PublishedContent();
+            var content = PublishedContent();
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+            A.CallTo(() => contentWorkflow.GetInfoAsync(content))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider);
+            await sut.EnrichAsync(requestContext, new[] { content }, schemaProvider);
 
-            Assert.Equal(StatusColors.Published, source.StatusColor);
+            Assert.Equal(StatusColors.Published, content.StatusColor);
         }
 
         [Fact]
         public async Task Should_enrich_content_with_default_color_if_not_found()
         {
-            var source = PublishedContent();
+            var content = PublishedContent();
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+            A.CallTo(() => contentWorkflow.GetInfoAsync(content))
                 .Returns(Task.FromResult<StatusInfo>(null!));
 
             var ctx = requestContext.WithResolveFlow(true);
 
-            await sut.EnrichAsync(ctx, new[] { source }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            Assert.Equal(StatusColors.Draft, source.StatusColor);
+            Assert.Equal(StatusColors.Draft, content.StatusColor);
         }
 
         [Fact]
         public async Task Should_enrich_content_with_can_update()
         {
-            var source = new ContentEntity { SchemaId = schemaId };
+            var content = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(source, requestContext.User))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, requestContext.User))
                 .Returns(true);
 
             var ctx = requestContext.WithResolveFlow(true);
 
-            await sut.EnrichAsync(ctx, new[] { source }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            Assert.True(source.CanUpdate);
+            Assert.True(content.CanUpdate);
         }
 
         [Fact]
@@ -89,15 +89,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             requestContext.WithResolveFlow(false);
 
-            var source = new ContentEntity { SchemaId = schemaId };
+            var content = new ContentEntity { SchemaId = schemaId };
 
             var ctx = requestContext.WithResolveFlow(false);
 
-            await sut.EnrichAsync(ctx, new[] { source }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            Assert.False(source.CanUpdate);
+            Assert.False(content.CanUpdate);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(source, requestContext.User))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, requestContext.User))
                 .MustNotHaveHappened();
         }
 

@@ -31,7 +31,7 @@ namespace Squidex.Web
             [412] = "https://tools.ietf.org/html/rfc7231#section-6.5.10",
             [415] = "https://tools.ietf.org/html/rfc7231#section-6.5.13",
             [422] = "https://tools.ietf.org/html/rfc4918#section-11.2",
-            [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
         };
 
         private static void AddHandler<T>(Func<T, ErrorDto> handler) where T : Exception
@@ -54,11 +54,9 @@ namespace Squidex.Web
         {
             Guard.NotNull(exception);
 
-            ErrorDto? result = null;
-
             foreach (var handler in Handlers)
             {
-                result = handler(exception);
+                var result = handler(exception);
 
                 if (result != null)
                 {

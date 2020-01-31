@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ref2_1 = CreateRefContent(Guid.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
             var ref2_2 = CreateRefContent(Guid.NewGuid(), 4, "ref2_2", 29, refSchemaId2);
 
-            var source = new[]
+            var contents = new[]
             {
                 CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, source, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            var enriched1 = source[0];
+            var enriched1 = contents[0];
 
             Assert.Contains(refSchemaId1.Id, enriched1.CacheDependencies);
             Assert.Contains(refSchemaId2.Id, enriched1.CacheDependencies);
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Contains(ref2_1.Id, enriched1.CacheDependencies);
             Assert.Contains(ref2_1.Version, enriched1.CacheDependencies);
 
-            var enriched2 = source[1];
+            var enriched2 = contents[1];
 
             Assert.Contains(refSchemaId1.Id, enriched2.CacheDependencies);
             Assert.Contains(refSchemaId2.Id, enriched2.CacheDependencies);
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ref2_1 = CreateRefContent(Guid.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
             var ref2_2 = CreateRefContent(Guid.NewGuid(), 3, "ref2_2", 29, refSchemaId2);
 
-            var source = new[]
+            var contents = new[]
             {
                 CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, source, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
                 new NamedContentData()
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 JsonValue.Object()
                                     .Add("en", "ref2_1, 23")
                                     .Add("de", "ref2_1, 23"))),
-                source[0].ReferenceData);
+                contents[0].ReferenceData);
 
             Assert.Equal(
                 new NamedContentData()
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 JsonValue.Object()
                                     .Add("en", "ref2_2, 29")
                                     .Add("de", "ref2_2, 29"))),
-                source[1].ReferenceData);
+                contents[1].ReferenceData);
         }
 
         [Fact]
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ref2_1 = CreateRefContent(Guid.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
             var ref2_2 = CreateRefContent(Guid.NewGuid(), 4, "ref2_2", 29, refSchemaId2);
 
-            var source = new[]
+            var contents = new[]
             {
                 CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id, ref2_2.Id }),
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, source, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
                 new NamedContentData()
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 JsonValue.Object()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
-                source[0].ReferenceData);
+                contents[0].ReferenceData);
 
             Assert.Equal(
                 new NamedContentData()
@@ -229,22 +229,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                 JsonValue.Object()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
-                source[1].ReferenceData);
+                contents[1].ReferenceData);
         }
 
         [Fact]
         public async Task Should_not_enrich_references_if_not_api_user()
         {
-            var source = new[]
+            var contents = new[]
             {
-                CreateContent(new Guid[] { Guid.NewGuid() }, new Guid[0])
+                CreateContent(new[] { Guid.NewGuid() }, new Guid[0])
             };
 
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, source, schemaProvider);
+            await sut.EnrichAsync(ctx, contents, schemaProvider);
 
-            Assert.Null(source[0].ReferenceData);
+            Assert.Null(contents[0].ReferenceData);
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
                 .MustNotHaveHappened();
@@ -253,16 +253,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_enrich_references_if_disabled()
         {
-            var source = new[]
+            var contents = new[]
             {
-                CreateContent(new Guid[] { Guid.NewGuid() }, new Guid[0])
+                CreateContent(new[] { Guid.NewGuid() }, new Guid[0])
             };
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).WithoutContentEnrichment(true);
 
-            await sut.EnrichAsync(ctx, source, schemaProvider);
+            await sut.EnrichAsync(ctx, contents, schemaProvider);
 
-            Assert.Null(source[0].ReferenceData);
+            Assert.Null(contents[0].ReferenceData);
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
                 .MustNotHaveHappened();
@@ -271,14 +271,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_invoke_query_service_if_no_references_found()
         {
-            var source = new[]
+            var contents = new[]
             {
                 CreateContent(new Guid[0], new Guid[0])
             };
 
-            await sut.EnrichAsync(requestContext, source, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            Assert.NotNull(source[0].ReferenceData);
+            Assert.NotNull(contents[0].ReferenceData);
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
                 .MustNotHaveHappened();

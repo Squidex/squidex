@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     var document = new Document();
 
-                    document.AddBinaryDocValuesField("field", new BytesRef(new byte[] { i }));
+                    document.AddBinaryDocValuesField("field", new BytesRef(new[] { i }));
 
                     indexWriter.AddDocument(document);
                 }

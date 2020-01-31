@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Log
                     new CreateIndexOptions
                     {
                         ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
-                    }),
+                    })
             }, ct);
         }
 

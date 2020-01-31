@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Metadata = new ContributorsMetadata
                 {
-                    IsInvited = isInvited.ToString()
+                    IsInvited = "true"
                 };
             }
         }

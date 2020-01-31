@@ -38,19 +38,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAppPlansProvider appPlansProvider;
         private readonly MyContentsControllerOptions controllerOptions;
         private readonly ITagService tagService;
-        private readonly AssetOptions assetOptions;
 
         public AssetsController(
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetStatsRepository,
             IAppPlansProvider appPlansProvider,
-            IOptions<AssetOptions> assetOptions,
             IOptions<MyContentsControllerOptions> controllerOptions,
             ITagService tagService)
             : base(commandBus)
         {
-            this.assetOptions = assetOptions.Value;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlansProvider = appPlansProvider;

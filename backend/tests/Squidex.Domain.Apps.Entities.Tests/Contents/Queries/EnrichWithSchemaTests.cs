@@ -39,13 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_with_reference_fields()
         {
+            var content = PublishedContent();
+
             var ctx = new Context(Mocks.FrontendUser(), requestContext.App);
 
-            var source = PublishedContent();
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), schemaProvider);
-
-            Assert.NotNull(source.ReferenceFields);
+            Assert.NotNull(content.ReferenceFields);
         }
 
         [Fact]
@@ -61,14 +61,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_with_schema_names()
         {
-            var ctx = new Context(Mocks.FrontendUser(), requestContext.App);
+            var content = PublishedContent();
 
-            var source = PublishedContent();
+            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(source, 1), schemaProvider);
-
-            Assert.Equal("my-schema", source.SchemaName);
-            Assert.Equal("my-schema", source.SchemaDisplayName);
+            Assert.Equal("my-schema", content.SchemaName);
+            Assert.Equal("my-schema", content.SchemaDisplayName);
         }
 
         private ContentEntity PublishedContent()

@@ -330,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Assert.Equal(new HashSet<string>
             {
                 "found1_mapped",
-                "found2_mapped",
+                "found2_mapped"
             }, newIndex);
         }
 

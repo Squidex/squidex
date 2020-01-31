@@ -23,7 +23,7 @@ namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
-        private static readonly AssemblyName[] SharedAssemblies = new Type[]
+        private static readonly AssemblyName[] SharedAssemblies = new[]
         {
             typeof(IPlugin),
             typeof(SquidexCoreModel),

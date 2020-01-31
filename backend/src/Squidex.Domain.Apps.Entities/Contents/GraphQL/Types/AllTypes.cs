@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly QueryArguments PathArguments = new QueryArguments(new QueryArgument(None)
         {
             Name = PathName,
-            Description = $"The path to the json value",
+            Description = "The path to the json value",
             DefaultValue = null,
             ResolvedType = String
         });

@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
     {
         Task<J<object>> ExecuteAsync(J<CommentsCommand> command);
 
-        Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any);
+        Task<CommentsResult> GetCommentsAsync(long sinceVersion = EtagVersion.Any);
     }
 }

@@ -11,8 +11,11 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
@@ -116,9 +119,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return dataDraft; }
         }
 
+        public void LoadData(ContentState value, Schema schema, IJsonSerializer serializer)
+        {
+            ReferencedIds = value.Data.GetReferencedIds(schema);
+
+            DataByIds = value.Data.ToMongoModel(schema, serializer);
+
+            if (!ReferenceEquals(value.Data, value.DataDraft))
+            {
+                DataDraftByIds = value.DataDraft.ToMongoModel(schema, serializer);
+            }
+            else
+            {
+                DataDraftByIds = DataByIds;
+            }
+        }
+
         public void ParseData(Schema schema, IJsonSerializer serializer)
         {
-            data = DataByIds?.FromMongoModel(schema, serializer);
+            if (DataByIds != null)
+            {
+                data = DataByIds.FromMongoModel(schema, serializer);
+            }
 
             if (DataDraftByIds != null)
             {

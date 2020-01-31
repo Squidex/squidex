@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 {
                     ["id"] = Builder.GuidProperty($"The id of the {schemaName} content.", true),
                     ["data"] = Builder.ObjectProperty(dataSchema, $"The data of the {schemaName}.", true),
-                    ["dataDraft"] = Builder.ObjectProperty(dataSchema, $"The draft data of the {schemaName}.", false),
+                    ["dataDraft"] = Builder.ObjectProperty(dataSchema, $"The draft data of the {schemaName}."),
                     ["version"] = Builder.NumberProperty($"The version of the {schemaName}.", true),
                     ["created"] = Builder.DateTimeProperty($"The date and time when the {schemaName} content has been created.", true),
                     ["createdBy"] = Builder.StringProperty($"The user that has created the {schemaName} content.", true),

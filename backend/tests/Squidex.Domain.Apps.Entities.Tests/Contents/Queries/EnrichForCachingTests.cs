@@ -39,14 +39,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_add_app_version_and_schema_as_dependency()
         {
-            var source = PublishedContent();
+            var content = PublishedContent();
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(source, 1), schemaProvider);
+            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
-            Assert.Contains(requestContext.App.Version, source.CacheDependencies);
+            Assert.Contains(requestContext.App.Version, content.CacheDependencies);
 
-            Assert.Contains(schema.Id, source.CacheDependencies);
-            Assert.Contains(schema.Version, source.CacheDependencies);
+            Assert.Contains(schema.Id, content.CacheDependencies);
+            Assert.Contains(schema.Version, content.CacheDependencies);
         }
 
         private ContentEntity PublishedContent()

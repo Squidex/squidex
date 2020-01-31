@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -34,32 +32,10 @@ namespace TestSuite.ApiTests
             var schemaName = $"schema-{DateTime.UtcNow.Ticks}";
 
             // STEP 1: Create a schema.
-            var schema = await _.Schemas.PostSchemaAsync(_.AppName, new CreateSchemaDto
-            {
-                Name = schemaName,
-                Fields = new List<UpsertSchemaFieldDto>
-                {
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "number",
-                        Properties = new NumberFieldPropertiesDto
-                        {
-                            IsRequired = true
-                        }
-                    },
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "string",
-                        Properties = new StringFieldPropertiesDto
-                        {
-                            IsRequired = false
-                        }
-                    }
-                },
-                IsPublished = true
-            });
+            var schema = await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
 
             var contents = _.ClientManager.GetClient<TestEntity, TestEntityData>(schemaName);
+
 
             // STEP 2: Create a content for this schema.
             var data = new TestEntityData { Number = 12, String = "hello" };
@@ -78,6 +54,40 @@ namespace TestSuite.ApiTests
 
             // Should not return deleted field.
             Assert.Null(content_2.Data.String);
+        }
+
+        [Fact]
+        public async Task Should_cleanup_old_references()
+        {
+            var schemaName = $"schema-{DateTime.UtcNow.Ticks}";
+
+            // STEP 1: Create a schema.
+            await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
+
+            var contents = _.ClientManager.GetClient<TestEntityWithReferences, TestEntityWithReferencesData>(schemaName);
+
+
+            // STEP 2: Create a referenced content.
+            var dataA = new TestEntityWithReferencesData();
+
+            var contentA_1 = await contents.CreateAsync(dataA);
+
+
+            // STEP 3: Create a content with a reference.
+            var dataB = new TestEntityWithReferencesData { References = new[] { Guid.Parse(contentA_1.Id) } };
+
+            var contentB_1 = await contents.CreateAsync(dataB);
+
+
+            // STEP 3: Delete a reference
+            await contents.DeleteAsync(contentA_1.Id);
+
+
+            // STEP 4: Make any update.
+            var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, "Published");
+
+            // Should not return deleted field.
+            Assert.Empty(contentB_2.Data.References);
         }
     }
 }

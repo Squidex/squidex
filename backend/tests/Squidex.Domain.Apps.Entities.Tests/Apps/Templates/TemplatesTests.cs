@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
 
-        public static readonly IEnumerable<object[]> TemplateTests = new object[][]
+        public static readonly IEnumerable<object[]> TemplateTests = new[]
         {
             new object[] { new CreateBlogCommandMiddleware(), "blog" },
             new object[] { new CreateIdentityCommandMiddleware(), "identity" },

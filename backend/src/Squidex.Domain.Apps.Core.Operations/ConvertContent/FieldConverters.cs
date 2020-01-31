@@ -225,8 +225,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ResolveFallbackLanguages(LanguagesConfig languages)
         {
-            var master = languages.Master;
-
             return (data, field) =>
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
