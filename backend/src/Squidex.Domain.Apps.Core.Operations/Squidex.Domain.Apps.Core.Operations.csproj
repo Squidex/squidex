@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -17,8 +17,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jint" Version="3.0.0-beta-1580" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.6.2" />
-    <PackageReference Include="NJsonSchema" Version="10.0.28" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.6.3" />
+    <PackageReference Include="NJsonSchema" Version="10.1.5" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />

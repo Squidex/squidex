@@ -87,7 +87,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public async Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            await Collection.ReplaceOneAsync(x => x.Id == role.Id, role, null, cancellationToken);
+            await Collection.ReplaceOneAsync(x => x.Id == role.Id, role, cancellationToken: cancellationToken);
 
             return IdentityResult.Success;
         }

@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 
             if (client != null && version < FeatureVersion)
             {
-                var query = new ODataQuery
+                var query = new ContentQuery
                 {
                     Filter = $"data/version/iv ge {FeatureVersion}"
                 };

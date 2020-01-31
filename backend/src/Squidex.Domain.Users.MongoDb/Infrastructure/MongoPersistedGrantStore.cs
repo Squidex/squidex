@@ -51,7 +51,7 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
 
         public Task StoreAsync(PersistedGrant grant)
         {
-            return Collection.ReplaceOneAsync(x => x.Key == grant.Key, grant, new UpdateOptions { IsUpsert = true });
+            return Collection.ReplaceOneAsync(x => x.Key == grant.Key, grant, UpsertReplace);
         }
 
         public Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)

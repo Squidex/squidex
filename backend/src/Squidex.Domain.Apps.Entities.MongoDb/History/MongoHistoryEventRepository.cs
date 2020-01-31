@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 
         public Task InsertAsync(HistoryEvent item)
         {
-            return Collection.ReplaceOneAsync(x => x.Id == item.Id, item, Upsert);
+            return Collection.ReplaceOneAsync(x => x.Id == item.Id, item, UpsertReplace);
         }
 
         public Task RemoveAsync(Guid appId)

@@ -344,7 +344,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => store.WithEventSourcing(typeof(MyLogDomainObject), id, A<HandleEvent>.Ignored))
                 .Invokes(args =>
                 {
-                    handleEvent = args.GetArgument<HandleEvent>(2);
+                    handleEvent = args.GetArgument<HandleEvent>(2)!;
                 })
                 .Returns(persistence);
 

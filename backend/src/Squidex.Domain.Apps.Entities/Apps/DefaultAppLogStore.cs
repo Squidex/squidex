@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string FieldRequestMethod = "RequestMethod";
         private const string FieldRequestPath = "RequestPath";
         private const string FieldTimestamp = "Timestamp";
-        private readonly Configuration csvConfiguration = new Configuration { Delimiter = "|" };
+        private readonly CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = "|" };
         private readonly IRequestLogStore requestLogStore;
 
         public DefaultAppLogStore(IRequestLogStore requestLogStore)
