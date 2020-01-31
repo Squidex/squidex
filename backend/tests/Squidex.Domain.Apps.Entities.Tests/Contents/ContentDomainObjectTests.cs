@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns((app, schema));
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data!);
+                .ReturnsLazily(x => x.GetArgument<ScriptContext>(0)!.Data!);
 
             patched = patch.MergeInto(data);
 

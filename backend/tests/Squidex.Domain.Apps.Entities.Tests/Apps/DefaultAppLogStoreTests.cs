@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>.Ignored, appId.ToString(), dateFrom, dateTo, default))
                 .Invokes(x =>
                 {
-                    var callback = x.GetArgument<Func<Request, Task>>(0);
+                    var callback = x.GetArgument<Func<Request, Task>>(0)!;
 
                     callback(CreateRecord());
                     callback(CreateRecord());

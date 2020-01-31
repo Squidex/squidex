@@ -30,7 +30,7 @@ namespace Squidex.Domain.Users
                 .Returns(true);
 
             A.CallTo(() => userManager.NormalizeEmail(A<string>.Ignored))
-                .ReturnsLazily(c => c.GetArgument<string>(0).ToUpperInvariant());
+                .ReturnsLazily(c => c.GetArgument<string>(0)!.ToUpperInvariant());
 
             var serviceProvider = A.Fake<IServiceProvider>();
 
