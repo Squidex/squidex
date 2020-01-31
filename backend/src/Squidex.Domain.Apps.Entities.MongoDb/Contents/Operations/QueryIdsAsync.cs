@@ -29,18 +29,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         protected override Task PrepareAsync(CancellationToken ct = default)
         {
-            var index1 =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.IsDeleted));
-
-            var index2 =
+            var index =
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted));
 
-            return Collection.Indexes.CreateManyAsync(new[] { index1, index2 }, ct);
+            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
         public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> DoAsync(Guid appId, HashSet<Guid> ids)

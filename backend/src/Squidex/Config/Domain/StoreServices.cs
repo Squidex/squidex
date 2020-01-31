@@ -37,7 +37,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Store;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -117,8 +116,8 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),
-                            c.GetRequiredService<IJsonSerializer>(),
-                            c.GetRequiredService<ITextIndexer>()))
+                            c.GetRequiredService<ITextIndexer>(),
+                            c.GetRequiredService<IJsonSerializer>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>();

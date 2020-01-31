@@ -13,7 +13,7 @@ namespace Migrate_00
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             Console.WriteLine("Migrate EventStore");
 

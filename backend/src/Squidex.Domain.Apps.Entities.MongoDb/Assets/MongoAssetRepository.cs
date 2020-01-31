@@ -29,6 +29,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
         }
 
+        public IMongoCollection<MongoAssetEntity> GetInternalCollection()
+        {
+            return Collection;
+        }
+
         protected override string CollectionName()
         {
             return "States_Assets";
@@ -43,6 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.ParentId)
+                        .Ascending(x => x.Tags)
                         .Descending(x => x.LastModified)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
@@ -53,12 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     Index
                         .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileHash)),
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.Id))
+                        .Ascending(x => x.FileHash))
             }, ct);
         }
 
@@ -75,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     var assetCount = Collection.Find(filter).CountDocumentsAsync();
                     var assetItems =
                         Collection.Find(filter)
-                            .Take(query)
-                            .Skip(query)
-                            .Sort(query)
+                            .QueryLimit(query)
+                            .QuerySkip(query)
+                            .QuerySort(query)
                             .ToListAsync();
 
                     await Task.WhenAll(assetItems, assetCount);
