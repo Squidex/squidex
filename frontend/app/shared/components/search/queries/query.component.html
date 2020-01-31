@@ -1,12 +1,12 @@
 <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
-    (change)="queryChange.emit()">
+    (change)="emitQueryChange()">
 </sqx-filter-logical>
 
 <h4 class="mt-4">Sorting</h4>
 
-<div class="mb-2" *ngFor="let sorting of queryValue.sort">
+<div class="mb-2" *ngFor="let sorting of queryValue.sort; let i = index">
     <sqx-sorting [sorting]="sorting" [model]="model"
-        (remove)="removeSorting(sorting)" (change)="queryChange.emit()">
+        (remove)="removeSorting(i)" (change)="emitQueryChange()">
     </sqx-sorting>
 </div>
 
