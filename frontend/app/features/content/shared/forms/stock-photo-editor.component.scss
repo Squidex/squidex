@@ -73,7 +73,7 @@ sqx-list-view {
     & {
         border: 2px solid $color-border;
         border-radius: 0;
-        display: inline-block;
+        break-inside: avoid-column;
         margin-bottom: .5rem;
         margin-right: .5rem;
         position: relative;
@@ -99,5 +99,9 @@ sqx-list-view {
         color: $color-dark-foreground;
         font-size: 90%;
         font-weight: normal;
+    }
+
+    img {
+        width: 100%;
     }
 }
