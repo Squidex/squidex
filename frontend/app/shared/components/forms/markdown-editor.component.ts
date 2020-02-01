@@ -219,13 +219,12 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                     content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
                     break;
                 case 'Video':
-                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)}')`;
                     break;
                 default:
-                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)}')`;
                     break;
             }
-            content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
         }
 
         if (content.length > 0) {
