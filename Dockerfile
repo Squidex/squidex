@@ -19,10 +19,10 @@ COPY backend .
  
 # Test Backend
 RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies \ 
- && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
- && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
- && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
- && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
+ && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj --filter Category!=Dependencies \ 
+ && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj --filter Category!=Dependencies \
+ && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj --filter Category!=Dependencies \
+ && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj --filter Category!=Dependencies
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION

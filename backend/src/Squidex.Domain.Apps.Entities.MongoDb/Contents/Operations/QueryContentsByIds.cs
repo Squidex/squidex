@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -29,18 +28,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.serializer = serializer;
 
             this.appProvider = appProvider;
-        }
-
-        protected override Task PrepareAsync(CancellationToken ct = default)
-        {
-            var index =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.Status)
-                    .Descending(x => x.LastModified));
-
-            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
         public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids, Status[]? status, bool includeDraft)
@@ -76,12 +63,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 schemas[schema.Id] = schema;
             }
 
-            var misingSchemaIds = contentItems.Select(x => x.IndexedSchemaId).Distinct().Where(x => !schemas.ContainsKey(x));
-            var missingSchemas = await Task.WhenAll(misingSchemaIds.Select(x => appProvider.GetSchemaAsync(appId, x)));
+            var schemaIds = contentItems.Select(x => x.IndexedSchemaId).Distinct();
 
-            foreach (var missingSchema in missingSchemas)
+            foreach (var schemaId in schemaIds)
             {
-                schemas[missingSchema.Id] = missingSchema;
+                if (!schemas.ContainsKey(schemaId))
+                {
+                    var found = await appProvider.GetSchemaAsync(appId, schemaId);
+
+                    if (found != null)
+                    {
+                        schemas[schemaId] = found;
+                    }
+                }
             }
 
             return schemas;
@@ -98,10 +92,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             if (status != null)
             {
                 filters.Add(Filter.In(x => x.Status, status));
-            }
-            else
-            {
-                filters.Add(Filter.Exists(x => x.Status));
             }
 
             if (ids != null && ids.Count > 0)

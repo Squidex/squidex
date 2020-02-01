@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, ITextIndexer indexer, IJsonSerializer serializer)
             : base(database)
         {
             Guard.NotNull(appProvider);
@@ -59,6 +59,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryScheduledItems = new QueryScheduledContents();
         }
 
+        public IMongoCollection<MongoContentEntity> GetInternalCollection()
+        {
+            return Collection;
+        }
+
+        protected override string CollectionName()
+        {
+            return "State_Contents";
+        }
+
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
             await queryContentAsync.PrepareAsync(collection, ct);
@@ -66,11 +76,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryContentsByQuery.PrepareAsync(collection, ct);
             await queryIdsAsync.PrepareAsync(collection, ct);
             await queryScheduledItems.PrepareAsync(collection, ct);
-        }
-
-        protected override string CollectionName()
-        {
-            return "State_Contents";
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, bool inDraft, ClrQuery query, bool includeDraft = true)

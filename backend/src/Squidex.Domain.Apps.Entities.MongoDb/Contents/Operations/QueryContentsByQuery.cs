@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -37,23 +36,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         protected override Task PrepareAsync(CancellationToken ct = default)
         {
-            var index1 =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedSchemaId)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.Status)
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.ReferencedIds)
-                    .Descending(x => x.LastModified));
-
-            var index2 =
+            var index =
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.Status)
                     .Descending(x => x.LastModified));
 
-            return Collection.Indexes.CreateManyAsync(new[] { index1, index2 }, ct);
+            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft, bool includeDraft = true)
@@ -84,9 +74,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentItems =
                     Collection.Find(filter)
                         .WithoutDraft(includeDraft)
-                        .Take(query)
-                        .Skip(query)
-                        .Sort(query)
+                        .QueryLimit(query)
+                        .QuerySkip(query)
+                        .QuerySort(query)
                         .ToListAsync();
 
                 await Task.WhenAll(contentItems, contentCount);
@@ -123,29 +113,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 filters.Add(Filter.In(x => x.Status, status));
             }
-            else
-            {
-                filters.Add(Filter.Exists(x => x.Status));
-            }
 
             if (ids != null && ids.Count > 0)
             {
-                if (ids.Count > 1)
-                {
-                    filters.Add(
-                        Filter.Or(
-                            Filter.In(x => x.Id, ids),
-                            Filter.AnyIn(x => x.ReferencedIds, ids)));
-                }
-                else
-                {
-                    var first = ids.First();
-
-                    filters.Add(
-                        Filter.Or(
-                            Filter.Eq(x => x.Id, first),
-                            Filter.AnyEq(x => x.ReferencedIds, first)));
-                }
+                filters.Add(Filter.In(x => x.Id, ids));
             }
 
             if (query?.Filter != null)

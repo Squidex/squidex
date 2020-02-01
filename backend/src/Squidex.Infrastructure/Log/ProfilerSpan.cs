@@ -8,6 +8,9 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable RECS0092 // Convert field to readonly
+
 namespace Squidex.Infrastructure.Log
 {
     public sealed class ProfilerSpan : IDisposable

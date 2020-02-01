@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
+#pragma warning disable RECS0092 // Convert field to readonly
+
 namespace Squidex.Web.Pipeline
 {
     public class CleanupHostMiddlewareTests

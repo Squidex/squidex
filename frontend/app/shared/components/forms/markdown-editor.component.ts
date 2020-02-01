@@ -214,6 +214,17 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         let content = '';
 
         for (const asset of assets) {
+            switch (asset.type) {
+                case 'Image':
+                    content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    break;
+                case 'Video':
+                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    break;
+                default:
+                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    break;
+            }
             content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
         }
 

@@ -98,10 +98,5 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>.Ignored, A<bool>.Ignored))
                 .MustNotHaveHappened();
         }
-
-        private CommandContext Context(AssignContributor command)
-        {
-            return new CommandContext(command, commandBus);
-        }
     }
 }

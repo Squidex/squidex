@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             var query = new ClrQuery { Take = 3 };
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
-            cursor.Take(query.AdjustToModel());
+            cursor.QueryLimit(query.AdjustToModel());
 
             A.CallTo(() => cursor.Limit(3))
                 .MustHaveHappened();
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             var query = new ClrQuery { Skip = 3 };
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
-            cursor.Skip(query.AdjustToModel());
+            cursor.QuerySkip(query.AdjustToModel());
 
             A.CallTo(() => cursor.Skip(3))
                 .MustHaveHappened();
@@ -210,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.Sort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel());
+            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel());
 
             return i;
         }

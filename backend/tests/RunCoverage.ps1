@@ -37,7 +37,7 @@ if ($all -Or $appsCore) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
 	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
 	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
@@ -49,7 +49,7 @@ if ($all -Or $appsEntities) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
 	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
 	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
@@ -61,7 +61,7 @@ if ($all -Or $users) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
 	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
 	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `
@@ -73,7 +73,7 @@ if ($all -Or $web) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
 	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
 	-excludebyattribute:*.ExcludeFromCodeCoverage* `
 	-skipautoprops `

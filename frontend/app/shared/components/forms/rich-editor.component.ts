@@ -211,11 +211,11 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
         for (const asset of assets) {
             switch (asset.type) {
-                case 'Video':
-                    content += `<video src="${asset.fullUrl(this.apiUrl)}" />`;
+                case 'Image':
+                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
                     break;
                 case 'Video':
-                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
+                    content += `<video src="${asset.fullUrl(this.apiUrl)}" />`;
                     break;
                 default:
                     content += `<a href="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}">${asset.fileName}</a>`;
