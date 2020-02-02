@@ -16,8 +16,8 @@ import {
 
 @Component({
     selector: 'sqx-asset-folder-form',
-    styleUrls: ['./asset-folder-form.component.scss'],
-    templateUrl: './asset-folder-form.component.html',
+    styleUrls: ['./asset-folder-dialog.component.scss'],
+    templateUrl: './asset-folder-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetFolderFormComponent implements OnInit {
