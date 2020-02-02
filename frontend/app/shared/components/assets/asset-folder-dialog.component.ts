@@ -15,12 +15,12 @@ import {
 } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-folder-form',
+    selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetFolderFormComponent implements OnInit {
+export class AssetFolderDialogComponent implements OnInit {
     @Output()
     public complete = new EventEmitter();
 

@@ -11,7 +11,7 @@ export * from './components/schema-category.component';
 export * from './components/table-header.component';
 
 export * from './components/assets/asset-dialog.component';
-export * from './components/assets/asset-folder-form.component';
+export * from './components/assets/asset-folder-dialog.component';
 export * from './components/assets/asset-folder.component';
 export * from './components/assets/asset-path.component';
 export * from './components/assets/asset-uploader.component';
