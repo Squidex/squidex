@@ -1,0 +1,29 @@
+<div class="menu">
+    <button type="button" class="btn" (click)="rotate(-90)" title="Rotate Left">
+        <i class="icon-rotate_left"></i>
+    </button>
+
+    <button type="button" class="btn" (click)="rotate(90)" title="Rotate Right">
+        <i class="icon-rotate_right"></i>
+    </button>
+
+    <span class="separator"></span>
+
+    <button type="button" class="btn" (click)="flip(false)" title="Flip Vertically">
+        <i class="icon-flip"></i>
+    </button>
+
+    <button type="button" class="btn rotate 90" (click)="flip(true)" title="Flip Horizontally">
+        <i class="icon-flip"></i>
+    </button>
+
+    <span class="separator"></span>
+
+    <button type="button" class="btn" (click)="reset()" title="Reset">
+        <i class="icon-close"></i>
+    </button>
+</div>
+
+<div class="editor">
+    <canvas #editor></canvas>
+</div>
