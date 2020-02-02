@@ -18,7 +18,8 @@ export * from './components/assets/asset-uploader.component';
 export * from './components/assets/asset.component';
 export * from './components/assets/assets-list.component';
 export * from './components/assets/assets-selector.component';
-export * from './components/assets/image-editor.component';
+export * from './components/assets/image-cropper.component';
+export * from './components/assets/image-focus-point.component';
 export * from './components/assets/pipes';
 
 export * from './components/comments/comment.component';

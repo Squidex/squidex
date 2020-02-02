@@ -30,6 +30,7 @@ import {
 const SVG_PREVIEW_LIMIT = 10 * 1024;
 
 import { encodeQuery, Query } from './../state/query';
+import { AuthService } from './auth.service';
 
 export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {
@@ -89,8 +90,14 @@ export class AssetDto {
         this._meta = meta;
     }
 
-    public fullUrl(apiUrl: ApiUrlConfig) {
-        return apiUrl.buildUrl(this.contentUrl);
+    public fullUrl(apiUrl: ApiUrlConfig, authService?: AuthService) {
+        let url = apiUrl.buildUrl(this.contentUrl);
+
+        if (this.isProtected && authService && authService.user) {
+            url += `&access_token=${authService.user.accessToken}`;
+        }
+
+        return url;
     }
 }
 

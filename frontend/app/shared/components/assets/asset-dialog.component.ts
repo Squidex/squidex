@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    AnnotateAssetDto,
     AnnotateAssetForm,
     AssetDto,
     AssetsState,
@@ -19,7 +20,8 @@ import {
     UploadCanceled
 } from '@app/shared/internal';
 
-import { ImageEditorComponent } from './image-editor.component';
+import { ImageCropperComponent } from './image-cropper.component';
+import { ImageFocusPointComponent } from './image-focus-point.component';
 
 @Component({
     selector: 'sqx-asset-dialog',
@@ -27,7 +29,7 @@ import { ImageEditorComponent } from './image-editor.component';
     templateUrl: './asset-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetDialogComponent implements OnInit {
+export class AssetDialogComponent implements OnChanges {
     @Output()
     public complete = new EventEmitter();
 
@@ -35,16 +37,16 @@ export class AssetDialogComponent implements OnInit {
     public changed = new EventEmitter<AssetDto>();
 
     @Input()
-    public accessToken: string;
-
-    @Input()
     public asset: AssetDto;
 
     @Input()
     public allTags: ReadonlyArray<string>;
 
-    @ViewChildren(ImageEditorComponent)
-    public imageEditor: QueryList<ImageEditorComponent>;
+    @ViewChildren(ImageCropperComponent)
+    public imageCropper: QueryList<ImageCropperComponent>;
+
+    @ViewChildren(ImageFocusPointComponent)
+    public imageFocus: QueryList<ImageFocusPointComponent>;
 
     public isEditable = false;
     public isEditableAny = false;
@@ -67,7 +69,7 @@ export class AssetDialogComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.isEditable = this.asset.canUpdate;
         this.isUploadable = this.asset.canUpload;
 
@@ -75,12 +77,14 @@ export class AssetDialogComponent implements OnInit {
         this.annotateForm.setEnabled(this.isEditable);
 
         if (this.asset.type === 'Image') {
-            this.selectableTabs = ['Metadata', 'Image'];
+            this.selectableTabs = ['Metadata', 'Image', 'Focus Point'];
         } else {
             this.selectableTabs = ['Metadata'];
         }
 
-        this.selectTab(this.selectableTabs[0]);
+        if (this.selectableTabs.indexOf(this.selectedTab) < 0) {
+            this.selectTab(this.selectableTabs[0]);
+        }
     }
 
     public selectTab(tab: string) {
@@ -95,14 +99,12 @@ export class AssetDialogComponent implements OnInit {
         this.complete.emit();
     }
 
-    public annotateAsset() {
-        if (this.selectedTab === 'Image') {
-            if (!this.isUploadable) {
-                return;
-            }
+    public cropImage() {
+        if (!this.isUploadable) {
+            return;
+        }
 
-            const file = this.imageEditor.first.toFile();
-
+        this.imageCropper.first.toFile().then(file => {
             if (file) {
                 this.setProgress(0);
 
@@ -112,9 +114,9 @@ export class AssetDialogComponent implements OnInit {
                             this.setProgress(dto);
                         } else {
                             this.changed.emit(dto);
-                        }
 
-                        this.dialogs.notifyInfo('Asset has been updated.');
+                            this.dialogs.notifyInfo('Asset has been updated.');
+                        }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
                             this.dialogs.notifyError(error);
@@ -125,25 +127,37 @@ export class AssetDialogComponent implements OnInit {
             } else {
                 this.dialogs.notifyInfo('Nothing has changed.');
             }
+        });
+    }
+
+    public setFocusPoint() {
+        if (!this.isEditable) {
+            return;
+        }
+
+        this.annoateAssetInternal(this.imageFocus.first.submit(this.asset));
+    }
+
+    public annotateAsset() {
+        if (!this.isEditable) {
+            return;
+        }
+
+        this.annoateAssetInternal(this.annotateForm.submit(this.asset));
+    }
+
+    private annoateAssetInternal(value: AnnotateAssetDto | null) {
+        if (value) {
+            this.assetsState.updateAsset(this.asset, value)
+                .subscribe(() => {
+                    this.annotateForm.submitCompleted({ noReset: true });
+
+                    this.dialogs.notifyInfo('Asset has been updated.');
+                }, error => {
+                    this.annotateForm.submitFailed(error);
+                });
         } else {
-            if (!this.isEditable) {
-                return;
-            }
-
-            const value = this.annotateForm.submit(this.asset);
-
-            if (value) {
-                this.assetsState.updateAsset(this.asset, value)
-                    .subscribe(() => {
-                        this.annotateForm.submitCompleted({ noReset: true });
-
-                        this.dialogs.notifyInfo('Asset has been updated.');
-                    }, error => {
-                        this.annotateForm.submitFailed(error);
-                    });
-            } else {
-                this.dialogs.notifyInfo('Nothing has changed.');
-            }
+            this.dialogs.notifyInfo('Nothing has changed.');
         }
     }
 

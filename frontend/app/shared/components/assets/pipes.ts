@@ -10,6 +10,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import {
     ApiUrlConfig,
     AssetDto,
+    AuthService,
     MathHelper
 } from '@app/shared/internal';
 
@@ -34,12 +35,13 @@ export class AssetUrlPipe implements PipeTransform {
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
     constructor(
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly authService: AuthService
     ) {
     }
 
     public transform(asset: AssetDto): string {
-        return asset.fullUrl(this.apiUrl);
+        return asset.fullUrl(this.apiUrl, this.authService);
     }
 }
 
