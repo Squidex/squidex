@@ -47,6 +47,18 @@ $inner-height: 1.75rem;
     &.dashed {
         border-style: dashed;
     }
+
+    &.readonly {
+        pointer-events: none;
+
+        input {
+            display: none !important;
+        }
+
+        .icon-close {
+            display: none !important;
+        }
+    }
 }
 
 .multiline {
@@ -74,7 +86,8 @@ div {
     }
 
     &.disabled,
-    &:disabled {
+    &:disabled,
+    &.readonly {
         background: transparent;
     }
 

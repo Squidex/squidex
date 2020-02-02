@@ -6,11 +6,10 @@
             </div>
             <div class="col col-tags">
                 <sqx-tag-editor [converter]="schemasSource.converter | async" [ngModel]="workflow.schemaIds"
-                    placeholder=""
                     styleGray="true"
                     styleBlank="true"
                     singleLine="true"
-                    disabled="true">
+                    readonly="true">
                 </sqx-tag-editor>
             </div>
             <div class="col-options">
