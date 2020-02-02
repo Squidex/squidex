@@ -8,11 +8,12 @@
 
     &-assigned {
         @include absolute(0, 50%, 0, 0);
-        border-right: 1px solid $color-border;
+        border-right: 1px solid darken($color-input, 2%);
     }
 
     &-available {
         @include absolute(0, 0, 0, 50%);
+        border: 0;
     }
 }
 

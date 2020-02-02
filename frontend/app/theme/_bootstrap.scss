@@ -661,9 +661,10 @@ $icon-size: 4.5rem;
         h4 {
             font-size: 1rem;
             font-weight: normal;
+            line-height: 2.25rem;
         }
 
-        .close {
+        .btn-close {
             & {
                 color: $color-modal-header-foreground;
             }

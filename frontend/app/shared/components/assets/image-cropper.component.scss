@@ -1,4 +1,4 @@
-:host /deep/ {
+:host ::ng-deep {
     @import '~cropperjs/dist/cropper';
 
     img {

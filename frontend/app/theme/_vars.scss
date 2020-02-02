@@ -2,6 +2,7 @@ $color-background:          #eef1f4;
 
 $color-border:              #e4e7e9;
 $color-border-dark:         #b3bbbf;
+$color-border-darker:       darken($color-border, 3%);
 
 $color-title:               #000;
 $color-text:                #373a3c;

@@ -12,7 +12,7 @@ import * as ProgressBar from 'progressbar.js';
 @Component({
     selector: 'sqx-progress-bar',
     styles: [`
-        :host /deep/ svg {
+        :host ::ng-deep svg {
             vertical-align: top
         }`
     ],
