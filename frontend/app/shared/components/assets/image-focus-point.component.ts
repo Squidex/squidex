@@ -86,7 +86,7 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnCha
             return null;
         }
 
-        const metadata = { ...asset.metadata, focusedX: this.x, focusedY: this.y };
+        const metadata = { ...asset.metadata, focusX: this.x, focusY: this.y };
 
         return { metadata };
     }
@@ -96,12 +96,12 @@ function getFocusPoint(value: any): { x: number, y: number } {
     let x = 0;
     let y = 0;
 
-    if (value && Types.isNumber(value.focusedX)) {
-        x = value.focusedX;
+    if (value && Types.isNumber(value.focusX)) {
+        x = value.focusX;
     }
 
-    if (value && Types.isNumber(value.focusedX)) {
-        y = value.focusedX;
+    if (value && Types.isNumber(value.focusY)) {
+        y = value.focusY;
     }
 
     return { x, y };

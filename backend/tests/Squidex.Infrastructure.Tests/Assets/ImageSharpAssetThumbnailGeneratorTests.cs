@@ -19,11 +19,11 @@ namespace Squidex.Infrastructure.Assets
         private readonly MemoryStream target = new MemoryStream();
 
         [Fact]
-        public async Task Should_return_same_image_if_no_size_is_passed_for_thumbnail()
+        public async Task Should_return_same_image_if_no_size_and_quality_is_passed_for_thumbnail()
         {
             var source = GetPng();
 
-            await sut.CreateThumbnailAsync(source, target);
+            await sut.CreateThumbnailAsync(source, target, new ResizeOptions());
 
             Assert.Equal(target.Length, source.Length);
         }
@@ -33,7 +33,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var source = GetPng();
 
-            await sut.CreateThumbnailAsync(source, target, 1000, 1000, "resize");
+            var options = new ResizeOptions { Width = 1000, Height = 1000, Mode = ResizeMode.BoxPad };
+
+            await sut.CreateThumbnailAsync(source, target, options);
 
             Assert.True(target.Length > source.Length);
         }
@@ -43,7 +45,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var source = GetJpeg();
 
-            await sut.CreateThumbnailAsync(source, target, quality: 10);
+            var options = new ResizeOptions { Quality = 10 };
+
+            await sut.CreateThumbnailAsync(source, target, options);
 
             Assert.True(target.Length < source.Length);
         }
@@ -53,7 +57,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var source = GetPng();
 
-            await sut.CreateThumbnailAsync(source, target, quality: 10);
+            var options = new ResizeOptions { Quality = 10 };
+
+            await sut.CreateThumbnailAsync(source, target, options);
 
             Assert.True(target.Length < source.Length);
         }

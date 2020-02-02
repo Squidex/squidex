@@ -5,8 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
@@ -28,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// Set it to 0 to prevent download.
         /// </summary>
         [FromQuery(Name = "download")]
-        public int Download { get; set; } = 1;
+        public int Download { get; set; } = 0;
 
         /// <summary>
         /// The target width of the asset, if it is an image.
@@ -52,11 +56,64 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The resize mode when the width and height is defined.
         /// </summary>
         [FromQuery(Name = "mode")]
-        public string? Mode { get; set; }
+        public ResizeMode? Mode { get; set; }
 
-        public bool ShouldResize()
+        /// <summary>
+        /// Override the y focus point.
+        /// </summary>
+        [FromQuery(Name = "focusX")]
+        public float? FocusX { get; set; }
+
+        /// <summary>
+        /// Override the x focus point.
+        /// </summary>
+        [FromQuery(Name = "focusY")]
+        public float? FocusY { get; set; }
+
+        /// <summary>
+        /// True to ignore the asset focus point if any.
+        /// </summary>
+        [FromQuery(Name = "nofocus")]
+        public bool IgnoreFocus { get; set; }
+
+        public ResizeOptions? ToResizeOptions(IAssetEntity asset)
         {
-            return Width.HasValue || Height.HasValue || Quality.HasValue;
+            Guard.NotNull(asset);
+
+            if (!Width.HasValue && !Height.HasValue && !Quality.HasValue)
+            {
+                return null;
+            }
+
+            var result = SimpleMapper.Map(this, new ResizeOptions());
+
+            var (x, y) = GetFocusPoint(asset);
+
+            result.FocusX = x;
+            result.FocusY = y;
+
+            return result;
+        }
+
+        private (float?, float?) GetFocusPoint(IAssetEntity asset)
+        {
+            if (!IgnoreFocus)
+            {
+                if (FocusX.HasValue && FocusY.HasValue)
+                {
+                    return (FocusX.Value, FocusY.Value);
+                }
+
+                var focusX = asset.Metadata.GetFocusX();
+                var focusY = asset.Metadata.GetFocusY();
+
+                if (focusX.HasValue && focusY.HasValue)
+                {
+                    return (focusX.Value, focusY.Value);
+                }
+            }
+
+            return (null, null);
         }
     }
 }

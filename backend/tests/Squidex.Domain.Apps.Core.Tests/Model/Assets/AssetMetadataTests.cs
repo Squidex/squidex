@@ -14,6 +14,27 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
     public class AssetMetadataTests
     {
         [Fact]
+        public void Should_return_focus_infos_if_found()
+        {
+            var sut =
+                new AssetMetadata()
+                    .SetFocusX(.5f)
+                    .SetFocusY(.2f);
+
+            Assert.Equal(.5f, sut.GetFocusX());
+            Assert.Equal(.2f, sut.GetFocusY());
+        }
+
+        [Fact]
+        public void Should_return_null_if_focus_infos_not_found()
+        {
+            var sut = new AssetMetadata();
+
+            Assert.Null(sut.GetFocusX());
+            Assert.Null(sut.GetFocusY());
+        }
+
+        [Fact]
         public void Should_return_pixel_infos_if_found()
         {
             var sut =
@@ -48,9 +69,12 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         [Fact]
         public void Should_return_plain_value_if_found()
         {
-            var sut = new AssetMetadata().SetPixelWidth(800);
+            var sut = new AssetMetadata
+            {
+                ["someValue"] = JsonValue.Create(800)
+            };
 
-            var found = sut.TryGetByPath("pixelWidth", out var result);
+            var found = sut.TryGetByPath("someValue", out var result);
 
             Assert.True(found);
             Assert.Equal(JsonValue.Create(800), result);
@@ -59,9 +83,9 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         [Fact]
         public void Should_return_null_if_not_found()
         {
-            var sut = new AssetMetadata().SetPixelWidth(800);
+            var sut = new AssetMetadata();
 
-            var found = sut.TryGetByPath("pixelHeight", out var result);
+            var found = sut.TryGetByPath("notFound", out var result);
 
             Assert.False(found);
             Assert.Null(result);

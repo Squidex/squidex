@@ -34,6 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
+        private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 50, Height = 50, Mode = ResizeMode.Crop };
         private readonly IAppImageStore appImageStore;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -232,7 +233,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                                 using (Profiler.Trace("ResizeImage"))
                                 {
-                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, 150, 150, "Crop");
+                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
                                     destinationStream.Position = 0;
                                 }
 

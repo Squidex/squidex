@@ -11,18 +11,24 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Transforms;
 using SixLabors.Primitives;
+using ISResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
+using ISResizeOptions = SixLabors.ImageSharp.Processing.ResizeOptions;
 
 namespace Squidex.Infrastructure.Assets.ImageSharp
 {
     public sealed class ImageSharpAssetThumbnailGenerator : IAssetThumbnailGenerator
     {
-        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string? mode = null, int? quality = null)
+        public Task CreateThumbnailAsync(Stream source, Stream destination, ResizeOptions options)
         {
+            Guard.NotNull(options);
+
             return Task.Run(() =>
             {
-                if (!width.HasValue && !height.HasValue && !quality.HasValue)
+                var w = options.Width ?? 0;
+                var h = options.Height ?? 0;
+
+                if (w <= 0 && h <= 0 && !options.Quality.HasValue)
                 {
                     source.CopyTo(destination);
 
@@ -33,9 +39,9 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 {
                     var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
 
-                    if (quality.HasValue)
+                    if (options.Quality.HasValue)
                     {
-                        encoder = new JpegEncoder { Quality = quality.Value };
+                        encoder = new JpegEncoder { Quality = options.Quality.Value };
                     }
 
                     if (encoder == null)
@@ -43,31 +49,37 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                         throw new NotSupportedException();
                     }
 
-                    if (width.HasValue || height.HasValue)
+                    if (w > 0 && h > 0)
                     {
-                        var isCropUpsize = string.Equals("CropUpsize", mode, StringComparison.OrdinalIgnoreCase);
+                        var isCropUpsize = options.Mode == ResizeMode.CropUpsize;
 
-                        if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
+                        if (!Enum.TryParse<ISResizeMode>(options.Mode.ToString(), true, out var resizeMode))
                         {
-                            resizeMode = ResizeMode.Max;
+                            resizeMode = ISResizeMode.Max;
                         }
 
                         if (isCropUpsize)
                         {
-                            resizeMode = ResizeMode.Crop;
+                            resizeMode = ISResizeMode.Crop;
                         }
 
-                        var resizeWidth = width ?? 0;
-                        var resizeHeight = height ?? 0;
-
-                        if (resizeWidth >= sourceImage.Width && resizeHeight >= sourceImage.Height && resizeMode == ResizeMode.Crop && !isCropUpsize)
+                        if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ISResizeMode.Crop && !isCropUpsize)
                         {
-                            resizeMode = ResizeMode.BoxPad;
+                            resizeMode = ISResizeMode.BoxPad;
                         }
 
-                        var options = new ResizeOptions { Size = new Size(resizeWidth, resizeHeight), Mode = resizeMode };
+                        var resizeOptions = new ISResizeOptions { Size = new Size(w, h), Mode = resizeMode };
 
-                        sourceImage.Mutate(x => x.Resize(options));
+                        if (options.FocusX.HasValue && options.FocusY.HasValue)
+                        {
+                            resizeOptions.CenterCoordinates = new float[]
+                            {
+                                +(options.FocusX.Value / 2f) + 0.5f,
+                                -(options.FocusX.Value / 2f) + 0.5f
+                            };
+                        }
+
+                        sourceImage.Mutate(x => x.Resize(resizeOptions));
                     }
 
                     sourceImage.Save(destination, encoder);

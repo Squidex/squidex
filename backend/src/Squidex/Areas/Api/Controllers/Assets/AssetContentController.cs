@@ -136,14 +136,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var handler = new Func<Stream, Task>(async bodyStream =>
             {
-                if (asset.Type == AssetType.Image && query.ShouldResize())
-                {
-                    var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{query.Width}_{query.Height}_{query.Mode}";
+                var resizeOptions = query.ToResizeOptions(asset);
 
-                    if (query.Quality.HasValue)
-                    {
-                        resizedAsset += $"_{query.Quality}";
-                    }
+                if (asset.Type == AssetType.Image && resizeOptions != null)
+                {
+                    var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
                     try
                     {
@@ -165,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                                     using (Profiler.Trace("ResizeImage"))
                                     {
-                                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, query.Width, query.Height, query.Mode, query.Quality);
+                                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
                                         destinationStream.Position = 0;
                                     }
 
@@ -187,7 +184,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             });
 
-            if (query.Download == 1)
+            if (query.Download == 1 || asset.Type != AssetType.Image)
             {
                 return new FileCallbackResult(asset.MimeType, asset.FileName, true, handler);
             }
