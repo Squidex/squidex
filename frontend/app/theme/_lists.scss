@@ -141,20 +141,19 @@
     }
 
     // Footer that typically contains an add-item-form.
-    &-header,
     &-footer {
         background: $color-table-footer;
         border: 1px solid $color-input;
         border-bottom-width: 2px;
+        margin-top: .75rem;
         padding: .75rem 1.25rem;
     }
 
     &-header {
-        margin-bottom: .8rem;
-    }
-
-    &-footer {
-        margin-top: .8rem;
+        background: $color-table-footer;
+        border-bottom: 1px solid $color-border-darker;
+        margin-bottom: .75rem;
+        padding: .75rem 1.25rem;
     }
 
     // Edit or expand button.

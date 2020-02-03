@@ -1,0 +1,46 @@
+:host ::ng-deep {
+    @import '~cropperjs/dist/cropper';
+
+    img {
+        background-image: $asset-background;
+    }
+}
+
+:host {
+    background: $color-dark-black;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.editor {
+    flex-grow: 1;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.menu {
+    flex-shrink: 0;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none;
+
+    .btn {
+        color: $color-dark-foreground;
+    }
+}
+
+.rotate {
+    transform: rotate(90deg);
+}
+
+.separator {
+    border-left: 1px solid $color-dark-foreground;
+    display: inline-block;
+    height: .75rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}

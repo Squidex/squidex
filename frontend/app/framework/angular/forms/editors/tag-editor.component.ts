@@ -177,6 +177,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public singleLine = false;
 
     @Input()
+    public readonly = false;
+
+    @Input()
     public styleBlank = false;
 
     @Input()

@@ -2,6 +2,7 @@ $color-background:          #eef1f4;
 
 $color-border:              #e4e7e9;
 $color-border-dark:         #b3bbbf;
+$color-border-darker:       darken($color-border, 3%);
 
 $color-title:               #000;
 $color-text:                #373a3c;
@@ -111,3 +112,4 @@ $asset-height:              19rem;
 $asset-header:              12rem;
 $asset-image:               12rem;
 $asset-footer:              7rem;
+$asset-background:          url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAIAAAC1nk4lAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAACbSURBVGhD7c6hDQAxAMPA33+m7vYlJh7AoFKOBMbfyfyZRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4E3o9kA7YFFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgQejz7nPYYKl8IqSfgAAAABJRU5ErkJggg==');

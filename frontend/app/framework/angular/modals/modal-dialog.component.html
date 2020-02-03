@@ -6,15 +6,13 @@
                     <ng-content select="[title]"></ng-content>
                 </h4>
 
-                <button type="button" class="close" (click)="close.emit()">
+                <ng-content select="[plainTitle]"></ng-content>
+
+                <button type="button" class="btn btn-close" (click)="close.emit()">
                     <i class="icon-close"></i>
                 </button>
             </div>
-
-            <div class="modal-tabs clearfix" #tabsElement *ngIf="showTabs">
-                <ng-content select="[tabs]"></ng-content>
-            </div>
-
+            
             <div class="modal-body" [class.flexed]="flexBody">
                 <ng-content select="[content]"></ng-content>
             </div>

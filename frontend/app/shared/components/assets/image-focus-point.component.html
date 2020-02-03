@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="col-5">
+        <Label>Select position of focus point</Label>
+
+        <div class="image">
+            <div class="image-container absolute align-items-center">
+                <div>
+                    <img #image [src]="imageSource" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-7">
+        <Label>Preview for different sizes</Label>
+
+        <div class="preview-wide">
+            <img #previewWide [src]="imageSource" />
+        </div>
+
+        <div class="preview-line2">
+            <div class="preview-small absolute">
+                <img #previewSmall [src]="imageSource" />
+            </div>
+            <div class="preview-normal absolute">
+                <img #previewNormal [src]="imageSource" />
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,7 +12,7 @@
     position: relative;
 
     .form-control {
-        @include absolute(-.4rem, auto, auto, 0);
+        @include absolute(-.125rem, auto, auto, 0);
         @include force-width(300px);
         color: $color-dark-foreground;
     }

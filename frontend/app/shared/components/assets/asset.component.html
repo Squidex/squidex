@@ -11,7 +11,7 @@
                 
                 <ng-container *ngIf="asset.canPreview; else noPreview">
                     <div class="file-image">
-                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" [accessToken]="authService.user?.accessToken" class="bg" layoutKey="asset-large">
+                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-large">
                     </div>
                 </ng-container>
                 <ng-template #noPreview>
@@ -68,12 +68,16 @@
         <div class="card-footer" (dblclick)="edit()">
             <ng-container *ngIf="asset">
                 <div>
-                    <div class="file-name editable" (click)="edit()">
+                    <div class="file-name truncate editable" (click)="edit()">
                         {{asset.fileName}}
                     </div>
                 </div>
                 <div class="file-tags tags">
-                    <sqx-tag-editor [ngModel]="asset.tags" disabled="true" styleBlank="true" placeholder="+Tag"></sqx-tag-editor>
+                    <sqx-tag-editor [ngModel]="asset.tags"  
+                        styleBlank="true"
+                        styleGray="true"
+                        readonly="true">
+                    </sqx-tag-editor>
                 </div>
                 <div class="file-info">
                     {{asset.metadataText}}
@@ -112,7 +116,7 @@
 
                     <ng-container *ngIf="!isCompact">
                         <td class="col-info">
-                            {{asset.metadataText}}
+                            <div class="truncate">{{asset.metadataText}}</div>
                         </td>
                         <td class="col-user">
                             <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef" />
@@ -152,7 +156,7 @@
 
 <ng-container *ngIf="asset">
     <ng-container *sqxModal="editDialog">
-        <sqx-asset-dialog [allTags]="allTags" [asset]="asset" [accessToken]="authService.user?.accessToken"
+        <sqx-asset-dialog [allTags]="allTags" [asset]="asset"
             (changed)="setAsset($event)"
             (complete)="editDialog.hide()">
         </sqx-asset-dialog>
