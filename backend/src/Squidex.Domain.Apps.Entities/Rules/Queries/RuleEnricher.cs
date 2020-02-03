@@ -62,6 +62,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
                     foreach (var rule in group)
                     {
+                        requestCache.AddDependency(rule.Id, rule.Version);
+
                         var statistic = statistics.FirstOrDefault(x => x.RuleId == rule.Id);
 
                         if (statistic != null)
@@ -71,7 +73,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                             rule.NumSucceeded = statistic.NumSucceeded;
 
                             requestCache.AddDependency(rule.LastExecuted);
-                            requestCache.AddDependency(rule.Id, rule.Version);
                         }
                     }
                 }

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                 .MustHaveHappened();
 
             A.CallTo(() => requestCache.AddDependency(null))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
         }
 
         [Fact]
