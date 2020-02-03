@@ -101,6 +101,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         return {
             convert_fonts_to_spans: true,
             convert_urls: false,
+            paste_data_images: true,
             plugins: 'code image media link lists advlist paste',
             min_height: 300,
             max_height: 800,
@@ -169,6 +170,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                             }
                         }
                     }
+
+                    return false;
                 });
 
                 self.tinyEditor.on('blur', () => {
