@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_content_with_status_color()
         {
-            var content = PublishedContent();
+            var content = CreateContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(content))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_content_with_default_color_if_not_found()
         {
-            var content = PublishedContent();
+            var content = CreateContent();
 
             A.CallTo(() => contentWorkflow.GetInfoAsync(content))
                 .Returns(Task.FromResult<StatusInfo>(null!));
@@ -101,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustNotHaveHappened();
         }
 
-        private ContentEntity PublishedContent()
+        private ContentEntity CreateContent()
         {
-            return new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            return new ContentEntity { SchemaId = schemaId };
         }
     }
 }

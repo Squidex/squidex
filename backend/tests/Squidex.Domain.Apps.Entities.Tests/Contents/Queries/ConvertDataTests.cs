@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_data_only()
         {
-            var content = PublishedContent(new NamedContentData());
+            var content = CreateContent(new NamedContentData());
 
             await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_data_and_data_draft_when_frontend_user()
         {
-            var content = PublishedContent(new NamedContentData());
+            var content = CreateContent(new NamedContentData());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = BuildTestData(id1, id2);
 
-            var content = PublishedContent(source);
+            var content = CreateContent(source);
 
             var expected =
                 new NamedContentData()
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = BuildTestData(id1, id2);
 
-            var content = PublishedContent(source);
+            var content = CreateContent(source);
 
             var expected =
                 new NamedContentData()
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     .Add("nested", JsonValue.Array(id1, id2)))));
         }
 
-        private ContentEntity PublishedContent(NamedContentData data)
+        private ContentEntity CreateContent(NamedContentData data)
         {
             return new ContentEntity
             {

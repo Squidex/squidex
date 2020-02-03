@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web
@@ -46,20 +47,18 @@ namespace Squidex.Web
             return string.Equals(subject, userId, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool TryGetHeaderString(this IHeaderDictionary headers, string header, [MaybeNullWhen(false)] out string result)
+        public static bool TryGetString(this IHeaderDictionary headers, string header, [MaybeNullWhen(false)] out string result)
         {
-            if (headers.TryGetValue(header, out var value))
-            {
-                string valueString = value;
+            result = null!;
 
-                if (!string.IsNullOrWhiteSpace(valueString))
+            if (headers.TryGetValue(header, out var value) && value != StringValues.Empty)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
                 {
-                    result = valueString;
+                    result = value;
                     return true;
                 }
             }
-
-            result = null!;
 
             return false;
         }

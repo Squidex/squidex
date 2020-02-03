@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
@@ -40,7 +39,5 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public int NumFailed { get; set; }
 
         public Instant? LastExecuted { get; set; }
-
-        public HashSet<object?> CacheDependencies { get; set; }
     }
 }

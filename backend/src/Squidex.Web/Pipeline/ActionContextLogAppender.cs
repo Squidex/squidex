@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -32,16 +33,7 @@ namespace Squidex.Web.Pipeline
                 return;
             }
 
-            Guid requestId;
-
-            if (httpContext.Items.TryGetValue(nameof(requestId), out var requestIdvalue) && requestIdvalue is Guid requestIdValue)
-            {
-                requestId = requestIdValue;
-            }
-            else
-            {
-                httpContext.Items[nameof(requestId)] = requestId = Guid.NewGuid();
-            }
+            var requestId = GetRequestId(httpContext);
 
             var logContext = (requestId, context: httpContext, actionContextAccessor);
 
@@ -64,6 +56,11 @@ namespace Squidex.Web.Pipeline
                     });
                 }
             });
+        }
+
+        private static string GetRequestId(HttpContext httpContext)
+        {
+            return Activity.Current?.Id ?? httpContext.TraceIdentifier ?? Guid.NewGuid().ToString();
         }
     }
 }

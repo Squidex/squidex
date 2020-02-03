@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -71,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_invoke_steps()
         {
-            var source = PublishedContent();
+            var source = CreateContent();
 
             var step1 = A.Fake<IContentEnricherStep>();
             var step2 = A.Fake<IContentEnricherStep>();
@@ -90,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_provide_and_cache_schema()
         {
-            var source = PublishedContent();
+            var source = CreateContent();
 
             var step1 = new ResolveSchema();
             var step2 = new ResolveSchema();
@@ -106,9 +105,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustHaveHappenedOnceExactly();
         }
 
-        private ContentEntity PublishedContent()
+        private ContentEntity CreateContent()
         {
-            return new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            return new ContentEntity { SchemaId = schemaId };
         }
     }
 }

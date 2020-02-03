@@ -10,10 +10,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
-using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -36,7 +34,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IAppPlansProvider appPlansProvider;
-        private readonly MyContentsControllerOptions controllerOptions;
         private readonly ITagService tagService;
 
         public AssetsController(
@@ -44,14 +41,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetStatsRepository,
             IAppPlansProvider appPlansProvider,
-            IOptions<MyContentsControllerOptions> controllerOptions,
             ITagService tagService)
             : base(commandBus)
         {
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlansProvider = appPlansProvider;
-            this.controllerOptions = controllerOptions.Value;
             this.tagService = tagService;
         }
 
@@ -112,13 +107,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return AssetsDto.FromAssets(assets, this, app);
             });
 
-            if (controllerOptions.EnableSurrogateKeys && assets.Count <= controllerOptions.MaxItemsForSurrogateKeys)
-            {
-                Response.Headers["Surrogate-Key"] = assets.ToSurrogateKeys();
-            }
-
-            Response.Headers[HeaderNames.ETag] = assets.ToEtag();
-
             return Ok(response);
         }
 
@@ -149,13 +137,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 return AssetDto.FromAsset(asset, this, app);
             });
-
-            if (controllerOptions.EnableSurrogateKeys)
-            {
-                Response.Headers["Surrogate-Key"] = asset.ToSurrogateKey();
-            }
-
-            Response.Headers[HeaderNames.ETag] = asset.ToEtag();
 
             return Ok(response);
         }

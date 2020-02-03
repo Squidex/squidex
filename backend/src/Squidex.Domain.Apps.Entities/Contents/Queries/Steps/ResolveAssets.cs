@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -27,14 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly IAssetQueryService assetQuery;
+        private readonly IRequestCache requestCache;
 
-        public ResolveAssets(IAssetUrlGenerator assetUrlGenerator, IAssetQueryService assetQuery)
+        public ResolveAssets(IAssetUrlGenerator assetUrlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
         {
             Guard.NotNull(assetUrlGenerator);
             Guard.NotNull(assetQuery);
+            Guard.NotNull(requestCache);
 
             this.assetUrlGenerator = assetUrlGenerator;
             this.assetQuery = assetQuery;
+            this.requestCache = requestCache;
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
@@ -88,10 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             {
                                 var url = assetUrlGenerator.GenerateUrl(referencedImage.Id.ToString());
 
-                                content.CacheDependencies ??= new HashSet<object?>();
-
-                                content.CacheDependencies.Add(referencedImage.Id);
-                                content.CacheDependencies.Add(referencedImage.Version);
+                                requestCache.AddDependency(referencedImage.Id, referencedImage.Version);
 
                                 fieldReference.AddJsonValue(partitionKey, JsonValue.Create(url));
                             }

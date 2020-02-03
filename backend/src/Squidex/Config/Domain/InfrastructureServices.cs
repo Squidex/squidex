@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Orleans;
-using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
@@ -97,10 +96,8 @@ namespace Squidex.Config.Domain
         {
             services.Configure<RobotsTxtOptions>(
                 config.GetSection("robots"));
-            services.Configure<ETagOptions>(
-                config.GetSection("etags"));
-            services.Configure<MyContentsControllerOptions>(
-                config.GetSection("contentsController"));
+            services.Configure<CachingOptions>(
+                config.GetSection("caching"));
             services.Configure<MyUIOptions>(
                 config.GetSection("ui"));
             services.Configure<MyNewsOptions>(

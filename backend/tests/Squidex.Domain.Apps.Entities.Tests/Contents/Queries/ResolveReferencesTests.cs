@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ResolveReferencesTests
     {
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> refSchemaId1 = NamedId.Of(Guid.NewGuid(), "my-ref1");
         private readonly NamedId<Guid> refSchemaId2 = NamedId.Of(Guid.NewGuid(), "my-ref2");
@@ -83,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
             };
 
-            sut = new ResolveReferences(new Lazy<IContentQueryService>(() => contentQuery));
+            sut = new ResolveReferences(new Lazy<IContentQueryService>(() => contentQuery), requestCache);
         }
 
         [Fact]
@@ -107,25 +109,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var enriched1 = contents[0];
 
-            Assert.Contains(refSchemaId1.Id, enriched1.CacheDependencies);
-            Assert.Contains(refSchemaId2.Id, enriched1.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(refSchemaId1.Id, 0))
+                .MustHaveHappened();
 
-            Assert.Contains(ref1_1.Id, enriched1.CacheDependencies);
-            Assert.Contains(ref1_1.Version, enriched1.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(refSchemaId2.Id, 0))
+                .MustHaveHappened();
 
-            Assert.Contains(ref2_1.Id, enriched1.CacheDependencies);
-            Assert.Contains(ref2_1.Version, enriched1.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(ref1_1.Id, ref1_1.Version))
+                .MustHaveHappened();
 
-            var enriched2 = contents[1];
+            A.CallTo(() => requestCache.AddDependency(ref2_1.Id, ref2_1.Version))
+                .MustHaveHappened();
 
-            Assert.Contains(refSchemaId1.Id, enriched2.CacheDependencies);
-            Assert.Contains(refSchemaId2.Id, enriched2.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(ref1_2.Id, ref1_2.Version))
+                .MustHaveHappened();
 
-            Assert.Contains(ref1_2.Id, enriched2.CacheDependencies);
-            Assert.Contains(ref1_2.Version, enriched2.CacheDependencies);
-
-            Assert.Contains(ref2_2.Id, enriched2.CacheDependencies);
-            Assert.Contains(ref2_2.Version, enriched2.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(ref2_2.Id, ref2_2.Version))
+                .MustHaveHappened();
         }
 
         [Fact]
