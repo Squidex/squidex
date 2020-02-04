@@ -71,7 +71,7 @@ namespace Squidex.Web.CommandMiddlewares
         {
             version = default;
 
-            if (httpContext.Request.Headers.TryGetHeaderString(HeaderNames.IfMatch, out var etag))
+            if (httpContext.Request.Headers.TryGetString(HeaderNames.IfMatch, out var etag))
             {
                 if (etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
                 {

@@ -7,7 +7,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Security.Cryptography;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -16,95 +16,48 @@ namespace Squidex.Web
 {
     public static class ETagExtensions
     {
-        private static readonly int GuidLength = Guid.Empty.ToString().Length;
-
         public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, 0);
+                var hash = Create(items, 0);
 
-                return unhashed.Sha256Base64();
+                return hash;
             }
         }
 
-        public static string ToEtag<T>(this IResultList<T> items) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this IResultList<T> entities) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, items.Total);
+                var hash = Create(entities, entities.Total);
 
-                return unhashed.Sha256Base64();
+                return hash;
             }
         }
 
-        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IEntity, IEntityWithVersion
+        private static string Create<T>(IReadOnlyList<T> entities, long total) where T : IEntity, IEntityWithVersion
         {
-            var sb = new StringBuilder();
-
-            foreach (var item in items)
+            using (var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
             {
-                AppendItem(item, sb);
+                hasher.AppendData(BitConverter.GetBytes(total));
 
-                sb.Append(";");
-            }
-
-            sb.Append(total);
-
-            return sb.ToString();
-        }
-
-        public static string ToSurrogateKey<T>(this T item) where T : IEntity
-        {
-            return item.Id.ToString();
-        }
-
-        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IEntity
-        {
-            if (items.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder(items.Count * (GuidLength + 1));
-
-            sb.Append(items[0].Id.ToString());
-
-            for (var i = 1; i < items.Count; i++)
-            {
-                sb.Append(" ");
-                sb.Append(items[i].Id.ToString());
-            }
-
-            return sb.ToString();
-        }
-
-        public static string ToEtag<T>(this T item) where T : IEntity, IEntityWithVersion
-        {
-            var sb = new StringBuilder();
-
-            AppendItem(item, sb);
-
-            return sb.ToString();
-        }
-
-        private static void AppendItem<T>(T item, StringBuilder sb) where T : IEntity, IEntityWithVersion
-        {
-            sb.Append(item.Id);
-            sb.Append(";");
-            sb.Append(item.Version);
-
-            if (item is IEntityWithCacheDependencies withDependencies)
-            {
-                if (withDependencies.CacheDependencies != null)
+                foreach (var item in entities)
                 {
-                    foreach (var dependency in withDependencies.CacheDependencies)
-                    {
-                        sb.Append(";");
-                        sb.Append(dependency);
-                    }
+                    hasher.AppendData(item.Id.ToByteArray());
+                    hasher.AppendData(BitConverter.GetBytes(item.Version));
                 }
+
+                var cacheBuffer = hasher.GetHashAndReset();
+                var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty).ToUpperInvariant();
+
+                return cacheString;
             }
+        }
+
+        public static string ToEtag<T>(this T entity) where T : IEntity, IEntityWithVersion
+        {
+            return entity.Version.ToString();
         }
     }
 }

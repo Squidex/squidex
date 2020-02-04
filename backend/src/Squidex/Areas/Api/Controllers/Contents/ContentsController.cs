@@ -6,12 +6,9 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -26,7 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
 {
     public sealed class ContentsController : ApiController
     {
-        private readonly MyContentsControllerOptions controllerOptions;
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
         private readonly IGraphQLService graphQl;
@@ -34,13 +30,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IContentWorkflow contentWorkflow,
-            IGraphQLService graphQl,
-            IOptions<MyContentsControllerOptions> controllerOptions)
+            IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
-            this.controllerOptions = controllerOptions.Value;
 
             this.graphQl = graphQl;
         }
@@ -133,13 +127,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
             });
 
-            if (ShouldProvideSurrogateKeys(contents))
-            {
-                Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
-            }
-
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
-
             return Ok(response);
         }
 
@@ -177,13 +164,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
             });
 
-            if (ShouldProvideSurrogateKeys(contents))
-            {
-                Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
-            }
-
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
-
             return Ok(response);
         }
 
@@ -210,13 +190,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var content = await contentQuery.FindContentAsync(Context, name, id);
 
             var response = ContentDto.FromContent(Context, content, this);
-
-            if (controllerOptions.EnableSurrogateKeys)
-            {
-                Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
-            }
-
-            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response);
         }
@@ -245,13 +218,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var content = await contentQuery.FindContentAsync(Context, name, id, version);
 
             var response = ContentDto.FromContent(Context, content, this);
-
-            if (controllerOptions.EnableSurrogateKeys)
-            {
-                Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
-            }
-
-            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response.Data);
         }
@@ -481,11 +447,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = ContentDto.FromContent(Context, result, this);
 
             return response;
-        }
-
-        private bool ShouldProvideSurrogateKeys(IReadOnlyList<IContentEntity> response)
-        {
-            return controllerOptions.EnableSurrogateKeys && response.Count <= controllerOptions.MaxItemsForSurrogateKeys;
         }
     }
 }

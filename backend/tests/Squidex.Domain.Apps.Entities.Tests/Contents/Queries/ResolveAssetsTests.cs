@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
+        private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
@@ -69,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
             };
 
-            sut = new ResolveAssets(assetUrlGenerator, assetQuery);
+            sut = new ResolveAssets(assetUrlGenerator, assetQuery, requestCache);
         }
 
         [Fact]
@@ -96,15 +98,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            var enriched1 = contents[0];
+            A.CallTo(() => requestCache.AddDependency(image1.Id, image1.Version))
+                .MustHaveHappened();
 
-            Assert.Contains(image1.Id, enriched1.CacheDependencies);
-            Assert.Contains(image1.Version, enriched1.CacheDependencies);
-
-            var enriched2 = contents[1];
-
-            Assert.Contains(image2.Id, enriched2.CacheDependencies);
-            Assert.Contains(image2.Version, enriched2.CacheDependencies);
+            A.CallTo(() => requestCache.AddDependency(image2.Id, image2.Version))
+                .MustHaveHappened();
         }
 
         [Fact]

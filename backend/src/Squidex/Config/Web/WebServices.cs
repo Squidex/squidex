@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure.Caching;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
@@ -48,6 +49,9 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
+            services.AddSingletonAs<CachingManager>()
+                .As<IRequestCache>();
+
             services.AddSingletonAs<ContextProvider>()
                 .As<IContextProvider>();
 
@@ -64,7 +68,7 @@ namespace Squidex.Config.Web
 
             services.AddMvc(options =>
             {
-                options.Filters.Add<ETagFilter>();
+                options.Filters.Add<CachingFilter>();
                 options.Filters.Add<DeferredActionFilter>();
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();

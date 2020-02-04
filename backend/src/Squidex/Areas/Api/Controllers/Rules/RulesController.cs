@@ -92,8 +92,6 @@ namespace Squidex.Areas.Api.Controllers.Rules
                 return RulesDto.FromRules(rules, this, app);
             });
 
-            Response.Headers[HeaderNames.ETag] = rules.ToEtag();
-
             return Ok(response);
         }
 

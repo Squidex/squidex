@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Infrastructure.Caching
 {
-    public interface IEntityWithCacheDependencies
+    public interface IRequestCache
     {
-        HashSet<object?> CacheDependencies { get; }
+        void AddDependency(Guid key, long version);
+
+        void AddDependency(object? value);
     }
 }

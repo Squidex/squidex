@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;

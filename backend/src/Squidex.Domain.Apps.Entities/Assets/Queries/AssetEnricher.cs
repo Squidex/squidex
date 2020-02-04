@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
@@ -20,14 +21,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly ITagService tagService;
         private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
+        private readonly IRequestCache requestCache;
 
-        public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources)
+        public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache)
         {
             Guard.NotNull(tagService);
             Guard.NotNull(assetMetadataSources);
+            Guard.NotNull(requestCache);
 
             this.tagService = tagService;
             this.assetMetadataSources = assetMetadataSources;
+            this.requestCache = requestCache;
         }
 
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context)
@@ -48,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             using (Profiler.TraceMethod<AssetEnricher>())
             {
                 var results = assets.Select(x => SimpleMapper.Map(x, new AssetEntity())).ToList();
+
+                foreach (var asset in results)
+                {
+                    requestCache.AddDependency(asset.Id, asset.Version);
+                }
 
                 if (ShouldEnrich(context))
                 {

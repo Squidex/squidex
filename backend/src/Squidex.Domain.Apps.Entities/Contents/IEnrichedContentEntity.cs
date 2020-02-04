@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public interface IEnrichedContentEntity : IContentEntity, IEntityWithCacheDependencies
+    public interface IEnrichedContentEntity : IContentEntity
     {
         bool CanUpdate { get; }
 

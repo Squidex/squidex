@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Controllers.Contents
+namespace Squidex.Web.Pipeline
 {
-    public sealed class MyContentsControllerOptions
+    public sealed class CachingOptions
     {
-        public bool EnableSurrogateKeys { get; set; }
+        public bool StrongETag { get; set; }
 
-        public int MaxItemsForSurrogateKeys { get; set; }
+        public int MaxSurrogateKeys { get; set; } = 200;
     }
 }

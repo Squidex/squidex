@@ -8,7 +8,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -39,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_with_reference_fields()
         {
-            var content = PublishedContent();
+            var content = CreateContent();
 
             var ctx = new Context(Mocks.FrontendUser(), requestContext.App);
 
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_enrich_with_reference_fields_when_not_frontend()
         {
-            var source = PublishedContent();
+            var source = CreateContent();
 
             await sut.EnrichAsync(requestContext, Enumerable.Repeat(source, 1), schemaProvider);
 
@@ -61,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_enrich_with_schema_names()
         {
-            var content = PublishedContent();
+            var content = CreateContent();
 
             await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
@@ -69,9 +68,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal("my-schema", content.SchemaDisplayName);
         }
 
-        private ContentEntity PublishedContent()
+        private ContentEntity CreateContent()
         {
-            return new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+            return new ContentEntity { SchemaId = schemaId };
         }
     }
 }

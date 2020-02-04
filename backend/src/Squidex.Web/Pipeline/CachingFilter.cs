@@ -15,24 +15,30 @@ using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Web.Pipeline
 {
-    public sealed class ETagFilter : IAsyncActionFilter
+    public sealed class CachingFilter : IAsyncActionFilter
     {
-        private readonly ETagOptions options;
+        private readonly CachingOptions cachingOptions;
+        private readonly CachingManager cachingManager;
 
-        public ETagFilter(IOptions<ETagOptions> options)
+        public CachingFilter(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions)
         {
-            this.options = options.Value;
+            this.cachingOptions = cachingOptions.Value;
+            this.cachingManager = cachingManager;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var resultContext = await next();
-
             var httpContext = context.HttpContext;
 
-            if (httpContext.Response.Headers.TryGetHeaderString(HeaderNames.ETag, out var etag))
+            cachingManager.Start(httpContext);
+
+            var resultContext = await next();
+
+            cachingManager.Finish(httpContext, cachingOptions.MaxSurrogateKeys);
+
+            if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
             {
-                if (!options.Strong && !etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                if (!cachingOptions.StrongETag && !etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
                 {
                     etag = $"W/{etag}";
 
@@ -41,7 +47,7 @@ namespace Squidex.Web.Pipeline
 
                 if (HttpMethods.IsGet(httpContext.Request.Method) &&
                     httpContext.Response.StatusCode == 200 &&
-                    httpContext.Request.Headers.TryGetHeaderString(HeaderNames.IfNoneMatch, out var noneMatch) &&
+                    httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatch) &&
                     string.Equals(etag, noneMatch, StringComparison.Ordinal))
                 {
                     resultContext.Result = new StatusCodeResult(304);

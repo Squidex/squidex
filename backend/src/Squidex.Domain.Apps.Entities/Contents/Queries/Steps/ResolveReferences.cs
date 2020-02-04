@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -22,17 +23,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     {
         private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyContents = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
         private readonly Lazy<IContentQueryService> contentQuery;
+        private readonly IRequestCache requestCache;
 
         private IContentQueryService ContentQuery
         {
             get { return contentQuery.Value; }
         }
 
-        public ResolveReferences(Lazy<IContentQueryService> contentQuery)
+        public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
         {
             Guard.NotNull(contentQuery);
+            Guard.NotNull(requestCache);
 
             this.contentQuery = contentQuery;
+
+            this.requestCache = requestCache;
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
@@ -92,12 +97,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                     var referencedSchema = await schemas(reference.SchemaId.Id);
 
-                                    content.CacheDependencies ??= new HashSet<object?>();
-
-                                    content.CacheDependencies.Add(referencedSchema.Id);
-                                    content.CacheDependencies.Add(referencedSchema.Version);
-                                    content.CacheDependencies.Add(reference.Id);
-                                    content.CacheDependencies.Add(reference.Version);
+                                    requestCache.AddDependency(referencedSchema.Id, referencedSchema.Version);
+                                    requestCache.AddDependency(reference.Id, reference.Version);
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
