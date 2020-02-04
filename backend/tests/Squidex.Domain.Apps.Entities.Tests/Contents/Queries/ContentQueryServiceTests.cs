@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schemaDef =
                 new Schema(schemaId.Name)
-                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" });
+                    .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
 

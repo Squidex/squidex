@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
-                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" });
+                    .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
 

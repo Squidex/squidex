@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                          new NumberFieldProperties { IsRequired = true })
                      .AddNumber(2, "my-field2", Partitioning.Invariant,
                          new NumberFieldProperties { IsRequired = false })
-                    .ConfigureScripts(scripts);
+                    .SetScripts(scripts);
 
             schema = Mocks.Schema(AppNamedId, SchemaNamedId, schemaDef);
 

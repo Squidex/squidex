@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                     .AddString(2, "ref2", Partitioning.Invariant,
                         new StringFieldProperties())
                     .AddString(3, "non-ref", Partitioning.Invariant)
-                    .ConfigureFieldsInReferences("ref1", "ref2");
+                    .SetFieldsInReferences("ref1", "ref2");
 
             var formatted = data.FormatReferences(schema, languages);
 

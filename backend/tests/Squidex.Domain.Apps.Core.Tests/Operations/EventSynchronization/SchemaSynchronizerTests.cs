@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new Schema("source");
 
             var targetSchema =
-                new Schema("target").ConfigureScripts(scripts);
+                new Schema("target").SetScripts(scripts);
 
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 
             var targetSchema =
                 new Schema("target")
-                    .ConfigurePreviewUrls(previewUrls);
+                    .SetPreviewUrls(previewUrls);
 
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
@@ -143,11 +143,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .ConfigureFieldsInLists("1", "2");
+                    .SetFieldsInLists("1", "2");
 
             var targetSchema =
                 new Schema("target")
-                    .ConfigureFieldsInLists("2", "1");
+                    .SetFieldsInLists("2", "1");
 
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
@@ -161,11 +161,11 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var sourceSchema =
                 new Schema("source")
-                    .ConfigureFieldsInReferences("1", "2");
+                    .SetFieldsInReferences("1", "2");
 
             var targetSchema =
                 new Schema("target")
-                    .ConfigureFieldsInReferences("2", "1");
+                    .SetFieldsInReferences("2", "1");
 
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 

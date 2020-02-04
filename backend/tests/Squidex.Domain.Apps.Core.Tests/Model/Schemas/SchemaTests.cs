@@ -258,8 +258,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 
             var schema_1 = schema_0
                 .AddField(field)
-                .ConfigureFieldsInLists(field.Name)
-                .ConfigureFieldsInReferences(field.Name);
+                .SetFieldsInLists(field.Name)
+                .SetFieldsInReferences(field.Name);
             var schema_2 = schema_1.DeleteField(1);
 
             Assert.Empty(schema_2.FieldsById);
@@ -356,8 +356,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_set_list_fields()
         {
-            var schema_1 = schema_0.ConfigureFieldsInLists("2");
-            var schema_2 = schema_1.ConfigureFieldsInLists("2");
+            var schema_1 = schema_0.SetFieldsInLists("2");
+            var schema_2 = schema_1.SetFieldsInLists("2");
 
             Assert.Equal(new[] { "2" }, schema_1.FieldsInLists);
             Assert.Equal(new[] { "2" }, schema_2.FieldsInLists);
@@ -365,10 +365,21 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
+        public void Should_also_set_list_fields_when_reordered()
+        {
+            var schema_1 = schema_0.SetFieldsInLists("2", "1");
+            var schema_2 = schema_1.SetFieldsInLists("1", "2");
+
+            Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInLists);
+            Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInLists);
+            Assert.NotSame(schema_1, schema_2);
+        }
+
+        [Fact]
         public void Should_set_reference_fields()
         {
-            var schema_1 = schema_0.ConfigureFieldsInReferences("2");
-            var schema_2 = schema_1.ConfigureFieldsInReferences("2");
+            var schema_1 = schema_0.SetFieldsInReferences("2");
+            var schema_2 = schema_1.SetFieldsInReferences("2");
 
             Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
             Assert.Equal(new[] { "2" }, schema_2.FieldsInReferences);
@@ -376,7 +387,18 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_configure_scripts()
+        public void Should_also_set_reference_fields_when_reordered()
+        {
+            var schema_1 = schema_0.SetFieldsInReferences("2", "1");
+            var schema_2 = schema_1.SetFieldsInReferences("1", "2");
+
+            Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInReferences);
+            Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInReferences);
+            Assert.NotSame(schema_1, schema_2);
+        }
+
+        [Fact]
+        public void Should_set_scripts()
         {
             var scripts1 = new SchemaScripts
             {
@@ -387,8 +409,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 Query = "<query-script>"
             };
 
-            var schema_1 = schema_0.ConfigureScripts(scripts1);
-            var schema_2 = schema_1.ConfigureScripts(scripts2);
+            var schema_1 = schema_0.SetScripts(scripts1);
+            var schema_2 = schema_1.SetScripts(scripts2);
 
             Assert.Equal("<query-script>", schema_1.Scripts.Query);
 
@@ -398,7 +420,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_configure_preview_urls()
+        public void Should_set_preview_urls()
         {
             var urls1 = new Dictionary<string, string>
             {
@@ -409,8 +431,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 ["web"] = "Url"
             };
 
-            var schema_1 = schema_0.ConfigurePreviewUrls(urls1);
-            var schema_2 = schema_1.ConfigurePreviewUrls(urls2);
+            var schema_1 = schema_0.SetPreviewUrls(urls1);
+            var schema_2 = schema_1.SetPreviewUrls(urls2);
 
             Assert.Equal("Url", schema_1.PreviewUrls["web"]);
 
@@ -425,13 +447,13 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource =
                 TestUtils.MixedSchema(true)
                     .ChangeCategory("Category")
-                    .ConfigureFieldsInLists("field2")
-                    .ConfigureFieldsInReferences("field1")
-                    .ConfigurePreviewUrls(new Dictionary<string, string>
+                    .SetFieldsInLists("field2")
+                    .SetFieldsInReferences("field1")
+                    .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"
                     })
-                    .ConfigureScripts(new SchemaScripts
+                    .SetScripts(new SchemaScripts
                     {
                         Create = "<create-script>"
                     });

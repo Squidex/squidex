@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 sb.Append(value);
             }
 
-            var referenceFields = schema.ReferencesFields();
+            var referenceFields = schema.ReferenceFields();
 
             foreach (var referenceField in referenceFields)
             {

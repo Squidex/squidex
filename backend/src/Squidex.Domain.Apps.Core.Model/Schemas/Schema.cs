@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -118,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             newProperties ??= new SchemaProperties();
 
-            if (properties.DeepEquals(newProperties))
+            if (properties.Equals(newProperties))
             {
                 return this;
             }
@@ -131,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ConfigureScripts(SchemaScripts newScripts)
+        public Schema SetScripts(SchemaScripts newScripts)
         {
             newScripts ??= new SchemaScripts();
 
@@ -148,11 +149,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ConfigureFieldsInLists(FieldNames names)
+        public Schema SetFieldsInLists(FieldNames names)
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInLists.SetEquals(names))
+            if (fieldsInLists.SequenceEqual(names))
             {
                 return this;
             }
@@ -164,17 +165,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ConfigureFieldsInLists(params string[] names)
+        public Schema SetFieldsInLists(params string[] names)
         {
-            return ConfigureFieldsInLists(new FieldNames(names));
+            return SetFieldsInLists(new FieldNames(names));
         }
 
         [Pure]
-        public Schema ConfigureFieldsInReferences(FieldNames names)
+        public Schema SetFieldsInReferences(FieldNames names)
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInReferences.SetEquals(names))
+            if (fieldsInReferences.SequenceEqual(names))
             {
                 return this;
             }
@@ -186,9 +187,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ConfigureFieldsInReferences(params string[] names)
+        public Schema SetFieldsInReferences(params string[] names)
         {
-            return ConfigureFieldsInReferences(new FieldNames(names));
+            return SetFieldsInReferences(new FieldNames(names));
         }
 
         [Pure]
@@ -234,7 +235,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ConfigurePreviewUrls(IReadOnlyDictionary<string, string> newPreviewUrls)
+        public Schema SetPreviewUrls(IReadOnlyDictionary<string, string> newPreviewUrls)
         {
             previewUrls ??= EmptyPreviewUrls;
 

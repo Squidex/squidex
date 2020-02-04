@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new StringFieldProperties())
                     .AddNumber(2, "number", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .ConfigureFieldsInReferences("name", "number");
+                    .SetFieldsInReferences("name", "number");
 
             var schemaDef =
                 new Schema(schemaId.Name)
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         MaxItems = 1,
                         SchemaId = refSchemaId2.Id
                     })
-                    .ConfigureFieldsInLists("ref1", "ref2");
+                    .SetFieldsInLists("ref1", "ref2");
 
             schemaProvider = x =>
             {

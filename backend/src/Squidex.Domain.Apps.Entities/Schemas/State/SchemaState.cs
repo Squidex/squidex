@@ -76,12 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                     {
                         if (e.FieldsInLists != null)
                         {
-                            SchemaDef = SchemaDef.ConfigureFieldsInLists(e.FieldsInLists);
+                            SchemaDef = SchemaDef.SetFieldsInLists(e.FieldsInLists);
                         }
 
                         if (e.FieldsInReferences != null)
                         {
-                            SchemaDef = SchemaDef.ConfigureFieldsInReferences(e.FieldsInReferences);
+                            SchemaDef = SchemaDef.SetFieldsInReferences(e.FieldsInReferences);
                         }
 
                         break;
@@ -96,14 +96,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
                 case SchemaPreviewUrlsConfigured e:
                     {
-                        SchemaDef = SchemaDef.ConfigurePreviewUrls(e.PreviewUrls);
+                        SchemaDef = SchemaDef.SetPreviewUrls(e.PreviewUrls);
 
                         break;
                     }
 
                 case SchemaScriptsConfigured e:
                     {
-                        SchemaDef = SchemaDef.ConfigureScripts(e.Scripts);
+                        SchemaDef = SchemaDef.SetScripts(e.Scripts);
 
                         break;
                     }

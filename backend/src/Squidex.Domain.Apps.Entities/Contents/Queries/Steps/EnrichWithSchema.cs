@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (context.IsFrontendClient)
                 {
-                    var referenceFields = schema.SchemaDef.ReferencesFields().ToArray();
+                    var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
 
                     foreach (var content in group)
                     {

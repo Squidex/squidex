@@ -64,12 +64,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : Guid.Empty;
         }
 
-        public static IEnumerable<RootField> ReferencesFields(this Schema schema)
+        public static IEnumerable<RootField> ReferenceFields(this Schema schema)
         {
             return schema.RootFields(schema.FieldsInReferences);
         }
 
-        public static IEnumerable<RootField> ListsFields(this Schema schema)
+        public static IEnumerable<RootField> ListFields(this Schema schema)
         {
             return schema.RootFields(schema.FieldsInLists);
         }
