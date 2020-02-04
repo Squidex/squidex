@@ -44,7 +44,7 @@ namespace Squidex.Web.Pipeline
 
             writer.WriteObject("web", logContext, (ctx, w) =>
             {
-                w.WriteProperty("requestId", ctx.requestId.ToString());
+                w.WriteProperty("requestId", ctx.requestId);
                 w.WriteProperty("requestPath", ctx.context.Request.Path);
                 w.WriteProperty("requestMethod", ctx.context.Request.Method);
 
