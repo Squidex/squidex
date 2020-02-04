@@ -11,6 +11,10 @@
 }
 
 .preview {
+    & {
+        border: 1px solid $color-border;
+    }
+
     &-wide {
         padding-top: 20%;
     }

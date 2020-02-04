@@ -3,7 +3,7 @@
         <Label>Select position of focus point</Label>
 
         <div class="image">
-            <div class="image-container absolute align-items-center">
+            <div class="image-container absolute align-items-center justify-content-center">
                 <div>
                     <img #image [src]="imageSource" />
                 </div>
@@ -13,15 +13,15 @@
     <div class="col-7">
         <Label>Preview for different sizes</Label>
 
-        <div class="preview-wide">
+        <div class="preview preview-wide">
             <img #previewWide [src]="imageSource" />
         </div>
 
         <div class="preview-line2">
-            <div class="preview-small absolute">
+            <div class="preview preview-small absolute">
                 <img #previewSmall [src]="imageSource" />
             </div>
-            <div class="preview-normal absolute">
+            <div class="preview preview-normal absolute">
                 <img #previewNormal [src]="imageSource" />
             </div>
         </div>
