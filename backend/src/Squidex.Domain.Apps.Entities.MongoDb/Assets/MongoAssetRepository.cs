@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x["_si"].AsString)).ToList();
+                return assetEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
             }
         }
 
