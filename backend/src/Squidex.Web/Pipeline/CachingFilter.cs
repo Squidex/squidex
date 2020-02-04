@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
@@ -22,6 +23,9 @@ namespace Squidex.Web.Pipeline
 
         public CachingFilter(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions)
         {
+            Guard.NotNull(cachingManager);
+            Guard.NotNull(cachingOptions);
+
             this.cachingOptions = cachingOptions.Value;
             this.cachingManager = cachingManager;
         }

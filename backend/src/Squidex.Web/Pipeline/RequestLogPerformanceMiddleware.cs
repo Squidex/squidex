@@ -16,12 +16,15 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
-        private readonly RequestLogOptions options;
+        private readonly RequestLogOptions requestLogOptions;
         private readonly ISemanticLog log;
 
-        public RequestLogPerformanceMiddleware(IOptions<RequestLogOptions> options, ISemanticLog log)
+        public RequestLogPerformanceMiddleware(IOptions<RequestLogOptions> requestLogOptions, ISemanticLog log)
         {
-            this.options = options.Value;
+            Guard.NotNull(requestLogOptions);
+            Guard.NotNull(log);
+
+            this.requestLogOptions = requestLogOptions.Value;
 
             this.log = log;
         }
@@ -40,11 +43,11 @@ namespace Squidex.Web.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    if (options.LogRequests)
+                    if (requestLogOptions.LogRequests)
                     {
                         log.LogInformation((elapsedMs, context), (ctx, w) =>
                         {
-                            if (options.LogProfiler)
+                            if (requestLogOptions.LogProfiler)
                             {
                                 Profiler.Session?.Write(w);
                             }

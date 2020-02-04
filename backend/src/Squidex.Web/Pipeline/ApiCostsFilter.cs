@@ -26,14 +26,19 @@ namespace Squidex.Web.Pipeline
         private readonly IUsageTracker usageTracker;
         private readonly IClock clock;
 
-        public ApiCostsFilter(IAppLogStore appLogStore, IAppPlansProvider appPlansProvider, IClock clock, IUsageTracker usageTracker)
+        public ApiCostsFilter(IAppLogStore appLogStore, IAppPlansProvider appPlansProvider, IUsageTracker usageTracker, IClock clock)
         {
+            Guard.NotNull(appLogStore);
+            Guard.NotNull(appPlansProvider);
+            Guard.NotNull(usageTracker);
+            Guard.NotNull(clock);
+
             this.appLogStore = appLogStore;
             this.appPlansProvider = appPlansProvider;
 
-            this.clock = clock;
-
             this.usageTracker = usageTracker;
+
+            this.clock = clock;
         }
 
         IFilterMetadata IFilterContainer.FilterDefinition { get; set; }

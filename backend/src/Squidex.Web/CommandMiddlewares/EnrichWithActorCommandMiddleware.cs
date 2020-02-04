@@ -9,6 +9,7 @@ using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 
@@ -20,6 +21,8 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithActorCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
+            Guard.NotNull(httpContextAccessor);
+
             this.httpContextAccessor = httpContextAccessor;
         }
 

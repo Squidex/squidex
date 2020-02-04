@@ -70,7 +70,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult<ActionExecutedContext?>(null);
             };
 
-            sut = new ApiCostsFilter(appLogStore, appPlansProvider, clock, usageTracker);
+            sut = new ApiCostsFilter(appLogStore, appPlansProvider, usageTracker, clock);
         }
 
         [Fact]

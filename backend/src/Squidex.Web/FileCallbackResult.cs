@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Web
@@ -23,6 +24,8 @@ namespace Squidex.Web
         public FileCallbackResult(string contentType, string? name, bool send404, Func<Stream, Task> callback)
             : base(contentType)
         {
+            Guard.NotNull(callback);
+
             FileDownloadName = name;
 
             Send404 = send404;
