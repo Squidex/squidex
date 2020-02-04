@@ -30,7 +30,9 @@ namespace Squidex.Web.Pipeline
         {
             this.appLogStore = appLogStore;
             this.appPlansProvider = appPlansProvider;
+
             this.clock = clock;
+
             this.usageTracker = usageTracker;
         }
 
