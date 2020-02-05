@@ -31,15 +31,15 @@
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file" 
-                    [isListView]="false"
                     [isDisabled]="snapshot.isDisabled"
+                    [isCompact]="snapshot.isCompact"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
                 <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" 
                     [asset]="asset"
-                    [isListView]="false"
                     [isDisabled]="snapshot.isDisabled"
+                    [isCompact]="snapshot.isCompact"
                     (update)="notifyOthers(asset)"
                     [removeMode]="true"
                     (remove)="removeLoadedAsset(asset)">
