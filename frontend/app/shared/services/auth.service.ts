@@ -79,15 +79,15 @@ export class AuthService {
         Log.logger = console;
 
         this.userManager = new UserManager({
-            client_id: 'squidex-frontend',
-            scope: 'squidex-api openid profile email squidex-profile role permissions',
-            response_type: 'id_token token',
-            redirect_uri: apiUrl.buildUrl('login;'),
-            post_logout_redirect_uri: apiUrl.buildUrl('logout'),
-            silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
-            popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
-            authority: apiUrl.buildUrl('identity-server/'),
-            userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
+                       client_id: 'squidex-frontend',
+                           scope: 'squidex-api openid profile email squidex-profile role permissions',
+                   response_type: 'id_token token',
+                    redirect_uri: apiUrl.buildUrl('login;'),
+        post_logout_redirect_uri: apiUrl.buildUrl('logout'),
+             silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
+              popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
+                       authority: apiUrl.buildUrl('identity-server/'),
+                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
             automaticSilentRenew: true
         });
 
