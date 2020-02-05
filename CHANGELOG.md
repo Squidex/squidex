@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.1.0 RC - 2020-02-05
+
+### Features
+
+* **Assets**: Support for focus points in UI and API.
+* **Assets**: Integrated editor / cropper for basic image editing.
+* **Contents**: Better and more consistent content cleanup and enrichment.
+
+### Bugfixes
+
+* **API**: Faster equals checks.
+* **API**: Fixed a critical bug that caused an infinite loop and Out of Memory.
+* **API**: Many small bugfixes.
+
 ## 4.1.0 Beta 1 - 2020-01-17
 
 ### Features
