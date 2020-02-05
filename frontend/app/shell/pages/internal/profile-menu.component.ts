@@ -17,9 +17,16 @@ import {
 } from '@app/shared';
 
 interface State {
+    // The display name of the user.
     profileDisplayName: string;
+
+    // The id of the user.
     profileId: string;
+
+    // The email address of the user.
     profileEmail: string;
+
+    // The url to the user profile.
     profileUrl: string;
 }
 

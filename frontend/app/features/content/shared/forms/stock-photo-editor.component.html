@@ -1,5 +1,9 @@
-<div class="row no-gutters">
-    <div class="col-auto col-image" [class.expand]="isCompact">
+<div class="row no-gutters"
+    (sqxResizeCondition)="setCompact($event)"
+    [sqxResizeMinWidth]="600"
+    [sqxResizeMaxWidth]="0">
+
+    <div class="col-auto col-image" [class.expand]="snapshot.isCompact">
         <input class="form-control value" [formControl]="valueControl" readonly />
 
         <button type="button" class="btn btn-text-secondary value-clear" (click)="reset()">
@@ -16,7 +20,7 @@
             </div>
         </ng-template>
     </div>
-    <div class="col pl-4" *ngIf="!isCompact">
+    <div class="col pl-4" *ngIf="!snapshot.isCompact">
         <i class="icon-angle-left icon"></i>
 
         <input class="form-control" [formControl]="stockPhotoSearch" placeholder="Search for Photos by Unsplash" />

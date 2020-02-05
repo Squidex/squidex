@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -24,13 +24,14 @@ export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true
 };
 
-interface Geolocation {
-    latitude: number;
-    longitude: number;
-}
+type Geolocation = { latitude: number; longitude: number; };
 
-interface Snapshot {
+interface State {
+    // True when the map should be hidden.
     isMapHidden?: boolean;
+
+    // True, when width less than 600 pixels.
+    isCompact?: boolean;
 }
 
 type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
@@ -44,7 +45,7 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {
+export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
@@ -70,9 +71,6 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                 ]
             ]
         });
-
-    @Input()
-    public isCompact: boolean;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
@@ -286,7 +284,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
             });
     }
 
-    public reset() {
+    public clearValue() {
         this.value = null;
 
         this.updateMarker({ fire: true });
@@ -389,5 +387,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<Snapsho
                 this.marker = null;
             }
         }
+    }
+
+    public setCompact(isCompact: boolean) {
+        this.next(s => ({ ...s, isCompact: isCompact }));
     }
 }

@@ -42,9 +42,6 @@ export class FieldEditorComponent {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public isCompact = false;
-
-    @Input()
     public displaySuffix: string;
 
     @ViewChild('editor', { static: false })

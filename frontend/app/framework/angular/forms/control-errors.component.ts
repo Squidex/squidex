@@ -18,6 +18,7 @@ import {
 import { formatError } from './error-formatting';
 
 interface State {
+    // The error messages to show.
     errorMessages: ReadonlyArray<string>;
 }
 

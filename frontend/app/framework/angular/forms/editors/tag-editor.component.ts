@@ -126,11 +126,16 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 let CACHED_FONT: string;
 
 interface State {
+    // True, when the item has the focus.
     hasFocus: boolean;
 
+    // The suggested item.
     suggestedItems: ReadonlyArray<TagValue>;
+
+    // The index of the selected suggested items.
     suggestedIndex: number;
 
+    // All available tag values.
     items: ReadonlyArray<TagValue>;
 }
 

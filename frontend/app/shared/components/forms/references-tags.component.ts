@@ -66,6 +66,7 @@ class TagsConverter implements Converter {
 }
 
 interface State {
+    // The tags converter.
     converter: TagsConverter;
 }
 

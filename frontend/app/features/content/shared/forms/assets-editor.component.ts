@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -34,11 +34,17 @@ class AssetUpdated {
 }
 
 interface State {
+    // The uploading files.
     assetFiles: ReadonlyArray<File>;
 
+    // The assets to render.
     assets: ReadonlyArray<AssetDto>;
 
+    // True when showing the assets as list.
     isListView: boolean;
+
+    // True, when width less than 600 pixels.
+    isCompact?: boolean;
 }
 
 @Component({
@@ -51,7 +57,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
-    @Input()
     public isCompact = false;
 
     public assetsDialog = new DialogModel();
@@ -102,6 +107,10 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
                         this.setAssets(this.snapshot.assets.replaceBy('id', event.asset));
                     }
                 }));
+    }
+
+    public setCompact(isCompact: boolean) {
+        this.next(s => ({ ...s, isCompact: isCompact }));
     }
 
     public setAssets(assets: ReadonlyArray<AssetDto>) {

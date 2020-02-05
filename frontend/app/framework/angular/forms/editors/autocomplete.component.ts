@@ -27,7 +27,10 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The suggested items.
     suggestedItems: ReadonlyArray<any>;
+
+    // The selected suggest item index.
     suggestedIndex: number;
 }
 

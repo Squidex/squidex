@@ -25,9 +25,14 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The content items to show.
     contentItems: ReadonlyArray<ContentDto>;
 
-    columnCount: number;
+    // The maximum number of columns.
+    columns: number;
+
+    // True, when width less than 600 pixels.
+    isCompact?: boolean;
 }
 
 @Component({
@@ -50,13 +55,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public isCompact = false;
-
-    @Input()
     public allowDuplicates = true;
-
-    @Input()
-    public columnCount = 0;
 
     public selectorDialog = new DialogModel();
 
@@ -64,7 +63,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService
     ) {
-        super(changeDetector, { contentItems: [], columnCount: 0 });
+        super(changeDetector, { contentItems: [], columns: 0 });
     }
 
     public writeValue(obj: any) {
@@ -89,13 +88,13 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
-        let columnCount = 1;
+        let columns = 1;
 
         for (const content of contentItems) {
-            columnCount = Math.max(columnCount, content.referenceFields.length);
+            columns = Math.max(columns, content.referenceFields.length);
         }
 
-        this.next(s => ({ ...s, contentItems, columnCount }));
+        this.next(s => ({ ...s, contentItems, columns }));
     }
 
     public select(contents: ReadonlyArray<ContentDto>) {
@@ -109,7 +108,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public remove(content: ContentDto) {
-        if (content) {
+        if (content && !this.snapshot.isDisabled) {
             this.setContentItems(this.snapshot.contentItems.filter(x => x.id !== content.id));
 
             this.updateValue();
@@ -117,7 +116,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
-        if (event) {
+        if (event && !this.snapshot.isDisabled) {
             this.setContentItems(sorted(event));
 
             this.updateValue();
@@ -134,6 +133,10 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         }
 
         this.callTouched();
+    }
+
+    public setCompact(isCompact: boolean) {
+        this.next(s => ({ ...s, isCompact }));
     }
 
     public trackByContent(index: number, content: ContentDto) {

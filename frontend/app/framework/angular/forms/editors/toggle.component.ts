@@ -15,6 +15,7 @@ export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The value indicating if something is checked.
     isChecked: boolean | null;
 }
 
