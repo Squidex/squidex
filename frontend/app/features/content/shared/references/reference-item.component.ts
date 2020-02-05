@@ -7,7 +7,7 @@
 
 /* tslint:disable:component-selector */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import {
     AppLanguageDto,
@@ -39,7 +39,7 @@ export class ReferenceItemComponent implements OnChanges {
 
     public values: ReadonlyArray<any> = [];
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges() {
         this.updateValues();
     }
 

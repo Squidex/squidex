@@ -19,7 +19,7 @@
                 </label>
             </div>
     
-            <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+            <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" enforceTime="true" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
         </ng-container>
     
         <ng-container footer>
