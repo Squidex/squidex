@@ -15,9 +15,13 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The current stars to show.
     stars: number;
+
+    // The array for rendering the stars.
     starsArray: ReadonlyArray<number>;
 
+    // The selected value.
     value: number | null;
 }
 

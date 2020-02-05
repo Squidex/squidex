@@ -1,4 +1,7 @@
-<div class="references-container" [class.disabled]="snapshot.isDisabled">
+<div class="references-container" [class.disabled]="snapshot.isDisabled"
+    (sqxResizeCondition)="setCompact($event)"
+    [sqxResizeMinWidth]="600"
+    [sqxResizeMaxWidth]="0">
     <ng-container>
         <div class="drop-area-container">
             <div class="drop-area" (click)="selectorDialog.show()">
@@ -17,8 +20,9 @@
                 cdkDrag
                 cdkDragLockAxis="y"
                 [language]="language"
-                [isCompact]="isCompact"
-                [columnCount]="snapshot.columnCount"
+                [columns]="snapshot.columns"
+                [isCompact]="snapshot.isCompact"
+                [isDisabled]="snapshot.isDisabled"
                 (delete)="remove(content)">
                 <i cdkDragHandle class="icon-drag2 drag-handle"></i>
             </tbody>

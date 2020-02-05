@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
@@ -19,7 +19,11 @@ import {
 } from '@app/shared';
 
 interface State {
+    // True when loading assets.
     isLoading?: boolean;
+
+    // True, when width less than 600 pixels.
+    isCompact?: boolean;
 }
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -36,9 +40,6 @@ export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
-    @Input()
-    public isCompact = false;
-
     public valueControl = new FormControl('');
 
     public valueThumb =
@@ -92,6 +93,10 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         } else {
             this.valueControl.setValue('', { emitEvent: true });
         }
+    }
+
+    public setCompact(isCompact: boolean) {
+        this.next(s => ({ ...s, isCompact: isCompact }));
     }
 
     public selectPhoto(photo: StockPhotoDto) {

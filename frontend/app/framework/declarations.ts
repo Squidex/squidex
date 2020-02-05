@@ -66,6 +66,7 @@ export * from './angular/pager.component';
 export * from './angular/panel-container.directive';
 export * from './angular/panel.component';
 export * from './angular/popup-link.directive';
+export * from './angular/resized.directive';
 export * from './angular/safe-html.pipe';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';

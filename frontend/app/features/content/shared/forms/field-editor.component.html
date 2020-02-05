@@ -31,7 +31,7 @@
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor [formControl]="editorControl" [isCompact]="isCompact"></sqx-assets-editor>
+                    <sqx-assets-editor [formControl]="editorControl"></sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
@@ -47,7 +47,7 @@
                     <sqx-date-time-editor enforceTime="true" [mode]="field.rawProperties.editor" [formControl]="editorControl"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
-					<sqx-geolocation-editor [isCompact]="isCompact" [formControl]="editorControl"></sqx-geolocation-editor>
+					<sqx-geolocation-editor [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
 					<sqx-json-editor height="350" [formControl]="editorControl"></sqx-json-editor>
@@ -84,8 +84,7 @@
                                 [allowDuplicates]="field.rawProperties.allowDuplicated"
                                 [language]="language"
                                 [languages]="languages"
-                                [schemaIds]="field.rawProperties.schemaIds"
-                                [isCompact]="isCompact">
+                                [schemaIds]="field.rawProperties.schemaIds">
                             </sqx-references-editor>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
@@ -125,7 +124,7 @@
 							<sqx-markdown-editor [formControl]="editorControl"></sqx-markdown-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'StockPhoto'">
-							<sqx-stock-photo-editor [formControl]="editorControl" [isCompact]="isCompact"></sqx-stock-photo-editor>
+							<sqx-stock-photo-editor [formControl]="editorControl"></sqx-stock-photo-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-control" [formControl]="editorControl">

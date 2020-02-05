@@ -18,8 +18,10 @@ import {
 } from '@app/shared/internal';
 
 interface State {
+    // The filtered schemas.
     filtered: ReadonlyArray<SchemaDto>;
 
+    // True when the category is open.
     isOpen?: boolean;
 }
 

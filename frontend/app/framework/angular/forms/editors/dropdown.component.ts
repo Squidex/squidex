@@ -21,9 +21,16 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The suggested item.
     suggestedItems: ReadonlyArray<any>;
+
+    // The selected suggested item.
     selectedItem: any;
+
+    // The selected suggested index.
     selectedIndex: number;
+
+    // The current search query.
     query?: RegExp;
 }
 

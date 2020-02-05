@@ -25,7 +25,6 @@
                         [field]="field"
                         [language]="language"
                         [languages]="languages"
-                        [isCompact]="!!fieldFormCompare"
                         [control]="fieldForm.controls[language.iso2Code]">
                     </sqx-field-editor>
                 </div>
@@ -38,7 +37,6 @@
                     [field]="field"
                     [language]="language"
                     [languages]="languages"
-                    [isCompact]="!!fieldFormCompare"
                     [control]="selectedFormControl">
                 </sqx-field-editor>
             </ng-template>
@@ -51,7 +49,6 @@
                 [field]="field"
                 [language]="language"
                 [languages]="languages"
-                [isCompact]="!!fieldFormCompare"
                 [control]="selectedFormControl">
             </sqx-field-editor>
         </ng-template>
@@ -81,7 +78,6 @@
                         [field]="field"
                         [language]="language"
                         [languages]="languages"
-                        [isCompact]="true"
                         [control]="fieldFormCompare?.controls[language.iso2Code]">
                     </sqx-field-editor>
                 </div>
@@ -92,7 +88,6 @@
                     [field]="field"
                     [language]="language"
                     [languages]="languages"
-                    [isCompact]="true"
                     [control]="selectedFormControlCompare">
                 </sqx-field-editor>
             </ng-template>
@@ -103,7 +98,6 @@
                 [field]="field"
                 [language]="language"
                 [languages]="languages"
-                [isCompact]="!!fieldFormCompare"
                 [control]="selectedFormControl">
             </sqx-field-editor>
         </ng-template>

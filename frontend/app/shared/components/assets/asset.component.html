@@ -1,8 +1,11 @@
 <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="select.emit()" 
+    <div class="card" 
+        (click)="select.emit()" 
+        [class.selectable]="isSelectable"
+        [class.border-primary]="isSelected"
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
-        [noDrop]="true">
+        [sqxDropNoPaste]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && progress === 0">
                 <span class="file-type" *ngIf="asset.fileType">
@@ -88,10 +91,12 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" [class.selectable]="isSelectable" (click)="select.emit()" 
+    <div class="table-items-row" 
+        (click)="select.emit()"
+        [class.selectable]="isSelectable"
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
-        [noDrop]="true">
+        [sqxDropNoPaste]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
         <ng-container *ngIf="asset && progress === 0">

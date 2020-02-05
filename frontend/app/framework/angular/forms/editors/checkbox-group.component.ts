@@ -19,6 +19,7 @@ export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The checked values.
     checkedValues: ReadonlyArray<string>;
 }
 

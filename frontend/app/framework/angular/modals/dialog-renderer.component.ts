@@ -19,10 +19,13 @@ import {
 } from '@app/framework/internal';
 
 interface State {
+    // The pending dialog request.
     dialogRequest?: DialogRequest | null;
 
+    // The list of open notifications.
     notifications: ReadonlyArray<Notification>;
 
+    // The current tooltip.
     tooltip?: Tooltip | null;
 }
 

@@ -19,7 +19,10 @@
         </div>
     </div>
 
-    <div class="body">
+    <div class="body"
+        (sqxResizeCondition)="setCompact($event)"
+        [sqxResizeMinWidth]="600"
+        [sqxResizeMaxWidth]="0">
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file" 
@@ -30,8 +33,7 @@
                     [asset]="asset"
                     (update)="notifyOthers(asset)"
                     [removeMode]="true"
-                    (remove)="removeLoadedAsset(asset)"
-                    [isCompact]="isCompact">
+                    (remove)="removeLoadedAsset(asset)">
                 </sqx-asset>
             </div>
         </ng-container>
@@ -39,7 +41,8 @@
         <ng-template #listTemplate>
             <div class="list-view">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file"
-                    [isListView]="true" 
+                    [isListView]="true"
+                    [isCompact]="snapshot.isCompact"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
@@ -56,7 +59,7 @@
                         <sqx-asset 
                             [asset]="asset"
                             [isListView]="true"
-                            [isCompact]="isCompact"
+                            [isCompact]="snapshot.isCompact"
                             (update)="notifyOthers(asset)"
                             [removeMode]="true" 
                             (remove)="removeLoadedAsset(asset)">

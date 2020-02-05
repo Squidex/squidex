@@ -32,7 +32,10 @@ export class ReferenceItemComponent implements OnChanges {
     public isCompact = false;
 
     @Input()
-    public columnCount = 0;
+    public isDisabled = false;
+
+    @Input()
+    public columns = 0;
 
     @Input('sqxReferenceItem')
     public content: ContentDto;
@@ -46,7 +49,7 @@ export class ReferenceItemComponent implements OnChanges {
     private updateValues() {
         const values = [];
 
-        for (let i = 0; i < this.columnCount; i++) {
+        for (let i = 0; i < this.columns; i++) {
             const field = this.content.referenceFields[i];
 
             if (field) {

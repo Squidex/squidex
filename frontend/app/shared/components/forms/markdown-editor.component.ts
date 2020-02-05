@@ -27,6 +27,7 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // True, when the editor is shown as fullscreen.
     isFullscreen: false;
 }
 

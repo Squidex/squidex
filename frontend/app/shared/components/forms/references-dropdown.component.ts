@@ -24,9 +24,13 @@ export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The referenced content items.
     contents: ReadonlyArray<ContentDto>;
+
+    // The names of the selected content items for search.
     contentNames: ReadonlyArray<ContentName>;
 
+    // The name of the selected item.
     selectedItem?: ContentName;
 }
 

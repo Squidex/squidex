@@ -52,13 +52,13 @@ export class AssetComponent implements OnInit {
     public removeMode = false;
 
     @Input()
-    public isCompact = false;
-
-    @Input()
     public isDisabled = false;
 
     @Input()
     public isSelected = false;
+
+    @Input()
+    public isCompact: boolean;
 
     @Input()
     public isSelectable = false;

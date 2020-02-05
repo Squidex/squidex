@@ -46,9 +46,11 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="app-image" noDrop="true" onlyImages="true"
+                        <div class="app-image"
                             (sqxDropFile)="uploadImage($event)"
-                            [sqxDropDisabled]="uploading || !isImageEditable">
+                            [sqxDropDisabled]="uploading || !isImageEditable"
+                            [sqxDropOnlyImages]="true"
+                            [sqxDropNoPaste]="true">
                             <div class="app-progress" *ngIf="uploading; else notUploading">
                                 <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
                             </div>

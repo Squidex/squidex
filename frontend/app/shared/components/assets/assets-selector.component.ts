@@ -16,9 +16,13 @@ import {
 } from '@app/shared/internal';
 
 interface State {
+    // The selected assets.
     selectedAssets: { [id: string]: AssetDto };
+
+    // The number of selected items.
     selectionCount: number;
 
+    // True, when rendering the assets as list.
     isListView: boolean;
 }
 

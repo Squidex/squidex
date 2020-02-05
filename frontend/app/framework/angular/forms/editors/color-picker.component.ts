@@ -19,8 +19,10 @@ export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
+    // The current value.
     value?: string;
 
+    // The foreground color.
     foreground: string;
 }
 
