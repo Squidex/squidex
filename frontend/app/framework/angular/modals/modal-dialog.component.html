@@ -12,6 +12,10 @@
                     <i class="icon-close"></i>
                 </button>
             </div>
+
+            <div class="modal-tabs clearfix" #tabsElement>
+                <ng-content select="[tabs]"></ng-content>
+            </div>
             
             <div class="modal-body" [class.flexed]="flexBody">
                 <ng-content select="[content]"></ng-content>
