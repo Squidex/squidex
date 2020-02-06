@@ -1,8 +1,13 @@
-<div class="assets-container" [class.disabled]="snapshot.isDisabled" (sqxDropFile)="addFiles($event)" tabindex="1000">
+<div class="assets-container"
+    (sqxDropFile)="addFiles($event)"
+    (sqxDropDisabled)="snapshot.isDisabled"
+    tabindex="1000">
     <div class="header list">
         <div class="row no-gutters">
-            <div class="col">
-                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)">
+            <div class="col" [class.disabled]="snapshot.isDisabled">
+                <div class="drop-area align-items-center" (click)="assetsDialog.show()"
+                    (sqxDropFile)="addFiles($event)"
+                    (sqxDropDisabled)="snapshot.isDisabled">
                     Drop files or click
                 </div>
             </div>
@@ -26,11 +31,15 @@
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file" 
+                    [isDisabled]="snapshot.isDisabled"
+                    [isCompact]="snapshot.isCompact"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
                 <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" 
                     [asset]="asset"
+                    [isDisabled]="snapshot.isDisabled"
+                    [isCompact]="snapshot.isCompact"
                     (update)="notifyOthers(asset)"
                     [removeMode]="true"
                     (remove)="removeLoadedAsset(asset)">
@@ -42,6 +51,7 @@
             <div class="list-view">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [assetFile]="file"
                     [isListView]="true"
+                    [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
@@ -59,6 +69,7 @@
                         <sqx-asset 
                             [asset]="asset"
                             [isListView]="true"
+                            [isDisabled]="snapshot.isDisabled"
                             [isCompact]="snapshot.isCompact"
                             (update)="notifyOthers(asset)"
                             [removeMode]="true" 

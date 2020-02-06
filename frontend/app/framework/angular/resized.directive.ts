@@ -5,25 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
-import ResizeObserver from 'resize-observer-polyfill';
+import { Directive, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, Output } from '@angular/core';
 
-const entriesMap = new WeakMap();
-
-const observer = new ResizeObserver(entries => {
-    for (const entry of entries) {
-        if (entriesMap.has(entry.target)) {
-            const component = entriesMap.get(entry.target);
-
-            component.onResized(entry);
-        }
-    }
-});
+import {
+    ResizeListener,
+    ResizeService,
+    ResourceOwner
+} from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]'
 })
-export class ResizedDirective implements OnDestroy, OnChanges {
+export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChanges, ResizeListener {
     private condition: ((rect: ClientRect) => boolean) | undefined;
     private conditionValue = false;
 
@@ -39,12 +32,12 @@ export class ResizedDirective implements OnDestroy, OnChanges {
     @Output('sqxResized')
     public resize = new EventEmitter<ClientRect>();
 
-    constructor(
-        private readonly element: ElementRef
+    constructor(resizeService: ResizeService, element: ElementRef,
+        private readonly zone: NgZone
     ) {
-        entriesMap.set(element.nativeElement, this);
+        super();
 
-        observer.observe(element.nativeElement);
+        this.own(resizeService.listen(element.nativeElement, this));
     }
 
     public ngOnChanges() {
@@ -62,21 +55,21 @@ export class ResizedDirective implements OnDestroy, OnChanges {
         }
     }
 
-    public ngOnDestroy() {
-        observer.unobserve(this.element.nativeElement);
-    }
-
-    public onResized(entry: ResizeObserverEntry) {
+    public onResize(rect: ClientRect) {
         if (this.condition) {
-            const value = this.condition(entry.contentRect);
+            const value = this.condition(rect);
 
             if (this.conditionValue !== value) {
-                this.resizeCondition.emit(value);
+                this.zone.run(() => {
+                    this.resizeCondition.emit(value);
+                });
 
                 this.conditionValue = value;
             }
         } else {
-            this.resize.emit(entry.contentRect);
+            this.zone.run(() => {
+                this.resize.emit(rect);
+            });
         }
     }
 }
