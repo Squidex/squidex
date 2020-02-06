@@ -1,4 +1,4 @@
-<div class="row no-gutters mb-1" *ngIf="fieldModel">
+<div class="row no-gutters mb-1 align-items-center" *ngIf="fieldModel">
     <div class="col-auto path">
         <sqx-query-path 
             (pathChange)="changePath($event)"
@@ -13,9 +13,12 @@
     </div>
     <div class="col pl-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
         <ng-container *ngSwitchCase="'boolean'">
-            <input type="checkbox" class="form-control"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
+            <div class="form-check form-check-inline pl-2">
+                <input type="checkbox" class="form-check-input"
+                    [ngModel]="filter.value"
+                    (ngModelChange)="changeValue($event)"
+                />
+            </div>
         </ng-container>
         <ng-container *ngSwitchCase="'date'">
             <sqx-date-time-editor mode="Date"
@@ -57,7 +60,8 @@
         <ng-container *ngSwitchCase="'string'">
             <input type="text" class="form-control" *ngIf="!fieldModel.extra"
                 [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
+                (ngModelChange)="changeValue($event)"
+            />
         </ng-container>
     </div>
     <div class="col-auto pl-2">
