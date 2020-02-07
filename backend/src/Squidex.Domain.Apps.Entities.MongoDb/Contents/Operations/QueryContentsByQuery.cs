@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft)
         {
             Guard.NotNull(app);
             Guard.NotNull(schema);
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                query = query.AdjustToModel(schema.SchemaDef, inDraft);
+                query = query.AdjustToModel(schema.SchemaDef);
 
                 List<Guid>? fullTextIds = null;
 
@@ -73,7 +73,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
                     Collection.Find(filter)
-                        .WithoutDraft(includeDraft)
                         .QueryLimit(query)
                         .QuerySkip(query)
                         .QuerySort(query)

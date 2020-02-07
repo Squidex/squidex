@@ -1,13 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public abstract class ContentUpdateCommand : ContentDataCommand
+    [EventType(nameof(ContentVersionCreated))]
+    public sealed class ContentVersionCreated : ContentEvent
     {
+        public Status Status { get; set; }
     }
 }

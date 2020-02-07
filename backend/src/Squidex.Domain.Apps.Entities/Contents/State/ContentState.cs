@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -17,33 +16,33 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
-    public sealed class ContentState : DomainObjectState<ContentState>, IContentEntity
+    public sealed class ContentState : DomainObjectState<ContentState>, IContentEntity, IContentInfo
     {
-        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [DataMember]
         public NamedId<Guid> SchemaId { get; set; }
 
-        [DataMember]
-        public NamedContentData Data { get; set; }
+        public Status? NewStatus { get; set; }
 
-        [DataMember]
-        public NamedContentData DataDraft { get; set; }
-
-        [DataMember]
-        public ScheduleJob? ScheduleJob { get; set; }
-
-        [DataMember]
-        public bool IsPending { get; set; }
-
-        [DataMember]
-        public bool IsDeleted { get; set; }
-
-        [DataMember]
         public Status Status { get; set; }
 
-        public override bool ApplyEvent(IEvent @event)
+        public ScheduleJob? ScheduleJob { get; set; }
+
+        public NamedContentData? NewData { get; set; }
+
+        public NamedContentData Data { get; set; }
+
+        public NamedContentData EditingData
+        {
+            get { return NewData ?? Data; }
+        }
+
+        public Status EditingStatus
+        {
+            get { return NewStatus ?? Status; }
+        }
+
+        public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
         {
             switch (@event)
             {
@@ -51,51 +50,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
                     {
                         SimpleMapper.Map(e, this);
 
-                        UpdateData(null, e.Data, false);
+                        break;
+                    }
+
+                case ContentVersionCreated e:
+                    {
+                        NewData = Data;
+                        NewStatus = e.Status;
+
+                        ScheduleJob = null;
 
                         break;
                     }
 
-                case ContentChangesPublished _:
+                case ContentVersionDeleted _:
                     {
-                        ScheduleJob = null;
+                        NewData = null;
+                        NewStatus = null;
 
-                        UpdateData(DataDraft, null, false);
+                        ScheduleJob = null;
 
                         break;
                     }
 
                 case ContentStatusChanged e:
                     {
-                        ScheduleJob = null;
-
-                        SimpleMapper.Map(e, this);
-
-                        if (e.Status == Status.Published)
+                        if (NewStatus.HasValue)
                         {
-                            UpdateData(DataDraft, null, false);
+                            if (e.Status == Status.Published)
+                            {
+                                Status = e.Status;
+
+                                Data = NewData!;
+
+                                NewStatus = null;
+                                NewData = null;
+                            }
+                            else
+                            {
+                                NewStatus = e.Status;
+                            }
                         }
-
-                        break;
-                    }
-
-                case ContentUpdated e:
-                    {
-                        UpdateData(e.Data, e.Data, false);
-
-                        break;
-                    }
-
-                case ContentUpdateProposed e:
-                    {
-                        UpdateData(null, e.Data, true);
-
-                        break;
-                    }
-
-                case ContentChangesDiscarded _:
-                    {
-                        UpdateData(null, Data, false);
+                        else
+                        {
+                            Status = e.Status;
+                        }
 
                         break;
                     }
@@ -114,6 +113,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
                         break;
                     }
 
+                case ContentUpdated e:
+                    {
+                        if (NewStatus.HasValue)
+                        {
+                            NewData = e.Data;
+                        }
+                        else
+                        {
+                            Data = e.Data;
+                        }
+
+                        break;
+                    }
+
                 case ContentDeleted _:
                     {
                         IsDeleted = true;
@@ -123,21 +136,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             }
 
             return true;
-        }
-
-        private void UpdateData(NamedContentData? data, NamedContentData? dataDraft, bool isPending)
-        {
-            if (data != null)
-            {
-                Data = data;
-            }
-
-            if (dataDraft != null)
-            {
-                DataDraft = dataDraft;
-            }
-
-            IsPending = isPending;
         }
     }
 }

@@ -8,8 +8,8 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        public static async Task CanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, UpdateContent command, bool isProposal)
+        public static async Task CanUpdate(ContentState content, IContentWorkflow contentWorkflow, UpdateContent command)
         {
             Guard.NotNull(command);
 
@@ -47,13 +47,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 ValidateData(command, e);
             });
 
-            if (!isProposal)
-            {
-                await ValidateCanUpdate(content, contentWorkflow, command.User);
-            }
+            await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static async Task CanPatch(IContentEntity content, IContentWorkflow contentWorkflow, PatchContent command, bool isProposal)
+        public static async Task CanPatch(ContentState content, IContentWorkflow contentWorkflow, PatchContent command)
         {
             Guard.NotNull(command);
 
@@ -62,41 +59,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 ValidateData(command, e);
             });
 
-            if (!isProposal)
-            {
-                await ValidateCanUpdate(content, contentWorkflow, command.User);
-            }
+            await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static void CanDiscardChanges(bool isPending, DiscardChanges command)
+        public static Task CanChangeStatus(ISchemaEntity schema, ContentState content, IContentWorkflow contentWorkflow, ChangeContentStatus command)
         {
             Guard.NotNull(command);
-
-            if (!isPending)
-            {
-                throw new DomainException("The content has no pending changes.");
-            }
-        }
-
-        public static Task CanChangeStatus(ISchemaEntity schema, IContentEntity content, IContentWorkflow contentWorkflow, ChangeContentStatus command, bool isChangeConfirm)
-        {
-            Guard.NotNull(command);
-
-            if (schema.SchemaDef.IsSingleton && command.Status != Status.Published)
-            {
-                throw new DomainException("Singleton content cannot be changed.");
-            }
 
             return Validate.It(() => "Cannot change status.", async e =>
             {
-                if (isChangeConfirm)
-                {
-                    if (!content.IsPending)
-                    {
-                        e("Content has no changes to publish.", nameof(command.Status));
-                    }
-                }
-                else if (!await contentWorkflow.CanMoveToAsync(content, command.Status, command.User))
+                if (!await contentWorkflow.CanMoveToAsync(content, command.Status, command.User))
                 {
                     e($"Cannot change status from {content.Status} to {command.Status}.", nameof(command.Status));
                 }
@@ -126,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
+        private static async Task ValidateCanUpdate(ContentState content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
         {
             if (!await contentWorkflow.CanUpdateAsync(content, user))
             {

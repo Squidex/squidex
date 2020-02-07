@@ -60,30 +60,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.True;
         }
 
-        public Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user)
+        public Task<bool> CanMoveToAsync(IContentInfo content, Status next, ClaimsPrincipal user)
         {
-            var result = Flow.TryGetValue(content.Status, out var step) && step.Transitions.Any(x => x.Status == next);
+            var result = Flow.TryGetValue(content.EditingStatus, out var step) && step.Transitions.Any(x => x.Status == next);
 
             return Task.FromResult(result);
         }
 
-        public Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user)
+        public Task<bool> CanUpdateAsync(IContentInfo content, ClaimsPrincipal user)
         {
-            var result = content.Status != Status.Archived;
+            var result = content.EditingStatus != Status.Archived;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo> GetInfoAsync(IContentEntity content)
+        public Task<StatusInfo> GetInfoAsync(IContentInfo content)
         {
-            var result = Flow[content.Status].Info;
+            var result = Flow[content.EditingStatus].Info;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo[]> GetNextsAsync(IContentEntity content, ClaimsPrincipal user)
+        public Task<StatusInfo[]> GetNextsAsync(IContentInfo content, ClaimsPrincipal user)
         {
-            var result = Flow.TryGetValue(content.Status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
+            var result = Flow.TryGetValue(content.EditingStatus, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
 
             return Task.FromResult(result);
         }

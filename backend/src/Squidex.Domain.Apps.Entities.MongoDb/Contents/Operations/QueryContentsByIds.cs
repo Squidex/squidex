@@ -30,11 +30,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.appProvider = appProvider;
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids, Status[]? status, bool includeDraft)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids, Status[]? status)
         {
             Guard.NotNull(ids);
 
-            var find = Collection.Find(CreateFilter(appId, ids, status)).WithoutDraft(includeDraft);
+            var find = Collection.Find(CreateFilter(appId, ids, status));
 
             var contentItems = await find.ToListAsync();
             var contentSchemas = await GetSchemasAsync(appId, schema, contentItems);

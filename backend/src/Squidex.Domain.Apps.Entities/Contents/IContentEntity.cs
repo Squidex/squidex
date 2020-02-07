@@ -22,14 +22,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         NamedId<Guid> SchemaId { get; }
 
+        Status? NewStatus { get; }
+
         Status Status { get; }
 
+        NamedContentData Data { get; }
+
         ScheduleJob? ScheduleJob { get; }
-
-        NamedContentData? Data { get; }
-
-        NamedContentData DataDraft { get; }
-
-        bool IsPending { get; }
     }
 }

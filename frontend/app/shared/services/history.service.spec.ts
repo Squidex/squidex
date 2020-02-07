@@ -12,7 +12,8 @@ import {
     ApiUrlConfig,
     DateTime,
     HistoryEventDto,
-    HistoryService
+    HistoryService,
+    Version
 } from '@app/shared/internal';
 
 describe('HistoryService', () => {
@@ -65,8 +66,8 @@ describe('HistoryService', () => {
 
         expect(events!).toEqual(
             [
-                new HistoryEventDto('1', 'User1', 'Message 1', 2, DateTime.parseISO_UTC('2016-12-12T10:10')),
-                new HistoryEventDto('2', 'User2', 'Message 2', 3, DateTime.parseISO_UTC('2016-12-13T10:10'))
+                new HistoryEventDto('1', 'User1', 'Message 1', DateTime.parseISO_UTC('2016-12-12T10:10'), new Version('2')),
+                new HistoryEventDto('2', 'User2', 'Message 2', DateTime.parseISO_UTC('2016-12-13T10:10'), new Version('3'))
             ]);
     }));
 });

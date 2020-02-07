@@ -8,8 +8,32 @@
     }
 }
 
-.user-picture {
-    margin-top: .25rem;
+.section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
+.btn-status {
+    padding: 1rem;
+    padding-top: .75rem;
+    text-align: left;
+}
+
+h3 {
+    &.bordered {
+        border-bottom: 1px solid $color-border;
+        margin-bottom: .5rem;
+        margin-top: 0;
+        padding-bottom: .5rem;
+    }
+}
+
+hr {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .event {
@@ -24,4 +48,8 @@
         font-weight: normal;
         margin: .25rem 0;
     }
+}
+
+.user-picture {
+    margin-top: .25rem;
 }

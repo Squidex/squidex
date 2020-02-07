@@ -25,11 +25,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.serializer = serializer;
         }
 
-        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id, Status[]? status, bool includeDraft)
+        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id, Status[]? status)
         {
             Guard.NotNull(schema);
 
-            var find = Collection.Find(x => x.Id == id).WithoutDraft(includeDraft);
+            var find = Collection.Find(x => x.Id == id);
 
             var contentEntity = await find.FirstOrDefaultAsync();
 

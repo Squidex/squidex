@@ -18,13 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user);
 
-        Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user);
+        Task<bool> CanMoveToAsync(IContentInfo content, Status next, ClaimsPrincipal user);
 
-        Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user);
+        Task<bool> CanUpdateAsync(IContentInfo content, ClaimsPrincipal user);
 
-        Task<StatusInfo> GetInfoAsync(IContentEntity content);
+        Task<StatusInfo> GetInfoAsync(IContentInfo content);
 
-        Task<StatusInfo[]> GetNextsAsync(IContentEntity content, ClaimsPrincipal user);
+        Task<StatusInfo[]> GetNextsAsync(IContentInfo content, ClaimsPrincipal user);
 
         Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema);
     }

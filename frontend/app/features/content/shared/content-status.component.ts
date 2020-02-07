@@ -26,28 +26,28 @@ export class ContentStatusComponent {
     public scheduledTo?: string;
 
     @Input()
+    public scheduledToColor?: string;
+
+    @Input()
     public scheduledAt?: DateTime;
 
     @Input()
-    public isPending: any;
-
-    @Input()
-    public showLabel = false;
+    public layout: 'icon' | 'text' | 'multiline' = 'icon';
 
     @Input()
     public small = false;
 
+    public get isMultiline() {
+        return this.layout === 'multiline';
+    }
+
+    public get isText() {
+        return this.layout === 'text';
+    }
+
     public get tooltipText() {
         if (this.scheduledAt) {
             return `Will be set to '${this.scheduledTo}' at ${this.scheduledAt.toStringFormat('LLLL')}`;
-        } else {
-            return this.status;
-        }
-    }
-
-    public get displayStatus() {
-        if (this.isPending) {
-            return 'Pending';
         } else {
             return this.status;
         }

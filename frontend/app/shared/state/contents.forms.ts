@@ -99,7 +99,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
         }
     }
 
-    const contentField = content.dataDraft[field.name];
+    const contentField = content.data[field.name];
 
     if (contentField) {
         let value: any;

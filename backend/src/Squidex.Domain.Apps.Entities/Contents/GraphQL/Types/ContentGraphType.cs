@@ -127,14 +127,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Resolver = Resolve(x => x.Data),
                     Description = $"The data of the {schemaName} content."
                 });
-
-                AddField(new FieldType
-                {
-                    Name = "dataDraft",
-                    ResolvedType = contentDataType,
-                    Resolver = Resolve(x => x.DataDraft),
-                    Description = $"The draft data of the {schemaName} content."
-                });
             }
 
             var contentDataTypeFlat = new ContentDataFlatGraphType(schema, schemaName, schemaType, model);
@@ -147,14 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     ResolvedType = new NonNullGraphType(contentDataTypeFlat),
                     Resolver = ResolveFlat(x => x.Data),
                     Description = $"The flat data of the {schemaName} content."
-                });
-
-                AddField(new FieldType
-                {
-                    Name = "flatDataDraft",
-                    ResolvedType = contentDataTypeFlat,
-                    Resolver = ResolveFlat(x => x.DataDraft),
-                    Description = $"The flat draft data of the {schemaName} content."
                 });
             }
         }

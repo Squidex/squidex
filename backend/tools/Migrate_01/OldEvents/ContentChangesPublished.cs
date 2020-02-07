@@ -5,9 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using System;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
+
+namespace Migrate_01.OldEvents
 {
-    public abstract class ContentUpdateCommand : ContentDataCommand
+    [EventType(nameof(ContentChangesPublished))]
+    [Obsolete]
+    public sealed class ContentChangesPublished : IMigrated<IEvent>
     {
+        public IEvent Migrate()
+        {
+            return new NoopEvent();
+        }
     }
 }

@@ -17,6 +17,10 @@ export class Version {
         return other && other.trimmed() === this.trimmed();
     }
 
+    public toString() {
+        return this.value;
+    }
+
     private trimmed(): string {
         if (this.value.startsWith('W/')) {
             return this.value.substr(2);

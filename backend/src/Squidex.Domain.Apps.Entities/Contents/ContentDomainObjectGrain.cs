@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             await DomainObject.EnsureLoadedAsync();
 
-            return DomainObject.GetSnapshot(version);
+            return await GetStateAsync(version);
         }
     }
 }

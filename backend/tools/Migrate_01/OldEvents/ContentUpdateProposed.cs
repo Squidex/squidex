@@ -5,12 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Migrate_01.OldEvents
 {
-    [EventType(nameof(ContentChangesPublished))]
-    public sealed class ContentChangesPublished : ContentEvent
+    [EventType(nameof(ContentUpdateProposed))]
+    [Obsolete]
+    public sealed class ContentUpdateProposed : IMigrated<IEvent>
     {
+        public IEvent Migrate()
+        {
+            return new NoopEvent();
+        }
     }
 }

@@ -148,7 +148,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public clone(content: ContentDto) {
-        this.tempService.put(content.dataDraft);
+        this.tempService.put(content.data);
 
         this.router.navigate(['new'], { relativeTo: this.route });
     }

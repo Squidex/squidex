@@ -44,27 +44,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The data of the content item.
         /// </summary>
         [Required]
-        public object? Data { get; set; }
-
-        /// <summary>
-        /// The pending changes of the content item.
-        /// </summary>
-        public object? DataDraft { get; set; }
+        public object Data { get; set; }
 
         /// <summary>
         /// The reference data for the frontend UI.
         /// </summary>
         public NamedContentData? ReferenceData { get; set; }
-
-        /// <summary>
-        /// Indicates if the draft data is pending.
-        /// </summary>
-        public bool IsPending { get; set; }
-
-        /// <summary>
-        /// The scheduled status.
-        /// </summary>
-        public ScheduleJobDto? ScheduleJob { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.
@@ -82,9 +67,29 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Status Status { get; set; }
 
         /// <summary>
+        /// The new status of the content.
+        /// </summary>
+        public Status? NewStatus { get; set; }
+
+        /// <summary>
         /// The color of the status.
         /// </summary>
         public string StatusColor { get; set; }
+
+        /// <summary>
+        /// The color of the new status.
+        /// </summary>
+        public string? NewStatusColor { get; set; }
+
+        /// <summary>
+        /// The color of the scheduled status.
+        /// </summary>
+        public string? ScheduledStatusColor { get; set; }
+
+        /// <summary>
+        /// The scheduled status.
+        /// </summary>
+        public ScheduleJobDto? ScheduleJob { get; set; }
 
         /// <summary>
         /// The name of the schema.
@@ -112,13 +117,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (context.ShouldFlatten())
             {
-                response.Data = content.Data?.ToFlatten();
-                response.DataDraft = content.DataDraft?.ToFlatten();
+                response.Data = content.Data.ToFlatten();
             }
             else
             {
                 response.Data = content.Data;
-                response.DataDraft = content.DataDraft;
             }
 
             if (content.ReferenceFields != null)
@@ -147,16 +150,18 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddGetLink("prev", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
-            if (IsPending)
+            if (NewStatus.HasValue)
             {
-                if (controller.HasPermission(Permissions.AppContentsDraftDiscard, app, schema))
+                if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
                 {
-                    AddPutLink("draft/discard", controller.Url<ContentsController>(x => nameof(x.DiscardDraft), values));
+                    AddPutLink("version/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                 }
-
-                if (controller.HasPermission(Permissions.AppContentsDraftPublish, app, schema))
+            }
+            else
+            {
+                if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
                 {
-                    AddPutLink("draft/publish", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
+                    AddPutLink("version/create", controller.Url<ContentsController>(x => nameof(x.CreateVersion), values));
                 }
             }
 
@@ -169,14 +174,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                     AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
                 }
 
-                if (Status == Status.Published)
+                if (content.NextStatuses != null)
                 {
-                    AddPutLink("draft/propose", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft=true");
-                }
-
-                if (content.Nexts != null)
-                {
-                    foreach (var next in content.Nexts)
+                    foreach (var next in content.NextStatuses)
                     {
                         AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
                     }

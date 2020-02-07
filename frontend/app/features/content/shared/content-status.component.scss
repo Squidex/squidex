@@ -8,6 +8,18 @@
         color: $color-dark-black;
     }
 
+    &-summary {
+        color: $color-text !important;
+        font-size: 1.3rem;
+        font-weight: normal;
+    }
+
+    &-scheduled {
+        color: lighten($color-text, 5%) !important;
+        font-size: .8rem;
+        font-weight: normal;
+    }
+
     &-label {
         color: $color-text;
     }

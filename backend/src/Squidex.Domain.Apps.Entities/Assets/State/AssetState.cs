@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -21,47 +20,31 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public class AssetState : DomainObjectState<AssetState>, IAssetEntity
     {
-        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [DataMember]
         public Guid ParentId { get; set; }
 
-        [DataMember]
         public string FileName { get; set; }
 
-        [DataMember]
         public string FileHash { get; set; }
 
-        [DataMember]
         public string MimeType { get; set; }
 
-        [DataMember]
         public string Slug { get; set; }
 
-        [DataMember]
         public long FileVersion { get; set; }
 
-        [DataMember]
         public long FileSize { get; set; }
 
-        [DataMember]
         public long TotalSize { get; set; }
 
-        [DataMember]
         public bool IsProtected { get; set; }
 
-        [DataMember]
         public HashSet<string> Tags { get; set; }
 
-        [DataMember]
         public AssetMetadata Metadata { get; set; }
 
-        [DataMember]
         public AssetType Type { get; set; }
-
-        [DataMember]
-        public bool IsDeleted { get; set; }
 
         public Guid AssetId
         {

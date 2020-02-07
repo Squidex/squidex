@@ -257,14 +257,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public publishDraft(content: ContentDto, dueTime: string | null): Observable<ContentDto> {
-        return this.contentsService.publishDraft(this.appName, content, dueTime, content.version).pipe(
-            tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
     public changeStatus(content: ContentDto, status: string, dueTime: string | null): Observable<ContentDto> {
         return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
             tap(updated => {
@@ -281,16 +273,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public proposeDraft(content: ContentDto, request: any): Observable<ContentDto> {
-        return this.contentsService.proposeDraft(this.appName, content, request, content.version).pipe(
+    public createVersion(content: ContentDto): Observable<ContentDto> {
+        return this.contentsService.createVersion(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.replaceContent(updated, content.version, 'Content updated successfully.');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public discardDraft(content: ContentDto): Observable<ContentDto> {
-        return this.contentsService.discardDraft(this.appName, content, content.version).pipe(
+    public deleteVersion(content: ContentDto): Observable<ContentDto> {
+        return this.contentsService.deleteVersion(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.replaceContent(updated, content.version, 'Content updated successfully.');
             }),

@@ -1,18 +1,24 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    [EventType(nameof(ContentUpdateProposed))]
-    public sealed class ContentUpdateProposed : ContentEvent
+    public interface IContentInfo
     {
-        public NamedContentData Data { get; set; }
+        NamedId<Guid> AppId { get; }
+
+        NamedId<Guid> SchemaId { get; }
+
+        Status EditingStatus { get; }
+
+        NamedContentData EditingData { get; }
     }
 }

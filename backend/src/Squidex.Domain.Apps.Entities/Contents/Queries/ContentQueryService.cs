@@ -162,28 +162,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var results = new List<IEnrichedContentEntity>();
-
-                var script = schema.SchemaDef.Scripts.Query;
-                var scripting = !string.IsNullOrWhiteSpace(script);
-
                 var enriched = await contentEnricher.EnrichAsync(contents, context);
 
-                foreach (var content in enriched)
+                var script = schema.SchemaDef.Scripts.Query;
+
+                if (!string.IsNullOrWhiteSpace(script) && !context.IsFrontendClient)
                 {
-                    var result = SimpleMapper.Map(content, new ContentEntity());
+                    var results = new List<IEnrichedContentEntity>();
 
-                    if (result.Data != null && !context.IsFrontendClient && scripting)
+                    var scriptContext = new ScriptContext { User = context.User };
+
+                    foreach (var content in enriched)
                     {
-                        var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
+                        scriptContext.Data = content.Data;
+                        scriptContext.ContentId = content.Id;
 
-                        result.Data = scriptEngine.Transform(ctx, script);
+                        var result = SimpleMapper.Map(content, new ContentEntity());
+
+                        result.Data = scriptEngine.Transform(scriptContext, script);
+
+                        results.Add(result);
                     }
 
-                    results.Add(result);
+                    return results;
                 }
-
-                return results;
+                else
+                {
+                    return enriched;
+                }
             }
         }
 
@@ -255,22 +261,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), WithDraft(context));
+            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), InDraft(context));
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), context.IsFrontendClient, query, WithDraft(context));
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), query, InDraft(context));
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, WithDraft(context));
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, InDraft(context));
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, WithDraft(context));
+            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, InDraft(context));
         }
 
         private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
@@ -278,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentVersionLoader.GetAsync(id, version);
         }
 
-        private static bool WithDraft(Context context)
+        private static bool InDraft(Context context)
         {
             return context.ShouldProvideUnpublished() || context.IsFrontendClient;
         }
