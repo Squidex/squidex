@@ -60,7 +60,7 @@ interface Snapshot {
 export abstract class ContentsStateBase extends State<Snapshot> {
     private previousId: string;
 
-    public selectedContent =
+    public selectedContent: Observable<ContentDto | null | undefined> =
         this.project(x => x.selectedContent, Types.equals);
 
     public contents =

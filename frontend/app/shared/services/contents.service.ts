@@ -33,6 +33,7 @@ export class ScheduleDto {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
+        public readonly color: string,
         public readonly dueTime: DateTime
     ) {
     }
@@ -86,7 +87,6 @@ export class ContentDto {
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
         public readonly scheduleJob: ScheduleDto | null,
-        public readonly scheduledStatusColor: string | undefined,
         public readonly data: ContentData,
         public readonly schemaName: string,
         public readonly schemaDisplayName: string,
@@ -301,17 +301,23 @@ function parseContent(response: any) {
         response.newStatusColor,
         DateTime.parseISO_UTC(response.created), response.createdBy,
         DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-        response.scheduleJob
-            ? new ScheduleDto(
-                response.scheduleJob.status,
-                response.scheduleJob.scheduledBy,
-                DateTime.parseISO_UTC(response.scheduleJob.dueTime))
-            : null,
-        response.scheduledStatusColor,
+        parseScheduleJob(response.scheduleJob),
         response.data,
         response.schemaName,
         response.schemaDisplayName,
         response.referenceData,
         response.referenceFields.map((item: any) => parseField(item)),
         new Version(response.version.toString()));
+}
+
+function parseScheduleJob(response: any) {
+    if (!response) {
+        return null;
+    }
+
+    return new ScheduleDto(
+        response.status,
+        response.scheduledBy,
+        response.color,
+        DateTime.parseISO_UTC(response.dueTime));
 }

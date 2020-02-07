@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             return Validate.It(() => "Cannot change status.", async e =>
             {
-                if (!await contentWorkflow.CanMoveToAsync(content, command.Status, command.User))
+                if (!await contentWorkflow.CanMoveToAsync(content, content.EditingStatus, command.Status, command.User))
                 {
                     e($"Cannot change status from {content.Status} to {command.Status}.", nameof(command.Status));
                 }
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         private static async Task ValidateCanUpdate(ContentState content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
         {
-            if (!await contentWorkflow.CanUpdateAsync(content, user))
+            if (!await contentWorkflow.CanUpdateAsync(content, content.EditingStatus, user))
             {
                 throw new DomainException($"The workflow does not allow updates at status {content.Status}");
             }

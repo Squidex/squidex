@@ -66,15 +66,17 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
                 }));
 
         this.own(
-            this.contentsState.selectedContent.pipe(filter(x => !!x))
+            this.contentsState.selectedContent
                 .subscribe(content => {
-                    const channel = `contents.${content.id}`;
+                    if (content) {
+                        const channel = `contents.${content.id}`;
 
-                    this.contentEvents =
-                        timer(0, 5000).pipe(
-                            switchSafe((() =>  this.historyService.getHistory(this.appsState.appName, channel))));
+                        this.contentEvents =
+                            timer(0, 5000).pipe(
+                                switchSafe((() =>  this.historyService.getHistory(this.appsState.appName, channel))));
 
-                    this.content = content;
+                        this.content = content;
+                    }
                 }));
     }
 

@@ -44,12 +44,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task EnrichNextsAsync(ContentEntity content, Context context)
         {
-            content.NextStatuses = await contentWorkflow.GetNextsAsync(content, context.User);
+            content.NextStatuses = await contentWorkflow.GetNextAsync(content, content.EditingStatus, context.User);
         }
 
         private async Task EnrichCanUpdateAsync(ContentEntity content, Context context)
         {
-            content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, context.User);
+            content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, content.EditingStatus, context.User);
         }
 
         private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
             {
-                info = await contentWorkflow.GetInfoAsync(content);
+                info = await contentWorkflow.GetInfoAsync(content, status);
 
                 if (info == null)
                 {

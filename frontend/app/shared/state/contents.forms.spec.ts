@@ -540,7 +540,7 @@ describe('GetContentValue', () => {
 
     it('should resolve invariant field', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 field1: {
                     iv: 13
                 }
@@ -554,7 +554,7 @@ describe('GetContentValue', () => {
 
     it('should resolve localized field', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 field1: {
                     en: 13
                 }
@@ -568,7 +568,7 @@ describe('GetContentValue', () => {
 
     it('should return default values if field not found', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 other: {
                     en: 13
                 }

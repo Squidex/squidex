@@ -369,9 +369,9 @@ describe('ContentsService', () => {
             scheduleJob: {
                 status: 'Draft',
                 scheduledBy: `Scheduler${id}`,
+                color: 'red',
                 dueTime: `${id % 1000 + 2000}-11-11T10:10:00`
             },
-            scheduledStatusColor: 'red',
             data: {},
             schemaName: 'my-schema',
             schemaDisplayName: 'MySchema',
@@ -398,8 +398,7 @@ export function createContent(id: number, suffix = '') {
         'black',
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
-        new ScheduleDto('Draft', `Scheduler${id}`, DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`)),
-        'red',
+        new ScheduleDto('Draft', `Scheduler${id}`, 'red', DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`)),
         {},
         'my-schema',
         'MySchema',

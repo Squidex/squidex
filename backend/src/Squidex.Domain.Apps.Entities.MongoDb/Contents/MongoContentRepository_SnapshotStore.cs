@@ -100,7 +100,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 Version = newVersion
             });
 
-            content.Status = value.EditingStatus;
             content.ScheduledAt = value.ScheduleJob?.DueTime;
             content.ScheduleJob = value.ScheduleJob;
             content.NewStatus = value.NewStatus;
@@ -119,7 +118,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 Version = newVersion
             });
 
-            content.Status = Status.Published;
             content.ScheduledAt = null;
             content.ScheduleJob = null;
             content.NewStatus = null;

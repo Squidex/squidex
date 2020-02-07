@@ -26,6 +26,10 @@ body {
     color: $color-text-decent;
 }
 
+.text-nowrap {
+    white-space: nowrap;
+}
+
 .drag-handle {
     color: $color-text-decent;
     cursor: move;

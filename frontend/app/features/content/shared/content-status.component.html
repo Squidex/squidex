@@ -4,38 +4,42 @@
             <i class="icon-circle icon-sm"></i>
         </span>
 
-        {{status}}
+        <span class="label">{{status}}</span>
     </div>
 
-    <div class="content-status-scheduled mt-1" *ngIf="scheduledTo">
-        Scheduled to
+    <div class="content-status-scheduled mt-2" *ngIf="scheduled">
+        <div>
+            <span class="label">to&nbsp;</span>
 
-        <span>
-            <span class="content-status default mr-1" [style.color]="scheduledToColor" title="{{tooltipText}}">
+            <span class="content-status default mr-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
                 <i class="icon-circle icon-sm"></i>
             </span>
 
-            {{scheduledTo}}
-        </span>
+            <span>{{scheduled?.status}}</span>
+        </div>
 
-        <br />
-
-        at {{scheduledAt | sqxFullDateTime}}
+        <div class="truncate">
+            <span class="label">at&nbsp;</span>
+    
+            <span>{{scheduled?.dueTime | sqxFullDateTime}}</span>
+        </div>
     </div>
 </ng-container>
 
 <ng-template #simple>
-    <ng-container *ngIf="scheduledTo; else noSchedule">
-        <span class="content-status pending mr-1" title="{{tooltipText}}">
-            <i class="icon-clock" [class.icon-sm]="small"></i>
-        </span>
-    </ng-container>
-    
-    <ng-template #noSchedule>
-        <span class="content-status default mr-1" [style.color]="statusColor" title="{{tooltipText}}">
-            <i class="icon-circle" [class.icon-sm]="small"></i>
-        </span>
-    </ng-template>
-    
-    <span class="content-status-label" *ngIf="isText">{{status}}</span>
+    <span [class.truncate]="truncate">
+        <ng-container *ngIf="scheduled; else noSchedule">
+            <span class="content-status pending" [style.color]="scheduled?.color" title="{{tooltipText}}">
+                <i class="icon-clock" [class.icon-sm]="small"></i>
+            </span>
+        </ng-container>
+        
+        <ng-template #noSchedule>
+            <span class="content-status default" [style.color]="statusColor" title="{{tooltipText}}">
+                <i class="icon-circle" [class.icon-sm]="small"></i>
+            </span>
+        </ng-template>
+        
+        <span class="content-status-label ml-1" *ngIf="isText">{{status}}</span>
+    </span>
 </ng-template>

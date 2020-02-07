@@ -69,15 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     case ContentUpdated contentUpdated:
                         await index.IndexAsync(Data(id, contentUpdated.Data, false));
                         break;
-                    // case ContentUpdateProposed contentUpdateProposed:
-                    //    await index.IndexAsync(Data(id, contentUpdateProposed.Data, true));
-                    //    break;
-                    // case ContentChangesDiscarded _:
-                    //    await index.CopyAsync(id, false);
-                    //    break;
-                    // case ContentChangesPublished _:
-                    //    await index.CopyAsync(id, true);
-                    //    break;
+                    case ContentVersionCreated _:
+                        await index.CopyAsync(id, true);
+                        break;
+                    case ContentVersionDeleted _:
+                        await index.CopyAsync(id, false);
+                        break;
                     case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
                         await index.CopyAsync(id, true);
                         break;

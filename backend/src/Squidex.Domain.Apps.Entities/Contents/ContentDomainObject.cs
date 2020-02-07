@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, c, () => "Failed to create content.");
 
-                        var status = (await contentWorkflow.GetInitialStatusAsync(ctx.Schema)).Status;
+                        var status = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
 
                         await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to create version.");
 
-                        var status = (await contentWorkflow.GetInitialStatusAsync(ctx.Schema)).Status;
+                        var status = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
 
                         CreateVersion(c, status);
 

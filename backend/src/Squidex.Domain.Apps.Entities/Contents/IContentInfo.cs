@@ -17,8 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         NamedId<Guid> SchemaId { get; }
 
-        Status EditingStatus { get; }
-
         NamedContentData EditingData { get; }
     }
 }

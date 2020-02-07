@@ -48,11 +48,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 })
             };
 
-        public Task<StatusInfo> GetInitialStatusAsync(ISchemaEntity schema)
+        public Task<Status> GetInitialStatusAsync(ISchemaEntity schema)
         {
-            var result = InfoDraft;
-
-            return Task.FromResult(result);
+            return Task.FromResult(Status.Draft);
         }
 
         public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
@@ -60,30 +58,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.True;
         }
 
-        public Task<bool> CanMoveToAsync(IContentInfo content, Status next, ClaimsPrincipal user)
+        public Task<bool> CanMoveToAsync(IContentInfo content, Status status, Status next, ClaimsPrincipal user)
         {
-            var result = Flow.TryGetValue(content.EditingStatus, out var step) && step.Transitions.Any(x => x.Status == next);
+            var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
 
             return Task.FromResult(result);
         }
 
-        public Task<bool> CanUpdateAsync(IContentInfo content, ClaimsPrincipal user)
+        public Task<bool> CanUpdateAsync(IContentInfo content, Status status, ClaimsPrincipal user)
         {
-            var result = content.EditingStatus != Status.Archived;
+            var result = status != Status.Archived;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo> GetInfoAsync(IContentInfo content)
+        public Task<StatusInfo> GetInfoAsync(IContentInfo content, Status status)
         {
-            var result = Flow[content.EditingStatus].Info;
+            var result = Flow[status].Info;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo[]> GetNextsAsync(IContentInfo content, ClaimsPrincipal user)
+        public Task<StatusInfo[]> GetNextAsync(IContentInfo content, Status status, ClaimsPrincipal user)
         {
-            var result = Flow.TryGetValue(content.EditingStatus, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
+            var result = Flow.TryGetValue(status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
 
             return Task.FromResult(result);
         }

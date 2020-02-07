@@ -105,7 +105,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     };
 
                     if (content) {
-                        this.loadContent(content.dataDraft, true);
+                        this.loadContent(content.data, true);
                     }
 
                     const clone = this.tempService.fetch();

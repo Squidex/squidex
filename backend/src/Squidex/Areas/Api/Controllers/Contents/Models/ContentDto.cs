@@ -82,11 +82,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? NewStatusColor { get; set; }
 
         /// <summary>
-        /// The color of the scheduled status.
-        /// </summary>
-        public string? ScheduledStatusColor { get; set; }
-
-        /// <summary>
         /// The scheduled status.
         /// </summary>
         public ScheduleJobDto? ScheduleJob { get; set; }
@@ -131,7 +126,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (content.ScheduleJob != null)
             {
-                response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
+                response.ScheduleJob = new ScheduleJobDto
+                {
+                    Color = content.ScheduledStatusColor!
+                };
+
+                SimpleMapper.Map(content.ScheduleJob, response.ScheduleJob);
             }
 
             return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name);
@@ -150,28 +150,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddGetLink("prev", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
-            if (NewStatus.HasValue)
+            if (!content.IsSingleton)
             {
-                if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
+                if (NewStatus.HasValue)
                 {
-                    AddPutLink("version/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                    if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
+                    {
+                        AddPutLink("version/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                    }
                 }
-            }
-            else
-            {
-                if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
+                else if (Status == Status.Published)
                 {
-                    AddPutLink("version/create", controller.Url<ContentsController>(x => nameof(x.CreateVersion), values));
-                }
-            }
-
-            if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
-            {
-                if (content.CanUpdate)
-                {
-                    AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
-
-                    AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+                    if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
+                    {
+                        AddPutLink("version/create", controller.Url<ContentsController>(x => nameof(x.CreateVersion), values));
+                    }
                 }
 
                 if (content.NextStatuses != null)
@@ -181,11 +174,18 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                         AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
                     }
                 }
+
+                if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+                {
+                    AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+                }
             }
 
-            if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+            if (content.CanUpdate && controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
             {
-                AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+                AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+
+                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
             }
 
             return this;

@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { DateTime } from '@app/shared';
+import { ScheduleDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-status',
@@ -23,16 +23,13 @@ export class ContentStatusComponent {
     public statusColor: string;
 
     @Input()
-    public scheduledTo?: string;
-
-    @Input()
-    public scheduledToColor?: string;
-
-    @Input()
-    public scheduledAt?: DateTime;
+    public scheduled?: ScheduleDto;
 
     @Input()
     public layout: 'icon' | 'text' | 'multiline' = 'icon';
+
+    @Input()
+    public truncate = false;
 
     @Input()
     public small = false;
@@ -46,8 +43,8 @@ export class ContentStatusComponent {
     }
 
     public get tooltipText() {
-        if (this.scheduledAt) {
-            return `Will be set to '${this.scheduledTo}' at ${this.scheduledAt.toStringFormat('LLLL')}`;
+        if (this.scheduled) {
+            return `Will be set to '${this.scheduled.status}' at ${this.scheduled.dueTime.toStringFormat('LLLL')}`;
         } else {
             return this.status;
         }

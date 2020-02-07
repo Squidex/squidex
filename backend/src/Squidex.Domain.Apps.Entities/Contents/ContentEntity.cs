@@ -45,15 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool CanUpdate { get; set; }
 
+        public bool IsSingleton { get; set; }
+
+        public string SchemaName { get; set; }
+
+        public string SchemaDisplayName { get; set; }
+
         public string StatusColor { get; set; }
 
         public string? NewStatusColor { get; set; }
 
         public string? ScheduledStatusColor { get; set; }
-
-        public string? SchemaName { get; set; }
-
-        public string? SchemaDisplayName { get; set; }
 
         public RootField[]? ReferenceFields { get; set; }
 
