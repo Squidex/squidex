@@ -6,17 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
-using Orleans.Concurrency;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public sealed class DeleteIndexEntry : IIndexCommand
     {
-        Task IndexAsync(Immutable<IIndexCommand[]> updates);
-
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+        public Guid ContentId { get; set; }
     }
 }

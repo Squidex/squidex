@@ -5,24 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Lucene.Net.Analysis;
-using Lucene.Net.Index;
-using Lucene.Net.Search;
+using System;
+using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface IIndex
+    public interface ITextIndexerState
     {
-        Analyzer? Analyzer { get; }
+        Task<ContentState?> GetAsync(Guid contentId);
 
-        IndexReader? Reader { get; }
+        Task SetAsync(ContentState state);
 
-        IndexSearcher? Searcher { get; }
-
-        IndexWriter Writer { get; }
-
-        void EnsureReader();
-
-        void MarkStale();
+        Task RemoveAsync(Guid contentId);
     }
 }

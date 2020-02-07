@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override string CollectionName()
         {
-            return "State_Contents";
+            return "State_Contents_All";
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)

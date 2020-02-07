@@ -9,27 +9,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public sealed class TextIndexerGrain : GrainOfGuid, ITextIndexerGrain
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
         private const int MaxUpdates = 400;
+        private const string MetaId = "_id";
+        private const string MetaFor = "_fd";
+        private const string MetaContentId = "_cid";
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
         private readonly IndexManager indexManager;
         private IDisposable? timer;
         private IIndex index;
-        private IndexState indexState;
         private QueryParser? queryParser;
         private HashSet<string>? currentLanguages;
         private int updates;
@@ -52,35 +57,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         protected override async Task OnActivateAsync(Guid key)
         {
             index = await indexManager.AcquireAsync(key);
-
-            indexState = new IndexState(index);
-        }
-
-        public Task<bool> IndexAsync(Update update)
-        {
-            var content = new TextIndexContent(index, indexState, update.Id);
-
-            content.Index(update.Text, update.OnlyDraft);
-
-            return TryCommitAsync();
-        }
-
-        public Task<bool> CopyAsync(Guid id, bool fromDraft)
-        {
-            var content = new TextIndexContent(index, indexState, id);
-
-            content.Copy(fromDraft);
-
-            return TryCommitAsync();
-        }
-
-        public Task<bool> DeleteAsync(Guid id)
-        {
-            var content = new TextIndexContent(index, indexState, id);
-
-            content.Delete();
-
-            return TryCommitAsync();
         }
 
         public Task<List<Guid>> SearchAsync(string queryText, SearchContext context)
@@ -99,15 +75,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                     if (hits.Length > 0)
                     {
+                        var buffer = new BytesRef(2);
+
                         var found = new HashSet<Guid>();
 
                         foreach (var hit in hits)
                         {
-                            if (TextIndexContent.TryGetId(hit.Doc, context.Scope, index, indexState, out var id))
+                            var forValue = index.Reader.GetBinaryValue(MetaFor, hit.Doc, buffer);
+
+                            if (context.Scope == Scope.Draft && forValue.Bytes[0] != 1)
                             {
-                                if (found.Add(id))
+                                continue;
+                            }
+
+                            if (context.Scope == Scope.Published && forValue.Bytes[1] != 1)
+                            {
+                                continue;
+                            }
+
+                            var document = index.Searcher.Doc(hit.Doc);
+
+                            if (document != null)
+                            {
+                                var idString = document.Get(MetaContentId);
+
+                                if (Guid.TryParse(idString, out var id))
                                 {
-                                    result.Add(id);
+                                    if (found.Add(id))
+                                    {
+                                        result.Add(id);
+                                    }
                                 }
                             }
                         }
@@ -176,6 +173,67 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 updates = 0;
             }
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            index.Writer.DeleteDocuments(new Term(MetaContentId, id.ToString()));
+
+            return TryCommitAsync();
+        }
+
+        public Task UpdateAsync(Immutable<UpdateIndexEntry[]> updates)
+        {
+            foreach (var update in updates.Value)
+            {
+                index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, GetValue(update.ServeAll, update.ServePublished));
+            }
+
+            return TryCommitAsync();
+        }
+
+        public Task IndexAsync(Immutable<IIndexCommand[]> updates)
+        {
+            foreach (var command in updates.Value)
+            {
+                switch (command)
+                {
+                    case DeleteIndexEntry delete:
+                        index.Writer.DeleteDocuments(new Term(MetaContentId, delete.ContentId.ToString()));
+                        break;
+                    case UpdateIndexEntry update:
+                        index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, GetValue(update.ServeAll, update.ServePublished));
+                        break;
+                    case UpsertIndexEntry upsert:
+                        {
+                            var document = new Document();
+
+                            document.SetField(MetaId, upsert.DocId);
+                            document.SetField(MetaContentId, upsert.ContentId.ToString());
+                            document.SetBinaryDocValue(MetaFor, GetValue(upsert.ServeAll, upsert.ServePublished));
+
+                            foreach (var (key, value) in upsert.Texts)
+                            {
+                                document.AddTextField(key, value, Field.Store.NO);
+                            }
+
+                            index.Writer.UpdateDocument(new Term(MetaId, upsert.DocId), document);
+
+                            break;
+                        }
+                }
+            }
+
+            return TryCommitAsync();
+        }
+
+        private static BytesRef GetValue(bool forDraft, bool forPublished)
+        {
+            return new BytesRef(new[]
+            {
+                (byte)(forDraft ? 1 : 0),
+                (byte)(forPublished ? 1 : 0)
+            });
         }
     }
 }

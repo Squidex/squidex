@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -22,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class GrainTextIndexer : ITextIndexer, IEventConsumer
     {
         private readonly IGrainFactory grainFactory;
+        private readonly ITextIndexerState indexState;
 
         public string Name
         {
@@ -33,11 +36,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return "^content-"; }
         }
 
-        public GrainTextIndexer(IGrainFactory grainFactory)
+        public GrainTextIndexer(IGrainFactory grainFactory, ITextIndexerState indexState)
         {
             Guard.NotNull(grainFactory);
+            Guard.NotNull(indexState);
 
             this.grainFactory = grainFactory;
+
+            this.indexState = indexState;
         }
 
         public bool Handles(StoredEvent @event)
@@ -52,39 +58,229 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is ContentEvent contentEvent)
+            switch (@event.Payload)
             {
-                var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
-
-                var id = contentEvent.ContentId;
-
-                switch (@event.Payload)
-                {
-                    case ContentDeleted _:
-                        await index.DeleteAsync(id);
-                        break;
-                    case ContentCreated contentCreated:
-                        await index.IndexAsync(Data(id, contentCreated.Data, true));
-                        break;
-                    case ContentUpdated contentUpdated:
-                        await index.IndexAsync(Data(id, contentUpdated.Data, false));
-                        break;
-                    case ContentVersionCreated _:
-                        await index.CopyAsync(id, true);
-                        break;
-                    case ContentVersionDeleted _:
-                        await index.CopyAsync(id, false);
-                        break;
-                    case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
-                        await index.CopyAsync(id, true);
-                        break;
-                }
+                case ContentCreated contentCreated:
+                    await CreateAsync(contentCreated);
+                    break;
+                case ContentUpdated contentUpdated:
+                    await UpdateAsync(contentUpdated);
+                    break;
+                case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
+                    await PublishAsync(contentStatusChanged);
+                    break;
+                case ContentVersionCreated deleteVersion:
+                    await CreateNewVersionAsync(deleteVersion);
+                    break;
+                case ContentVersionDeleted deleteVersion:
+                    await DeleteVersionAsync(deleteVersion);
+                    break;
+                case ContentDeleted contentDeleted:
+                    await DeleteAsync(contentDeleted);
+                    break;
             }
         }
 
-        private static Update Data(Guid contentId, NamedContentData data, bool onlyDraft)
+        private async Task CreateAsync(ContentCreated @event)
         {
-            return new Update { Id = contentId, Text = data.ToTexts(), OnlyDraft = onlyDraft };
+            var state = new ContentState
+            {
+                ContentId = @event.ContentId,
+                DocIdCurrent = Guid.NewGuid().ToString(),
+                DocIdNew = Guid.NewGuid().ToString()
+            };
+
+            var texts = @event.Data.ToTexts();
+
+            await IndexAsync(@event.SchemaId.Id,
+                new UpsertIndexEntry
+                {
+                    ContentId = @event.ContentId,
+                    DocId = state.DocIdCurrent,
+                    ServeAll = true,
+                    ServePublished = false,
+                    Texts = texts,
+                },
+                new UpsertIndexEntry
+                {
+                    ContentId = @event.ContentId,
+                    DocId = state.DocIdNew,
+                    ServeAll = false,
+                    ServePublished = false,
+                    Texts = texts,
+                });
+
+            state.DocIdForAll = state.DocIdCurrent;
+
+            await indexState.SetAsync(state);
+        }
+
+        private async Task UpdateAsync<TCommand>(TCommand @event, Func<ContentState, TCommand, Task> updater) where TCommand : ContentEvent
+        {
+            var state = await indexState.GetAsync(@event.ContentId);
+
+            if (state != null)
+            {
+                await updater(state, @event);
+
+                await indexState.SetAsync(state);
+            }
+        }
+
+        private Task CreateNewVersionAsync(ContentVersionCreated @event)
+        {
+            return UpdateAsync(@event, (state, e) =>
+            {
+                state.HasNew = true;
+
+                return TaskHelper.Done;
+            });
+        }
+
+        private Task UpdateAsync(ContentUpdated @event)
+        {
+            return UpdateAsync(@event, async (state, e) =>
+            {
+                var texts = e.Data.ToTexts();
+
+                if (state.HasNew)
+                {
+                    await IndexAsync(e.SchemaId.Id,
+                        new UpsertIndexEntry
+                        {
+                            ContentId = @event.ContentId,
+                            DocId = state.DocIdNew,
+                            ServeAll = true,
+                            ServePublished = false,
+                            Texts = texts
+                        },
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdCurrent,
+                            ServeAll = false,
+                            ServePublished = true
+                        });
+
+                    state.DocIdForAll = state.DocIdNew;
+                    state.DocIdForPublished = state.DocIdCurrent;
+                }
+                else
+                {
+                    await IndexAsync(@event.SchemaId.Id,
+                        new UpsertIndexEntry
+                        {
+                            ContentId = @event.ContentId,
+                            DocId = state.DocIdCurrent,
+                            ServeAll = true,
+                            ServePublished = state.DocIdCurrent == state.DocIdForPublished,
+                            Texts = texts
+                        },
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdNew,
+                            ServeAll = false,
+                            ServePublished = false
+                        });
+
+                    state.DocIdForAll = state.DocIdCurrent;
+                    state.DocIdForPublished = state.DocIdNew;
+                }
+            });
+        }
+
+        private Task PublishAsync(ContentStatusChanged @event)
+        {
+            return UpdateAsync(@event, async (state, e) =>
+            {
+                if (state.HasNew)
+                {
+                    await IndexAsync(e.SchemaId.Id,
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdCurrent,
+                            ServeAll = false,
+                            ServePublished = false
+                        },
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdNew,
+                            ServeAll = true,
+                            ServePublished = true
+                        });
+
+                    state.DocIdForAll = state.DocIdNew;
+                    state.DocIdForPublished = state.DocIdNew;
+                }
+                else
+                {
+                    await IndexAsync(e.SchemaId.Id,
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdCurrent,
+                            ServeAll = true,
+                            ServePublished = true
+                        },
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdNew,
+                            ServeAll = false,
+                            ServePublished = false
+                        });
+
+                    state.DocIdForAll = state.DocIdCurrent;
+                    state.DocIdForPublished = state.DocIdCurrent;
+                }
+
+                state.HasNew = false;
+            });
+        }
+
+        private Task DeleteVersionAsync(ContentVersionDeleted @event)
+        {
+            return UpdateAsync(@event, async (state, e) =>
+            {
+                await IndexAsync(e.SchemaId.Id,
+                    new UpdateIndexEntry
+                    {
+                        DocId = state.DocIdCurrent,
+                        ServeAll = true,
+                        ServePublished = true
+                    },
+                    new UpdateIndexEntry
+                    {
+                        DocId = state.DocIdNew,
+                        ServeAll = false,
+                        ServePublished = false
+                    });
+
+                state.DocIdForAll = state.DocIdCurrent;
+                state.DocIdForPublished = state.DocIdCurrent;
+
+                state.HasNew = false;
+            });
+        }
+
+        private async Task DeleteAsync(ContentDeleted @event)
+        {
+            var state = await indexState.GetAsync(@event.ContentId);
+
+            if (state != null)
+            {
+                await IndexAsync(@event.SchemaId.Id,
+                    new DeleteIndexEntry
+                    {
+                        ContentId = @event.ContentId
+                    });
+
+                await indexState.RemoveAsync(state.ContentId);
+            }
+        }
+
+        private async Task IndexAsync(Guid schemaId, params IIndexCommand[] commands)
+        {
+            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+
+            await index.IndexAsync(commands.AsImmutable());
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)

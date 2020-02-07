@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             return new ContentEntity
             {
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("ref1",
                             new ContentFieldData()
@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new ContentEntity
             {
                 Id = id,
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("name",
                             new ContentFieldData()

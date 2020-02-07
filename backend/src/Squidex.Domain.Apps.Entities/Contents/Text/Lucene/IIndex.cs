@@ -5,19 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using Orleans.Concurrency;
+using Lucene.Net.Analysis;
+using Lucene.Net.Index;
+using Lucene.Net.Search;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    [Immutable]
-    public sealed class Update
+    public interface IIndex
     {
-        public Guid Id { get; set; }
+        Analyzer? Analyzer { get; }
 
-        public Dictionary<string, string> Text { get; set; }
+        IndexReader? Reader { get; }
 
-        public bool OnlyDraft { get; set; }
+        IndexSearcher? Searcher { get; }
+
+        IndexWriter Writer { get; }
+
+        void EnsureReader();
+
+        void MarkStale();
     }
 }

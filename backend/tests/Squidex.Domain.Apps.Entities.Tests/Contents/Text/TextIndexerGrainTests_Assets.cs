@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text

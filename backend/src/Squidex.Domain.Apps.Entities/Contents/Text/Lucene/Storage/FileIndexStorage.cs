@@ -12,7 +12,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Store;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
 {
     public sealed class FileIndexStorage : IIndexStorage
     {

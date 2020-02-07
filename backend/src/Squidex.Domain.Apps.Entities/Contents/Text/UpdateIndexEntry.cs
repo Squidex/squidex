@@ -5,18 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
-using Orleans.Concurrency;
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public sealed class UpdateIndexEntry : IIndexCommand
     {
-        Task IndexAsync(Immutable<IIndexCommand[]> updates);
+        public string DocId { get; set; }
 
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+        public bool ServeAll { get; set; }
+
+        public bool ServePublished { get; set; }
     }
 }

@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             return new ContentEntity
             {
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("asset1",
                             new ContentFieldData()

@@ -7,6 +7,7 @@
 
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text

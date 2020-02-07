@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;

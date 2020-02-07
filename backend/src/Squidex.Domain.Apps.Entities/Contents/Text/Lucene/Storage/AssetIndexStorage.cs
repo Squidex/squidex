@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
 {
     public sealed class AssetIndexStorage : IIndexStorage
     {

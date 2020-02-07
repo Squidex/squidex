@@ -7,16 +7,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
-using Orleans.Concurrency;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public sealed class UpsertIndexEntry : IIndexCommand
     {
-        Task IndexAsync(Immutable<IIndexCommand[]> updates);
+        public string DocId { get; set; }
 
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+        public Dictionary<string, string> Texts { get; set; }
+
+        public bool ServeAll { get; set; }
+
+        public bool ServePublished { get; set; }
+
+        public Guid ContentId { get; set; }
     }
 }

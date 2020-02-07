@@ -13,7 +13,7 @@ using Lucene.Net.Store;
 using Lucene.Net.Util;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public sealed partial class IndexManager
     {

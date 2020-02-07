@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -62,9 +63,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
+        public static void CanDeleteVersion(DeleteContentVersion command, ContentState content)
+        {
+            Guard.NotNull(command);
+
+            if (content.NewStatus == null)
+            {
+                throw new DomainException("There is nothing to delete.");
+            }
+        }
+
+        public static void CanCreateVersion(CreateContentVersion command, ISchemaEntity schema, ContentState content)
+        {
+            Guard.NotNull(command);
+
+            if (schema.SchemaDef.IsSingleton)
+            {
+                throw new DomainException("Singleton content cannot be updated.");
+            }
+
+            if (content.Status != Status.Published)
+            {
+                throw new DomainException("You can only create a new version when the content is published.");
+            }
+        }
+
         public static Task CanChangeStatus(ISchemaEntity schema, ContentState content, IContentWorkflow contentWorkflow, ChangeContentStatus command)
         {
             Guard.NotNull(command);
+
+            if (schema.SchemaDef.IsSingleton)
+            {
+                throw new DomainException("Singleton content cannot be updated.");
+            }
 
             return Validate.It(() => "Cannot change status.", async e =>
             {

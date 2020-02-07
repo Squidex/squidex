@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public sealed partial class IndexManager : DisposableObjectBase
     {

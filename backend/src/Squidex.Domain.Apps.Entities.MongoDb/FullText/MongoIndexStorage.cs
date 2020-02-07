@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Lucene.Net.Index;
 using MongoDB.Driver.GridFS;
-using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText

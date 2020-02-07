@@ -6,17 +6,16 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
-using Orleans.Concurrency;
+using Lucene.Net.Index;
+using Lucene.Net.Store;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public interface IIndexStorage
     {
-        Task IndexAsync(Immutable<IIndexCommand[]> updates);
+        Task<Directory> CreateDirectoryAsync(Guid schemaId);
 
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+        Task WriteAsync(Directory directory, SnapshotDeletionPolicy snapshotter);
     }
 }

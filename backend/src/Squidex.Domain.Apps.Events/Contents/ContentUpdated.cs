@@ -14,5 +14,7 @@ namespace Squidex.Domain.Apps.Events.Contents
     public sealed class ContentUpdated : ContentEvent
     {
         public NamedContentData Data { get; set; }
+
+        public bool NewVersion { get; set; }
     }
 }
