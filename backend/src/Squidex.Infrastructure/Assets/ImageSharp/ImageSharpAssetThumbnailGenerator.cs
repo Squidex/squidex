@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                         throw new NotSupportedException();
                     }
 
-                    if (w > 0 && h > 0)
+                    if (w > 0 || h > 0)
                     {
                         var isCropUpsize = options.Mode == ResizeMode.CropUpsize;
 
