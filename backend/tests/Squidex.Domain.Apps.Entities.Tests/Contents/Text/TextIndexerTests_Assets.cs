@@ -11,9 +11,9 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerGrainTests_Assets : TextIndexerGrainTestsBase
+    public class TextIndexerTests_Assets : TextIndexerTestsBase
     {
-        public override IIndexStorage Storage { get; } = CreateStorage();
+        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(CreateStorage());
 
         private static IIndexStorage CreateStorage()
         {

@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
-                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, inDraft ? Scope.Draft : Scope.Published);
+                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, inDraft ? SearchScope.All : SearchScope.Published);
 
                     if (fullTextIds?.Count == 0)
                     {

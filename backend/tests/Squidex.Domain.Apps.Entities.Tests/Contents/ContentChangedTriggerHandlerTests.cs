@@ -48,15 +48,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader);
         }
 
-        public static IEnumerable<object[]> TestEvents = new[]
+        public static IEnumerable<object[]> TestEvents()
         {
-            new object[] { new ContentCreated(), EnrichedContentEventType.Created },
-            new object[] { new ContentUpdated(), EnrichedContentEventType.Updated },
-            new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Change }, EnrichedContentEventType.StatusChanged },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished }
-        };
+            yield return new object[] { new ContentCreated(), EnrichedContentEventType.Created };
+            yield return new object[] { new ContentUpdated(), EnrichedContentEventType.Updated };
+            yield return new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted };
+            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Change }, EnrichedContentEventType.StatusChanged };
+            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published };
+            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished };
+        }
 
         [Theory]
         [MemberData(nameof(TestEvents))]

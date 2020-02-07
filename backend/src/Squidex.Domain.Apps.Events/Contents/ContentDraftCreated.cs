@@ -5,10 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class DeleteIndexEntry : IIndexCommand
+    [EventType(nameof(ContentDraftCreated))]
+    public sealed class ContentDraftCreated : ContentEvent
     {
-        public string DocId { get; set; }
+        public Status Status { get; set; }
     }
 }

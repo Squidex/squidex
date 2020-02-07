@@ -24,7 +24,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    internal sealed class MongoContentCollectionPublished : MongoRepositoryBase<MongoContentEntity>
+    public sealed class MongoContentCollectionPublished : MongoRepositoryBase<MongoContentEntity>
     {
         private readonly QueryContent queryContentAsync;
         private readonly QueryContentsByIds queryContentsById;

@@ -147,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 var versioned = new { app, name = schema, id = Id, version = Version - 1 };
 
-                AddGetLink("prev", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
+                AddGetLink("previous", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
             if (!content.IsSingleton)
@@ -156,14 +156,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 {
                     if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
                     {
-                        AddPutLink("version/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                        AddPutLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                     }
                 }
                 else if (Status == Status.Published)
                 {
                     if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
                     {
-                        AddPutLink("version/create", controller.Url<ContentsController>(x => nameof(x.CreateVersion), values));
+                        AddPutLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                     }
                 }
 
@@ -181,11 +181,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.CanUpdate && controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
+            if (content.CanUpdate)
             {
-                AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+                if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
+                {
+                    AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+                }
 
-                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+                if (controller.HasPermission(Permissions.AppContentsUpdatePartial, app, schema))
+                {
+                    AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+                }
             }
 
             return this;

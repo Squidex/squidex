@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State

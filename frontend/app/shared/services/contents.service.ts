@@ -71,10 +71,9 @@ export class ContentDto {
     public readonly statusUpdates: ReadonlyArray<StatusInfo>;
 
     public readonly canDelete: boolean;
-    public readonly canVersionDelete: boolean;
-    public readonly canVersionCreate: boolean;
+    public readonly canDraftDelete: boolean;
+    public readonly canDraftCreate: boolean;
     public readonly canUpdate: boolean;
-    public readonly canUpdateAny: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -97,10 +96,9 @@ export class ContentDto {
         this._links = links;
 
         this.canDelete = hasAnyLink(links, 'delete');
-        this.canVersionCreate = hasAnyLink(links, 'version/create');
-        this.canVersionDelete = hasAnyLink(links, 'version/delete');
+        this.canDraftCreate = hasAnyLink(links, 'draft/create');
+        this.canDraftDelete = hasAnyLink(links, 'draft/delete');
         this.canUpdate = hasAnyLink(links, 'update');
-        this.canUpdateAny = this.canUpdate || this.canVersionCreate;
 
         this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
     }
@@ -235,11 +233,11 @@ export class ContentsService {
     }
 
     public createVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
-        const link = resource._links['version/create'];
+        const link = resource._links['draft/create'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
@@ -250,7 +248,7 @@ export class ContentsService {
     }
 
     public deleteVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
-        const link = resource._links['version/delete'];
+        const link = resource._links['draft/delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 

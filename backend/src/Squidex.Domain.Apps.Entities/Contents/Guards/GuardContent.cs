@@ -63,9 +63,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static void CanDeleteVersion(DeleteContentVersion command, ContentState content)
+        public static void CanDeleteDraft(DeleteContentDraft command, ISchemaEntity schema, ContentState content)
         {
             Guard.NotNull(command);
+
+            if (schema.SchemaDef.IsSingleton)
+            {
+                throw new DomainException("Singleton content cannot be updated.");
+            }
 
             if (content.NewStatus == null)
             {
@@ -73,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        public static void CanCreateVersion(CreateContentVersion command, ISchemaEntity schema, ContentState content)
+        public static void CanCreateDraft(CreateContentDraft command, ISchemaEntity schema, ContentState content)
         {
             Guard.NotNull(command);
 

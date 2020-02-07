@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
@@ -16,12 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public string DocIdCurrent { get; set; }
 
-        public string DocIdNew { get; set; }
-
-        public string DocIdForAll { get; set; }
+        public string? DocIdNew { get; set; }
 
         public string? DocIdForPublished { get; set; }
-
-        public bool HasNew { get; set; }
     }
 }

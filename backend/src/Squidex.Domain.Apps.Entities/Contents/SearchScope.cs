@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    [EventType(nameof(ContentVersionCreated))]
-    public sealed class ContentVersionCreated : ContentEvent
+    public enum SearchScope
     {
-        public Status Status { get; set; }
+        All,
+        Published
     }
 }

@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.InitializeAsync(ct);
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, ClrQuery query, bool inDraft)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, ClrQuery query, SearchScope scope)
         {
-            if (inDraft)
+            if (scope == SearchScope.All)
             {
                 return collectionAll.QueryAsync(app, schema, status, query);
             }
@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids, bool inDraft)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids, SearchScope scope)
         {
-            if (inDraft)
+            if (scope == SearchScope.All)
             {
                 return collectionAll.QueryAsync(app, schema, status, ids);
             }
@@ -78,9 +78,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids, bool inDraft)
+        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids, SearchScope scope)
         {
-            if (inDraft)
+            if (scope == SearchScope.All)
             {
                 return collectionAll.QueryAsync(app, status, ids);
             }
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, Guid id, bool inDraft)
+        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, Guid id, SearchScope scope)
         {
-            if (inDraft)
+            if (scope == SearchScope.All)
             {
                 return collectionAll.FindContentAsync(schema, status, id);
             }
@@ -102,9 +102,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids, bool inDraft)
+        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids, SearchScope scope)
         {
-            if (inDraft)
+            if (scope == SearchScope.All)
             {
                 return collectionAll.QueryIdsAsync(appId, ids);
             }
@@ -122,6 +122,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
         {
             return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
+        }
+
+        public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()
+        {
+            yield return collectionAll.GetInternalCollection();
+            yield return collectionPublished.GetInternalCollection();
         }
     }
 }

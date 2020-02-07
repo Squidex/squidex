@@ -10,9 +10,9 @@ using Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerGrainTests_FS : TextIndexerGrainTestsBase
+    public class TextIndexerTests_FS : TextIndexerTestsBase
     {
-        public override IIndexStorage Storage => CreateStorage();
+        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(CreateStorage());
 
         private static IIndexStorage CreateStorage()
         {

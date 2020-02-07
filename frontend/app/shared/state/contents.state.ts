@@ -273,7 +273,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public createVersion(content: ContentDto): Observable<ContentDto> {
+    public createDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.createVersion(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.replaceContent(updated, content.version, 'Content updated successfully.');
@@ -281,7 +281,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public deleteVersion(content: ContentDto): Observable<ContentDto> {
+    public deleteDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.deleteVersion(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.replaceContent(updated, content.version, 'Content updated successfully.');

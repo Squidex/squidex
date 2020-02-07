@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {

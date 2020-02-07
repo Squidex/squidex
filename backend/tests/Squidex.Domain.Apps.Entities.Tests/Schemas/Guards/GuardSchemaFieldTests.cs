@@ -42,16 +42,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             return method;
         }
 
-        public static IEnumerable<object[]> FieldCommandData = new[]
+        public static IEnumerable<object[]> FieldCommandData()
         {
-            new object[] { A<EnableField>(GuardSchemaField.CanEnable) },
-            new object[] { A<DeleteField>(GuardSchemaField.CanDelete) },
-            new object[] { A<DisableField>(GuardSchemaField.CanDisable) },
-            new object[] { A<HideField>(GuardSchemaField.CanHide) },
-            new object[] { A<LockField>(GuardSchemaField.CanLock) },
-            new object[] { A<ShowField>(GuardSchemaField.CanShow) },
-            new object[] { A<UpdateField>(GuardSchemaField.CanUpdate) }
-        };
+            yield return new object[] { A<EnableField>(GuardSchemaField.CanEnable) };
+            yield return new object[] { A<DeleteField>(GuardSchemaField.CanDelete) };
+            yield return new object[] { A<DisableField>(GuardSchemaField.CanDisable) };
+            yield return new object[] { A<HideField>(GuardSchemaField.CanHide) };
+            yield return new object[] { A<LockField>(GuardSchemaField.CanLock) };
+            yield return new object[] { A<ShowField>(GuardSchemaField.CanShow) };
+            yield return new object[] { A<UpdateField>(GuardSchemaField.CanUpdate) };
+        }
 
         [Theory]
         [MemberData(nameof(FieldCommandData))]

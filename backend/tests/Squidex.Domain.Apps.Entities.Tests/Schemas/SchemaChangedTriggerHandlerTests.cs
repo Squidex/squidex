@@ -40,14 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             sut = new SchemaChangedTriggerHandler(scriptEngine);
         }
 
-        public static IEnumerable<object[]> TestEvents = new[]
+        public static IEnumerable<object[]> TestEvents()
         {
-            new object[] { new SchemaCreated(), EnrichedSchemaEventType.Created },
-            new object[] { new SchemaUpdated(), EnrichedSchemaEventType.Updated },
-            new object[] { new SchemaDeleted(), EnrichedSchemaEventType.Deleted },
-            new object[] { new SchemaPublished(), EnrichedSchemaEventType.Published },
-            new object[] { new SchemaUnpublished(), EnrichedSchemaEventType.Unpublished }
-        };
+            yield return new object[] { new SchemaCreated(), EnrichedSchemaEventType.Created };
+            yield return new object[] { new SchemaUpdated(), EnrichedSchemaEventType.Updated };
+            yield return new object[] { new SchemaDeleted(), EnrichedSchemaEventType.Deleted };
+            yield return new object[] { new SchemaPublished(), EnrichedSchemaEventType.Published };
+            yield return new object[] { new SchemaUnpublished(), EnrichedSchemaEventType.Unpublished };
+        }
 
         [Theory]
         [MemberData(nameof(TestEvents))]

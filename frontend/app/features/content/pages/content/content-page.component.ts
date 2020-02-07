@@ -260,7 +260,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         try {
             this.contentForm.load(data, isInitial);
-            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
+            this.contentForm.setEnabled(!this.content);
         } finally {
             this.isLoadingContent = false;
         }

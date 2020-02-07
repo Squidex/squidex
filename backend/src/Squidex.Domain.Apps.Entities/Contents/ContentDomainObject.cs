@@ -108,26 +108,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         return Snapshot;
                     });
 
-                case CreateContentVersion createContentVersion:
-                    return UpdateReturnAsync(createContentVersion, async c =>
+                case CreateContentDraft createContentDraft:
+                    return UpdateReturnAsync(createContentDraft, async c =>
                     {
-                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to create version.");
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to create draft.");
 
-                        GuardContent.CanCreateVersion(c, ctx.Schema, Snapshot);
+                        GuardContent.CanCreateDraft(c, ctx.Schema, Snapshot);
 
                         var status = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
 
-                        CreateVersion(c, status);
+                        CreateDraft(c, status);
 
                         return Snapshot;
                     });
 
-                case DeleteContentVersion deleteVersion:
-                    return UpdateReturn(deleteVersion, c =>
+                case DeleteContentDraft deleteContentDraft:
+                    return UpdateReturnAsync(deleteContentDraft, async c =>
                     {
-                        GuardContent.CanDeleteVersion(c, Snapshot);
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to delete draft.");
 
-                        DeleteVersion(c);
+                        GuardContent.CanDeleteDraft(c, ctx.Schema, Snapshot);
+
+                        DeleteDraft(c);
 
                         return Snapshot;
                     });
@@ -261,9 +263,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public void CreateVersion(CreateContentVersion command, Status status)
+        public void CreateDraft(CreateContentDraft command, Status status)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentVersionCreated { Status = status }));
+            RaiseEvent(SimpleMapper.Map(command, new ContentDraftCreated { Status = status }));
         }
 
         public void Delete(DeleteContent command)
@@ -271,9 +273,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
         }
 
-        public void DeleteVersion(DeleteContentVersion command)
+        public void DeleteDraft(DeleteContentDraft command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentVersionDeleted()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentDraftDeleted()));
         }
 
         public void Update(ContentCommand command, NamedContentData data)

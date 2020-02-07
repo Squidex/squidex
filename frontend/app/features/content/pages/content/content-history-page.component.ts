@@ -89,12 +89,16 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
             .subscribe();
     }
 
-    public createVersion() {
-        this.contentsState.createVersion(this.content);
+    public createDraft() {
+        this.contentsState.createDraft(this.content);
     }
 
-    public deleteVersion() {
-        this.contentsState.deleteVersion(this.content);
+    public delete() {
+        this.contentsState.deleteMany([this.content]);
+    }
+
+    public deleteDraft() {
+        this.contentsState.deleteDraft(this.content);
     }
 
     public loadVersion(event: HistoryEventDto) {

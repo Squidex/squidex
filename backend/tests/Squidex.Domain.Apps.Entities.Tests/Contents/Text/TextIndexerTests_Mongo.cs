@@ -12,9 +12,9 @@ using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    internal class TextIndexerGrainTests_Mongo : TextIndexerGrainTestsBase
+    internal class TextIndexerTests_Mongo : TextIndexerTestsBase
     {
-        public override IIndexStorage Storage => CreateStorage();
+        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(CreateStorage());
 
         private static IIndexStorage CreateStorage()
         {

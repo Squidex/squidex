@@ -83,12 +83,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                         {
                             var forValue = index.Reader.GetBinaryValue(MetaFor, hit.Doc, buffer);
 
-                            if (context.Scope == Scope.Draft && forValue.Bytes[0] != 1)
+                            if (context.Scope == SearchScope.All && forValue.Bytes[0] != 1)
                             {
                                 continue;
                             }
 
-                            if (context.Scope == Scope.Published && forValue.Bytes[1] != 1)
+                            if (context.Scope == SearchScope.Published && forValue.Bytes[1] != 1)
                             {
                                 continue;
                             }
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 switch (command)
                 {
                     case DeleteIndexEntry delete:
-                        index.Writer.DeleteDocuments(new Term(MetaContentId, delete.ContentId.ToString()));
+                        index.Writer.DeleteDocuments(new Term(MetaId, delete.DocId));
                         break;
                     case UpdateIndexEntry update:
                         index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, GetValue(update.ServeAll, update.ServePublished));

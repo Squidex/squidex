@@ -5,11 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Threading.Tasks;
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public enum Scope
+    public interface IIndexerFactory
     {
-        Draft,
-        Published
+        Task<ITextIndexer> CreateAsync(Guid schemaId);
+
+        Task CleanupAsync();
     }
 }

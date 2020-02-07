@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class DeleteContentVersion : ContentCommand
+    [EventType(nameof(ContentDraftDeleted))]
+    public sealed class ContentDraftDeleted : ContentEvent
     {
     }
 }

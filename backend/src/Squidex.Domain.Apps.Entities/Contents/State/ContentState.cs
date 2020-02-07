@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
                         break;
                     }
 
-                case ContentVersionCreated e:
+                case ContentDraftCreated e:
                     {
                         NewData = Data;
                         NewStatus = e.Status;
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
                         break;
                     }
 
-                case ContentVersionDeleted _:
+                case ContentDraftDeleted _:
                     {
                         NewData = null;
                         NewStatus = null;

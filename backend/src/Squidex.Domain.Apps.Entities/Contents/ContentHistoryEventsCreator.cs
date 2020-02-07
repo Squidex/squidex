@@ -28,11 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             AddEventMessage<ContentDeleted>(
                 "deleted {[Schema]} content.");
 
-            AddEventMessage<ContentVersionCreated>(
-                "created new version.");
+            AddEventMessage<ContentDraftCreated>(
+                "created new draft.");
 
-            AddEventMessage<ContentVersionDeleted>(
-                "deleted version.");
+            AddEventMessage<ContentDraftDeleted>(
+                "deleted draft.");
 
             AddEventMessage<ContentSchedulingCancelled>(
                 "failed to schedule status change for {[Schema]} content.");

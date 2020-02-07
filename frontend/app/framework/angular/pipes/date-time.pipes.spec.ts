@@ -124,7 +124,7 @@ describe('FullDateTimePipe', () => {
         const pipe = new FullDateTimePipe();
 
         const actual = pipe.transform(dateTime);
-        const expected = 'Thursday, October 3, 2013 12:13 PM';
+        const expected = 'October 3, 2013 12:13 PM';
 
         expect(actual).toBe(expected);
     });

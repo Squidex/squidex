@@ -261,32 +261,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), InDraft(context));
+            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), query, InDraft(context));
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), query, context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, InDraft(context));
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, context.Scope());
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, InDraft(context));
+            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, context.Scope());
         }
 
         private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
         {
             return contentVersionLoader.GetAsync(id, version);
-        }
-
-        private static bool InDraft(Context context)
-        {
-            return context.ShouldProvideUnpublished() || context.IsFrontendClient;
         }
     }
 }

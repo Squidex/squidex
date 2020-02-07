@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public sealed class CreateContentVersion : ContentCommand
+    public sealed class CreateContentDraft : ContentCommand
     {
     }
 }

@@ -9,16 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -28,141 +24,132 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public abstract class TextIndexerGrainTestsBase
+    public abstract class TextIndexerTestsBase
     {
-        private readonly InMemoryTextIndexerState state = new InMemoryTextIndexerState();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly SearchContext context;
 
-        public abstract IIndexStorage Storage { get; }
+        public abstract IIndexerFactory Factory { get; }
 
-        protected TextIndexerGrainTestsBase()
-        {
-            context = new SearchContext
-            {
-                Languages = new HashSet<string> { "de", "en" }
-            };
-        }
+        public virtual InMemoryTextIndexerState State { get; } = new InMemoryTextIndexerState();
 
-        /*
         [Fact]
         public async Task Should_throw_exception_for_invalid_query()
         {
-            await ExecuteAsync(Guid.NewGuid(), async sut =>
+            await Assert.ThrowsAsync<ValidationException>(async () =>
             {
-                await Assert.ThrowsAsync<ValidationException>(() => sut.SearchAsync("~hello", context));
+                await TestCombinations(g => Search(g, expected: null, text: "~hello"));
             });
-        }*/
+        }
 
         [Fact]
         public async Task Should_index_invariant_content_and_retrieve()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Hello"),
                 g => CreateContent(g, ids2[0], "iv", "World"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Hello"),
-                g => TestSearchAsync(g, expected: ids2, text: "World"),
+                g => Search(g, expected: ids1, text: "Hello"),
+                g => Search(g, expected: ids2, text: "World"),
 
-                g => TestSearchAsync(g, expected: null, text: "Hello", Scope.Published),
-                g => TestSearchAsync(g, expected: null, text: "World", Scope.Published)
+                g => Search(g, expected: null, text: "Hello", SearchScope.Published),
+                g => Search(g, expected: null, text: "World", SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Hello"),
                 g => CreateContent(g, ids2[0], "iv", "World"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "helo~"),
-                g => TestSearchAsync(g, expected: ids2, text: "wold~", Scope.Draft)
+                g => Search(g, expected: ids1, text: "helo~"),
+                g => Search(g, expected: ids2, text: "wold~", SearchScope.All)
             );
         }
 
         [Fact]
         public async Task Should_update_draft_only()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Morning"),
 
                 g => UpdateContent(g, ids1[0], "iv", "Evening"),
 
-                g => TestSearchAsync(g, expected: null, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: null, text: "Morning", target: SearchScope.Published),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Evening", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Evening", target: Scope.Published)
+                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
+                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_also_serve_published_after_publish()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Morning"),
 
                 g => PublishAsync(g, ids1[0]),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Published)
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_also_update_published_content()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Morning"),
 
                 g => PublishAsync(g, ids1[0]),
 
                 g => UpdateContent(g, ids1[0], "iv", "Evening"),
 
-                g => TestSearchAsync(g, expected: null, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: null, text: "Morning", target: SearchScope.Published),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Evening", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Evening", target: Scope.Published)
+                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_simulate_new_version()
         {
-            await SearchWithGrains(3,
+            await TestCombinations(3,
                 g => CreateContent(g, ids1[0], "iv", "Morning"),
 
                 // Publish the content.
                 g => PublishAsync(g, ids1[0]),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
 
                 // Create a new version, the value is still the same as old version.
                 g => CreateVersion(g, ids1[0]),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
 
                 // Make an update, this updates the new version only.
                 g => UpdateContent(g, ids1[0], "iv", "Evening"),
 
-                g => TestSearchAsync(g, expected: null, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Evening", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Evening", target: Scope.Published)
+                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
+                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_simulate_content_reversion()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Morning"),
 
                 // Publish the content.
@@ -177,17 +164,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 // Make an update, this updates the new version only.
                 g => DeleteVersionAsync(g, ids1[0]),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Morning", target: Scope.Published),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
 
-                g => TestSearchAsync(g, expected: null, text: "Evening", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Evening", target: Scope.Published),
+                g => Search(g, expected: null, text: "Evening", target: SearchScope.All),
+                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published),
 
                 // Make an update, this updates the current version only.
                 g => UpdateContent(g, ids1[0], "iv", "Night"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Night", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Night", target: Scope.Published)
+                g => Search(g, expected: ids1, text: "Night", target: SearchScope.All),
+                g => Search(g, expected: ids1, text: "Night", target: SearchScope.Published)
             );
         }
 
@@ -211,51 +198,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_delete_documents_from_index()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "iv", "Hello"),
                 g => CreateContent(g, ids2[0], "iv", "World"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Hello"),
-                g => TestSearchAsync(g, expected: ids2, text: "World"),
+                g => Search(g, expected: ids1, text: "Hello"),
+                g => Search(g, expected: ids2, text: "World"),
 
                 g => DeleteAsync(g, id: ids1[0]),
 
-                g => TestSearchAsync(g, expected: null, text: "Hello"),
-                g => TestSearchAsync(g, expected: ids2, text: "World")
+                g => Search(g, expected: null, text: "Hello"),
+                g => Search(g, expected: ids2, text: "World")
             );
         }
 
         [Fact]
         public async Task Should_search_by_field()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "en", "City"),
                 g => CreateContent(g, ids2[0], "de", "Stadt"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "en:city"),
-                g => TestSearchAsync(g, expected: ids2, text: "de:Stadt")
+                g => Search(g, expected: ids1, text: "en:city"),
+                g => Search(g, expected: ids2, text: "de:Stadt")
             );
         }
 
         [Fact]
         public async Task Should_index_localized_content_and_retrieve()
         {
-            await SearchWithGrains(
+            await TestCombinations(
                 g => CreateContent(g, ids1[0], "de", "Stadt und Land and Fluss"),
 
                 g => CreateContent(g, ids2[0], "en", "City and Country und River"),
 
-                g => TestSearchAsync(g, expected: ids1, text: "Stadt"),
-                g => TestSearchAsync(g, expected: ids1, text: "and"),
-                g => TestSearchAsync(g, expected: ids2, text: "und"),
+                g => Search(g, expected: ids1, text: "Stadt"),
+                g => Search(g, expected: ids1, text: "and"),
+                g => Search(g, expected: ids2, text: "und"),
 
-                g => TestSearchAsync(g, expected: ids2, text: "City"),
-                g => TestSearchAsync(g, expected: ids2, text: "und"),
-                g => TestSearchAsync(g, expected: ids1, text: "and")
+                g => Search(g, expected: ids2, text: "City"),
+                g => Search(g, expected: ids2, text: "und"),
+                g => Search(g, expected: ids1, text: "and")
             );
         }
 
-        private async Task CreateContent(GrainTextIndexer grain, Guid id, string language, string text)
+        private async Task CreateContent(TextIndexingProcess grain, Guid id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -268,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await grain.On(Envelope.Create(@event));
         }
 
-        private async Task UpdateContent(GrainTextIndexer grain, Guid id, string language, string text)
+        private async Task UpdateContent(TextIndexingProcess grain, Guid id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -281,66 +268,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await grain.On(Envelope.Create(@event));
         }
 
-        private async Task CreateVersion(GrainTextIndexer grain, Guid id)
+        private async Task CreateVersion(TextIndexingProcess process, Guid id)
         {
-            var @event = new ContentVersionCreated { ContentId = id, SchemaId = schemaId };
+            var @event = new ContentDraftCreated { ContentId = id, SchemaId = schemaId };
 
-            await grain.On(Envelope.Create(@event));
+            await process.On(Envelope.Create(@event));
         }
 
-        private async Task PublishAsync(GrainTextIndexer grain, Guid id)
+        private async Task PublishAsync(TextIndexingProcess process, Guid id)
         {
             var @event = new ContentStatusChanged { ContentId = id, SchemaId = schemaId, Status = Status.Published };
 
-            await grain.On(Envelope.Create(@event));
+            await process.On(Envelope.Create(@event));
         }
 
-        private async Task DeleteVersionAsync(GrainTextIndexer grain, Guid id)
+        private async Task DeleteVersionAsync(TextIndexingProcess process, Guid id)
         {
-            var @event = new ContentVersionDeleted { ContentId = id, SchemaId = schemaId };
+            var @event = new ContentDraftDeleted { ContentId = id, SchemaId = schemaId };
 
-            await grain.On(Envelope.Create(@event));
+            await process.On(Envelope.Create(@event));
         }
 
-        private async Task DeleteAsync(GrainTextIndexer grain, Guid id)
+        private async Task DeleteAsync(TextIndexingProcess process, Guid id)
         {
             var @event = new ContentDeleted { ContentId = id, SchemaId = schemaId };
 
-            await grain.On(Envelope.Create(@event));
+            await process.On(Envelope.Create(@event));
         }
 
-        /*
-
-        private async Task AddInvariantContent(TextIndexerGrain grain, string text1, string text2, bool onlyDraft = false)
-        {
-            var content1 = new Dictionary<string, string>
-            {
-                ["iv"] = text1
-            };
-
-            var content2 = new Dictionary<string, string>
-            {
-                ["iv"] = text2
-            };
-
-            await grain.IndexAsync(new Update { Id = ids1[0], Text = content1, OnlyDraft = onlyDraft });
-            await grain.IndexAsync(new Update { Id = ids2[0], Text = content2, OnlyDraft = onlyDraft });
-        }
-        private async Task CopyAsync(TextIndexerGrain grain, bool fromDraft)
-        {
-            await grain.CopyAsync(ids1[0], fromDraft);
-            await grain.CopyAsync(ids2[0], fromDraft);
-        }
-        */
-
-        private async Task TestSearchAsync(GrainTextIndexer indexer, List<Guid>? expected, string text, Scope target = Scope.Draft)
+        private async Task Search(TextIndexingProcess process, List<Guid>? expected, string text, SearchScope target = SearchScope.All)
         {
             var app =
                 Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"),
                     Language.DE,
                     Language.EN);
 
-            var result = await indexer.SearchAsync(text, app, schemaId.Id, target);
+            var result = await process.TextIndexer.SearchAsync(text, app, schemaId.Id, target);
 
             if (expected != null)
             {
@@ -352,15 +315,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task SearchWithGrains(params Func<GrainTextIndexer, Task>[] actions)
+        private async Task TestCombinations(params Func<TextIndexingProcess, Task>[] actions)
         {
             for (var i = 0; i < actions.Length; i++)
             {
-                await SearchWithGrains(i, actions);
+                await TestCombinations(i, actions);
             }
         }
 
-        private async Task SearchWithGrains(int i, params Func<GrainTextIndexer, Task>[] actions)
+        private async Task TestCombinations(int i, params Func<TextIndexingProcess, Task>[] actions)
         {
             await ExecuteAsync(async sut =>
             {
@@ -379,25 +342,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             });
         }
 
-        private async Task ExecuteAsync(Func<GrainTextIndexer, Task> action)
+        private async Task ExecuteAsync(Func<TextIndexingProcess, Task> action)
         {
-            var grain = new TextIndexerGrain(new IndexManager(Storage, A.Fake<ISemanticLog>()));
+            var indexer = await Factory.CreateAsync(schemaId.Id);
             try
             {
-                await grain.ActivateAsync(schemaId.Id);
-
-                var grainFactory = A.Fake<IGrainFactory>();
-
-                A.CallTo(() => grainFactory.GetGrain<ITextIndexerGrain>(schemaId.Id, null))
-                    .Returns(grain);
-
-                var sut = new GrainTextIndexer(grainFactory, state);
+                var sut = new TextIndexingProcess(indexer, State);
 
                 await action(sut);
             }
             finally
             {
-                await grain.OnDeactivateAsync();
+                await Factory.CleanupAsync();
             }
         }
     }

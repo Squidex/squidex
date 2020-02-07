@@ -261,37 +261,12 @@ describe('ContentsService', () => {
         expect(content!).toEqual(createContent(12));
     }));
 
-    it('should make put request to delete version',
+    it('should make post request to create draft',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {
             _links: {
-                ['version/delete']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/deleteVersion' }
-            }
-        };
-
-        let content: ContentDto;
-
-        contentsService.deleteVersion('my-app', resource, version).subscribe(result => {
-            content = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/deleteVersion');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush(contentResponse(12));
-
-        expect(content!).toEqual(createContent(12));
-    }));
-
-    it('should make put request to create version',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-
-        const resource: Resource = {
-            _links: {
-                ['version/create']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/createVersion' }
+                ['draft/create']: { method: 'POST', href: '/api/content/my-app/my-schema/content1/draft' }
             }
         };
 
@@ -301,9 +276,34 @@ describe('ContentsService', () => {
             content = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/createVersion');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/draft');
 
-        expect(req.request.method).toEqual('PUT');
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
+    }));
+
+    it('should make delete request to delete draft',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['draft/delete']: { method: 'DELETE', href: '/api/content/my-app/my-schema/content1/draft' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.deleteVersion('my-app', resource, version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/draft');
+
+        expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
         req.flush(contentResponse(12));

@@ -392,16 +392,16 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
-        [HttpPut]
-        [Route("content/{app}/{name}/{id}/versionCreate/")]
+        [HttpPost]
+        [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> CreateVersion(string app, string name, Guid id)
+        public async Task<IActionResult> CreateDraft(string app, string name, Guid id)
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            var command = new CreateContentVersion { ContentId = id };
+            var command = new CreateContentDraft { ContentId = id };
 
             var response = await InvokeCommandAsync(command);
 
@@ -421,8 +421,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
-        [HttpPut]
-        [Route("content/{app}/{name}/{id}/versionDelete/")]
+        [HttpDelete]
+        [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
@@ -430,7 +430,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            var command = new DeleteContentVersion { ContentId = id };
+            var command = new DeleteContentDraft { ContentId = id };
 
             var response = await InvokeCommandAsync(command);
 

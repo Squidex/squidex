@@ -5,10 +5,10 @@
 
     <ng-container content>
         <ng-container *ngIf="!schema.isSingleton">
-            <div class="section" *ngIf="content.canVersionCreate || content.canVersionDelete">
+            <div class="section" *ngIf="content.canDraftDelete || content.canDraftDelete">
                 <ng-container *ngIf="!content.newStatus; else newVersion">
-                    <button class="btn btn-success btn-block" (click)="createVersion() ">
-                        New Version
+                    <button class="btn btn-success btn-block" (click)="createDraft() ">
+                        New Draft
                     </button>
                 </ng-container>
         
@@ -35,8 +35,8 @@
                             </ng-container>
     
                             <a class="dropdown-item dropdown-item-delete"
-                                [class.disabled]="!content.canVersionDelete"
-                                (sqxConfirmClick)="deleteVersion()"
+                                [class.disabled]="!content.canDraftDelete"
+                                (sqxConfirmClick)="deleteDraft()"
                                 confirmTitle="Delete content"
                                 confirmText="Do you really want to delete this version?">
                                 Delete this Version
@@ -46,7 +46,7 @@
     
                             <a class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!content.canDelete"
-                                (sqxConfirmClick)="deleteVersion()"
+                                (sqxConfirmClick)="delete()"
                                 confirmTitle="Delete content"
                                 confirmText="Do you really want to delete the content?">
                                 Delete
@@ -87,7 +87,7 @@
     
                             <a class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!content.canDelete"
-                                (sqxConfirmClick)="deleteVersion()"
+                                (sqxConfirmClick)="delete()"
                                 confirmTitle="Delete content"
                                 confirmText="Do you really want to delete the content?">
                                 Delete
