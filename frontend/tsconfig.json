@@ -29,7 +29,7 @@
     },
     "angularCompilerOptions": {
         "fullTemplateTypeCheck": true,
-        // https://angular.io/guide/angular-compiler-options
-        "strictInjectionParameters": true
+        "strictInjectionParameters": true,
+        "strictTemplate": true
     }
 }
