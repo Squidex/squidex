@@ -13,7 +13,6 @@
         ],
         "moduleResolution": "node",
         "module": "esnext",
-        "noEmitHelpers": true,
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
