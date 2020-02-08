@@ -24,7 +24,7 @@ export class Profile {
     }
 
     public get email(): string {
-        return this.user.profile['email'];
+        return this.user.profile['email']!;
     }
 
     public get displayName(): string {
