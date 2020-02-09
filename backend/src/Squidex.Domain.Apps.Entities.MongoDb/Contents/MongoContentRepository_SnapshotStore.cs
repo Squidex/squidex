@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = value.ScheduleJob;
             content.NewStatus = value.NewStatus;
 
-            content.LoadData(value.EditingData, schema.SchemaDef, serializer);
+            content.LoadData(value.Data, schema.SchemaDef, serializer);
 
             await collectionAll.UpsertVersionedAsync(content.Id, oldVersion, content);
         }
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = null;
             content.NewStatus = null;
 
-            content.LoadData(value.Data, schema.SchemaDef, serializer);
+            content.LoadData(value.CurrentVersion.Data, schema.SchemaDef, serializer);
 
             await collectionPublished.UpsertVersionedAsync(content.Id, oldVersion, content);
         }

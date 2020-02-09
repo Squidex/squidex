@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Create_should_create_events_and_update_state()
+        public async Task Create_should_create_events_and_update_data_and_status()
         {
             var command = new CreateContent { Data = data };
 
@@ -128,7 +128,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Draft, sut.Snapshot.Status);
+            Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
+            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -173,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_state()
+        public async Task Update_should_create_events_and_update_data()
         {
             var command = new UpdateContent { Data = otherData };
 
@@ -182,6 +183,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await PublishAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                );
+
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(ScriptContext(otherData, data, Status.Draft), "<update-script>"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Update_should_create_events_and_update_new_version_when_draft_available()
+        {
+            var command = new UpdateContent { Data = otherData };
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+            await ExecuteCreateDraftAsync();
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(otherData, sut.Snapshot.NewVersion?.Data);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -220,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Patch_should_create_events_and_update_state()
+        public async Task Patch_should_create_events_and_update_data()
         {
             var command = new PatchContent { Data = patch };
 
@@ -229,6 +256,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await PublishAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.NotEqual(data, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = patched })
+                );
+
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(ScriptContext(patched, data, Status.Draft), "<update-script>"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Patch_should_create_events_and_update_new_version_when_draft_available()
+        {
+            var command = new PatchContent { Data = patch };
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+            await ExecuteCreateDraftAsync();
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(patched, sut.Snapshot.NewVersion?.Data);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -257,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_update_state()
+        public async Task ChangeStatus_should_create_events_and_update_status()
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
@@ -267,7 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Published, sut.Snapshot.Status);
+            Assert.Equal(Status.Published, sut.Snapshot.CurrentVersion.Status);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -275,6 +328,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 );
 
             A.CallTo(() => scriptEngine.Execute(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task ChangeStatus_should_create_events_and_update_new_version_when_draft_available()
+        {
+            var command = new ChangeContentStatus { Status = Status.Archived };
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+            await ExecuteCreateDraftAsync();
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(Status.Archived, sut.Snapshot.NewVersion?.Status);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
+                );
+
+            A.CallTo(() => scriptEngine.Execute(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>"))
                 .MustHaveHappened();
         }
 
@@ -289,7 +366,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Archived, sut.Snapshot.Status);
+            Assert.Equal(Status.Archived, sut.Snapshot.CurrentVersion.Status);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -312,7 +389,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Draft, sut.Snapshot.Status);
+            Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -335,7 +412,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Draft, sut.Snapshot.Status);
+            Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -359,7 +436,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Null(sut.Snapshot.NewStatus);
+            Assert.Null(sut.Snapshot.NewVersion);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -383,9 +460,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Draft, sut.Snapshot.Status);
-            Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob!.Status);
-            Assert.Equal(dueTime, sut.Snapshot.ScheduleJob.DueTime);
+            Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
+            Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob?.Status);
+
+            Assert.Equal(dueTime, sut.Snapshot.ScheduleJob?.DueTime);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -404,7 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new ChangeContentStatus { Status = Status.Published, JobId = sut.Snapshot.ScheduleJob!.Id };
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentInfo>.Ignored, Status.Draft, Status.Published, User))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, Status.Draft, Status.Published, User))
                 .Returns(false);
 
             var result = await PublishAsync(CreateContentCommand(command));
@@ -456,7 +534,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Status.Draft, sut.Snapshot.NewStatus);
+            Assert.Equal(Status.Draft, sut.Snapshot.NewVersion?.Status);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -477,7 +555,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
-            Assert.Null(sut.Snapshot.NewStatus);
+            Assert.Null(sut.Snapshot.NewVersion);
 
             LastEvents
                 .ShouldHaveSameEvents(

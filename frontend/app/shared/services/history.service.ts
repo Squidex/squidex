@@ -23,6 +23,7 @@ export class HistoryEventDto {
     constructor(
         public readonly eventId: string,
         public readonly actor: string,
+        public readonly eventType: string,
         public readonly message: string,
         public readonly created: DateTime,
         public readonly version: Version
@@ -88,6 +89,7 @@ export class HistoryService {
                     new HistoryEventDto(
                         item.eventId,
                         item.actor,
+                        item.eventType,
                         item.message,
                         DateTime.parseISO_UTC(item.created),
                         new Version(item.version.toString())));

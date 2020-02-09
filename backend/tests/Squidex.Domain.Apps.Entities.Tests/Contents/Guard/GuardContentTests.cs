@@ -256,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var schema = CreateSchema(false);
 
-            var content = new ContentState { NewStatus = null };
+            var content = new ContentState();
             var command = new DeleteContentDraft();
 
             Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, schema, content));
@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var schema = CreateSchema(true);
 
-            var content = new ContentState { NewStatus = Status.Draft };
+            var content = CreateDraftContent(Status.Draft);
             var command = new DeleteContentDraft();
 
             Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, schema, content));
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var schema = CreateSchema(false);
 
-            var content = new ContentState { NewStatus = Status.Draft };
+            var content = CreateDraftContent(Status.Draft);
             var command = new DeleteContentDraft();
 
             GuardContent.CanDeleteDraft(command, schema, content);
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private void SetupCanUpdate(bool canUpdate)
         {
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentInfo>.Ignored, A<Status>.Ignored, user))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored, A<Status>.Ignored, user))
                 .Returns(canUpdate);
         }
 
@@ -321,9 +321,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             return Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
+        private ContentState CreateDraftContent(Status status)
+        {
+            return new ContentState
+            {
+                NewVersion = new ContentVersion(status, new NamedContentData())
+            };
+        }
+
         private ContentState CreateContent(Status status)
         {
-            return new ContentState { Status = status };
+            return new ContentState
+            {
+                CurrentVersion = new ContentVersion(status, new NamedContentData())
+            };
         }
     }
 }

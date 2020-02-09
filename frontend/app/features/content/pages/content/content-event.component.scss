@@ -1,0 +1,27 @@
+:host ::ng-deep {
+    .user-ref {
+        font-weight: 500;
+    }
+
+    .marker-ref {
+        font-weight: 500;
+    }
+}
+
+.event {
+    & {
+        font-size: .9rem;
+        font-weight: normal;
+        margin-bottom: 1.5rem;
+    }
+
+    &-created {
+        font-size: .75rem;
+        font-weight: normal;
+        margin: .25rem 0;
+    }
+}
+
+.user-picture {
+    margin-top: .25rem;
+}

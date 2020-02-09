@@ -16,30 +16,36 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
-    public sealed class ContentState : DomainObjectState<ContentState>, IContentEntity, IContentInfo
+    public sealed class ContentState : DomainObjectState<ContentState>, IContentEntity
     {
         public NamedId<Guid> AppId { get; set; }
 
         public NamedId<Guid> SchemaId { get; set; }
 
-        public Status? NewStatus { get; set; }
+        public ContentVersion? NewVersion { get; set; }
 
-        public Status Status { get; set; }
+        public ContentVersion CurrentVersion { get; set; }
 
         public ScheduleJob? ScheduleJob { get; set; }
 
-        public NamedContentData? NewData { get; set; }
-
-        public NamedContentData Data { get; set; }
-
-        public NamedContentData EditingData
+        public NamedContentData Data
         {
-            get { return NewData ?? Data; }
+            get { return NewVersion?.Data ?? CurrentVersion.Data; }
         }
 
         public Status EditingStatus
         {
             get { return NewStatus ?? Status; }
+        }
+
+        public Status Status
+        {
+            get { return CurrentVersion.Status; }
+        }
+
+        public Status? NewStatus
+        {
+            get { return NewVersion?.Status; }
         }
 
         public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
@@ -50,13 +56,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
                     {
                         SimpleMapper.Map(e, this);
 
+                        CurrentVersion = new ContentVersion(e.Status, e.Data);
+
                         break;
                     }
 
                 case ContentDraftCreated e:
                     {
-                        NewData = Data;
-                        NewStatus = e.Status;
+                        NewVersion = new ContentVersion(e.Status, CurrentVersion.Data);
 
                         ScheduleJob = null;
 
@@ -65,8 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
                 case ContentDraftDeleted _:
                     {
-                        NewData = null;
-                        NewStatus = null;
+                        NewVersion = null;
 
                         ScheduleJob = null;
 
@@ -75,25 +81,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
                 case ContentStatusChanged e:
                     {
-                        if (NewStatus.HasValue)
+                        if (NewVersion != null)
                         {
                             if (e.Status == Status.Published)
                             {
-                                Status = e.Status;
+                                CurrentVersion = new ContentVersion(e.Status, NewVersion.Data);
 
-                                Data = NewData!;
-
-                                NewStatus = null;
-                                NewData = null;
+                                NewVersion = null;
                             }
                             else
                             {
-                                NewStatus = e.Status;
+                                NewVersion = NewVersion.WithStatus(e.Status);
                             }
                         }
                         else
                         {
-                            Status = e.Status;
+                            CurrentVersion = CurrentVersion.WithStatus(e.Status);
                         }
 
                         break;
@@ -115,13 +118,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
                 case ContentUpdated e:
                     {
-                        if (NewStatus.HasValue)
+                        if (NewVersion != null)
                         {
-                            NewData = e.Data;
+                            NewVersion = NewVersion.WithData(e.Data);
                         }
                         else
                         {
-                            Data = e.Data;
+                            CurrentVersion = CurrentVersion.WithData(e.Data);
                         }
 
                         break;

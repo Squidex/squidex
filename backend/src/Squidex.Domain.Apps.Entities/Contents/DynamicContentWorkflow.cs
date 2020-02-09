@@ -39,11 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
-        public async Task<bool> CanMoveToAsync(IContentInfo content, Status status, Status next, ClaimsPrincipal user)
+        public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.EditingData, user);
+            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
         }
 
         public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
@@ -53,19 +53,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
-        public async Task<bool> CanUpdateAsync(IContentInfo content, Status status, ClaimsPrincipal user)
+        public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             if (workflow.TryGetStep(status, out var step))
             {
-                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.EditingData, user);
+                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.Data, user);
             }
 
             return true;
         }
 
-        public async Task<StatusInfo> GetInfoAsync(IContentInfo content, Status status)
+        public async Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return status;
         }
 
-        public async Task<StatusInfo[]> GetNextAsync(IContentInfo content, Status status, ClaimsPrincipal user)
+        public async Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal user)
         {
             var result = new List<StatusInfo>();
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var (to, step, transition) in workflow.GetTransitions(status))
             {
-                if (IsTrue(transition, content.EditingData, user))
+                if (IsTrue(transition, content.Data, user))
                 {
                     result.Add(new StatusInfo(to, GetColor(step)));
                 }

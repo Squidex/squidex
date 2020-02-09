@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     new ScriptContext
                                     {
                                         Operation = change.ToString(),
-                                        Data = Snapshot.EditingData,
+                                        Data = Snapshot.Data,
                                         Status = c.Status,
                                         StatusOld = Snapshot.EditingStatus
                                     });
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             new ScriptContext
                             {
                                 Operation = "Delete",
-                                Data = Snapshot.EditingData,
+                                Data = Snapshot.Data,
                                 Status = Snapshot.EditingStatus,
                                 StatusOld = default
                             });
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
         {
-            var currentData = Snapshot.EditingData;
+            var currentData = Snapshot.Data;
 
             var newData = newDataFunc(currentData!);
 

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentEntity : IEnrichedContentEntity, IContentInfo
+    public sealed class ContentEntity : IEnrichedContentEntity, IContentEntity
     {
         public Guid Id { get; set; }
 
@@ -58,15 +58,5 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public string? ScheduledStatusColor { get; set; }
 
         public RootField[]? ReferenceFields { get; set; }
-
-        public NamedContentData EditingData
-        {
-            get { return Data; }
-        }
-
-        public Status EditingStatus
-        {
-            get { return NewStatus ?? Status; }
-        }
     }
 }

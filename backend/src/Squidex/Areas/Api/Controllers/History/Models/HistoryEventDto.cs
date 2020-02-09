@@ -16,10 +16,16 @@ namespace Squidex.Areas.Api.Controllers.History.Models
     public sealed class HistoryEventDto
     {
         /// <summary>
-        /// The message of the event.
+        /// The message for the event.
         /// </summary>
         [Required]
         public string Message { get; set; }
+
+        /// <summary>
+        /// The type of the original event.
+        /// </summary>
+        [Required]
+        public string EventType { get; set; }
 
         /// <summary>
         /// The user who called the action.
