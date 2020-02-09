@@ -28,11 +28,9 @@
                     <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                         Change to 
 
-                        <sqx-content-status
+                        <sqx-content-status layout="text" small="true"
                             [status]="info.status"
-                            [statusColor]="info.color"
-                            showLabel="true"
-                            small="true">
+                            [statusColor]="info.color">
                         </sqx-content-status>
                     </a>
                     <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">

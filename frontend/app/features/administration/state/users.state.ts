@@ -210,8 +210,7 @@ export class UsersState extends State<Snapshot> {
             const users = s.users.map(u => u.id === user.id ? user : u);
 
             const selectedUser =
-                s.selectedUser &&
-                s.selectedUser.id !== user.id ?
+                s.selectedUser?.id !== user.id ?
                 s.selectedUser :
                 users.find(x => x.id === user.id);
 

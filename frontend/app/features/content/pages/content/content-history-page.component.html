@@ -5,7 +5,7 @@
 
     <ng-container content>
         <ng-container *ngIf="!schema.isSingleton">
-            <div class="section" *ngIf="content.canDraftDelete || content.canDraftDelete">
+            <div class="section" *ngIf="content.canDraftCreate || content.canDraftDelete">
                 <ng-container *ngIf="!content.newStatus; else newVersion">
                     <button class="btn btn-success btn-block" (click)="createDraft() ">
                         New Draft

@@ -297,7 +297,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly schemaIds?: ReadonlyArray<string>;
 
     public get singleId() {
-        return this.schemaIds && this.schemaIds.length === 1 ? this.schemaIds[0] : null;
+        return this.schemaIds?.[0] || null;
     }
 
     public get isSortable() {

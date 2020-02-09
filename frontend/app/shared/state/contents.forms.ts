@@ -576,7 +576,7 @@ export class EditContentForm extends Form<FormGroup, any> {
                 const fieldForm = this.form.get(field.name) as FormGroup;
 
                 if (fieldForm) {
-                    const fieldValue = value ? value[field.name] || {} : {};
+                    const fieldValue = value?.[field.name] || {};
 
                     for (const partition of this.partitions.getAll(field)) {
                         const { key, isOptional } = partition;

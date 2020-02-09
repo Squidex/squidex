@@ -54,7 +54,7 @@ export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
     }
 
     protected transformLoad(user: Partial<UserDto>) {
-        const permissions = user.permissions ? user.permissions.join('\n') : '';
+        const permissions = user.permissions?.join('\n') || '';
 
         return { ...user, permissions: permissions };
     }

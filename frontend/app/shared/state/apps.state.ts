@@ -44,11 +44,11 @@ export class AppsState extends State<Snapshot> {
         this.selectedAppOrNull.pipe(defined());
 
     public get appName() {
-        return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
+        return this.snapshot.selectedApp?.name || '';
     }
 
     public get appDisplayName() {
-        return this.snapshot.selectedApp ? this.snapshot.selectedApp.displayName : '';
+        return this.snapshot.selectedApp?.displayName || '';
     }
 
     constructor(

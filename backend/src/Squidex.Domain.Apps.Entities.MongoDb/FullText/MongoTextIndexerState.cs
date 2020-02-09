@@ -18,8 +18,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
     {
         static MongoTextIndexerState()
         {
-            BsonClassMap.RegisterClassMap<TextContentState>()
-                .MapIdField(x => x.ContentId);
+            BsonClassMap.RegisterClassMap<TextContentState>(cm =>
+            {
+                cm.MapIdField(x => x.ContentId);
+
+                cm.MapProperty(x => x.DocIdCurrent)
+                    .SetElementName("c");
+
+                cm.MapProperty(x => x.DocIdNew)
+                    .SetElementName("n").SetIgnoreIfNull(true);
+
+                cm.MapProperty(x => x.DocIdForPublished)
+                    .SetElementName("p").SetIgnoreIfNull(true);
+            });
         }
 
         public MongoTextIndexerState(IMongoDatabase database, bool setup = false)

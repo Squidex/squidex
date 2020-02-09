@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
@@ -29,17 +30,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly IAppEntity app;
+
+        private delegate Task IndexOperation(TextIndexingProcess process);
 
         public abstract IIndexerFactory Factory { get; }
 
         public virtual InMemoryTextIndexerState State { get; } = new InMemoryTextIndexerState();
+
+        protected TextIndexerTestsBase()
+        {
+            app =
+                Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"),
+                    Language.DE,
+                    Language.EN);
+        }
 
         [Fact]
         public async Task Should_throw_exception_for_invalid_query()
         {
             await Assert.ThrowsAsync<ValidationException>(async () =>
             {
-                await TestCombinations(g => Search(g, expected: null, text: "~hello"));
+                await TestCombinations(Search(expected: null, text: "~hello"));
             });
         }
 
@@ -47,14 +59,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_index_invariant_content_and_retrieve()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Hello"),
-                g => CreateContent(g, ids2[0], "iv", "World"),
+                Create(ids1[0], "iv", "Hello"),
+                Create(ids2[0], "iv", "World"),
 
-                g => Search(g, expected: ids1, text: "Hello"),
-                g => Search(g, expected: ids2, text: "World"),
+                Search(expected: ids1, text: "Hello"),
+                Search(expected: ids2, text: "World"),
 
-                g => Search(g, expected: null, text: "Hello", SearchScope.Published),
-                g => Search(g, expected: null, text: "World", SearchScope.Published)
+                Search(expected: null, text: "Hello", SearchScope.Published),
+                Search(expected: null, text: "World", SearchScope.Published)
             );
         }
 
@@ -62,11 +74,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Hello"),
-                g => CreateContent(g, ids2[0], "iv", "World"),
+                Create(ids1[0], "iv", "Hello"),
+                Create(ids2[0], "iv", "World"),
 
-                g => Search(g, expected: ids1, text: "helo~"),
-                g => Search(g, expected: ids2, text: "wold~", SearchScope.All)
+                Search(expected: ids1, text: "helo~"),
+                Search(expected: ids2, text: "wold~", SearchScope.All)
             );
         }
 
@@ -74,15 +86,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_update_draft_only()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Morning"),
+                Create(ids1[0], "iv", "V1"),
 
-                g => UpdateContent(g, ids1[0], "iv", "Evening"),
+                Update(ids1[0], "iv", "V2"),
 
-                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: null, text: "Morning", target: SearchScope.Published),
+                Search(expected: null, text: "V1", target: SearchScope.All),
+                Search(expected: null, text: "V1", target: SearchScope.Published),
 
-                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
-                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published)
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published)
             );
         }
 
@@ -90,12 +102,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_also_serve_published_after_publish()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Morning"),
+                Create(ids1[0], "iv", "V1"),
 
-                g => PublishAsync(g, ids1[0]),
+                Publish(ids1[0]),
 
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published)
+                Search(expected: ids1, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published)
             );
         }
 
@@ -103,46 +115,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_also_update_published_content()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Morning"),
+                Create(ids1[0], "iv", "V1"),
 
-                g => PublishAsync(g, ids1[0]),
+                Publish(ids1[0]),
 
-                g => UpdateContent(g, ids1[0], "iv", "Evening"),
+                Update(ids1[0], "iv", "V2"),
 
-                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: null, text: "Morning", target: SearchScope.Published),
+                Search(expected: null, text: "V1", target: SearchScope.All),
+                Search(expected: null, text: "V1", target: SearchScope.Published),
 
-                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.Published)
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: ids1, text: "V2", target: SearchScope.Published)
             );
         }
 
         [Fact]
         public async Task Should_simulate_new_version()
         {
-            await TestCombinations(3,
-                g => CreateContent(g, ids1[0], "iv", "Morning"),
+            await TestCombinations(0,
+                Create(ids1[0], "iv", "V1"),
 
                 // Publish the content.
-                g => PublishAsync(g, ids1[0]),
+                Publish(ids1[0]),
 
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
+                Search(expected: ids1, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
 
                 // Create a new version, the value is still the same as old version.
-                g => CreateVersion(g, ids1[0]),
+                CreateDraft(ids1[0]),
 
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
+                Search(expected: ids1, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
 
                 // Make an update, this updates the new version only.
-                g => UpdateContent(g, ids1[0], "iv", "Evening"),
+                Update(ids1[0], "iv", "V2"),
 
-                g => Search(g, expected: null, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
+                Search(expected: null, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
 
-                g => Search(g, expected: ids1, text: "Evening", target: SearchScope.All),
-                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published)
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published),
+
+                // Publish the new version to get rid of the "V1" version.
+                Publish(ids1[0]),
+
+                Search(expected: null, text: "V1", target: SearchScope.All),
+                Search(expected: null, text: "V1", target: SearchScope.Published),
+
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: ids1, text: "V2", target: SearchScope.Published),
+
+                // Unpublish the version
+                Unpublish(ids1[0]),
+
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published)
             );
         }
 
@@ -150,65 +177,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_simulate_content_reversion()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Morning"),
+                Create(ids1[0], "iv", "V1"),
 
                 // Publish the content.
-                g => PublishAsync(g, ids1[0]),
+                Publish(ids1[0]),
 
                 // Create a new version, the value is still the same as old version.
-                g => CreateVersion(g, ids1[0]),
+                CreateDraft(ids1[0]),
 
                 // Make an update, this updates the new version only.
-                g => UpdateContent(g, ids1[0], "iv", "Evening"),
+                Update(ids1[0], "iv", "V2"),
 
                 // Make an update, this updates the new version only.
-                g => DeleteVersionAsync(g, ids1[0]),
+                DeleteDraft(ids1[0]),
 
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Morning", target: SearchScope.Published),
+                Search(expected: ids1, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
 
-                g => Search(g, expected: null, text: "Evening", target: SearchScope.All),
-                g => Search(g, expected: null, text: "Evening", target: SearchScope.Published),
+                Search(expected: null, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published),
 
                 // Make an update, this updates the current version only.
-                g => UpdateContent(g, ids1[0], "iv", "Night"),
+                Update(ids1[0], "iv", "Night"),
 
-                g => Search(g, expected: ids1, text: "Night", target: SearchScope.All),
-                g => Search(g, expected: ids1, text: "Night", target: SearchScope.Published)
+                Search(expected: ids1, text: "Night", target: SearchScope.All),
+                Search(expected: ids1, text: "Night", target: SearchScope.Published)
             );
         }
-
-        /*
-        [Fact]
-        public async Task Should_also_retrieve_published_content_after_copy()
-        {
-            await SearchWithGrains(
-                g => AddInvariantContent(g, text1: "Hello", text2: "World", onlyDraft: false),
-
-                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: null, text: "Hello", target: Scope.Published),
-
-                g => CopyAsync(g, fromDraft: true),
-
-                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Draft),
-                g => TestSearchAsync(g, expected: ids1, text: "Hello", target: Scope.Published));
-        }
-                */
 
         [Fact]
         public async Task Should_delete_documents_from_index()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "iv", "Hello"),
-                g => CreateContent(g, ids2[0], "iv", "World"),
+                Create(ids1[0], "iv", "Hello"),
+                Create(ids2[0], "iv", "World"),
 
-                g => Search(g, expected: ids1, text: "Hello"),
-                g => Search(g, expected: ids2, text: "World"),
+                Search(expected: ids1, text: "Hello"),
+                Search(expected: ids2, text: "World"),
 
-                g => DeleteAsync(g, id: ids1[0]),
+                Delete(ids1[0]),
 
-                g => Search(g, expected: null, text: "Hello"),
-                g => Search(g, expected: ids2, text: "World")
+                Search(expected: null, text: "Hello"),
+                Search(expected: ids2, text: "World")
             );
         }
 
@@ -216,11 +226,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_search_by_field()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "en", "City"),
-                g => CreateContent(g, ids2[0], "de", "Stadt"),
+                Create(ids1[0], "en", "City"),
+                Create(ids2[0], "de", "Stadt"),
 
-                g => Search(g, expected: ids1, text: "en:city"),
-                g => Search(g, expected: ids2, text: "de:Stadt")
+                Search(expected: ids1, text: "en:city"),
+                Search(expected: ids2, text: "de:Stadt")
             );
         }
 
@@ -228,21 +238,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_index_localized_content_and_retrieve()
         {
             await TestCombinations(
-                g => CreateContent(g, ids1[0], "de", "Stadt und Land and Fluss"),
+                Create(ids1[0], "de", "Stadt und Land and Fluss"),
 
-                g => CreateContent(g, ids2[0], "en", "City and Country und River"),
+                Create(ids2[0], "en", "City and Country und River"),
 
-                g => Search(g, expected: ids1, text: "Stadt"),
-                g => Search(g, expected: ids1, text: "and"),
-                g => Search(g, expected: ids2, text: "und"),
+                Search(expected: ids1, text: "Stadt"),
+                Search(expected: ids1, text: "and"),
+                Search(expected: ids2, text: "und"),
 
-                g => Search(g, expected: ids2, text: "City"),
-                g => Search(g, expected: ids2, text: "und"),
-                g => Search(g, expected: ids1, text: "and")
+                Search(expected: ids2, text: "City"),
+                Search(expected: ids2, text: "und"),
+                Search(expected: ids1, text: "and")
             );
         }
 
-        private async Task CreateContent(TextIndexingProcess grain, Guid id, string language, string text)
+        private IndexOperation Create(Guid id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -250,12 +260,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue(language, text));
 
-            var @event = new ContentCreated { ContentId = id, Data = data, SchemaId = schemaId };
-
-            await grain.On(Envelope.Create(@event));
+            return Op(id, new ContentCreated { Data = data });
         }
 
-        private async Task UpdateContent(TextIndexingProcess grain, Guid id, string language, string text)
+        private IndexOperation Update(Guid id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -263,59 +271,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue(language, text));
 
-            var @event = new ContentUpdated { ContentId = id, Data = data, SchemaId = schemaId };
-
-            await grain.On(Envelope.Create(@event));
+            return Op(id, new ContentUpdated { Data = data });
         }
 
-        private async Task CreateVersion(TextIndexingProcess process, Guid id)
+        private IndexOperation CreateDraft(Guid id)
         {
-            var @event = new ContentDraftCreated { ContentId = id, SchemaId = schemaId };
-
-            await process.On(Envelope.Create(@event));
+            return Op(id, new ContentDraftCreated());
         }
 
-        private async Task PublishAsync(TextIndexingProcess process, Guid id)
+        private IndexOperation Publish(Guid id)
         {
-            var @event = new ContentStatusChanged { ContentId = id, SchemaId = schemaId, Status = Status.Published };
-
-            await process.On(Envelope.Create(@event));
+            return Op(id, new ContentStatusChanged { Status = Status.Published });
         }
 
-        private async Task DeleteVersionAsync(TextIndexingProcess process, Guid id)
+        private IndexOperation Unpublish( Guid id)
         {
-            var @event = new ContentDraftDeleted { ContentId = id, SchemaId = schemaId };
-
-            await process.On(Envelope.Create(@event));
+            return Op(id, new ContentStatusChanged { Status = Status.Draft });
         }
 
-        private async Task DeleteAsync(TextIndexingProcess process, Guid id)
+        private IndexOperation DeleteDraft(Guid id)
         {
-            var @event = new ContentDeleted { ContentId = id, SchemaId = schemaId };
-
-            await process.On(Envelope.Create(@event));
+            return Op(id, new ContentDraftDeleted());
         }
 
-        private async Task Search(TextIndexingProcess process, List<Guid>? expected, string text, SearchScope target = SearchScope.All)
+        private IndexOperation Delete(Guid id)
         {
-            var app =
-                Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"),
-                    Language.DE,
-                    Language.EN);
+            return Op(id, new ContentDeleted());
+        }
 
-            var result = await process.TextIndexer.SearchAsync(text, app, schemaId.Id, target);
+        private IndexOperation Op(Guid id, ContentEvent contentEvent)
+        {
+            contentEvent.ContentId = id;
+            contentEvent.SchemaId = schemaId;
 
-            if (expected != null)
+            return p => p.On(Envelope.Create(contentEvent));
+        }
+
+        private IndexOperation Search(List<Guid>? expected, string text, SearchScope target = SearchScope.All)
+        {
+            return async p =>
             {
-                Assert.Equal(expected, result);
-            }
-            else
-            {
-                Assert.Empty(result);
-            }
+                var result = await p.TextIndexer.SearchAsync(text, app, schemaId.Id, target);
+
+                if (expected != null)
+                {
+                    Assert.Equal(expected, result);
+                }
+                else
+                {
+                    Assert.Empty(result);
+                }
+            };
         }
 
-        private async Task TestCombinations(params Func<TextIndexingProcess, Task>[] actions)
+        private async Task TestCombinations(params IndexOperation[] actions)
         {
             for (var i = 0; i < actions.Length; i++)
             {
@@ -323,11 +332,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task TestCombinations(int i, params Func<TextIndexingProcess, Task>[] actions)
+        private async Task TestCombinations(int firstSteps, params IndexOperation[] actions)
         {
             await ExecuteAsync(async sut =>
             {
-                foreach (var action in actions.Take(i))
+                foreach (var action in actions.Take(firstSteps))
                 {
                     await action(sut);
                 }
@@ -335,14 +344,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await ExecuteAsync(async sut =>
             {
-                foreach (var action in actions.Skip(i))
+                foreach (var action in actions.Skip(firstSteps))
                 {
                     await action(sut);
                 }
             });
         }
 
-        private async Task ExecuteAsync(Func<TextIndexingProcess, Task> action)
+        private async Task ExecuteAsync(IndexOperation action)
         {
             var indexer = await Factory.CreateAsync(schemaId.Id);
             try

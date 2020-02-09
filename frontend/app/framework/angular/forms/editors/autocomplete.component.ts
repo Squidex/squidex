@@ -87,7 +87,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                         this.callChange(query);
                     }),
                     map(query => <string>query),
-                    map(query => query ? query.trim() : query),
+                    map(query => query?.trim() || query),
                     tap(query => {
                         if (!query) {
                             this.reset();

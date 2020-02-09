@@ -7,11 +7,13 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -55,10 +57,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_add_image_tag_if_small()
         {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(100, 100));
+            var command = new CreateAsset { Type = AssetType.Image };
 
-            var command = new CreateAsset { File = file };
+            command.Metadata.SetPixelWidth(100);
+            command.Metadata.SetPixelWidth(100);
 
             await sut.EnhanceAsync(command, tags);
 
@@ -69,10 +71,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_add_image_tag_if_medium()
         {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(800, 600));
+            var command = new CreateAsset { Type = AssetType.Image };
 
-            var command = new CreateAsset { File = file };
+            command.Metadata.SetPixelWidth(800);
+            command.Metadata.SetPixelWidth(600);
 
             await sut.EnhanceAsync(command, tags);
 
@@ -83,10 +85,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_add_image_tag_if_large()
         {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(1200, 1400));
+            var command = new CreateAsset { Type = AssetType.Image };
 
-            var command = new CreateAsset { File = file };
+            command.Metadata.SetPixelWidth(1200);
+            command.Metadata.SetPixelWidth(1400);
 
             await sut.EnhanceAsync(command, tags);
 
@@ -95,9 +97,37 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_format_to_empty()
+        public void Should_format_image()
         {
-            var source = new AssetEntity();
+            var source = new AssetEntity
+            {
+                Metadata = new AssetMetadata()
+                {
+                    ["pixelWidth"] = JsonValue.Create(128),
+                    ["pixelHeight"] = JsonValue.Create(55),
+                },
+                Type = AssetType.Image
+            };
+
+            var formatted = sut.Format(source);
+
+            Assert.Equal(new[] { "128x55px" }, formatted);
+        }
+
+        [Fact]
+        public void Should_not_format_video()
+        {
+            var source = new AssetEntity { Type = AssetType.Video };
+
+            var formatted = sut.Format(source);
+
+            Assert.Empty(formatted);
+        }
+
+        [Fact]
+        public void Should_not_format_audio()
+        {
+            var source = new AssetEntity { Type = AssetType.Audio };
 
             var formatted = sut.Format(source);
 

@@ -178,44 +178,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var metadata = asset.Metadata;
 
-            switch (asset.Type)
+            if (asset.Type == AssetType.Video)
             {
-                case AssetType.Image:
-                    {
-                        if (metadata.TryGetNumber("pixelWidth", out var w) &&
-                            metadata.TryGetNumber("pixelHeight", out var h))
-                        {
-                            yield return $"{w}x{h}px";
-                        }
+                if (metadata.TryGetNumber("videoWidth", out var w) &&
+                    metadata.TryGetNumber("videoHeight", out var h))
+                {
+                    yield return $"{w}x{h}pt";
+                }
 
-                        break;
-                    }
-
-                case AssetType.Video:
-                    {
-                        if (metadata.TryGetNumber("videoWidth", out var w) &&
-                            metadata.TryGetNumber("videoHeight", out var h))
-                        {
-                            yield return $"{w}x{h}pt";
-                        }
-
-                        if (metadata.TryGetString("duration", out var duration))
-                        {
-                            yield return duration;
-                        }
-
-                        break;
-                    }
-
-                case AssetType.Audio:
-                    {
-                        if (metadata.TryGetString("duration", out var duration))
-                        {
-                            yield return duration;
-                        }
-
-                        break;
-                    }
+                if (metadata.TryGetString("duration", out var duration))
+                {
+                    yield return duration;
+                }
+            }
+            else if (asset.Type == AssetType.Audio)
+            {
+                if (metadata.TryGetString("duration", out var duration))
+                {
+                    yield return duration;
+                }
             }
         }
     }

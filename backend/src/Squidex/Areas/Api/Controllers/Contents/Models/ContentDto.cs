@@ -156,14 +156,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 {
                     if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
                     {
-                        AddPutLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                        AddDeleteLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                     }
                 }
                 else if (Status == Status.Published)
                 {
                     if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
                     {
-                        AddPutLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
+                        AddPostLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                     }
                 }
 

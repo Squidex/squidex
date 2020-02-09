@@ -132,7 +132,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
         if (this.initial === name) {
             const first = steps.find(x => !x.isLocked);
 
-            return this.with({ initial: first ? first.name : null, steps, transitions });
+            return this.with({ initial: first?.name || null, steps, transitions });
         } else {
             return this.with({ steps, transitions });
         }

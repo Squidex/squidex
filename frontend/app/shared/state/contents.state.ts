@@ -364,7 +364,7 @@ export class ManualContentsState extends ContentsStateBase {
 }
 
 function buildStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
-    return statuses ? statuses.map(s => buildStatusQuery(s)) : [];
+    return statuses?.map(s => buildStatusQuery(s)) || [];
 }
 
 function buildStatusQuery(s: StatusInfo) {

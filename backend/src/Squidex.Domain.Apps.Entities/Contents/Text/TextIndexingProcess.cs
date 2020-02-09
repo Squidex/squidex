@@ -134,6 +134,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             ServeAll = true,
                             ServePublished = false,
                             Texts = @event.Data.ToTexts()
+                        },
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdCurrent,
+                            ServeAll = false,
+                            ServePublished = true
                         });
 
                     state.DocIdForPublished = state.DocIdCurrent;
@@ -169,8 +175,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     new UpdateIndexEntry
                     {
                         DocId = state.DocIdForPublished,
-                        ServeAll = false,
-                        ServePublished = true
+                        ServeAll = true,
+                        ServePublished = false
                     });
 
                 state.DocIdForPublished = null;

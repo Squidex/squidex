@@ -22,11 +22,11 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
     {
         static MongoPersistedGrantStore()
         {
-            BsonClassMap.RegisterClassMap<PersistedGrant>(map =>
+            BsonClassMap.RegisterClassMap<PersistedGrant>(cm =>
             {
-                map.AutoMap();
+                cm.AutoMap();
 
-                map.MapIdProperty(x => x.Key).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.MapIdProperty(x => x.Key).SetSerializer(new StringSerializer(BsonType.ObjectId));
             });
         }
 

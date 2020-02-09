@@ -119,7 +119,7 @@ export module ValidatorsEx {
                     return null;
                 }
 
-                const length: number = control.value ? control.value.length : 0;
+                const length: number = control.value?.length || 0;
 
                 if (minLength === maxLength) {
                     if (isNaN(length) || length !== minLength) {

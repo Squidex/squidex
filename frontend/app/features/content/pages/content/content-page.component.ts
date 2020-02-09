@@ -101,7 +101,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
                         schemaVersion: this.schema.version,
-                        contentId: content ? content.id : undefined
+                        contentId: content?.id
                     };
 
                     if (content) {
@@ -231,7 +231,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         if (!content || version === null || version.eq(content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.loadContent(content ? content.data : {}, true);
+            this.loadContent(content?.data || {}, true);
         } else {
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
@@ -260,7 +260,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         try {
             this.contentForm.load(data, isInitial);
-            this.contentForm.setEnabled(!this.content);
+            this.contentForm.setEnabled(!this.content || this.content.canUpdate);
         } finally {
             this.isLoadingContent = false;
         }

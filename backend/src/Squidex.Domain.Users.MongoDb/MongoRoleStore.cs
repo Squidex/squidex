@@ -25,7 +25,8 @@ namespace Squidex.Domain.Users.MongoDb
             {
                 cm.AutoMap();
 
-                cm.MapMember(x => x.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.MapMember(x => x.Id)
+                    .SetSerializer(new StringSerializer(BsonType.ObjectId));
 
                 cm.UnmapMember(x => x.ConcurrencyStamp);
             });

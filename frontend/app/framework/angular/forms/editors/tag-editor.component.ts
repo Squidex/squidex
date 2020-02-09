@@ -250,7 +250,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                         this.resetSize();
                     }),
                     map(query => <string>query),
-                    map(query => query ? query.trim().toLowerCase() : query),
+                    map(query => query?.trim().toLowerCase() || query),
                     tap(query => {
                         if (!query) {
                             this.resetAutocompletion();
