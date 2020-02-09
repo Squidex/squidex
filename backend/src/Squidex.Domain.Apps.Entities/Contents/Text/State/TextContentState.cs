@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
-    public sealed class ContentState
+    public sealed class TextContentState
     {
         public Guid ContentId { get; set; }
 

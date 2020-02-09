@@ -50,6 +50,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
         {
             if (index != null)
             {
+                await CommitAsync();
+
                 await indexManager.ReleaseAsync(index);
             }
         }
@@ -173,23 +175,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
                 updates = 0;
             }
-        }
-
-        public Task DeleteAsync(Guid id)
-        {
-            index.Writer.DeleteDocuments(new Term(MetaContentId, id.ToString()));
-
-            return TryCommitAsync();
-        }
-
-        public Task UpdateAsync(Immutable<UpdateIndexEntry[]> updates)
-        {
-            foreach (var update in updates.Value)
-            {
-                index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, GetValue(update.ServeAll, update.ServePublished));
-            }
-
-            return TryCommitAsync();
         }
 
         public Task IndexAsync(Immutable<IIndexCommand[]> updates)

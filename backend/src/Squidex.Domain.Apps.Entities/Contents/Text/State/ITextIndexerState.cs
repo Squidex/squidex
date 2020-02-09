@@ -7,15 +7,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Contents.Text.State;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public interface ITextIndexerState
     {
-        Task<ContentState?> GetAsync(Guid contentId);
+        Task<TextContentState?> GetAsync(Guid contentId);
 
-        Task SetAsync(ContentState state);
+        Task SetAsync(TextContentState state);
 
         Task RemoveAsync(Guid contentId);
     }

@@ -83,19 +83,19 @@ namespace Migrate_01.Migrations
 
                 switch (@event.Payload)
                 {
-                    case AppCreated appCreated:
+                    case AppCreated created:
                         {
-                            RemoveApp(appCreated.AppId, false);
+                            RemoveApp(created.AppId, false);
 
-                            appsByName[appCreated.Name] = appCreated.AppId.Id;
+                            appsByName[created.Name] = created.AppId.Id;
                             break;
                         }
 
-                    case AppContributorAssigned appContributorAssigned:
+                    case AppContributorAssigned contributorAssigned:
                         {
-                            if (HasApp(appContributorAssigned.AppId, true, out _))
+                            if (HasApp(contributorAssigned.AppId, true, out _))
                             {
-                                Index(appContributorAssigned.ContributorId).Add(appContributorAssigned.AppId.Id);
+                                Index(contributorAssigned.ContributorId).Add(contributorAssigned.AppId.Id);
                             }
 
                             break;
@@ -104,8 +104,8 @@ namespace Migrate_01.Migrations
                     case AppContributorRemoved contributorRemoved:
                         Index(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
                         break;
-                    case AppArchived appArchived:
-                        RemoveApp(appArchived.AppId, true);
+                    case AppArchived archived:
+                        RemoveApp(archived.AppId, true);
                         break;
                 }
 
@@ -135,11 +135,11 @@ namespace Migrate_01.Migrations
 
                 switch (@event.Payload)
                 {
-                    case RuleCreated ruleCreated:
-                        Index(ruleCreated).Add(ruleCreated.RuleId);
+                    case RuleCreated created:
+                        Index(created).Add(created.RuleId);
                         break;
-                    case RuleDeleted ruleDeleted:
-                        Index(ruleDeleted).Remove(ruleDeleted.RuleId);
+                    case RuleDeleted deleted:
+                        Index(deleted).Remove(deleted.RuleId);
                         break;
                 }
 
@@ -167,11 +167,11 @@ namespace Migrate_01.Migrations
 
                 switch (@event.Payload)
                 {
-                    case SchemaCreated schemaCreated:
-                        Index(schemaCreated)[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
+                    case SchemaCreated created:
+                        Index(created)[created.SchemaId.Name] = created.SchemaId.Id;
                         break;
-                    case SchemaDeleted schemaDeleted:
-                        Index(schemaDeleted).Remove(schemaDeleted.SchemaId.Name);
+                    case SchemaDeleted deleted:
+                        Index(deleted).Remove(deleted.SchemaId.Name);
                         break;
                 }
 

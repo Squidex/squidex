@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
 
-                case ContentStatusChanged contentStatusChanged:
+                case ContentStatusChanged statusChanged:
                     {
-                        switch (contentStatusChanged.Change)
+                        switch (statusChanged.Change)
                         {
                             case StatusChange.Published:
                                 result.Type = EnrichedContentEventType.Published;

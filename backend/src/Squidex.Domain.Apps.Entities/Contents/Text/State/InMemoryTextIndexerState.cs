@@ -14,16 +14,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class InMemoryTextIndexerState : ITextIndexerState
     {
-        private readonly Dictionary<Guid, ContentState> states = new Dictionary<Guid, ContentState>();
+        private readonly Dictionary<Guid, TextContentState> states = new Dictionary<Guid, TextContentState>();
 
-        public Task<ContentState?> GetAsync(Guid contentId)
+        public Task<TextContentState?> GetAsync(Guid contentId)
         {
             if (states.TryGetValue(contentId, out var result))
             {
-                return Task.FromResult<ContentState?>(result);
+                return Task.FromResult<TextContentState?>(result);
             }
 
-            return Task.FromResult<ContentState?>(null);
+            return Task.FromResult<TextContentState?>(null);
         }
 
         public Task RemoveAsync(Guid contentId)
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return TaskHelper.Done;
         }
 
-        public Task SetAsync(ContentState state)
+        public Task SetAsync(TextContentState state)
         {
             states[state.ContentId] = state;
 

@@ -60,37 +60,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             switch (@event.Payload)
             {
-                case ContentCreated contentCreated:
-                    await CreateAsync(contentCreated);
+                case ContentCreated created:
+                    await CreateAsync(created);
                     break;
-                case ContentUpdated contentUpdated:
-                    await UpdateAsync(contentUpdated);
+                case ContentUpdated updated:
+                    await UpdateAsync(updated);
                     break;
-                case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
-                    await PublishAsync(contentStatusChanged);
+                case ContentStatusChanged statusChanged when statusChanged.Status == Status.Published:
+                    await PublishAsync(statusChanged);
                     break;
-                case ContentDraftCreated deleteVersion:
-                    await CreateDraftAsync(deleteVersion);
+                case ContentStatusChanged statusChanged:
+                    await UnpublishAsync(statusChanged);
                     break;
-                case ContentDraftDeleted deleteVersion:
-                    await DeleteDraftAsync(deleteVersion);
+                case ContentDraftCreated draftCreated:
+                    await CreateDraftAsync(draftCreated);
                     break;
-                case ContentDeleted contentDeleted:
-                    await DeleteAsync(contentDeleted);
+                case ContentDraftDeleted draftDelted:
+                    await DeleteDraftAsync(draftDelted);
+                    break;
+                case ContentDeleted deleted:
+                    await DeleteAsync(deleted);
                     break;
             }
         }
 
         private async Task CreateAsync(ContentCreated @event)
         {
-            var state = new ContentState
+            var state = new TextContentState
             {
                 ContentId = @event.ContentId,
                 DocIdCurrent = Guid.NewGuid().ToString(),
                 DocIdNew = null
             };
-
-            var texts = @event.Data.ToTexts();
 
             await textIndexer.ExecuteAsync(@event.SchemaId.Id,
                 new UpsertIndexEntry
@@ -99,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     DocId = state.DocIdCurrent,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = texts,
+                    Texts = @event.Data.ToTexts(),
                 });
 
             await textIndexerState.SetAsync(state);
@@ -123,8 +124,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (state != null)
             {
-                var texts = @event.Data.ToTexts();
-
                 if (state.DocIdNew != null)
                 {
                     await textIndexer.ExecuteAsync(@event.SchemaId.Id,
@@ -134,31 +133,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             DocId = state.DocIdNew,
                             ServeAll = true,
                             ServePublished = false,
-                            Texts = texts
-                        },
-                        new UpdateIndexEntry
-                        {
-                            DocId = state.DocIdCurrent,
-                            ServeAll = false,
-                            ServePublished = true
+                            Texts = @event.Data.ToTexts()
                         });
 
                     state.DocIdForPublished = state.DocIdCurrent;
                 }
                 else
                 {
+                    var isPublished = state.DocIdCurrent == state.DocIdForPublished;
+
                     await textIndexer.ExecuteAsync(@event.SchemaId.Id,
                         new UpsertIndexEntry
                         {
                             ContentId = @event.ContentId,
                             DocId = state.DocIdCurrent,
                             ServeAll = true,
-                            ServePublished = state.DocIdCurrent == state.DocIdForPublished,
-                            Texts = texts
+                            ServePublished = isPublished,
+                            Texts = @event.Data.ToTexts()
                         });
 
                     state.DocIdForPublished = state.DocIdNew;
                 }
+
+                await textIndexerState.SetAsync(state);
+            }
+        }
+
+        private async Task UnpublishAsync(ContentStatusChanged @event)
+        {
+            var state = await textIndexerState.GetAsync(@event.ContentId);
+
+            if (state != null && state.DocIdForPublished != null)
+            {
+                await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                    new UpdateIndexEntry
+                    {
+                        DocId = state.DocIdForPublished,
+                        ServeAll = false,
+                        ServePublished = true
+                    });
+
+                state.DocIdForPublished = null;
 
                 await textIndexerState.SetAsync(state);
             }
@@ -175,18 +190,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     await textIndexer.ExecuteAsync(@event.SchemaId.Id,
                         new UpdateIndexEntry
                         {
-                            DocId = state.DocIdCurrent,
-                            ServeAll = false,
-                            ServePublished = false
-                        },
-                        new UpdateIndexEntry
-                        {
                             DocId = state.DocIdNew,
                             ServeAll = true,
                             ServePublished = true
+                        },
+                        new DeleteIndexEntry
+                        {
+                            DocId = state.DocIdCurrent
                         });
 
                     state.DocIdForPublished = state.DocIdNew;
+                    state.DocIdCurrent = state.DocIdNew;
                 }
                 else
                 {
@@ -211,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
-            if (state != null)
+            if (state != null && state.DocIdNew != null)
             {
                 await textIndexer.ExecuteAsync(@event.SchemaId.Id,
                     new UpdateIndexEntry
@@ -222,10 +236,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     },
                     new DeleteIndexEntry
                     {
-                        DocId = state.DocIdNew ?? NotFound,
+                        DocId = state.DocIdNew,
                     });
 
-                state.DocIdForPublished = state.DocIdCurrent;
                 state.DocIdNew = null;
 
                 await textIndexerState.SetAsync(state);

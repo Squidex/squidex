@@ -14,13 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
-using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
@@ -33,7 +32,6 @@ using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Store;
 using Squidex.Infrastructure.Migrations;
@@ -56,16 +54,16 @@ namespace Squidex.Config.Domain
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
-                    services.AddSingletonAs(_ => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
+                    services.AddSingletonAs(c => GetClient(mongoConfiguration))
                         .As<IMongoClient>();
 
-                    services.AddSingletonAs(c => c.GetRequiredService<IMongoClient>().GetDatabase(mongoDatabaseName))
+                    services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
                         .As<IMongoDatabase>();
 
-                    services.AddTransientAs(c => new DeleteContentCollections(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                    services.AddTransientAs(c => new DeleteContentCollections(GetDatabase(c, mongoContentDatabaseName)))
                         .As<IMigration>();
 
-                    services.AddTransientAs(c => new RestructureContentCollection(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                    services.AddTransientAs(c => new RestructureContentCollection(GetDatabase(c, mongoContentDatabaseName)))
                         .As<IMigration>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()
@@ -110,12 +108,14 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoAssetFolderRepository>()
                         .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, Guid>>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(
-                            c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
-                            c.GetRequiredService<IAppProvider>(),
-                            c.GetRequiredService<ITextIndexer>(),
-                            c.GetRequiredService<IJsonSerializer>()))
+                    services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
                         .As<IContentRepository>().As<ISnapshotStore<ContentState, Guid>>();
+
+                    services.AddSingletonAs<MongoTextIndexerState>()
+                        .AsSelf();
+
+                    services.AddSingletonAs(c => new CachingTextIndexerState(c.GetRequiredService<MongoTextIndexerState>()))
+                        .As<ITextIndexerState>();
 
                     var registration = services.FirstOrDefault(x => x.ServiceType == typeof(IPersistedGrantStore));
 
@@ -140,6 +140,16 @@ namespace Squidex.Config.Domain
             });
 
             services.AddSingleton(typeof(IStore<>), typeof(Store<>));
+        }
+
+        private static IMongoClient GetClient(string configuration)
+        {
+            return Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s));
+        }
+
+        private static IMongoDatabase GetDatabase(IServiceProvider service, string name)
+        {
+            return service.GetRequiredService<IMongoClient>().GetDatabase(name);
         }
     }
 }
