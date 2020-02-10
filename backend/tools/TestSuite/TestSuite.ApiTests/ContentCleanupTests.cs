@@ -34,7 +34,7 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a schema.
             var schema = await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
 
-            var contents = _.ClientManager.GetClient<TestEntity, TestEntityData>(schemaName);
+            var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
 
 
             // STEP 2: Create a content for this schema.
@@ -64,7 +64,7 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a schema.
             await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
 
-            var contents = _.ClientManager.GetClient<TestEntityWithReferences, TestEntityWithReferencesData>(schemaName);
+            var contents = _.ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(schemaName);
 
 
             // STEP 2: Create a referenced content.
@@ -74,7 +74,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { Guid.Parse(contentA_1.Id) } };
+            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
             var contentB_1 = await contents.CreateAsync(dataB);
 
