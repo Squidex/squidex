@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -16,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, SearchScope scope = SearchScope.Published);
 
-        Task ExecuteAsync(Guid schemaId, params IIndexCommand[] commands);
+        Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IIndexCommand[] commands);
     }
 }

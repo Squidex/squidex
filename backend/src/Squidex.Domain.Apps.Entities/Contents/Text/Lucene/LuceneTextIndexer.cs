@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return new SearchContext { Languages = languages, Scope = scope };
         }
 
-        public Task ExecuteAsync(Guid schemaId, params IIndexCommand[] commands)
+        public Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IIndexCommand[] commands)
         {
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId.Id);
 
             return index.IndexAsync(commands.AsImmutable());
         }

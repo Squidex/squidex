@@ -43,11 +43,13 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 var contentId = contentEvent.Id.ToString();
 
                 var ruleDescription = string.Empty;
+
                 var ruleJob = new ElasticSearchJob
                 {
-                    Host = action.Host.ToString(),
                     IndexName = Format(action.IndexName, @event),
-                    IndexType = Format(action.IndexType, @event),
+                    ServerHost = action.Host.ToString(),
+                    ServerUser = action.Username,
+                    ServerPassword = action.Password,
                     ContentId = contentId
                 };
 
@@ -65,9 +67,6 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                     ruleJob.Content = $"{{ \"objectId\": \"{contentId}\", {json.Substring(1)}";
                 }
 
-                ruleJob.Username = action.Username;
-                ruleJob.Password = action.Password;
-
                 return (ruleDescription, ruleJob);
             }
 
@@ -76,24 +75,24 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
         protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job, CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(job.Host))
+            if (string.IsNullOrWhiteSpace(job.ServerHost))
             {
                 return Result.Ignored();
             }
 
-            var client = clients.GetClient((new Uri(job.Host, UriKind.Absolute), job.Username, job.Password));
+            var client = clients.GetClient((new Uri(job.ServerHost, UriKind.Absolute), job.ServerUser, job.ServerPassword));
 
             try
             {
                 if (job.Content != null)
                 {
-                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, job.Content, ctx: ct);
+                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.ContentId, job.Content, ctx: ct);
 
                     return Result.SuccessOrFailed(response.OriginalException, response.Body);
                 }
                 else
                 {
-                    var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, ctx: ct);
+                    var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.ContentId, ctx: ct);
 
                     return Result.SuccessOrFailed(response.OriginalException, response.Body);
                 }
@@ -107,18 +106,16 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
     public sealed class ElasticSearchJob
     {
-        public string Host { get; set; }
+        public string ServerHost { get; set; }
 
-        public string Username { get; set; }
+        public string ServerUser { get; set; }
 
-        public string Password { get; set; }
+        public string ServerPassword { get; set; }
 
         public string ContentId { get; set; }
 
         public string Content { get; set; }
 
         public string IndexName { get; set; }
-
-        public string IndexType { get; set; }
     }
 }

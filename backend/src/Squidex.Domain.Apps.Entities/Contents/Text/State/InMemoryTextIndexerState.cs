@@ -16,6 +16,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     {
         private readonly Dictionary<Guid, TextContentState> states = new Dictionary<Guid, TextContentState>();
 
+        public Task ClearAsync()
+        {
+            states.Clear();
+
+            return TaskHelper.Done;
+        }
+
         public Task<TextContentState?> GetAsync(Guid contentId)
         {
             if (states.TryGetValue(contentId, out var result))

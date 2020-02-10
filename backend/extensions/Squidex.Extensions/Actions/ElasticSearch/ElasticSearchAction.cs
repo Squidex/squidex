@@ -34,12 +34,6 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         [Formattable]
         public string IndexName { get; set; }
 
-        [Required]
-        [Display(Name = "Index Type", Description = "The name of the index type.")]
-        [DataType(DataType.Text)]
-        [Formattable]
-        public string IndexType { get; set; }
-
         [Display(Name = "Username", Description = "The optional username.")]
         [DataType(DataType.Text)]
         public string Username { get; set; }

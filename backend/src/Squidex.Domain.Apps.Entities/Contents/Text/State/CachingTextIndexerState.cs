@@ -14,12 +14,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class CachingTextIndexerState : ITextIndexerState
     {
-        private readonly LRUCache<Guid, Tuple<TextContentState?>> cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
         private readonly ITextIndexerState inner;
+        private LRUCache<Guid, Tuple<TextContentState?>> cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
+            Guard.NotNull(inner);
+
             this.inner = inner;
+        }
+
+        public async Task ClearAsync()
+        {
+            await inner.ClearAsync();
+
+            cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
         }
 
         public async Task<TextContentState?> GetAsync(Guid contentId)

@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task ClearAsync()
         {
-            return TaskHelper.Done;
+            return textIndexerState.ClearAsync();
         }
 
         public async Task On(Envelope<IEvent> @event)
@@ -88,12 +88,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var state = new TextContentState
             {
-                ContentId = @event.ContentId,
-                DocIdCurrent = Guid.NewGuid().ToString(),
-                DocIdNew = null
+                ContentId = @event.ContentId
             };
 
-            await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+            state.GenerateDocIdCurrent();
+
+            await IndexAsync(@event,
                 new UpsertIndexEntry
                 {
                     ContentId = @event.ContentId,
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (state != null)
             {
-                state.DocIdNew = Guid.NewGuid().ToString();
+                state.GenerateDocIdNew();
 
                 await textIndexerState.SetAsync(state);
             }
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 if (state.DocIdNew != null)
                 {
-                    await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                    await IndexAsync(@event,
                         new UpsertIndexEntry
                         {
                             ContentId = @event.ContentId,
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     var isPublished = state.DocIdCurrent == state.DocIdForPublished;
 
-                    await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                    await IndexAsync(@event,
                         new UpsertIndexEntry
                         {
                             ContentId = @event.ContentId,
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (state != null && state.DocIdForPublished != null)
             {
-                await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                await IndexAsync(@event,
                     new UpdateIndexEntry
                     {
                         DocId = state.DocIdForPublished,
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 if (state.DocIdNew != null)
                 {
-                    await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                    await IndexAsync(@event,
                         new UpdateIndexEntry
                         {
                             DocId = state.DocIdNew,
@@ -210,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
                 else
                 {
-                    await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                    await IndexAsync(@event,
                         new UpdateIndexEntry
                         {
                             DocId = state.DocIdCurrent,
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (state != null && state.DocIdNew != null)
             {
-                await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                await IndexAsync(@event,
                     new UpdateIndexEntry
                     {
                         DocId = state.DocIdCurrent,
@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (state != null)
             {
-                await textIndexer.ExecuteAsync(@event.SchemaId.Id,
+                await IndexAsync(@event,
                     new DeleteIndexEntry
                     {
                         DocId = state.DocIdCurrent
@@ -269,6 +269,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 await textIndexerState.RemoveAsync(state.ContentId);
             }
+        }
+
+        private Task IndexAsync(ContentEvent @event, params IIndexCommand[] commands)
+        {
+            return textIndexer.ExecuteAsync(@event.AppId, @event.SchemaId, commands);
         }
     }
 }

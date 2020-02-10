@@ -17,5 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         Task SetAsync(TextContentState state);
 
         Task RemoveAsync(Guid contentId);
+
+        Task ClearAsync();
     }
 }
