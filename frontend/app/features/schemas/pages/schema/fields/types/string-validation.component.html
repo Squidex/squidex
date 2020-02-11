@@ -61,7 +61,7 @@
             {{patternName}}
         </small>
     </div>
-    <div class="form-group row" *ngIf="showPatternMessage">
+    <div class="form-group row" *ngIf="showPatternMessage | async">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPatternMessage">Pattern Message</label>
 
         <div class="col-6">

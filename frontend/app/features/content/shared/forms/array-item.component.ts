@@ -8,7 +8,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { startWith } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -16,7 +15,8 @@ import {
     FieldDto,
     FieldFormatter,
     invalid$,
-    RootFieldDto
+    RootFieldDto,
+    value$
 } from '@app/shared';
 
 import { FieldEditorComponent } from './field-editor.component';
@@ -103,7 +103,7 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
             this.unsubscribeFromForm();
 
             this.subscription =
-                this.itemForm.valueChanges.pipe(startWith(this.itemForm.value))
+                value$(this.itemForm)
                     .subscribe(() => {
                         this.updateTitle();
                     });

@@ -10,8 +10,8 @@
             <i class="icon-close"></i>
         </button>
 
-        <div *ngIf="valueThumb | async; let thumbUrl; else noThumb" class="preview">
-            <img [src]="thumbUrl" />
+        <div *ngIf="stockPhotoThumbnail | async; let url; else noThumb" class="preview">
+            <img [src]="url" />
         </div>
 
         <ng-template #noThumb>

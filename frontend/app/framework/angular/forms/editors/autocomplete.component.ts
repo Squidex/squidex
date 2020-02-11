@@ -20,8 +20,6 @@ export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
 }
 
-const NO_EMIT = { emitEvent: false };
-
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
 };
@@ -33,6 +31,8 @@ interface State {
     // The selected suggest item index.
     suggestedIndex: number;
 }
+
+const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-autocomplete',
