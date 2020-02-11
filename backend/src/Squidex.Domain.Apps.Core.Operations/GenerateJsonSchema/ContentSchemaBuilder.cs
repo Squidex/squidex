@@ -24,15 +24,15 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             {
                 Properties =
                 {
-                    ["id"] = Builder.GuidProperty($"The id of the {schemaName} content.", true),
-                    ["data"] = Builder.ObjectProperty(dataSchema, $"The data of the {schemaName}.", true),
-                    ["dataDraft"] = Builder.ObjectProperty(dataSchema, $"The draft data of the {schemaName}."),
-                    ["version"] = Builder.NumberProperty($"The version of the {schemaName}.", true),
-                    ["created"] = Builder.DateTimeProperty($"The date and time when the {schemaName} content has been created.", true),
-                    ["createdBy"] = Builder.StringProperty($"The user that has created the {schemaName} content.", true),
-                    ["lastModified"] = Builder.DateTimeProperty($"The date and time when the {schemaName} content has been modified last.", true),
-                    ["lastModifiedBy"] = Builder.StringProperty($"The user that has updated the {schemaName} content last.", true),
-                    ["status"] = Builder.StringProperty($"The status of the content.", true)
+                    ["id"] = SchemaBuilder.GuidProperty($"The id of the {schemaName} content.", true),
+                    ["data"] = SchemaBuilder.ObjectProperty(dataSchema, $"The data of the {schemaName}.", true),
+                    ["dataDraft"] = SchemaBuilder.ObjectProperty(dataSchema, $"The draft data of the {schemaName}."),
+                    ["version"] = SchemaBuilder.NumberProperty($"The version of the {schemaName}.", true),
+                    ["created"] = SchemaBuilder.DateTimeProperty($"The date and time when the {schemaName} content has been created.", true),
+                    ["createdBy"] = SchemaBuilder.StringProperty($"The user that has created the {schemaName} content.", true),
+                    ["lastModified"] = SchemaBuilder.DateTimeProperty($"The date and time when the {schemaName} content has been modified last.", true),
+                    ["lastModifiedBy"] = SchemaBuilder.StringProperty($"The user that has updated the {schemaName} content last.", true),
+                    ["status"] = SchemaBuilder.StringProperty($"The status of the content.", true)
                 },
                 Type = JsonObjectType.Object
             };
