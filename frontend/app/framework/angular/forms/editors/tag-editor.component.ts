@@ -139,6 +139,8 @@ interface State {
     items: ReadonlyArray<TagValue>;
 }
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
@@ -302,9 +304,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         super.setDisabledState(isDisabled);
 
         if (isDisabled) {
-            this.addInput.disable();
+            this.addInput.disable(NO_EMIT);
         } else {
-            this.addInput.enable();
+            this.addInput.enable(NO_EMIT);
         }
     }
 

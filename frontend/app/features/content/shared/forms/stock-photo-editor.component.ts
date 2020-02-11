@@ -8,14 +8,15 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
 
 import {
     StatefulControlComponent,
     StockPhotoDto,
     StockPhotoService,
     thumbnail,
-    Types
+    Types,
+    value$
 } from '@app/shared';
 
 interface State {
@@ -30,6 +31,8 @@ export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true
 };
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
@@ -42,18 +45,11 @@ export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
     public valueControl = new FormControl('');
 
-    public valueThumb =
-        this.valueControl.valueChanges.pipe(
-            startWith(this.valueControl.value),
-            shareReplay(1),
-            map(value => thumbnail(value, 400) || value));
-
+    public stockPhotoThumbnail = value$(this.valueControl).pipe(map(v => thumbnail(v, 400) || v));
     public stockPhotoSearch = new FormControl('');
 
     public stockPhotos =
-        this.stockPhotoSearch.valueChanges.pipe(
-            startWith(this.stockPhotoSearch.value),
-            distinctUntilChanged(),
+        value$(this.stockPhotoSearch).pipe(
             debounceTime(500),
             tap(query => {
                 if (query && query.length > 0) {
@@ -78,8 +74,6 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public ngOnInit() {
-        this.own(this.valueThumb);
-
         this.own(
             this.valueControl.valueChanges
                 .subscribe(value => {
@@ -89,9 +83,19 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
 
     public writeValue(obj: string) {
         if (Types.isString(obj)) {
-            this.valueControl.setValue(obj, { emitEvent: true });
+            this.valueControl.setValue(obj);
         } else {
-            this.valueControl.setValue('', { emitEvent: true });
+            this.valueControl.setValue('');
+        }
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        super.setDisabledState(isDisabled);
+
+        if (isDisabled) {
+            this.stockPhotoSearch.disable(NO_EMIT);
+        } else {
+            this.stockPhotoSearch.enable(NO_EMIT);
         }
     }
 
