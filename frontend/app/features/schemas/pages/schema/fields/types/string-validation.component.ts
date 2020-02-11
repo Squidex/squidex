@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -13,12 +13,14 @@ import {
     fadeAnimation,
     FieldDto,
     hasNoValue$,
+    hasValue$,
     ModalModel,
     PatternDto,
     ResourceOwner,
     RootFieldDto,
     StringFieldPropertiesDto,
-    Types
+    Types,
+    value$
 } from '@app/shared';
 
 @Component({
@@ -29,7 +31,7 @@ import {
         fadeAnimation
     ]
 })
-export class StringValidationComponent extends ResourceOwner implements OnInit {
+export class StringValidationComponent extends ResourceOwner implements OnChanges, OnInit {
     @Input()
     public editForm: FormGroup;
 
@@ -43,7 +45,7 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
     public patterns: ReadonlyArray<PatternDto>;
 
     public showDefaultValue: Observable<boolean>;
-    public showPatternMessage: boolean;
+    public showPatternMessage: Observable<boolean>;
     public showPatternSuggestions: Observable<boolean>;
 
     public patternName: string;
@@ -84,10 +86,10 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
             hasNoValue$(this.editForm.controls['pattern']);
 
         this.showPatternMessage =
-            this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
+            hasValue$(this.editForm.controls['pattern']);
 
         this.own(
-            this.editForm.controls['pattern'].valueChanges
+            value$(this.editForm.controls['pattern'])
                 .subscribe((value: string) => {
                     if (!value) {
                         this.editForm.controls['patternMessage'].setValue(undefined);
@@ -99,22 +101,28 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
         this.setPatternName();
     }
 
+    public ngOnChanges() {
+        this.setPatternName();
+    }
+
     public setPattern(pattern: PatternDto) {
-        this.patternName = pattern.name;
         this.editForm.controls['pattern'].setValue(pattern.pattern);
         this.editForm.controls['patternMessage'].setValue(pattern.message);
-        this.showPatternMessage = true;
     }
 
     private setPatternName() {
-        const matchingPattern = this.patterns.find(x => x.pattern === this.editForm.controls['pattern'].value);
+        const value = this.editForm.controls['pattern'].value;
 
-        if (matchingPattern) {
-            this.patternName = matchingPattern.name;
-        } else if (this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim() !== '') {
-            this.patternName = 'Advanced';
-        } else {
+        if (!value) {
             this.patternName = '';
+        } else {
+            const matchingPattern = this.patterns.find(x => x.pattern === this.editForm.controls['pattern'].value);
+
+            if (matchingPattern) {
+                this.patternName = matchingPattern.name;
+            } else {
+                this.patternName = 'Advanced';
+            }
         }
     }
 }

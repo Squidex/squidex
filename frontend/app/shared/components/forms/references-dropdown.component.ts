@@ -16,7 +16,8 @@ import {
     LanguageDto,
     StatefulControlComponent,
     Types,
-    UIOptions
+    UIOptions,
+    value$
 } from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -83,7 +84,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
-            this.selectionControl.valueChanges
+            value$(this.selectionControl)
                 .subscribe((value: ContentName) => {
                     if (value && value.id) {
                         this.callTouched();
