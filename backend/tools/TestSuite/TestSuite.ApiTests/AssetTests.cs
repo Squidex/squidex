@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
@@ -152,6 +153,22 @@ namespace TestSuite.ApiTests
             var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
 
             Assert.Equal(404, ex.StatusCode);
+        }
+
+        [Fact]
+        public async Task Should_query_asset_by_metadata()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Query asset
+            var assets = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                Filter = "metadata/pixelWidth eq 600"
+            });
+
+            Assert.Contains(assets.Items, x => x.Id == asset_1.Id);
         }
     }
 }
