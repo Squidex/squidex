@@ -14,7 +14,7 @@ using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Model
 {
-    public sealed class TestEntityWithReferences : SquidexEntityBase<TestEntityWithReferencesData>
+    public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesData>
     {
         public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {

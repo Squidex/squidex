@@ -12,6 +12,7 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts",
     "build": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env.production",
     "build:clean": "rimraf wwwroot/build",
+    "build:analyze": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env.production --env.analyze",
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
   },
   "dependencies": {
@@ -49,7 +50,7 @@
     "zone.js": "0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-optimizer": "0.900.1",
+    "@angular-devkit/build-optimizer": "^0.900.1",
     "@angular/compiler": "9.0.0",
     "@angular/compiler-cli": "9.0.0",
     "@ngtools/webpack": "9.0.1",
@@ -109,6 +110,7 @@
     "typescript": "3.7.5",
     "underscore": "1.9.2",
     "webpack": "4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.10.3"
   }

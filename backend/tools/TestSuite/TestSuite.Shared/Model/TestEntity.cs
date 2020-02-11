@@ -13,7 +13,7 @@ using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Model
 {
-    public sealed class TestEntity : SquidexEntityBase<TestEntityData>
+    public sealed class TestEntity : Content<TestEntityData>
     {
         public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {

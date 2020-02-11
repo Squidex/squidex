@@ -41,7 +41,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -60,7 +60,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -79,7 +79,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -99,7 +99,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -120,7 +120,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -142,7 +142,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -165,7 +165,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }
@@ -188,7 +188,7 @@ namespace TestSuite.ApiTests
             }
             finally
             {
-                if (content.Id != null)
+                if (content != null)
                 {
                     await _.Contents.DeleteAsync(content.Id);
                 }

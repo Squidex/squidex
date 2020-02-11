@@ -36,7 +36,7 @@ namespace TestSuite.Fixtures
         {
             Task.Run(async () =>
             {
-                var contents = await Contents.GetAllAsync();
+                var contents = await Contents.GetAsync();
 
                 foreach (var content in contents.Items)
                 {

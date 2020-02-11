@@ -229,14 +229,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             {
                 Properties =
                 {
-                    ["total"] = new JsonSchemaProperty
-                    {
-                        Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} contents."
-                    },
-                    ["items"] = new JsonSchemaProperty
-                    {
-                        Type = JsonObjectType.Array, IsRequired = true, Description = $"The {schemaName} contents.", Item = contentSchema
-                    }
+                    ["total"] = SchemaBuilder.NumberProperty($"The total number of {schemaName} contents.", true),
+                    ["items"] = SchemaBuilder.ArrayProperty(contentSchema, $"The {schemaName} contents.", true)
                 },
                 Type = JsonObjectType.Object
             };

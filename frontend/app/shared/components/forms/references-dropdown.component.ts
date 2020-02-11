@@ -16,7 +16,8 @@ import {
     LanguageDto,
     StatefulControlComponent,
     Types,
-    UIOptions
+    UIOptions,
+    value$
 } from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -83,7 +84,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
-            this.selectionControl.valueChanges
+            value$(this.selectionControl)
                 .subscribe((value: ContentName) => {
                     if (value && value.id) {
                         this.callTouched();
@@ -119,19 +120,19 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
                         this.selectContent();
                     }, () => {
-                        this.selectionControl.disable();
+                        this.selectionControl.disable(NO_EMIT);
                     });
             } else {
-                this.selectionControl.disable();
+                this.selectionControl.disable(NO_EMIT);
             }
         }
     }
 
     public setDisabledState(isDisabled: boolean) {
         if (isDisabled) {
-            this.selectionControl.disable();
+            this.selectionControl.disable(NO_EMIT);
         } else if (this.isValid) {
-            this.selectionControl.enable();
+            this.selectionControl.enable(NO_EMIT);
         }
 
         super.setDisabledState(isDisabled);

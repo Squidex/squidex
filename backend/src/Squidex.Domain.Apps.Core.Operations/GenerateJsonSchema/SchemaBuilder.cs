@@ -9,7 +9,7 @@ using NJsonSchema;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public static class Builder
+    public static class SchemaBuilder
     {
         public static JsonSchema Object()
         {
@@ -69,9 +69,21 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         private static JsonSchemaProperty Enrich(JsonSchemaProperty property, string? description = null, bool isRequired = false)
         {
             property.Description = description;
-            property.IsRequired = isRequired;
+            property.SetRequired(isRequired);
 
             return property;
+        }
+
+        public static void SetRequired(this JsonSchemaProperty property, bool isRequired)
+        {
+            if (isRequired)
+            {
+                property.IsRequired = true;
+            }
+            else
+            {
+                property.IsNullableRaw = true;
+            }
         }
     }
 }
