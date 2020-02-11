@@ -34,6 +34,8 @@ interface State {
     query?: RegExp;
 }
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
@@ -134,6 +136,16 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         this.selectIndex(this.items && obj ? this.items.indexOf(obj) : 0, false);
     }
 
+    public setDisabledState(isDisabled: boolean): void {
+        super.setDisabledState(isDisabled);
+
+        if (isDisabled) {
+            this.queryInput.disable(NO_EMIT);
+        } else {
+            this.queryInput.enable(NO_EMIT);
+        }
+    }
+
     public onKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case Keys.UP:
@@ -208,6 +220,5 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
             this.next(s => ({ ...s, selectedIndex, selectedItem: value }));
         }
-
     }
 }

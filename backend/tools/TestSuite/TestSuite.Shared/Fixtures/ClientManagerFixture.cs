@@ -24,10 +24,14 @@ namespace TestSuite.Fixtures
 
         public ClientManagerFixture()
         {
-            ClientManager = new SquidexClientManager(ServerUrl, AppName, ClientId, ClientSecret)
+            ClientManager = new SquidexClientManager(new SquidexOptions
             {
-                ReadResponseAsString = true
-            };
+                AppName = AppName,
+                ClientId = ClientId,
+                ClientSecret = ClientSecret,
+                ReadResponseAsString = true,
+                Url = ServerUrl
+            });
         }
 
         public virtual void Dispose()

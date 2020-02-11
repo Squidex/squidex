@@ -7,7 +7,7 @@
 
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 
 import { Types } from './../../utils/types';
 
@@ -26,7 +26,7 @@ export function invalid$(form: AbstractControl): Observable<boolean> {
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {
-    return form.valueChanges.pipe(startWith(form.value));
+    return form.valueChanges.pipe(startWith(form.value), filter(_ => form.enabled), distinctUntilChanged());
 }
 
 export function hasValue$(form: AbstractControl): Observable<boolean> {

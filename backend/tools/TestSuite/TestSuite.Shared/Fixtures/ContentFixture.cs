@@ -14,7 +14,7 @@ namespace TestSuite.Fixtures
 {
     public class ContentFixture : CreatedAppFixture
     {
-        public SquidexClient<TestEntity, TestEntityData> Contents { get; }
+        public IContentsClient<TestEntity, TestEntityData> Contents { get; }
 
         public string SchemaName { get; }
 
@@ -42,7 +42,7 @@ namespace TestSuite.Fixtures
                 }
             }).Wait();
 
-            Contents = ClientManager.GetClient<TestEntity, TestEntityData>(SchemaName);
+            Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
         }
     }
 }
