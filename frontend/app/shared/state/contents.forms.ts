@@ -15,7 +15,8 @@ import {
     Form,
     formControls,
     Types,
-    ValidatorsEx
+    ValidatorsEx,
+    value$
 } from '@app/framework';
 
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -468,7 +469,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     ) {
         super(new FormGroup({}));
 
-        this.form.valueChanges.subscribe(value => {
+        value$(this.form).subscribe(value => {
             this.value.next(value);
         });
 

@@ -40,7 +40,7 @@ describe('FormHelpers', () => {
             form.setValue('3');
             form.disable();
 
-            expect(values).toEqual(['1', '2', '2', '3']);
+            expect(values).toEqual(['1', '2', '3']);
         });
     });
 });

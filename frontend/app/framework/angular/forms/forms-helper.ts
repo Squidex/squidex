@@ -26,7 +26,7 @@ export function invalid$(form: AbstractControl): Observable<boolean> {
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {
-    return form.valueChanges.pipe(startWith(form.value), filter(_ => form.enabled));
+    return form.valueChanges.pipe(startWith(form.value), filter(_ => form.enabled), distinctUntilChanged());
 }
 
 export function hasValue$(form: AbstractControl): Observable<boolean> {
