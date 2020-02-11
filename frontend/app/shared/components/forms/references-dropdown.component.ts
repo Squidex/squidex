@@ -119,19 +119,19 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
                         this.selectContent();
                     }, () => {
-                        this.selectionControl.disable();
+                        this.selectionControl.disable(NO_EMIT);
                     });
             } else {
-                this.selectionControl.disable();
+                this.selectionControl.disable(NO_EMIT);
             }
         }
     }
 
     public setDisabledState(isDisabled: boolean) {
         if (isDisabled) {
-            this.selectionControl.disable();
+            this.selectionControl.disable(NO_EMIT);
         } else if (this.isValid) {
-            this.selectionControl.enable();
+            this.selectionControl.enable(NO_EMIT);
         }
 
         super.setDisabledState(isDisabled);

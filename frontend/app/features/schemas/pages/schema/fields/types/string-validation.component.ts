@@ -80,13 +80,16 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
         this.showPatternSuggestions =
             hasNoValue$(this.editForm.controls['pattern']);
 
+        this.showPatternSuggestions =
+            hasNoValue$(this.editForm.controls['pattern']);
+
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
 
         this.own(
             this.editForm.controls['pattern'].valueChanges
                 .subscribe((value: string) => {
-                    if (!value || value.length === 0) {
+                    if (!value) {
                         this.editForm.controls['patternMessage'].setValue(undefined);
                     }
 

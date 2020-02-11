@@ -24,8 +24,6 @@ export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true
 };
 
-const NO_EMIT = { emitEvent: false };
-
 class TagsConverter implements Converter {
     public suggestions: ReadonlyArray<TagValue> = [];
 
@@ -69,6 +67,8 @@ interface State {
     // The tags converter.
     converter: TagsConverter;
 }
+
+const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-tags',
@@ -141,9 +141,9 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     public setDisabledState(isDisabled: boolean) {
         if (isDisabled) {
-            this.selectionControl.disable();
+            this.selectionControl.disable(NO_EMIT);
         } else if (this.isValid) {
-            this.selectionControl.enable();
+            this.selectionControl.enable(NO_EMIT);
         }
 
         super.setDisabledState(isDisabled);
@@ -159,11 +159,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         if (this.isValid && this.contentItems && this.contentItems.length > 0) {
             converter = new TagsConverter(this.language, this.contentItems);
 
-            this.selectionControl.enable();
+            this.selectionControl.enable(NO_EMIT);
         } else {
             converter = new TagsConverter(null!, []);
 
-            this.selectionControl.disable();
+            this.selectionControl.disable(NO_EMIT);
         }
 
         this.next({ converter });
