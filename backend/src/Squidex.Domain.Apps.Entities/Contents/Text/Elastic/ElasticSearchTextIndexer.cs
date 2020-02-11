@@ -100,7 +100,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, SearchScope scope = SearchScope.Published)
         {
-            var serveField = scope == SearchScope.Published ? "servePublished" : "serveAll";
+            var serveField =
+                scope == SearchScope.Published ?
+                "servePublished" :
+                "serveAll";
 
             var query = new
             {
@@ -133,6 +136,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                                         "texts.*"
                                     },
                                     query = queryText
+                                }
+                            }
+                        },
+                        should = new object[]
+                        {
+                            new
+                            {
+                                term = new Dictionary<string, string>
+                                {
+                                    ["schemaId.keyword"] = schemaId.ToString()
                                 }
                             }
                         }

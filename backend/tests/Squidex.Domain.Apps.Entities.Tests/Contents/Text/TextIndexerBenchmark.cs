@@ -20,6 +20,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
+    [Trait("Category", "Dependencies")]
     public class TextIndexerBenchmark
     {
         private readonly Guid schemaId = Guid.NewGuid();
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             sut.ActivateAsync(schemaId).Wait();
         }
 
-        [Fact(Skip = "Only used for benchmarks")]
+        [Fact]
         public async Task Should_index_many_documents()
         {
             var text = new Dictionary<string, string>
