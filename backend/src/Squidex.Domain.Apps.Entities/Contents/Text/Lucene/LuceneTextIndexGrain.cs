@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public sealed class TextIndexerGrain : GrainOfGuid, ITextIndexerGrain
+    public sealed class LuceneTextIndexGrain : GrainOfGuid, ILuceneTextIndexGrain
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
@@ -30,6 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
         private const string MetaId = "_id";
         private const string MetaFor = "_fd";
         private const string MetaContentId = "_cid";
+        private const string MetaSchemaId = "_si";
+        private const string MetaSchemaName = "_sn";
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly string[] Invariant = { InvariantPartitioning.Key };
         private readonly IndexManager indexManager;
@@ -39,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
         private HashSet<string>? currentLanguages;
         private int updates;
 
-        public TextIndexerGrain(IndexManager indexManager)
+        public LuceneTextIndexGrain(IndexManager indexManager)
         {
             Guard.NotNull(indexManager);
 
@@ -61,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             index = await indexManager.AcquireAsync(key);
         }
 
-        public Task<List<Guid>> SearchAsync(string queryText, SearchContext context)
+        public Task<List<Guid>> SearchAsync(string queryText, Guid schemaId, SearchContext context)
         {
             var result = new List<Guid>();
 
@@ -71,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
                 if (index.Searcher != null)
                 {
-                    var query = BuildQuery(queryText, context);
+                    var query = BuildQuery(queryText, schemaId, context);
 
                     var hits = index.Searcher.Search(query, MaxResults).ScoreDocs;
 
@@ -117,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return Task.FromResult(result);
         }
 
-        private Query BuildQuery(string query, SearchContext context)
+        private Query BuildQuery(string query, Guid schemaId, SearchContext context)
         {
             if (queryParser == null || currentLanguages == null || !currentLanguages.SetEquals(context.Languages))
             {
@@ -130,7 +132,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                return queryParser.Parse(query);
+                var byQuery = queryParser.Parse(query);
+
+                if (schemaId != default)
+                {
+                    var bySchema = new TermQuery(new Term(MetaSchemaId, schemaId.ToString()))
+                    {
+                        Boost = 2f
+                    };
+
+                    return new BooleanQuery
+                    {
+                        { byQuery, Occur.MUST },
+                        { bySchema, Occur.SHOULD }
+                    };
+                }
+
+                return byQuery;
             }
             catch (ParseException ex)
             {
@@ -177,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             }
         }
 
-        public Task IndexAsync(Immutable<IIndexCommand[]> updates)
+        public Task IndexAsync(NamedId<Guid> schemaId, Immutable<IndexCommand[]> updates)
         {
             foreach (var command in updates.Value)
             {
@@ -193,9 +211,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                         {
                             var document = new Document();
 
-                            document.SetField(MetaId, upsert.DocId);
-                            document.SetField(MetaContentId, upsert.ContentId.ToString());
-                            document.SetBinaryDocValue(MetaFor, GetValue(upsert.ServeAll, upsert.ServePublished));
+                            document.AddStringField(MetaId, upsert.DocId, Field.Store.YES);
+                            document.AddStringField(MetaContentId, upsert.ContentId.ToString(), Field.Store.YES);
+                            document.AddStringField(MetaSchemaId, schemaId.Id.ToString(), Field.Store.YES);
+                            document.AddStringField(MetaSchemaName, schemaId.Name, Field.Store.YES);
+                            document.AddBinaryDocValuesField(MetaFor, GetValue(upsert.ServeAll, upsert.ServePublished));
 
                             foreach (var (key, value) in upsert.Texts)
                             {

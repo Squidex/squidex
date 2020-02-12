@@ -7,8 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class DeleteIndexEntry : IIndexCommand
+    public sealed class DeleteIndexEntry : IndexCommand
     {
-        public string DocId { get; set; }
     }
 }

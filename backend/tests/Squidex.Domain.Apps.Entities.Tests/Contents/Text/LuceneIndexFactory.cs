@@ -18,19 +18,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IIndexStorage storage;
-        private TextIndexerGrain grain;
+        private LuceneTextIndexGrain grain;
 
         public LuceneIndexFactory(IIndexStorage storage)
         {
             this.storage = storage;
 
-            A.CallTo(() => grainFactory.GetGrain<ITextIndexerGrain>(A<Guid>.Ignored, null))
+            A.CallTo(() => grainFactory.GetGrain<ILuceneTextIndexGrain>(A<Guid>.Ignored, null))
                 .ReturnsLazily(() => grain);
         }
 
         public async Task<ITextIndexer> CreateAsync(Guid schemaId)
         {
-            grain = new TextIndexerGrain(new IndexManager(storage, A.Fake<ISemanticLog>()));
+            grain = new LuceneTextIndexGrain(new IndexManager(storage, A.Fake<ISemanticLog>()));
 
             await grain.ActivateAsync(schemaId);
 

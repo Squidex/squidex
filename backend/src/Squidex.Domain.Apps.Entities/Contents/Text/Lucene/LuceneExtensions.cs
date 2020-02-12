@@ -14,20 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public static class LuceneExtensions
     {
-        public static void SetBinaryDocValue(this Document document, string name, BytesRef value)
-        {
-            document.RemoveField(name);
-
-            document.AddBinaryDocValuesField(name, value);
-        }
-
-        public static void SetField(this Document document, string name, string value)
-        {
-            document.RemoveField(name);
-
-            document.AddStringField(name, value, Field.Store.YES);
-        }
-
         public static BytesRef GetBinaryValue(this IndexReader? reader, string field, int docId, BytesRef? result = null)
         {
             if (result != null)

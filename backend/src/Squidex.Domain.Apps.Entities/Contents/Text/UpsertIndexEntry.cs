@@ -10,10 +10,8 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class UpsertIndexEntry : IIndexCommand
+    public sealed class UpsertIndexEntry : IndexCommand
     {
-        public string DocId { get; set; }
-
         public Dictionary<string, string> Texts { get; set; }
 
         public bool ServeAll { get; set; }

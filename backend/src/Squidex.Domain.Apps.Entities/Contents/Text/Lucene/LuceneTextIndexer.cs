@@ -34,13 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 return null;
             }
 
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id);
 
             using (Profiler.TraceMethod<LuceneTextIndexer>())
             {
                 var context = CreateContext(app, scope);
 
-                return await index.SearchAsync(queryText, context);
+                return await index.SearchAsync(queryText, schemaId, context);
             }
         }
 
@@ -51,11 +51,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return new SearchContext { Languages = languages, Scope = scope };
         }
 
-        public Task ExecuteAsync(Guid schemaId, params IIndexCommand[] commands)
+        public Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
         {
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(appId.Id);
 
-            return index.IndexAsync(commands.AsImmutable());
+            return index.IndexAsync(schemaId, commands.AsImmutable());
         }
     }
 }

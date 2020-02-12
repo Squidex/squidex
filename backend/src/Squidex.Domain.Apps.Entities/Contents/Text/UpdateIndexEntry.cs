@@ -7,10 +7,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class UpdateIndexEntry : IIndexCommand
+    public sealed class UpdateIndexEntry : IndexCommand
     {
-        public string DocId { get; set; }
-
         public bool ServeAll { get; set; }
 
         public bool ServePublished { get; set; }

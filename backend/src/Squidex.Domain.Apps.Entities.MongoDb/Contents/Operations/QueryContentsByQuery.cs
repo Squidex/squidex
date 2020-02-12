@@ -41,12 +41,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.Status)
+                    .Ascending(x => x.ReferencedIds)
                     .Descending(x => x.LastModified));
 
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft)
+        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, SearchScope scope)
         {
             Guard.NotNull(app);
             Guard.NotNull(schema);
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
-                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, inDraft ? SearchScope.All : SearchScope.Published);
+                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, scope);
 
                     if (fullTextIds?.Count == 0)
                     {
@@ -115,7 +116,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (ids != null && ids.Count > 0)
             {
-                filters.Add(Filter.In(x => x.Id, ids));
+                filters.Add(
+                    Filter.Or(
+                        Filter.AnyIn(x => x.ReferencedIds, ids),
+                        Filter.In(x => x.Id, ids)));
             }
 
             if (query?.Filter != null)

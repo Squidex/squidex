@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly IAppEntity app;
 
@@ -302,6 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private IndexOperation Op(Guid id, ContentEvent contentEvent)
         {
             contentEvent.ContentId = id;
+            contentEvent.AppId = appId;
             contentEvent.SchemaId = schemaId;
 
             return p => p.On(Envelope.Create(contentEvent));
