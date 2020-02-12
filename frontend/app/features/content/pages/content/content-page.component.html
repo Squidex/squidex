@@ -21,7 +21,7 @@
 
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
-                <div class="dropdown dropdown-options ml-1">
+                <div class="dropdown dropdown-options ml-1" *ngIf="!schema.isSingleton">
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
                     <ng-container *ngIf="content?.canDelete">
@@ -96,7 +96,7 @@
 
         <ng-container sidebar>
             <div class="panel-nav">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left" #linkHistory>
+                <a class="panel-link" routerLink="history" routerLinkActive="active" title="Workflow" titlePosition="left" #linkHistory>
                     <i class="icon-time"></i>
                 </a>
 

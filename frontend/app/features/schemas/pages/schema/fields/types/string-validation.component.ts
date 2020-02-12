@@ -111,7 +111,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     }
 
     private setPatternName() {
-        const value = this.editForm.controls['pattern'].value;
+        const value = this.editForm.controls['pattern']?.value;
 
         if (!value) {
             this.patternName = '';
