@@ -708,7 +708,8 @@ $icon-size: 4.5rem;
     }
 
     &-footer {
-        padding: .75rem 1.25rem;
+        padding-bottom: 1.25rem;
+        padding-top: 1.25rem;
 
         .clearfix {
             width: 100%;
