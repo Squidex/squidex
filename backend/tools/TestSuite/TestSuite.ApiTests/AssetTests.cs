@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
@@ -152,6 +153,40 @@ namespace TestSuite.ApiTests
             var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
 
             Assert.Equal(404, ex.StatusCode);
+        }
+
+        [Fact]
+        public async Task Should_query_asset_by_metadata()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Query asset by pixel width.
+            var assets_1 = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                Filter = "metadata/pixelWidth eq 600"
+            });
+
+            Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
+
+
+            // STEP 3: Add custom metadata.
+            asset_1.Metadata["custom"] = "foo";
+
+            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id.ToString(), new AnnotateAssetDto
+            {
+                Metadata = asset_1.Metadata
+            });
+
+
+            // STEP 4: Query asset by custom metadata
+            var assets_2 = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                Filter = "metadata/custom eq 'foo'"
+            });
+
+            Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
         }
     }
 }

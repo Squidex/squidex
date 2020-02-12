@@ -10,13 +10,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public interface ITextIndexerGrain : IGrainWithGuidKey
+    public interface ILuceneTextIndexGrain : IGrainWithGuidKey
     {
-        Task IndexAsync(Immutable<IIndexCommand[]> updates);
+        Task IndexAsync(NamedId<Guid> schemaId, Immutable<IndexCommand[]> updates);
 
-        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
+        Task<List<Guid>> SearchAsync(string queryText, Guid schemaId, SearchContext context);
     }
 }

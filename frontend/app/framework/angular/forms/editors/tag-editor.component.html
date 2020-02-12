@@ -6,7 +6,7 @@
         [class.readonly]="readonly"
         [class.multiline]="!singleLine"
         [class.focus]="snapshot.hasFocus" 
-        [class.disabled]="addInput.disabled"
+        [class.disabled]="snapshot.isDisabled"
         [class.dashed]="dashed && !(snapshot.items.length > 0)">
 
         <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">

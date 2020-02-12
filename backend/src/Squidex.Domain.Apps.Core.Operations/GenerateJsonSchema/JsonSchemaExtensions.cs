@@ -21,11 +21,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             var schemaName = schema.Name.ToPascalCase();
 
             var jsonTypeVisitor = new JsonTypeVisitor(schemaResolver, withHidden);
-            var jsonSchema = Builder.Object();
+            var jsonSchema = SchemaBuilder.Object();
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var partitionObject = Builder.Object();
+                var partitionObject = SchemaBuilder.Object();
                 var partitioning = partitionResolver(field.Partitioning);
 
                 foreach (var partitionKey in partitioning.AllKeys)
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                         var name = partitioning.GetName(partitionKey);
 
                         partitionItemProperty.Description = name;
-                        partitionItemProperty.IsRequired = field.RawProperties.IsRequired && !isOptional;
+                        partitionItemProperty.SetRequired(field.RawProperties.IsRequired && !isOptional);
 
                         partitionObject.Properties.Add(partitionKey, partitionItemProperty);
                     }
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public static JsonSchemaProperty CreateProperty(IField field, JsonSchema reference)
         {
-            var jsonProperty = Builder.ObjectProperty(reference);
+            var jsonProperty = SchemaBuilder.ObjectProperty(reference);
 
             if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
             {

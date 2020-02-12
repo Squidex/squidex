@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                return await queryContentsByQuery.DoAsync(app, schema, query, null, false);
+                return await queryContentsByQuery.DoAsync(app, schema, query, null, SearchScope.Published);
             }
         }
 

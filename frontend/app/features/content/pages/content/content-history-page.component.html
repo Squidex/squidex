@@ -5,7 +5,7 @@
 
     <ng-container content>
         <ng-container *ngIf="!schema.isSingleton">
-            <div class="section" *ngIf="content.canDraftCreate || content.canDraftDelete">
+            <div class="section mb-4" *ngIf="content.canDraftCreate || content.canDraftDelete">
                 <ng-container *ngIf="!content.newStatus; else newVersion">
                     <button class="btn btn-success btn-block" (click)="createDraft() ">
                         New Draft
@@ -112,8 +112,8 @@
             </div>
         </ng-container>
 
-        <div class="section mt-4">
-            <h3 class="bordered">History</h3>
+        <div class="section">
+            <h3 class="bordered" *ngIf="!schema.isSingleton">History</h3>
     
             <sqx-content-event *ngFor="let event of contentEvents | async; trackBy: trackByEvent"
                 [content]="content" 

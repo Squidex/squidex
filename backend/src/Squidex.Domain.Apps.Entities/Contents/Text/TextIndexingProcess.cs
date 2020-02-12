@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -271,7 +269,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private Task IndexAsync(ContentEvent @event, params IIndexCommand[] commands)
+        private Task IndexAsync(ContentEvent @event, params IndexCommand[] commands)
         {
             return textIndexer.ExecuteAsync(@event.AppId, @event.SchemaId, commands);
         }

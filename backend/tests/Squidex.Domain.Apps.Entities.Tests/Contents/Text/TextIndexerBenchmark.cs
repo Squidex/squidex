@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
-using Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -23,26 +22,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     [Trait("Category", "Dependencies")]
     public class TextIndexerBenchmark
     {
-        private readonly Guid schemaId = Guid.NewGuid();
-        private readonly TextIndexerGrain sut;
+        private const int Size = 200;
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
 
-        public TextIndexerBenchmark()
+        [Fact]
+        public async Task Should_index_and_search_in_temp_folder()
         {
-            var factory = new IndexManager(new FileIndexStorage(), A.Fake<ISemanticLog>());
-
-            sut = new TextIndexerGrain(factory);
-            sut.ActivateAsync(schemaId).Wait();
+            await IndexAndSearchAsync(TestStorages.TempFolder());
         }
 
         [Fact]
-        public async Task Should_index_many_documents()
+        public async Task Should_index_and_search_in_assets()
+        {
+            await IndexAndSearchAsync(TestStorages.Assets());
+        }
+
+        [Fact]
+        public async Task Should_index_and_search_in_mongoDB()
+        {
+            await IndexAndSearchAsync(TestStorages.MongoDB());
+        }
+
+        private async Task IndexAndSearchAsync(IIndexStorage storage)
+        {
+            var factory = new IndexManager(storage, A.Fake<ISemanticLog>());
+
+            var grain = new LuceneTextIndexGrain(factory);
+
+            await grain.ActivateAsync(appId.Id);
+
+            var elapsed1 = await IndexAsync(grain);
+            var elapsed2 = await SearchAsync(grain);
+            var elapsed3 = await SearchAsync(grain);
+
+            Assert.Equal(new long[0], new[] { elapsed1, elapsed2, elapsed3 });
+        }
+
+        private async Task<long> IndexAsync(LuceneTextIndexGrain grain)
         {
             var text = new Dictionary<string, string>
             {
-                ["iv"] = "Hallo Welt"
+                ["iv"] = "Hello World"
             };
 
-            var ids = new Guid[10000];
+            var ids = new Guid[Size];
 
             for (var i = 0; i < ids.Length; i++)
             {
@@ -53,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             foreach (var id in ids)
             {
-                var commands = new IIndexCommand[]
+                var commands = new IndexCommand[]
                 {
                     new UpsertIndexEntry
                     {
@@ -65,14 +89,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     }
                 };
 
-                await sut.IndexAsync(commands.AsImmutable());
+                await grain.IndexAsync(schemaId, commands.AsImmutable());
             }
 
-            sut.OnDeactivateAsync().Wait();
+            return watch.Stop();
+        }
 
-            var elapsed = watch.Stop();
+        private async Task<long> SearchAsync(LuceneTextIndexGrain grain)
+        {
+            var searchContext = new SearchContext
+            {
+                Languages = new HashSet<string>()
+            };
 
-            Assert.InRange(elapsed, 0, 1);
+            var watch = ValueStopwatch.StartNew();
+
+            for (var i = 0; i < Size; i++)
+            {
+                var result = await grain.SearchAsync("Hello", default, searchContext);
+
+                Assert.NotEmpty(result);
+            }
+
+            return watch.Stop();
         }
     }
 }

@@ -7,7 +7,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface IIndexCommand
+    public abstract class IndexCommand
     {
+        public string DocId { get; set; }
     }
 }

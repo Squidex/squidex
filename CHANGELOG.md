@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1..0 - 2020-02-11
+
+### Bugfixes
+
+* **Assets**: Resizing of images when only or height is defined.
+* **Contents**: Fixes with nullable property in OpenApi.
+* **UI**: Fixes with valueChanges in editors.
+
 ## 4.1.0 RC - 2020-02-05
 
 ### Features

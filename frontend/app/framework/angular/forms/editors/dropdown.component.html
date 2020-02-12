@@ -17,7 +17,7 @@
     <ng-container *sqxModal="dropdown">
         <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left">
             <div *ngIf="canSearch" class="search-form">
-                <input class="form-control search" [formControl]="queryInput" [disabled]="snapshot.isDisabled" placeholder="Search" (keydown)="onKeyDown($event)" sqxFocusOnInit />
+                <input class="form-control search" [formControl]="queryInput" placeholder="Search" (keydown)="onKeyDown($event)" sqxFocusOnInit />
             </div>
 
             <div class="control-dropdown-items" #container>

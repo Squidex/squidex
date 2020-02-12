@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             client = new ElasticLowLevelClient(config);
         }
 
-        public async Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IIndexCommand[] commands)
+        public async Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
         {
             foreach (var command in commands)
             {

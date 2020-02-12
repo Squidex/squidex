@@ -174,8 +174,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.contentForm.submitFailed(error);
                     });
             } else {
-                if (!this.canCreate(publish)) {
-                    return;
+                if (publish) {
+                    return this.contentsState.snapshot.canCreateAndPublish;
+                } else {
+                    return this.contentsState.snapshot.canCreate;
                 }
 
                 this.contentsState.create(value, publish)
@@ -189,14 +191,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             }
         } else {
             this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
-        }
-    }
-
-    private canCreate(publish: boolean) {
-        if (publish) {
-            return this.contentsState.snapshot.canCreateAndPublish;
-        } else {
-            return this.contentsState.snapshot.canCreate;
         }
     }
 
@@ -216,6 +210,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public checkPendingChanges(action: string) {
+        if (this.content && !this.content.canUpdate) {
+            return of(true);
+        }
+
         return this.contentForm.hasChanged() ?
             this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n**Do you want to continue anyway?**`) :
             of(true);
