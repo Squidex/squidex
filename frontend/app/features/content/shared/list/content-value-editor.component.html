@@ -38,9 +38,9 @@
                     <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
-                    <ng-container class="form-check form-check-inline">
+                    <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" [formControlName]="field.name" sqxIndeterminateValue />
-                    </ng-container>
+                    </div>
                 </ng-container>
             </ng-container>
         </ng-container>
