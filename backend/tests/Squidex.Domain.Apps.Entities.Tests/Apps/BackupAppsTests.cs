@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.BackupAsync(context);
 
-            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>.Ignored, settings))
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, settings))
                 .MustHaveHappened();
         }
 
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadJsonAttachmentAsync<JsonObject>(A<string>.Ignored))
+            A.CallTo(() => context.Reader.ReadJsonAttachmentAsync<JsonObject>(A<string>._))
                 .Returns(settings);
 
             await sut.RestoreAsync(context);
@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
             A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, default))
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+            A.CallTo(() => context.Writer.WriteBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
             await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context);
@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
             await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context);
@@ -283,7 +283,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>.Ignored, A<Func<Stream, Task>>.Ignored))
+            A.CallTo(() => context.Reader.ReadBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
             A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, default))
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             HashSet<string>? newIndex = null;
 
-            A.CallTo(() => index.RebuildByContributorsAsync(appId, A<HashSet<string>>.Ignored))
+            A.CallTo(() => index.RebuildByContributorsAsync(appId, A<HashSet<string>>._))
                 .Invokes(new Action<Guid, HashSet<string>>((_, i) => newIndex = i));
 
             await sut.CompleteRestoreAsync(context);

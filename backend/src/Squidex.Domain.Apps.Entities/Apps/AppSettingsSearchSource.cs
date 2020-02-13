@@ -17,7 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppSettingsSearchSource : ISearchSource
     {
-        private const string Type = "Screen";
         private const int MaxItems = 3;
         private readonly IUrlGenerator urlGenerator;
 
@@ -28,15 +27,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.urlGenerator = urlGenerator;
         }
 
-        public Task<List<SearchResult>> SearchAsync(string query, Context context)
+        public Task<SearchResults> SearchAsync(string query, Context context)
         {
-            var result = new List<SearchResult>();
+            var result = new SearchResults();
 
             var appId = context.App.NamedId();
 
-            void Search(string permissionId, string term, Func<NamedId<Guid>, string> generate)
+            void Search(string term, string permissionId, Func<NamedId<Guid>, string> generate, SearchResultType? type = null)
             {
-                if (result.Count > MaxItems && term.Contains(query, StringComparison.OrdinalIgnoreCase))
+                if (result.Count < MaxItems && term.Contains(query, StringComparison.OrdinalIgnoreCase))
                 {
                     var permission = Permissions.ForApp(permissionId, appId.Name);
 
@@ -44,19 +43,24 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         var url = generate(appId);
 
-                        result.Add(new SearchResult { Name = term, Url = url, Type = Type });
+                        result.Add(term, type ?? SearchResultType.Setting, url);
                     }
                 }
             }
 
-            Search(Permissions.AppCommon, "Contents", urlGenerator.ContentsUI);
-            Search(Permissions.AppAssetsRead, "Assets", urlGenerator.AssetsUI);
-            Search(Permissions.AppContributorsRead, "Contributors", urlGenerator.ContributorsUI);
-            Search(Permissions.AppCommon, "Schemas", urlGenerator.SchemasUI);
-            Search(Permissions.AppRulesRead, "Rules", urlGenerator.RulesUI);
-            Search(Permissions.AppWorkflowsRead, "Workflows", urlGenerator.WorkflowsUI);
-            Search(Permissions.AppClientsRead, "Clients", urlGenerator.ClientsUI);
-            Search(Permissions.AppBackupsRead, "Backups", urlGenerator.BackupsUI);
+            Search("Assets", Permissions.AppAssetsRead, appId => urlGenerator.AssetsUI(appId), SearchResultType.Asset);
+            Search("Backups", Permissions.AppBackupsRead, urlGenerator.BackupsUI);
+            Search("Clients", Permissions.AppClientsRead, urlGenerator.ClientsUI);
+            Search("Contents", Permissions.AppCommon, urlGenerator.ContentsUI, SearchResultType.Content);
+            Search("Contributors", Permissions.AppContributorsRead, urlGenerator.ContributorsUI);
+            Search("Dashboard", Permissions.AppCommon, urlGenerator.DashboardUI);
+            Search("Patterns", Permissions.AppCommon, urlGenerator.PatternsUI);
+            Search("Languages", Permissions.AppRolesRead, urlGenerator.RulesUI);
+            Search("Roles", Permissions.AppRolesRead, urlGenerator.RulesUI);
+            Search("Rules", Permissions.AppRulesRead, urlGenerator.RulesUI, SearchResultType.Rule);
+            Search("Schemas", Permissions.AppCommon, urlGenerator.SchemasUI, SearchResultType.Schema);
+            Search("Subscription", Permissions.AppPlansRead, urlGenerator.PlansUI);
+            Search("Workflows", Permissions.AppWorkflowsRead, urlGenerator.WorkflowsUI);
 
             return Task.FromResult(result);
         }

@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryContentsByQuery : OperationBase
     {
         private readonly IJsonSerializer serializer;
-        private readonly ITextIndexer indexer;
+        private readonly IContentTextIndexer indexer;
 
-        public QueryContentsByQuery(IJsonSerializer serializer, ITextIndexer indexer)
+        public QueryContentsByQuery(IJsonSerializer serializer, IContentTextIndexer indexer)
         {
             this.serializer = serializer;
 

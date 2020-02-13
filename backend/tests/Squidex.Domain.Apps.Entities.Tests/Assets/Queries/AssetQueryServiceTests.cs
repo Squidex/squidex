@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            A.CallTo(() => queryParser.ParseQuery(requestContext, A<Q>.Ignored))
+            A.CallTo(() => queryParser.ParseQuery(requestContext, A<Q>._))
                 .Returns(new ClrQuery());
 
             sut = new AssetQueryService(assetEnricher, assetRepository, assetFolderRepository, queryParser);
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var parentId = Guid.NewGuid();
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, A<ClrQuery>.Ignored))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, A<ClrQuery>._))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))

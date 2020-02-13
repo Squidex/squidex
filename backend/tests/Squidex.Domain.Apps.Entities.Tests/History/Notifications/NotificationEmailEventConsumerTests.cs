@@ -153,19 +153,19 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>.Ignored, A<Action<None, IObjectWriter>>.Ignored))
+            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>._, A<Action<None, IObjectWriter>>._))
                 .MustHaveHappened();
         }
 
         private void MustNotResolveUser()
         {
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
         private void MustNotSendEmail()
         {
-            A.CallTo(() => emailSender.SendContributorEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => emailSender.SendContributorEmailAsync(A<IUser>._, A<IUser>._, A<string>._, A<bool>._))
                 .MustNotHaveHappened();
         }
 

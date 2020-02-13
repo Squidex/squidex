@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>.Ignored, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             Assert.Same(result, context.Result<IEnrichedRuleEntity>());
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>.Ignored, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext))
                 .MustNotHaveHappened();
         }
 

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
         public FieldConvertersTests()
         {
-            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>.Ignored))
+            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>._))
                 .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(0)}");
         }
 

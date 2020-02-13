@@ -157,7 +157,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.DeleteAsync();
 
-            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>.Ignored))
+            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => snapshotStore.RemoveAsync(key))
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.States
         {
             await sut.RemoveSnapshotAsync<string, int>(key);
 
-            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>.Ignored))
+            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => snapshotStore.RemoveAsync(key))

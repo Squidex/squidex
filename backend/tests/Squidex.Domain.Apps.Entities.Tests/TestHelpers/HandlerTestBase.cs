@@ -60,16 +60,16 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected HandlerTestBase()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<HandleSnapshot<TState>>.Ignored, A<HandleEvent>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>._, Id, A<HandleSnapshot<TState>>._, A<HandleEvent>._))
                 .Returns(persistenceWithState);
 
-            A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<HandleEvent>.Ignored))
+            A.CallTo(() => store.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
                 .Returns(persistence);
 
-            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
         }
 

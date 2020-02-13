@@ -141,17 +141,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<Guid>._, false))
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<Guid>(0)!, x.GetArgument<Guid>(1)!)));
 
             return appProvider;
         }
 
-        private static ITextIndexer CreateTextIndexer()
+        private static IContentTextIndexer CreateTextIndexer()
         {
-            var textIndexer = A.Fake<ITextIndexer>();
+            var textIndexer = A.Fake<IContentTextIndexer>();
 
-            A.CallTo(() => textIndexer.SearchAsync(A<string>.Ignored, A<IAppEntity>.Ignored, A<Guid>.Ignored, A<SearchScope>.Ignored))
+            A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<Guid>._, A<SearchScope>._))
                 .Returns(new List<Guid> { Guid.NewGuid() });
 
             return textIndexer;

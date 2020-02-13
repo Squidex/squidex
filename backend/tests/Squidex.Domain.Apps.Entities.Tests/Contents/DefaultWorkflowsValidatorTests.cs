@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var schema = Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>._, false))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))

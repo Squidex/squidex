@@ -13,12 +13,10 @@
 }
 
 h3 {
-    &.bordered {
-        border-bottom: 1px solid $color-border;
-        margin-bottom: 1rem;
-        margin-top: 0;
-        padding-bottom: .5rem;
-    }
+    border-bottom: 1px solid $color-border;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    padding-bottom: .5rem;
 }
 
 hr {

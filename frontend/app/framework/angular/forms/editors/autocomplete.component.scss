@@ -1,3 +1,15 @@
 .control-dropdown {
     width: 18rem;
 }
+
+.control-container {
+    position: relative;
+}
+
+.form-icon {
+    padding-left: 2.25rem;
+}
+
+.icon {
+    @include absolute(12px, null, null, 10px);
+}

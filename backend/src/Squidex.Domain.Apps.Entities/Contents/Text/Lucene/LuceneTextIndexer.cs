@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public sealed class LuceneTextIndexer : ITextIndexer
+    public sealed class LuceneTextIndexer : IContentTextIndexer
     {
         private readonly IGrainFactory grainFactory;
 

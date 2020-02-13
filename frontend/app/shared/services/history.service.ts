@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -83,7 +83,13 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return this.http.get<any[]>(url).pipe(
+        const options = {
+            headers: new HttpHeaders({
+                'X-Silent': '1'
+            })
+        };
+
+        return this.http.get<any[]>(url, options).pipe(
             map(body => {
                 const history = body.map(item =>
                     new HistoryEventDto(

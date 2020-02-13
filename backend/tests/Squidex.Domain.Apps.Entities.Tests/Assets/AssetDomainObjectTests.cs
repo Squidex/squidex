@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
 
             sut = new AssetDomainObject(Store, tagService, assetQuery, A.Dummy<ISemanticLog>());

@@ -11,10 +11,10 @@ namespace Squidex.Domain.Apps.Entities.Search
     {
         public string Name { get; set; }
 
-        public string Label { get; set; }
-
-        public string Type { get; set; }
+        public string? Label { get; set; }
 
         public string Url { get; set; }
+
+        public SearchResultType Type { get; set; }
     }
 }

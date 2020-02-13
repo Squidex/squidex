@@ -62,6 +62,7 @@ namespace Squidex
             services.AddSquidexQueries(config);
             services.AddSquidexRules(config);
             services.AddSquidexSchemas();
+            services.AddSquidexSearch();
             services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);

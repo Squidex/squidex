@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>.Ignored, A<NamedId<Guid>>.Ignored, A<string?>.Ignored))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, A<string?>._))
                 .MustNotHaveHappened();
         }
 
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>.Ignored, A<NamedId<Guid>>.Ignored, planIdFree))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, planIdFree))
                 .MustNotHaveHappened();
         }
 

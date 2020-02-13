@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal("data.tags1.iv == 'value'", result!.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
                 .MustNotHaveHappened();
         }
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal("data.string.iv == 'value'", result!.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
                 .MustNotHaveHappened();
         }
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal("no.data == 'value'", result!.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
                 .MustNotHaveHappened();
         }
     }

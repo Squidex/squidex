@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public GuardAppTests()
         {
-            A.CallTo(() => users.FindByIdOrEmailAsync(A<string>.Ignored))
+            A.CallTo(() => users.FindByIdOrEmailAsync(A<string>._))
                 .Returns(A.Dummy<IUser>());
 
             A.CallTo(() => appPlans.GetPlan("notfound"))

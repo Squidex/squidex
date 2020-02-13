@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscriptionTests()
         {
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(eventSubscription);
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._)).Returns(eventSubscription);
 
             sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 50 };
 
@@ -51,10 +51,10 @@ namespace Squidex.Infrastructure.EventSourcing
             A.CallTo(() => eventSubscription.StopAsync())
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>.Ignored, A<Exception>.Ignored))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
             await sut.StopAsync();
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>.Ignored, A<Exception>.Ignored))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await OnEventAsync(A.Fake<IEventSubscription>(), ev);
             await sut.StopAsync();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>.Ignored, A<StoredEvent>.Ignored))
+            A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>._, A<StoredEvent>._))
                 .MustNotHaveHappened();
         }
 

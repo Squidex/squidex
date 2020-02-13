@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Entities.Search
 {
-    public interface IRuleUrlGenerator
+    public interface ISearchManager
     {
-        string GenerateContentUIUrl(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId);
+        Task<SearchResults> SearchAsync(string? query, Context context);
     }
 }

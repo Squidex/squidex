@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => index.AddAsync(token))
                 .MustHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -167,10 +167,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
 
-            A.CallTo(() => index.AddAsync(A<string>.Ignored))
+            A.CallTo(() => index.AddAsync(A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -183,10 +183,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.ReserveAsync(schemaId.Id, A<string>.Ignored))
+            A.CallTo(() => index.ReserveAsync(schemaId.Id, A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 

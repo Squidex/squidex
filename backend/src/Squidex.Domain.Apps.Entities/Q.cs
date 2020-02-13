@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -21,6 +22,13 @@ namespace Squidex.Domain.Apps.Entities
         public string? ODataQuery { get; private set; }
 
         public string? JsonQuery { get; private set; }
+
+        public ClrQuery? Query { get; private set; }
+
+        public Q WithQuery(ClrQuery? query)
+        {
+            return Clone(c => c.Query = query);
+        }
 
         public Q WithODataQuery(string? odataQuery)
         {

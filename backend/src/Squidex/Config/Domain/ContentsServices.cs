@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 
@@ -72,11 +73,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultWorkflowsValidator>()
                 .AsOptional<IWorkflowsValidator>();
 
-            services.AddSingletonAs<ElasticSearchTextIndexer>()
-                .As<ITextIndexer>();
+            services.AddSingletonAs<LuceneTextIndexer>()
+                .As<IContentTextIndexer>();
 
             services.AddSingletonAs<TextIndexingProcess>()
                 .As<IEventConsumer>();
+
+            services.AddSingletonAs<ContentsSearchSource>()
+                .As<ISearchSource>();
 
             services.AddSingletonAs<IndexManager>()
                 .AsSelf();

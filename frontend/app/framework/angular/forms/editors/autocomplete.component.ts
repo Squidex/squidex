@@ -8,12 +8,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 
 import {
     fadeAnimation,
     Keys,
-    StatefulControlComponent
+    StatefulControlComponent,
+    Types
 } from '@app/framework/internal';
 
 export interface AutocompleteSource {
@@ -30,6 +31,9 @@ interface State {
 
     // The selected suggest item index.
     suggestedIndex: number;
+
+    // True, when the searching is in progress.
+    isSearching?: boolean;
 }
 
 const NO_EMIT = { emitEvent: false };
@@ -54,16 +58,22 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public inputName = 'autocompletion';
 
     @Input()
-    public displayProperty = '';
+    public displayProperty: string;
 
     @Input()
-    public placeholder = '';
+    public placeholder: string;
+
+    @Input()
+    public icon: string;
 
     @Input()
     public autoFocus = false;
 
     @Input()
     public underlined = false;
+
+    @Input()
+    public debounceTime = 300;
 
     @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
@@ -86,22 +96,28 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                     tap(query => {
                         this.callChange(query);
                     }),
-                    map(query => <string>query),
-                    map(query => query?.trim() || query),
-                    tap(query => {
-                        if (!query) {
-                            this.reset();
+                    map(query => {
+                        if (Types.isString(query)) {
+                            return query.trim();
+                        } else {
+                            return '';
                         }
                     }),
-                    debounceTime(500),
+                    debounceTime(this.debounceTime),
                     distinctUntilChanged(),
-                    filter(query => !!query && !!this.source),
-                    switchMap(query => this.source.find(query)), catchError(() => of([])))
+                    switchMap(query => {
+                        if (!query || !this.source) {
+                            return of([]);
+                        } else {
+                            return this.source.find(query).pipe(catchError(() => of([])));
+                        }
+                    }))
                 .subscribe(items => {
                     this.next(s => ({
                         ...s,
                         suggestedIndex: -1,
-                        suggestedItems: items || []
+                        suggestedItems: items || [],
+                        isSearching: false
                     }));
                 }));
     }
@@ -151,20 +167,21 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
+    public reset() {
+        this.resetState();
 
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
+        this.queryInput.setValue('', NO_EMIT);
     }
 
     public focus() {
+        this.resetState();
+
         this.inputControl.nativeElement.focus();
     }
 
     public blur() {
-        this.reset();
+        this.resetState();
+
         this.callTouched();
     }
 
@@ -184,9 +201,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                 } else {
                     this.queryInput.setValue(selection.toString(), NO_EMIT);
                 }
+
                 this.callChange(selection);
             } finally {
-                this.reset();
+                this.resetState();
             }
 
             return true;
@@ -217,13 +235,5 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     private resetForm() {
         this.queryInput.setValue('', NO_EMIT);
-    }
-
-    private reset() {
-        this.next(s => ({
-            ...s,
-            suggestedItems: [],
-            suggestedIndex: -1
-        }));
     }
 }

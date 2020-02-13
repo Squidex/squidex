@@ -66,10 +66,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>._, requestContext))
                 .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), AppId, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), AppId, A<string>._))
                 .Returns(new List<IEnrichedAssetEntity>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Same(result, context.Result<IEnrichedAssetEntity>());
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>.Ignored, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -285,11 +285,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AssertAssetHasBeenUploaded(long version)
         {
-            A.CallTo(() => assetFileStore.UploadAsync(A<string>.Ignored, A<HasherStream>.Ignored, CancellationToken.None))
+            A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>.Ignored, Id, version, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, Id, version, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.DeleteAsync(A<string>.Ignored))
+            A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
                 .MustHaveHappened();
         }
 
@@ -301,13 +301,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<Guid>.Ignored, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<Guid>._, A<string>._))
                 .Returns(new List<IEnrichedAssetEntity> { duplicate });
         }
 
         private void AssertMetadataEnriched()
         {
-            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._, A<HashSet<string>>._))
                 .MustHaveHappened();
         }
     }

@@ -1,22 +1,20 @@
-<nav class="navbar fixed-top navbar-dark bg-primary bg-faded navbar-expand">
-    <span class="navbar-brand" routerLink="/app">
+<nav class="navbar fixed-top navbar-dark bg-primary bg-faded navbar-expand align-items-center">
+    <span class="navbar-brand align-items-center justify-content-center d-flex" routerLink="/app">
         <sqx-logo [isLoading]="loadingService.loading | async"></sqx-logo>
     </span>
 
-    <div class="float-left apps-menu">
+    <div class="navbar-nav">
         <sqx-apps-menu></sqx-apps-menu>
     </div>
 
-    <div class="float-right profile-menu">
-        <sqx-profile-menu></sqx-profile-menu>
-    </div>
+    <div class="navbar-nav ml-auto">
+        <sqx-search-menu></sqx-search-menu>
 
-    <div class="float-right notifications-menu">
-        <sqx-notifications-menu></sqx-notifications-menu>
-    </div>
-
-    <div class="float-right assets-menu">
         <sqx-asset-uploader></sqx-asset-uploader>
+
+        <sqx-notifications-menu></sqx-notifications-menu>
+
+        <sqx-profile-menu></sqx-profile-menu>
     </div>
 </nav>
 

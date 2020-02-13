@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
                 .Returns(false);
 
             sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader);
@@ -249,12 +249,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, A<string>.Ignored))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, A<string>._))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustHaveHappened();
             }
         }

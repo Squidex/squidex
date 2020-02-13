@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
                 .Returns(false);
 
             sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader);
@@ -149,12 +149,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustHaveHappened();
             }
         }

@@ -60,7 +60,7 @@ namespace Squidex.Web.Pipeline
             A.CallTo(() => appPlan.MaxApiCalls)
                 .ReturnsLazily(x => apiCallsMax);
 
-            A.CallTo(() => usageTracker.GetMonthlyCallsAsync(A<string>.Ignored, DateTime.Today))
+            A.CallTo(() => usageTracker.GetMonthlyCallsAsync(A<string>._, DateTime.Today))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
 
             next = () =>
@@ -88,7 +88,7 @@ namespace Squidex.Web.Pipeline
             Assert.Equal(429, (actionContext.Result as StatusCodeResult)?.StatusCode);
             Assert.False(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, A<double>._, A<double>._))
                 .MustNotHaveHappened();
         }
 
@@ -106,7 +106,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, 13, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, 13, A<double>._))
                 .MustHaveHappened();
         }
 
@@ -124,7 +124,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, 13, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, 13, A<double>._))
                 .MustHaveHappened();
         }
 
@@ -142,7 +142,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, A<double>._, A<double>._))
                 .MustNotHaveHappened();
         }
 
@@ -158,7 +158,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, A<double>._, A<double>._))
                 .MustNotHaveHappened();
         }
 
@@ -179,7 +179,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
-            A.CallTo(() => appLogStore.LogAsync(appEntity.Id, instant, "GET", "/my-path", null, null, A<long>.Ignored, 0))
+            A.CallTo(() => appLogStore.LogAsync(appEntity.Id, instant, "GET", "/my-path", null, null, A<long>._, 0))
                 .MustHaveHappened();
         }
 

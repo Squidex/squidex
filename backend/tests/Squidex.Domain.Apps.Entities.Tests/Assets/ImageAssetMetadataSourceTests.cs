@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.EnhanceAsync(command, tags);
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>.Ignored))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
                 .MustNotHaveHappened();
         }
 

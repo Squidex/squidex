@@ -14,6 +14,8 @@ import {
     StatefulControlComponent
 } from '@app/framework/internal';
 
+import { FocusComponent } from './../forms-helper';
+
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true
 };
@@ -35,7 +37,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ColorPickerComponent extends StatefulControlComponent<State, string> {
+export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;
 
     @Input()

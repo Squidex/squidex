@@ -13,6 +13,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
+using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
@@ -36,6 +37,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
+
+            services.AddSingletonAs<AssetsSearchSource>()
+                .As<ISearchSource>();
 
             services.AddSingletonAs<DefaultAssetFileStore>()
                 .As<IAssetFileStore>();

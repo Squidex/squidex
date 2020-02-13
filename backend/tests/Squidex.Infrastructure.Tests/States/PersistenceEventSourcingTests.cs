@@ -188,11 +188,11 @@ namespace Squidex.Infrastructure.States
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventEnricher.Enrich(A<Envelope<IEvent>>.Ignored, key))
+            A.CallTo(() => eventEnricher.Enrich(A<Envelope<IEvent>>._, key))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -203,7 +203,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, EtagVersion.Empty, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, EtagVersion.Empty, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
         }
 
@@ -217,7 +217,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
             await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));

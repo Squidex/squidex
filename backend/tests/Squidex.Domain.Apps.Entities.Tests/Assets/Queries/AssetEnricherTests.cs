@@ -116,10 +116,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>.Ignored))
+            A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>._))
                 .Returns(new[] { "metadata1" });
 
-            A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>.Ignored))
+            A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>._))
                 .Returns(new[] { "metadata2", "metadata3" });
 
             var result = await sut.EnrichAsync(source, requestContext);

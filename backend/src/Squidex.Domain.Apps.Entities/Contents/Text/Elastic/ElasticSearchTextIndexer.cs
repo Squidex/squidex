@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 {
-    public sealed class ElasticSearchTextIndexer : ITextIndexer
+    public sealed class ElasticSearchTextIndexer : IContentTextIndexer
     {
         private const string IndexName = "contents";
         private readonly ElasticLowLevelClient client;

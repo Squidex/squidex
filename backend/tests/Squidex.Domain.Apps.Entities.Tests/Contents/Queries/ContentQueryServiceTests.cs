@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             SetupEnricher();
 
-            A.CallTo(() => queryParser.ParseQuery(requestContext, schema, A<Q>.Ignored))
+            A.CallTo(() => queryParser.ParseQuery(requestContext, schema, A<Q>._))
                 .Returns(new ClrQuery());
 
             sut = new ContentQueryService(
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -203,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustHaveHappened(1, Times.Exactly);
         }
 
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(total, result.Total);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(total, result.Total);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustHaveHappened(count, Times.Exactly);
         }
 
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustHaveHappened(count, Times.Exactly);
         }
 
@@ -354,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -377,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
                 .MustHaveHappened(count, Times.Exactly);
         }
 
@@ -412,7 +412,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.Ignored, A<HashSet<Guid>>.Ignored, A<SearchScope>.Ignored))
+            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>._, A<HashSet<Guid>>._, A<SearchScope>._))
                 .MustNotHaveHappened();
         }
 
@@ -442,19 +442,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private void SetupContents(Status[]? status, int count, int total, IContentEntity content, SearchScope scope)
         {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<ClrQuery>.Ignored, scope))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<ClrQuery>._, scope))
                 .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
         }
 
         private void SetupContents(Status[]? status, int total, List<Guid> ids, SearchScope scope)
         {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, scope))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>._, scope))
                 .Returns(ResultList.Create(total, ids.Select(CreateContent).Shuffle()));
         }
 
         private void SetupContents(Status[]? status, List<Guid> ids, SearchScope scope)
         {
-            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, scope))
+            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.Is(status), A<HashSet<Guid>>._, scope))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
         }
 
@@ -484,7 +484,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private void SetupEnricher()
         {
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, requestContext))
                 .ReturnsLazily(x =>
                 {
                     var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;

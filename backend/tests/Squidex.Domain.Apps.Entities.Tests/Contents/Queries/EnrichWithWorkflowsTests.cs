@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.False(content.CanUpdate);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, A<Status>.Ignored, requestContext.User))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, A<Status>._, requestContext.User))
                 .MustNotHaveHappened();
         }
     }

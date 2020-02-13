@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Log
 
             channels.Add(channel);
 
-            A.CallTo(() => channel.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored))
+            A.CallTo(() => channel.Log(A<SemanticLogLevel>._, A<string>._))
                 .Invokes((SemanticLogLevel level, string message) =>
                 {
                     output += message;
@@ -499,8 +499,8 @@ namespace Squidex.Infrastructure.Log
             var channel1 = A.Fake<ILogChannel>();
             var channel2 = A.Fake<ILogChannel>();
 
-            A.CallTo(() => channel1.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception1);
-            A.CallTo(() => channel2.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception2);
+            A.CallTo(() => channel1.Log(A<SemanticLogLevel>._, A<string>._)).Throws(exception1);
+            A.CallTo(() => channel2.Log(A<SemanticLogLevel>._, A<string>._)).Throws(exception2);
 
             var sut = new SemanticLog(options, new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), JsonLogWriterFactory.Default());
 

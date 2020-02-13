@@ -39,7 +39,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_return_items_from_store()
         {
-            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>._, A<CancellationToken>._))
                 .Invokes((Func<DefaultXmlRepository.State, long, Task> callback, CancellationToken ct) =>
                 {
                     callback(new DefaultXmlRepository.State { Xml = "<a />" }, EtagVersion.Any);

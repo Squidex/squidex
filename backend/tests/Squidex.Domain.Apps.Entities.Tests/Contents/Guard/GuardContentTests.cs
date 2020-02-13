@@ -306,13 +306,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private void SetupCanUpdate(bool canUpdate)
         {
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored, A<Status>.Ignored, user))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
                 .Returns(canUpdate);
         }
 
         private void SetupCanCreatePublish(ISchemaEntity schema, bool canCreate)
         {
-            A.CallTo(() => contentWorkflow.CanPublishOnCreateAsync(schema, A<NamedContentData>.Ignored, user))
+            A.CallTo(() => contentWorkflow.CanPublishOnCreateAsync(schema, A<NamedContentData>._, user))
                 .Returns(canCreate);
         }
 

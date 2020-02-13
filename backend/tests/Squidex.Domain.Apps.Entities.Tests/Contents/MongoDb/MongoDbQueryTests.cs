@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var i = string.Empty;
 
-            A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>.Ignored))
+            A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>._))
                 .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
                 {
                     i = sortDefinition.Render(Serializer, Registry).ToString();

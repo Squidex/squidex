@@ -24,11 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             this.storage = storage;
 
-            A.CallTo(() => grainFactory.GetGrain<ILuceneTextIndexGrain>(A<Guid>.Ignored, null))
+            A.CallTo(() => grainFactory.GetGrain<ILuceneTextIndexGrain>(A<Guid>._, null))
                 .ReturnsLazily(() => grain);
         }
 
-        public async Task<ITextIndexer> CreateAsync(Guid schemaId)
+        public async Task<IContentTextIndexer> CreateAsync(Guid schemaId)
         {
             grain = new LuceneTextIndexGrain(new IndexManager(storage, A.Fake<ISemanticLog>()));
 

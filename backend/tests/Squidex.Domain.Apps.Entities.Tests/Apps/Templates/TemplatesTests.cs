@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await middleware.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<CreateSchema>.Ignored))
+            A.CallTo(() => commandBus.PublishAsync(A<CreateSchema>._))
                 .MustHaveHappened();
         }
     }

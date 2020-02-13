@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Migrations
 
         public MigratorTests()
         {
-            A.CallTo(() => path.GetNext(A<int>.Ignored))
+            A.CallTo(() => path.GetNext(A<int>._))
                 .ReturnsLazily((int v) =>
                 {
                     var m = migrations.Where(x => x.From == v).ToList();
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Migrations
 
             await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, None.Value, A<Action<None, IObjectWriter>>.Ignored))
+            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, None.Value, A<Action<None, IObjectWriter>>._))
                 .MustHaveHappened();
 
             A.CallTo(() => migrator_1_2.UpdateAsync())
