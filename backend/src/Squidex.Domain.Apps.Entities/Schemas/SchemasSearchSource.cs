@@ -72,13 +72,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             if (schema.SchemaDef.IsSingleton)
             {
-                var contentUrl = urlGenerator.ContentsUI(appId, schemaId);
+                var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 
-                result.Add($"{name} Contents", SearchResultType.Content, contentUrl, name);
+                result.Add($"{name} Content", SearchResultType.Content, contentUrl, name);
             }
             else
             {
-                var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
+                var contentUrl = urlGenerator.ContentsUI(appId, schemaId);
 
                 result.Add($"{name} Contents", SearchResultType.Content, contentUrl, name);
             }

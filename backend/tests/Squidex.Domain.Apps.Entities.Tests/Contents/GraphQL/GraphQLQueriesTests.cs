@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -161,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -254,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -443,7 +444,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -561,7 +562,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -702,7 +703,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(10, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });

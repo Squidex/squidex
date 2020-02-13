@@ -79,6 +79,11 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"app/{appId.Name}/settings", false);
         }
 
+        public string AssetsUI(NamedId<Guid> appId)
+        {
+            return urlsOptions.BuildUrl($"app/{appId.Name}/assets", false);
+        }
+
         public string AssetsUI(NamedId<Guid> appId, string? query = null)
         {
             return urlsOptions.BuildUrl($"app/{appId.Name}/assets", false);

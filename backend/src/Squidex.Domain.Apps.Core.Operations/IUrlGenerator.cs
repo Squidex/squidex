@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core
     {
         string AppSettingsUI(NamedId<Guid> appId);
 
+        string AssetsUI(NamedId<Guid> appId);
+
         string AssetsUI(NamedId<Guid> appId, string? query = null);
 
         string BackupsUI(NamedId<Guid> appId);
