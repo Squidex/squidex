@@ -68,12 +68,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {
-                    if (fieldValue.TryGetValue("iv", out var value))
+                    var isInvariant = field.Partitioning.Equals(Partitioning.Invariant);
+
+                    if (isInvariant && fieldValue.TryGetValue("iv", out var value))
                     {
                         return value;
                     }
 
-                    if (fieldValue.TryGetValue(masterLanguage, out value))
+                    if (!isInvariant && fieldValue.TryGetValue(masterLanguage, out value))
                     {
                         return value;
                     }
@@ -95,7 +97,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         if (sb.Length > 0)
                         {
                             sb.Append(", ");
-                            sb.Append(formatted);
                         }
 
                         sb.Append(formatted);

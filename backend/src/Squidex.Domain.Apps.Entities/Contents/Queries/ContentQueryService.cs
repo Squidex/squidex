@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentQueryService : IContentQueryService
     {
-        private static readonly Status[] StatusPublishedOnly = { Status.Published };
         private static readonly IResultList<IEnrichedContentEntity> EmptyContents = ResultList.CreateFrom<IEnrichedContentEntity>(0);
         private readonly IAppProvider appProvider;
         private readonly IContentEnricher contentEnricher;
@@ -233,18 +232,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return context.Permissions.Allows(permission);
         }
 
-        private static Status[]? GetStatus(Context context)
-        {
-            if (context.IsFrontendClient || context.ShouldProvideUnpublished())
-            {
-                return null;
-            }
-            else
-            {
-                return StatusPublishedOnly;
-            }
-        }
-
         private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
         {
             var parsedQuery = queryParser.ParseQuery(context, schema, query);
@@ -261,22 +248,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), context.Scope());
+            return contentRepository.QueryAsync(context.App, null, new HashSet<Guid>(ids), context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), query, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, null, query, context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, null, ids, context.Scope());
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, context.Scope());
+            return contentRepository.FindContentAsync(context.App, schema, null, id, context.Scope());
         }
 
         private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
