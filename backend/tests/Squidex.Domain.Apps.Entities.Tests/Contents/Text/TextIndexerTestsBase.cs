@@ -313,7 +313,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             return async p =>
             {
-                var result = await p.TextIndexer.SearchAsync(text, app, schemaId.Id, target);
+                var searchFilter = SearchFilter.ShouldHaveSchemas(schemaId.Id);
+
+                var result = await p.TextIndexer.SearchAsync(text, app, searchFilter, target);
 
                 if (expected != null)
                 {

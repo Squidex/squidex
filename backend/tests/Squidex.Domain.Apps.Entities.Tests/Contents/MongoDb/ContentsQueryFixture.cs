@@ -147,11 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return appProvider;
         }
 
-        private static IContentTextIndexer CreateTextIndexer()
+        private static IContentTextIndex CreateTextIndexer()
         {
-            var textIndexer = A.Fake<IContentTextIndexer>();
+            var textIndexer = A.Fake<IContentTextIndex>();
 
-            A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<Guid>._, A<SearchScope>._))
+            A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<SearchFilter>._, A<SearchScope>._))
                 .Returns(new List<Guid> { Guid.NewGuid() });
 
             return textIndexer;

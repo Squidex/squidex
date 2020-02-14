@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_return_empty_results_if_no_permission()
+        public async Task Should_return_empty_results_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 

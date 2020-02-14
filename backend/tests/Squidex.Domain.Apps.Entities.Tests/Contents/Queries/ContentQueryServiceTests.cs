@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task FindContentAsync_should_throw_exception_if_no_permission()
+        public async Task FindContentAsync_should_throw_exception_if_user_has_no_permission()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task QueryAsync_should_throw_if_no_permission()
+        public async Task QueryAsync_should_throw_if_user_has_no_permission()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task QueryByIds_should_not_return_contents_if_no_permission()
+        public async Task QueryByIds_should_not_return_contents_if_user_has_no_permission()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 

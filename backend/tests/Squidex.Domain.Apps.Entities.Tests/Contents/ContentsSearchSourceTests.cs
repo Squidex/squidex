@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -14,35 +15,46 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentsSearchSourceTests
     {
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly IContentTextIndexer contentIndex = A.Fake<IContentTextIndexer>();
+        private readonly IContentTextIndex contentIndex = A.Fake<IContentTextIndex>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly Context requestContext;
+        private readonly NamedId<Guid> schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
+        private readonly NamedId<Guid> schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
+        private readonly NamedId<Guid> schemaId3 = NamedId.Of(Guid.NewGuid(), "my-schema3");
         private readonly ContentsSearchSource sut;
 
         public ContentsSearchSourceTests()
         {
-            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+                .Returns(new List<ISchemaEntity>
+                {
+                    Mocks.Schema(appId, schemaId1),
+                    Mocks.Schema(appId, schemaId2),
+                    Mocks.Schema(appId, schemaId3)
+                });
 
-            sut = new ContentsSearchSource(contentQuery, contentIndex, urlGenerator);
+            sut = new ContentsSearchSource(appProvider, contentQuery, contentIndex, urlGenerator);
         }
 
         [Fact]
         public async Task Should_return_content_with_default_name()
         {
-            var content = new ContentEntity { Id = Guid.NewGuid(), SchemaId = schemaId };
+            var content = new ContentEntity { Id = Guid.NewGuid(), SchemaId = schemaId1 };
 
             await TestContentAsyc(content, "Content");
         }
@@ -66,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     Fields.String(1, "field1", Partitioning.Invariant),
                     Fields.String(2, "field2", Partitioning.Invariant)
                 },
-                SchemaId = schemaId
+                SchemaId = schemaId1
             };
 
             await TestContentAsyc(content, "hello, world");
@@ -87,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     Fields.String(1, "field", Partitioning.Invariant)
                 },
-                SchemaId = schemaId
+                SchemaId = schemaId1
             };
 
             await TestContentAsyc(content, "hello");
@@ -108,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     Fields.String(1, "field", Partitioning.Language)
                 },
-                SchemaId = schemaId
+                SchemaId = schemaId1
             };
 
             await TestContentAsyc(content, "hello");
@@ -134,30 +146,78 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     Fields.String(1, "field", Partitioning.Language)
                 },
-                SchemaId = schemaId
+                SchemaId = schemaId1
             };
 
             await TestContentAsyc(content, "resolved");
         }
 
+        [Fact]
+        public async Task Should_not_invoke_content_index_if_no_permission()
+        {
+            var ctx = ContextWithPermissions();
+
+            var result = await sut.SearchAsync("query", ctx);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => contentIndex.SearchAsync(A<string>._, ctx.App, A<SearchFilter>._, A<SearchScope>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_context_query_if_no_id_found()
+        {
+            var ctx = ContextWithPermissions(schemaId1, schemaId2);
+
+            A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>._, ctx.Scope()))
+                .Returns(new List<Guid>());
+
+            var result = await sut.SearchAsync("query", ctx);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<IReadOnlyList<Guid>>._))
+                .MustNotHaveHappened();
+        }
+
         private async Task TestContentAsyc(IEnrichedContentEntity content, string expectedName)
         {
+            var ctx = ContextWithPermissions(schemaId1, schemaId2);
+
+            var searchFilter = SearchFilter.MustHaveSchemas(schemaId1.Id, schemaId2.Id);
+
             var ids = new List<Guid> { content.Id };
 
-            A.CallTo(() => contentIndex.SearchAsync("query~", requestContext.App, default, requestContext.Scope()))
+            A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>.That.IsEqualTo(searchFilter), ctx.Scope()))
                 .Returns(ids);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, ids))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, ids))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, content.Id))
+            A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");
 
-            var result = await sut.SearchAsync("query", requestContext);
+            var result = await sut.SearchAsync("query", ctx);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add(expectedName, SearchResultType.Content, "content-url"));
+        }
+
+        private Context ContextWithPermissions(params NamedId<Guid>[] allowedSchemas)
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            foreach (var schemaId in allowedSchemas)
+            {
+                var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            }
+
+            return new Context(claimsPrincipal, Mocks.App(appId));
         }
     }
 }

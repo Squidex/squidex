@@ -16,18 +16,18 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public sealed class LuceneTextIndexer : IContentTextIndexer
+    public sealed class LuceneTextIndex : IContentTextIndex
     {
         private readonly IGrainFactory grainFactory;
 
-        public LuceneTextIndexer(IGrainFactory grainFactory)
+        public LuceneTextIndex(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }
 
-        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, SearchScope scope = SearchScope.Published)
+        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
         {
             if (string.IsNullOrWhiteSpace(queryText))
             {
@@ -36,11 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id);
 
-            using (Profiler.TraceMethod<LuceneTextIndexer>())
+            using (Profiler.TraceMethod<LuceneTextIndex>())
             {
                 var context = CreateContext(app, scope);
 
-                return await index.SearchAsync(queryText, schemaId, context);
+                return await index.SearchAsync(queryText, filter, context);
             }
         }
 

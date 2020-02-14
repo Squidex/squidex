@@ -28,13 +28,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 .ReturnsLazily(() => grain);
         }
 
-        public async Task<IContentTextIndexer> CreateAsync(Guid schemaId)
+        public async Task<IContentTextIndex> CreateAsync(Guid schemaId)
         {
             grain = new LuceneTextIndexGrain(new IndexManager(storage, A.Fake<ISemanticLog>()));
 
             await grain.ActivateAsync(schemaId);
 
-            return new LuceneTextIndexer(grainFactory);
+            return new LuceneTextIndex(grainFactory);
         }
 
         public async Task CleanupAsync()

@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Should_return_result_to_schema_only_if_no_permission()
+        public async Task Should_return_result_to_schema_only_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 

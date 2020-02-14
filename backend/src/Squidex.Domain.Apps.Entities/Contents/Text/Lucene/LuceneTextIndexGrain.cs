@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             index = await indexManager.AcquireAsync(key);
         }
 
-        public Task<List<Guid>> SearchAsync(string queryText, Guid schemaId, SearchContext context)
+        public Task<List<Guid>> SearchAsync(string queryText, SearchFilter? filter, SearchContext context)
         {
             var result = new List<Guid>();
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
                 if (index.Searcher != null)
                 {
-                    var query = BuildQuery(queryText, schemaId, context);
+                    var query = BuildQuery(queryText, filter, context);
 
                     var hits = index.Searcher.Search(query, MaxResults).ScoreDocs;
 
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return Task.FromResult(result);
         }
 
-        private Query BuildQuery(string query, Guid schemaId, SearchContext context)
+        private Query BuildQuery(string query, SearchFilter? filter, SearchContext context)
         {
             if (queryParser == null || currentLanguages == null || !currentLanguages.SetEquals(context.Languages))
             {
@@ -134,17 +134,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             {
                 var byQuery = queryParser.Parse(query);
 
-                if (schemaId != default)
+                if (filter?.SchemaIds.Count > 0)
                 {
-                    var bySchema = new TermQuery(new Term(MetaSchemaId, schemaId.ToString()))
+                    var bySchemas = new BooleanQuery
                     {
                         Boost = 2f
                     };
 
+                    foreach (var schemaId in filter.SchemaIds)
+                    {
+                        var term = new Term(MetaSchemaId, schemaId.ToString());
+
+                        bySchemas.Add(new TermQuery(term), Occur.SHOULD);
+                    }
+
+                    var occur = filter.Must ? Occur.MUST : Occur.SHOULD;
+
                     return new BooleanQuery
                     {
                         { byQuery, Occur.MUST },
-                        { bySchema, Occur.SHOULD }
+                        { bySchemas, occur }
                     };
                 }
 

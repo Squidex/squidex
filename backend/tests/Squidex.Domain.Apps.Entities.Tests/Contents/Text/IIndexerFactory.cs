@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface IIndexerFactory
     {
-        Task<IContentTextIndexer> CreateAsync(Guid schemaId);
+        Task<IContentTextIndex> CreateAsync(Guid schemaId);
 
         Task CleanupAsync();
     }

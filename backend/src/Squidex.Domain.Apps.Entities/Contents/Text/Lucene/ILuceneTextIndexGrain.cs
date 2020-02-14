@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
     {
         Task IndexAsync(NamedId<Guid> schemaId, Immutable<IndexCommand[]> updates);
 
-        Task<List<Guid>> SearchAsync(string queryText, Guid schemaId, SearchContext context);
+        Task<List<Guid>> SearchAsync(string queryText, SearchFilter? filter, SearchContext context);
     }
 }

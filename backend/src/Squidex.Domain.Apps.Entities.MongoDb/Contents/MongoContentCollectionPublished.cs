@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryContentsByQuery queryContentsByQuery;
         private readonly QueryIdsAsync queryIdsAsync;
 
-        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, IContentTextIndexer indexer, IJsonSerializer serializer)
+        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, IContentTextIndex indexer, IJsonSerializer serializer)
             : base(database)
         {
             queryContentAsync = new QueryContent(serializer);

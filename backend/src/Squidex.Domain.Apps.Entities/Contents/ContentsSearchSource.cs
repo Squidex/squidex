@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
@@ -15,21 +17,29 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentsSearchSource : ISearchSource
     {
+        private readonly IAppProvider appProvider;
         private readonly IContentQueryService contentQuery;
-        private readonly IContentTextIndexer contentTextIndexer;
+        private readonly IContentTextIndex contentTextIndexer;
         private readonly IUrlGenerator urlGenerator;
 
-        public ContentsSearchSource(IContentQueryService contentQuery, IContentTextIndexer contentTextIndexer, IUrlGenerator urlGenerator)
+        public ContentsSearchSource(
+            IAppProvider appProvider,
+            IContentQueryService contentQuery,
+            IContentTextIndex contentTextIndexer,
+            IUrlGenerator urlGenerator)
         {
+            Guard.NotNull(appProvider);
             Guard.NotNull(contentQuery);
             Guard.NotNull(contentTextIndexer);
             Guard.NotNull(urlGenerator);
 
+            this.appProvider = appProvider;
             this.contentQuery = contentQuery;
             this.contentTextIndexer = contentTextIndexer;
             this.urlGenerator = urlGenerator;
@@ -39,25 +49,63 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = new SearchResults();
 
-            var ids = await contentTextIndexer.SearchAsync($"{query}~", context.App, default, context.Scope());
+            var searchFilter = await CreateSearchFilterAsync(context);
 
-            if (ids?.Count > 0)
+            if (searchFilter == null)
             {
-                var appId = context.App.NamedId();
+                return result;
+            }
 
-                var contents = await contentQuery.QueryAsync(context, ids);
+            var ids = await contentTextIndexer.SearchAsync($"{query}~", context.App, searchFilter, context.Scope());
 
-                foreach (var content in contents)
-                {
-                    var url = urlGenerator.ContentUI(appId, content.SchemaId, content.Id);
+            if (ids == null || ids.Count == 0)
+            {
+                return result;
+            }
 
-                    var name = FormatName(content, context.App.LanguagesConfig.Master);
+            var appId = context.App.NamedId();
 
-                    result.Add(name, SearchResultType.Content, url, content.SchemaDisplayName);
-                }
+            var contents = await contentQuery.QueryAsync(context, ids);
+
+            foreach (var content in contents)
+            {
+                var url = urlGenerator.ContentUI(appId, content.SchemaId, content.Id);
+
+                var name = FormatName(content, context.App.LanguagesConfig.Master);
+
+                result.Add(name, SearchResultType.Content, url, content.SchemaDisplayName);
             }
 
             return result;
+        }
+
+        private async Task<SearchFilter?> CreateSearchFilterAsync(Context context)
+        {
+            var allowedSchemas = new List<Guid>();
+
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
+
+            foreach (var schema in schemas)
+            {
+                if (HasPermission(context, schema.SchemaDef.Name))
+                {
+                    allowedSchemas.Add(schema.Id);
+                }
+            }
+
+            if (allowedSchemas.Count == 0)
+            {
+                return null;
+            }
+
+            return SearchFilter.MustHaveSchemas(allowedSchemas.ToArray());
+        }
+
+        private static bool HasPermission(Context context, string schemaName)
+        {
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaName);
+
+            return context.Permissions.Allows(permission);
         }
 
         private string FormatName(IEnrichedContentEntity content, string masterLanguage)

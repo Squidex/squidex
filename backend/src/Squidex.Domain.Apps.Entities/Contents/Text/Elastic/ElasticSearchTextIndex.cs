@@ -14,12 +14,12 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 {
-    public sealed class ElasticSearchTextIndexer : IContentTextIndexer
+    public sealed class ElasticSearchTextIndex : IContentTextIndex
     {
         private const string IndexName = "contents";
         private readonly ElasticLowLevelClient client;
 
-        public ElasticSearchTextIndexer()
+        public ElasticSearchTextIndex()
         {
             var config = new ConnectionConfiguration(new Uri("http://localhost:9200"));
 
@@ -98,12 +98,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return new SerializableData<T>(data);
         }
 
-        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, Guid schemaId, SearchScope scope = SearchScope.Published)
+        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
         {
-            var serveField =
-                scope == SearchScope.Published ?
-                "servePublished" :
-                "serveAll";
+            var serveField = GetServeField(scope);
 
             var query = new
             {
@@ -111,13 +108,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 {
                     @bool = new
                     {
-                        must = new object[]
+                        must = new List<object>
                         {
                             new
                             {
-                                term = new Dictionary<string, string>
+                                term = new Dictionary<string, object>
                                 {
-                                    ["appId.keyword"] = app.Id.ToString()
+                                    ["appId.keyword"] = app.Id
                                 }
                             },
                             new
@@ -139,16 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                                 }
                             }
                         },
-                        should = new object[]
-                        {
-                            new
-                            {
-                                term = new Dictionary<string, string>
-                                {
-                                    ["schemaId.keyword"] = schemaId.ToString()
-                                }
-                            }
-                        }
+                        should = new List<object>()
                     }
                 },
                 _source = new[]
@@ -157,6 +145,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 },
                 size = 2000
             };
+
+            if (filter?.SchemaIds.Count > 0)
+            {
+                var bySchema = new
+                {
+                    term = new Dictionary<string, object>
+                    {
+                        ["schemaId.keyword"] = filter.SchemaIds
+                    }
+                };
+
+                if (filter.Must)
+                {
+                    query.query.@bool.must.Add(bySchema);
+                }
+                else
+                {
+                    query.query.@bool.should.Add(bySchema);
+                }
+            }
 
             var result = await client.SearchAsync<DynamicResponse>(IndexName, CreatePost(query));
 
@@ -176,6 +184,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
 
             return ids;
+        }
+
+        private static string GetServeField(SearchScope scope)
+        {
+            return scope == SearchScope.Published ?
+                "servePublished" :
+                "serveAll";
         }
     }
 }

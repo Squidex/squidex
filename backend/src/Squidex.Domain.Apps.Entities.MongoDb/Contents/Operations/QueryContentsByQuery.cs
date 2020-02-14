@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryContentsByQuery : OperationBase
     {
         private readonly IJsonSerializer serializer;
-        private readonly IContentTextIndexer indexer;
+        private readonly IContentTextIndex indexer;
 
-        public QueryContentsByQuery(IJsonSerializer serializer, IContentTextIndexer indexer)
+        public QueryContentsByQuery(IJsonSerializer serializer, IContentTextIndex indexer)
         {
             this.serializer = serializer;
 
@@ -61,7 +61,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
-                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, scope);
+                    var searchFilter = SearchFilter.ShouldHaveSchemas(schema.Id);
+
+                    fullTextIds = await indexer.SearchAsync(query.FullText, app, searchFilter, scope);
 
                     if (fullTextIds?.Count == 0)
                     {
