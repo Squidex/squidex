@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_return_assets_result_if_no_permission()
+        public async Task Should_not_return_assets_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_return_backups_result_if_no_permission()
+        public async Task Should_not_return_backups_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_return_clients_result_if_no_permission()
+        public async Task Should_not_return_clients_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -215,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_contributors_clients_result_if_no_permission()
+        public async Task Should_not_contributors_clients_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_subscription_clients_result_if_no_permission()
+        public async Task Should_not_subscription_clients_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -269,7 +269,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_roles_clients_result_if_no_permission()
+        public async Task Should_not_roles_clients_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -296,7 +296,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_return_rules_result_if_no_permission()
+        public async Task Should_not_return_rules_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -323,7 +323,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_workflows_clients_result_if_no_permission()
+        public async Task Should_not_workflows_clients_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 

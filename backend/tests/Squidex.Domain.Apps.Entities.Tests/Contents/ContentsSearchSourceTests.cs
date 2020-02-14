@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_not_invoke_content_index_if_no_permission()
+        public async Task Should_not_invoke_content_index_if_user_has_no_permission()
         {
             var ctx = ContextWithPermissions();
 

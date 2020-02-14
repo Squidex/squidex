@@ -1,6 +1,6 @@
 <ng-container *ngIf="searchSource.selectedAppOrNull | async">
     <div class="search-container">
-        <sqx-autocomplete [source]="searchSource" placeholder="Quick Nav (Press 'q')" icon="search" #searchControl
+        <sqx-autocomplete [source]="searchSource" inputName="searchMenu" placeholder="Quick Nav (Press 'q')" icon="search" #searchControl
             [ngModel]="selection"
             (ngModelChange)="selectResult($event)">
             <ng-template let-result="$implicit">
