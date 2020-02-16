@@ -7,21 +7,23 @@
 
 using Xunit;
 
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+
 namespace Squidex.Infrastructure.Assets
 {
     [Trait("Category", "Dependencies")]
     public class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>, IClassFixture<MongoGridFSAssetStoreFixture>
     {
-        private readonly MongoGridFSAssetStoreFixture fixture;
+        public MongoGridFSAssetStoreFixture _ { get; }
 
         public MongoGridFsAssetStoreTests(MongoGridFSAssetStoreFixture fixture)
         {
-            this.fixture = fixture;
+            _ = fixture;
         }
 
         public override MongoGridFsAssetStore CreateStore()
         {
-            return fixture.AssetStore;
+            return _.AssetStore;
         }
 
         [Fact]

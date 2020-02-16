@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -63,43 +62,43 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryScheduledItems.PrepareAsync(collection, ct);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, ClrQuery query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                return await queryContentsByQuery.DoAsync(app, schema, query, status, SearchScope.All);
+                return await queryContentsByQuery.DoAsync(app, schema, query, SearchScope.All);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids)
         {
             Guard.NotNull(app);
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, schema, ids, status);
+                var result = await queryContentsById.DoAsync(app.Id, schema, ids);
 
                 return ResultList.Create(result.Count, result.Select(x => x.Content));
             }
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids)
         {
             Guard.NotNull(app);
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, null, ids, status);
+                var result = await queryContentsById.DoAsync(app.Id, null, ids);
 
                 return result;
             }
         }
 
-        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, Status[]? status, Guid id)
+        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, Guid id)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryContentAsync.DoAsync(schema, id, status);
+                return await queryContentAsync.DoAsync(schema, id);
             }
         }
 

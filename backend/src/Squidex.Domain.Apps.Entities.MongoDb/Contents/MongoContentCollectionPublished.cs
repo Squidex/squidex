@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                return await queryContentsByQuery.DoAsync(app, schema, query, null, SearchScope.Published);
+                return await queryContentsByQuery.DoAsync(app, schema, query, SearchScope.Published);
             }
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, schema, ids, null);
+                var result = await queryContentsById.DoAsync(app.Id, schema, ids);
 
                 return ResultList.Create(result.Count, result.Select(x => x.Content));
             }
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, null, ids, null);
+                var result = await queryContentsById.DoAsync(app.Id, null, ids);
 
                 return result;
             }
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryContentAsync.DoAsync(schema, id, null);
+                return await queryContentAsync.DoAsync(schema, id);
             }
         }
 

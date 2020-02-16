@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -30,11 +29,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.appProvider = appProvider;
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids, Status[]? status)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids)
         {
             Guard.NotNull(ids);
 
-            var find = Collection.Find(CreateFilter(appId, ids, status));
+            var find = Collection.Find(CreateFilter(appId, ids));
 
             var contentItems = await find.ToListAsync();
             var contentSchemas = await GetSchemasAsync(appId, schema, contentItems);
@@ -43,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             foreach (var contentEntity in contentItems)
             {
-                if (contentEntity.HasStatus(status) && contentSchemas.TryGetValue(contentEntity.IndexedSchemaId, out var contentSchema))
+                if (contentSchemas.TryGetValue(contentEntity.IndexedSchemaId, out var contentSchema))
                 {
                     contentEntity.ParseData(contentSchema.SchemaDef, serializer);
 
@@ -81,18 +80,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return schemas;
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid appId, ICollection<Guid> ids, Status[]? status)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid appId, ICollection<Guid> ids)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Ne(x => x.IsDeleted, true)
             };
-
-            if (status != null)
-            {
-                filters.Add(Filter.In(x => x.Status, status));
-            }
 
             if (ids != null && ids.Count > 0)
             {

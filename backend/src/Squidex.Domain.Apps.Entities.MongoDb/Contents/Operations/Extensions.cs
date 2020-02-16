@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -31,11 +30,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     ValueConverters.EncodeJson(serializer)),
                 FieldConverters.ForNestedName2Id(
                     ValueConverters.EncodeJson(serializer)));
-        }
-
-        public static bool HasStatus(this MongoContentEntity content, Status[]? status)
-        {
-            return status == null || status.Contains(content.Status);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
-            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, A<Status[]>._, contentId, A<SearchScope>._))
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns(CreateContent(contentId));
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, schemaId.Name, contentId));
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, A<Status[]>._, contentId, A<SearchScope>._))
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns<IContentEntity?>(null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, null, contentId, SearchScope.All))
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, SearchScope.All))
                 .Returns(content);
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, null, contentId, scope))
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, scope))
                 .Returns(content);
 
             SetupSchemaScripting(contentId);
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, null, A<ClrQuery>._, SearchScope.All))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, SearchScope.All))
                 .Returns(ResultList.CreateFrom(5, content));
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, null, A<ClrQuery>._, scope))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, scope))
                 .Returns(ResultList.CreateFrom(5, content));
 
             SetupSchemaScripting(contentId);
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, null, A<HashSet<Guid>>._, SearchScope.All))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, SearchScope.All))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
             var result = await sut.QueryAsync(ctx, ids);
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, null, A<HashSet<Guid>>._, SearchScope.All))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, SearchScope.All))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
             var result = await sut.QueryAsync(ctx, ids);
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, null, A<HashSet<Guid>>._, scope))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, scope))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
             SetupSchemaScripting();
@@ -320,7 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<Status[]>._, A<HashSet<Guid>>._, A<SearchScope>._))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, A<SearchScope>._))
                 .MustNotHaveHappened();
         }
 

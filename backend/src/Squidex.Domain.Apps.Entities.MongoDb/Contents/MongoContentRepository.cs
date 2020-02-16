@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -54,11 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.InitializeAsync(ct);
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, ClrQuery query, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, status, query);
+                return collectionAll.QueryAsync(app, schema, query);
             }
             else
             {
@@ -66,11 +65,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, status, ids);
+                return collectionAll.QueryAsync(app, schema, ids);
             }
             else
             {
@@ -78,11 +77,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids, SearchScope scope)
+        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, status, ids);
+                return collectionAll.QueryAsync(app, ids);
             }
             else
             {
@@ -90,11 +89,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, Guid id, SearchScope scope)
+        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.FindContentAsync(schema, status, id);
+                return collectionAll.FindContentAsync(schema, id);
             }
             else
             {

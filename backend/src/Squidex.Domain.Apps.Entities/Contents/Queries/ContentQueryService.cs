@@ -247,22 +247,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, null, new HashSet<Guid>(ids), context.Scope());
+            return contentRepository.QueryAsync(context.App, new HashSet<Guid>(ids), context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
         {
-            return contentRepository.QueryAsync(context.App, schema, null, query, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, query, context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, schema, null, ids, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, ids, context.Scope());
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(context.App, schema, null, id, context.Scope());
+            return contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
         }
 
         private Task<IContentEntity> FindByVersionAsync(Guid id, long version)

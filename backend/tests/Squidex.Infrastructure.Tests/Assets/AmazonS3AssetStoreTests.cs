@@ -8,21 +8,23 @@
 using System.Threading.Tasks;
 using Xunit;
 
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+
 namespace Squidex.Infrastructure.Assets
 {
     [Trait("Category", "Dependencies")]
     public class AmazonS3AssetStoreTests : AssetStoreTests<AmazonS3AssetStore>, IClassFixture<AmazonS3AssetStoreFixture>
     {
-        private readonly AmazonS3AssetStoreFixture fixture;
+        public AmazonS3AssetStoreFixture _ { get; }
 
         public AmazonS3AssetStoreTests(AmazonS3AssetStoreFixture fixture)
         {
-            this.fixture = fixture;
+            _ = fixture;
         }
 
         public override AmazonS3AssetStore CreateStore()
         {
-            return fixture.AssetStore;
+            return _.AssetStore;
         }
 
         [Fact]
