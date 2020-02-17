@@ -60,6 +60,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ResolveReferences>()
                 .As<IContentEnricherStep>();
 
+            services.AddSingletonAs<ScriptContent>()
+                .As<IContentEnricherStep>();
+
             services.AddSingletonAs<ContentEnricher>()
                 .As<IContentEnricher>();
 

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -36,7 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
         private readonly ISchemaEntity schema;
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
@@ -66,7 +64,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 contentEnricher,
                 contentRepository,
                 contentVersionLoader,
-                scriptEngine,
                 queryParser);
         }
 
@@ -133,52 +130,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
 
-        [Fact]
-        public async Task FindContentAsync_should_return_content_for_frontend_without_transform()
-        {
-            var ctx = CreateContext(isFrontend: true, allowSchema: true);
-
-            var content = CreateContent(contentId);
-
-            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, SearchScope.All))
-                .Returns(content);
-
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
-
-            Assert.Equal(contentTransformed, result!.Data);
-            Assert.Equal(content.Id, result.Id);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustNotHaveHappened();
-        }
-
         [Theory]
-        [InlineData(true,  SearchScope.All)]
-        [InlineData(false, SearchScope.Published)]
-        public async Task FindContentAsync_should_return_content_for_api_and_transform(bool unpublished, SearchScope scope)
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task FindContentAsync_should_return_content(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: false, allowSchema: true)
-                    .WithUnpublished(unpublished);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
 
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, scope))
                 .Returns(content);
 
-            SetupSchemaScripting(contentId);
-
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
-        public async Task FindContentAsync_should_return_content_by_version_for_api_and_transform()
+        public async Task FindContentAsync_should_return_content_by_version()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
@@ -187,15 +162,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentVersionLoader.GetAsync(contentId, 13))
                 .Returns(content);
 
-            SetupSchemaScripting(contentId);
-
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 13);
 
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
@@ -206,42 +176,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, schemaId.Name, Q.Empty));
         }
 
-        [Fact]
-        public async Task QueryAsync_should_return_contents_for_frontend_without_transform()
-        {
-            var ctx = CreateContext(isFrontend: true, allowSchema: true);
-
-            var content = CreateContent(contentId);
-
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, SearchScope.All))
-                .Returns(ResultList.CreateFrom(5, content));
-
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
-
-            Assert.Equal(contentData, result[0].Data);
-            Assert.Equal(content.Id, result[0].Id);
-
-            Assert.Equal(5, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustNotHaveHappened();
-        }
-
         [Theory]
-        [InlineData(true, SearchScope.All)]
-        [InlineData(false, SearchScope.Published)]
-        public async Task QueryAsync_should_return_contents_for_api_and_transform(bool unpublished, SearchScope scope)
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task QueryAsync_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: false, allowSchema: true)
-                    .WithUnpublished(unpublished);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, scope))
                 .Returns(ResultList.CreateFrom(5, content));
-
-            SetupSchemaScripting(contentId);
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
@@ -249,27 +198,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(contentId, result[0].Id);
 
             Assert.Equal(5, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
-        }
-
-        [Fact]
-        public async Task QueryByIds_should_return_contents_for_frontend_without_transform()
-        {
-            var ctx = CreateContext(isFrontend: true, allowSchema: true);
-
-            var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
-
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, SearchScope.All))
-                .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
-
-            var result = await sut.QueryAsync(ctx, ids);
-
-            Assert.Equal(ids, result.Select(x => x.Id).ToList());
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -288,27 +216,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Theory]
-        [InlineData(true, SearchScope.All)]
-        [InlineData(false, SearchScope.Published)]
-        public async Task QueryByIds_should_return_contents_for_api_with_transform(bool unpublished, SearchScope scope)
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task QueryByIds_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: false, allowSchema: true)
-                    .WithUnpublished(unpublished);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
 
             var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, scope))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
-            SetupSchemaScripting();
-
             var result = await sut.QueryAsync(ctx, ids);
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>._, A<string>._))
-                .MustHaveHappened(5, Times.Exactly);
         }
 
         [Fact]
@@ -322,15 +247,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, A<SearchScope>._))
                 .MustNotHaveHappened();
-        }
-
-        private void SetupSchemaScripting(params Guid[] ids)
-        {
-            foreach (var id in ids)
-            {
-                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.ContentId == id && x.Data == contentData), "<query-script>"))
-                    .Returns(contentTransformed);
-            }
         }
 
         private void SetupEnricher()

@@ -9,13 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 
 #pragma warning disable RECS0147
@@ -29,7 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
         private readonly IContentLoader contentVersionLoader;
-        private readonly IScriptEngine scriptEngine;
         private readonly ContentQueryParser queryParser;
 
         public ContentQueryService(
@@ -37,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
             IContentLoader contentVersionLoader,
-            IScriptEngine scriptEngine,
             ContentQueryParser queryParser)
         {
             Guard.NotNull(appProvider);
@@ -45,14 +41,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Guard.NotNull(contentRepository);
             Guard.NotNull(contentVersionLoader);
             Guard.NotNull(queryParser);
-            Guard.NotNull(scriptEngine);
 
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.queryParser = queryParser;
-            this.scriptEngine = scriptEngine;
             this.queryParser = queryParser;
         }
 
@@ -82,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return await TransformAsync(context, schema, content);
+                return await TransformAsync(context, content);
             }
         }
 
@@ -107,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     contents = await QueryByQueryAsync(context, schema, query);
                 }
 
-                return await TransformAsync(context, schema, contents);
+                return await TransformAsync(context, contents);
             }
         }
 
@@ -122,72 +116,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     return EmptyContents;
                 }
 
-                var results = new List<IEnrichedContentEntity>();
-
                 var contents = await QueryCoreAsync(context, ids);
 
-                foreach (var group in contents.GroupBy(x => x.Schema.Id))
-                {
-                    var schema = group.First().Schema;
+                var filtered =
+                    contents
+                        .GroupBy(x => x.Schema.Id)
+                        .Select(g => FilterContents(g, context))
+                        .SelectMany(c => c);
 
-                    if (HasPermission(context, schema))
-                    {
-                        var enriched = await TransformCoreAsync(context, schema, group.Select(x => x.Content));
-
-                        results.AddRange(enriched);
-                    }
-                }
+                var results = await TransformCoreAsync(context, filtered);
 
                 return ResultList.Create(results.Count, results.SortList(x => x.Id, ids));
             }
         }
 
-        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, ISchemaEntity schema, IResultList<IContentEntity> contents)
+        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents)
         {
-            var transformed = await TransformCoreAsync(context, schema, contents);
+            var transformed = await TransformCoreAsync(context, contents);
 
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private async Task<IEnrichedContentEntity> TransformAsync(Context context, ISchemaEntity schema, IContentEntity content)
+        private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content)
         {
-            var transformed = await TransformCoreAsync(context, schema, Enumerable.Repeat(content, 1));
+            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1));
 
             return transformed[0];
         }
 
-        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var enriched = await contentEnricher.EnrichAsync(contents, context);
-
-                var script = schema.SchemaDef.Scripts.Query;
-
-                if (!string.IsNullOrWhiteSpace(script) && !context.IsFrontendClient)
-                {
-                    var results = new List<IEnrichedContentEntity>();
-
-                    var scriptContext = new ScriptContext { User = context.User };
-
-                    foreach (var content in enriched)
-                    {
-                        scriptContext.Data = content.Data;
-                        scriptContext.ContentId = content.Id;
-
-                        var result = SimpleMapper.Map(content, new ContentEntity());
-
-                        result.Data = scriptEngine.Transform(scriptContext, script);
-
-                        results.Add(result);
-                    }
-
-                    return results;
-                }
-                else
-                {
-                    return enriched;
-                }
+                return await contentEnricher.EnrichAsync(contents, context);
             }
         }
 
@@ -221,6 +182,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 {
                     throw new DomainForbiddenException("You do not have permission for this schema.");
                 }
+            }
+        }
+
+        private static IEnumerable<IContentEntity> FilterContents(IGrouping<Guid, (IContentEntity Content, ISchemaEntity Schema)> group, Context context)
+        {
+            var schema = group.First().Schema;
+
+            if (HasPermission(context, schema))
+            {
+                return group.Select(x => x.Content);
+            }
+            else
+            {
+                return Enumerable.Empty<IContentEntity>();
             }
         }
 
