@@ -41,7 +41,7 @@ export class SearchFormComponent implements OnChanges {
     public queryModel: QueryModel;
 
     @Input()
-    public query: Query;
+    public query: Query | undefined;
 
     @Input()
     public queries: Queries;

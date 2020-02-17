@@ -25,7 +25,7 @@ export class TableHeaderComponent implements OnChanges {
     public queryChange = new EventEmitter<Query>();
 
     @Input()
-    public query: Query;
+    public query: Query | undefined;
 
     @Input()
     public text: string;
@@ -65,7 +65,7 @@ export class TableHeaderComponent implements OnChanges {
                 this.order = 'descending';
             }
 
-            const newQuery = Types.clone(this.query);
+            const newQuery = Types.clone(this.query || {});
 
             newQuery.sort = [
                 { path: this.fieldPath, order: this.order! }
