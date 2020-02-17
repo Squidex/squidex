@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
-            return Task.FromResult(true);
+            return TaskHelper.Done;
         }
 
         public override Task OnDeactivateAsync()
