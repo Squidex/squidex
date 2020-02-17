@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Caching
             for (var i = 5; i < 15; i++)
             {
                 Assert.True(sut.TryGetValue(i.ToString(), out var value));
-                Assert.Equal(0, value);
+                Assert.Equal(i, value);
             }
         }
 
