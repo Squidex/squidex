@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
         {
-            Enhance(command, tags);
+            Enhance(command);
 
             return TaskHelper.Done;
         }
 
-        private void Enhance(UploadAssetCommand command, HashSet<string>? tags)
+        private void Enhance(UploadAssetCommand command)
         {
             try
             {

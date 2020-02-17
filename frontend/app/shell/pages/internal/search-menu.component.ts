@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import {
     ApiUrlConfig,
@@ -30,6 +30,10 @@ export class SearchSource implements AutocompleteSource {
     }
 
     public find(query: string): Observable<readonly any[]> {
+        if (!query || query.length < 3) {
+            return of([]);
+        }
+
         return this.searchService.getResults(this.appsState.appName, query);
     }
 }

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
 
 import {
     fadeAnimation,
@@ -34,6 +34,9 @@ interface State {
 
     // True, when the searching is in progress.
     isSearching?: boolean;
+
+    // Indicates whether the loading is in progress.
+    isLoading?: boolean;
 }
 
 const NO_EMIT = { emitEvent: false };
@@ -50,7 +53,9 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit {
+export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
+    private timer: any;
+
     @Input()
     public source: AutocompleteSource;
 
@@ -90,6 +95,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         });
     }
 
+    public ngOnDestroy() {
+        clearTimeout(this.timer);
+    }
+
     public ngOnInit() {
         this.own(
             this.queryInput.valueChanges.pipe(
@@ -109,7 +118,14 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                         if (!query || !this.source) {
                             return of([]);
                         } else {
-                            return this.source.find(query).pipe(catchError(() => of([])));
+                            this.setLoading(true);
+
+                            return this.source.find(query).pipe(
+                                finalize(() => {
+                                    this.setLoading(false);
+                                }),
+                                catchError(() => of([]))
+                            );
                         }
                     }))
                 .subscribe(items => {
@@ -211,6 +227,18 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
 
         return false;
+    }
+
+    private setLoading(value: boolean) {
+        clearTimeout(this.timer);
+
+        if (value) {
+            this.next(s => ({ ...s, isLoading: true }));
+        } else {
+            this.timer = setTimeout(() => {
+                this.next(s => ({ ...s, isLoading: false }));
+            }, 250);
+        }
     }
 
     public selectIndex(suggestedIndex: number) {
