@@ -36,6 +36,65 @@ namespace Squidex.Domain.Apps.Entities.Rules
             sut = new RuleDequeuerGrain(ruleService, ruleEventRepository, log, clock);
         }
 
+        [Fact]
+        public async Task Should_query_repository()
+        {
+            await sut.QueryAsync();
+
+            A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_ignore_repository_exceptions_and_log()
+        {
+            A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+                .Throws(new InvalidOperationException());
+
+            await sut.QueryAsync();
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_ignore_rule_service_exceptions_and_log()
+        {
+            var @event = CreateEvent(1, "MyAction", "{}");
+
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+                .Throws(new InvalidOperationException());
+
+            await sut.HandleAsync(@event);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_execute_if_already_running()
+        {
+            var id = Guid.NewGuid();
+
+            var @event1 = CreateEvent(1, "MyAction", "{}", id);
+            var @event2 = CreateEvent(1, "MyAction", "{}", id);
+
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+                .ReturnsLazily(async () =>
+                {
+                    await Task.Delay(500);
+
+                    return (Result.Ignored(), TimeSpan.Zero);
+                });
+
+            await Task.WhenAll(
+                sut.HandleAsync(@event1),
+                sut.HandleAsync(@event2));
+
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+                .MustHaveHappenedOnceExactly();
+        }
+
         [Theory]
         [InlineData(0, 0,   RuleResult.Success, RuleJobResult.Success)]
         [InlineData(0, 5,   RuleResult.Timeout, RuleJobResult.Retry)]
@@ -73,17 +132,22 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private IRuleEventEntity CreateEvent(int numCalls, string actionName, string actionData)
         {
+            return CreateEvent(numCalls, actionName, actionData, Guid.NewGuid());
+        }
+
+        private IRuleEventEntity CreateEvent(int numCalls, string actionName, string actionData, Guid id)
+        {
             var @event = A.Fake<IRuleEventEntity>();
 
             var job = new RuleJob
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 ActionData = actionData,
                 ActionName = actionName,
                 Created = clock.GetCurrentInstant()
             };
 
-            A.CallTo(() => @event.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => @event.Id).Returns(id);
             A.CallTo(() => @event.Job).Returns(job);
             A.CallTo(() => @event.Created).Returns(clock.GetCurrentInstant());
             A.CallTo(() => @event.NumCalls).Returns(numCalls);

@@ -93,26 +93,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         command.Metadata.SetPixelWidth(pw);
                         command.Metadata.SetPixelHeight(ph);
-
-                        if (tags != null)
-                        {
-                            tags.Add("image");
-
-                            var wh = pw + ph;
-
-                            if (wh > 2000)
-                            {
-                                tags.Add("image/large");
-                            }
-                            else if (wh > 1000)
-                            {
-                                tags.Add("image/medium");
-                            }
-                            else
-                            {
-                                tags.Add("image/small");
-                            }
-                        }
                     }
 
                     void TryAddString(string name, string? value)
@@ -149,8 +129,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     if (file.Tag is ImageTag imageTag)
                     {
-                        TryAddDouble("locationLatitude", imageTag.Latitude);
-                        TryAddDouble("locationLongitude", imageTag.Longitude);
+                        TryAddDouble("latitude", imageTag.Latitude);
+                        TryAddDouble("longitude", imageTag.Longitude);
 
                         TryAddString("created", imageTag.DateTime?.ToIso8601());
                     }

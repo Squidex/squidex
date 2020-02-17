@@ -34,12 +34,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(IArrayField field)
         {
-            return FormatList("Item", "Items");
+            return FormatArray("Item", "Items");
         }
 
         public string Visit(IField<AssetsFieldProperties> field)
         {
-            return FormatList("Asset", "Assets");
+            return FormatArray("Asset", "Assets");
         }
 
         public string Visit(IField<BooleanFieldProperties> field)
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(IField<ReferencesFieldProperties> field)
         {
-            return FormatList("Reference", "References");
+            return FormatArray("Reference", "References");
         }
 
         public string Visit(IField<StringFieldProperties> field)
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return string.Empty;
         }
 
-        private string FormatList(string singularName, string pluralName)
+        private string FormatArray(string singularName, string pluralName)
         {
             if (value is JsonArray array)
             {
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     return $"{array.Count} {pluralName}";
                 }
-                else if (array.Count == 1)
+                else
                 {
                     return $"1 {singularName}";
                 }

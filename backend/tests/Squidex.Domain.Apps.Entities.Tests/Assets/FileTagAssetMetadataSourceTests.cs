@@ -21,6 +21,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly FileTagAssetMetadataSource sut = new FileTagAssetMetadataSource();
 
         [Fact]
+        public async Task Should_ignore_files_without_extension()
+        {
+            var command = FakeCommand("NoExtension");
+
+            await sut.EnhanceAsync(command, null);
+
+            Assert.Equal(AssetType.Unknown, command.Type);
+        }
+
+        [Fact]
         public async Task Should_provide_metadata_for_image()
         {
             var command = Command("SamplePNGImage_100kbmb.png");
@@ -118,6 +128,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return new CreateAsset
             {
                 File = new AssetFile(file.Name, "mime", file.Length, file.OpenRead)
+            };
+        }
+
+        private UploadAssetCommand FakeCommand(string name)
+        {
+            var stream = new MemoryStream();
+
+            return new CreateAsset
+            {
+                File = new AssetFile(name, "mime", stream.Length, () => stream)
             };
         }
     }

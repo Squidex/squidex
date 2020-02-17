@@ -141,19 +141,11 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitArray(_: ArrayFieldPropertiesDto): string {
-        if (this.value.length) {
-            return `${this.value.length} Item(s)`;
-        } else {
-            return '0 Items';
-        }
+        return this.formatArray('Item', 'Items');
     }
 
     public visitAssets(_: AssetsFieldPropertiesDto): string {
-        if (this.value.length) {
-            return `${this.value.length} Asset(s)`;
-        } else {
-            return '0 Assets';
-        }
+        return this.formatArray('Asset', 'Assets');
     }
 
     public visitBoolean(_: BooleanFieldPropertiesDto): string {
@@ -200,11 +192,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitReferences(_: ReferencesFieldPropertiesDto): string {
-        if (this.value.length) {
-            return `${this.value.length} Reference(s)`;
-        } else {
-            return '0 References';
-        }
+        return this.formatArray('Reference', 'References');
     }
 
     public visitTags(_: TagsFieldPropertiesDto): string {
@@ -229,6 +217,18 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
 
     public visitUI(_: UIFieldPropertiesDto): any {
         return '';
+    }
+
+    private formatArray(singularName: string, pluralName: string) {
+        if (Types.isArray(this.value)) {
+            if (this.value.length > 1) {
+                return `${this.value.length} ${pluralName}`;
+            } else if (this.value.length === 1) {
+                return `1 ${singularName}`;
+            }
+        }
+
+        return `0 ${pluralName}`;
     }
 }
 

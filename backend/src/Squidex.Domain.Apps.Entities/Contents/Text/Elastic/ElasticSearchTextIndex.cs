@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -14,6 +15,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 {
+    [ExcludeFromCodeCoverage]
     public sealed class ElasticSearchTextIndex : IContentTextIndex
     {
         private const string IndexName = "contents";
