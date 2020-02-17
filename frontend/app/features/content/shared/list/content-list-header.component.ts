@@ -30,7 +30,7 @@ export class ContentListHeaderComponent {
     public queryChange = new EventEmitter<Query>();
 
     @Input()
-    public query: Query;
+    public query: Query | undefined;
 
     @Input()
     public language: LanguageDto;
