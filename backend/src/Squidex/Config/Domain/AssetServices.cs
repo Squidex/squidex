@@ -28,6 +28,9 @@ namespace Squidex.Config.Domain
             services.Configure<AssetOptions>(
                 config.GetSection("assets"));
 
+            services.AddTransientAs<RecursiveDeleter>()
+               .As<IEventConsumer>();
+
             services.AddTransientAs<AssetDomainObject>()
                 .AsSelf();
 

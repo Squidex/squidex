@@ -55,7 +55,7 @@ namespace TestSuite.Fixtures
             }
         }
 
-        public async Task<AssetDto> UploadFileAsync(string path, string mimeType, string fileName = null)
+        public async Task<AssetDto> UploadFileAsync(string path, string mimeType, string fileName = null, Guid? parentId = null)
         {
             var fileInfo = new FileInfo(path);
 
@@ -63,7 +63,7 @@ namespace TestSuite.Fixtures
             {
                 var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo), mimeType);
 
-                return await Assets.PostAssetAsync(AppName, upload);
+                return await Assets.PostAssetAsync(AppName, upload, parentId);
             }
         }
 

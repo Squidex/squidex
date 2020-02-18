@@ -188,5 +188,36 @@ namespace TestSuite.ApiTests
 
             Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
         }
+
+        [Fact]
+        public async Task Should_delete_recursively()
+        {
+            // STEP 1: Create asset folder
+            var createRequest1 = new CreateAssetFolderDto { FolderName = "folder1" };
+
+            var folder_1 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest1);
+
+
+            // STEP 2: Create nested asset folder
+            var createRequest2 = new CreateAssetFolderDto { FolderName = "subfolder", ParentId = folder_1.Id };
+
+            var folder_2 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest2);
+
+
+            // STEP 3: Create asset in folder
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
+
+
+            // STEP 4: Delete folder.
+            await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id.ToString());
+
+
+            // STEP 5: Wait for recursive deleter to delete the asset.
+            await Task.Delay(5000);
+
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
+
+            Assert.Equal(404, ex.StatusCode);
+        }
     }
 }
