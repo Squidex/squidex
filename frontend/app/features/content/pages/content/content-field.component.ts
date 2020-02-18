@@ -120,8 +120,8 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
-    public changeShowAllControls(value: boolean) {
-        this.showAllControls = value;
+    public changeShowAllControls(showAllControls: boolean) {
+        this.showAllControls = showAllControls;
 
         this.localStore.setBoolean(this.configKey(), this.showAllControls);
     }
