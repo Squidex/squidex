@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     return $"{array.Count} {pluralName}";
                 }
-                else
+                else if (array.Count == 1)
                 {
                     return $"1 {singularName}";
                 }
