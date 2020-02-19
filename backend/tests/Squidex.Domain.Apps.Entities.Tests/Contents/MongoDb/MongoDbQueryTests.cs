@@ -181,19 +181,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
-        public void Should_make_query_from_draft()
-        {
-            var i = F(ClrFilter.Eq("data/dashed_field/iv", "Value"), true);
-            var o = C("{ 'dd.8.iv' : 'Value' }");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
         public void Should_make_query_with_empty_test()
         {
-            var i = F(ClrFilter.Empty("data/firstName/iv"), true);
-            var o = C("{ '$or' : [{ 'dd.1.iv' : { '$exists' : false } }, { 'dd.1.iv' : null }, { 'dd.1.iv' : '' }, { 'dd.1.iv' : [] }] }");
+            var i = F(ClrFilter.Empty("data/firstName/iv"));
+            var o = C("{ '$or' : [{ 'do.1.iv' : { '$exists' : false } }, { 'do.1.iv' : null }, { 'do.1.iv' : '' }, { 'do.1.iv' : [] }] }");
 
             Assert.Equal(o, i);
         }
@@ -299,9 +290,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return value.Replace('\'', '"');
         }
 
-        private string F(FilterNode<ClrValue> filter, bool useDraft = false)
+        private string F(FilterNode<ClrValue> filter)
         {
-            return Q(new ClrQuery { Filter = filter }, useDraft);
+            return Q(new ClrQuery { Filter = filter });
         }
 
         private string S(params SortNode[] sorts)
@@ -310,21 +301,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var i = string.Empty;
 
-            A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>.Ignored))
+            A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>._))
                 .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
                 {
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef, false));
+            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef));
 
             return i;
         }
 
-        private string Q(ClrQuery query, bool useDraft = false)
+        private string Q(ClrQuery query)
         {
             var rendered =
-                query.AdjustToModel(schemaDef, useDraft).BuildFilter<MongoContentEntity>().Filter!
+                query.AdjustToModel(schemaDef).BuildFilter<MongoContentEntity>().Filter!
                     .Render(Serializer, Registry).ToString();
 
             return rendered;

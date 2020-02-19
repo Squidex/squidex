@@ -20,6 +20,7 @@ import { fadeAnimation } from '@app/framework/internal';
 })
 export class ListViewComponent implements AfterViewInit {
     private timer: any;
+    private isLoadingValue = false;
 
     @ViewChild('headerElement', { static: false })
     public headerElement: ElementRef<ParentNode>;
@@ -44,12 +45,12 @@ export class ListViewComponent implements AfterViewInit {
 
     @Input()
     public set isLoading(value: boolean) {
+        clearTimeout(this.timer);
+
         if (value) {
             this.isLoadingValue = value;
 
             this.changeDetector.markForCheck();
-
-            clearTimeout(this.timer);
         } else {
             this.timer = setTimeout(() => {
                 this.isLoadingValue = value;
@@ -59,7 +60,9 @@ export class ListViewComponent implements AfterViewInit {
         }
     }
 
-    public isLoadingValue = false;
+    public get isLoading() {
+        return this.isLoadingValue;
+    }
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,

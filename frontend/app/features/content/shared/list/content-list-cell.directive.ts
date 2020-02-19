@@ -44,11 +44,11 @@ export function getCellWidth(field: TableField) {
             case MetaFields.lastModifiedByName:
                 return 150;
             case MetaFields.status:
-                return 160;
+                return 200;
             case MetaFields.statusNext:
                 return 240;
             case MetaFields.statusColor:
-                return 50;
+                return 80;
             case MetaFields.version:
                 return 80;
         }

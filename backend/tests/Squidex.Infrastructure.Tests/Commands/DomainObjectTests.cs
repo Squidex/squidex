@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+            A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
             Assert.True(result is EntityCreatedResult<Guid>);
@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+            A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
             Assert.True(result is EntitySavedResult);
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+            A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappenedOnceExactly();
 
             Assert.True(result is EntitySavedResult);
@@ -156,7 +156,7 @@ namespace Squidex.Infrastructure.Commands
             await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 9, ExpectedVersion = 1 });
 
-            A.CallTo(() => persistence.ReadAsync(A<long>.Ignored))
+            A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappenedOnceExactly();
 
             Assert.Equal(9, sut.Snapshot.Value);
@@ -172,7 +172,7 @@ namespace Squidex.Infrastructure.Commands
 
             A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4)))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
                 .MustNotHaveHappened();
         }
 
@@ -240,7 +240,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupEmpty();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
@@ -256,7 +256,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto()));
@@ -281,7 +281,7 @@ namespace Squidex.Infrastructure.Commands
                     handleEvent(Envelope.Create(new ValueChanged { Value = value }));
                 });
 
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>.Ignored, A<HandleEvent>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Invokes(args =>
                 {
                     handleEvent = args.GetArgument<HandleEvent>(3)!;
@@ -296,7 +296,7 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupEmpty()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>.Ignored, A<HandleEvent>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
             A.CallTo(() => persistence.Version)

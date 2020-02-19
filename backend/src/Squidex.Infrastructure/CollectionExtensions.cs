@@ -13,12 +13,12 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
-        public static bool SetEquals<T>(this ICollection<T> source, ICollection<T> other)
+        public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
         {
             return source.Intersect(other).Count() == other.Count;
         }
 
-        public static bool SetEquals<T>(this ICollection<T> source, ICollection<T> other, IEqualityComparer<T> comparer)
+        public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other, IEqualityComparer<T> comparer)
         {
             return source.Intersect(other, comparer).Count() == other.Count;
         }

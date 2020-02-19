@@ -13,6 +13,10 @@
             .loading {
                 display: none;
             }
+
+            #outdated {
+                display: none;
+            }
         </style>
     </noscript>
 
@@ -20,16 +24,16 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.js"></script>
     <script>
-        function addLoadEvent(func) {
-            var oldonload = window.onload;
+        function addLoadEvent(callback) {
+            var oldOnload = window.onload;
             if (typeof window.onload != 'function') {
-                window.onload = func;
+                window.oldOnload = callback;
             } else {
                 window.onload = function () {
-                    if (oldonload) {
-                        oldonload();
+                    if (oldOnload) {
+                        oldOnload();
                     }
-                    func();
+                    callback();
                 }
             }
         }

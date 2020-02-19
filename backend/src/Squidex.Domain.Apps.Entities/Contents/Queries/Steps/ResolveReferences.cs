@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     try
                     {
-                        if (content.DataDraft.TryGetValue(field.Name, out var fieldData) && fieldData != null)
+                        if (content.Data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                         {
                             foreach (var (partition, partitionValue) in fieldData)
                             {
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static JsonObject Format(IContentEntity content, Context context, ISchemaEntity referencedSchema)
         {
-            return content.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig);
+            return content.Data.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig);
         }
 
         private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             foreach (var content in contents)
             {
-                content.DataDraft.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids);
             }
         }
 

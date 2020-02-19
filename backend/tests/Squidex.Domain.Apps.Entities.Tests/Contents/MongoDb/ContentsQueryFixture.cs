@@ -71,63 +71,64 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
                 await mongoDatabase.DropCollectionAsync("system.profile");
 
-                var collection = contentRepository.GetInternalCollection();
+                var collections = contentRepository.GetInternalCollections();
 
-                var contentCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
-
-                if (contentCount == 0)
+                foreach (var collection in collections)
                 {
-                    var batch = new List<MongoContentEntity>();
+                    var contentCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
 
-                    async Task ExecuteBatchAsync(MongoContentEntity? entity)
+                    if (contentCount == 0)
                     {
-                        if (entity != null)
-                        {
-                            batch.Add(entity);
-                        }
+                        var batch = new List<MongoContentEntity>();
 
-                        if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
+                        async Task ExecuteBatchAsync(MongoContentEntity? entity)
                         {
-                            await collection.InsertManyAsync(batch);
-
-                            batch.Clear();
-                        }
-                    }
-
-                    foreach (var appId in AppIds)
-                    {
-                        foreach (var schemaId in SchemaIds)
-                        {
-                            for (var i = 0; i < numValues; i++)
+                            if (entity != null)
                             {
-                                var value = i.ToString();
+                                batch.Add(entity);
+                            }
 
-                                var data =
-                                    new IdContentData()
-                                        .AddField(1,
-                                            new ContentFieldData()
-                                                .AddJsonValue(JsonValue.Create(value)));
+                            if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
+                            {
+                                await collection.InsertManyAsync(batch);
 
-                                var content = new MongoContentEntity
-                                {
-                                    Id = Guid.NewGuid(),
-                                    AppId = appId,
-                                    DataByIds = data,
-                                    DataDraftByIds = data,
-                                    IndexedAppId = appId.Id,
-                                    IndexedSchemaId = schemaId.Id,
-                                    IsDeleted = false,
-                                    IsPending = false,
-                                    SchemaId = schemaId,
-                                    Status = Status.Published
-                                };
-
-                                await ExecuteBatchAsync(content);
+                                batch.Clear();
                             }
                         }
-                    }
 
-                    await ExecuteBatchAsync(null);
+                        foreach (var appId in AppIds)
+                        {
+                            foreach (var schemaId in SchemaIds)
+                            {
+                                for (var i = 0; i < numValues; i++)
+                                {
+                                    var value = i.ToString();
+
+                                    var data =
+                                        new IdContentData()
+                                            .AddField(1,
+                                                new ContentFieldData()
+                                                    .AddJsonValue(JsonValue.Create(value)));
+
+                                    var content = new MongoContentEntity
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        AppId = appId,
+                                        DataByIds = data,
+                                        IndexedAppId = appId.Id,
+                                        IndexedSchemaId = schemaId.Id,
+                                        IsDeleted = false,
+                                        SchemaId = schemaId,
+                                        Status = Status.Published
+                                    };
+
+                                    await ExecuteBatchAsync(content);
+                                }
+                            }
+                        }
+
+                        await ExecuteBatchAsync(null);
+                    }
                 }
 
                 await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
@@ -140,17 +141,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<Guid>._, false))
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<Guid>(0)!, x.GetArgument<Guid>(1)!)));
 
             return appProvider;
         }
 
-        private static ITextIndexer CreateTextIndexer()
+        private static IContentTextIndex CreateTextIndexer()
         {
-            var textIndexer = A.Fake<ITextIndexer>();
+            var textIndexer = A.Fake<IContentTextIndex>();
 
-            A.CallTo(() => textIndexer.SearchAsync(A<string>.Ignored, A<IAppEntity>.Ignored, A<Guid>.Ignored, A<Scope>.Ignored))
+            A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<SearchFilter>._, A<SearchScope>._))
                 .Returns(new List<Guid> { Guid.NewGuid() });
 
             return textIndexer;

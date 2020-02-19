@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             HashSet<Guid>? newIndex = null;
 
-            A.CallTo(() => index.RebuildAsync(appId, A<HashSet<Guid>>.Ignored))
+            A.CallTo(() => index.RebuildAsync(appId, A<HashSet<Guid>>._))
                 .Invokes(new Action<Guid, HashSet<Guid>>((_, i) => newIndex = i));
 
             await sut.RestoreAsync(context);

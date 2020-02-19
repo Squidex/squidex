@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             Request? recordedRequest = null;
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>.Ignored))
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
                 .Invokes((Request request) => recordedRequest = request);
 
             var clientId = "frontend";
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = Guid.NewGuid();
 
-            A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>.Ignored, appId.ToString(), dateFrom, dateTo, default))
+            A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>._, appId.ToString(), dateFrom, dateTo, default))
                 .Invokes(x =>
                 {
                     var callback = x.GetArgument<Func<Request, Task>>(0)!;

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public string Channel { get; set; }
 
-        public string Message { get; set; }
+        public string EventType { get; set; }
 
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 
@@ -34,14 +34,14 @@ namespace Squidex.Domain.Apps.Entities.History
         {
         }
 
-        public HistoryEvent(string channel, string message)
+        public HistoryEvent(string channel, string eventType)
         {
             Guard.NotNullOrEmpty(channel);
-            Guard.NotNullOrEmpty(message);
+            Guard.NotNullOrEmpty(eventType);
 
             Channel = channel;
 
-            Message = message;
+            EventType = eventType;
         }
 
         public HistoryEvent Param(string key, object? value)

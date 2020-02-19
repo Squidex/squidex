@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<Guid>>._))
                 .MustNotHaveHappened();
         }
 
@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<Guid>>._))
                 .MustNotHaveHappened();
         }
 
@@ -280,7 +280,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<List<Guid>>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<Guid>>._))
                 .MustNotHaveHappened();
         }
 
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             return new ContentEntity
             {
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("ref1",
                             new ContentFieldData()
@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new ContentEntity
             {
                 Id = id,
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("name",
                             new ContentFieldData()

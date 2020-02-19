@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -19,16 +18,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public sealed class AssetFolderState : DomainObjectState<AssetFolderState>, IAssetFolderEntity
     {
-        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [DataMember]
         public string FolderName { get; set; }
 
-        [DataMember]
-        public bool IsDeleted { get; set; }
-
-        [DataMember]
         public Guid ParentId { get; set; }
 
         public override bool ApplyEvent(IEvent @event)

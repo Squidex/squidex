@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     return UpdateImage(e, ev => null);
 
                 case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                    return UpdatePlan(e, ev => AppPlan.Build(ev.Actor, ev.PlanId));
+                    return UpdatePlan(e, ev => new AppPlan(ev.Actor, ev.PlanId));
 
                 case AppPlanReset e when Plan != null:
                     return UpdatePlan(e, ev => null);

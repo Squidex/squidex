@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Caching
 {
@@ -68,9 +69,9 @@ namespace Squidex.Infrastructure.Caching
             return false;
         }
 
-        public bool TryGetValue(TKey key, out object? value)
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
-            value = null;
+            value = default!;
 
             if (cacheMap.TryGetValue(key, out var node))
             {

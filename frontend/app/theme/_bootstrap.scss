@@ -128,25 +128,6 @@ a {
     }
 }
 
-//
-// Fix navbar.
-// 
-.navbar {
-    // Use fixed height to reduce problems with dynamic elements.
-    & {
-        height: $size-navbar-height;
-    }
-
-    &-nav {
-        line-height: 2.2rem;
-    }
-
-    // Ensure that dropdown is always under nav bar.
-    .dropdown-menu {
-        top: 2.6rem;
-    }
-}
-
 .navbar-nav {
     .nav-link {
         cursor: pointer;

@@ -155,7 +155,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>.Ignored))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 

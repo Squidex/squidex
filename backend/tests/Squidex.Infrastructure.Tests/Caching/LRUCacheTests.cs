@@ -38,13 +38,13 @@ namespace Squidex.Infrastructure.Caching
             for (var i = 0; i < 5; i++)
             {
                 Assert.False(sut.TryGetValue(i.ToString(), out var value));
-                Assert.Null(value);
+                Assert.Equal(0, value);
             }
 
             for (var i = 5; i < 15; i++)
             {
                 Assert.True(sut.TryGetValue(i.ToString(), out var value));
-                Assert.NotNull(value);
+                Assert.Equal(i, value);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Caching
             Assert.True(sut.Remove(key));
             Assert.False(sut.Contains(key));
             Assert.False(sut.TryGetValue(key, out var value));
-            Assert.Null(value);
+            Assert.Equal(0, value);
         }
     }
 }

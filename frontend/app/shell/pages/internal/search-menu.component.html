@@ -1,0 +1,23 @@
+<ng-container *ngIf="searchSource.selectedAppOrNull | async">
+    <div class="search-container">
+        <sqx-autocomplete [source]="searchSource" inputName="searchMenu" placeholder="Quick Nav (Press 'q')" icon="search" #searchControl
+            [ngModel]="selection"
+            (ngModelChange)="selectResult($event)">
+            <ng-template let-result="$implicit">
+                <div class="row no-gutters">
+                    <div class="col-auto pr-4">
+                        <i class="icon-search-{{result.type}}"></i>
+                    </div>
+                    <div class="col truncate">
+                        {{result.name}}
+                    </div>
+                    <div class="col-auto text-right" *ngIf="result.label">
+                        <div class="badge badge-pill badge-primary">{{result.label}}</div>
+                    </div>
+                </div>
+            </ng-template>
+        </sqx-autocomplete>
+
+        <sqx-shortcut keys="q" (trigger)="searchControl.focus()"></sqx-shortcut>
+    </div>
+</ng-container>

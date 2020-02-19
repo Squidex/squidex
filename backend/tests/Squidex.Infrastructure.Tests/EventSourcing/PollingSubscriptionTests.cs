@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await WaitAndStopAsync(sut);
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
                 .MustHaveHappened(1, Times.Exactly);
         }
 
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventSubscriber, "^my-stream", position);
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new OperationCanceledException();
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventSubscriber, "^my-stream", position);
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new AggregateException(new OperationCanceledException());
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventSubscriber, "^my-stream", position);
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await WaitAndStopAsync(sut);
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
                 .MustHaveHappened(2, Times.Exactly);
         }
 

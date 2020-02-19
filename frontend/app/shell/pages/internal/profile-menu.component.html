@@ -4,39 +4,39 @@
             <i class="icon-help2"></i>
         </a>
     </li>
-    <li class="nav-item nav-icon dropdown">
-        <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
+    <li class="nav-item nav-icon dropdown" #button>
+        <span class="nav-link dropdown-toggle"(click)="modalMenu.toggle()">
             <span class="user">
                 <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture" />
                 
                 <span>{{snapshot.profileDisplayName}}</span>
             </span>
         </span>
-
-        <ng-container *sqxModal="modalMenu;closeAlways:true;onRoot:false">
-            <div class="dropdown-menu" @fade>
-                <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
-                    <div>Signed in with</div>
-            
-                    <strong>{{snapshot.profileEmail}}</strong>
-                </a>
-                
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
-                    Administration
-                </a>
-
-                <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
-                    Profile
-                </a>
-
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item" (click)="logout()" sqxExternalLink>
-                    Logout
-                </a>
-            </div>
-        </ng-container>
     </li>
 </ul>
+
+<ng-container *sqxModal="modalMenu;closeAlways:true;onRoot:false">
+    <div class="dropdown-menu" [sqxAnchoredTo]="button" [offset]="10" @fade>
+        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
+            <div>Signed in with</div>
+    
+            <strong>{{snapshot.profileEmail}}</strong>
+        </a>
+        
+        <div class="dropdown-divider"></div>
+
+        <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
+            Administration
+        </a>
+
+        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
+            Profile
+        </a>
+
+        <div class="dropdown-divider"></div>
+
+        <a class="dropdown-item" (click)="logout()" sqxExternalLink>
+            Logout
+        </a>
+    </div>
+</ng-container>

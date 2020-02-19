@@ -152,8 +152,12 @@ describe('ArrayField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Item(s)');
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Items');
+    });
+
+    it('should format to plural count for single item', () => {
+        expect(FieldFormatter.format(field, [1])).toBe('1 Item');
     });
 
     it('should return zero formatting if other type', () => {
@@ -176,8 +180,12 @@ describe('AssetsField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Asset(s)');
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Assets');
+    });
+
+    it('should format to plural count for single item', () => {
+        expect(FieldFormatter.format(field, [1])).toBe('1 Asset');
     });
 
     it('should return zero formatting if other type', () => {
@@ -389,8 +397,12 @@ describe('ReferencesField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Reference(s)');
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 References');
+    });
+
+    it('should format to plural count for single item', () => {
+        expect(FieldFormatter.format(field, [1])).toBe('1 Reference');
     });
 
     it('should return zero formatting if other type', () => {
@@ -540,7 +552,7 @@ describe('GetContentValue', () => {
 
     it('should resolve invariant field', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 field1: {
                     iv: 13
                 }
@@ -554,7 +566,7 @@ describe('GetContentValue', () => {
 
     it('should resolve localized field', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 field1: {
                     en: 13
                 }
@@ -568,7 +580,7 @@ describe('GetContentValue', () => {
 
     it('should return default values if field not found', () => {
         const content: any = {
-            dataDraft: {
+            data: {
                 other: {
                     en: 13
                 }

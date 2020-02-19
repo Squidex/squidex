@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             Assert.Equal("other == 'value'", result!.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>.Ignored, A<HashSet<string>>.Ignored))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>._, A<HashSet<string>>._))
                 .MustNotHaveHappened();
         }
     }

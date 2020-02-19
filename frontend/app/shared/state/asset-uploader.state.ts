@@ -71,7 +71,7 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
-        const parentId = target ? target.parentId : undefined;
+        const parentId = target?.parentId || undefined;
 
         const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
 

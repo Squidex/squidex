@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.Search;
 
 namespace Squidex.Config.Domain
 {
@@ -37,6 +38,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AppUISettings>()
                 .As<IAppUISettings>();
+
+            services.AddSingletonAs<AppSettingsSearchSource>()
+                .As<ISearchSource>();
 
             services.AddSingleton(c =>
             {

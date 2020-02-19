@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public sealed class SearchContext
     {
-        public Scope Scope { get; set; }
+        public SearchScope Scope { get; set; }
 
         public HashSet<string> Languages { get; set; }
     }

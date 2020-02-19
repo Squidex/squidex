@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -25,17 +24,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.serializer = serializer;
         }
 
-        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id, Status[]? status, bool includeDraft)
+        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id)
         {
             Guard.NotNull(schema);
 
-            var find = Collection.Find(x => x.Id == id).WithoutDraft(includeDraft);
+            var find = Collection.Find(x => x.Id == id);
 
             var contentEntity = await find.FirstOrDefaultAsync();
 
             if (contentEntity != null)
             {
-                if (contentEntity.IndexedSchemaId != schema.Id || !contentEntity.HasStatus(status))
+                if (contentEntity.IndexedSchemaId != schema.Id)
                 {
                     return null;
                 }

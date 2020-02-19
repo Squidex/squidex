@@ -39,11 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
-        public async Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user)
+        public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            return workflow.TryGetTransition(content.Status, next, out var transition) && IsTrue(transition, content.DataDraft, user);
+            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
         }
 
         public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
@@ -53,48 +53,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
-        public async Task<bool> CanUpdateAsync(IContentEntity content, ClaimsPrincipal user)
+        public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            if (workflow.TryGetStep(content.Status, out var step))
+            if (workflow.TryGetStep(status, out var step))
             {
-                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.DataDraft, user);
+                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.Data, user);
             }
 
             return true;
         }
 
-        public async Task<StatusInfo> GetInfoAsync(IContentEntity content)
+        public async Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            if (workflow.TryGetStep(content.Status, out var step))
+            if (workflow.TryGetStep(status, out var step))
             {
-                return new StatusInfo(content.Status, GetColor(step));
+                return new StatusInfo(status, GetColor(step));
             }
 
-            return new StatusInfo(content.Status, StatusColors.Draft);
+            return new StatusInfo(status, StatusColors.Draft);
         }
 
-        public async Task<StatusInfo> GetInitialStatusAsync(ISchemaEntity schema)
+        public async Task<Status> GetInitialStatusAsync(ISchemaEntity schema)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
-            var (status, step) = workflow.GetInitialStep();
+            var (status, _) = workflow.GetInitialStep();
 
-            return new StatusInfo(status, GetColor(step));
+            return status;
         }
 
-        public async Task<StatusInfo[]> GetNextsAsync(IContentEntity content, ClaimsPrincipal user)
+        public async Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal user)
         {
             var result = new List<StatusInfo>();
 
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            foreach (var (to, step, transition) in workflow.GetTransitions(content.Status))
+            foreach (var (to, step, transition) in workflow.GetTransitions(status))
             {
-                if (IsTrue(transition, content.DataDraft, user))
+                if (IsTrue(transition, content.Data, user))
                 {
                     result.Add(new StatusInfo(to, GetColor(step)));
                 }

@@ -21,12 +21,5 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             Roles = roles;
         }
-
-        public override string ToString()
-        {
-            var roles = Roles?.Count > 0 ? string.Join(", ", Roles) : "*";
-
-            return $"When=${Expression}, For={roles}";
-        }
     }
 }

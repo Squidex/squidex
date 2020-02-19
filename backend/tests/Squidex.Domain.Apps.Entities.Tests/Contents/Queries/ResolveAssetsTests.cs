@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     })
                     .SetFieldsInLists("asset1", "asset2");
 
-            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>.Ignored))
+            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>._))
                 .ReturnsLazily(new Func<string, string>(id => $"url/to/{id}"));
 
             schemaProvider = x =>
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, null, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, null, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.Ignored, null, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, null, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             return new ContentEntity
             {
-                DataDraft =
+                Data =
                     new NamedContentData()
                         .AddField("asset1",
                             new ContentFieldData()

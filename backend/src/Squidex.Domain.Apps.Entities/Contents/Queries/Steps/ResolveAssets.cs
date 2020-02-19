@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 
-                    if (content.DataDraft.TryGetValue(field.Name, out var fieldData) && fieldData != null)
+                    if (content.Data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                     {
                         foreach (var (partitionKey, partitionValue) in fieldData)
                         {
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             foreach (var content in contents)
             {
-                content.DataDraft.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids);
             }
         }
 

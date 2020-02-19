@@ -11,6 +11,10 @@ import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 
 import { Types } from './../../utils/types';
 
+export interface FocusComponent {
+    focus(): void;
+}
+
 export function formControls(form: AbstractControl): ReadonlyArray<AbstractControl> {
     if (Types.is(form, FormGroup)) {
         return Object.values(form.controls);

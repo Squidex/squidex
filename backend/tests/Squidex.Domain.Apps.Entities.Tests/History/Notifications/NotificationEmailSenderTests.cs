@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
         {
             await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>._, A<string>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
         {
             await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>._, A<string>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>.Ignored, A<Action<None, IObjectWriter>>.Ignored))
+            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>._, A<Action<None, IObjectWriter>>._))
                 .MustHaveHappened();
         }
     }

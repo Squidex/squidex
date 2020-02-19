@@ -116,6 +116,7 @@ import {
     WorkflowsService,
     WorkflowsState
 } from './declarations';
+import { SearchService } from './services/search.service';
 
 @NgModule({
     imports: [
@@ -257,6 +258,7 @@ export class SqxSharedModule {
                 RuleEventsState,
                 RulesService,
                 RulesState,
+                SearchService,
                 SchemaMustExistGuard,
                 SchemaMustExistPublishedGuard,
                 SchemaMustNotBeSingletonGuard,

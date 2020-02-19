@@ -101,7 +101,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         if (options && options.noReset) {
             this.form.markAsPristine();
         } else {
-            this.setValue(options ? options.newValue : undefined);
+            this.setValue(options?.newValue);
         }
     }
 

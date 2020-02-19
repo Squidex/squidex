@@ -84,6 +84,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return SetBoolean(context, HeaderNoResolveLanguages, value);
         }
 
+        public static SearchScope Scope(this Context context)
+        {
+            return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
+        }
+
         public static IEnumerable<string> AssetUrls(this Context context)
         {
             if (context.Headers.TryGetValue(HeaderResolveAssetUrls, out var value))

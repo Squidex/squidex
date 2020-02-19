@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -21,17 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
     [CollectionName("Schemas")]
     public sealed class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
     {
-        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [DataMember]
-        public long SchemaFieldsTotal { get; set; }
-
-        [DataMember]
-        public bool IsDeleted { get; set; }
-
-        [DataMember]
         public Schema SchemaDef { get; set; }
+
+        public long SchemaFieldsTotal { get; set; }
 
         public override bool ApplyEvent(IEvent @event)
         {

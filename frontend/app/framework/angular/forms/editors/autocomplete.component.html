@@ -1,12 +1,19 @@
-<span>
+<span class="control-container">
     <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)" #input
         [sqxFocusOnInit]="autoFocus"
-        [name]="inputName" [placeholder]="placeholder"
+        [name]="inputName" 
+        [placeholder]="placeholder"
         autocomplete="off" 
         autocorrect="off"
         autocapitalize="off"
         [class.form-underlined]="underlined"
+        [class.form-icon]="!!icon"
         [formControl]="queryInput">
+
+    <div class="icon" *ngIf="icon">
+        <i class="icon-{{icon}}" [class.icon-spinner2]="snapshot.isLoading" [class.spin2]="snapshot.isLoading"></i>
+    </div>
+
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0" position="bottom-left">
         <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left" #container @fade>

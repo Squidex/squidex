@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -32,38 +30,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryServiceTests
     {
-        private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
         private readonly ISchemaEntity schema;
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly NamedContentData contentData = new NamedContentData();
         private readonly NamedContentData contentTransformed = new NamedContentData();
-        private readonly ClaimsPrincipal user;
-        private readonly ClaimsIdentity identity = new ClaimsIdentity();
-        private readonly Context requestContext;
         private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
         private readonly ContentQueryService sut;
 
-        public static IEnumerable<object?[]> ApiStatusTests = new[]
-        {
-            new object?[] { 0, new[] { Status.Published } },
-            new object?[] { 1, null }
-        };
-
         public ContentQueryServiceTests()
         {
-            user = new ClaimsPrincipal(identity);
-
-            app = Mocks.App(appId);
-
-            requestContext = new Context(user, app);
-
             var schemaDef =
                 new Schema(schemaId.Name)
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
@@ -72,7 +53,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             SetupEnricher();
 
-            A.CallTo(() => queryParser.ParseQuery(requestContext, schema, A<Q>.Ignored))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
+                .Returns(schema);
+
+            A.CallTo(() => queryParser.ParseQuery(A<Context>._, schema, A<Q>._))
                 .Returns(new ClrQuery());
 
             sut = new ContentQueryService(
@@ -80,396 +64,194 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 contentEnricher,
                 contentRepository,
                 contentVersionLoader,
-                scriptEngine,
                 queryParser);
         }
 
         [Fact]
-        public async Task Should_return_schema_from_id_if_string_is_guid()
+        public async Task GetSchemaOrThrowAsync_should_return_schema_from_guid_string()
         {
-            SetupSchemaFound();
+            var input = schemaId.Id.ToString();
 
-            var result = await sut.GetSchemaOrThrowAsync(requestContext, schemaId.Id.ToString());
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+                .Returns(schema);
+
+            var result = await sut.GetSchemaOrThrowAsync(ctx, input);
 
             Assert.Equal(schema, result);
         }
 
         [Fact]
-        public async Task Should_return_schema_from_name_if_string_not_guid()
+        public async Task GetSchemaOrThrowAsync_should_return_schema_from_name()
         {
-            SetupSchemaFound();
+            var input = schemaId.Name;
 
-            var result = await sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name);
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
+                .Returns(schema);
+
+            var result = await sut.GetSchemaOrThrowAsync(ctx, input);
 
             Assert.Equal(schema, result);
         }
 
         [Fact]
-        public async Task Should_throw_404_if_schema_not_found()
+        public async Task GetSchemaOrThrowAsync_should_throw_404_if_not_found()
         {
-            SetupSchemaNotFound();
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            var ctx = requestContext;
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<string>._))
+                .Returns((ISchemaEntity?)null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
 
         [Fact]
-        public async Task Should_throw_404_if_schema_not_found_in_check()
+        public async Task FindContentAsync_should_throw_exception_if_user_has_no_permission()
         {
-            SetupSchemaNotFound();
+            var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
-            var ctx = requestContext;
-
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
-        }
-
-        [Fact]
-        public async Task Should_throw_for_single_content_if_no_permission()
-        {
-            SetupUser(false, false);
-            SetupSchemaFound();
-
-            var ctx = requestContext;
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
+                .Returns(CreateContent(contentId));
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
 
         [Fact]
-        public async Task Should_throw_404_for_single_content_if_content_not_found()
+        public async Task FindContentAsync_should_throw_404_if_not_found()
         {
-            var status = new[] { Status.Published };
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-            SetupContent(status, null, includeDraft: false);
-
-            var ctx = requestContext;
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
+                .Returns<IContentEntity?>(null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
 
-        [Fact]
-        public async Task Should_return_single_content_for_frontend_without_transform()
-        {
-            var content = CreateContent(contentId);
-
-            SetupUser(isFrontend: true);
-            SetupSchemaFound();
-            SetupSchemaScripting(contentId);
-            SetupContent(null, content, includeDraft: true);
-
-            var ctx = requestContext;
-
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
-
-            Assert.Equal(contentTransformed, result!.Data);
-            Assert.Equal(content.Id, result.Id);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustNotHaveHappened();
-        }
-
         [Theory]
-        [MemberData(nameof(ApiStatusTests))]
-        public async Task Should_return_single_content_for_api_with_transform(int unpublished, Status[] status)
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task FindContentAsync_should_return_content(int isFrontend, int unpublished, SearchScope scope)
         {
+            var ctx =
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
+
             var content = CreateContent(contentId);
 
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-            SetupSchemaScripting(contentId);
-            SetupContent(status, content, unpublished == 1);
-
-            var ctx = requestContext.WithUnpublished(unpublished == 1);
-
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
-
-            Assert.Equal(contentTransformed, result!.Data);
-            Assert.Equal(content.Id, result.Id);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(1, Times.Exactly);
-        }
-
-        [Fact]
-        public async Task Should_return_versioned_content_from_repository_and_transform()
-        {
-            var content = CreateContent(contentId);
-
-            SetupUser(true);
-            SetupSchemaFound();
-            SetupSchemaScripting(contentId);
-
-            A.CallTo(() => contentVersionLoader.GetAsync(contentId, 10))
+            A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, scope))
                 .Returns(content);
 
-            var ctx = requestContext;
-
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 10);
+            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
         }
 
         [Fact]
-        public async Task Should_throw_for_query_if_no_permission()
+        public async Task FindContentAsync_should_return_content_by_version()
         {
-            SetupUser(false, false);
-            SetupSchemaFound();
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            var ctx = requestContext;
+            var content = CreateContent(contentId);
+
+            A.CallTo(() => contentVersionLoader.GetAsync(contentId, 13))
+                .Returns(content);
+
+            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 13);
+
+            Assert.Equal(contentTransformed, result!.Data);
+            Assert.Equal(content.Id, result.Id);
+        }
+
+        [Fact]
+        public async Task QueryAsync_should_throw_if_user_has_no_permission()
+        {
+            var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, schemaId.Name, Q.Empty));
         }
 
-        [Fact]
-        public async Task Should_query_contents_by_query_for_frontend_without_transform()
-        {
-            const int count = 5, total = 200;
-
-            var content = CreateContent(contentId);
-
-            SetupUser(isFrontend: true);
-            SetupSchemaFound();
-            SetupSchemaScripting(contentId);
-            SetupContents(null, count, total, content, inDraft: true, includeDraft: true);
-
-            var ctx = requestContext;
-
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
-
-            Assert.Equal(contentData, result[0].Data);
-            Assert.Equal(content.Id, result[0].Id);
-
-            Assert.Equal(total, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustNotHaveHappened();
-        }
-
         [Theory]
-        [MemberData(nameof(ApiStatusTests))]
-        public async Task Should_query_contents_by_query_for_api_and_transform(int unpublished, Status[] status)
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task QueryAsync_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
-            const int count = 5, total = 200;
+            var ctx =
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
 
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-            SetupSchemaScripting(contentId);
-            SetupContents(status, count, total, content, inDraft: false, unpublished == 1);
-
-            var ctx = requestContext.WithUnpublished(unpublished == 1);
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, scope))
+                .Returns(ResultList.CreateFrom(5, content));
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(contentId, result[0].Id);
 
-            Assert.Equal(total, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(count, Times.Exactly);
+            Assert.Equal(5, result.Total);
         }
 
         [Fact]
-        public async Task Should_query_contents_by_id_for_frontend_and_transform()
+        public async Task QueryByIds_should_not_return_contents_if_user_has_no_permission()
         {
-            const int count = 5, total = 200;
+            var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
-            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
+            var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
 
-            SetupUser(isFrontend: true);
-            SetupSchemaFound();
-            SetupSchemaScripting(ids.ToArray());
-            SetupContents(null, total, ids, includeDraft: true);
-
-            var ctx = requestContext;
-
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithIds(ids));
-
-            Assert.Equal(ids, result.Select(x => x.Id).ToList());
-            Assert.Equal(total, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustNotHaveHappened();
-        }
-
-        [Theory]
-        [MemberData(nameof(ApiStatusTests))]
-        public async Task Should_query_contents_by_id_for_api_and_transform(int unpublished, Status[] status)
-        {
-            const int count = 5, total = 200;
-
-            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
-
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-            SetupSchemaScripting(ids.ToArray());
-            SetupContents(status, total, ids, unpublished == 1);
-
-            var ctx = requestContext.WithUnpublished(unpublished == 1);
-
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithIds(ids));
-
-            Assert.Equal(ids, result.Select(x => x.Id).ToList());
-            Assert.Equal(total, result.Total);
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(count, Times.Exactly);
-        }
-
-        [Fact]
-        public async Task Should_query_all_contents_by_id_for_frontend_and_transform()
-        {
-            const int count = 5;
-
-            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
-
-            SetupUser(isFrontend: true);
-            SetupSchemaFound();
-            SetupSchemaScripting(ids.ToArray());
-            SetupContents(null, ids, includeDraft: true);
-
-            var ctx = requestContext;
-
-            var result = await sut.QueryAsync(ctx, ids);
-
-            Assert.Equal(ids, result.Select(x => x.Id).ToList());
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustNotHaveHappened();
-        }
-
-        [Theory]
-        [MemberData(nameof(ApiStatusTests))]
-        public async Task Should_query_all_contents_by_id_for_api_and_transform(int unpublished, Status[] status)
-        {
-            const int count = 5;
-
-            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
-
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-            SetupSchemaScripting(ids.ToArray());
-            SetupContents(status, ids, unpublished == 1);
-
-            var ctx = requestContext.WithUnpublished(unpublished == 1);
-
-            var result = await sut.QueryAsync(ctx, ids);
-
-            Assert.Equal(ids, result.Select(x => x.Id).ToList());
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(count, Times.Exactly);
-        }
-
-        [Fact]
-        public async Task Should_skip_contents_when_user_has_no_permission()
-        {
-            var ids = Enumerable.Range(0, 1).Select(x => Guid.NewGuid()).ToList();
-
-            SetupUser(isFrontend: false, allowSchema: false);
-            SetupSchemaFound();
-            SetupSchemaScripting(ids.ToArray());
-            SetupContents(new Status[0], ids, includeDraft: false);
-
-            var ctx = requestContext;
-
-            var result = await sut.QueryAsync(ctx, ids);
-
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task Should_not_call_repository_if_no_id_defined()
-        {
-            var ids = new List<Guid>();
-
-            SetupUser(isFrontend: false, allowSchema: false);
-            SetupSchemaFound();
-
-            var ctx = requestContext;
-
-            var result = await sut.QueryAsync(ctx, ids);
-
-            Assert.Empty(result);
-
-            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.Ignored, A<HashSet<Guid>>.Ignored, A<bool>.Ignored))
-                .MustNotHaveHappened();
-        }
-
-        private void SetupUser(bool isFrontend, bool allowSchema = true)
-        {
-            if (isFrontend)
-            {
-                identity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
-            }
-
-            if (allowSchema)
-            {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.ForApp(Permissions.AppContentsRead, app.Name, schema.SchemaDef.Name).Id));
-            }
-
-            requestContext.UpdatePermissions();
-        }
-
-        private void SetupSchemaScripting(params Guid[] ids)
-        {
-            foreach (var id in ids)
-            {
-                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == id && x.Data == contentData), "<query-script>"))
-                    .Returns(contentTransformed);
-            }
-        }
-
-        private void SetupContents(Status[]? status, int count, int total, IContentEntity content, bool inDraft, bool includeDraft)
-        {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<ClrQuery>.Ignored, includeDraft))
-                .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
-        }
-
-        private void SetupContents(Status[]? status, int total, List<Guid> ids, bool includeDraft)
-        {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
-                .Returns(ResultList.Create(total, ids.Select(CreateContent).Shuffle()));
-        }
-
-        private void SetupContents(Status[]? status, List<Guid> ids, bool includeDraft)
-        {
-            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, SearchScope.All))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Empty(result);
         }
 
-        private void SetupContent(Status[]? status, IContentEntity? content, bool includeDraft)
+        [Theory]
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
+        public async Task QueryByIds_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
-            A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.That.Is(status), contentId, includeDraft))
-                .Returns(content);
+            var ctx =
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
+
+            var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
+
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, scope))
+                .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Equal(ids, result.Select(x => x.Id).ToList());
         }
 
-        private void SetupSchemaFound()
+        [Fact]
+        public async Task QueryByIds_should_not_call_repository_if_no_id_defined()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
-                .Returns(schema);
+            var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
-                .Returns(schema);
-        }
+            var result = await sut.QueryAsync(ctx, new List<Guid>());
 
-        private void SetupSchemaNotFound()
-        {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
-                .Returns((ISchemaEntity?)null);
+            Assert.Empty(result);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
-                .Returns((ISchemaEntity?)null);
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, A<SearchScope>._))
+                .MustNotHaveHappened();
         }
 
         private void SetupEnricher()
         {
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._))
                 .ReturnsLazily(x =>
                 {
                     var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;
@@ -478,20 +260,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 });
         }
 
-        private IContentEntity CreateContent(Guid id)
+        private Context CreateContext(bool isFrontend, bool allowSchema)
         {
-            return CreateContent(id, Status.Published);
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            if (isFrontend)
+            {
+                claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
+            }
+
+            if (allowSchema)
+            {
+                var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            }
+
+            return new Context(claimsPrincipal, Mocks.App(appId));
         }
 
-        private IContentEntity CreateContent(Guid id, Status status)
+        private IContentEntity CreateContent(Guid id)
         {
             var content = new ContentEntity
             {
                 Id = id,
                 Data = contentData,
-                DataDraft = contentData,
                 SchemaId = schemaId,
-                Status = status
+                Status = Status.Published
             };
 
             return content;

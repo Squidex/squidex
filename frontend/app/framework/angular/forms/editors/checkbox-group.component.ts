@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -32,7 +34,6 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-// tslint:disable-next-line: readonly-array
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> {
     public readonly controlId = MathHelper.guid();
 

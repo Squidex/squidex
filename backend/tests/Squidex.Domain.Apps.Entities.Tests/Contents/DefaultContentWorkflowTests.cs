@@ -25,13 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_draft_as_initial_status()
+        public async Task Should_return_draft_as_initial_status()
         {
-            var expected = new StatusInfo(Status.Draft, StatusColors.Draft);
-
             var result = await sut.GetInitialStatusAsync(null!);
 
-            result.Should().BeEquivalentTo(expected);
+            Assert.Equal(Status.Draft, result);
         }
 
         [Fact]
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanMoveToAsync(content, Status.Draft, null!);
+            var result = await sut.CanMoveToAsync(content, content.Status, Status.Draft, null!);
 
             Assert.True(result);
         }
@@ -49,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content, null!);
+            var result = await sut.CanUpdateAsync(content, content.Status, null!);
 
             Assert.True(result);
         }
@@ -59,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content, null!);
+            var result = await sut.CanUpdateAsync(content, content.Status, null!);
 
             Assert.True(result);
         }
@@ -69,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Archived };
 
-            var result = await sut.CanUpdateAsync(content, null!);
+            var result = await sut.CanUpdateAsync(content, content.Status, null!);
 
             Assert.False(result);
         }
@@ -85,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextsAsync(content, null!);
+            var result = await sut.GetNextAsync(content, content.Status, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -100,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null!);
+            var result = await sut.GetNextAsync(content, content.Status, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -116,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null!);
+            var result = await sut.GetNextAsync(content, content.Status, null!);
 
             result.Should().BeEquivalentTo(expected);
         }

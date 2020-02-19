@@ -14,7 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         bool CanUpdate { get; }
 
+        bool IsSingleton { get; }
+
         string StatusColor { get; }
+
+        string? NewStatusColor { get; }
+
+        string? ScheduledStatusColor { get; }
 
         string SchemaName { get; }
 
@@ -22,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         RootField[]? ReferenceFields { get; }
 
-        StatusInfo[]? Nexts { get; }
+        StatusInfo[]? NextStatuses { get; }
 
         NamedContentData? ReferenceData { get; }
     }

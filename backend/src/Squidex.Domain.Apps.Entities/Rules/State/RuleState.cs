@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
@@ -20,14 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
     [CollectionName("Rules")]
     public sealed class RuleState : DomainObjectState<RuleState>, IRuleEntity
     {
-        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [DataMember]
         public Rule RuleDef { get; set; }
-
-        [DataMember]
-        public bool IsDeleted { get; set; }
 
         public override bool ApplyEvent(IEvent @event)
         {

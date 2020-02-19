@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
-            return Task.FromResult(true);
+            return TaskHelper.Done;
         }
 
         public override Task OnDeactivateAsync()
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
-                    .WriteProperty("action", "QueueWebhookEvents")
+                    .WriteProperty("action", "QueryRuleEvents")
                     .WriteProperty("status", "Failed"));
             }
         }
@@ -100,17 +100,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 var (response, elapsed) = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
-                var jobInvoke = ComputeJobInvoke(response.Status, @event, job);
-                var jobResult = ComputeJobResult(response.Status, jobInvoke);
+                var jobDelay = ComputeJobDelay(response.Status, @event, job);
+                var jobResult = ComputeJobResult(response.Status, jobDelay);
 
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.MarkSentAsync(@event.Job, response.Dump, response.Status, jobResult, elapsed, now, jobInvoke);
+                await ruleEventRepository.MarkSentAsync(@event.Job, response.Dump, response.Status, jobResult, elapsed, now, jobDelay);
             }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
-                    .WriteProperty("action", "SendWebhookEvent")
+                    .WriteProperty("action", "SendRuleEvent")
                     .WriteProperty("status", "Failed"));
             }
             finally
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        private static Instant? ComputeJobInvoke(RuleResult result, IRuleEventEntity @event, RuleJob job)
+        private static Instant? ComputeJobDelay(RuleResult result, IRuleEventEntity @event, RuleJob job)
         {
             if (result != RuleResult.Success)
             {

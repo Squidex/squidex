@@ -41,11 +41,6 @@ $color-nav-shadow: rgba(26, 93, 184, .26);
         padding: 1rem 1.5rem;
     }
 
-    &-menu {
-        @include absolute($size-navbar-height - .5rem, auto, auto, 0);
-        margin: 0;
-    }
-
     &-item {
         border-radius: 0;
     }

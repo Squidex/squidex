@@ -47,15 +47,26 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {
-                var result = new ClrQuery();
+                ClrQuery result;
 
-                if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
+                if (q.Query != null)
                 {
-                    result = ParseJson(q.JsonQuery);
+                    result = q.Query;
                 }
-                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+                else
                 {
-                    result = ParseOData(q.ODataQuery);
+                    if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
+                    {
+                        result = ParseJson(q.JsonQuery);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+                    {
+                        result = ParseOData(q.ODataQuery);
+                    }
+                    else
+                    {
+                        result = new ClrQuery();
+                    }
                 }
 
                 if (result.Filter != null)

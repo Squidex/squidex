@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.True(context.PlainResult is ImportResult);
 
-            A.CallTo(() => serviceProvider.GetService(A<Type>.Ignored))
+            A.CallTo(() => serviceProvider.GetService(A<Type>._))
                 .MustNotHaveHappened();
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.True(context.PlainResult is ImportResult);
 
-            A.CallTo(() => serviceProvider.GetService(A<Type>.Ignored))
+            A.CallTo(() => serviceProvider.GetService(A<Type>._))
                 .MustNotHaveHappened();
         }
 
@@ -88,10 +88,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(2, result.Count);
             Assert.Equal(2, result.Count(x => x.ContentId.HasValue && x.Exception == null));
 
-            A.CallTo(() => domainObject.Setup(A<Guid>.Ignored))
+            A.CallTo(() => domainObject.Setup(A<Guid>._))
                 .MustHaveHappenedTwiceExactly();
 
-            A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>.Ignored))
+            A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>._))
                 .MustHaveHappenedTwiceExactly();
         }
 

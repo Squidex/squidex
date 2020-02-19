@@ -6,29 +6,22 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public sealed class BackupJob : IBackupJob
     {
-        [DataMember]
         public Guid Id { get; set; }
 
-        [DataMember]
         public Instant Started { get; set; }
 
-        [DataMember]
         public Instant? Stopped { get; set; }
 
-        [DataMember]
         public int HandledEvents { get; set; }
 
-        [DataMember]
         public int HandledAssets { get; set; }
 
-        [DataMember]
         public JobStatus Status { get; set; }
     }
 }

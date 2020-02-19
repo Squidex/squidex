@@ -34,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true)
                 .Not(x => x.DataByIds)
-                .Not(x => x.DataDraftByIds)
                 .ForEachAsync(c =>
                 {
                     callback(c);

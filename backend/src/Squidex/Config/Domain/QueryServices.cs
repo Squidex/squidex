@@ -10,8 +10,8 @@ using GraphQL.DataLoader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IOptions<UrlsOptions>>(),
                     c.GetRequiredService<IAssetFileStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>().As<IEmailUrlGenerator>();
+                .As<IGraphQLUrlGenerator>().As<IUrlGenerator>().As<IAssetUrlGenerator>().As<IEmailUrlGenerator>();
 
             services.AddSingletonAs(x => new FuncDependencyResolver(x.GetRequiredService))
                 .As<IDependencyResolver>();

@@ -42,6 +42,11 @@ namespace Squidex.Domain.Apps.Entities.History
             get { return item.Channel; }
         }
 
+        public string EventType
+        {
+            get { return item.EventType; }
+        }
+
         public string? Message
         {
             get { return message.Value; }
@@ -53,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             message = new Lazy<string?>(() =>
             {
-                if (texts.TryGetValue(item.Message, out var result))
+                if (texts.TryGetValue(item.EventType, out var result))
                 {
                     foreach (var (key, value) in item.Parameters)
                     {

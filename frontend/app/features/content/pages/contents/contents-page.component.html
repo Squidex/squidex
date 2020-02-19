@@ -45,11 +45,9 @@
                         {{selectionCount}} items selected&nbsp;&nbsp;
             
                         <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
-                            <sqx-content-status
+                            <sqx-content-status layout="text"
                                 [status]="status"
-                                [statusColor]="nextStatuses[status]"
-                                showLabel="true"
-                                small="true">
+                                [statusColor]="nextStatuses[status]">
                             </sqx-content-status>
                         </button>
                         
@@ -113,7 +111,7 @@
                                 (clone)="clone(content)"
                                 [canClone]="contentsState.snapshot.canCreate"
                                 [language]="language"
-                                [link]="[content.id]"
+                                [link]="[content.id, 'history']"
                                 [listFields]="listFields">
                             </tbody>
                         </table>

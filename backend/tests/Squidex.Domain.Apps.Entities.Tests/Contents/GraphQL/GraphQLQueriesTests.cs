@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_introspect()
         {
-            const string query = @"              
+            const string query = @"
                 query IntrospectionQuery {
                   __schema {
                     queryType { name }
@@ -161,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -248,13 +249,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       metadata
                       tags
                       slug
-                    }   
+                    }
                   }
                 }";
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -443,7 +444,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -561,7 +562,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -702,7 +703,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(10, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1029,7 +1030,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
@@ -1104,7 +1105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>.Ignored))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
@@ -1173,7 +1174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.Ignored))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>._))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -1293,99 +1294,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var json = serializer.Serialize(result);
 
             Assert.Contains("\"data\":null", json);
-        }
-
-        [Fact]
-        public async Task Should_return_draft_content_when_querying_dataDraft()
-        {
-            var dataDraft = new NamedContentData()
-                .AddField("my-string",
-                    new ContentFieldData()
-                        .AddValue("de", "draft value"))
-                .AddField("my-number",
-                    new ContentFieldData()
-                        .AddValue("iv", 42));
-
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null, dataDraft);
-
-            var query = @"
-                query {
-                  findMySchemaContent(id: ""<ID>"") {
-                    dataDraft {
-                      myString {
-                        de
-                      }
-                      myNumber {
-                        iv
-                      }
-                    }
-                  }
-                }".Replace("<ID>", contentId.ToString());
-
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
-                .Returns(ResultList.CreateFrom(1, content));
-
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
-
-            var expected = new
-            {
-                data = new
-                {
-                    findMySchemaContent = new
-                    {
-                        dataDraft = new
-                        {
-                            myString = new
-                            {
-                                de = "draft value"
-                            },
-                            myNumber = new
-                            {
-                                iv = 42
-                            }
-                        }
-                    }
-                }
-            };
-
-            AssertResult(expected, result);
-        }
-
-        [Fact]
-        public async Task Should_return_null_when_querying_dataDraft_and_no_draft_content_is_available()
-        {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null);
-
-            var query = @"
-                query {
-                  findMySchemaContent(id: ""<ID>"") {
-                    dataDraft {
-                      myString {
-                        de
-                      }
-                    }
-                  }
-                }".Replace("<ID>", contentId.ToString());
-
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
-                .Returns(ResultList.CreateFrom(1, content));
-
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
-
-            var expected = new
-            {
-                data = new
-                {
-                    findMySchemaContent = new
-                    {
-                        dataDraft = (object?)null
-                    }
-                }
-            };
-
-            AssertResult(expected, result);
         }
 
         private static IReadOnlyList<Guid> MatchId(Guid contentId)

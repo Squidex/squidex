@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private static readonly Regex ContentDataPlaceholderNew = new Regex(@"^\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
         private readonly List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
-        private readonly IRuleUrlGenerator urlGenerator;
+        private readonly IUrlGenerator urlGenerator;
         private readonly IScriptEngine scriptEngine;
 
-        public RuleEventFormatter(IJsonSerializer jsonSerializer, IRuleUrlGenerator urlGenerator, IScriptEngine scriptEngine)
+        public RuleEventFormatter(IJsonSerializer jsonSerializer, IUrlGenerator urlGenerator, IScriptEngine scriptEngine)
         {
             Guard.NotNull(jsonSerializer);
             Guard.NotNull(scriptEngine);
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                return urlGenerator.GenerateContentUIUrl(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
+                return urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
             }
 
             return Fallback;

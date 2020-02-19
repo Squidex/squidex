@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var content in group)
                 {
+                    content.IsSingleton = schema.SchemaDef.IsSingleton;
+
                     content.SchemaName = schemaName;
                     content.SchemaDisplayName = schemaDisplayName;
                 }

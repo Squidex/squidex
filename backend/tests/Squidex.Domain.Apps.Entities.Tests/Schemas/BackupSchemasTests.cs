@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             Dictionary<string, Guid>? newIndex = null;
 
-            A.CallTo(() => index.RebuildAsync(appId, A<Dictionary<string, Guid>>.Ignored))
+            A.CallTo(() => index.RebuildAsync(appId, A<Dictionary<string, Guid>>._))
                 .Invokes(new Action<Guid, Dictionary<string, Guid>>((_, i) => newIndex = i));
 
             await sut.RestoreAsync(context);

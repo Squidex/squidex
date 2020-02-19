@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => indexByName.AddAsync(token))
                 .MustHaveHappened();
 
-            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => indexByName.AddAsync(token))
                 .MustHaveHappened();
 
-            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))
@@ -209,10 +209,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
 
-            A.CallTo(() => indexByName.AddAsync(A<string>.Ignored))
+            A.CallTo(() => indexByName.AddAsync(A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))
@@ -228,10 +228,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => indexByName.ReserveAsync(appId.Id, A<string>.Ignored))
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => indexByUser.AddAsync(appId.Id))

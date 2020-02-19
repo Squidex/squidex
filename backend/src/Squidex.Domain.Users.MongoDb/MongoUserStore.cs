@@ -91,16 +91,35 @@ namespace Squidex.Domain.Users.MongoDb
             {
                 cm.AutoMap();
 
-                cm.MapMember(x => x.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
-                cm.MapMember(x => x.AccessFailedCount).SetIgnoreIfDefault(true);
-                cm.MapMember(x => x.EmailConfirmed).SetIgnoreIfDefault(true);
-                cm.MapMember(x => x.LockoutEnd).SetElementName("LockoutEndDateUtc").SetIgnoreIfNull(true);
-                cm.MapMember(x => x.LockoutEnabled).SetIgnoreIfDefault(true);
-                cm.MapMember(x => x.PasswordHash).SetIgnoreIfNull(true);
-                cm.MapMember(x => x.PhoneNumber).SetIgnoreIfNull(true);
-                cm.MapMember(x => x.PhoneNumberConfirmed).SetIgnoreIfDefault(true);
-                cm.MapMember(x => x.SecurityStamp).SetIgnoreIfNull(true);
-                cm.MapMember(x => x.TwoFactorEnabled).SetIgnoreIfDefault(true);
+                cm.MapMember(x => x.Id)
+                    .SetSerializer(new StringSerializer(BsonType.ObjectId));
+
+                cm.MapMember(x => x.AccessFailedCount)
+                    .SetIgnoreIfDefault(true);
+
+                cm.MapMember(x => x.EmailConfirmed)
+                    .SetIgnoreIfDefault(true);
+
+                cm.MapMember(x => x.LockoutEnd)
+                    .SetElementName("LockoutEndDateUtc").SetIgnoreIfNull(true);
+
+                cm.MapMember(x => x.LockoutEnabled)
+                    .SetIgnoreIfDefault(true);
+
+                cm.MapMember(x => x.PasswordHash)
+                    .SetIgnoreIfNull(true);
+
+                cm.MapMember(x => x.PhoneNumber)
+                    .SetIgnoreIfNull(true);
+
+                cm.MapMember(x => x.PhoneNumberConfirmed)
+                    .SetIgnoreIfDefault(true);
+
+                cm.MapMember(x => x.SecurityStamp)
+                    .SetIgnoreIfNull(true);
+
+                cm.MapMember(x => x.TwoFactorEnabled)
+                    .SetIgnoreIfDefault(true);
             });
         }
 

@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryContentsAsync(HashSet<Guid> ids)
         {
-            return await contentRepository.QueryIdsAsync(appEntity.Id, ids);
+            return await contentRepository.QueryIdsAsync(appEntity.Id, ids, SearchScope.All);
         }
 
         private string GetScript(Func<SchemaScripts, string> script)

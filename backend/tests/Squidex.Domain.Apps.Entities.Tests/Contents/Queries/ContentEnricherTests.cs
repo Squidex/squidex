@@ -60,10 +60,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>.Ignored, A<ProvideSchema>.Ignored))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>.Ignored, A<ProvideSchema>.Ignored))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustNotHaveHappened();
         }
 
@@ -79,10 +79,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>.Ignored, A<ProvideSchema>.Ignored))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>.Ignored, A<ProvideSchema>.Ignored))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustHaveHappened();
         }
 

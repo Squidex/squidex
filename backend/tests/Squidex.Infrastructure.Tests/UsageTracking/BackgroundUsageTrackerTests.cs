@@ -172,7 +172,7 @@ namespace Squidex.Infrastructure.UsageTracking
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
                 .MustNotHaveHappened();
         }
 
@@ -198,7 +198,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             UsageUpdate[]? updates = null;
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
                 .Invokes((UsageUpdate[] u) => updates = u);
 
             sut.Next();
@@ -212,7 +212,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new UsageUpdate(today, $"{key3}_API", "*", Counters(1, 8000))
             }, o => o.ComparingByMembers<UsageUpdate>());
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
                 .MustHaveHappened();
         }
 

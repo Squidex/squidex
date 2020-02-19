@@ -1,0 +1,101 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System;
+using System.Threading.Tasks;
+using FakeItEasy;
+using FluentAssertions;
+using Squidex.Infrastructure.Log;
+using Xunit;
+
+namespace Squidex.Domain.Apps.Entities.Search
+{
+    public class SearchManagerTests
+    {
+        private readonly ISearchSource source1 = A.Fake<ISearchSource>();
+        private readonly ISearchSource source2 = A.Fake<ISearchSource>();
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly Context requestContext = Context.Anonymous();
+        private readonly SearchManager sut;
+
+        public SearchManagerTests()
+        {
+            sut = new SearchManager(new[] { source1, source2 }, log);
+        }
+
+        [Fact]
+        public async Task Should_not_call_sources_and_return_empty_if_query_is_empty()
+        {
+            var result = await sut.SearchAsync(string.Empty, requestContext);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_call_sources_and_return_empty_if_is_too_short()
+        {
+            var result = await sut.SearchAsync("11", requestContext);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_aggregate_results_from_all_sources()
+        {
+            var result1 = new SearchResults().Add("Name1", SearchResultType.Setting, "Url1");
+            var result2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
+
+            var query = "a query";
+
+            A.CallTo(() => source1.SearchAsync(query, requestContext))
+                .Returns(result1);
+
+            A.CallTo(() => source2.SearchAsync(query, requestContext))
+                .Returns(result2);
+
+            var result = await sut.SearchAsync(query, requestContext);
+
+            result.Should().BeEquivalentTo(
+                new SearchResults()
+                    .Add("Name1", SearchResultType.Setting, "Url1")
+                    .Add("Name2", SearchResultType.Setting, "Url2"));
+        }
+
+        [Fact]
+        public async Task Should_ignore_exception_from_source()
+        {
+            var result2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
+
+            var query = "a query";
+
+            A.CallTo(() => source1.SearchAsync(query, requestContext))
+                .Throws(new InvalidOperationException());
+
+            A.CallTo(() => source2.SearchAsync(query, requestContext))
+                .Returns(result2);
+
+            var result = await sut.SearchAsync(query, requestContext);
+
+            result.Should().BeEquivalentTo(result2);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, query, A<Action<string, IObjectWriter>>._))
+                .MustHaveHappened();
+        }
+    }
+}

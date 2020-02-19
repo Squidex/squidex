@@ -17,7 +17,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 20;
+        private const int CurrentVersion = 21;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -58,42 +58,51 @@ namespace Migrate_01
             {
                 yield return serviceProvider.GetRequiredService<RebuildSnapshots>();
             }
-
-            // Version 12: Introduce roles.
-            else if (version < 12)
+            else
             {
-                yield return serviceProvider.GetRequiredService<RebuildApps>();
-            }
+                // Version 09: Grain indexes.
+                if (version < 9)
+                {
+                    yield return serviceProvider.GetService<ConvertOldSnapshotStores>();
+                }
 
-            // Version 09: Grain indexes.
-            if (version < 9)
-            {
-                yield return serviceProvider.GetService<ConvertOldSnapshotStores>();
-            }
+                // Version 12: Introduce roles.
+                if (version < 12)
+                {
+                    yield return serviceProvider.GetRequiredService<RebuildApps>();
+                }
 
-            // Version 19: Unify indexes.
-            if (version < 19)
-            {
-                yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
-            }
+                // Version 14: Schema refactoring
+                if (version < 14)
+                {
+                    yield return serviceProvider.GetRequiredService<ClearSchemas>();
+                }
 
-            // Version 11: Introduce content drafts.
-            if (version < 11)
-            {
-                yield return serviceProvider.GetService<DeleteContentCollections>();
-                yield return serviceProvider.GetRequiredService<RebuildContents>();
-            }
+                // Version 18: Rebuild assets.
+                if (version < 18)
+                {
+                    yield return serviceProvider.GetService<RebuildAssets>();
+                }
+                else
+                {
+                    // Version 17: Rename slug field.
+                    if (version < 17)
+                    {
+                        yield return serviceProvider.GetService<RenameAssetSlugField>();
+                    }
 
-            // Version 13: Json refactoring
-            if (version < 13)
-            {
-                yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
-            }
+                    // Version 20: Rename slug field.
+                    if (version < 20)
+                    {
+                        yield return serviceProvider.GetService<RenameAssetMetadata>();
+                    }
+                }
 
-            // Version 14: Schema refactoring
-            if (version < 14)
-            {
-                yield return serviceProvider.GetRequiredService<ClearSchemas>();
+                // Version 21: Introduce content drafts V2.
+                if (version < 21)
+                {
+                    yield return serviceProvider.GetRequiredService<RebuildContents>();
+                }
             }
 
             // Version 01: Introduce app patterns.
@@ -102,36 +111,22 @@ namespace Migrate_01
                 yield return serviceProvider.GetRequiredService<AddPatterns>();
             }
 
-            // Version 15: Introduce custom full text search actors.
-            if (version < 15)
+            // Version 13: Json refactoring
+            if (version < 13)
             {
-                yield return serviceProvider.GetRequiredService<RestructureContentCollection>();
-            }
-
-            // Version 18: Rebuild assets.
-            if (version < 18)
-            {
-                yield return serviceProvider.GetService<RebuildAssets>();
-            }
-            else
-            {
-                // Version 17: Rename slug field.
-                if (version < 17)
-                {
-                    yield return serviceProvider.GetService<RenameAssetSlugField>();
-                }
-
-                // Version 20: Rename slug field.
-                if (version < 20)
-                {
-                    yield return serviceProvider.GetService<RenameAssetMetadata>();
-                }
+                yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
             }
 
             // Version 16: Introduce file name slugs for assets.
             if (version < 16)
             {
                 yield return serviceProvider.GetRequiredService<CreateAssetSlugs>();
+            }
+
+            // Version 19: Unify indexes.
+            if (version < 19)
+            {
+                yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

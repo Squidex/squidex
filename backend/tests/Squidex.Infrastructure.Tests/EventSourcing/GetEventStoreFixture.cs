@@ -33,6 +33,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public void Dispose()
         {
             CleanupAsync().Wait();
+
+            connection.Dispose();
         }
 
         private async Task CleanupAsync()

@@ -33,6 +33,7 @@ export class ScheduleDto {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
+        public readonly color: string,
         public readonly dueTime: DateTime
     ) {
     }
@@ -70,24 +71,22 @@ export class ContentDto {
     public readonly statusUpdates: ReadonlyArray<StatusInfo>;
 
     public readonly canDelete: boolean;
-    public readonly canDraftDiscard: boolean;
-    public readonly canDraftPropose: boolean;
-    public readonly canDraftPublish: boolean;
+    public readonly canDraftDelete: boolean;
+    public readonly canDraftCreate: boolean;
     public readonly canUpdate: boolean;
-    public readonly canUpdateAny: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly status: string,
         public readonly statusColor: string,
+        public readonly newStatus: string | undefined,
+        public readonly newStatusColor: string | undefined,
         public readonly created: DateTime,
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
         public readonly scheduleJob: ScheduleDto | null,
-        public readonly isPending: boolean,
-        public readonly data: ContentData | undefined,
-        public readonly dataDraft: ContentData,
+        public readonly data: ContentData,
         public readonly schemaName: string,
         public readonly schemaDisplayName: string,
         public readonly referenceData: ContentReferences,
@@ -97,11 +96,9 @@ export class ContentDto {
         this._links = links;
 
         this.canDelete = hasAnyLink(links, 'delete');
-        this.canDraftDiscard = hasAnyLink(links, 'draft/discard');
-        this.canDraftPropose = hasAnyLink(links, 'draft/propose');
-        this.canDraftPublish = hasAnyLink(links, 'draft/publish');
+        this.canDraftCreate = hasAnyLink(links, 'draft/create');
+        this.canDraftDelete = hasAnyLink(links, 'draft/delete');
         this.canUpdate = hasAnyLink(links, 'update');
-        this.canUpdateAny = this.canUpdate || this.canDraftPropose;
 
         this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
     }
@@ -235,8 +232,8 @@ export class ContentsService {
             pretifyError('Failed to update content. Please reload.'));
     }
 
-    public discardDraft(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
-        const link = resource._links['draft/discard'];
+    public createVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
+        const link = resource._links['draft/create'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -245,39 +242,24 @@ export class ContentsService {
                 return parseContent(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('Content', 'Discarded', appName);
+                this.analytics.trackEvent('Content', 'VersioNCreated', appName);
             }),
-            pretifyError('Failed to discard draft. Please reload.'));
+            pretifyError('Failed to version a new version. Please reload.'));
     }
 
-    public proposeDraft(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
-        const link = resource._links['draft/propose'];
+    public deleteVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
+        const link = resource._links['draft/delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('Content', 'Updated', appName);
+                this.analytics.trackEvent('Content', 'VersionDeleted', appName);
             }),
-            pretifyError('Failed to propose draft. Please reload.'));
-    }
-
-    public publishDraft(appName: string, resource: Resource, dueTime: string | null, version: Version): Observable<ContentDto> {
-        const link = resource._links['draft/publish'];
-
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version, { status: 'Published', dueTime }).pipe(
-            map(({ payload }) => {
-                return parseContent(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Discarded', appName);
-            }),
-            pretifyError('Failed to publish draft. Please reload.'));
+            pretifyError('Failed to delete version. Please reload.'));
     }
 
     public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
@@ -313,20 +295,27 @@ function parseContent(response: any) {
         response.id,
         response.status,
         response.statusColor,
+        response.newStatus,
+        response.newStatusColor,
         DateTime.parseISO_UTC(response.created), response.createdBy,
         DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-        response.scheduleJob
-            ? new ScheduleDto(
-                response.scheduleJob.status,
-                response.scheduleJob.scheduledBy,
-                DateTime.parseISO_UTC(response.scheduleJob.dueTime))
-            : null,
-        response.isPending === true,
+        parseScheduleJob(response.scheduleJob),
         response.data,
-        response.dataDraft,
         response.schemaName,
         response.schemaDisplayName,
         response.referenceData,
         response.referenceFields.map((item: any) => parseField(item)),
         new Version(response.version.toString()));
+}
+
+function parseScheduleJob(response: any) {
+    if (!response) {
+        return null;
+    }
+
+    return new ScheduleDto(
+        response.status,
+        response.scheduledBy,
+        response.color,
+        DateTime.parseISO_UTC(response.dueTime));
 }

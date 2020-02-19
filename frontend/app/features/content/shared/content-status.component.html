@@ -1,13 +1,45 @@
-<ng-container *ngIf="scheduledTo; else noSchedule">
-    <span class="content-status pending mr-1" title="{{tooltipText}}">
-        <i class="icon-clock" [class.icon-sm]="small"></i>
-    </span>
+<ng-container *ngIf="isMultiline; else simple">
+    <div class="content-status-summary">
+        <span class="content-status default mr-1" [style.color]="statusColor" title="{{tooltipText}}">
+            <i class="icon-circle icon-sm"></i>
+        </span>
+
+        <span class="label">{{status}}</span>
+    </div>
+
+    <div class="content-status-scheduled mt-2" *ngIf="scheduled">
+        <div>
+            <span class="label">to&nbsp;</span>
+
+            <span class="content-status default mr-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
+                <i class="icon-circle icon-sm"></i>
+            </span>
+
+            <span>{{scheduled?.status}}</span>
+        </div>
+
+        <div class="truncate">
+            <span class="label">at&nbsp;</span>
+    
+            <span>{{scheduled?.dueTime | sqxFullDateTime}}</span>
+        </div>
+    </div>
 </ng-container>
 
-<ng-template #noSchedule>
-    <span class="content-status default mr-1" [style.color]="statusColor" title="{{tooltipText}}">
-        <i class="icon-circle" [class.icon-sm]="small"></i>
+<ng-template #simple>
+    <span [class.truncate]="truncate">
+        <ng-container *ngIf="scheduled; else noSchedule">
+            <span class="content-status pending" [style.color]="scheduled?.color" title="{{tooltipText}}">
+                <i class="icon-clock" [class.icon-sm]="small"></i>
+            </span>
+        </ng-container>
+        
+        <ng-template #noSchedule>
+            <span class="content-status default" [style.color]="statusColor" title="{{tooltipText}}">
+                <i class="icon-circle" [class.icon-sm]="small"></i>
+            </span>
+        </ng-template>
+        
+        <span class="content-status-label ml-1" *ngIf="isText">{{status}}</span>
     </span>
 </ng-template>
-
-<span class="content-status-label" *ngIf="showLabel">{{displayStatus}}</span>

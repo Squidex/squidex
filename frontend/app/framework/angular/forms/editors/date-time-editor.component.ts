@@ -7,13 +7,15 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import * as moment from 'moment';
+import moment from 'moment';
 
 import {
     StatefulControlComponent,
     Types,
     UIOptions
 } from '@app/framework/internal';
+
+import { FocusComponent } from './../forms-helper';
 
 declare module 'pikaday/pikaday';
 
@@ -34,7 +36,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit {
+export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private picker: any;
     private timeValue: moment.Moment | null = null;
     private dateValue: moment.Moment | null = null;
@@ -54,7 +56,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     public hideDateButtons: boolean;
 
     @ViewChild('dateInput', { static: false })
-    public dateInput: ElementRef;
+    public dateInput: ElementRef<HTMLInputElement>;
 
     public timeControl = new FormControl();
     public dateControl = new FormControl();
@@ -130,12 +132,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
+    public focus() {
+        this.dateInput.nativeElement.focus();
     }
 
     public ngAfterViewInit() {

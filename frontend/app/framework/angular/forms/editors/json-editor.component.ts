@@ -12,6 +12,8 @@ import { debounceTime } from 'rxjs/operators';
 
 import { ResourceLoaderService, StatefulControlComponent } from '@app/framework/internal';
 
+import { FocusComponent } from './../forms-helper';
+
 declare var ace: any;
 
 export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -27,12 +29,11 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JsonEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit {
+export class JsonEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: any;
     private valueString: string;
-    private isDisabled = false;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLDivElement>;
@@ -47,28 +48,6 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector, {});
-    }
-
-    public writeValue(obj: any) {
-        this.value = obj;
-
-        try {
-            this.valueString = JSON.stringify(obj);
-        } catch (e) {
-            this.valueString = '';
-        }
-
-        if (this.aceEditor) {
-            this.setValue(obj);
-        }
-    }
-
-    public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
-        if (this.aceEditor) {
-            this.aceEditor.setReadOnly(isDisabled);
-        }
     }
 
     public ngAfterViewInit() {
@@ -86,7 +65,7 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
             this.aceEditor.getSession().setMode('ace/mode/javascript');
-            this.aceEditor.setReadOnly(this.isDisabled);
+            this.aceEditor.setReadOnly(this.snapshot.isDisabled);
             this.aceEditor.setFontSize(14);
 
             this.setValue(this.value);
@@ -102,6 +81,34 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
 
             this.detach();
         });
+    }
+
+    public writeValue(obj: any) {
+        this.value = obj;
+
+        try {
+            this.valueString = JSON.stringify(obj);
+        } catch (e) {
+            this.valueString = '';
+        }
+
+        if (this.aceEditor) {
+            this.setValue(obj);
+        }
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        super.setDisabledState(isDisabled);
+
+        if (this.aceEditor) {
+            this.aceEditor.setReadOnly(isDisabled);
+        }
+    }
+
+    public focus() {
+        if (this.aceEditor) {
+            this.aceEditor.focus();
+        }
     }
 
     private changeValue() {

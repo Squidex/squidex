@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => appImageStore.UploadAsync(appId, stream, A<CancellationToken>.Ignored))
+            A.CallTo(() => appImageStore.UploadAsync(appId, stream, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

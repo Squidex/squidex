@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
         {
-            Enhance(command, tags);
+            Enhance(command);
 
             return TaskHelper.Done;
         }
 
-        private void Enhance(UploadAssetCommand command, HashSet<string>? tags)
+        private void Enhance(UploadAssetCommand command)
         {
             try
             {
@@ -93,26 +93,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         command.Metadata.SetPixelWidth(pw);
                         command.Metadata.SetPixelHeight(ph);
-
-                        if (tags != null)
-                        {
-                            tags.Add("image");
-
-                            var wh = pw + ph;
-
-                            if (wh > 2000)
-                            {
-                                tags.Add("image/large");
-                            }
-                            else if (wh > 1000)
-                            {
-                                tags.Add("image/medium");
-                            }
-                            else
-                            {
-                                tags.Add("image/small");
-                            }
-                        }
                     }
 
                     void TryAddString(string name, string? value)
@@ -149,8 +129,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     if (file.Tag is ImageTag imageTag)
                     {
-                        TryAddDouble("locationLatitude", imageTag.Latitude);
-                        TryAddDouble("locationLongitude", imageTag.Longitude);
+                        TryAddDouble("latitude", imageTag.Latitude);
+                        TryAddDouble("longitude", imageTag.Longitude);
 
                         TryAddString("created", imageTag.DateTime?.ToIso8601());
                     }
@@ -178,44 +158,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var metadata = asset.Metadata;
 
-            switch (asset.Type)
+            if (asset.Type == AssetType.Video)
             {
-                case AssetType.Image:
-                    {
-                        if (metadata.TryGetNumber("pixelWidth", out var w) &&
-                            metadata.TryGetNumber("pixelHeight", out var h))
-                        {
-                            yield return $"{w}x{h}px";
-                        }
+                if (metadata.TryGetNumber("videoWidth", out var w) &&
+                    metadata.TryGetNumber("videoHeight", out var h))
+                {
+                    yield return $"{w}x{h}pt";
+                }
 
-                        break;
-                    }
-
-                case AssetType.Video:
-                    {
-                        if (metadata.TryGetNumber("videoWidth", out var w) &&
-                            metadata.TryGetNumber("videoHeight", out var h))
-                        {
-                            yield return $"{w}x{h}pt";
-                        }
-
-                        if (metadata.TryGetString("duration", out var duration))
-                        {
-                            yield return duration;
-                        }
-
-                        break;
-                    }
-
-                case AssetType.Audio:
-                    {
-                        if (metadata.TryGetString("duration", out var duration))
-                        {
-                            yield return duration;
-                        }
-
-                        break;
-                    }
+                if (metadata.TryGetString("duration", out var duration))
+                {
+                    yield return duration;
+                }
+            }
+            else if (asset.Type == AssetType.Audio)
+            {
+                if (metadata.TryGetString("duration", out var duration))
+                {
+                    yield return duration;
+                }
             }
         }
     }

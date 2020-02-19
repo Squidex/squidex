@@ -1,27 +1,25 @@
-:host ::ng-deep {
-    .user-ref {
-        font-weight: 500;
-    }
+.section {
+    margin-bottom: 1rem;
 
-    .marker-ref {
-        font-weight: 500;
+    &:last-child {
+        margin: 0;
     }
 }
 
-.user-picture {
-    margin-top: .25rem;
+.btn-status {
+    padding: 1rem;
+    padding-top: .75rem;
+    text-align: left;
 }
 
-.event {
-    & {
-        font-size: .9rem;
-        font-weight: normal;
-        margin-bottom: 1.5rem;
-    }
+h3 {
+    border-bottom: 1px solid $color-border;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    padding-bottom: .5rem;
+}
 
-    &-created {
-        font-size: .75rem;
-        font-weight: normal;
-        margin: .25rem 0;
-    }
+hr {
+    margin-left: 0;
+    margin-right: 0;
 }

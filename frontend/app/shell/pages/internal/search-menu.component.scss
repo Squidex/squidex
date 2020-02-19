@@ -1,0 +1,26 @@
+:host /deep/ {
+    .form-control {
+        @include placeholder-color($color-theme-blue-light);
+        background: darken($color-theme-blue-dark, 5%);
+        border: 0;
+        color: $color-dark-foreground;
+    }
+
+    i {
+        color: $color-dark-foreground;
+    }
+
+    .dropdown-container {
+        max-width: 30rem;
+        min-width: 10rem;
+        width: auto;
+    }
+}
+
+.search-container {
+    width: 300px;
+}
+
+.row {
+    overflow: hidden;
+}

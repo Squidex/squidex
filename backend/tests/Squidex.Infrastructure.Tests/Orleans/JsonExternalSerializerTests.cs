@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             var reader = A.Fake<IBinaryTokenStreamReader>();
 
-            A.CallTo(() => reader.ReadByteArray(A<byte[]>.Ignored, A<int>.Ignored, A<int>.Ignored))
+            A.CallTo(() => reader.ReadByteArray(A<byte[]>._, A<int>._, A<int>._))
                 .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             var writer = A.Fake<IBinaryTokenStreamWriter>();
 
-            A.CallTo(() => writer.Write(A<byte[]>.Ignored, A<int>.Ignored, A<int>.Ignored))
+            A.CallTo(() => writer.Write(A<byte[]>._, A<int>._, A<int>._))
                 .Invokes(new Action<byte[], int, int>(buffer.Write));
             A.CallTo(() => writer.CurrentOffset)
                 .ReturnsLazily(x => (int)buffer.Position);

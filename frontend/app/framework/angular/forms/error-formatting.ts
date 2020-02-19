@@ -53,7 +53,7 @@ export function formatError(field: string, type: string, properties: any, value:
         }
     }
 
-    let message = (errors ? errors[type] : null) || DEFAULT_ERRORS[type];
+    let message = errors?.[type] || DEFAULT_ERRORS[type];
 
     if (!message) {
         return null;

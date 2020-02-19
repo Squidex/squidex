@@ -1,7 +1,7 @@
 <ng-container *ngIf="appsState.selectedAppOrNull | async; let app">
     <ng-container *ngIf="app.canUploadAssets">
         <ul class="nav navbar-nav" *ngIf="assetUploader.uploads | async; let uploads" (sqxDropFile)="addFiles($event)">
-            <li class="nav-item  nav-icon dropdown">
+            <li class="nav-item nav-icon dropdown">
                 <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
                     <i class="icon-upload-3"></i>
 

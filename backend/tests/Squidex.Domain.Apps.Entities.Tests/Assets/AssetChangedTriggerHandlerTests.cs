@@ -32,22 +32,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
                 .Returns(false);
 
             sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader);
         }
 
-        public static IEnumerable<object[]> TestEvents = new[]
+        public static IEnumerable<object[]> TestEvents()
         {
-            new object[] { new AssetCreated(), EnrichedAssetEventType.Created },
-            new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated },
-            new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated },
-            new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted }
-        };
+            yield return new object[] { new AssetCreated(), EnrichedAssetEventType.Created };
+            yield return new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated };
+            yield return new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated };
+            yield return new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted };
+        }
 
         [Theory]
         [MemberData(nameof(TestEvents))]
@@ -149,12 +149,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustHaveHappened();
             }
         }

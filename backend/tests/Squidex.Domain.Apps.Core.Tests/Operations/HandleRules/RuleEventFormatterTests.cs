@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     public class RuleEventFormatterTests
     {
         private readonly IUser user = A.Fake<IUser>();
-        private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
-            A.CallTo(() => urlGenerator.GenerateContentUIUrl(appId, schemaId, contentId))
+            A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
             sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine());

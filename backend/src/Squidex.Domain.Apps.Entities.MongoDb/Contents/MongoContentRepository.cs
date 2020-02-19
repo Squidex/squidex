@@ -7,43 +7,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>, IContentRepository
+    public partial class MongoContentRepository : IContentRepository, IInitializable
     {
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
-        private readonly QueryContent queryContentAsync;
-        private readonly QueryContentsByIds queryContentsById;
-        private readonly QueryContentsByQuery queryContentsByQuery;
-        private readonly QueryIdsAsync queryIdsAsync;
-        private readonly QueryScheduledContents queryScheduledItems;
+        private readonly MongoContentCollectionAll collectionAll;
+        private readonly MongoContentCollectionPublished collectionPublished;
 
         static MongoContentRepository()
         {
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, ITextIndexer indexer, IJsonSerializer serializer)
-            : base(database)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IContentTextIndex indexer, IJsonSerializer serializer)
         {
             Guard.NotNull(appProvider);
             Guard.NotNull(serializer);
@@ -52,94 +43,90 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             this.serializer = serializer;
 
-            queryContentAsync = new QueryContent(serializer);
-            queryContentsById = new QueryContentsByIds(serializer, appProvider);
-            queryContentsByQuery = new QueryContentsByQuery(serializer, indexer);
-            queryIdsAsync = new QueryIdsAsync(appProvider);
-            queryScheduledItems = new QueryScheduledContents();
+            collectionAll = new MongoContentCollectionAll(database, appProvider, indexer, serializer);
+            collectionPublished = new MongoContentCollectionPublished(database, appProvider, indexer, serializer);
         }
 
-        public IMongoCollection<MongoContentEntity> GetInternalCollection()
+        public async Task InitializeAsync(CancellationToken ct = default)
         {
-            return Collection;
+            await collectionAll.InitializeAsync(ct);
+            await collectionPublished.InitializeAsync(ct);
         }
 
-        protected override string CollectionName()
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
         {
-            return "State_Contents";
-        }
-
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
-        {
-            await queryContentAsync.PrepareAsync(collection, ct);
-            await queryContentsById.PrepareAsync(collection, ct);
-            await queryContentsByQuery.PrepareAsync(collection, ct);
-            await queryIdsAsync.PrepareAsync(collection, ct);
-            await queryScheduledItems.PrepareAsync(collection, ct);
-        }
-
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, bool inDraft, ClrQuery query, bool includeDraft = true)
-        {
-            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
+            if (scope == SearchScope.All)
             {
-                return await queryContentsByQuery.DoAsync(app, schema, query, status, inDraft, includeDraft);
+                return collectionAll.QueryAsync(app, schema, query);
+            }
+            else
+            {
+                return collectionPublished.QueryAsync(app, schema, query);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, HashSet<Guid> ids, bool includeDraft = true)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, SearchScope scope)
         {
-            Guard.NotNull(app);
-
-            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
+            if (scope == SearchScope.All)
             {
-                var result = await queryContentsById.DoAsync(app.Id, schema, ids, status, includeDraft);
-
-                return ResultList.Create(result.Count, result.Select(x => x.Content));
+                return collectionAll.QueryAsync(app, schema, ids);
+            }
+            else
+            {
+                return collectionPublished.QueryAsync(app, schema, ids);
             }
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[]? status, HashSet<Guid> ids, bool includeDraft = true)
+        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids, SearchScope scope)
         {
-            Guard.NotNull(app);
-
-            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
+            if (scope == SearchScope.All)
             {
-                var result = await queryContentsById.DoAsync(app.Id, null, ids, status, includeDraft);
-
-                return result;
+                return collectionAll.QueryAsync(app, ids);
+            }
+            else
+            {
+                return collectionPublished.QueryAsync(app, ids);
             }
         }
 
-        public async Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[]? status, Guid id, bool includeDraft = true)
+        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, SearchScope scope)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            if (scope == SearchScope.All)
             {
-                return await queryContentAsync.DoAsync(schema, id, status, includeDraft);
+                return collectionAll.FindContentAsync(schema, id);
+            }
+            else
+            {
+                return collectionPublished.FindContentAsync(schema, id);
             }
         }
 
-        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids, SearchScope scope)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            if (scope == SearchScope.All)
             {
-                await queryScheduledItems.DoAsync(now, callback);
+                return collectionAll.QueryIdsAsync(appId, ids);
+            }
+            else
+            {
+                return collectionPublished.QueryIdsAsync(appId, ids);
             }
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
-            {
-                return await queryIdsAsync.DoAsync(appId, ids);
-            }
+            return collectionAll.QueryScheduledWithoutDataAsync(now, callback);
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
-            {
-                return await queryIdsAsync.DoAsync(appId, schemaId, filterNode);
-            }
+            return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
+        }
+
+        public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()
+        {
+            yield return collectionAll.GetInternalCollection();
+            yield return collectionPublished.GetInternalCollection();
         }
     }
 }

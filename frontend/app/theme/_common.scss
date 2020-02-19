@@ -26,6 +26,10 @@ body {
     color: $color-text-decent;
 }
 
+.text-nowrap {
+    white-space: nowrap;
+}
+
 .drag-handle {
     color: $color-text-decent;
     cursor: move;
@@ -230,7 +234,17 @@ body {
 }
 
 .spin2 {
-    animation: spin2 5s infinite linear;
+    animation: spin2 1s infinite linear;
+}
+
+i {
+    &.spin {
+        display: inline-block;
+    }
+
+    &.spin2 {
+        display: inline-block;
+    }
 }
 
 @keyframes spin2 {

@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
         }
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
         }
     }

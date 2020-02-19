@@ -6,6 +6,7 @@
  */
 
 export * from './pages/comments/comments-page.component';
+export * from './pages/content/content-event.component';
 export * from './pages/content/content-field.component';
 export * from './pages/content/content-history-page.component';
 export * from './pages/content/content-page.component';

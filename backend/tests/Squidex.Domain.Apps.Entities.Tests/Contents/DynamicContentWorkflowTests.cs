@@ -94,13 +94,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_draft_as_initial_status()
+        public async Task Should_return_draft_as_initial_status()
         {
-            var expected = new StatusInfo(Status.Draft, StatusColors.Draft);
-
             var result = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));
 
-            result.Should().BeEquivalentTo(expected);
+            Assert.Equal(Status.Draft, result);
         }
 
         [Fact]
@@ -108,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
@@ -118,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 4);
 
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
 
             Assert.False(result);
         }
@@ -128,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -138,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
@@ -148,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -158,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
@@ -168,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 4);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
             Assert.False(result);
         }
@@ -178,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
             Assert.True(result);
         }
@@ -188,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
             Assert.True(result);
         }
@@ -198,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Archived, 2);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -208,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
             Assert.False(result);
         }
@@ -218,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 1);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
             Assert.True(result);
         }
@@ -228,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
             Assert.False(result);
         }
@@ -238,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 1);
 
-            var result = await sut.CanUpdateAsync(content, Mocks.FrontendUser("Owner"));
+            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
             Assert.True(result);
         }
@@ -253,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Developer"));
+            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -268,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Editor"));
+            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -284,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Editor"));
+            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -299,7 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null!);
+            var result = await sut.GetNextAsync(content, content.Status, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -315,7 +313,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextsAsync(content, null!);
+            var result = await sut.GetNextAsync(content, content.Status, null!);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -366,7 +364,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.Should().BeEquivalentTo(expected);
         }
 
-        private IContentEntity CreateContent(Status status, int value, bool simple = false)
+        private ContentEntity CreateContent(Status status, int value, bool simple = false)
         {
             var content = new ContentEntity { AppId = appId, Status = status };
 
@@ -379,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 content.SchemaId = schemaId;
             }
 
-            content.DataDraft =
+            content.Data =
                 new NamedContentData()
                     .AddField("field",
                         new ContentFieldData()

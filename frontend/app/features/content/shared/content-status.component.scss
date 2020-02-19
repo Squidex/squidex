@@ -1,5 +1,6 @@
 
 .content-status {
+
     &.default {
         color: $color-text-decent;
     }
@@ -8,7 +9,22 @@
         color: $color-dark-black;
     }
 
+    &-summary {
+        font-size: 1.3rem;
+        font-weight: normal;
+    }
+
+    &-scheduled {
+        color: $color-text !important;
+        font-size: .9rem;
+        font-weight: normal;
+    }
+
     &-label {
         color: $color-text;
     }
+}
+
+.label {
+    color: lighten($color-text, 20%) !important;
 }

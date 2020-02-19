@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -15,16 +15,18 @@ import { UsersProviderService } from './users-provider.service';
 import {
     ApiUrlConfig,
     DateTime,
-    pretifyError
+    pretifyError,
+    Version
 } from '@app/framework';
 
 export class HistoryEventDto {
     constructor(
         public readonly eventId: string,
         public readonly actor: string,
+        public readonly eventType: string,
         public readonly message: string,
-        public readonly version: number,
-        public readonly created: DateTime
+        public readonly created: DateTime,
+        public readonly version: Version
     ) {
     }
 }
@@ -81,15 +83,22 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return this.http.get<any[]>(url).pipe(
+        const options = {
+            headers: new HttpHeaders({
+                'X-Silent': '1'
+            })
+        };
+
+        return this.http.get<any[]>(url, options).pipe(
             map(body => {
                 const history = body.map(item =>
                     new HistoryEventDto(
                         item.eventId,
                         item.actor,
+                        item.eventType,
                         item.message,
-                        item.version,
-                        DateTime.parseISO_UTC(item.created)));
+                        DateTime.parseISO_UTC(item.created),
+                        new Version(item.version.toString())));
 
                 return history;
             }),

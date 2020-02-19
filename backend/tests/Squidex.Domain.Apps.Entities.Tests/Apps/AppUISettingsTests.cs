@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettingsTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IAppUISettingsGrain>(A<string>.Ignored, null))
+            A.CallTo(() => grainFactory.GetGrain<IAppUISettingsGrain>(A<string>._, null))
                 .Returns(grain);
 
             sut = new AppUISettings(grainFactory);

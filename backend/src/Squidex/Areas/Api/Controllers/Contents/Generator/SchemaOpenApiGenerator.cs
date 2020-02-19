@@ -75,7 +75,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 GenerateSchemaUpdateOperation(),
                 GenerateSchemaUpdatePatchOperation(),
                 GenerateSchemaStatusOperation(),
-                GenerateSchemaDiscardOperation(),
                 GenerateSchemaDeleteOperation()
             };
 
@@ -177,20 +176,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content not valid.");
-            });
-        }
-
-        private OpenApiPathItem GenerateSchemaDiscardOperation()
-        {
-            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsDraftDiscard, "/{id}/discard",
-                operation =>
-            {
-                operation.OperationId = $"Discard{schemaType}Content";
-
-                operation.Summary = $"Discard changes of {schemaName} content.";
-
-                operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
-                operation.AddResponse("400", $"{schemaName} content has no pending draft.");
             });
         }
 

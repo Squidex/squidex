@@ -21,31 +21,74 @@
         <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.status">
-        <span class="truncate">
-            <sqx-content-status
+        <ng-container *ngIf="content.newStatus; else singleStatus">
+            <div class="row no-gutters status-grid">
+                <div class="col">
+                    <sqx-content-status truncate="true"
+                        layout="text"
+                        [status]="content.status"
+                        [statusColor]="content.statusColor">
+                    </sqx-content-status>
+                </div>
+                <div class="col-auto">
+                    <i class="icon-caret-right"></i>
+                </div>
+                <div class="col">
+                    <sqx-content-status truncate="true"
+                        layout="text"
+                        [status]="content.newStatus"
+                        [statusColor]="content.newStatusColor"
+                        [scheduled]="content.scheduleJob">
+                    </sqx-content-status>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #singleStatus>
+            <sqx-content-status truncate="true"
+                layout="text"
                 [status]="content.status"
                 [statusColor]="content.statusColor"
-                [scheduledTo]="content.scheduleJob?.status"
-                [scheduledAt]="content.scheduleJob?.dueTime"
-                [isPending]="content.isPending">
+                [scheduled]="content.scheduleJob">
             </sqx-content-status>
-
-            {{content.status}}
-        </span>
+        </ng-template>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusNext">
         <span class="truncate" *ngIf="content.scheduleJob">
-            {{content.scheduleJob.status}} at {{content.scheduleJob.dueTime | sqxShortDate}}
+            <sqx-content-status
+                layout="text"
+                [status]="content.scheduleJob?.status"
+                [statusColor]="content.scheduleJob?.color">
+            </sqx-content-status>
+        
+            at {{content.scheduleJob?.dueTime | sqxShortDate}}
         </span>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusColor">
-        <sqx-content-status
-            [status]="content.status"
-            [statusColor]="content.statusColor"
-            [scheduledTo]="content.scheduleJob?.status"
-            [scheduledAt]="content.scheduleJob?.dueTime"
-            [isPending]="content.isPending">
-        </sqx-content-status>
+        <ng-container *ngIf="content.newStatus; else singleStatus">
+            <span class="text-nowrap">
+                <sqx-content-status
+                    [status]="content.status"
+                    [statusColor]="content.statusColor">
+                </sqx-content-status>
+    
+                <i class="icon-caret-right"></i>
+    
+                <sqx-content-status
+                    [status]="content.newStatus"
+                    [statusColor]="content.newStatusColor"
+                    [scheduled]="content.scheduleJob">
+                </sqx-content-status>
+            </span>
+        </ng-container>
+
+        <ng-template #singleStatus>    
+            <sqx-content-status
+                [status]="content.status"
+                [statusColor]="content.statusColor"
+                [scheduled]="content.scheduleJob">
+            </sqx-content-status>
+        </ng-template>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.version">
         <small class="truncate">{{content.version.value}}</small>

@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 return EmptyIds;
             }
 
-            var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef, true), schemaId);
+            var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), schemaId);
 
             var contentEntities =
                 await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)

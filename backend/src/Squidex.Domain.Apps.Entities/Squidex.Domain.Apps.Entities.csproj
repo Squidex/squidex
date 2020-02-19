@@ -17,6 +17,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="14.0.0" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.5.1" />
+    <PackageReference Include="Equals.Fody" Version="1.9.5" />
+    <PackageReference Include="Fody" Version="4.2.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00005" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00005" />

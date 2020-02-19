@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 
@@ -58,6 +60,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ResolveReferences>()
                 .As<IContentEnricherStep>();
 
+            services.AddSingletonAs<ScriptContent>()
+                .As<IContentEnricherStep>();
+
             services.AddSingletonAs<ContentEnricher>()
                 .As<IContentEnricher>();
 
@@ -70,8 +75,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultWorkflowsValidator>()
                 .AsOptional<IWorkflowsValidator>();
 
-            services.AddSingletonAs<GrainTextIndexer>()
-                .As<ITextIndexer>().As<IEventConsumer>();
+            services.AddSingletonAs<LuceneTextIndex>()
+                .As<IContentTextIndex>();
+
+            services.AddSingletonAs<TextIndexingProcess>()
+                .As<IEventConsumer>();
+
+            services.AddSingletonAs<ContentsSearchSource>()
+                .As<ISearchSource>();
 
             services.AddSingletonAs<IndexManager>()
                 .AsSelf();

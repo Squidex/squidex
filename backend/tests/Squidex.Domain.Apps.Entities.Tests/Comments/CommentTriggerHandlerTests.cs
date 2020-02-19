@@ -31,10 +31,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
+            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
                 .Returns(false);
 
             sut = new CommentTriggerHandler(scriptEngine, userResolver);
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.Ignored))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
                 .MustNotHaveHappened();
         }
 
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.Ignored))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
                 .MustNotHaveHappened();
         }
 
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.Ignored))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
                 .MustNotHaveHappened();
         }
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.Ignored))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
                 .MustNotHaveHappened();
         }
 
@@ -280,12 +280,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, condition))
+                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
                     .MustHaveHappened();
             }
         }

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -25,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryContentsByQuery : OperationBase
     {
         private readonly IJsonSerializer serializer;
-        private readonly ITextIndexer indexer;
+        private readonly IContentTextIndex indexer;
 
-        public QueryContentsByQuery(IJsonSerializer serializer, ITextIndexer indexer)
+        public QueryContentsByQuery(IJsonSerializer serializer, IContentTextIndex indexer)
         {
             this.serializer = serializer;
 
@@ -40,13 +39,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.Status)
+                    .Ascending(x => x.ReferencedIds)
                     .Descending(x => x.LastModified));
 
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Status[]? status, bool inDraft, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
         {
             Guard.NotNull(app);
             Guard.NotNull(schema);
@@ -54,13 +53,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                query = query.AdjustToModel(schema.SchemaDef, inDraft);
+                query = query.AdjustToModel(schema.SchemaDef);
 
                 List<Guid>? fullTextIds = null;
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
-                    fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, inDraft ? Scope.Draft : Scope.Published);
+                    var searchFilter = SearchFilter.ShouldHaveSchemas(schema.Id);
+
+                    fullTextIds = await indexer.SearchAsync(query.FullText, app, searchFilter, scope);
 
                     if (fullTextIds?.Count == 0)
                     {
@@ -68,12 +69,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.Id, fullTextIds, status, query);
+                var filter = CreateFilter(schema.Id, fullTextIds, query);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
                     Collection.Find(filter)
-                        .WithoutDraft(includeDraft)
                         .QueryLimit(query)
                         .QuerySkip(query)
                         .QuerySort(query)
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, Status[]? status, ClrQuery? query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -109,14 +109,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
-            if (status != null)
-            {
-                filters.Add(Filter.In(x => x.Status, status));
-            }
-
             if (ids != null && ids.Count > 0)
             {
-                filters.Add(Filter.In(x => x.Id, ids));
+                filters.Add(
+                    Filter.Or(
+                        Filter.AnyIn(x => x.ReferencedIds, ids),
+                        Filter.In(x => x.Id, ids)));
             }
 
             if (query?.Filter != null)

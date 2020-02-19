@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>.Ignored, A<RuleTrigger>.Ignored, ruleId))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
                 .MustNotHaveHappened();
         }
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>.Ignored, A<RuleTrigger>.Ignored, ruleId))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
                 .MustNotHaveHappened();
         }
 
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>.Ignored, A<RuleTrigger>.Ignored, ruleId))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
                 .MustNotHaveHappened();
         }
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>.Ignored, A<RuleTrigger>.Ignored, ruleId))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
                 .MustNotHaveHappened();
         }
 
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>.Ignored, A<RuleTrigger>.Ignored, ruleId))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
                 .MustNotHaveHappened();
         }
 
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Empty(jobs);
 
-            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>.Ignored))
+            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>._))
                 .MustNotHaveHappened();
         }
 
@@ -296,7 +296,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Success(actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new InvalidOperationException(), actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
@@ -324,7 +324,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new TimeoutException(), actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
@@ -342,7 +342,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Throws(ex);
 
             var result = await sut.InvokeAsync(actionName, actionData);

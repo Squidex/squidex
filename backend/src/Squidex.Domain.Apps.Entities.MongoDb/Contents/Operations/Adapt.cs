@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return x.Name;
         }
 
-        public static Func<PropertyPath, PropertyPath> Path(Schema schema, bool inDraft)
+        public static Func<PropertyPath, PropertyPath> Path(Schema schema)
         {
             return propertyNames =>
             {
@@ -74,14 +74,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 {
                     if (result[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        if (inDraft)
-                        {
-                            result[0] = "dd";
-                        }
-                        else
-                        {
-                            result[0] = "do";
-                        }
+                        result[0] = "do";
                     }
                     else
                     {
@@ -93,9 +86,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             };
         }
 
-        public static ClrQuery AdjustToModel(this ClrQuery query, Schema schema, bool useDraft)
+        public static ClrQuery AdjustToModel(this ClrQuery query, Schema schema)
         {
-            var pathConverter = Path(schema, useDraft);
+            var pathConverter = Path(schema);
 
             if (query.Filter != null)
             {
@@ -107,9 +100,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query;
         }
 
-        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema, bool useDraft)
+        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema)
         {
-            var pathConverter = Path(schema, useDraft);
+            var pathConverter = Path(schema);
 
             return filterNode.Accept(new AdaptionVisitor(pathConverter));
         }

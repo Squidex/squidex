@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._))
                 .MustNotHaveHappened();
         }
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._))
                 .MustNotHaveHappened();
         }
     }
