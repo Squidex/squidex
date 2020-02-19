@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -45,12 +47,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>("QueryAsyncByQuery"))
             {
-                var assetFolders =
+                var assetFolderEntities =
                     await Collection
                         .Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).SortBy(x => x.FolderName)
                             .ToListAsync();
 
-                return ResultList.Create<IAssetFolderEntity>(assetFolders.Count, assetFolders);
+                return ResultList.Create<IAssetFolderEntity>(assetFolderEntities.Count, assetFolderEntities);
+            }
+        }
+
+        public async Task<IReadOnlyList<Guid>> QueryChildIdsAsync(Guid appId, Guid parentId)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetFolderEntities =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                        .ToListAsync();
+
+                return assetFolderEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
             }
         }
 
