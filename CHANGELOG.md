@@ -1,6 +1,20 @@
 # Changelog
 
-## 4.1..0 - 2020-02-11
+## 4.1.2 - 2020-02-19
+
+### Bugfixes
+
+* **UI**: Fix to show all controls for localized assets.
+* **UI**: Fix for sorting content when clicking on table headers.
+* **UI**: Fixed disable state in tag editor.
+* **UI**: Fixed layout issues with modal editor.
+
+### Features
+
+* **Clustering**: Configuration option to define the IP Address manually.
+* **UI**: Migration to Angular9 and Ivy.
+
+## 4.1.0 - 2020-02-11
 
 ### Bugfixes
 

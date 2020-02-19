@@ -35,6 +35,6 @@ export class FieldLanguagesComponent {
     public field: RootFieldDto;
 
     public toggleShowAllControls() {
-        this.showAllControlsChange.emit(this.showAllControls);
+        this.showAllControlsChange.emit(!this.showAllControls);
     }
 }
