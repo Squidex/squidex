@@ -104,13 +104,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         contentId: content?.id
                     };
 
+                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
+
                     if (content) {
                         this.loadContent(content.data, true);
                     }
 
                     const clone = this.tempService.fetch();
-
-                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
 
                     if (clone) {
                         this.loadContent(clone, true);

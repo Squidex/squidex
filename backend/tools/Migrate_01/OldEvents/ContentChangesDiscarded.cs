@@ -13,7 +13,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(ContentChangesDiscarded))]
     [Obsolete]
-    public sealed class ContentChangesDiscarded : IMigrated<IEvent>
+    public sealed class ContentChangesDiscarded : IEvent, IMigrated<IEvent>
     {
         public IEvent Migrate()
         {

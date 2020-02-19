@@ -47,21 +47,28 @@ namespace Squidex.Infrastructure.Commands
             OnSetup();
         }
 
-        public virtual async Task EnsureLoadedAsync()
+        public virtual async Task EnsureLoadedAsync(bool silent = false)
         {
             if (isLoaded)
             {
                 return;
             }
 
-            var logContext = (id: id.ToString(), name: GetType().Name);
-
-            using (log.MeasureInformation(logContext, (ctx, w) => w
-                .WriteProperty("action", "ActivateDomainObject")
-                .WriteProperty("domainObjectType", ctx.name)
-                .WriteProperty("domainObjectKey", ctx.id)))
+            if (silent)
             {
                 await ReadAsync();
+            }
+            else
+            {
+                var logContext = (id: id.ToString(), name: GetType().Name);
+
+                using (log.MeasureInformation(logContext, (ctx, w) => w
+                    .WriteProperty("action", "ActivateDomainObject")
+                    .WriteProperty("domainObjectType", ctx.name)
+                    .WriteProperty("domainObjectKey", ctx.id)))
+                {
+                    await ReadAsync();
+                }
             }
 
             isLoaded = true;

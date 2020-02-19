@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure.Commands
 
         public sealed override async Task RebuildStateAsync()
         {
-            await EnsureLoadedAsync();
+            await EnsureLoadedAsync(true);
 
             if (persistence != null)
             {

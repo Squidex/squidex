@@ -13,7 +13,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(ContentUpdateProposed))]
     [Obsolete]
-    public sealed class ContentUpdateProposed : IMigrated<IEvent>
+    public sealed class ContentUpdateProposed : IEvent, IMigrated<IEvent>
     {
         public IEvent Migrate()
         {

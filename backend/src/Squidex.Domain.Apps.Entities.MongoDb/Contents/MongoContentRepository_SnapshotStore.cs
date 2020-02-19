@@ -73,16 +73,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                await UpsertDraftContentAsync(value, oldVersion, newVersion, schema);
+                await Task.WhenAll(
+                    UpsertDraftContentAsync(value, oldVersion, newVersion, schema),
+                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema));
+            }
+        }
 
-                if (value.Status == Status.Published)
-                {
-                    await UpsertPublishedContentAsync(value, oldVersion, newVersion, schema);
-                }
-                else
-                {
-                    await DeletePublishedContentAsync(key);
-                }
+        private async Task UpsertOrDeletePublishedAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
+        {
+            if (value.Status == Status.Published)
+            {
+                await UpsertPublishedContentAsync(value, oldVersion, newVersion, schema);
+            }
+            else
+            {
+                await DeletePublishedContentAsync(value.Id);
             }
         }
 

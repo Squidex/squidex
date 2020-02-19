@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure.Reflection;
 
-namespace Migrate_01.OldEvents
+namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class NoopEvent : IEvent
+    [TypeName(nameof(NoopEvent))]
+    public sealed class NoopEvent : SquidexEvent
     {
     }
 }
