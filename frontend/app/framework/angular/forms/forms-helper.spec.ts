@@ -26,7 +26,7 @@ describe('FormHelpers', () => {
             expect(values).toEqual(['1', '2', '3']);
         });
 
-        it('should not trigger on disable', () => {
+        it('should also trigger on disable', () => {
             const form = new FormControl('1', Validators.required);
 
             const values: any[] = [];
@@ -39,6 +39,7 @@ describe('FormHelpers', () => {
             form.enable();
             form.setValue('3');
             form.disable();
+            form.setValue('4');
 
             expect(values).toEqual(['1', '2', '3']);
         });

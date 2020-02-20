@@ -29,6 +29,7 @@ export * from './angular/forms/form-hint.component';
 export * from './angular/forms/forms-helper';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/progress-bar.component';
+export * from './angular/forms/string-form-control';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 

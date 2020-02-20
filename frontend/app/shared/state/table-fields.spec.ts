@@ -20,7 +20,7 @@ import {
     UIState
 } from '@app/shared/internal';
 
-describe('TableFielsd', () => {
+describe('TableFields', () => {
     let uiState: IMock<UIState>;
 
     const schema =
@@ -82,6 +82,8 @@ describe('TableFielsd', () => {
             tableFields.updateFields(test.fields, true);
 
             uiState.verify(x => x.removeUser('schemas.my-schema.view'), Times.once());
+
+            expect().nothing();
         });
     });
 
@@ -119,5 +121,7 @@ describe('TableFielsd', () => {
         tableFields.updateFields(config, true);
 
         uiState.verify(x => x.set('schemas.my-schema.view', [MetaFields.version], true), Times.once());
+
+        expect().nothing();
     });
 });

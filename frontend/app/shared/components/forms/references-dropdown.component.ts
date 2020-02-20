@@ -86,21 +86,23 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.own(
             value$(this.selectionControl)
                 .subscribe((value: ContentName) => {
-                    if (value && value.id) {
-                        this.callTouched();
+                    if (this.selectionControl.enabled) {
+                        if (value && value.id) {
+                            this.callTouched();
 
-                        if (this.mode === 'Single') {
-                            this.callChange(value.id);
+                            if (this.mode === 'Single') {
+                                this.callChange(value.id);
+                            } else {
+                                this.callChange([value.id]);
+                            }
                         } else {
-                            this.callChange([value.id]);
-                        }
-                    } else {
-                        this.callTouched();
+                            this.callTouched();
 
-                        if (this.mode === 'Single') {
-                            this.callChange(null);
-                        } else {
-                            this.callChange([]);
+                            if (this.mode === 'Single') {
+                                this.callChange(null);
+                            } else {
+                                this.callChange([]);
+                            }
                         }
                     }
                 }));

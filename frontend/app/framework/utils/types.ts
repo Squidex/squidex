@@ -126,9 +126,19 @@ export module Types {
         return lhs;
     }
 
-    export function equals(lhs: any, rhs: any) {
+    export function equals(lhs: any, rhs: any, lazyString = false) {
         if (lhs === rhs || (lhs !== lhs && rhs !== rhs)) {
             return true;
+        }
+
+        if (lazyString) {
+            const result =
+                (lhs === '' && Types.isUndefined(rhs) ||
+                (rhs === '' && Types.isUndefined(lhs)));
+
+            if (result) {
+                return true;
+            }
         }
 
         if (!lhs || !rhs) {
@@ -141,7 +151,7 @@ export module Types {
             }
 
             for (let i = 0; i < lhs.length; i++) {
-                if (!equals(lhs[i], rhs[i])) {
+                if (!equals(lhs[i], rhs[i], lazyString)) {
                     return false;
                 }
             }
@@ -154,7 +164,7 @@ export module Types {
 
             for (let key in lhs) {
                 if (lhs.hasOwnProperty(key)) {
-                    if (!equals(lhs[key], rhs[key])) {
+                    if (!equals(lhs[key], rhs[key], lazyString)) {
                         return false;
                     }
                 }

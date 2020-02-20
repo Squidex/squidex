@@ -7,13 +7,14 @@
 
 // tslint:disable:prefer-for-of
 
-import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 
 import {
     DateTime,
     Form,
     formControls,
+    StringFormControl,
     Types,
     ValidatorsEx,
     value$
@@ -483,11 +484,12 @@ export class EditContentForm extends Form<FormGroup, any> {
                 for (const { key, isOptional } of this.partitions.getAll(field)) {
                     const fieldValidators = FieldsValidators.create(field, isOptional);
 
-                    if (field.isArray) {
-                        fieldForm.setControl(key, new FormArray([], fieldValidators));
-                    } else {
-                        fieldForm.setControl(key, new FormControl(fieldDefault, fieldValidators));
-                    }
+                    const control =
+                        field.isArray ?
+                            new FormArray([], fieldValidators) :
+                            new StringFormControl(fieldDefault, fieldValidators);
+
+                    fieldForm.setControl(key, control);
                 }
 
                 this.form.setControl(field.name, fieldForm);
@@ -501,13 +503,13 @@ export class EditContentForm extends Form<FormGroup, any> {
     public hasChanged() {
         const currentValue = this.form.getRawValue();
 
-        return !Types.equals(this.initialData, currentValue);
+        return !Types.equals(this.initialData, currentValue, true);
     }
 
     public hasChanges(changes: any) {
         const currentValue = this.form.getRawValue();
 
-        return !Types.equals(changes, currentValue);
+        return !Types.equals(changes, currentValue, true);
     }
 
     public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
@@ -546,7 +548,7 @@ export class EditContentForm extends Form<FormGroup, any> {
                 }
 
                 const nestedValidators = FieldsValidators.create(nestedField, partition.isOptional);
-                const nestedForm = new FormControl(value, nestedValidators);
+                const nestedForm = new StringFormControl(value, nestedValidators);
 
                 if (nestedField.isDisabled) {
                     nestedForm.disable(NO_EMIT);
@@ -673,7 +675,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new FormControl(undefined, validators));
+            this.form.setControl(field.name, new StringFormControl(undefined, validators));
         }
     }
 

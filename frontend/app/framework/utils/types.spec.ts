@@ -173,6 +173,26 @@ describe('Types', () => {
         expect(Types.equals({ a: [1, 2] }, { a: [1, 2] })).toBeTruthy();
     });
 
+    const FalsyValues = [false, null, 0];
+
+    it('should compare empty string with undefined', () => {
+        expect(Types.equals('', undefined, true)).toBeTruthy();
+        expect(Types.equals('', undefined, false)).toBeFalsy();
+
+        expect(Types.equals(undefined, '', true)).toBeTruthy();
+        expect(Types.equals(undefined, '', false)).toBeFalsy();
+    });
+
+    FalsyValues.forEach(x => {
+        it(`should compare empty string with {x}`, () => {
+            expect(Types.equals('', x, true)).toBeFalsy();
+            expect(Types.equals('', x, false)).toBeFalsy();
+
+            expect(Types.equals(x, '', true)).toBeFalsy();
+            expect(Types.equals(x, '', false)).toBeFalsy();
+        });
+    });
+
     it('should clone array', () => {
         const source = [1, 2, 3];
         const result = Types.clone(source);
