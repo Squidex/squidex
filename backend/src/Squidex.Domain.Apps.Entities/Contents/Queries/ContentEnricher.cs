@@ -54,6 +54,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var results = new List<ContentEntity>();
 
+                foreach (var step in steps)
+                {
+                    await step.EnrichAsync(context);
+                }
+
                 if (contents.Any())
                 {
                     foreach (var content in contents)

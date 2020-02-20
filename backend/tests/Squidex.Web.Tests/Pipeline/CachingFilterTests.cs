@@ -59,6 +59,53 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_append_authorization_header_as_vary()
+        {
+            await sut.OnActionExecutionAsync(executingContext, Next());
+
+            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
+        public async Task Should_not_append_null_header_as_vary()
+        {
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddHeader(null!);
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
+        public async Task Should_not_append_empty_header_as_vary()
+        {
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddHeader(string.Empty);
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
+        public async Task Should_append_custom_header_as_vary()
+        {
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddHeader("X-Header");
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal("Authorization,X-Header", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
         public async Task Should_not_append_etag_if_empty()
         {
             httpContext.Response.Headers[HeaderNames.ETag] = string.Empty;

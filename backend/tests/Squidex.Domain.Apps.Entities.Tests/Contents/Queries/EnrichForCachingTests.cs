@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -36,6 +37,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             schemaProvider = x => Task.FromResult(schema);
 
             sut = new EnrichForCaching(requestCache);
+        }
+
+        [Fact]
+        public async Task Should_add_cache_headers()
+        {
+            var headers = new List<string>();
+
+            A.CallTo(() => requestCache.AddHeader(A<string>._))
+                .Invokes(new Action<string>(header => headers.Add(header)));
+
+            await sut.EnrichAsync(requestContext);
+
+            Assert.Equal(new List<string>
+            {
+                "X-Flatten",
+                "X-Languages",
+                "X-NoCleanup",
+                "X-NoEnrichment",
+                "X-NoResolveLanguages",
+                "X-ResolveFlow",
+                "X-Resolve-Urls",
+                "X-Unpublished"
+            }, headers);
         }
 
         [Fact]

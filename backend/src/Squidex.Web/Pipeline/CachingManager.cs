@@ -7,10 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -26,6 +28,7 @@ namespace Squidex.Web.Pipeline
         {
             private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             private readonly HashSet<string> keys = new HashSet<string>();
+            private readonly HashSet<string> headers = new HashSet<string>();
             private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
             private bool hasDependency;
 
@@ -99,6 +102,28 @@ namespace Squidex.Web.Pipeline
 
                     response.Headers.Add("Surrogate-Key", value);
                 }
+
+                if (headers.Count > 0)
+                {
+                    response.Headers.Add(HeaderNames.Vary, new StringValues(headers.ToArray()));
+                }
+            }
+
+            public void AddHeader(string header)
+            {
+                if (!string.IsNullOrWhiteSpace(header))
+                {
+                    try
+                    {
+                        slimLock.EnterWriteLock();
+
+                        headers.Add(header);
+                    }
+                    finally
+                    {
+                        slimLock.ExitWriteLock();
+                    }
+                }
             }
         }
 
@@ -138,6 +163,19 @@ namespace Squidex.Web.Pipeline
                 if (cacheContext != null)
                 {
                     cacheContext.AddDependency(value);
+                }
+            }
+        }
+
+        public void AddHeader(string header)
+        {
+            if (httpContextAccessor.HttpContext != null)
+            {
+                var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
+
+                if (cacheContext != null)
+                {
+                    cacheContext.AddHeader(header);
                 }
             }
         }

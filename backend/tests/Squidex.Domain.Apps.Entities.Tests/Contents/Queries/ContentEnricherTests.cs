@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_invoke_steps()
+        public async Task Should_only_invoke_pre_enrich_for_empty_results()
         {
             var source = new IContentEntity[0];
 
@@ -59,6 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
             await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => step1.EnrichAsync(requestContext))
+                .MustHaveHappened();
+
+            A.CallTo(() => step2.EnrichAsync(requestContext))
+                .MustHaveHappened();
 
             A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustNotHaveHappened();
@@ -78,6 +84,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
             await sut.EnrichAsync(source, requestContext);
+
+            A.CallTo(() => step1.EnrichAsync(requestContext))
+                .MustHaveHappened();
+
+            A.CallTo(() => step2.EnrichAsync(requestContext))
+                .MustHaveHappened();
 
             A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
                 .MustHaveHappened();

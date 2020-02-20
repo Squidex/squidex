@@ -9,20 +9,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
+
+#pragma warning disable IDE0060 // Remove unused parameter
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public static class ContextExtensions
     {
-        private const string HeaderUnpublished = "X-Unpublished";
         private const string HeaderFlatten = "X-Flatten";
         private const string HeaderLanguages = "X-Languages";
-        private const string HeaderResolveFlow = "X-ResolveFlow";
-        private const string HeaderResolveAssetUrls = "X-Resolve-Urls";
-        private const string HeaderNoResolveLanguages = "X-NoResolveLanguages";
-        private const string HeaderNoEnrichment = "X-NoEnrichment";
         private const string HeaderNoCleanup = "X-NoCleanup";
+        private const string HeaderNoEnrichment = "X-NoEnrichment";
+        private const string HeaderNoResolveLanguages = "X-NoResolveLanguages";
+        private const string HeaderResolveFlow = "X-ResolveFlow";
+        private const string HeaderResolveUrls = "X-Resolve-Urls";
+        private const string HeaderUnpublished = "X-Unpublished";
         private static readonly char[] Separators = { ',', ';' };
+
+        public static void AddCacheHeaders(this Context context, IRequestCache cache)
+        {
+            cache.AddHeader(HeaderFlatten);
+            cache.AddHeader(HeaderLanguages);
+            cache.AddHeader(HeaderNoCleanup);
+            cache.AddHeader(HeaderNoEnrichment);
+            cache.AddHeader(HeaderNoResolveLanguages);
+            cache.AddHeader(HeaderResolveFlow);
+            cache.AddHeader(HeaderResolveUrls);
+            cache.AddHeader(HeaderUnpublished);
+        }
 
         public static bool ShouldCleanup(this Context context)
         {
@@ -91,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public static IEnumerable<string> AssetUrls(this Context context)
         {
-            if (context.Headers.TryGetValue(HeaderResolveAssetUrls, out var value))
+            if (context.Headers.TryGetValue(HeaderResolveUrls, out var value))
             {
                 return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToHashSet();
             }
@@ -103,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (fieldNames?.Any() == true)
             {
-                context.Headers[HeaderResolveAssetUrls] = string.Join(",", fieldNames);
+                context.Headers[HeaderResolveUrls] = string.Join(",", fieldNames);
             }
             else
             {
-                context.Headers.Remove(HeaderResolveAssetUrls);
+                context.Headers.Remove(HeaderResolveUrls);
             }
 
             return context;

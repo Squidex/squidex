@@ -35,6 +35,7 @@ namespace Squidex.Web.Pipeline
             var httpContext = context.HttpContext;
 
             cachingManager.Start(httpContext);
+            cachingManager.AddHeader(HeaderNames.Authorization);
 
             var resultContext = await next();
 

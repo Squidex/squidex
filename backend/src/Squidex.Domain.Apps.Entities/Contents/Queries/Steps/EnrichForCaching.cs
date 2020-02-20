@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -22,6 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             Guard.NotNull(requestCache);
 
             this.requestCache = requestCache;
+        }
+
+        public Task EnrichAsync(Context context)
+        {
+            context.AddCacheHeaders(requestCache);
+
+            return TaskHelper.Done;
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
