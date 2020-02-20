@@ -1,5 +1,26 @@
 # Changelog
 
+## 4.2.0 Beta 1 - 2020-02-20
+
+The release makes a lot of changed to the content structure, therefore it will run a migration to recreate the contents collections. This can take a while.
+
+### Features
+
+* **UI**: Global search
+* **Contents**: Full text search also includes references items.
+* **Contents**: Alignment of workflows.
+* **Contents**: Improvements to full text index for later support of elastic search.
+
+## 4.1.3 - 2020-02-20
+
+### Bugfixes
+
+* **UI**: Several fixes due to wrong references of SCSS mixins.
+
+### Features
+
+* **Assets**: Option to turn on the recursive deleter.
+
 ## 4.1.2 - 2020-02-19
 
 ### Bugfixes
