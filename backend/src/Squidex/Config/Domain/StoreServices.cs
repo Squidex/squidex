@@ -102,6 +102,9 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
+                    services.AddSingletonAs<MongoKeyStore>()
+                        .As<ISigningCredentialStore>().As<IValidationKeysStore>();
+
                     services.AddSingletonAs<MongoAssetRepository>()
                         .As<IAssetRepository>().As<ISnapshotStore<AssetState, Guid>>();
 

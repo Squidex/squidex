@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
@@ -28,21 +27,6 @@ namespace Squidex.Areas.IdentityServer.Config
     {
         public static void AddSquidexIdentityServer(this IServiceCollection services)
         {
-            X509Certificate2 certificate;
-
-            var assembly = typeof(IdentityServerServices).Assembly;
-
-            using (var certificateStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
-            {
-                var certData = new byte[certificateStream!.Length];
-
-                certificateStream.Read(certData, 0, certData.Length);
-                certificate = new X509Certificate2(certData, "password",
-                    X509KeyStorageFlags.MachineKeySet |
-                    X509KeyStorageFlags.PersistKeySet |
-                    X509KeyStorageFlags.Exportable);
-            }
-
             services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
             {
                 return new ConfigureOptions<KeyManagementOptions>(options =>
@@ -77,8 +61,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 })
                 .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryApiResources(GetApiResources())
-                .AddInMemoryIdentityResources(GetIdentityResources())
-                .AddSigningCredential(certificate);
+                .AddInMemoryIdentityResources(GetIdentityResources());
         }
 
         private static IEnumerable<ApiResource> GetApiResources()
