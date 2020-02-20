@@ -1,3 +1,5 @@
+// sass-lint:disable no-vendor-prefixes, one-declaration-per-line, no-misspelled-properties, no-color-keywords, no-color-literals
+
 @mixin build-icon($color) {
     & {
         color: $color;
@@ -27,13 +29,13 @@
     &:disabled
     &.disabled {
         opacity: .4;
-    }  
+    }
 
     &:focus,
     &.focus {
         box-shadow: 0 0 0 $btn-focus-width rgba($color, .5);
     }
-    
+
     &:active,
     &:hover {
         color: darken($color, 15%);
@@ -71,23 +73,26 @@
     }
 }
 
-@mixin hidden() {
+@mixin hidden {
     opacity: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     position: absolute;
     width: 0;
 }
 
 @mixin force-width($width) {
-    width:  $width;
     // Ensure that we use the minimum width in flex scenarios.
     max-width: $width;
     min-width: $width;
+    // Normal width definition.
+    width:  $width;
 }
 
 @mixin force-height($height) {
+    // Normal height definition.
     height:  $height;
-    // Ensure that we use the minimum width in flex scenarios.
+    // Ensure that we use the minimum height in flex scenarios.
     max-height: $height;
     min-height: $height;
 }
@@ -122,7 +127,7 @@
     content: '';
     display: inline-block;
 }
- 
+
 @mixin circle($size) {
     @include border-radius($size * .5);
     @include force-height($size);

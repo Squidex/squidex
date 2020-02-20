@@ -1,3 +1,6 @@
+@import '_mixins';
+@import '_vars';
+
 body {
     // Default body with padding for fixed navbar and sidebar.
     & {
