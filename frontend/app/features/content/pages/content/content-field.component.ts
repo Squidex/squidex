@@ -90,7 +90,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
             this.isDifferent =
                 value$(this.fieldForm).pipe(
                     combineLatest(value$(this.fieldFormCompare),
-                        (lhs, rhs) => !Types.equals(lhs, rhs)));
+                        (lhs, rhs) => !Types.equals(lhs, rhs, true)));
         }
     }
 

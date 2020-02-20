@@ -41,7 +41,7 @@ describe('FormHelpers', () => {
             form.disable();
             form.setValue('4');
 
-            expect(values).toEqual(['1', '2', '3']);
+            expect(values).toEqual(['1', '2', '3', '4']);
         });
     });
 });
