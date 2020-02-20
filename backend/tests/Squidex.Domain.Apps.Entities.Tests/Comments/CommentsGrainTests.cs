@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_state()
+        public async Task Update_should_create_events()
         {
             await ExecuteCreateAsync();
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Delete_should_create_events_and_update_state()
+        public async Task Delete_should_create_events()
         {
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();

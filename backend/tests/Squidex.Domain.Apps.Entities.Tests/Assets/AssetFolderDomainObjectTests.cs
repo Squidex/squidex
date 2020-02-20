@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Create_should_create_events_and_update_state()
+        public async Task Create_should_create_events_and_set_intitial_state()
         {
             var command = new CreateAssetFolder { FolderName = "New Name" };
 

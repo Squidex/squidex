@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Create_should_create_events_and_update_state()
+        public async Task Create_should_create_events_and_set_intitial_state()
         {
             var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_state()
+        public async Task Update_should_create_events_and_update_file_state()
         {
             var command = new UpdateAsset { File = file, FileHash = "NewHash" };
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateName_should_create_events_and_update_state()
+        public async Task AnnotateName_should_create_events_and_update_file_name()
         {
             var command = new AnnotateAsset { FileName = "My New Image.png" };
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateSlug_should_create_events_and_update_state()
+        public async Task AnnotateSlug_should_create_events_and_update_slug()
         {
             var command = new AnnotateAsset { Slug = "my-new-image.png" };
 
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateProtected_should_create_events_and_update_state()
+        public async Task AnnotateProtected_should_create_events_and_update_protected_flag()
         {
             var command = new AnnotateAsset { IsProtected = true };
 
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateMetadata_should_create_events_and_update_state()
+        public async Task AnnotateMetadata_should_create_events_and_update_metadata()
         {
             var command = new AnnotateAsset { Metadata = new AssetMetadata().SetPixelWidth(800) };
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task AnnotateTags_should_create_events_and_update_state()
+        public async Task AnnotateTags_should_create_events_and_update_tags()
         {
             var command = new AnnotateAsset { Tags = new HashSet<string> { "tag1" } };
 
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Move_should_create_events_and_update_state()
+        public async Task Move_should_create_events_and_update_parent_id()
         {
             var command = new MoveAsset { ParentId = parentId };
 
@@ -228,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Delete_should_create_events_with_total_file_size()
+        public async Task Delete_should_create_events_with_total_file_size_and_update_deleted_flag()
         {
             var command = new DeleteAsset();
 

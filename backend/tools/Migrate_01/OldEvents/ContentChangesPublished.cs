@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.OldEvents
 {
@@ -17,7 +19,7 @@ namespace Migrate_01.OldEvents
     {
         public IEvent Migrate()
         {
-            return new NoopEvent();
+            return SimpleMapper.Map(this, new ContentSchedulingCancelled());
         }
     }
 }

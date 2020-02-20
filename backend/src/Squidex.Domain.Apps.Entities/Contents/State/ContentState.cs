@@ -81,6 +81,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
                 case ContentStatusChanged e:
                     {
+                        ScheduleJob = null;
+
                         if (NewVersion != null)
                         {
                             if (e.Status == Status.Published)

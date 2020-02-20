@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Create_should_create_events_and_update_state()
+        public async Task Create_should_create_events_and_set_intitial_state()
         {
             var command = MakeCreateCommand();
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_state()
+        public async Task Update_should_create_events_and_update_trigger_and_action()
         {
             var command = MakeUpdateCommand();
 
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Enable_should_create_events_and_update_state()
+        public async Task Enable_should_create_events_and_update_enabled_flag()
         {
             var command = new EnableRule();
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Disable_should_create_events_and_update_state()
+        public async Task Disable_should_create_events_and_update_enabled_flag()
         {
             var command = new DisableRule();
 
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Delete_should_update_create_events()
+        public async Task Delete_should_create_events_and_update_deleted_flag()
         {
             var command = new DeleteRule();
 

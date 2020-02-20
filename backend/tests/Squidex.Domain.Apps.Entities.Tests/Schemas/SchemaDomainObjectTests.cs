@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Create_should_create_schema_and_create_events()
+        public async Task Create_should_create_events_and_set_intitial_state()
         {
             var properties = new SchemaProperties();
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Create_should_create_schema_with_initial_fields()
+        public async Task Create_should_create_events_and_schema_with_initial_fields()
         {
             var properties = new SchemaProperties();
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_state()
+        public async Task Update_should_create_events_and_update_schema_properties()
         {
             var command = new UpdateSchema { Properties = new SchemaProperties { Label = "My Properties" } };
 
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ConfigureScripts_should_create_events()
+        public async Task ConfigureScripts_should_create_events_and_update_schema_scripts()
         {
             var command = new ConfigureScripts
             {
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ConfigureUIFields_should_create_events_for_list_fields()
+        public async Task ConfigureUIFields_should_create_events_for_list_fields_and_update_schema()
         {
             var command = new ConfigureUIFields
             {
@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ConfigureUIFields_should_create_events_for_reference_fields()
+        public async Task ConfigureUIFields_should_create_events_for_reference_fields_and_update_schema()
         {
             var command = new ConfigureUIFields
             {
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Publish_should_create_events_and_update_state()
+        public async Task Publish_should_create_events_and_update_published_flag()
         {
             var command = new PublishSchema();
 
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Unpublish_should_create_events_and_update_state()
+        public async Task Unpublish_should_create_events_and_update_published_flag()
         {
             var command = new UnpublishSchema();
 
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ChangeCategory_should_create_events_and_update_state()
+        public async Task ChangeCategory_should_create_events_and_update_category()
         {
             var command = new ChangeCategory { Name = "my-category" };
 
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ConfigurePreviewUrls_should_create_events_and_update_state()
+        public async Task ConfigurePreviewUrls_should_create_events_and_update_preview_urls()
         {
             var command = new ConfigurePreviewUrls
             {
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Delete_should_create_events_and_update_state()
+        public async Task Delete_should_create_events_and_update_deleted_flag()
         {
             var command = new DeleteSchema();
 
@@ -303,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Reorder_should_create_events_and_update_state()
+        public async Task Reorder_should_create_events_and_reorder_fields()
         {
             var command = new ReorderFields { FieldIds = new List<long> { 2, 1 } };
 
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Reorder_should_create_events_and_update_state_for_array()
+        public async Task Reorder_should_create_events_and_reorder_nestedy_fields()
         {
             var command = new ReorderFields { ParentFieldId = 1, FieldIds = new List<long> { 3, 2 } };
 
@@ -342,7 +342,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Add_should_create_events_and_update_state()
+        public async Task Add_should_create_events_and_add_field()
         {
             var command = new AddField { Name = fieldName, Properties = ValidProperties() };
 
@@ -361,7 +361,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Add_should_create_events_and_update_state_for_array()
+        public async Task Add_should_create_events_and_add_field_to_array()
         {
             var command = new AddField { ParentFieldId = 1, Name = fieldName, Properties = ValidProperties() };
 
@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task UpdateField_should_create_events_and_update_state()
+        public async Task UpdateField_should_create_events_and_update_field_properties()
         {
             var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
 
@@ -401,7 +401,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task UpdateField_should_create_events_and_update_state_for_array()
+        public async Task UpdateField_should_create_events_and_update_nested_field_properties()
         {
             var command = new UpdateField { ParentFieldId = 1, FieldId = 2, Properties = new StringFieldProperties() };
 
@@ -422,7 +422,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task LockField_should_create_events_and_update_state()
+        public async Task LockField_should_create_events_and_update_field_locked_flag()
         {
             var command = new LockField { FieldId = 1 };
 
@@ -433,7 +433,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsDisabled);
+            Assert.True(GetField(1).IsLocked);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -442,7 +442,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task LockField_should_create_events_and_update_state_for_array()
+        public async Task LockField_should_create_events_and_update_nested_field_locked_flag()
         {
             var command = new LockField { ParentFieldId = 1, FieldId = 2 };
 
@@ -463,7 +463,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task HideField_should_create_events_and_update_state()
+        public async Task HideField_should_create_events_and_update_field_hidden_flag()
         {
             var command = new HideField { FieldId = 1 };
 
@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task HideField_should_create_events_and_update_state_for_array()
+        public async Task HideField_should_create_events_and_update_nested_field_hidden_flag()
         {
             var command = new HideField { ParentFieldId = 1, FieldId = 2 };
 
@@ -504,7 +504,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ShowField_should_create_events_and_update_state()
+        public async Task ShowField_should_create_events_and_update_field_hidden_flag()
         {
             var command = new ShowField { FieldId = 1 };
 
@@ -525,7 +525,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task ShowField_should_create_events_and_update_state_for_array()
+        public async Task ShowField_should_create_events_and_update_nested_field_hidden_flag()
         {
             var command = new ShowField { ParentFieldId = 1, FieldId = 2 };
 
@@ -547,7 +547,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task DisableField_should_create_events_and_update_state()
+        public async Task DisableField_should_create_events_and_update_field_disabled_flag()
         {
             var command = new DisableField { FieldId = 1 };
 
@@ -567,7 +567,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task DisableField_should_create_events_and_update_state_for_array()
+        public async Task DisableField_should_create_events_and_update_nested_field_disabled_flag()
         {
             var command = new DisableField { ParentFieldId = 1, FieldId = 2 };
 
@@ -588,7 +588,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task EnableField_should_create_events_and_update_state()
+        public async Task EnableField_should_create_events_and_update_field_disabled_flag()
         {
             var command = new EnableField { FieldId = 1 };
 
@@ -609,7 +609,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task EnableField_should_create_events_and_update_state_for_array()
+        public async Task EnableField_should_create_events_and_update_nested_field_disabled_flag()
         {
             var command = new EnableField { ParentFieldId = 1, FieldId = 2 };
 
@@ -631,7 +631,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task DeleteField_should_create_events_and_update_state()
+        public async Task DeleteField_should_create_events_and_delete_field()
         {
             var command = new DeleteField { FieldId = 1 };
 
@@ -651,7 +651,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task DeleteField_should_create_events_and_update_state_for_array()
+        public async Task DeleteField_should_create_events_and_delete_nested_field()
         {
             var command = new DeleteField { ParentFieldId = 1, FieldId = 2 };
 
@@ -672,7 +672,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Synchronize_should_create_events_and_update_state()
+        public async Task Synchronize_should_create_events_and_update_schema()
         {
             var command = new SynchronizeSchema
             {
