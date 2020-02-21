@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline
 {
@@ -35,11 +36,19 @@ namespace Squidex.Web.Pipeline
             var httpContext = context.HttpContext;
 
             cachingManager.Start(httpContext);
-            cachingManager.AddHeader(HeaderNames.Authorization);
+
+            cachingManager.AddHeader("Auth-State");
+
+            if (!string.IsNullOrWhiteSpace(httpContext.User.OpenIdSubject()))
+            {
+                cachingManager.AddHeader(HeaderNames.Authorization);
+            }
+            else if (!string.IsNullOrWhiteSpace(httpContext.User.OpenIdClientId()))
+            {
+                cachingManager.AddHeader("Auth-ClientId");
+            }
 
             var resultContext = await next();
-
-            cachingManager.Finish(httpContext, cachingOptions.MaxSurrogateKeys);
 
             if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
             {
@@ -58,6 +67,8 @@ namespace Squidex.Web.Pipeline
                     resultContext.Result = new StatusCodeResult(304);
                 }
             }
+
+            cachingManager.Finish(httpContext, cachingOptions.MaxSurrogateKeys);
         }
     }
 }

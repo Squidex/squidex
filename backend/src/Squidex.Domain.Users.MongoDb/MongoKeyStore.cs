@@ -36,6 +36,7 @@ namespace Squidex.Domain.Users.MongoDb
         public async Task<SigningCredentials> GetSigningCredentialsAsync()
         {
             var (_, key) = await GetOrCreateKeyAsync();
+            // SignatureProvider signatureProvider = key.CryptoProviderFactory.CreateForVerifying(key, key.Al);
 
             return key;
         }

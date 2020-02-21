@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using Squidex.Infrastructure.Security;
 using Xunit;
 
 namespace Squidex.Web.Pipeline
@@ -63,7 +65,31 @@ namespace Squidex.Web.Pipeline
         {
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+            Assert.Equal("Auth-State", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
+        public async Task Should_append_authorization_as_header_when_user_has_subject()
+        {
+            var identity = (ClaimsIdentity)httpContext.User.Identity;
+
+            identity.AddClaim(new Claim(OpenIdClaims.Subject, "my-id"));
+
+            await sut.OnActionExecutionAsync(executingContext, Next());
+
+            Assert.Equal("Auth-State,Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+        }
+
+        [Fact]
+        public async Task Should_append_client_id_as_header_when_user_has_client_but_no_subject()
+        {
+            var identity = (ClaimsIdentity)httpContext.User.Identity;
+
+            identity.AddClaim(new Claim(OpenIdClaims.ClientId, "my-client"));
+
+            await sut.OnActionExecutionAsync(executingContext, Next());
+
+            Assert.Equal("Auth-State,Auth-ClientId", httpContext.Response.Headers[HeaderNames.Vary]);
         }
 
         [Fact]
@@ -76,7 +102,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult(executedContext);
             });
 
-            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+            Assert.Equal("Auth-State", httpContext.Response.Headers[HeaderNames.Vary]);
         }
 
         [Fact]
@@ -89,7 +115,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult(executedContext);
             });
 
-            Assert.Equal("Authorization", httpContext.Response.Headers[HeaderNames.Vary]);
+            Assert.Equal("Auth-State", httpContext.Response.Headers[HeaderNames.Vary]);
         }
 
         [Fact]
@@ -102,7 +128,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult(executedContext);
             });
 
-            Assert.Equal("Authorization,X-Header", httpContext.Response.Headers[HeaderNames.Vary]);
+            Assert.Equal("Auth-State,X-Header", httpContext.Response.Headers[HeaderNames.Vary]);
         }
 
         [Fact]
