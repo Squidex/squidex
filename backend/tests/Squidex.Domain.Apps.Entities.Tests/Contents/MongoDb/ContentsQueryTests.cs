@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 using F = Squidex.Infrastructure.Queries.ClrFilter;
 
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 
-            await _.ContentRepository.QueryScheduledWithoutDataAsync(time, _ => TaskHelper.Done);
+            await _.ContentRepository.QueryScheduledWithoutDataAsync(time, _ => Task.CompletedTask);
         }
 
         [Fact]

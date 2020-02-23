@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
@@ -27,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
 
                 context.Complete(true);
 
-                return TaskHelper.True;
+                return Task.FromResult(true);
             }
         }
 
@@ -39,7 +38,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 LastCommand = context.Command;
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }
         }
 

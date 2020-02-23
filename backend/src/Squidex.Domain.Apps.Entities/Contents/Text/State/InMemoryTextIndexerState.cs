@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             states.Clear();
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task<TextContentState?> GetAsync(Guid contentId)
@@ -37,14 +36,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             states.Remove(contentId);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetAsync(TextContentState state)
         {
             states[state.ContentId] = state;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

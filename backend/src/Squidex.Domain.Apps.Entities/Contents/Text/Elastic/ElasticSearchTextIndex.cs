@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 {
     [ExcludeFromCodeCoverage]
-    public sealed class ElasticSearchTextIndex : IContentTextIndex
+    public sealed class ElasticSearchTextIndex : ITextIndex
     {
         private const string IndexName = "contents";
         private readonly ElasticLowLevelClient client;
@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             var config = new ConnectionConfiguration(new Uri("http://localhost:9200"));
 
             client = new ElasticLowLevelClient(config);
+        }
+
+        public Task ClearAsync()
+        {
+            return Task.CompletedTask;
         }
 
         public async Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)

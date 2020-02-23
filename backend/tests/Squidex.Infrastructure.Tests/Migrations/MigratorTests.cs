@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Migrations
@@ -60,7 +59,7 @@ namespace Squidex.Infrastructure.Migrations
                     version = newVersion;
                 }
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }
         }
 

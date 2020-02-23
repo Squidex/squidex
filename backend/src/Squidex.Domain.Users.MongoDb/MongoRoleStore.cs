@@ -13,7 +13,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Users.MongoDb
 {
@@ -119,14 +118,14 @@ namespace Squidex.Domain.Users.MongoDb
         {
             role.Name = roleName;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName, CancellationToken cancellationToken)
         {
             role.NormalizedName = normalizedName;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

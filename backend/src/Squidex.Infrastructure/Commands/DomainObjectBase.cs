@@ -209,7 +209,7 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual Task RebuildStateAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         protected virtual void OnSetup()

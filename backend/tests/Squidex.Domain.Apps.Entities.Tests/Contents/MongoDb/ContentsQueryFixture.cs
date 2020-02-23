@@ -147,9 +147,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return appProvider;
         }
 
-        private static IContentTextIndex CreateTextIndexer()
+        private static ITextIndex CreateTextIndexer()
         {
-            var textIndexer = A.Fake<IContentTextIndex>();
+            var textIndexer = A.Fake<ITextIndex>();
 
             A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<SearchFilter>._, A<SearchScope>._))
                 .Returns(new List<Guid> { Guid.NewGuid() });

@@ -17,7 +17,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Users.MongoDb
 {
@@ -354,126 +353,126 @@ namespace Squidex.Domain.Users.MongoDb
         {
             ((MongoUser)user).UserName = userName;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetNormalizedUserNameAsync(IdentityUser user, string normalizedName, CancellationToken cancellationToken)
         {
             ((MongoUser)user).NormalizedUserName = normalizedName;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetPasswordHashAsync(IdentityUser user, string passwordHash, CancellationToken cancellationToken)
         {
             ((MongoUser)user).PasswordHash = passwordHash;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task AddToRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
         {
             ((MongoUser)user).AddRole(roleName);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task RemoveFromRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
         {
             ((MongoUser)user).RemoveRole(roleName);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task AddLoginAsync(IdentityUser user, UserLoginInfo login, CancellationToken cancellationToken)
         {
             ((MongoUser)user).AddLogin(login);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task RemoveLoginAsync(IdentityUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
             ((MongoUser)user).RemoveLogin(loginProvider, providerKey);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetSecurityStampAsync(IdentityUser user, string stamp, CancellationToken cancellationToken)
         {
             ((MongoUser)user).SecurityStamp = stamp;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetEmailAsync(IdentityUser user, string email, CancellationToken cancellationToken)
         {
             ((MongoUser)user).Email = email;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetEmailConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
         {
             ((MongoUser)user).EmailConfirmed = confirmed;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetNormalizedEmailAsync(IdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
         {
             ((MongoUser)user).NormalizedEmail = normalizedEmail;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task AddClaimsAsync(IdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
             ((MongoUser)user).AddClaims(claims);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task ReplaceClaimAsync(IdentityUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
         {
             ((MongoUser)user).ReplaceClaim(claim, newClaim);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task RemoveClaimsAsync(IdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
             ((MongoUser)user).RemoveClaims(claims);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetPhoneNumberAsync(IdentityUser user, string phoneNumber, CancellationToken cancellationToken)
         {
             ((MongoUser)user).PhoneNumber = phoneNumber;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetPhoneNumberConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
         {
             ((MongoUser)user).PhoneNumberConfirmed = confirmed;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetTwoFactorEnabledAsync(IdentityUser user, bool enabled, CancellationToken cancellationToken)
         {
             ((MongoUser)user).TwoFactorEnabled = enabled;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetLockoutEndDateAsync(IdentityUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
         {
             ((MongoUser)user).LockoutEnd = lockoutEnd?.UtcDateTime;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task<int> IncrementAccessFailedCountAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -487,42 +486,42 @@ namespace Squidex.Domain.Users.MongoDb
         {
             ((MongoUser)user).AccessFailedCount = 0;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetLockoutEnabledAsync(IdentityUser user, bool enabled, CancellationToken cancellationToken)
         {
             ((MongoUser)user).LockoutEnabled = enabled;
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetTokenAsync(IdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
         {
             ((MongoUser)user).SetToken(loginProvider, name, value);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task RemoveTokenAsync(IdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
             ((MongoUser)user).RemoveToken(loginProvider, name);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task SetAuthenticatorKeyAsync(IdentityUser user, string key, CancellationToken cancellationToken)
         {
             ((MongoUser)user).SetToken(InternalLoginProvider, AuthenticatorKeyTokenName, key);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task ReplaceCodesAsync(IdentityUser user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
         {
             ((MongoUser)user).SetToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", recoveryCodes));
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task<bool> RedeemCodeAsync(IdentityUser user, string code, CancellationToken cancellationToken)
@@ -536,10 +535,10 @@ namespace Squidex.Domain.Users.MongoDb
 
                 ((MongoUser)user).SetToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", updatedCodes));
 
-                return TaskHelper.True;
+                return Task.FromResult(true);
             }
 
-            return TaskHelper.False;
+            return Task.FromResult(false);
         }
     }
 }

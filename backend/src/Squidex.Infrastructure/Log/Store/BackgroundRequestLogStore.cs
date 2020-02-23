@@ -10,7 +10,6 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.Log.Store
@@ -85,7 +84,7 @@ namespace Squidex.Infrastructure.Log.Store
 
             jobs.Enqueue(request);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

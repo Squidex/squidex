@@ -10,7 +10,6 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -81,7 +80,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public virtual async Task ClearAsync()

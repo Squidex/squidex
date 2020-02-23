@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -87,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 rebuildContents.Add(id);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
 
             A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IdSource>._, A<CancellationToken>._))

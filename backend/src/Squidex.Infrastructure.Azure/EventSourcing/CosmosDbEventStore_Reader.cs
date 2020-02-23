@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -37,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             ThrowIfDisposed();
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
@@ -74,7 +73,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
                     }
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 });
 
                 IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
@@ -120,7 +119,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         }
                     }
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 });
 
                 return result;

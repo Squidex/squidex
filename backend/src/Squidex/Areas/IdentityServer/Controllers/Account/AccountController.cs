@@ -25,7 +25,6 @@ using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -352,7 +351,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             if (isFirst || !identityOptions.LockAutomatically)
             {
-                return TaskHelper.True;
+                return Task.FromResult(true);
             }
 
             return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user.Identity, DateTimeOffset.UtcNow.AddYears(100)));

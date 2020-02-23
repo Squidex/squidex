@@ -16,7 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
@@ -61,17 +60,17 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => CheckUsagesAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task ActivateAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task CheckUsagesAsync()

@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             RecoverAfterRestartAsync().Forget();
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private async Task RecoverAfterRestartAsync()

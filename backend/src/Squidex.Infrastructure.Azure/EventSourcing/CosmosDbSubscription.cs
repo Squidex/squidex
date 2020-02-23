@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.ChangeFeedProcessor.FeedProcessing;
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Tasks;
 using Builder = Microsoft.Azure.Documents.ChangeFeedProcessor.ChangeFeedProcessorBuilder;
 using Collection = Microsoft.Azure.Documents.ChangeFeedProcessor.DocumentCollectionInfo;
 using Options = Microsoft.Azure.Documents.ChangeFeedProcessor.ChangeFeedProcessorOptions;
@@ -104,7 +103,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task OpenAsync(IChangeFeedObserverContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task ProcessChangesAsync(IChangeFeedObserverContext context, IReadOnlyList<Document> docs, CancellationToken cancellationToken)

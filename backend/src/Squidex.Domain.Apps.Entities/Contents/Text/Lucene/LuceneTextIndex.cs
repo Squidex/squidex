@@ -16,15 +16,24 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public sealed class LuceneTextIndex : IContentTextIndex
+    public sealed class LuceneTextIndex : ITextIndex
     {
         private readonly IGrainFactory grainFactory;
+        private readonly IndexManager indexManager;
 
-        public LuceneTextIndex(IGrainFactory grainFactory)
+        public LuceneTextIndex(IGrainFactory grainFactory, IndexManager indexManager)
         {
             Guard.NotNull(grainFactory);
+            Guard.NotNull(indexManager);
 
             this.grainFactory = grainFactory;
+
+            this.indexManager = indexManager;
+        }
+
+        public Task ClearAsync()
+        {
+            return indexManager.ClearAsync();
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)

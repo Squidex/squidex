@@ -10,7 +10,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Config.Authentication
@@ -21,7 +20,7 @@ namespace Squidex.Config.Authentication
         {
             context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public override Task CreatingTicket(OAuthCreatingTicketContext context)

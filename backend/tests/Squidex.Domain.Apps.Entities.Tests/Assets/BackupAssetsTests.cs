@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
@@ -175,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 rebuildAssets.Add(id);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
 
             A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(A<IdSource>._, A<CancellationToken>._))
@@ -219,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 rebuildAssets.Add(id);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
 
             A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(A<IdSource>._, A<CancellationToken>._))

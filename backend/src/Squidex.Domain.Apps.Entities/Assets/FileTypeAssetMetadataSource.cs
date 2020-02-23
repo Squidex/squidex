@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -27,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 }
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public IEnumerable<string> Format(IAssetEntity asset)

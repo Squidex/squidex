@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
@@ -57,13 +57,13 @@ namespace Squidex.Infrastructure.Orleans
 
                     ReportIAmAlive();
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 },
                 ct =>
                 {
                     ReportIAmDead();
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 });
         }
 

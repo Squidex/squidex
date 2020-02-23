@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -33,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task ClearAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task On(Envelope<IEvent> @event)
@@ -50,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.DeletedSize, -1);
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private static DateTime GetDate(Envelope<IEvent> @event)

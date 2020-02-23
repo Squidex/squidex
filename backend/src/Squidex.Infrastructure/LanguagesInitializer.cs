@@ -8,7 +8,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure
 {
@@ -33,7 +32,7 @@ namespace Squidex.Infrastructure
                 }
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

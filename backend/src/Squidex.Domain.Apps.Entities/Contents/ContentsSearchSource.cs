@@ -25,13 +25,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IAppProvider appProvider;
         private readonly IContentQueryService contentQuery;
-        private readonly IContentTextIndex contentTextIndexer;
+        private readonly ITextIndex contentTextIndexer;
         private readonly IUrlGenerator urlGenerator;
 
         public ContentsSearchSource(
             IAppProvider appProvider,
             IContentQueryService contentQuery,
-            IContentTextIndex contentTextIndexer,
+            ITextIndex contentTextIndexer,
             IUrlGenerator urlGenerator)
         {
             Guard.NotNull(appProvider);

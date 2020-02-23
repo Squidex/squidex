@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryContentsByQuery queryContentsByQuery;
         private readonly QueryIdsAsync queryIdsAsync;
 
-        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, IContentTextIndex indexer, IJsonSerializer serializer)
+        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, IJsonSerializer serializer)
             : base(database)
         {
             queryContentAsync = new QueryContent(serializer);
@@ -43,6 +43,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public IMongoCollection<MongoContentEntity> GetInternalCollection()
         {
             return Collection;
+        }
+
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings
+            {
+                ReadPreference = ReadPreference.SecondaryPreferred.With(TimeSpan.FromSeconds(10))
+            };
         }
 
         protected override string CollectionName()

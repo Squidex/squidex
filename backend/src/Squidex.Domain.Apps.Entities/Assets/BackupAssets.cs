@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     return WriteAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, context.Writer);
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)

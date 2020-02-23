@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly IContentTextIndex contentIndex = A.Fake<IContentTextIndex>();
+        private readonly ITextIndex contentIndex = A.Fake<ITextIndex>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");

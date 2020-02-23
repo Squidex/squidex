@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Tasks;
 using TagLib;
 using TagLib.Image;
 using static TagLib.File;
@@ -57,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             Enhance(command);
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private void Enhance(UploadAssetCommand command)

@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Startup
 {
@@ -42,7 +41,7 @@ namespace Squidex.Config.Startup
 
         protected virtual Task StopAsync(ISemanticLog log, CancellationToken ct)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

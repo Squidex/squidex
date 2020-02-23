@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IContentTextIndex indexer, IJsonSerializer serializer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, IJsonSerializer serializer)
         {
             Guard.NotNull(appProvider);
             Guard.NotNull(serializer);

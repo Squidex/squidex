@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Web
 {
@@ -62,7 +61,7 @@ namespace Squidex.Web
                 {
                     context.Result = new StatusCodeResult(403);
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 }
             }
 

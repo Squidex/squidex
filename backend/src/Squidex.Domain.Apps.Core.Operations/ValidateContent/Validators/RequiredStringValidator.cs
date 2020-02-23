@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -23,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (context.IsOptional)
             {
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }
 
             if (value.IsNullOrUndefined() || IsEmptyString(value))
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 addError(context.Path, "Field is required.");
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private bool IsEmptyString(object? value)

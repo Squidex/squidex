@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
@@ -51,7 +50,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 context.Complete(true);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
 
             Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
@@ -84,7 +83,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var context = new CommandContext(command, commandBus);
 
-            await sut.HandleAsync(context, c => TaskHelper.Done);
+            await sut.HandleAsync(context, c => Task.CompletedTask);
 
             Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
             {

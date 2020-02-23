@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
     {
         Task<Directory> CreateDirectoryAsync(Guid schemaId);
 
+        Task ClearAsync();
+
         Task WriteAsync(Directory directory, SnapshotDeletionPolicy snapshotter);
     }
 }

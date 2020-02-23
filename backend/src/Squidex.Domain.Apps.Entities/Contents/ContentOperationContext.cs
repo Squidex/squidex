@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             data.GenerateDefaultValues(schemaEntity.SchemaDef, appEntity.PartitionResolver());
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task ValidateAsync(NamedContentData data, bool optimized)
@@ -112,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             scriptEngine.Execute(context, GetScript(script));
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private void Enrich(ScriptContext context)

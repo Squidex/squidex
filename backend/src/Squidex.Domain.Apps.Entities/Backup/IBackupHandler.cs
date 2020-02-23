@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
@@ -18,37 +17,37 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
         {
-            return TaskHelper.True;
+            return Task.FromResult(true);
         }
 
         public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task RestoreAsync(RestoreContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task BackupAsync(BackupContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task CleanupRestoreErrorAsync(Guid appId)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task CompleteRestoreAsync(RestoreContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public Task CompleteBackupAsync(BackupContext context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

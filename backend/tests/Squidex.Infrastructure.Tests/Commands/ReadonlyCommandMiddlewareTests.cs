@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
@@ -55,7 +54,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 context.Complete(true);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
         }
     }

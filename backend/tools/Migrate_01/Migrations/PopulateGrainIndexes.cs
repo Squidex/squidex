@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Tasks;
 
 namespace Migrate_01.Migrations
 {
@@ -109,7 +108,7 @@ namespace Migrate_01.Migrations
                         break;
                 }
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }, "^app\\-");
 
             await indexApps.RebuildAsync(appsByName);
@@ -143,7 +142,7 @@ namespace Migrate_01.Migrations
                         break;
                 }
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }, "^rule\\-");
 
             foreach (var (appId, rules) in rulesByApp)
@@ -175,7 +174,7 @@ namespace Migrate_01.Migrations
                         break;
                 }
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }, "^schema\\-");
 
             foreach (var (appId, schemas) in schemasByApp)

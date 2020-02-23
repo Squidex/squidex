@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public override Task OnDeactivateAsync()
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public Task ActivateAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task QueryAsync()
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

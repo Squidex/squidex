@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
@@ -33,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         protected virtual Task PrepareAsync(CancellationToken ct = default)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

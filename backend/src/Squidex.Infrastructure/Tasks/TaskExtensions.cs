@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 action(x);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             };
         }
 

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         Task EnrichAsync(Context context)
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

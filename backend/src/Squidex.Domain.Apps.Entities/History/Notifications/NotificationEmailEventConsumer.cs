@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.History.Notifications
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
 
         public Task ClearAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public async Task On(Envelope<IEvent> @event)

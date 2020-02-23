@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -60,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 isNextCalled = true;
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             });
 
             Assert.True(isNextCalled);

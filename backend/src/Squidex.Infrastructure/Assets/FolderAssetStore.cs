@@ -10,7 +10,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
@@ -43,7 +42,7 @@ namespace Squidex.Infrastructure.Assets
                     .WriteProperty("action", "FolderAssetStoreConfigured")
                     .WriteProperty("path", directory.FullName));
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -68,7 +67,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 sourceFile.CopyTo(targetFile.FullName);
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }
             catch (IOException) when (targetFile.Exists)
             {
@@ -124,7 +123,7 @@ namespace Squidex.Infrastructure.Assets
 
             file.Delete();
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         private FileInfo GetFile(string fileName)

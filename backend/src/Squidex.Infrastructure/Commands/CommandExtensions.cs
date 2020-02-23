@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -14,7 +13,7 @@ namespace Squidex.Infrastructure.Commands
     {
         public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)
         {
-            return commandMiddleware.HandleAsync(context, x => TaskHelper.Done);
+            return commandMiddleware.HandleAsync(context, x => Task.CompletedTask);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace Squidex.Config.Domain
                 .AsOptional<IWorkflowsValidator>();
 
             services.AddSingletonAs<LuceneTextIndex>()
-                .As<IContentTextIndex>();
+                .As<ITextIndex>();
 
             services.AddSingletonAs<TextIndexingProcess>()
                 .As<IEventConsumer>();

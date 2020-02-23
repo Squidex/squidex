@@ -17,12 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class TextIndexingProcess : IEventConsumer
     {
         private const string NotFound = "<404>";
-        private readonly IContentTextIndex textIndexer;
+        private readonly ITextIndex textIndexer;
         private readonly ITextIndexerState textIndexerState;
 
         public string Name
         {
-            get { return "TextIndexer2"; }
+            get { return "TextIndexer3"; }
         }
 
         public string EventsFilter
@@ -30,12 +30,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return "^content-"; }
         }
 
-        public IContentTextIndex TextIndexer
+        public ITextIndex TextIndexer
         {
             get { return textIndexer; }
         }
 
-        public TextIndexingProcess(IContentTextIndex textIndexer, ITextIndexerState textIndexerState)
+        public TextIndexingProcess(ITextIndex textIndexer, ITextIndexerState textIndexerState)
         {
             Guard.NotNull(textIndexer);
             Guard.NotNull(textIndexerState);
@@ -49,9 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return true;
         }
 
-        public Task ClearAsync()
+        public async Task ClearAsync()
         {
-            return textIndexerState.ClearAsync();
+            await textIndexer.ClearAsync();
+            await textIndexerState.ClearAsync();
         }
 
         public async Task On(Envelope<IEvent> @event)

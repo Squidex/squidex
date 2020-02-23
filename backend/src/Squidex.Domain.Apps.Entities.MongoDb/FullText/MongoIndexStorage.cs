@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Lucene.Net.Index;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Infrastructure;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
@@ -21,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public MongoIndexStorage(IGridFSBucket<string> bucket)
         {
+            Guard.NotNull(bucket);
+
             this.bucket = bucket;
         }
 
@@ -34,6 +37,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             var directory = new MongoDirectory(bucket, folderName, tempDirectory);
 
             return Task.FromResult<LuceneDirectory>(directory);
+        }
+
+        public Task ClearAsync()
+        {
+            return bucket.DropAsync();
         }
 
         public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)

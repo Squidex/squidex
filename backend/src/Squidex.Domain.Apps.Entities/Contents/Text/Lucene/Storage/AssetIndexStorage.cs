@@ -64,6 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
             return directory;
         }
 
+        public Task ClearAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         public async Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
             Guard.NotNull(directory);

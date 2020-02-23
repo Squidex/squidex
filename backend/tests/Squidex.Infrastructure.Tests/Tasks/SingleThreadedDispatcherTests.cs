@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Tasks
                 {
                     target.Add(item);
 
-                    return TaskHelper.Done;
+                    return Task.CompletedTask;
                 }).Forget();
             }
 

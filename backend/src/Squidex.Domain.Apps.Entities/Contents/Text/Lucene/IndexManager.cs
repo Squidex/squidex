@@ -19,15 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
     {
         private readonly Dictionary<Guid, IndexHolder> indices = new Dictionary<Guid, IndexHolder>();
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
-        private readonly IIndexStorage directoryFactory;
+        private readonly IIndexStorage indexStorage;
         private readonly ISemanticLog log;
 
-        public IndexManager(IIndexStorage directoryFactory, ISemanticLog log)
+        public IndexManager(IIndexStorage indexStorage, ISemanticLog log)
         {
-            Guard.NotNull(directoryFactory);
+            Guard.NotNull(indexStorage);
             Guard.NotNull(log);
 
-            this.directoryFactory = directoryFactory;
+            this.indexStorage = indexStorage;
 
             this.log = log;
         }
@@ -38,6 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             {
                 ReleaseAllAsync().Wait();
             }
+        }
+
+        public Task ClearAsync()
+        {
+            return indexStorage.ClearAsync();
         }
 
         public async Task<IIndex> AcquireAsync(Guid schemaId)
@@ -65,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 lockObject.Release();
             }
 
-            var directory = await directoryFactory.CreateDirectoryAsync(schemaId);
+            var directory = await indexStorage.CreateDirectoryAsync(schemaId);
 
             indexHolder.Open(directory);
 
@@ -113,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     holder.Commit();
                 }
 
-                await directoryFactory.WriteAsync(holder.GetUnsafeWriter().Directory, holder.Snapshotter);
+                await indexStorage.WriteAsync(holder.GetUnsafeWriter().Directory, holder.Snapshotter);
             }
         }
 

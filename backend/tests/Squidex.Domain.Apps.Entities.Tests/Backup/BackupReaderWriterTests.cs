@@ -17,7 +17,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             innerStream.WriteByte((byte)index);
 
-                            return TaskHelper.Done;
+                            return Task.CompletedTask;
                         });
                     }
                     else if (index % 37 == 0)
@@ -139,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                             Assert.Equal((byte)index, byteRead);
 
-                            return TaskHelper.Done;
+                            return Task.CompletedTask;
                         });
                     }
                     else if (index % 37 == 0)

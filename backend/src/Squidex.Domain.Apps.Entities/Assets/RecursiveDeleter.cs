@@ -15,7 +15,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -60,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task ClearAsync()
         {
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
 
         public bool Handles(StoredEvent @event)

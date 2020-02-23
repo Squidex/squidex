@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Users
 {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Users
             {
                 result.Add(XElement.Parse(state.Xml));
 
-                return TaskHelper.Done;
+                return Task.CompletedTask;
             }).Wait();
 
             return result;
