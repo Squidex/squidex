@@ -29,9 +29,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return result;
         }
 
-        private static bool ParseString(string value, out string result)
+        private static bool ParseString(ReadOnlySpan<char> value, out string result)
         {
-            result = value;
+            result = new string(value);
 
             return true;
         }

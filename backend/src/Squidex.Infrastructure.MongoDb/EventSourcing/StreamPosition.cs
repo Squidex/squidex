@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using MongoDB.Bson;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -34,15 +35,17 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static implicit operator string(StreamPosition position)
         {
-            var parts = new object[]
-            {
-                position.Timestamp.Timestamp,
-                position.Timestamp.Increment,
-                position.CommitOffset,
-                position.CommitSize
-            };
+            var sb = new StringBuilder();
 
-            return string.Join("-", parts);
+            sb.Append(position.Timestamp.Timestamp);
+            sb.Append(",");
+            sb.Append(position.Timestamp.Increment);
+            sb.Append(",");
+            sb.Append(position.CommitOffset);
+            sb.Append(",");
+            sb.Append(position.CommitSize);
+
+            return sb.ToString();
         }
 
         public static implicit operator StreamPosition(string? position)

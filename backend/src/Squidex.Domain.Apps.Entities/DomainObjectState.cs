@@ -69,13 +69,15 @@ namespace Squidex.Domain.Apps.Entities
                 clone.Id = headers.AggregateId();
             }
 
+            var timestamp = headers.Timestamp();
+
             if (clone.CreatedBy == null)
             {
-                clone.Created = headers.Timestamp();
+                clone.Created = timestamp;
                 clone.CreatedBy = payload.Actor;
             }
 
-            clone.LastModified = headers.Timestamp();
+            clone.LastModified = timestamp;
             clone.LastModifiedBy = payload.Actor;
 
             return (clone as T)!;

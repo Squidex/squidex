@@ -9,13 +9,26 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonHelper
     {
+        private const string TypeBson = "§type";
+        private const string TypeJson = "$json";
+
         public static string UnescapeBson(this string value)
         {
+            if (value == TypeBson)
+            {
+                return TypeJson;
+            }
+
             return ReplaceFirstCharacter(value, '§', '$');
         }
 
         public static string EscapeJson(this string value)
         {
+            if (value == TypeJson)
+            {
+                return TypeBson;
+            }
+
             return ReplaceFirstCharacter(value, '$', '§');
         }
 

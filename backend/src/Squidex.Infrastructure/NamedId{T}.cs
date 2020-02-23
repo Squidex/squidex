@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
-    public delegate bool Parser<T>(string input, out T result);
+    public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
 
     [Equals(DoNotAddEqualityOperators = true)]
     public sealed class NamedId<T> where T : notnull
@@ -42,11 +42,13 @@ namespace Squidex.Infrastructure
         {
             if (value != null)
             {
+                var span = value.AsSpan();
+
                 if (typeof(T) == typeof(Guid))
                 {
                     if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
                     {
-                        if (parser(value.Substring(0, GuidLength), out var id))
+                        if (parser(span.Slice(0, GuidLength), out var id))
                         {
                             result = new NamedId<T>(id, value.Substring(GuidLength + 1));
 
@@ -60,7 +62,7 @@ namespace Squidex.Infrastructure
 
                     if (index > 0 && index < value.Length - 1)
                     {
-                        if (parser(value.Substring(0, index), out var id))
+                        if (parser(span.Slice(0, index), out var id))
                         {
                             result = new NamedId<T>(id, value.Substring(index + 1));
 
