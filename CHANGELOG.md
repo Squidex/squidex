@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.0 Beta 2 - 2020-02-24
+
+This release just contains a lot of bugfixes.
+
 ## 4.2.0 Beta 1 - 2020-02-20
 
 The release makes a lot of changed to the content structure, therefore it will run a migration to recreate the contents collections. This can take a while.
