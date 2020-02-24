@@ -8,18 +8,12 @@
 using System.Threading.Tasks;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.History.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 {
-    public sealed class NoopNotificationEmailSender : INotificationEmailSender
+    public interface INotificationEmailSender
     {
-        public bool IsActive
-        {
-            get { return false; }
-        }
+        bool IsActive { get; }
 
-        public Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated)
-        {
-            return Task.CompletedTask;
-        }
+        Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated);
     }
 }

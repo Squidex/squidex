@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Shared.Users;
-
-namespace Squidex.Domain.Apps.Entities.History.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 {
-    public interface INotificationEmailSender
+    public sealed class NotificationEmailTextOptions
     {
-        bool IsActive { get; }
+        public string NewUserSubject { get; set; }
 
-        Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated);
+        public string NewUserBody { get; set; }
+
+        public string ExistingUserSubject { get; set; }
+
+        public string ExistingUserBody { get; set; }
     }
 }

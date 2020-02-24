@@ -39,6 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             cache.AddHeader(HeaderUnpublished);
         }
 
+        public static SearchScope Scope(this Context context)
+        {
+            return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
+        }
+
         public static bool ShouldCleanup(this Context context)
         {
             return !context.Headers.ContainsKey(HeaderNoCleanup);
@@ -97,11 +102,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public static Context WithoutResolveLanguages(this Context context, bool value = true)
         {
             return SetBoolean(context, HeaderNoResolveLanguages, value);
-        }
-
-        public static SearchScope Scope(this Context context)
-        {
-            return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
         }
 
         public static IEnumerable<string> AssetUrls(this Context context)

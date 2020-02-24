@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.History.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 {
     public class NotificationEmailEventConsumerTests
     {

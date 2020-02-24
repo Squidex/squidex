@@ -8,7 +8,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Entities.History.Notifications;
+using Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;
 

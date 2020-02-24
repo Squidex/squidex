@@ -13,7 +13,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.History.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 {
     public sealed class NotificationEmailEventConsumer : IEventConsumer
     {

@@ -31,7 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public ISemanticLog Log { get; }
 
         public GraphQLExecutionContext(Context context, IDependencyResolver resolver)
-            : base(context,
+            : base(context
+                    .WithoutCleanup()
+                    .WithoutContentEnrichment(),
                 resolver.Resolve<IAssetQueryService>(),
                 resolver.Resolve<IContentQueryService>())
         {

@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Email
@@ -17,26 +18,54 @@ namespace Squidex.Infrastructure.Email
     public sealed class SmtpEmailSender : IEmailSender
     {
         private readonly SmptOptions options;
+        private readonly ObjectPool<SmtpClient> pool;
+
+        internal sealed class SmtpClientPolicy : PooledObjectPolicy<SmtpClient>
+        {
+            private readonly SmptOptions options;
+
+            public SmtpClientPolicy(SmptOptions options)
+            {
+                this.options = options;
+            }
+
+            public override SmtpClient Create()
+            {
+                return new SmtpClient(options.Server, options.Port)
+                {
+                    Credentials = new NetworkCredential(
+                        options.Username,
+                        options.Password),
+
+                    EnableSsl = options.EnableSsl
+                };
+            }
+
+            public override bool Return(SmtpClient obj)
+            {
+                return true;
+            }
+        }
 
         public SmtpEmailSender(IOptions<SmptOptions> options)
         {
             Guard.NotNull(options);
 
             this.options = options.Value;
+
+            pool = new DefaultObjectPoolProvider().Create(new SmtpClientPolicy(options.Value));
         }
 
         public async Task SendAsync(string recipient, string subject, string body)
         {
-            using (var smtpClient = new SmtpClient(options.Server, options.Port)
-            {
-                Credentials = new NetworkCredential(
-                    options.Username,
-                    options.Password),
-
-                EnableSsl = options.EnableSsl
-            })
+            var smtpClient = pool.Get();
+            try
             {
                 await smtpClient.SendMailAsync(options.Sender, recipient, subject, body);
+            }
+            finally
+            {
+                pool.Return(smtpClient);
             }
         }
     }

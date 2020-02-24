@@ -5,24 +5,49 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using System.Text.Json;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Squidex.Infrastructure.Log
 {
     public sealed class JsonLogWriterFactory : IObjectWriterFactory
     {
-        private const int MaxPoolSize = 10;
-        private const int MaxCapacity = 5000;
-        private readonly ConcurrentStack<JsonLogWriter> pool = new ConcurrentStack<JsonLogWriter>();
-        private readonly JsonWriterOptions formatting;
-        private readonly bool formatLine;
+        private readonly ObjectPool<JsonLogWriter> pool;
+
+        internal sealed class JsonLogWriterPolicy : PooledObjectPolicy<JsonLogWriter>
+        {
+            private const int MaxCapacity = 5000;
+            private readonly JsonWriterOptions formatting;
+            private readonly bool formatLine;
+
+            public JsonLogWriterPolicy(bool indended = false, bool formatLine = false)
+            {
+                formatting.Indented = indended;
+
+                this.formatLine = formatLine;
+            }
+
+            public override JsonLogWriter Create()
+            {
+                return new JsonLogWriter(formatting, formatLine);
+            }
+
+            public override bool Return(JsonLogWriter obj)
+            {
+                if (obj.BufferSize > MaxCapacity)
+                {
+                    return false;
+                }
+
+                obj.Reset();
+
+                return true;
+            }
+        }
 
         public JsonLogWriterFactory(bool indended = false, bool formatLine = false)
         {
-            formatting.Indented = indended;
-
-            this.formatLine = formatLine;
+            pool = new DefaultObjectPoolProvider().Create(new JsonLogWriterPolicy(indended, formatLine));
         }
 
         public static JsonLogWriterFactory Default()
@@ -37,26 +62,12 @@ namespace Squidex.Infrastructure.Log
 
         public IObjectWriter Create()
         {
-            if (pool.TryPop(out var writer))
-            {
-                writer.Reset();
-            }
-            else
-            {
-                writer = new JsonLogWriter(formatting, formatLine);
-            }
-
-            return writer;
+            return pool.Get();
         }
 
         public void Release(IObjectWriter writer)
         {
-            var jsonWriter = (JsonLogWriter)writer;
-
-            if (pool.Count < MaxPoolSize && jsonWriter.BufferSize < MaxCapacity)
-            {
-                pool.Push(jsonWriter);
-            }
+            pool.Return((JsonLogWriter)writer);
         }
     }
 }
