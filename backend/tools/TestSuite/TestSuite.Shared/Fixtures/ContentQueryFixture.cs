@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.ClientLibrary;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures

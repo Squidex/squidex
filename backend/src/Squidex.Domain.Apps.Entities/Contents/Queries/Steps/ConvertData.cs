@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task<IEnumerable<Guid>> QueryContentIdsAsync(Context context, HashSet<Guid> ids)
         {
-            var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.ShouldProvideUnpublished() ? SearchScope.All : SearchScope.Published);
+            var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope());
 
             return result.Select(x => x.Id);
         }

@@ -10,7 +10,7 @@ namespace Squidex.Infrastructure.MongoDb
     public static class BsonHelper
     {
         private const string TypeBson = "§type";
-        private const string TypeJson = "$json";
+        private const string TypeJson = "$type";
 
         public static string UnescapeBson(this string value)
         {

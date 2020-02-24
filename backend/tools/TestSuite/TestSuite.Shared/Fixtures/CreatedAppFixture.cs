@@ -28,7 +28,9 @@ namespace TestSuite.Fixtures
                     }
                 }
 
-                await Apps.PostContributorAsync(AppName, new AssignContributorDto { ContributorId = "sebastian@squidex.io", Invite = true, Role = "Owner" });
+                var invite = new AssignContributorDto { ContributorId = "sebastian@squidex.io", Invite = true, Role = "Owner" };
+
+                await Apps.PostContributorAsync(AppName, invite);
             }).Wait();
         }
     }

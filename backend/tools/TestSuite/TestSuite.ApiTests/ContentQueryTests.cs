@@ -188,12 +188,12 @@ namespace TestSuite.ApiTests
                 query = @"
                 {
                     queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
-                      id,
-                      data {
-                        number {
-                          iv
+                        id,
+                        data {
+                            number {
+                                iv
+                            }
                         }
-                      }
                     }
                 }"
             };

@@ -38,11 +38,11 @@ namespace Squidex.Infrastructure.EventSourcing
             var sb = new StringBuilder();
 
             sb.Append(position.Timestamp.Timestamp);
-            sb.Append(",");
+            sb.Append("-");
             sb.Append(position.Timestamp.Increment);
-            sb.Append(",");
+            sb.Append("-");
             sb.Append(position.CommitOffset);
-            sb.Append(",");
+            sb.Append("-");
             sb.Append(position.CommitSize);
 
             return sb.ToString();
@@ -54,7 +54,10 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var parts = position.Split('-');
 
-                return new StreamPosition(new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])), long.Parse(parts[2]), long.Parse(parts[3]));
+                return new StreamPosition(
+                    new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])),
+                    long.Parse(parts[2]),
+                    long.Parse(parts[3]));
             }
 
             return new StreamPosition(EmptyTimestamp, -1, -1);
