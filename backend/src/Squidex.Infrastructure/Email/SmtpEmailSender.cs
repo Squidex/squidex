@@ -16,29 +16,28 @@ namespace Squidex.Infrastructure.Email
     [ExcludeFromCodeCoverage]
     public sealed class SmtpEmailSender : IEmailSender
     {
-        private readonly SmtpClient smtpClient;
-        private readonly string sender;
+        private readonly SmptOptions options;
 
         public SmtpEmailSender(IOptions<SmptOptions> options)
         {
             Guard.NotNull(options);
 
-            var config = options.Value;
-
-            smtpClient = new SmtpClient(config.Server, config.Port)
-            {
-                Credentials = new NetworkCredential(
-                    config.Username,
-                    config.Password),
-                EnableSsl = config.EnableSsl
-            };
-
-            sender = config.Sender;
+            this.options = options.Value;
         }
 
-        public Task SendAsync(string recipient, string subject, string body)
+        public async Task SendAsync(string recipient, string subject, string body)
         {
-            return smtpClient.SendMailAsync(sender, recipient, subject, body);
+            using (var smtpClient = new SmtpClient(options.Server, options.Port)
+            {
+                Credentials = new NetworkCredential(
+                    options.Username,
+                    options.Password),
+
+                EnableSsl = options.EnableSsl
+            })
+            {
+                await smtpClient.SendMailAsync(options.Sender, recipient, subject, body);
+            }
         }
     }
 }

@@ -43,20 +43,22 @@ namespace Squidex.Extensions.Actions.Email
 
         protected override async Task<Result> ExecuteJobAsync(EmailJob job, CancellationToken ct = default)
         {
-            using (var client = new SmtpClient(job.ServerHost, job.ServerPort))
+            using (var client = new SmtpClient(job.ServerHost, job.ServerPort)
             {
-                client.EnableSsl = job.ServerUseSsl;
-                client.Credentials = new NetworkCredential(job.ServerUsername, job.ServerPassword);
+                Credentials = new NetworkCredential(
+                    job.ServerUsername,
+                    job.ServerPassword),
 
-                using (var message = new MailMessage(job.MessageFrom, job.MessageTo))
+                EnableSsl = job.ServerUseSsl
+            })
+            {
+                using (ct.Register(client.SendAsyncCancel))
                 {
-                    message.Subject = job.MessageSubject;
-                    message.Body = job.MessageBody;
-
-                    using (ct.Register(client.SendAsyncCancel))
-                    {
-                        await client.SendMailAsync(message);
-                    }
+                    await client.SendMailAsync(
+                        job.MessageBody,
+                        job.MessageBody,
+                        job.MessageSubject,
+                        job.MessageBody);
                 }
             }
 
