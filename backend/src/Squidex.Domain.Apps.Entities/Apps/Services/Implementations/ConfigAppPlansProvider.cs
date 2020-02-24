@@ -57,13 +57,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             return plansById.GetOrDefault(planId ?? string.Empty);
         }
 
-        public IAppLimitsPlan GetPlanForApp(IAppEntity app)
-        {
-            Guard.NotNull(app);
-
-            return GetPlanCore(app.Plan?.PlanId);
-        }
-
         public IAppLimitsPlan GetFreePlan()
         {
             return GetPlanCore(plansList.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Costs))?.Id);
@@ -88,6 +81,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             }
 
             return null;
+        }
+
+        public (IAppLimitsPlan Plan, string PlanId) GetPlanForApp(IAppEntity app)
+        {
+            Guard.NotNull(app);
+
+            var planId = app.Plan?.PlanId;
+            var plan = GetPlanCore(planId);
+
+            if (plan.YearlyId != null && plan.YearlyId == planId)
+            {
+                return (plan, plan.YearlyId);
+            }
+            else
+            {
+                return (plan, plan.Id);
+            }
         }
 
         private ConfigAppLimitsPlan GetPlanCore(string? planId)

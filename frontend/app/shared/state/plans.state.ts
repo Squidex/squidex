@@ -134,7 +134,11 @@ export class PlansState extends State<Snapshot> {
     }
 
     private createPlan(plan: PlanDto, id: string) {
-        return { plan, isYearlySelected: plan.yearlyId === id, isSelected: plan.id === id };
+        return {
+            plan,
+            isSelected: plan.id === id,
+            isYearlySelected: plan.yearlyId === id
+        };
     }
 
     private get appName() {

@@ -139,7 +139,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
-            PlanName = plans.GetPlanForApp(app).Name;
+            PlanName = plans.GetPlanForApp(app).Plan.Name;
         }
 
         private void SetImage(IAppEntity app, ApiController controller)

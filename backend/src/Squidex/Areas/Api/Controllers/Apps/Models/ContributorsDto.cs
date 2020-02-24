@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         private void WithPlan(IAppEntity app, IAppPlansProvider plans)
         {
-            MaxContributors = plans.GetPlanForApp(app).MaxContributors;
+            MaxContributors = plans.GetPlanForApp(app).Plan.MaxContributors;
         }
 
         private void WithInvited(bool isInvited)

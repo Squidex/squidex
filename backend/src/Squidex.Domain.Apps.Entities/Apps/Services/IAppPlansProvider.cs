@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services
 
         IAppLimitsPlan? GetPlan(string? planId);
 
-        IAppLimitsPlan GetPlanForApp(IAppEntity app);
-
         IAppLimitsPlan GetFreePlan();
+
+        (IAppLimitsPlan Plan, string PlanId) GetPlanForApp(IAppEntity app);
     }
 }

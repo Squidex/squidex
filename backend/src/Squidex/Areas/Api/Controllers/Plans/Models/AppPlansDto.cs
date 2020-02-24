@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
 
         public static AppPlansDto FromApp(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
         {
-            var planId = plans.GetPlanForApp(app).Id;
+            var (_, planId) = plans.GetPlanForApp(app);
 
             var response = new AppPlansDto
             {

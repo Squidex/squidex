@@ -55,7 +55,7 @@ namespace Squidex.Web.Pipeline
                 .Returns(appPlan);
 
             A.CallTo(() => appPlansProvider.GetPlanForApp(appEntity))
-                .Returns(appPlan);
+                .Returns((appPlan, "free"));
 
             A.CallTo(() => appPlan.MaxApiCalls)
                 .ReturnsLazily(x => apiCallsMax);

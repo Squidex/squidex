@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var count = await usageTracker.GetMonthlyCallsAsync(AppId.ToString(), DateTime.Today);
 
-            var plan = appPlansProvider.GetPlanForApp(App);
+            var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
             var response = new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls };
 
@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
-            var plan = appPlansProvider.GetPlanForApp(App);
+            var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 

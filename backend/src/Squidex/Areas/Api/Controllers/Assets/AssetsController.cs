@@ -296,7 +296,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            var plan = appPlansProvider.GetPlanForApp(App);
+            var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
             var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
