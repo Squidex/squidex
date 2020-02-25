@@ -174,7 +174,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             }
         }
 
-        this.reset();
+        this.resetState();
     }
 
     public setDisabledState(isDisabled: boolean): void {

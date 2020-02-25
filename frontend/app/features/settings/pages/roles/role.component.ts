@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -55,11 +55,13 @@ export class RoleComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.role.canUpdate;
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['role']) {
+            this.isEditable = this.role.canUpdate;
 
-        this.editForm.load(this.role);
-        this.editForm.setEnabled(this.isEditable);
+            this.editForm.load(this.role);
+            this.editForm.setEnabled(this.isEditable);
+        }
     }
 
     public toggleEditing() {
