@@ -140,7 +140,7 @@
 
                     <td class="col-actions text-right" *ngIf="!isDisabled">
                         <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete"
-                            (sqxConfirmClick)="remove.emit()"
+                            (sqxConfirmClick)="delete.emit()"
                             confirmTitle="Delete asset" 
                             confirmText="Do you really want to delete the asset?">
                             <i class="icon-bin2"></i>
