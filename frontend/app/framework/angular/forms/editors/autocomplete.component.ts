@@ -80,6 +80,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public debounceTime = 300;
 
+    @Input()
+    public dropdownWidth = '18rem';
+
     @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
 
