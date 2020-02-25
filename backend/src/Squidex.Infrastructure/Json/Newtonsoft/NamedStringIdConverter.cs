@@ -12,6 +12,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class NamedStringIdConverter : JsonClassConverter<NamedId<string>>
     {
+        private static readonly Parser<string> Parser = ParseString;
+
         protected override void WriteValue(JsonWriter writer, NamedId<string> value, JsonSerializer serializer)
         {
             writer.WriteValue(value.ToString());
@@ -21,7 +23,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         {
             var value = serializer.Deserialize<string>(reader)!;
 
-            if (!NamedId<string>.TryParse(value, ParseString, out var result))
+            if (!NamedId<string>.TryParse(value, Parser, out var result))
             {
                 throw new JsonException("Named id must have at least 2 parts divided by commata.");
             }

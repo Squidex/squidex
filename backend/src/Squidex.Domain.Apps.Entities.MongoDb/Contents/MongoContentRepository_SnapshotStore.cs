@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 {
                     var schema = await GetSchemaAsync(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
-                    contentEntity.ParseData(schema.SchemaDef, serializer);
+                    contentEntity.ParseData(schema.SchemaDef, converter);
 
                     return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
                 }
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = value.ScheduleJob;
             content.NewStatus = value.NewStatus;
 
-            content.LoadData(value.Data, schema.SchemaDef, serializer);
+            content.LoadData(value.Data, schema.SchemaDef, converter);
 
             await collectionAll.UpsertVersionedAsync(content.Id, oldVersion, content);
         }
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = null;
             content.NewStatus = null;
 
-            content.LoadData(value.CurrentVersion.Data, schema.SchemaDef, serializer);
+            content.LoadData(value.CurrentVersion.Data, schema.SchemaDef, converter);
 
             await collectionPublished.UpsertVersionedAsync(content.Id, oldVersion, content);
         }

@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
+
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class StreamPosition
@@ -30,14 +32,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static implicit operator string(StreamPosition position)
         {
-            var parts = new object[]
-            {
-                position.Timestamp,
-                position.CommitOffset,
-                position.CommitSize
-            };
+            var sb = new StringBuilder(20);
 
-            return string.Join("-", parts);
+            sb.Append(position.Timestamp);
+            sb.Append("-");
+            sb.Append(position.CommitOffset);
+            sb.Append("-");
+            sb.Append(position.CommitSize);
+
+            return sb.ToString();
         }
 
         public static implicit operator StreamPosition(string? position)

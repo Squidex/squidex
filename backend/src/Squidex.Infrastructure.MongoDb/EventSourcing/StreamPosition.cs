@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static implicit operator string(StreamPosition position)
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(20);
 
             sb.Append(position.Timestamp.Timestamp);
             sb.Append("-");

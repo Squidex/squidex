@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
         private readonly IAppProvider appProvider;
-        private readonly IJsonSerializer serializer;
+        private readonly DataConverter converter;
         private readonly MongoContentCollectionAll collectionAll;
         private readonly MongoContentCollectionPublished collectionPublished;
 
@@ -41,10 +42,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             this.appProvider = appProvider;
 
-            this.serializer = serializer;
+            converter = new DataConverter(serializer);
 
-            collectionAll = new MongoContentCollectionAll(database, appProvider, indexer, serializer);
-            collectionPublished = new MongoContentCollectionPublished(database, appProvider, indexer, serializer);
+            collectionAll = new MongoContentCollectionAll(database, appProvider, indexer, converter);
+            collectionPublished = new MongoContentCollectionPublished(database, appProvider, indexer, converter);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

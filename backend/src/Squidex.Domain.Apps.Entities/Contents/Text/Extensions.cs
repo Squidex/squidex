@@ -5,17 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.ObjectPool;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public static class Extensions
     {
+        private static readonly ObjectPool<StringBuilder> Pool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+
         public static Dictionary<string, string> ToTexts(this NamedContentData data)
         {
             var result = new Dictionary<string, string>();
@@ -24,62 +25,67 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var languages = new Dictionary<string, StringBuilder>();
 
-                void AppendText(string language, string text)
-                {
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        var sb = languages.GetOrAddNew(language);
-
-                        if (sb.Length > 0)
-                        {
-                            sb.Append(" ");
-                        }
-
-                        sb.Append(text);
-                    }
-                }
-
                 foreach (var value in data.Values)
                 {
                     if (value != null)
                     {
                         foreach (var (key, jsonValue) in value)
                         {
-                            var appendText = new Action<string>(text => AppendText(key, text));
-
-                            AppendJsonText(jsonValue, appendText);
+                            AppendJsonText(languages, key, jsonValue);
                         }
                     }
                 }
 
-                foreach (var (key, value) in languages)
+                foreach (var (key, stringBuilder) in languages)
                 {
-                    result[key] = value.ToString();
+                    result[key] = stringBuilder.ToString();
+
+                    Pool.Return(stringBuilder);
                 }
             }
 
             return result;
         }
 
-        private static void AppendJsonText(IJsonValue value, Action<string> appendText)
+        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, IJsonValue value)
         {
             if (value.Type == JsonValueType.String)
             {
-                appendText(value.ToString());
+                AppendText(languages, language, value.ToString());
             }
             else if (value is JsonArray array)
             {
                 foreach (var item in array)
                 {
-                    AppendJsonText(item, appendText);
+                    AppendJsonText(languages, language, item);
                 }
             }
             else if (value is JsonObject obj)
             {
                 foreach (var item in obj.Values)
                 {
-                    AppendJsonText(item, appendText);
+                    AppendJsonText(languages, language, item);
                 }
+            }
+        }
+
+        private static void AppendText(Dictionary<string, StringBuilder> languages, string language, string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                if (!languages.TryGetValue(language, out var stringBuilder))
+                {
+                    stringBuilder = Pool.Get();
+
+                    languages[language] = stringBuilder;
+                }
+
+                if (stringBuilder.Length > 0)
+                {
+                    stringBuilder.Append(" ");
+                }
+
+                stringBuilder.Append(text);
             }
         }
     }

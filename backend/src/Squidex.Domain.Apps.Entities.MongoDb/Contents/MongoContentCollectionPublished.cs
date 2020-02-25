@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
@@ -31,12 +30,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryContentsByQuery queryContentsByQuery;
         private readonly QueryIdsAsync queryIdsAsync;
 
-        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, IJsonSerializer serializer)
+        public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, DataConverter converter)
             : base(database)
         {
-            queryContentAsync = new QueryContent(serializer);
-            queryContentsById = new QueryContentsByIds(serializer, appProvider);
-            queryContentsByQuery = new QueryContentsByQuery(serializer, indexer);
+            queryContentAsync = new QueryContent(converter);
+            queryContentsById = new QueryContentsByIds(converter, appProvider);
+            queryContentsByQuery = new QueryContentsByQuery(converter, indexer);
             queryIdsAsync = new QueryIdsAsync(appProvider);
         }
 

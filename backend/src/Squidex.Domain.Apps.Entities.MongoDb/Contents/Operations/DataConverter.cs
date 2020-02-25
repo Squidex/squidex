@@ -12,24 +12,38 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    public static class Extensions
+    public sealed class DataConverter
     {
-        public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, IJsonSerializer serializer)
+        private readonly FieldConverter[] decodeJsonConverters;
+        private readonly FieldConverter[] encodeJsonConverters;
+
+        public DataConverter(IJsonSerializer serializer)
         {
-            return result.ConvertId2Name(schema,
+            decodeJsonConverters = new[]
+            {
                 FieldConverters.ForValues(
                     ValueConverters.DecodeJson(serializer)),
                 FieldConverters.ForNestedId2Name(
-                    ValueConverters.DecodeJson(serializer)));
-        }
+                    ValueConverters.DecodeJson(serializer))
+            };
 
-        public static IdContentData ToMongoModel(this NamedContentData result, Schema schema, IJsonSerializer serializer)
-        {
-            return result.ConvertName2Id(schema,
+            encodeJsonConverters = new[]
+            {
                 FieldConverters.ForValues(
                     ValueConverters.EncodeJson(serializer)),
                 FieldConverters.ForNestedName2Id(
-                    ValueConverters.EncodeJson(serializer)));
+                    ValueConverters.EncodeJson(serializer))
+            };
+        }
+
+        public NamedContentData FromMongoModel(IdContentData result, Schema schema)
+        {
+            return result.ConvertId2Name(schema, decodeJsonConverters);
+        }
+
+        public IdContentData ToMongoModel(NamedContentData result, Schema schema)
+        {
+            return result.ConvertName2Id(schema, encodeJsonConverters);
         }
     }
 }

@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -105,16 +104,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
-        public void LoadData(NamedContentData data, Schema schema, IJsonSerializer serializer)
+        public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
         {
             ReferencedIds = data.GetReferencedIds(schema);
 
-            DataByIds = data.ToMongoModel(schema, serializer);
+            DataByIds = converter.ToMongoModel(data, schema);
         }
 
-        public void ParseData(Schema schema, IJsonSerializer serializer)
+        public void ParseData(Schema schema, DataConverter converter)
         {
-            data = DataByIds.FromMongoModel(schema, serializer);
+            data = converter.FromMongoModel(DataByIds, schema);
         }
     }
 }

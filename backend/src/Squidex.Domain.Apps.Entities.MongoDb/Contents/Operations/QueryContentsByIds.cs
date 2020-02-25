@@ -13,18 +13,17 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryContentsByIds : OperationBase
     {
-        private readonly IJsonSerializer serializer;
+        private readonly DataConverter converter;
         private readonly IAppProvider appProvider;
 
-        public QueryContentsByIds(IJsonSerializer serializer, IAppProvider appProvider)
+        public QueryContentsByIds(DataConverter converter, IAppProvider appProvider)
         {
-            this.serializer = serializer;
+            this.converter = converter;
 
             this.appProvider = appProvider;
         }
@@ -44,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 if (contentSchemas.TryGetValue(contentEntity.IndexedSchemaId, out var contentSchema))
                 {
-                    contentEntity.ParseData(contentSchema.SchemaDef, serializer);
+                    contentEntity.ParseData(contentSchema.SchemaDef, converter);
 
                     result.Add((contentEntity, contentSchema));
                 }

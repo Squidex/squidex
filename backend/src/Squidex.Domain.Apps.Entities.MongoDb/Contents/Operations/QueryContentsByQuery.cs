@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -23,12 +22,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryContentsByQuery : OperationBase
     {
-        private readonly IJsonSerializer serializer;
+        private readonly DataConverter converter;
         private readonly ITextIndex indexer;
 
-        public QueryContentsByQuery(IJsonSerializer serializer, ITextIndex indexer)
+        public QueryContentsByQuery(DataConverter converter, ITextIndex indexer)
         {
-            this.serializer = serializer;
+            this.converter = converter;
 
             this.indexer = indexer;
         }
@@ -83,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 foreach (var entity in contentItems.Result)
                 {
-                    entity.ParseData(schema.SchemaDef, serializer);
+                    entity.ParseData(schema.SchemaDef, converter);
                 }
 
                 return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
