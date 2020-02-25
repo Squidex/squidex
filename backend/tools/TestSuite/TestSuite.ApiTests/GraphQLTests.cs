@@ -93,7 +93,7 @@ namespace TestSuite.ApiTests
                                 data: flatData {
                                     name
                                     cities {
-                                        data:flatData {
+                                        data: flatData {
                                             name
                                         }
                                     }

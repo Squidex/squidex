@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class JsonLogWriterFactory : IObjectWriterFactory
     {
-        private readonly ObjectPool<JsonLogWriter> pool;
+        private readonly ObjectPool<JsonLogWriter> writerPool;
 
         internal sealed class JsonLogWriterPolicy : PooledObjectPolicy<JsonLogWriter>
         {
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Log
 
         public JsonLogWriterFactory(bool indended = false, bool formatLine = false)
         {
-            pool = new DefaultObjectPoolProvider().Create(new JsonLogWriterPolicy(indended, formatLine));
+            writerPool = new DefaultObjectPoolProvider().Create(new JsonLogWriterPolicy(indended, formatLine));
         }
 
         public static JsonLogWriterFactory Default()
@@ -62,12 +62,12 @@ namespace Squidex.Infrastructure.Log
 
         public IObjectWriter Create()
         {
-            return pool.Get();
+            return writerPool.Get();
         }
 
         public void Release(IObjectWriter writer)
         {
-            pool.Return((JsonLogWriter)writer);
+            writerPool.Return((JsonLogWriter)writer);
         }
     }
 }

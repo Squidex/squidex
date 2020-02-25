@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Email
     public sealed class SmtpEmailSender : IEmailSender
     {
         private readonly SmptOptions options;
-        private readonly ObjectPool<SmtpClient> pool;
+        private readonly ObjectPool<SmtpClient> clientPool;
 
         internal sealed class SmtpClientPolicy : PooledObjectPolicy<SmtpClient>
         {
@@ -53,19 +53,19 @@ namespace Squidex.Infrastructure.Email
 
             this.options = options.Value;
 
-            pool = new DefaultObjectPoolProvider().Create(new SmtpClientPolicy(options.Value));
+            clientPool = new DefaultObjectPoolProvider().Create(new SmtpClientPolicy(options.Value));
         }
 
         public async Task SendAsync(string recipient, string subject, string body)
         {
-            var smtpClient = pool.Get();
+            var smtpClient = clientPool.Get();
             try
             {
                 await smtpClient.SendMailAsync(options.Sender, recipient, subject, body);
             }
             finally
             {
-                pool.Return(smtpClient);
+                clientPool.Return(smtpClient);
             }
         }
     }

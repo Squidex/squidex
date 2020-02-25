@@ -6,11 +6,15 @@
 // ==========================================================================
 
 using System.Text;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class StreamPosition
     {
+        private static readonly ObjectPool<StringBuilder> StringBuilderPool =
+            new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+
         public long Timestamp { get; }
 
         public long CommitOffset { get; }
@@ -32,15 +36,21 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static implicit operator string(StreamPosition position)
         {
-            var sb = new StringBuilder(20);
+            var sb = StringBuilderPool.Get();
+            try
+            {
+                sb.Append(position.Timestamp);
+                sb.Append("-");
+                sb.Append(position.CommitOffset);
+                sb.Append("-");
+                sb.Append(position.CommitSize);
 
-            sb.Append(position.Timestamp);
-            sb.Append("-");
-            sb.Append(position.CommitOffset);
-            sb.Append("-");
-            sb.Append(position.CommitSize);
-
-            return sb.ToString();
+                return sb.ToString();
+            }
+            finally
+            {
+                StringBuilderPool.Return(sb);
+            }
         }
 
         public static implicit operator StreamPosition(string? position)
@@ -49,7 +59,10 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var parts = position.Split('-');
 
-                return new StreamPosition(long.Parse(parts[0]), long.Parse(parts[1]), long.Parse(parts[2]));
+                return new StreamPosition(
+                    long.Parse(parts[0]),
+                    long.Parse(parts[1]),
+                    long.Parse(parts[2]));
             }
 
             return new StreamPosition(0, -1, -1);

@@ -15,7 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public static class Extensions
     {
-        private static readonly ObjectPool<StringBuilder> Pool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+        private static readonly ObjectPool<StringBuilder> StringBuilderPool =
+            new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
         public static Dictionary<string, string> ToTexts(this NamedContentData data)
         {
@@ -24,23 +25,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (data != null)
             {
                 var languages = new Dictionary<string, StringBuilder>();
-
-                foreach (var value in data.Values)
+                try
                 {
-                    if (value != null)
+                    foreach (var value in data.Values)
                     {
-                        foreach (var (key, jsonValue) in value)
+                        if (value != null)
                         {
-                            AppendJsonText(languages, key, jsonValue);
+                            foreach (var (key, jsonValue) in value)
+                            {
+                                AppendJsonText(languages, key, jsonValue);
+                            }
                         }
                     }
+
+                    foreach (var (key, sb) in languages)
+                    {
+                        result[key] = sb.ToString();
+                    }
                 }
-
-                foreach (var (key, stringBuilder) in languages)
+                finally
                 {
-                    result[key] = stringBuilder.ToString();
-
-                    Pool.Return(stringBuilder);
+                    foreach (var (_, sb) in languages)
+                    {
+                        StringBuilderPool.Return(sb);
+                    }
                 }
             }
 
@@ -73,19 +81,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (!string.IsNullOrWhiteSpace(text))
             {
-                if (!languages.TryGetValue(language, out var stringBuilder))
+                if (!languages.TryGetValue(language, out var sb))
                 {
-                    stringBuilder = Pool.Get();
+                    sb = StringBuilderPool.Get();
 
-                    languages[language] = stringBuilder;
+                    languages[language] = sb;
                 }
 
-                if (stringBuilder.Length > 0)
+                if (sb.Length > 0)
                 {
-                    stringBuilder.Append(" ");
+                    sb.Append(" ");
                 }
 
-                stringBuilder.Append(text);
+                sb.Append(text);
             }
         }
     }
