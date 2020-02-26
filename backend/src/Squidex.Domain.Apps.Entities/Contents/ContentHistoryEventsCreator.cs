@@ -52,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (@event.Payload is SchemaEvent schemaEvent)
             {
+                if (schemaEvent.SchemaId == null)
+                {
+                    return Task.FromResult<HistoryEvent?>(null);
+                }
+
                 result = result.Param("Schema", schemaEvent.SchemaId.Name);
             }
 
