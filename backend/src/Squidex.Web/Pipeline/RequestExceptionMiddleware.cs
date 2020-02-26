@@ -33,7 +33,7 @@ namespace Squidex.Web.Pipeline
             }
             catch (Exception ex)
             {
-                exceptionHandler.Handle(ex);
+                exceptionHandler.Handle(ex, context);
 
                 context.Response.StatusCode = 500;
             }

@@ -35,7 +35,7 @@ namespace Squidex.Web
             {
                 var exceptionHandler = context.HttpContext.RequestServices.GetService<IExceptionHandler>();
 
-                exceptionHandler?.Handle(context.Exception);
+                exceptionHandler.Handle(context.Exception, context.HttpContext);
             }
 
             context.Result = GetResult(error);

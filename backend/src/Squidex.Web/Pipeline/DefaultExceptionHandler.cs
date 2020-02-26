@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -22,7 +23,7 @@ namespace Squidex.Web.Pipeline
             this.log = log;
         }
 
-        public void Handle(Exception ex)
+        public void Handle(Exception ex, HttpContext? httpContext = null)
         {
             log.LogError(ex, w => w.WriteProperty("status", "UnhandledException"));
         }

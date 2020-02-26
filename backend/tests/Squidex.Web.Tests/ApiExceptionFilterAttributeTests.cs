@@ -50,7 +50,7 @@ namespace Squidex.Web
 
             Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -63,7 +63,7 @@ namespace Squidex.Web
 
             Assert.IsType<NotFoundResult>(context.Result);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -76,7 +76,7 @@ namespace Squidex.Web
 
             Validate(500, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(context.Exception, A<HttpContext>._))
                 .MustHaveHappened();
         }
 
@@ -89,7 +89,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -102,7 +102,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -115,7 +115,7 @@ namespace Squidex.Web
 
             Validate(412, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -128,7 +128,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
@@ -141,7 +141,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(context.Exception, A<HttpContext>._))
                 .MustHaveHappened();
         }
 
@@ -154,7 +154,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
                 .MustNotHaveHappened();
         }
 
