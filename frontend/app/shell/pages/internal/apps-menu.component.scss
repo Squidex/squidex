@@ -73,3 +73,34 @@ $color-nav-shadow: rgba(26, 93, 184, .26);
         @include absolute(.5rem, .625rem, auto, auto);
     }
 }
+
+.app-upgrade {
+    & {
+        margin-left: 2rem;
+        margin-right: 0;
+        vertical-align: top;
+    }
+
+    .btn {
+        padding: .375rem;
+    }
+
+    .btn-plan {
+        padding: .375rem 1rem;
+    }
+
+    .btn-warning {
+        color: $color-dark-foreground;
+    }
+
+    .btn-primary {
+        @include box-shadow-outer;
+        background: $color-theme-blue-dark;
+        border: 0;
+        pointer-events: none;
+    }
+
+    @media (max-width: 1400px) {
+        display: none;
+    }
+}

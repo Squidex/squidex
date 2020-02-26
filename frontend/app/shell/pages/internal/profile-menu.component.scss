@@ -13,3 +13,15 @@
         line-height: 1.4rem;
     }
 }
+
+@media (max-width: 1200px) {
+    .profile-name {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    .nav-item-help {
+        display: none;
+    }
+}
