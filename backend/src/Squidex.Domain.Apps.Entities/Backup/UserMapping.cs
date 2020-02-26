@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void Backup(RefToken token)
         {
-            Guard.NotNull(userMap);
+            Guard.NotNull(token);
 
             if (!token.IsSubject)
             {

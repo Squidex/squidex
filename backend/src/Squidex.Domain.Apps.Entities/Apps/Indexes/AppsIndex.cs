@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 var apps =
                     await Task.WhenAll(ids
-                        .SelectMany(x => x)
+                        .SelectMany(x => x).Distinct()
                         .Select(GetAppAsync));
 
                 return apps.Where(x => x != null).ToList();

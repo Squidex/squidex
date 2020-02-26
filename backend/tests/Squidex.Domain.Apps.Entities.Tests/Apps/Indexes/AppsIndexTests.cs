@@ -71,6 +71,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
+        public async Task Should_resolve_combined_apps()
+        {
+            var expected = SetupApp(0, false);
+
+            A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
+                .Returns(new List<Guid> { appId.Id });
+
+            A.CallTo(() => indexByUser.GetIdsAsync())
+                .Returns(new List<Guid> { appId.Id });
+
+            var actual = await sut.GetAppsForUserAsync(userId, new PermissionSet($"squidex.apps.{appId.Name}"));
+
+            Assert.Single(actual);
+            Assert.Same(expected, actual[0]);
+        }
+
+        [Fact]
         public async Task Should_resolve_all_apps()
         {
             var expected = SetupApp(0, false);
