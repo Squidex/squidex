@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web.Pipeline;
 using Xunit;
@@ -190,7 +189,7 @@ namespace Squidex.Web
         {
             var services = A.Fake<IServiceProvider>();
 
-            A.CallTo(() => services.GetService(typeof(ISemanticLog)))
+            A.CallTo(() => services.GetService(typeof(IExceptionHandler)))
                 .Returns(exceptionHandler);
 
             var httpContext = new DefaultHttpContext
