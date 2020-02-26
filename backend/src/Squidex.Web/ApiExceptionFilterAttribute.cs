@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Log;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Web
 {
@@ -33,12 +33,9 @@ namespace Squidex.Web
 
             if (!wellKnown)
             {
-                var log = context.HttpContext.RequestServices.GetService<ISemanticLog>();
+                var exceptionHandler = context.HttpContext.RequestServices.GetService<IExceptionHandler>();
 
-                if (log != null)
-                {
-                    log.LogError(context.Exception, w => w.WriteProperty("status", "UnhandledException"));
-                }
+                exceptionHandler?.Handle(context.Exception);
             }
 
             context.Result = GetResult(error);

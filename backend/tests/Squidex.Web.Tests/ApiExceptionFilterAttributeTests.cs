@@ -19,13 +19,14 @@ using Microsoft.AspNetCore.Routing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web.Pipeline;
 using Xunit;
 
 namespace Squidex.Web
 {
     public class ApiExceptionFilterAttributeTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly IExceptionHandler exceptionHandler = A.Fake<IExceptionHandler>();
         private readonly ApiExceptionFilterAttribute sut = new ApiExceptionFilterAttribute();
 
         [Fact]
@@ -49,7 +50,7 @@ namespace Squidex.Web
 
             Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -62,7 +63,7 @@ namespace Squidex.Web
 
             Assert.IsType<NotFoundResult>(context.Result);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -75,7 +76,7 @@ namespace Squidex.Web
 
             Validate(500, context.Result, null);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustHaveHappened();
         }
 
@@ -88,7 +89,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -101,7 +102,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -114,7 +115,7 @@ namespace Squidex.Web
 
             Validate(412, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -127,7 +128,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -140,7 +141,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustHaveHappened();
         }
 
@@ -153,7 +154,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => exceptionHandler.Handle(A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -190,7 +191,7 @@ namespace Squidex.Web
             var services = A.Fake<IServiceProvider>();
 
             A.CallTo(() => services.GetService(typeof(ISemanticLog)))
-                .Returns(log);
+                .Returns(exceptionHandler);
 
             var httpContext = new DefaultHttpContext
             {
