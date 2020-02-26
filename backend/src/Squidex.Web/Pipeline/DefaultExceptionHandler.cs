@@ -23,9 +23,9 @@ namespace Squidex.Web.Pipeline
             this.log = log;
         }
 
-        public virtual void Handle(Exception ex, HttpContext? httpContext = null)
+        public virtual void Handle(Exception exception, HttpContext? httpContext = null)
         {
-            log.LogError(ex, w => w.WriteProperty("status", "UnhandledException"));
+            log.LogError(exception, w => w.WriteProperty("status", "UnhandledException"));
         }
     }
 }
