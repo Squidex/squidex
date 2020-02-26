@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             return new MongoCollectionSettings
             {
-                ReadPreference = ReadPreference.SecondaryPreferred.With(TimeSpan.FromSeconds(10))
+                ReadPreference = ReadPreference.SecondaryPreferred.With(TimeSpan.FromMinutes(2))
             };
         }
 
