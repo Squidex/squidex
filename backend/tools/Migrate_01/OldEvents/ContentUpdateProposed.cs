@@ -6,18 +6,23 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.OldEvents
 {
     [EventType(nameof(ContentUpdateProposed))]
     [Obsolete]
-    public sealed class ContentUpdateProposed : IEvent, IMigrated<IEvent>
+    public sealed class ContentUpdateProposed : SquidexEvent, IMigrated<IEvent>
     {
+        public NamedContentData Data { get; set; }
+
         public IEvent Migrate()
         {
-            return new NoopEvent();
+            return SimpleMapper.Map(this, new NoopConventEvent());
         }
     }
 }
