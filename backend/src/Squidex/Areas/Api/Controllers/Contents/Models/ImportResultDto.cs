@@ -26,7 +26,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public static ImportResultDto FromImportResult(ImportResultItem result, HttpContext httpContext)
         {
-            return new ImportResultDto { ContentId = result.ContentId, Error = result.Exception?.ToErrorDto(httpContext) };
+            var error = result.Exception?.ToErrorDto(httpContext).Error;
+
+            return new ImportResultDto { ContentId = result.ContentId, Error = error };
         }
     }
 }

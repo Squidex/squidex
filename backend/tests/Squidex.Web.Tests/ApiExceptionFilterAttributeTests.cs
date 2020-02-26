@@ -8,13 +8,16 @@
 using System;
 using System.Collections.Generic;
 using System.Security;
+using System.Text;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -22,17 +25,8 @@ namespace Squidex.Web
 {
     public class ApiExceptionFilterAttributeTests
     {
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly ApiExceptionFilterAttribute sut = new ApiExceptionFilterAttribute();
-
-        [Fact]
-        public void Should_generate_404_for_DomainObjectNotFoundException()
-        {
-            var context = E(new DomainObjectNotFoundException("1", typeof(object)));
-
-            sut.OnException(context);
-
-            Assert.IsType<NotFoundResult>(context.Result);
-        }
 
         [Fact]
         public void Should_generate_400_for_ValidationException()
@@ -42,7 +36,7 @@ namespace Squidex.Web
                 new ValidationError("Error2", "P"),
                 new ValidationError("Error3", "P1", "P2"));
 
-            var context = E(ex);
+            var context = Error(ex);
 
             sut.OnException(context);
 
@@ -54,73 +48,134 @@ namespace Squidex.Web
             Assert.Equal(ex.Summary, ((ErrorDto)result.Value).Message);
 
             Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_generate_404_for_DomainObjectNotFoundException()
+        {
+            var context = Error(new DomainObjectNotFoundException("1", typeof(object)));
+
+            sut.OnException(context);
+
+            Assert.IsType<NotFoundResult>(context.Result);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_generate_500_and_log_for_unknown_error()
+        {
+            var context = Error(new InvalidOperationException());
+
+            sut.OnException(context);
+
+            Validate(500, context.Result, null);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustHaveHappened();
         }
 
         [Fact]
         public void Should_generate_400_for_DomainException()
         {
-            var context = E(new DomainException("NotAllowed"));
+            var context = Error(new DomainException("NotAllowed"));
 
             sut.OnException(context);
 
             Validate(400, context.Result, context.Exception);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_generate_400_for_DecoderFallbackException()
+        {
+            var context = Error(new DecoderFallbackException("Decoder"));
+
+            sut.OnException(context);
+
+            Validate(400, context.Result, context.Exception);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
         public void Should_generate_412_for_DomainObjectVersionException()
         {
-            var context = E(new DomainObjectVersionException("1", typeof(object), 1, 2));
+            var context = Error(new DomainObjectVersionException("1", typeof(object), 1, 2));
 
             sut.OnException(context);
 
             Validate(412, context.Result, context.Exception);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
         public void Should_generate_403_for_DomainForbiddenException()
         {
-            var context = E(new DomainForbiddenException("Forbidden"));
+            var context = Error(new DomainForbiddenException("Forbidden"));
 
             sut.OnException(context);
 
             Validate(403, context.Result, context.Exception);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public void Should_generate_403_for_SecurityException()
+        public void Should_generate_403_and_log_for_SecurityException()
         {
-            var context = E(new SecurityException("Forbidden"));
+            var context = Error(new SecurityException());
 
             sut.OnException(context);
 
-            Validate(403, context.Result, context.Exception);
+            Validate(403, context.Result, null);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_unify_errror()
         {
-            var context = R(new ProblemDetails { Status = 403, Type = "type" });
+            var context = Problem(new ProblemDetails { Status = 403, Type = "type" });
 
             await sut.OnResultExecutionAsync(context, () => Task.FromResult(Result(context)));
 
             Validate(403, context.Result, null);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+                .MustNotHaveHappened();
         }
 
-        private static ResultExecutedContext Result(ResultExecutingContext context)
+        private ResultExecutedContext Result(ResultExecutingContext context)
         {
             var actionContext = ActionContext();
 
-            return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), context.Result, context.Controller);
+            var result = context.Result;
+
+            return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), result, context.Controller);
         }
 
-        private static ResultExecutingContext R(ProblemDetails problem)
+        private ResultExecutingContext Problem(ProblemDetails problem)
         {
             var actionContext = ActionContext();
 
-            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), new ObjectResult(problem) { StatusCode = problem.Status }, null);
+            var result = new ObjectResult(problem) { StatusCode = problem.Status };
+
+            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), result, null);
         }
 
-        private static ExceptionContext E(Exception exception)
+        private ExceptionContext Error(Exception exception)
         {
             var actionContext = ActionContext();
 
@@ -130,9 +185,17 @@ namespace Squidex.Web
             };
         }
 
-        private static ActionContext ActionContext()
+        private ActionContext ActionContext()
         {
-            var httpContext = new DefaultHttpContext();
+            var services = A.Fake<IServiceProvider>();
+
+            A.CallTo(() => services.GetService(typeof(ISemanticLog)))
+                .Returns(log);
+
+            var httpContext = new DefaultHttpContext
+            {
+                RequestServices = services
+            };
 
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
             {

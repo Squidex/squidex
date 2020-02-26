@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -38,6 +39,12 @@ namespace Squidex.Web.Pipeline
                 try
                 {
                     await next(context);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, w => w.WriteProperty("status", "UnhandledException"));
+
+                    context.Response.StatusCode = 500;
                 }
                 finally
                 {

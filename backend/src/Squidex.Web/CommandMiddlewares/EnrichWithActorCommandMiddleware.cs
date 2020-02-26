@@ -41,7 +41,7 @@ namespace Squidex.Web.CommandMiddlewares
                 {
                     var actorToken = user.Token();
 
-                    squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
+                    squidexCommand.Actor = actorToken ?? throw new DomainForbiddenException("No actor with subject or client id available.");
                 }
 
                 if (squidexCommand.User == null)

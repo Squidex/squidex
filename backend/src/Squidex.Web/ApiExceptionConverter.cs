@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
@@ -19,7 +20,6 @@ namespace Squidex.Web
 {
     public static class ApiExceptionConverter
     {
-        private static readonly List<Func<Exception, ErrorDto?>> Handlers = new List<Func<Exception, ErrorDto?>>();
         private static readonly Dictionary<int, string> Links = new Dictionary<int, string>
         {
             [400] = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
@@ -34,84 +34,104 @@ namespace Squidex.Web
             [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
         };
 
-        private static void AddHandler<T>(Func<T, ErrorDto> handler) where T : Exception
+        public static (ErrorDto Error, bool WellKnown) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
         {
-            Handlers.Add(ex => ex is T typed ? handler(typed) : null);
+            Guard.NotNull(problem);
+
+            var error = new ErrorDto { Message = problem.Title, StatusCode = problem.Status };
+
+            Enrich(httpContext, error);
+
+            return (error, true);
         }
 
-        static ApiExceptionConverter()
-        {
-            AddHandler<ValidationException>(OnValidationException);
-            AddHandler<DecoderFallbackException>(OnDecoderException);
-            AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
-            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
-            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
-            AddHandler<DomainException>(OnDomainException);
-            AddHandler<SecurityException>(OnSecurityException);
-        }
-
-        public static ErrorDto ToErrorDto(this Exception exception, HttpContext? httpContext)
+        public static (ErrorDto Error, bool WellKnown) ToErrorDto(this Exception exception, HttpContext? httpContext)
         {
             Guard.NotNull(exception);
 
-            foreach (var handler in Handlers)
+            var result = CreateError(exception);
+
+            Enrich(httpContext, result.Error);
+
+            return result;
+        }
+
+        private static void Enrich(HttpContext? httpContext, ErrorDto error)
+        {
+            error.TraceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
+
+            if (error.StatusCode.HasValue)
             {
-                var result = handler(exception);
-
-                if (result != null)
-                {
-                    result.TraceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
-
-                    if (result.StatusCode.HasValue)
-                    {
-                        result.Type = Links.GetOrDefault(result.StatusCode.Value);
-                    }
-
-                    return result;
-                }
+                error.Type = Links.GetOrDefault(error.StatusCode.Value);
             }
-
-            return new ErrorDto { StatusCode = 500 };
         }
 
-        private static ErrorDto OnDecoderException(DecoderFallbackException ex)
+        private static (ErrorDto Error, bool WellKnown) CreateError(Exception exception)
         {
-            return new ErrorDto { StatusCode = 400, Message = ex.Message };
-        }
+            switch (exception)
+            {
+                case ValidationException ex:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 400,
+                        Message = ex.Summary,
+                        Details = ToDetails(ex)
+                    }, true);
 
-        private static ErrorDto OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
-        {
-            return new ErrorDto { StatusCode = 404 };
-        }
+                case DomainObjectNotFoundException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 404,
+                        Message = null!
+                    }, true);
 
-        private static ErrorDto OnDomainObjectVersionException(DomainObjectVersionException ex)
-        {
-            return new ErrorDto { StatusCode = 412, Message = ex.Message };
-        }
+                case DomainObjectVersionException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 412,
+                        Message = exception.Message
+                    }, true);
 
-        private static ErrorDto OnDomainException(DomainException ex)
-        {
-            return new ErrorDto { StatusCode = 400, Message = ex.Message };
-        }
+                case DomainForbiddenException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 403,
+                        Message = exception.Message
+                    }, true);
 
-        private static ErrorDto OnDomainForbiddenException(DomainForbiddenException ex)
-        {
-            return new ErrorDto { StatusCode = 403, Message = ex.Message };
-        }
+                case DomainException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 400,
+                        Message = exception.Message
+                    }, true);
 
-        private static ErrorDto OnSecurityException(SecurityException ex)
-        {
-            return new ErrorDto { StatusCode = 403, Message = ex.Message };
-        }
+                case SecurityException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 403,
+                        Message = "Forbidden"
+                    }, false);
 
-        private static ErrorDto OnValidationException(ValidationException ex)
-        {
-            return new ErrorDto { StatusCode = 400, Message = ex.Summary, Details = ToDetails(ex) };
+                case DecoderFallbackException _:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 400,
+                        Message = exception.Message
+                    }, true);
+
+                default:
+                    return (new ErrorDto
+                    {
+                        StatusCode = 500,
+                        Message = "Server Error"
+                    }, false);
+            }
         }
 
         private static string[] ToDetails(ValidationException ex)
         {
-            return ex.Errors?.Select(e =>
+            return ex.Errors.Select(e =>
             {
                 if (e.PropertyNames?.Any() == true)
                 {
@@ -121,7 +141,7 @@ namespace Squidex.Web
                 {
                     return e.Message;
                 }
-            }).ToArray() ?? new string[0];
+            }).ToArray();
         }
     }
 }

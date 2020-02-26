@@ -8,6 +8,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Web
 {
@@ -19,32 +21,40 @@ namespace Squidex.Web
 
             if (resultContext.Result is ObjectResult objectResult && objectResult.Value is ProblemDetails problem)
             {
-                var error = new ErrorDto { Message = problem.Title, Type = problem.Type, StatusCode = problem.Status };
+                var (error, _) = problem.ToErrorDto(context.HttpContext);
 
-                if (problem.Extensions.TryGetValue("traceId", out var temp) && temp is string traceId)
-                {
-                    error.TraceId = traceId;
-                }
-
-                objectResult.Value = error;
+                context.Result = GetResult(error);
             }
         }
 
         public void OnException(ExceptionContext context)
         {
-            var error = context.Exception.ToErrorDto(context.HttpContext);
+            var (error, wellKnown) = context.Exception.ToErrorDto(context.HttpContext);
 
+            if (!wellKnown)
+            {
+                var log = context.HttpContext.RequestServices.GetService<ISemanticLog>();
+
+                if (log != null)
+                {
+                    log.LogError(context.Exception, w => w.WriteProperty("status", "UnhandledException"));
+                }
+            }
+
+            context.Result = GetResult(error);
+        }
+
+        private static IActionResult GetResult(ErrorDto error)
+        {
             if (error.StatusCode == 404)
             {
-                context.Result = new NotFoundResult();
+                return new NotFoundResult();
             }
-            else
+
+            return new ObjectResult(error)
             {
-                context.Result = new ObjectResult(error)
-                {
-                    StatusCode = error.StatusCode
-                };
-            }
+                StatusCode = error.StatusCode
+            };
         }
     }
 }

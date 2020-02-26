@@ -71,7 +71,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {
-            throw new SecurityException("User is not allowed to login.");
+            throw new DomainForbiddenException("User is not allowed to login.");
         }
 
         [HttpGet]
