@@ -142,39 +142,19 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 {
                     var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
-                    try
+                    if (query.ForceResize)
                     {
-                        await assetStore.DownloadAsync(resizedAsset, bodyStream);
+                        await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, true);
                     }
-                    catch (AssetNotFoundException)
+                    else
                     {
-                        using (Profiler.Trace("Resize"))
+                        try
                         {
-                            using (var sourceStream = GetTempStream())
-                            {
-                                using (var destinationStream = GetTempStream())
-                                {
-                                    using (Profiler.Trace("ResizeDownload"))
-                                    {
-                                        await assetFileStore.DownloadAsync(asset.Id, fileVersion, sourceStream);
-                                        sourceStream.Position = 0;
-                                    }
-
-                                    using (Profiler.Trace("ResizeImage"))
-                                    {
-                                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
-                                        destinationStream.Position = 0;
-                                    }
-
-                                    using (Profiler.Trace("ResizeUpload"))
-                                    {
-                                        await assetStore.UploadAsync(resizedAsset, destinationStream);
-                                        destinationStream.Position = 0;
-                                    }
-
-                                    await destinationStream.CopyToAsync(bodyStream);
-                                }
-                            }
+                            await assetStore.DownloadAsync(resizedAsset, bodyStream);
+                        }
+                        catch (AssetNotFoundException)
+                        {
+                            await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, false);
                         }
                     }
                 }
@@ -191,6 +171,38 @@ namespace Squidex.Areas.Api.Controllers.Assets
             else
             {
                 return new FileCallbackResult(asset.MimeType, null, true, handler);
+            }
+        }
+
+        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, long fileVersion, ResizeOptions resizeOptions, bool overwrite)
+        {
+            using (Profiler.Trace("Resize"))
+            {
+                using (var sourceStream = GetTempStream())
+                {
+                    using (var destinationStream = GetTempStream())
+                    {
+                        using (Profiler.Trace("ResizeDownload"))
+                        {
+                            await assetFileStore.DownloadAsync(asset.Id, fileVersion, sourceStream);
+                            sourceStream.Position = 0;
+                        }
+
+                        using (Profiler.Trace("ResizeImage"))
+                        {
+                            await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
+                            destinationStream.Position = 0;
+                        }
+
+                        using (Profiler.Trace("ResizeUpload"))
+                        {
+                            await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                            destinationStream.Position = 0;
+                        }
+
+                        await destinationStream.CopyToAsync(bodyStream);
+                    }
+                }
             }
         }
 
