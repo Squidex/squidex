@@ -25,15 +25,15 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
             return Task.Run(() =>
             {
-                var w = options.Width ?? 0;
-                var h = options.Height ?? 0;
-
-                if (w <= 0 && h <= 0 && !options.Quality.HasValue)
+                if (!options.IsValid)
                 {
                     source.CopyTo(destination);
 
                     return;
                 }
+
+                var w = options.Width ?? 0;
+                var h = options.Height ?? 0;
 
                 using (var sourceImage = Image.Load(source, out var format))
                 {

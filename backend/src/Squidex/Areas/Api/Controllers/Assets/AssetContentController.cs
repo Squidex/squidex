@@ -138,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 var resizeOptions = query.ToResizeOptions(asset);
 
-                if (asset.Type == AssetType.Image && resizeOptions != null)
+                if (asset.Type == AssetType.Image && resizeOptions.IsValid)
                 {
                     var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 

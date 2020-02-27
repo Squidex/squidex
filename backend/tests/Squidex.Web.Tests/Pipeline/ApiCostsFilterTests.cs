@@ -36,7 +36,7 @@ namespace Squidex.Web.Pipeline
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ActionExecutionDelegate next;
         private readonly ApiCostsFilter sut;
-        private long apiCallsMax;
+        private long apiCallsBlocking;
         private long apiCallsCurrent;
         private bool isNextCalled;
 
@@ -57,8 +57,8 @@ namespace Squidex.Web.Pipeline
             A.CallTo(() => appPlansProvider.GetPlanForApp(appEntity))
                 .Returns((appPlan, "free"));
 
-            A.CallTo(() => appPlan.MaxApiCalls)
-                .ReturnsLazily(x => apiCallsMax);
+            A.CallTo(() => appPlan.BlockingApiCalls)
+                .ReturnsLazily(x => apiCallsBlocking);
 
             A.CallTo(() => usageTracker.GetMonthlyCallsAsync(A<string>._, DateTime.Today))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
@@ -74,14 +74,14 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_429_status_code_if_max_calls_over_limit()
+        public async Task Should_return_429_status_code_if_max_calls_over_blocking_limit()
         {
             sut.FilterDefinition = new ApiCostsAttribute(1);
 
             SetupApp();
 
             apiCallsCurrent = 1000;
-            apiCallsMax = 600;
+            apiCallsBlocking = 600;
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
@@ -100,7 +100,7 @@ namespace Squidex.Web.Pipeline
             SetupApp();
 
             apiCallsCurrent = 1000;
-            apiCallsMax = 1600;
+            apiCallsBlocking = 1600;
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
@@ -111,21 +111,21 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_allow_small_buffer()
+        public async Task Should_not_allow_small_buffer()
         {
             sut.FilterDefinition = new ApiCostsAttribute(13);
 
             SetupApp();
 
             apiCallsCurrent = 1099;
-            apiCallsMax = 1000;
+            apiCallsBlocking = 1000;
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
-            Assert.True(isNextCalled);
+            Assert.False(isNextCalled);
 
             A.CallTo(() => usageTracker.TrackAsync(A<string>._, A<string>._, 13, A<double>._))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Squidex.Web.Pipeline
             SetupApp();
 
             apiCallsCurrent = 1000;
-            apiCallsMax = 600;
+            apiCallsBlocking = 600;
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
@@ -152,7 +152,7 @@ namespace Squidex.Web.Pipeline
             sut.FilterDefinition = new ApiCostsAttribute(1);
 
             apiCallsCurrent = 1000;
-            apiCallsMax = 600;
+            apiCallsBlocking = 600;
 
             await sut.OnActionExecutionAsync(actionContext, next);
 

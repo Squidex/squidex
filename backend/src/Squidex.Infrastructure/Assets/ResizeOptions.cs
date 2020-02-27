@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class ResizeOptions
     {
+        public ResizeMode Mode { get; set; }
+
         public int? Width { get; set; }
 
         public int? Height { get; set; }
@@ -21,7 +23,10 @@ namespace Squidex.Infrastructure.Assets
 
         public float? FocusY { get; set; }
 
-        public ResizeMode Mode { get; set; }
+        public bool IsValid
+        {
+            get { return Width > 0 || Height > 0 || Quality > 0; }
+        }
 
         public override string ToString()
         {

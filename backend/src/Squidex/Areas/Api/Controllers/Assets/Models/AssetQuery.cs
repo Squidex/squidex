@@ -81,14 +81,9 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [FromQuery(Name = "force")]
         public bool ForceResize { get; set; }
 
-        public ResizeOptions? ToResizeOptions(IAssetEntity asset)
+        public ResizeOptions ToResizeOptions(IAssetEntity asset)
         {
             Guard.NotNull(asset);
-
-            if (!Width.HasValue && !Height.HasValue && !Quality.HasValue)
-            {
-                return null;
-            }
 
             var result = SimpleMapper.Map(this, new ResizeOptions());
 

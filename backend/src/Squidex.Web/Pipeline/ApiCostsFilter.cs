@@ -73,7 +73,7 @@ namespace Squidex.Web.Pipeline
 
                         var usage = await usageTracker.GetMonthlyCallsAsync(appId, DateTime.Today);
 
-                        if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
+                        if (plan.BlockingApiCalls >= 0 && usage > plan.BlockingApiCalls)
                         {
                             context.Result = new StatusCodeResult(429);
                             return;
