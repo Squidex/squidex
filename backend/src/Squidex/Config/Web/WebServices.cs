@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Squidex.Areas.Frontend.Middlewares;
+using Squidex.Areas.OrleansDashboard.Middlewares;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Caching;
@@ -44,6 +46,9 @@ namespace Squidex.Config.Web
                 .AsSelf();
 
             services.AddSingletonAs<LocalCacheMiddleware>()
+                .AsSelf();
+
+            services.AddSingletonAs<UsageMiddleware>()
                 .AsSelf();
 
             services.AddSingletonAs<RequestExceptionMiddleware>()

@@ -36,6 +36,7 @@ namespace Squidex.Config.Web
         public static IApplicationBuilder UseSquidexTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestExceptionMiddleware>();
+            app.UseMiddleware<UsageMiddleware>();
             app.UseMiddleware<RequestLogPerformanceMiddleware>();
 
             return app;
@@ -113,6 +114,7 @@ namespace Squidex.Config.Web
             app.UseForwardedHeaders(GetForwardingOptions(config));
 
             app.UseMiddleware<EnforceHttpsMiddleware>();
+
             app.UseMiddleware<CleanupHostMiddleware>();
         }
 

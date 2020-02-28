@@ -85,11 +85,11 @@
 
                 <div class="card card-lg">
                     <div class="card-header">
-                        API Performance (ms)
+                        API Performance (ms): {{callsPerformance}}ms avg
 
                         <div class="float-right">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isPerformanceStacked" />
+                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isStacked" />
                                 <label class="form-check-label" for="stacked">
                                     Stacked
                                 </label>
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <chart type="bar" [data]="chartCallsPerformance" [options]="isPerformanceStacked ? stackedChartOptions : chartOptions"></chart>
+                        <chart type="bar" [data]="chartCallsPerformance" [options]="isStacked ? stackedChartOptions : chartOptions"></chart>
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@
                         <div class="aggregation" *ngIf="callsCurrent >= 0">
                             <div class="aggregation-label">This month</div>
                             <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
-                            <div class="aggregation-label" *ngIf="callsMax > 0">Monthly limit: {{callsMax | sqxKNumber}}</div>
+                            <div class="aggregation-label" *ngIf="callsAllowed > 0">Monthly limit: {{callsAllowed | sqxKNumber}}</div>
                         </div>
                     </div>
                 </div>
@@ -122,10 +122,10 @@
                 <div class="card card">
                     <div class="card-header">Assets Size (MB)</div>
                     <div class="card-body">
-                        <div class="aggregation" *ngIf="assetsCurrent >= 0">
+                        <div class="aggregation" *ngIf="storageCurrent >= 0">
                             <div class="aggregation-label">Total Size</div>
-                            <div class="aggregation-value">{{assetsCurrent | sqxFileSize}}</div>
-                            <div class="aggregation-label" *ngIf="assetsMax > 0">Total limit: {{assetsMax | sqxFileSize}}</div>
+                            <div class="aggregation-value">{{storageCurrent | sqxFileSize}}</div>
+                            <div class="aggregation-label" *ngIf="storageAllowed > 0">Total limit: {{storageAllowed | sqxFileSize}}</div>
                         </div>
                     </div>
                 </div>
@@ -134,6 +134,24 @@
                     <div class="card-header">Assets Uploads (MB)</div>
                     <div class="card-body">
                         <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
+                    </div>
+                </div>
+
+                <div class="card card-lg">
+                    <div class="card-header">
+                        Traffic (MB): {{callsBytes | sqxFileSize}} total
+
+                        <div class="float-right">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isStacked" />
+                                <label class="form-check-label" for="stacked">
+                                    Stacked
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <chart type="bar" [data]="chartCallsBytes" [options]="isStacked ? stackedChartOptions : chartOptions"></chart>
                     </div>
                 </div>
 

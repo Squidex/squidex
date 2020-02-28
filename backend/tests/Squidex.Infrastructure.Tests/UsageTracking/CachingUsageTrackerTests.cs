@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly string key = Guid.NewGuid().ToString();
+        private readonly DateTime date = DateTime.Today;
         private readonly IUsageTracker inner = A.Fake<IUsageTracker>();
         private readonly IUsageTracker sut;
 
@@ -29,54 +30,78 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_forward_track_call()
         {
-            await sut.TrackAsync(key, "MyCategory", 123, 456);
+            var counters = new Counters();
 
-            A.CallTo(() => inner.TrackAsync(key, "MyCategory", 123, 456))
+            await sut.TrackAsync(date, key, "my-category", counters);
+
+            A.CallTo(() => inner.TrackAsync(date, key, "my-category", counters))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_forward_query_call()
         {
-            await sut.QueryAsync(key, DateTime.MaxValue, DateTime.MinValue);
+            var dateFrom = date;
+            var dateTo = dateFrom.AddDays(10);
 
-            A.CallTo(() => inner.QueryAsync(key, DateTime.MaxValue, DateTime.MinValue))
+            await sut.QueryAsync(key, dateFrom, dateTo);
+
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_cache_monthly_usage()
         {
-            A.CallTo(() => inner.GetMonthlyCallsAsync(key, DateTime.Today))
-                .Returns(100);
+            var counters = new Counters();
 
-            var result1 = await sut.GetMonthlyCallsAsync(key, DateTime.Today);
-            var result2 = await sut.GetMonthlyCallsAsync(key, DateTime.Today);
+            A.CallTo(() => inner.GetForMonthAsync(key, date))
+                .Returns(counters);
 
-            Assert.Equal(100, result1);
-            Assert.Equal(100, result2);
+            var result1 = await sut.GetForMonthAsync(key, date);
+            var result2 = await sut.GetForMonthAsync(key, date);
 
-            A.CallTo(() => inner.GetMonthlyCallsAsync(key, DateTime.Today))
-                .MustHaveHappened(1, Times.Exactly);
+            Assert.Same(counters, result1);
+            Assert.Same(counters, result2);
+
+            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today))
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public async Task Should_cache_days_usage()
         {
-            var f = DateTime.Today;
-            var t = DateTime.Today.AddDays(10);
+            var counters = new Counters();
 
-            A.CallTo(() => inner.GetPreviousCallsAsync(key, f, t))
-                .Returns(120);
+            var dateFrom = date;
+            var dateTo = dateFrom.AddDays(10);
 
-            var result1 = await sut.GetPreviousCallsAsync(key, f, t);
-            var result2 = await sut.GetPreviousCallsAsync(key, f, t);
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo))
+                .Returns(counters);
 
-            Assert.Equal(120, result1);
-            Assert.Equal(120, result2);
+            var result1 = await sut.GetAsync(key, dateFrom, dateTo);
+            var result2 = await sut.GetAsync(key, dateFrom, dateTo);
 
-            A.CallTo(() => inner.GetPreviousCallsAsync(key, f, t))
-                .MustHaveHappened(1, Times.Exactly);
+            Assert.Same(counters, result1);
+            Assert.Same(counters, result2);
+
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_not_cache_queries()
+        {
+            var dateFrom = date;
+            var dateTo = dateFrom.AddDays(10);
+
+            var result1 = await sut.QueryAsync(key, dateFrom, dateTo);
+            var result2 = await sut.QueryAsync(key, dateFrom, dateTo);
+
+            Assert.NotSame(result2, result1);
+
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
+                .MustHaveHappenedTwiceOrMore();
         }
     }
 }

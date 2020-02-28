@@ -22,7 +22,7 @@ namespace Squidex.Areas.Portal.Middlewares
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             var authentication = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 

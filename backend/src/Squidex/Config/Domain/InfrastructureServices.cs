@@ -71,6 +71,9 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IMemoryCache>()))
                 .As<IUsageTracker>();
 
+            services.AddSingletonAs<ApiUsageTracker>()
+                .As<IApiUsageTracker>();
+
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();
 

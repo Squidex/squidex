@@ -5,24 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed class DateUsage
+    public sealed class ApiStats
     {
-        public DateTime Date { get; }
+        public long TotalCalls { get; }
 
-        public long TotalCount { get; }
+        public long TotalBytes { get; }
 
-        public long TotalElapsedMs { get; }
+        public double AverageElapsed { get; }
 
-        public DateUsage(DateTime date, long totalCount, long totalElapsedMs)
+        public ApiStats(long totalCalls, double averageElapsed, long totalBytes)
         {
-            Date = date;
+            TotalCalls = totalCalls;
+            TotalBytes = totalBytes;
 
-            TotalCount = totalCount;
-            TotalElapsedMs = totalElapsedMs;
+            AverageElapsed = averageElapsed;
         }
     }
 }

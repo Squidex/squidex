@@ -72,12 +72,12 @@ namespace Squidex
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseSquidexHealthCheck();
-            app.UseSquidexRobotsTxt();
+            app.UseSquidexForwardingRules(config);
             app.UseSquidexTracking();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
-            app.UseSquidexForwardingRules(config);
+            app.UseSquidexHealthCheck();
+            app.UseSquidexRobotsTxt();
 
             app.ConfigureApi();
             app.ConfigurePortal();

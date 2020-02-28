@@ -10,7 +10,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public sealed class CallsUsageDto
+    public sealed class ApiUsageDto
     {
         /// <summary>
         /// The date when the usage was tracked.
@@ -18,20 +18,31 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// The number of calls.
+        /// The total number of API calls.
         /// </summary>
-        public long Count { get; set; }
+        public long TotalCalls { get; set; }
+
+        /// <summary>
+        /// The total number of bytes transferred.
+        /// </summary>
+        public long TotalBytes { get; set; }
 
         /// <summary>
         /// The average duration in milliseconds.
         /// </summary>
-        public long AverageMs { get; set; }
+        public double AverageMs { get; set; }
 
-        public static CallsUsageDto FromUsage(DateUsage usage)
+        public static ApiUsageDto FromUsage((DateTime Date, ApiStats Stats) dateStatistics)
         {
-            var averageMs = usage.TotalCount == 0 ? 0 : usage.TotalElapsedMs / usage.TotalCount;
+            var (date, stats) = dateStatistics;
 
-            return new CallsUsageDto { Date = usage.Date, Count = usage.TotalCount, AverageMs = averageMs };
+            return new ApiUsageDto
+            {
+                Date = date,
+                TotalBytes = stats.TotalBytes,
+                TotalCalls = stats.TotalCalls,
+                AverageMs = stats.AverageElapsed,
+            };
         }
     }
 }
