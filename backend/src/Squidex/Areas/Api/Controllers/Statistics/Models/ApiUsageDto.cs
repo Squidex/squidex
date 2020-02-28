@@ -34,13 +34,15 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
 
         public static ApiUsageDto FromStats(ApiStats stats)
         {
-            return new ApiUsageDto
+            var result = new ApiUsageDto
             {
                 Date = stats.Date,
                 TotalBytes = stats.TotalBytes,
                 TotalCalls = stats.TotalCalls,
                 AverageElapsedMs = stats.AverageElapsedMs,
             };
+
+            return result;
         }
     }
 }

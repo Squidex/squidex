@@ -20,16 +20,23 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The number of assets.
         /// </summary>
-        public long Count { get; set; }
+        public long TotalCount { get; set; }
 
         /// <summary>
         /// The size in bytes.
         /// </summary>
-        public long Size { get; set; }
+        public long TotalSize { get; set; }
 
         public static StorageUsageDto FromStats(AssetStats stats)
         {
-            return new StorageUsageDto { Date = stats.Date, Count = stats.TotalCount, Size = stats.TotalSize };
+            var result = new StorageUsageDto
+            {
+                Date = stats.Date,
+                TotalCount = stats.TotalCount,
+                TotalSize = stats.TotalSize
+            };
+
+            return result;
         }
     }
 }

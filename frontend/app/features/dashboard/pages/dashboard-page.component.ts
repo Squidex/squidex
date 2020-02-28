@@ -151,7 +151,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                                 backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
                                 borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => x.count)
+                                data: dtos.map(x => x.totalCount)
                             }
                         ]
                     };
@@ -166,7 +166,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                                 backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
                                 borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => Math.round(100 * (x.size / (1024 * 1024))) / 100)
+                                data: dtos.map(x => Math.round(100 * (x.totalSize / (1024 * 1024))) / 100)
                             }
                         ]
                     };

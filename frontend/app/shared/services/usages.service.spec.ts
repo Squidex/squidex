@@ -99,13 +99,13 @@ describe('UsagesService', () => {
         req.flush([
             {
                 date: '2017-10-12',
-                count: 10,
-                size: 130
+                totalCount: 10,
+                totalSize: 130
             },
             {
                 date: '2017-10-13',
-                count: 13,
-                size: 170
+                totalCount: 13,
+                totalSize: 170
             }
         ]);
 

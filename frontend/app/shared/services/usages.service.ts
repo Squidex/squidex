@@ -40,8 +40,8 @@ export class ApiUsageDto {
 export class StorageUsageDto {
     constructor(
         public readonly date: DateTime,
-        public readonly count: number,
-        public readonly size: number
+        public readonly totalCount: number,
+        public readonly totalSize: number
     ) {
     }
 }
@@ -119,8 +119,8 @@ export class UsagesService {
                 const usages = body.map(item =>
                     new StorageUsageDto(
                         DateTime.parseISO_UTC(item.date),
-                        item.count,
-                        item.size));
+                        item.totalCount,
+                        item.totalSize));
 
                 return usages;
             }),
