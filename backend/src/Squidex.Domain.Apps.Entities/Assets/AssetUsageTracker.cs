@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return enriched;
         }
 
-        private static void AddCounters(List<AssetStats> enriched, List<(DateTime Date, Counters Counters)>? byCategory)
+        private static void AddCounters(List<AssetStats> enriched, List<(DateTime, Counters)> details)
         {
-            foreach (var (date, counters) in byCategory)
+            foreach (var (date, counters) in details)
             {
                 var totalCount = counters.GetInt64(CounterTotalCount);
                 var totalSize = counters.GetInt64(CounterTotalSize);

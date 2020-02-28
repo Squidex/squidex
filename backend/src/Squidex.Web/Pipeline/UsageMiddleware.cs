@@ -49,11 +49,11 @@ namespace Squidex.Web.Pipeline
             {
                 if (context.Response.StatusCode != StatusCodes.Status429TooManyRequests)
                 {
-                    var app = context.Features.Get<IAppFeature>()?.AppId;
+                    var appId = context.Features.Get<IAppFeature>()?.AppId;
 
-                    var costs = context.Features.Get<IApiCostsFeature>()?.Weight ?? 0;
+                    var costs = context.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
 
-                    if (app != null)
+                    if (appId != null)
                     {
                         var elapsedMs = watch.Stop();
 
@@ -62,7 +62,7 @@ namespace Squidex.Web.Pipeline
                         var userId = context.User.OpenIdSubject();
                         var userClient = context.User.OpenIdClientId();
 
-                        await log.LogAsync(app.Id, now,
+                        await log.LogAsync(appId.Id, now,
                             context.Request.Method,
                             context.Request.Path,
                             userId,
@@ -72,11 +72,16 @@ namespace Squidex.Web.Pipeline
 
                         if (costs > 0)
                         {
-                            var bytes = usageBody.BytesWritten + (context.Request.ContentLength ?? 0);
+                            var bytes = usageBody.BytesWritten;
+
+                            if (context.Request.ContentLength != null)
+                            {
+                                bytes += context.Request.ContentLength.Value;
+                            }
 
                             var date = now.ToDateTimeUtc().Date;
 
-                            await usageTracker.TrackAsync(date, app.Id.ToString(), userClient, costs, elapsedMs, bytes);
+                            await usageTracker.TrackAsync(date, appId.Id.ToString(), userClient, costs, elapsedMs, bytes);
                         }
                     }
                 }

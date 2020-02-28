@@ -19,6 +19,6 @@ namespace Squidex.Infrastructure.UsageTracking
 
         Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate);
 
-        Task<Dictionary<string, List<(DateTime Date, Counters Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

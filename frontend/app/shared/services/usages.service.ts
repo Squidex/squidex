@@ -21,7 +21,7 @@ export class ApiUsagesDto {
         public readonly allowedCalls: number,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
-        public readonly averageMs: number,
+        public readonly averageElapsedMs: number,
         public readonly details: { [category: string]: ReadonlyArray<ApiUsageDto> }
     ) {
     }
@@ -32,7 +32,7 @@ export class ApiUsageDto {
         public readonly date: DateTime,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
-        public readonly averageMs: number
+        public readonly averageElapsedMs: number
     ) {
     }
 }
@@ -95,7 +95,7 @@ export class UsagesService {
                             DateTime.parseISO_UTC(item.date),
                             item.totalBytes,
                             item.totalCalls,
-                            item.averageMs));
+                            item.averageElapsedMs));
                 }
 
                 const usages =
@@ -103,7 +103,7 @@ export class UsagesService {
                         body.allowedCalls,
                         body.totalBytes,
                         body.totalBytes,
-                        body.averageMs,
+                        body.averageElapsedMs,
                         details);
 
                 return usages;

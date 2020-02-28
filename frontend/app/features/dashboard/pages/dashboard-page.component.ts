@@ -175,7 +175,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.appsState.selectedApp.pipe(
                     switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
-                .subscribe(({ details, totalBytes, totalCalls, allowedCalls, averageMs }) => {
+                .subscribe(({ details, totalBytes, totalCalls, allowedCalls, averageElapsedMs }) => {
                     const labels = createLabelsFromSet(details);
 
                     this.chartCallsCount = {
@@ -210,11 +210,11 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                                 backgroundColor: `rgba(${COLORS[i]}, 0.6)`,
                                 borderColor: `rgba(${COLORS[i]}, 1)`,
                                 borderWidth: 1,
-                                data: details[k].map(x => x.averageMs)
+                                data: details[k].map(x => x.averageElapsedMs)
                             }))
                     };
 
-                    this.callsPerformance = averageMs;
+                    this.callsPerformance = averageElapsedMs;
                     this.callsBytes = totalBytes;
                     this.callsCurrent = totalCalls;
                     this.callsAllowed = allowedCalls;

@@ -130,7 +130,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_track_if_weight_is_zero()
+        public async Task Should_not_track_if_costs_are_zero()
         {
             httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
@@ -146,7 +146,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_log_request_even_if_weight_is_zero()
+        public async Task Should_log_request_even_if_costs_are_zero()
         {
             httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));

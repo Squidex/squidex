@@ -44,22 +44,22 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 1024,
                 [ApiUsageTracker.CounterTotalCalls] = 1,
                 [ApiUsageTracker.CounterTotalElapsedMs] = 120,
-                [ApiUsageTracker.CounterTotalWeight] = 4
+                [ApiUsageTracker.CounterTotalCosts] = 4
             });
         }
 
         [Fact]
-        public async Task Should_query_weight_from_tracker()
+        public async Task Should_query_from_tracker()
         {
             var counters = new Counters
             {
-                [ApiUsageTracker.CounterTotalWeight] = 4
+                [ApiUsageTracker.CounterTotalCosts] = 4
             };
 
             A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))
                 .Returns(counters);
 
-            var result = await sut.GetMonthlyWeightAsync(key, date);
+            var result = await sut.GetMonthCostsAsync(key, date);
 
             Assert.Equal(4, result);
         }
@@ -95,27 +95,27 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var (summary, stats) = await sut.QueryAsync(key, dateFrom, dateTo);
 
-            stats.Should().BeEquivalentTo(new Dictionary<string, List<(DateTime Date, ApiStats Counters)>>
+            stats.Should().BeEquivalentTo(new Dictionary<string, List<ApiStats>>
             {
-                ["my-category"] = new List<(DateTime Date, ApiStats Counters)>
+                ["my-category"] = new List<ApiStats>
                 {
-                    (dateFrom.AddDays(0), new ApiStats(0, 0, 0)),
-                    (dateFrom.AddDays(1), new ApiStats(4, 25, 2048)),
-                    (dateFrom.AddDays(2), new ApiStats(0, 0, 0)),
-                    (dateFrom.AddDays(3), new ApiStats(2, 30, 1024)),
-                    (dateFrom.AddDays(4), new ApiStats(3, 10, 512))
+                    new ApiStats(dateFrom.AddDays(0), 0, 0, 0),
+                    new ApiStats(dateFrom.AddDays(1), 4, 25, 2048),
+                    new ApiStats(dateFrom.AddDays(2), 0, 0, 0),
+                    new ApiStats(dateFrom.AddDays(3), 2, 30, 1024),
+                    new ApiStats(dateFrom.AddDays(4), 3, 10, 512)
                 },
-                ["*"] = new List<(DateTime Date, ApiStats)>
+                ["*"] = new List<ApiStats>
                 {
-                    (dateFrom.AddDays(0), new ApiStats(1, 20, 128)),
-                    (dateFrom.AddDays(1), new ApiStats(0, 0, 0)),
-                    (dateFrom.AddDays(2), new ApiStats(5, 18, 16)),
-                    (dateFrom.AddDays(3), new ApiStats(0, 0, 0)),
-                    (dateFrom.AddDays(4), new ApiStats(0, 0, 0))
+                    new ApiStats(dateFrom.AddDays(0), 1, 20, 128),
+                    new ApiStats(dateFrom.AddDays(1), 0, 0, 0),
+                    new ApiStats(dateFrom.AddDays(2), 5, 18, 16),
+                    new ApiStats(dateFrom.AddDays(3), 0, 0, 0),
+                    new ApiStats(dateFrom.AddDays(4), 0, 0, 0)
                 }
             });
 
-            summary.Should().BeEquivalentTo(new ApiStats(15, 20, 3728));
+            summary.Should().BeEquivalentTo(new ApiStatsSummary(15, 20, 3728));
         }
 
         private static Counters Counters(long calls, long elapsed, long bytes)

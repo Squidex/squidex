@@ -14,12 +14,12 @@ namespace Squidex.Web
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class ApiCostsAttribute : ServiceFilterAttribute, IApiCostsFeature
     {
-        public double Weight { get; }
+        public double Costs { get; }
 
-        public ApiCostsAttribute(double weight)
+        public ApiCostsAttribute(double costs)
             : base(typeof(ApiCostsFilter))
         {
-            Weight = weight;
+            Costs = costs;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Squidex.Web.Pipeline
             A.CallTo(() => appPlan.BlockingApiCalls)
                 .ReturnsLazily(x => apiCallsBlocking);
 
-            A.CallTo(() => usageTracker.GetMonthlyWeightAsync(A<string>._, DateTime.Today))
+            A.CallTo(() => usageTracker.GetMonthCostsAsync(A<string>._, DateTime.Today))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
 
             next = () =>

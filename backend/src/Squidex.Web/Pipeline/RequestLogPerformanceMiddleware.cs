@@ -84,7 +84,7 @@ namespace Squidex.Web.Pipeline
                 c.WriteProperty(nameof(clientId), clientId);
             }
 
-            var costs = httpContext.Features.Get<IApiCostsFeature>()?.Weight ?? 0;
+            var costs = httpContext.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
 
             c.WriteProperty(nameof(costs), costs);
         }

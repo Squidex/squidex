@@ -103,11 +103,11 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var usages = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
+            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
-            var response = ApiUsagesDto.FromUsages(plan.MaxApiCalls, usages.Summary, usages.Details);
+            var response = ApiUsagesDto.FromStats(plan.MaxApiCalls, summary, details);
 
             return Ok(response);
         }

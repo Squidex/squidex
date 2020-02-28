@@ -30,18 +30,16 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The average duration in milliseconds.
         /// </summary>
-        public double AverageMs { get; set; }
+        public double AverageElapsedMs { get; set; }
 
-        public static ApiUsageDto FromUsage((DateTime Date, ApiStats Stats) dateStatistics)
+        public static ApiUsageDto FromStats(ApiStats stats)
         {
-            var (date, stats) = dateStatistics;
-
             return new ApiUsageDto
             {
-                Date = date,
+                Date = stats.Date,
                 TotalBytes = stats.TotalBytes,
                 TotalCalls = stats.TotalCalls,
-                AverageMs = stats.AverageElapsed,
+                AverageElapsedMs = stats.AverageElapsedMs,
             };
         }
     }

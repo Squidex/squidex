@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return Task.CompletedTask;
         }
 
-        public async Task<Dictionary<string, List<(DateTime Date, Counters Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             Guard.NotNullOrEmpty(key);
 

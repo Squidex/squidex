@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.UsageTracking
     public sealed class ApiUsageTracker : IApiUsageTracker
     {
         public const string CounterTotalBytes = "TotalBytes";
-        public const string CounterTotalWeight = "TotalWeight";
+        public const string CounterTotalCosts = "TotalCosts";
         public const string CounterTotalCalls = "TotalCalls";
         public const string CounterTotalElapsedMs = "TotalElapsedMs";
         private readonly IUsageTracker usageTracker;
@@ -24,37 +24,37 @@ namespace Squidex.Infrastructure.UsageTracking
             this.usageTracker = usageTracker;
         }
 
-        public async Task<long> GetMonthlyWeightAsync(string key, DateTime date)
+        public async Task<long> GetMonthCostsAsync(string key, DateTime date)
         {
             var apiKey = GetKey(key);
 
             var counters = await usageTracker.GetForMonthAsync(apiKey, date);
 
-            return counters.GetInt64(CounterTotalWeight);
+            return counters.GetInt64(CounterTotalCosts);
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsed, long bytes)
+        public Task TrackAsync(DateTime date, string key, string? category, double costs, long elapsedMs, long bytes)
         {
             var apiKey = GetKey(key);
 
             var counters = new Counters
             {
-                [CounterTotalWeight] = weight,
+                [CounterTotalCosts] = costs,
                 [CounterTotalCalls] = 1,
-                [CounterTotalElapsedMs] = elapsed,
+                [CounterTotalElapsedMs] = elapsedMs,
                 [CounterTotalBytes] = bytes
             };
 
             return usageTracker.TrackAsync(date, apiKey, category, counters);
         }
 
-        public async Task<(ApiStats Summary, Dictionary<string, List<(DateTime Date, ApiStats Stats)>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             var apiKey = GetKey(key);
 
             var queries = await usageTracker.QueryAsync(apiKey, fromDate, toDate);
 
-            var result = new Dictionary<string, List<(DateTime Date, ApiStats Stats)>>();
+            var details = new Dictionary<string, List<ApiStats>>();
 
             var summaryBytes = 0L;
             var summaryCalls = 0L;
@@ -62,30 +62,30 @@ namespace Squidex.Infrastructure.UsageTracking
 
             foreach (var (category, usages) in queries)
             {
-                var resultByCategory = new List<(DateTime Date, ApiStats)>();
+                var resultByCategory = new List<ApiStats>();
 
-                foreach (var usage in usages)
+                foreach (var (date, counters) in usages)
                 {
-                    var dateBytes = usage.Counters.GetInt64(CounterTotalBytes);
-                    var dateCalls = usage.Counters.GetInt64(CounterTotalCalls);
-                    var dateElapsed = usage.Counters.GetInt64(CounterTotalElapsedMs);
+                    var dateBytes = counters.GetInt64(CounterTotalBytes);
+                    var dateCalls = counters.GetInt64(CounterTotalCalls);
+                    var dateElapsed = counters.GetInt64(CounterTotalElapsedMs);
                     var dateElapsedAvg = CalculateAverage(dateCalls, dateElapsed);
 
-                    resultByCategory.Add((usage.Date, new ApiStats(dateCalls, dateElapsedAvg, dateBytes)));
+                    resultByCategory.Add(new ApiStats(date, dateCalls, dateElapsedAvg, dateBytes));
 
                     summaryBytes += dateBytes;
                     summaryCalls += dateCalls;
                     summaryElapsed += dateElapsed;
                 }
 
-                result[category] = resultByCategory;
+                details[category] = resultByCategory;
             }
 
             var summaryElapsedAvg = CalculateAverage(summaryCalls, summaryElapsed);
 
-            var summary = new ApiStats(summaryCalls, summaryElapsedAvg, summaryBytes);
+            var summary = new ApiStatsSummary(summaryCalls, summaryElapsedAvg, summaryBytes);
 
-            return (summary, result);
+            return (summary, details);
         }
 
         private static double CalculateAverage(long calls, long elapsed)

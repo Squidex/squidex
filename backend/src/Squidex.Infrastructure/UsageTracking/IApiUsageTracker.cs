@@ -13,10 +13,10 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IApiUsageTracker
     {
-        Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsed, long bytes);
+        Task TrackAsync(DateTime date, string key, string? category, double costs, long elapsedMs, long bytes);
 
-        Task<long> GetMonthlyWeightAsync(string key, DateTime date);
+        Task<long> GetMonthCostsAsync(string key, DateTime date);
 
-        Task<(ApiStats Summary, Dictionary<string, List<(DateTime Date, ApiStats Stats)>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

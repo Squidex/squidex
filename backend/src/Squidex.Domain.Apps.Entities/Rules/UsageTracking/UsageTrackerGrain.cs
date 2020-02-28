@@ -83,18 +83,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
                 if (!target.Triggered.HasValue || target.Triggered < from)
                 {
-                    var usage = await usageTracker.GetMonthlyWeightAsync(target.AppId.Id.ToString(), today);
+                    var costs = await usageTracker.GetMonthCostsAsync(target.AppId.Id.ToString(), today);
 
                     var limit = target.Limits;
 
-                    if (usage > limit)
+                    if (costs > limit)
                     {
                         target.Triggered = today;
 
                         var @event = new AppUsageExceeded
                         {
                             AppId = target.AppId,
-                            CallsCurrent = usage,
+                            CallsCurrent = costs,
                             CallsLimit = limit,
                             RuleId = key
                         };

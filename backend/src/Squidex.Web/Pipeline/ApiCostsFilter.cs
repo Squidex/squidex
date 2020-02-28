@@ -55,13 +55,13 @@ namespace Squidex.Web.Pipeline
             {
                 var appId = app.Id.ToString();
 
-                if (FilterDefinition.Weight > 0)
+                if (FilterDefinition.Costs > 0)
                 {
                     using (Profiler.Trace("CheckUsage"))
                     {
                         var (plan, _) = appPlansProvider.GetPlanForApp(app);
 
-                        var usage = await usageTracker.GetMonthlyWeightAsync(appId, DateTime.Today);
+                        var usage = await usageTracker.GetMonthCostsAsync(appId, DateTime.Today);
 
                         if (plan.BlockingApiCalls >= 0 && usage > plan.BlockingApiCalls)
                         {

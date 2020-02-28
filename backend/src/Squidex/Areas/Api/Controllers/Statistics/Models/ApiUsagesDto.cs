@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The average duration in milliseconds.
         /// </summary>
-        public double AverageMs { get; set; }
+        public double AverageElapsedMs { get; set; }
 
         /// <summary>
         /// The statistics by date and group.
@@ -41,15 +41,15 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         [Required]
         public Dictionary<string, ApiUsageDto[]> Details { get; set; }
 
-        public static ApiUsagesDto FromUsages(long allowedCalls, ApiStats summary, Dictionary<string, List<(DateTime Date, ApiStats Stats)>> details)
+        public static ApiUsagesDto FromStats(long allowedCalls, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
         {
             return new ApiUsagesDto
             {
                 AllowedCalls = allowedCalls,
-                AverageMs = summary.AverageElapsed,
+                AverageElapsedMs = summary.AverageElapsedMs,
                 TotalBytes = summary.TotalBytes,
                 TotalCalls = summary.TotalBytes,
-                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(ApiUsageDto.FromUsage).ToArray())
+                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(ApiUsageDto.FromStats).ToArray())
             };
         }
     }

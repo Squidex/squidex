@@ -53,20 +53,20 @@ describe('UsagesService', () => {
             allowedCalls: 100,
             totalBytes: 1024,
             totalCalls: 40,
-            averageMs: 12.4,
+            averageElapsedMs: 12.4,
             details: {
                 category1: [
                     {
                         date: '2017-10-12',
                         totalBytes: 10,
                         totalCalls: 130,
-                        averageMs: 12.3
+                        averageElapsedMs: 12.3
                     },
                     {
                         date: '2017-10-13',
                         totalBytes: 13,
                         totalCalls: 170,
-                        averageMs: 33.3
+                        averageElapsedMs: 33.3
                     }
                 ]
             }

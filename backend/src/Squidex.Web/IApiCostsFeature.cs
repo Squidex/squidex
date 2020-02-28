@@ -9,6 +9,6 @@ namespace Squidex.Web
 {
     public interface IApiCostsFeature
     {
-        double Weight { get; }
+        double Costs { get; }
     }
 }

@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.UsageTracking
             this.inner = inner;
         }
 
-        public Task<Dictionary<string, List<(DateTime Date, Counters Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             Guard.NotNull(key);
 
