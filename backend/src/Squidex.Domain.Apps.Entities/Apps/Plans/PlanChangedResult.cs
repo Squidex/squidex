@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class PlanChangeAsyncResult : IChangePlanResult
+    public sealed class PlanChangedResult : IChangePlanResult
     {
     }
 }

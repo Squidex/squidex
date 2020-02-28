@@ -8,8 +8,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Web;

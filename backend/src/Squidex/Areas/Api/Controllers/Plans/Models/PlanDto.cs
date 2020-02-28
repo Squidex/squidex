@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models

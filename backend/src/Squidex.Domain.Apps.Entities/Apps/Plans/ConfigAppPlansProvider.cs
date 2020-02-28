@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public sealed class ConfigAppPlansProvider : IAppPlansProvider
     {

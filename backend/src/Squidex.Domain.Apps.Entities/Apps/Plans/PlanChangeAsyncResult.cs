@@ -5,18 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Squidex.Infrastructure;
-
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public interface IAppPlanBillingManager
+    public sealed class PlanChangeAsyncResult : IChangePlanResult
     {
-        bool HasPortal { get; }
-
-        Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string? planId);
-
-        Task<string> GetPortalLinkAsync(string userId);
     }
 }

@@ -14,19 +14,38 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
+#pragma warning disable SA1401 // Fields must be private
+
 namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
         public const string CounterTotalCalls = "TotalCalls";
         public const string CounterTotalElapsedMs = "TotalElapsedMs";
-
-        private const string FallbackCategory = "*";
+        public const string FallbackCategory = "*";
         private const int Intervall = 60 * 1000;
         private readonly IUsageRepository usageRepository;
         private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category), Usage> usages = new ConcurrentDictionary<(string Key, string Category), Usage>();
+
+        private struct Usage
+        {
+            public readonly double Count;
+            public readonly double ElapsedMs;
+
+            public Usage(double elapsed, double count)
+            {
+                ElapsedMs = elapsed;
+
+                Count = count;
+            }
+
+            public Usage Add(double elapsed, double weight)
+            {
+                return new Usage(ElapsedMs + elapsed, Count + weight);
+            }
+        }
 
         public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
@@ -122,8 +141,6 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var result = new Dictionary<string, IReadOnlyList<DateUsage>>();
 
-            IEnumerable<string> categories = usagesByCategory.Keys;
-
             if (usagesByCategory.Count == 0)
             {
                 var enriched = new List<DateUsage>();
@@ -137,7 +154,7 @@ namespace Squidex.Infrastructure.UsageTracking
             }
             else
             {
-                foreach (var category in categories)
+                foreach (var category in usagesByCategory.Keys)
                 {
                     var enriched = new List<DateUsage>();
 

@@ -14,7 +14,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;

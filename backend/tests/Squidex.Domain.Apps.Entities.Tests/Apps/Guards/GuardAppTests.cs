@@ -9,7 +9,7 @@ using System.IO;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;

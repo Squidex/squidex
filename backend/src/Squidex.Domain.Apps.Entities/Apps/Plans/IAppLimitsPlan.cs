@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public interface IAppLimitsPlan
     {

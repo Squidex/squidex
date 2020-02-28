@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public sealed class ConfigAppLimitsPlan : IAppLimitsPlan
     {

@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 

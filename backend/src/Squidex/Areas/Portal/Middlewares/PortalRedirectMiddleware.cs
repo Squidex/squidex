@@ -8,7 +8,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 
 namespace Squidex.Areas.Portal.Middlewares
 {

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Guards;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;

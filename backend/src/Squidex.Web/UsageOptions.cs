@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 
 namespace Squidex.Web
 {

@@ -6,10 +6,9 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Billing
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public class NoopAppPlanBillingManagerTests
     {

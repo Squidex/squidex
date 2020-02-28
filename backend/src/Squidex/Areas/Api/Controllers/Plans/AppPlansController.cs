@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Plans.Models;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;

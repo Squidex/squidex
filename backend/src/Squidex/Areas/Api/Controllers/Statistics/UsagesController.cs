@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;

@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 

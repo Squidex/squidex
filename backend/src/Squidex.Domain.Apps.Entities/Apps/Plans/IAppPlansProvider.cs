@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public interface IAppPlansProvider
     {

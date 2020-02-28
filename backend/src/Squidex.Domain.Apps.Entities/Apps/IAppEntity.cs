@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {

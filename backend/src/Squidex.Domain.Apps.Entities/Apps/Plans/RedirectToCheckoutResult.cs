@@ -5,9 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+using System;
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class PlanChangedResult : IChangePlanResult
+    public sealed class RedirectToCheckoutResult : IChangePlanResult
     {
+        public Uri Url { get; }
+
+        public RedirectToCheckoutResult(Uri url)
+        {
+            Guard.NotNull(url);
+
+            Url = url;
+        }
     }
 }

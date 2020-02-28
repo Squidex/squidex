@@ -6,19 +6,17 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class RedirectToCheckoutResult : IChangePlanResult
+    public interface IAppPlanBillingManager
     {
-        public Uri Url { get; }
+        bool HasPortal { get; }
 
-        public RedirectToCheckoutResult(Uri url)
-        {
-            Guard.NotNull(url);
+        Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string? planId);
 
-            Url = url;
-        }
+        Task<string> GetPortalLinkAsync(string userId);
     }
 }

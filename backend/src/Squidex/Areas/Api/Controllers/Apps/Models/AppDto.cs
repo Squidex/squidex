@@ -16,7 +16,7 @@ using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;

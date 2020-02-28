@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;

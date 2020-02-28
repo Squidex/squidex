@@ -8,7 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
