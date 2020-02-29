@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
@@ -93,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(ApiUsagesDto), 200)]
+        [ProducesResponseType(typeof(CallsUsageDtoDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
@@ -107,7 +106,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
-            var response = ApiUsagesDto.FromStats(plan.MaxApiCalls, summary, details);
+            var response = CallsUsageDtoDto.FromStats(plan.MaxApiCalls, summary, details);
 
             return Ok(response);
         }
@@ -149,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(StorageUsageDto[]), 200)]
+        [ProducesResponseType(typeof(StorageUsagePerDateDto[]), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)
@@ -161,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var usages = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
-            var models = usages.Select(StorageUsageDto.FromStats).ToArray();
+            var models = usages.Select(StorageUsagePerDateDto.FromStats).ToArray();
 
             return Ok(models);
         }

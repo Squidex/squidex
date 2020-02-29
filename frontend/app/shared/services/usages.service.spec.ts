@@ -10,11 +10,11 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     ApiUrlConfig,
-    ApiUsageDto,
-    ApiUsagesDto,
+    CallsUsageDto,
+    CallsUsagePerDateDto,
     CurrentStorageDto,
     DateTime,
-    StorageUsageDto,
+    StorageUsagePerDateDto,
     UsagesService
 } from '@app/shared/internal';
 
@@ -38,7 +38,7 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: ApiUsagesDto;
+        let usages: CallsUsageDto;
 
         usagesService.getCallsUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -73,10 +73,10 @@ describe('UsagesService', () => {
         });
 
         expect(usages!).toEqual(
-            new ApiUsagesDto(100, 1024, 40, 12.4, {
+            new CallsUsageDto(100, 1024, 40, 12.4, {
                 category1: [
-                    new ApiUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130, 12.3),
-                    new ApiUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170, 33.3)
+                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130, 12.3),
+                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170, 33.3)
                 ]
             })
         );
@@ -85,7 +85,7 @@ describe('UsagesService', () => {
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: ReadonlyArray<StorageUsageDto>;
+        let usages: ReadonlyArray<StorageUsagePerDateDto>;
 
         usagesService.getStorageUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -111,8 +111,8 @@ describe('UsagesService', () => {
 
         expect(usages!).toEqual(
             [
-                new StorageUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
-                new StorageUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
+                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
+                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
             ]);
     }));
 

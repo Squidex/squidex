@@ -10,7 +10,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public sealed class ApiUsageDto
+    public sealed class CallsUsagePerDateDto
     {
         /// <summary>
         /// The date when the usage was tracked.
@@ -32,9 +32,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public double AverageElapsedMs { get; set; }
 
-        public static ApiUsageDto FromStats(ApiStats stats)
+        public static CallsUsagePerDateDto FromStats(ApiStats stats)
         {
-            var result = new ApiUsageDto
+            var result = new CallsUsagePerDateDto
             {
                 Date = stats.Date,
                 TotalBytes = stats.TotalBytes,

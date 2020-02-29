@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,7 +12,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public sealed class ApiUsagesDto
+    public sealed class CallsUsageDtoDto
     {
         /// <summary>
         /// The total number of API calls.
@@ -39,17 +38,17 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// The statistics by date and group.
         /// </summary>
         [Required]
-        public Dictionary<string, ApiUsageDto[]> Details { get; set; }
+        public Dictionary<string, CallsUsagePerDateDto[]> Details { get; set; }
 
-        public static ApiUsagesDto FromStats(long allowedCalls, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
+        public static CallsUsageDtoDto FromStats(long allowedCalls, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
         {
-            return new ApiUsagesDto
+            return new CallsUsageDtoDto
             {
                 AllowedCalls = allowedCalls,
                 AverageElapsedMs = summary.AverageElapsedMs,
                 TotalBytes = summary.TotalBytes,
-                TotalCalls = summary.TotalBytes,
-                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(ApiUsageDto.FromStats).ToArray())
+                TotalCalls = summary.TotalCalls,
+                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromStats).ToArray())
             };
         }
     }

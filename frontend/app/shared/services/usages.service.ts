@@ -16,18 +16,18 @@ import {
     pretifyError
 } from '@app/framework';
 
-export class ApiUsagesDto {
+export class CallsUsageDto {
     constructor(
         public readonly allowedCalls: number,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
         public readonly averageElapsedMs: number,
-        public readonly details: { [category: string]: ReadonlyArray<ApiUsageDto> }
+        public readonly details: { [category: string]: ReadonlyArray<CallsUsagePerDateDto> }
     ) {
     }
 }
 
-export class ApiUsageDto {
+export class CallsUsagePerDateDto {
     constructor(
         public readonly date: DateTime,
         public readonly totalBytes: number,
@@ -37,7 +37,7 @@ export class ApiUsageDto {
     }
 }
 
-export class StorageUsageDto {
+export class StorageUsagePerDateDto {
     constructor(
         public readonly date: DateTime,
         public readonly totalCount: number,
@@ -82,16 +82,16 @@ export class UsagesService {
             pretifyError('Failed to load todays storage size. Please reload.'));
     }
 
-    public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<ApiUsagesDto> {
+    public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const details: { [category: string]: ApiUsageDto[] } = {};
+                const details: { [category: string]: CallsUsagePerDateDto[] } = {};
 
                 for (let category of Object.keys(body.details)) {
                     details[category] = body.details[category].map((item: any) =>
-                        new ApiUsageDto(
+                        new CallsUsagePerDateDto(
                             DateTime.parseISO_UTC(item.date),
                             item.totalBytes,
                             item.totalCalls,
@@ -99,10 +99,10 @@ export class UsagesService {
                 }
 
                 const usages =
-                    new ApiUsagesDto(
+                    new CallsUsageDto(
                         body.allowedCalls,
                         body.totalBytes,
-                        body.totalBytes,
+                        body.totalCalls,
                         body.averageElapsedMs,
                         details);
 
@@ -111,13 +111,13 @@ export class UsagesService {
             pretifyError('Failed to load calls usage. Please reload.'));
     }
 
-    public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<ReadonlyArray<StorageUsageDto>> {
+    public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
                 const usages = body.map(item =>
-                    new StorageUsageDto(
+                    new StorageUsagePerDateDto(
                         DateTime.parseISO_UTC(item.date),
                         item.totalCount,
                         item.totalSize));

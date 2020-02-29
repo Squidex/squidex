@@ -20,7 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             Name = "Infinite",
             MaxApiCalls = -1,
             MaxAssetSize = -1,
-            MaxContributors = -1
+            MaxContributors = -1,
+            BlockingApiCalls = -1
         };
 
         private readonly Dictionary<string, ConfigAppLimitsPlan> plansById = new Dictionary<string, ConfigAppLimitsPlan>(StringComparer.OrdinalIgnoreCase);

@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public sealed class StorageUsageDto
+    public sealed class StorageUsagePerDateDto
     {
         /// <summary>
         /// The date when the usage was tracked.
@@ -27,9 +27,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public long TotalSize { get; set; }
 
-        public static StorageUsageDto FromStats(AssetStats stats)
+        public static StorageUsagePerDateDto FromStats(AssetStats stats)
         {
-            var result = new StorageUsageDto
+            var result = new StorageUsagePerDateDto
             {
                 Date = stats.Date,
                 TotalCount = stats.TotalCount,
