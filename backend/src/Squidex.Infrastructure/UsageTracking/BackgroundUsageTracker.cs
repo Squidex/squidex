@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             category = GetCategory(category);
 
-            jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.Aggregate(counters));
+            jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
 
             return Task.CompletedTask;
         }
@@ -161,7 +161,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             foreach (var usage in queried)
             {
-                result.MergeIn(usage.Counters);
+                result.SumUp(usage.Counters);
             }
 
             return result;

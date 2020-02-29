@@ -44,16 +44,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return (long)value;
         }
 
-        public Counters Aggregate(Counters counters)
-        {
-            var result = new Counters(this);
-
-            result.MergeIn(counters);
-
-            return result;
-        }
-
-        public void MergeIn(Counters counters)
+        public Counters SumUp(Counters counters)
         {
             foreach (var (key, value) in counters)
             {
@@ -66,6 +57,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
                 this[key] = newValue;
             }
+
+            return this;
         }
     }
 }
