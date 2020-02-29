@@ -42,9 +42,8 @@ namespace Squidex.Infrastructure.UsageTracking
             measuredCounters.Should().BeEquivalentTo(new Counters
             {
                 [ApiUsageTracker.CounterTotalBytes] = 1024,
-                [ApiUsageTracker.CounterTotalCalls] = 1,
-                [ApiUsageTracker.CounterTotalElapsedMs] = 120,
-                [ApiUsageTracker.CounterTotalCosts] = 4
+                [ApiUsageTracker.CounterTotalCalls] = 4,
+                [ApiUsageTracker.CounterTotalElapsedMs] = 120
             });
         }
 
@@ -53,7 +52,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var counters = new Counters
             {
-                [ApiUsageTracker.CounterTotalCosts] = 4
+                [ApiUsageTracker.CounterTotalCalls] = 4
             };
 
             A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))

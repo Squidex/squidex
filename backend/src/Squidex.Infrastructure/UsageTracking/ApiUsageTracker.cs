@@ -14,7 +14,6 @@ namespace Squidex.Infrastructure.UsageTracking
     public sealed class ApiUsageTracker : IApiUsageTracker
     {
         public const string CounterTotalBytes = "TotalBytes";
-        public const string CounterTotalCosts = "TotalCosts";
         public const string CounterTotalCalls = "TotalCalls";
         public const string CounterTotalElapsedMs = "TotalElapsedMs";
         private readonly IUsageTracker usageTracker;
@@ -30,17 +29,16 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var counters = await usageTracker.GetForMonthAsync(apiKey, date);
 
-            return counters.GetInt64(CounterTotalCosts);
+            return counters.GetInt64(CounterTotalCalls);
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, double costs, long elapsedMs, long bytes)
+        public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes)
         {
             var apiKey = GetKey(key);
 
             var counters = new Counters
             {
-                [CounterTotalCosts] = costs,
-                [CounterTotalCalls] = 1,
+                [CounterTotalCalls] = weight,
                 [CounterTotalElapsedMs] = elapsedMs,
                 [CounterTotalBytes] = bytes
             };

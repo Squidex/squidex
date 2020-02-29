@@ -18,9 +18,9 @@ namespace Squidex.Areas.Api.Controllers.News.Service
     {
         private const int FeatureVersion = 8;
         private readonly QueryContext flatten = QueryContext.Default.Flatten();
-        private readonly SquidexClient<NewsEntity, FeatureDto> client;
+        private readonly IContentsClient<NewsEntity, FeatureDto> client;
 
-        public sealed class NewsEntity : SquidexEntityBase<FeatureDto>
+        public sealed class NewsEntity : Content<FeatureDto>
         {
         }
 
@@ -28,12 +28,17 @@ namespace Squidex.Areas.Api.Controllers.News.Service
         {
             if (options.Value.IsConfigured())
             {
-                var clientManager = new SquidexClientManager("https://cloud.squidex.io",
-                    options.Value.AppName,
-                    options.Value.ClientId,
-                    options.Value.ClientSecret);
+                var squidexOptions = new SquidexOptions
+                {
+                    AppName = options.Value.AppName,
+                    ClientId = options.Value.ClientId,
+                    ClientSecret = options.Value.ClientSecret,
+                    Url = "https://cloud.squidex.io"
+                };
 
-                client = clientManager.GetClient<NewsEntity, FeatureDto>("feature-news");
+                var clientManager = new SquidexClientManager(squidexOptions);
+
+                client = clientManager.CreateContentsClient<NewsEntity, FeatureDto>("feature-news");
             }
         }
 
