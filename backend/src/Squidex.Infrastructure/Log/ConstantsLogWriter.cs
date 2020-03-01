@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Log
             this.objectWriter = objectWriter;
         }
 
-        public void Append(IObjectWriter writer, SemanticLogLevel logLevel)
+        public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
             objectWriter(writer);
         }

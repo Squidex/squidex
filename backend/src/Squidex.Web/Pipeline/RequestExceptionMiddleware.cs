@@ -10,19 +10,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class RequestExceptionMiddleware : IMiddleware
     {
-        private readonly IExceptionHandler exceptionHandler;
+        private readonly ISemanticLog log;
 
-        public RequestExceptionMiddleware(IExceptionHandler exceptionHandler)
+        public RequestExceptionMiddleware(ISemanticLog log)
         {
-            Guard.NotNull(exceptionHandler);
+            Guard.NotNull(log);
 
-            this.exceptionHandler = exceptionHandler;
+            this.log = log;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -33,7 +32,7 @@ namespace Squidex.Web.Pipeline
             }
             catch (Exception ex)
             {
-                exceptionHandler.Handle(ex, context);
+                log.LogError(ex, w => w.WriteProperty("messag", "An unexpected exception has occurred."));
 
                 context.Response.StatusCode = 500;
             }

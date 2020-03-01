@@ -49,8 +49,8 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_multiple_lines()
         {
-            Log.Log(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg1"));
-            Log.Log(SemanticLogLevel.Error, None.Value, (_, w) => w.WriteProperty("logMessage", "Msg2"));
+            Log.Log(SemanticLogLevel.Error, null, w => w.WriteProperty("logMessage", "Msg1"));
+            Log.Log(SemanticLogLevel.Error, null, w => w.WriteProperty("logMessage", "Msg2"));
 
             var expected1 =
                 LogTest(w => w
@@ -229,7 +229,7 @@ namespace Squidex.Infrastructure.Log
         {
             var exception = new InvalidOperationException();
 
-            Log.LogWarning(exception);
+            Log.LogWarning(exception, w => { });
 
             var expected =
                 LogTest(w => w
@@ -286,7 +286,7 @@ namespace Squidex.Infrastructure.Log
         {
             var exception = new InvalidOperationException();
 
-            Log.LogError(exception);
+            Log.LogError(exception, w => { });
 
             var expected =
                 LogTest(w => w
@@ -343,7 +343,7 @@ namespace Squidex.Infrastructure.Log
         {
             var exception = new InvalidOperationException();
 
-            Log.LogFatal(exception);
+            Log.LogFatal(exception, w => { });
 
             var expected =
                 LogTest(w => w
@@ -365,18 +365,6 @@ namespace Squidex.Infrastructure.Log
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("logValue", 1500)
                     .WriteException(exception));
-
-            Assert.Equal(expected, output);
-        }
-
-        [Fact]
-        public void Should_log_nothing_when_exception_is_null()
-        {
-            Log.LogFatal((Exception?)null);
-
-            var expected =
-                LogTest(w => w
-                    .WriteProperty("logLevel", "Fatal"));
 
             Assert.Equal(expected, output);
         }
@@ -484,8 +472,8 @@ namespace Squidex.Infrastructure.Log
                     .WriteObject("eventId", e => e
                         .WriteProperty("id", 123)
                         .WriteProperty("name", "EventName"))
-                    .WriteException(exception)
-                    .WriteProperty("category", "Squidex.Infrastructure.Log.SemanticLogTests"));
+                    .WriteProperty("category", "Squidex.Infrastructure.Log.SemanticLogTests")
+                    .WriteException(exception));
 
             Assert.Equal(expected, output);
         }
@@ -506,7 +494,7 @@ namespace Squidex.Infrastructure.Log
 
             try
             {
-                sut.Log(SemanticLogLevel.Debug, None.Value, (_, w) => w.WriteProperty("should", "throw"));
+                sut.Log(SemanticLogLevel.Debug, null, w => w.WriteProperty("should", "throw"));
 
                 Assert.False(true);
             }

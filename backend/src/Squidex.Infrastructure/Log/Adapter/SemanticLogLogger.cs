@@ -49,9 +49,20 @@ namespace Squidex.Infrastructure.Log.Adapter
                     break;
             }
 
+            if (state is IReadOnlyList<KeyValuePair<string, object>> parameters)
+            {
+                foreach (var (key, value) in parameters)
+                {
+                    if (value is Exception ex && exception == null)
+                    {
+                        exception = ex;
+                    }
+                }
+            }
+
             var context = (eventId, state, exception, formatter);
 
-            semanticLog.Log(semanticLogLevel, context, (ctx, writer) =>
+            semanticLog.Log(semanticLogLevel, context, exception, (ctx, writer) =>
             {
                 var message = ctx.formatter(ctx.state, ctx.exception);
 
@@ -73,25 +84,22 @@ namespace Squidex.Infrastructure.Log.Adapter
                     });
                 }
 
-                if (ctx.state is IReadOnlyList<KeyValuePair<string, object>> parameters)
+                if (ctx.state is IReadOnlyList<KeyValuePair<string, object>> parameters2)
                 {
-                    foreach (var (key, value) in parameters)
+                    foreach (var (key, value) in parameters2)
                     {
                         if (value != null)
                         {
                             var trimmedName = key.Trim('{', '}', ' ');
 
-                            if (trimmedName.Length > 2 && !string.Equals(trimmedName, "originalFormat", StringComparison.OrdinalIgnoreCase))
+                            if (trimmedName.Length > 2 &&
+                                !string.Equals(trimmedName, "exception", StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(trimmedName, "originalFormat", StringComparison.OrdinalIgnoreCase))
                             {
                                 writer.WriteProperty(trimmedName.ToCamelCase(), value.ToString());
                             }
                         }
                     }
-                }
-
-                if (ctx.exception != null)
-                {
-                    writer.WriteException(ctx.exception);
                 }
             });
         }

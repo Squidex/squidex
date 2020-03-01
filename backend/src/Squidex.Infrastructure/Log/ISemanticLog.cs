@@ -9,9 +9,15 @@ using System;
 
 namespace Squidex.Infrastructure.Log
 {
+    public delegate void LogFormatter(IObjectWriter writer);
+
+    public delegate void LogFormatter<T>(T context, IObjectWriter writer);
+
     public interface ISemanticLog
     {
-        void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action);
+        void Log<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action);
+
+        void Log(SemanticLogLevel logLevel, Exception? exception, LogFormatter action);
 
         ISemanticLog CreateScope(Action<IObjectWriter> objectWriter);
     }
