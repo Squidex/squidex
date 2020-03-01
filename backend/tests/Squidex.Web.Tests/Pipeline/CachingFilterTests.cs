@@ -215,7 +215,7 @@ namespace Squidex.Web.Pipeline
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            cachingOptions.MaxSurrogateKeys = 2;
+            cachingOptions.MaxSurrogateKeysSize = 100;
 
             await sut.OnActionExecutionAsync(executingContext, () =>
             {
@@ -229,12 +229,31 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_append_surrogate_keys_if_just_enough_space_for_one()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            cachingOptions.MaxSurrogateKeysSize = 36;
+
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddDependency(id2, 12);
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal($"{id1}", httpContext.Response.Headers["Surrogate-Key"]);
+        }
+
+        [Fact]
         public async Task Should_not_append_surrogate_keys_if_maximum_is_exceeded()
         {
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            cachingOptions.MaxSurrogateKeys = 1;
+            cachingOptions.MaxSurrogateKeysSize = 20;
 
             await sut.OnActionExecutionAsync(executingContext, () =>
             {

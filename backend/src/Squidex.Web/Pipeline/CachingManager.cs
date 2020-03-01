@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
@@ -26,6 +27,9 @@ namespace Squidex.Web.Pipeline
 
         internal sealed class CacheContext : IRequestCache, IDisposable
         {
+            private static readonly ObjectPool<StringBuilder> StringBuilderPool =
+                new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+
             private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             private readonly HashSet<string> keys = new HashSet<string>();
             private readonly HashSet<string> headers = new HashSet<string>();
@@ -83,7 +87,7 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            public void Finish(HttpResponse response, int maxSurrogateKeys)
+            public void Finish(HttpResponse response, int maxSurrogateKeySize)
             {
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
@@ -96,11 +100,44 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                if (keys.Count <= maxSurrogateKeys)
+                if (keys.Count > 0 && maxSurrogateKeySize > 0)
                 {
-                    var value = string.Join(" ", keys);
+                    const int GuidLength = 36;
 
-                    response.Headers.Add("Surrogate-Key", value);
+                    var stringBuilder = StringBuilderPool.Get();
+                    try
+                    {
+                        foreach (var key in keys)
+                        {
+                            if (stringBuilder.Length == 0)
+                            {
+                                if (stringBuilder.Length + GuidLength > maxSurrogateKeySize)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (stringBuilder.Length + GuidLength + 1 > maxSurrogateKeySize)
+                                {
+                                    break;
+                                }
+
+                                stringBuilder.Append(' ');
+                            }
+
+                            stringBuilder.Append(key);
+                        }
+
+                        if (stringBuilder.Length > 0)
+                        {
+                            response.Headers.Add("Surrogate-Key", stringBuilder.ToString());
+                        }
+                    }
+                    finally
+                    {
+                        StringBuilderPool.Return(stringBuilder);
+                    }
                 }
 
                 if (headers.Count > 0)
@@ -180,7 +217,7 @@ namespace Squidex.Web.Pipeline
             }
         }
 
-        public void Finish(HttpContext httpContext, int maxSurrogateKeys)
+        public void Finish(HttpContext httpContext, int maxSurrogateKeySize)
         {
             Guard.NotNull(httpContext);
 
@@ -188,7 +225,7 @@ namespace Squidex.Web.Pipeline
 
             if (cacheContext != null)
             {
-                cacheContext.Finish(httpContext.Response, maxSurrogateKeys);
+                cacheContext.Finish(httpContext.Response, maxSurrogateKeySize);
             }
         }
     }
