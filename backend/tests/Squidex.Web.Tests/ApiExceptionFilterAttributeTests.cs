@@ -17,15 +17,15 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
-using Squidex.Web.Pipeline;
 using Xunit;
 
 namespace Squidex.Web
 {
     public class ApiExceptionFilterAttributeTests
     {
-        private readonly IExceptionHandler exceptionHandler = A.Fake<IExceptionHandler>();
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly ApiExceptionFilterAttribute sut = new ApiExceptionFilterAttribute();
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Squidex.Web
 
             Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -62,7 +62,7 @@ namespace Squidex.Web
 
             Assert.IsType<NotFoundResult>(context.Result);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -75,7 +75,7 @@ namespace Squidex.Web
 
             Validate(500, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(context.Exception, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, context.Exception, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
 
@@ -88,7 +88,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -101,7 +101,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Web
 
             Validate(412, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -127,7 +127,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, context.Exception);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -140,7 +140,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(context.Exception, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, context.Exception, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
 
@@ -153,7 +153,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => exceptionHandler.Handle(A<Exception>._, A<HttpContext>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
         }
 
@@ -189,8 +189,8 @@ namespace Squidex.Web
         {
             var services = A.Fake<IServiceProvider>();
 
-            A.CallTo(() => services.GetService(typeof(IExceptionHandler)))
-                .Returns(exceptionHandler);
+            A.CallTo(() => services.GetService(typeof(ISemanticLog)))
+                .Returns(log);
 
             var httpContext = new DefaultHttpContext
             {

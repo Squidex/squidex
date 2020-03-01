@@ -11,7 +11,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
@@ -137,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>._, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
     }

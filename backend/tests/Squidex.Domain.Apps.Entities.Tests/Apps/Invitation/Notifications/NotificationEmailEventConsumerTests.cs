@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<None>._, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
 

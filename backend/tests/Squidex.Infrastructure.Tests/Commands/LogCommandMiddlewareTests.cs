@@ -25,7 +25,12 @@ namespace Squidex.Infrastructure.Commands
         {
             public Dictionary<SemanticLogLevel, int> LogLevels { get; } = new Dictionary<SemanticLogLevel, int>();
 
-            public void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action)
+            public void Log<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action)
+            {
+                LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
+            }
+
+            public void Log(SemanticLogLevel logLevel, Exception? exception, LogFormatter action)
             {
                 LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
             }

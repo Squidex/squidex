@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;

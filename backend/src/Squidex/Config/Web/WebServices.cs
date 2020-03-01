@@ -64,9 +64,6 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
 
-            services.AddSingletonAs<DefaultExceptionHandler>()
-                .AsOptional<IExceptionHandler>();
-
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;

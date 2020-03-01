@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2)))
                 .MustHaveHappened();
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>.Ignored))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
     }

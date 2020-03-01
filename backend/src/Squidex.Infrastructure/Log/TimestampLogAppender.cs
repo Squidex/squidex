@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using NodaTime;
 
 namespace Squidex.Infrastructure.Log
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.Log
             this.clock = clock ?? SystemClock.Instance;
         }
 
-        public void Append(IObjectWriter writer, SemanticLogLevel logLevel)
+        public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
             writer.WriteProperty("timestamp", clock.GetCurrentInstant());
         }

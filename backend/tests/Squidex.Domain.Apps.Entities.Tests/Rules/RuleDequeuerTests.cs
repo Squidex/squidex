@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.QueryAsync();
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, None.Value, A<Action<None, IObjectWriter>>._))
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustHaveHappened();
         }
 
