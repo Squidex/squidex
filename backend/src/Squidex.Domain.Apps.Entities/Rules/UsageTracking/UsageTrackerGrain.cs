@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
     public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
     {
         private readonly IGrainState<GrainState> state;
-        private readonly IUsageTracker usageTracker;
+        private readonly IApiUsageTracker usageTracker;
 
         public sealed class Target
         {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             public Dictionary<Guid, Target> Targets { get; set; } = new Dictionary<Guid, Target>();
         }
 
-        public UsageTrackerGrain(IGrainState<GrainState> state, IUsageTracker usageTracker)
+        public UsageTrackerGrain(IGrainState<GrainState> state, IApiUsageTracker usageTracker)
         {
             Guard.NotNull(state);
             Guard.NotNull(usageTracker);
@@ -83,18 +83,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
                 if (!target.Triggered.HasValue || target.Triggered < from)
                 {
-                    var usage = await usageTracker.GetMonthlyCallsAsync(target.AppId.Id.ToString(), today);
+                    var costs = await usageTracker.GetMonthCostsAsync(target.AppId.Id.ToString(), today);
 
                     var limit = target.Limits;
 
-                    if (usage > limit)
+                    if (costs > limit)
                     {
                         target.Triggered = today;
 
                         var @event = new AppUsageExceeded
                         {
                             AppId = target.AppId,
-                            CallsCurrent = usage,
+                            CallsCurrent = costs,
                             CallsLimit = limit,
                             RuleId = key
                         };

@@ -6,16 +6,17 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Web.Pipeline
 {
-    public static class DomainEntityExtensions
+    public sealed class AppFeature : IAppFeature
     {
-        public static NamedId<Guid> NamedId(this IAppEntity entity)
+        public NamedId<Guid> AppId { get; }
+
+        public AppFeature(NamedId<Guid> appId)
         {
-            return new NamedId<Guid>(entity.Id, entity.Name);
+            AppId = appId;
         }
     }
 }

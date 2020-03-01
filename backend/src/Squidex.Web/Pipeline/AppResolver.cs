@@ -74,14 +74,22 @@ namespace Squidex.Web.Pipeline
                 requestContext.App = app;
                 requestContext.UpdatePermissions();
 
-                if (!requestContext.Permissions.Includes(Permissions.ForApp(Permissions.App, appName)) && !AllowAnonymous(context))
+                if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
+
+                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app.NamedId()));
+                context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
 
             await next();
+        }
+
+        private static bool HasPermission(string appName, Context requestContext)
+        {
+            return requestContext.Permissions.Includes(Permissions.ForApp(Permissions.App, appName));
         }
 
         private static bool AllowAnonymous(ActionExecutingContext context)

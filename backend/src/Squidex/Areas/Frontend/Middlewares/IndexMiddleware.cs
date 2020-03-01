@@ -21,7 +21,7 @@ namespace Squidex.Areas.Frontend.Middlewares
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             if (context.IsHtmlPath() && context.Response.StatusCode != 304)
             {

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -19,51 +18,54 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public partial class AssetUsageTracker : IAssetUsageTracker, IEventConsumer
     {
-        private const string Category = "Default";
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
         private static readonly DateTime SummaryDate;
-        private readonly IUsageRepository usageStore;
+        private readonly IUsageTracker usageTracker;
 
-        public AssetUsageTracker(IUsageRepository usageStore)
+        public AssetUsageTracker(IUsageTracker usageTracker)
         {
-            Guard.NotNull(usageStore);
+            Guard.NotNull(usageTracker);
 
-            this.usageStore = usageStore;
+            this.usageTracker = usageTracker;
         }
 
         public async Task<long> GetTotalSizeAsync(Guid appId)
         {
             var key = GetKey(appId);
 
-            var entries = await usageStore.QueryAsync(key, SummaryDate, SummaryDate);
+            var counters = await usageTracker.GetAsync(key, SummaryDate, SummaryDate);
 
-            return (long)entries.Select(x => x.Counters.Get(CounterTotalSize)).FirstOrDefault();
+            return counters.GetInt64(CounterTotalSize);
         }
 
         public async Task<IReadOnlyList<AssetStats>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
         {
             var enriched = new List<AssetStats>();
 
-            var usagesFlat = await usageStore.QueryAsync(GetKey(appId), fromDate, toDate);
+            var usages = await usageTracker.QueryAsync(GetKey(appId), fromDate, toDate);
 
-            for (var date = fromDate; date <= toDate; date = date.AddDays(1))
+            if (usages.TryGetValue("*", out var byCategory1))
             {
-                var stored = usagesFlat.FirstOrDefault(x => x.Date == date && x.Category == Category);
-
-                var totalCount = 0L;
-                var totalSize = 0L;
-
-                if (stored != null)
-                {
-                    totalCount = (long)stored.Counters.Get(CounterTotalCount);
-                    totalSize = (long)stored.Counters.Get(CounterTotalSize);
-                }
-
-                enriched.Add(new AssetStats(date, totalCount, totalSize));
+                AddCounters(enriched, byCategory1);
+            }
+            else if (usages.TryGetValue("Default", out var byCategory2))
+            {
+                AddCounters(enriched, byCategory2);
             }
 
             return enriched;
+        }
+
+        private static void AddCounters(List<AssetStats> enriched, List<(DateTime, Counters)> details)
+        {
+            foreach (var (date, counters) in details)
+            {
+                var totalCount = counters.GetInt64(CounterTotalCount);
+                var totalSize = counters.GetInt64(CounterTotalSize);
+
+                enriched.Add(new AssetStats(date, totalCount, totalSize));
+            }
         }
     }
 }

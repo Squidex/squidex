@@ -38,7 +38,7 @@ namespace Squidex.Web.Pipeline
             httpContext.Request.Scheme = "https";
             httpContext.Request.Host = new HostString("host", 443);
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext);
 
             Assert.Null(httpContext.Request.Host.Port);
             Assert.True(isNextCalled);
@@ -52,7 +52,7 @@ namespace Squidex.Web.Pipeline
             httpContext.Request.Scheme = "http";
             httpContext.Request.Host = new HostString("host", 80);
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext);
 
             Assert.Null(httpContext.Request.Host.Port);
             Assert.True(isNextCalled);
@@ -66,7 +66,7 @@ namespace Squidex.Web.Pipeline
             httpContext.Request.Scheme = "http";
             httpContext.Request.Host = new HostString("host", 8080);
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext);
 
             Assert.Equal(8080, httpContext.Request.Host.Port);
             Assert.True(isNextCalled);

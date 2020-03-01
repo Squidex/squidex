@@ -26,7 +26,7 @@ namespace Squidex.Pipeline.Squid
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             var request = context.Request;
 

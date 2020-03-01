@@ -100,10 +100,16 @@ export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
                     errorDto = { message: 'Failed to make the request.', details: [] };
                 }
 
-                if (response.status === 412) {
-                    result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
-                } else if (response.status !== 500) {
-                    result = new ErrorDto(response.status, errorDto.message, errorDto.details, response);
+                switch (response.status) {
+                    case 412:
+                        result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
+                        break;
+                    case 429:
+                        result = new ErrorDto(response.status, 'You have exceeded the maximum limit of API calls.', [], response);
+                        break;
+                    case 500:
+                        result = new ErrorDto(response.status, errorDto.message, errorDto.details, response);
+                        break;
                 }
             } catch (e) {
                 result = new ErrorDto(500, 'Failed to make the request.', [], response);

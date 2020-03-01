@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -11,14 +11,12 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public interface IUsageTracker
+    public interface IApiUsageTracker
     {
-        Task TrackAsync(DateTime date, string key, string? category, Counters counters);
+        Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes);
 
-        Task<Counters> GetForMonthAsync(string key, DateTime date);
+        Task<long> GetMonthCostsAsync(string key, DateTime date);
 
-        Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate);
-
-        Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

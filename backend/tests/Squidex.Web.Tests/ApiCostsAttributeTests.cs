@@ -12,11 +12,11 @@ namespace Squidex.Web
     public class ApiCostsAttributeTests
     {
         [Fact]
-        public void Should_assign_weight()
+        public void Should_assign_costs()
         {
             var sut = new ApiCostsAttribute(10.5);
 
-            Assert.Equal(10.5, sut.Weight);
+            Assert.Equal(10.5, sut.Costs);
         }
     }
 }

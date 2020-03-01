@@ -52,7 +52,9 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
 
         public static CommentDto FromCommand(CreateComment command)
         {
-            return SimpleMapper.Map(command, new CommentDto { Id = command.CommentId, User = command.Actor, Time = SystemClock.Instance.GetCurrentInstant() });
+            var time = SystemClock.Instance.GetCurrentInstant();
+
+            return SimpleMapper.Map(command, new CommentDto { Id = command.CommentId, User = command.Actor, Time = time });
         }
     }
 }

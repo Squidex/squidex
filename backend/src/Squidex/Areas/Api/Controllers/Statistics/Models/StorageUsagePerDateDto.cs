@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.UsageTracking;
+using Squidex.Domain.Apps.Entities.Assets;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public sealed class CallsUsageDto
+    public sealed class StorageUsagePerDateDto
     {
         /// <summary>
         /// The date when the usage was tracked.
@@ -18,20 +18,25 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// The number of calls.
+        /// The number of assets.
         /// </summary>
-        public long Count { get; set; }
+        public long TotalCount { get; set; }
 
         /// <summary>
-        /// The average duration in milliseconds.
+        /// The size in bytes.
         /// </summary>
-        public long AverageMs { get; set; }
+        public long TotalSize { get; set; }
 
-        public static CallsUsageDto FromUsage(DateUsage usage)
+        public static StorageUsagePerDateDto FromStats(AssetStats stats)
         {
-            var averageMs = usage.TotalCount == 0 ? 0 : usage.TotalElapsedMs / usage.TotalCount;
+            var result = new StorageUsagePerDateDto
+            {
+                Date = stats.Date,
+                TotalCount = stats.TotalCount,
+                TotalSize = stats.TotalSize
+            };
 
-            return new CallsUsageDto { Date = usage.Date, Count = usage.TotalCount, AverageMs = averageMs };
+            return result;
         }
     }
 }

@@ -46,6 +46,9 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<LocalCacheMiddleware>()
                 .AsSelf();
 
+            services.AddSingletonAs<UsageMiddleware>()
+                .AsSelf();
+
             services.AddSingletonAs<RequestExceptionMiddleware>()
                 .AsSelf();
 

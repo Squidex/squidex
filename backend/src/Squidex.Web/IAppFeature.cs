@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using Squidex.Infrastructure;
+
 namespace Squidex.Web
 {
-    public interface IApiCostsFeature
+    public interface IAppFeature
     {
-        double Costs { get; }
+        NamedId<Guid> AppId { get; }
     }
 }

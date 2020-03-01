@@ -11,10 +11,10 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     ApiUrlConfig,
     CallsUsageDto,
-    CurrentCallsDto,
+    CallsUsagePerDateDto,
     CurrentStorageDto,
     DateTime,
-    StorageUsageDto,
+    StorageUsagePerDateDto,
     UsagesService
 } from '@app/shared/internal';
 
@@ -38,7 +38,7 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: { [category: string]: ReadonlyArray<CallsUsageDto> };
+        let usages: CallsUsageDto;
 
         usagesService.getCallsUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -50,51 +50,42 @@ describe('UsagesService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
-            category1: [
-                {
-                    date: '2017-10-12',
-                    count: 10,
-                    averageMs: 130
-                },
-                {
-                    date: '2017-10-13',
-                    count: 13,
-                    averageMs: 170
-                }
-            ]
+            allowedCalls: 100,
+            totalBytes: 1024,
+            totalCalls: 40,
+            averageElapsedMs: 12.4,
+            details: {
+                category1: [
+                    {
+                        date: '2017-10-12',
+                        totalBytes: 10,
+                        totalCalls: 130,
+                        averageElapsedMs: 12.3
+                    },
+                    {
+                        date: '2017-10-13',
+                        totalBytes: 13,
+                        totalCalls: 170,
+                        averageElapsedMs: 33.3
+                    }
+                ]
+            }
         });
 
-        expect(usages!).toEqual({
-            category1: [
-                new CallsUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
-                new CallsUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
-            ]
-        });
-    }));
-
-    it('should make get request to get month calls',
-        inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
-
-        let usages: CurrentCallsDto;
-
-        usagesService.getMonthCalls('my-app').subscribe(result => {
-            usages = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/calls/month');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({ count: 130, maxAllowed: 150 });
-
-        expect(usages!).toEqual(new CurrentCallsDto(130, 150));
+        expect(usages!).toEqual(
+            new CallsUsageDto(100, 1024, 40, 12.4, {
+                category1: [
+                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130, 12.3),
+                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170, 33.3)
+                ]
+            })
+        );
     }));
 
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: ReadonlyArray<StorageUsageDto>;
+        let usages: ReadonlyArray<StorageUsagePerDateDto>;
 
         usagesService.getStorageUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -108,20 +99,20 @@ describe('UsagesService', () => {
         req.flush([
             {
                 date: '2017-10-12',
-                count: 10,
-                size: 130
+                totalCount: 10,
+                totalSize: 130
             },
             {
                 date: '2017-10-13',
-                count: 13,
-                size: 170
+                totalCount: 13,
+                totalSize: 170
             }
         ]);
 
         expect(usages!).toEqual(
             [
-                new StorageUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
-                new StorageUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
+                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
+                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
             ]);
     }));
 

@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
