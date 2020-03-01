@@ -70,6 +70,8 @@ namespace Squidex.Web.Pipeline
                         }
                     }
                 }
+
+                context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString());
             }
 
             await next();

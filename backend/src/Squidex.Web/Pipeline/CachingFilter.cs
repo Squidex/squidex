@@ -68,7 +68,7 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            cachingManager.Finish(httpContext, cachingOptions.MaxSurrogateKeys);
+            cachingManager.Finish(httpContext, cachingOptions.MaxSurrogateKeysSize);
         }
     }
 }
