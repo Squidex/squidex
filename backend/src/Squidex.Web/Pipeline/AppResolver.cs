@@ -81,6 +81,7 @@ namespace Squidex.Web.Pipeline
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app.NamedId()));
+                context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
 
             await next();
