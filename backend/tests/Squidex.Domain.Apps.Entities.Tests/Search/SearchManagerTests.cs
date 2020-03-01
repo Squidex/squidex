@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             result.Should().BeEquivalentTo(result2);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, query, A<Action<string, IObjectWriter>>._))
+            A.CallTo(() => log.Log<string>(A<SemanticLogLevel>._, A<string>._, A<Exception?>._, A<LogFormatter<string>>._!))
                 .MustHaveHappened();
         }
     }

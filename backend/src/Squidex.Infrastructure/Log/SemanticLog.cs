@@ -30,13 +30,13 @@ namespace Squidex.Infrastructure.Log
             Guard.NotNull(appenders);
             Guard.NotNull(writerFactory);
 
+            this.options = options;
             this.channels = channels.ToArray();
             this.appenders = appenders.ToArray();
-            this.options = options;
             this.writerFactory = writerFactory;
         }
 
-        public void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action)
+        public void Log<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action)
         {
             Guard.NotNull(action);
 
@@ -45,7 +45,21 @@ namespace Squidex.Infrastructure.Log
                 return;
             }
 
-            var formattedText = FormatText(logLevel, context, action);
+            var formattedText = FormatText(logLevel, context, exception, action);
+
+            LogFormattedText(logLevel, formattedText);
+        }
+
+        public void Log(SemanticLogLevel logLevel, Exception? exception, LogFormatter action)
+        {
+            Guard.NotNull(action);
+
+            if (logLevel < options.Value.Level)
+            {
+                return;
+            }
+
+            var formattedText = FormatText(logLevel, exception, action);
 
             LogFormattedText(logLevel, formattedText);
         }
@@ -77,7 +91,7 @@ namespace Squidex.Infrastructure.Log
             }
         }
 
-        private string FormatText<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> objectWriter)
+        private string FormatText(SemanticLogLevel logLevel, Exception? exception, LogFormatter action)
         {
             var writer = writerFactory.Create();
 
@@ -85,12 +99,39 @@ namespace Squidex.Infrastructure.Log
             {
                 writer.WriteProperty(nameof(logLevel), logLevel.ToString());
 
-                objectWriter(context, writer);
+                action(writer);
 
                 for (var i = 0; i < appenders.Length; i++)
                 {
-                    appenders[i].Append(writer, logLevel);
+                    appenders[i].Append(writer, logLevel, exception);
                 }
+
+                writer.WriteException(exception);
+
+                return writer.ToString();
+            }
+            finally
+            {
+                writerFactory.Release(writer);
+            }
+        }
+
+        private string FormatText<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action)
+        {
+            var writer = writerFactory.Create();
+
+            try
+            {
+                writer.WriteProperty(nameof(logLevel), logLevel.ToString());
+
+                action(context, writer);
+
+                for (var i = 0; i < appenders.Length; i++)
+                {
+                    appenders[i].Append(writer, logLevel, exception);
+                }
+
+                writer.WriteException(exception);
 
                 return writer.ToString();
             }
@@ -102,7 +143,9 @@ namespace Squidex.Infrastructure.Log
 
         public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
         {
-            return new SemanticLog(options, channels, appenders.Union(new ILogAppender[] { new ConstantsLogWriter(objectWriter) }).ToArray(), writerFactory);
+            var newAppenders = appenders.Union(Enumerable.Repeat(new ConstantsLogWriter(objectWriter), 1));
+
+            return new SemanticLog(options, channels, newAppenders, writerFactory);
         }
     }
 }

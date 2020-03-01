@@ -126,14 +126,33 @@ namespace Squidex.Infrastructure.Log
 
             var logger = sut.CreateLogger("my-category");
 
-            logger.Log(LogLevel.Debug, new EventId(0), 1, exception, (x, e) => "my-message");
+            logger.Log(LogLevel.Debug, new EventId(0), exception, "my-message");
 
             var expected =
                 MakeTestCall(w => w
                     .WriteProperty("logLevel", "Debug")
                     .WriteProperty("message", "my-message")
-                    .WriteException(exception)
-                    .WriteProperty("category", "my-category"));
+                    .WriteProperty("category", "my-category")
+                    .WriteException(exception));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_message_with_integrated_exception()
+        {
+            var exception = new InvalidOperationException();
+
+            var logger = sut.CreateLogger("my-category");
+
+            logger.Log(LogLevel.Debug, new EventId(0), "exception: {exception}", exception);
+
+            var expected =
+                MakeTestCall(w => w
+                    .WriteProperty("logLevel", "Debug")
+                    .WriteProperty("message", $"exception: {exception}")
+                    .WriteProperty("category", "my-category")
+                    .WriteException(exception));
 
             Assert.Equal(expected, output);
         }

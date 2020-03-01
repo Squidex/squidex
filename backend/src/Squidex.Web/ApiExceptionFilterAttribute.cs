@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Web.Pipeline;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Web
 {
@@ -33,9 +33,9 @@ namespace Squidex.Web
 
             if (!wellKnown)
             {
-                var exceptionHandler = context.HttpContext.RequestServices.GetService<IExceptionHandler>();
+                var log = context.HttpContext.RequestServices.GetService<ISemanticLog>();
 
-                exceptionHandler.Handle(context.Exception, context.HttpContext);
+                log.LogError(context.Exception, w => w.WriteProperty("messag", "An unexpected exception has occurred."));
             }
 
             context.Result = GetResult(error);

@@ -29,7 +29,7 @@ namespace Squidex.Web.Pipeline
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public void Append(IObjectWriter writer, SemanticLogLevel logLevel)
+        public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
             var httpContext = httpContextAccessor.HttpContext;
 

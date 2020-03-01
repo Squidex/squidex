@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Extensions.Actions.Kafka
@@ -65,10 +64,10 @@ namespace Squidex.Extensions.Actions.Kafka
                     break;
             }
 
-            log.Log<None>(level, default, (_, w) => w
-                .WriteProperty("action", "KafkaAction")
-                .WriteProperty("name", message.Name)
-                .WriteProperty("message", message.Message));
+            log.Log(level, null, w => w
+                 .WriteProperty("action", "KafkaAction")
+                 .WriteProperty("name", message.Name)
+                 .WriteProperty("message", message.Message));
         }
 
         private static void LogError(ISemanticLog log, Error error)

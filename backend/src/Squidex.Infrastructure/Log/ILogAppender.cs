@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Infrastructure.Log
 {
     public interface ILogAppender
     {
-        void Append(IObjectWriter writer, SemanticLogLevel logLevel);
+        void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception);
     }
 }
