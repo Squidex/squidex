@@ -39,7 +39,7 @@ namespace Squidex.Web.Pipeline
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
 
-            cachingManager = new CachingManager(httpContextAccessor, Options.Create(new CachingOptions()));
+            cachingManager = new CachingManager(httpContextAccessor, Options.Create(cachingOptions));
 
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             var actionFilters = new List<IFilterMetadata>();
