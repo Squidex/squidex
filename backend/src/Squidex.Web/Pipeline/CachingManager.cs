@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
@@ -23,13 +24,12 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class CachingManager : IRequestCache
     {
+        private readonly ObjectPool<StringBuilder> stringBuilderPool;
+        private readonly CachingOptions cachingOptions;
         private readonly IHttpContextAccessor httpContextAccessor;
 
         internal sealed class CacheContext : IRequestCache, IDisposable
         {
-            private static readonly ObjectPool<StringBuilder> StringBuilderPool =
-                new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-
             private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             private readonly HashSet<string> keys = new HashSet<string>();
             private readonly HashSet<string> headers = new HashSet<string>();
@@ -87,7 +87,7 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            public void Finish(HttpResponse response, int maxSurrogateKeySize)
+            public void Finish(HttpResponse response, int maxSurrogateKeySize, ObjectPool<StringBuilder> stringBuilderPool)
             {
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
@@ -104,7 +104,7 @@ namespace Squidex.Web.Pipeline
                 {
                     const int GuidLength = 36;
 
-                    var stringBuilder = StringBuilderPool.Get();
+                    var stringBuilder = stringBuilderPool.Get();
                     try
                     {
                         foreach (var key in keys)
@@ -136,7 +136,7 @@ namespace Squidex.Web.Pipeline
                     }
                     finally
                     {
-                        StringBuilderPool.Return(stringBuilder);
+                        stringBuilderPool.Return(stringBuilder);
                     }
                 }
 
@@ -164,11 +164,19 @@ namespace Squidex.Web.Pipeline
             }
         }
 
-        public CachingManager(IHttpContextAccessor httpContextAccessor)
+        public CachingManager(IHttpContextAccessor httpContextAccessor, IOptions<CachingOptions> cachingOptions)
         {
             Guard.NotNull(httpContextAccessor);
+            Guard.NotNull(cachingOptions);
 
             this.httpContextAccessor = httpContextAccessor;
+
+            this.cachingOptions = cachingOptions.Value;
+
+            stringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy
+            {
+                MaximumRetainedCapacity = cachingOptions.Value.MaxSurrogateKeysSize
+            });
         }
 
         public void Start(HttpContext httpContext)
@@ -217,7 +225,7 @@ namespace Squidex.Web.Pipeline
             }
         }
 
-        public void Finish(HttpContext httpContext, int maxSurrogateKeySize)
+        public void Finish(HttpContext httpContext)
         {
             Guard.NotNull(httpContext);
 
@@ -225,7 +233,7 @@ namespace Squidex.Web.Pipeline
 
             if (cacheContext != null)
             {
-                cacheContext.Finish(httpContext.Response, maxSurrogateKeySize);
+                cacheContext.Finish(httpContext.Response, cachingOptions.MaxSurrogateKeysSize, stringBuilderPool);
             }
         }
     }

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -38,7 +39,7 @@ namespace Squidex.Web.Pipeline
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
 
-            cachingManager = new CachingManager(httpContextAccessor);
+            cachingManager = new CachingManager(httpContextAccessor, Options.Create(new CachingOptions()));
 
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             var actionFilters = new List<IFilterMetadata>();

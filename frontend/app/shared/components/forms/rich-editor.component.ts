@@ -72,10 +72,16 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public ngAfterViewInit() {
-        const self = this;
+        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.2.0/tinymce.min.js').then(() => {
+            const timer = setInterval(() => {
+                const target = this.editor.nativeElement;
 
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.4/tinymce.min.js').then(() => {
-            tinymce.init(self.getEditorOptions());
+                if (document.body.contains(target)) {
+                    tinymce.init(this.getEditorOptions(target));
+
+                    clearInterval(timer);
+                }
+            }, 10);
         });
     }
 
@@ -95,21 +101,13 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.assetsDialog.show();
     }
 
-    private getEditorOptions() {
+    private getEditorOptions(target: any): any {
         const self = this;
 
         return {
-            convert_fonts_to_spans: true,
-            convert_urls: false,
-            paste_data_images: true,
-            plugins: 'code image media link lists advlist paste',
-            min_height: 300,
-            max_height: 800,
-            removed_menuitems: 'newdocument',
-            resize: true,
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
+            ...DEFAULT_PROPS,
 
-            images_upload_handler: (blob: any, success: (url: string) => void, failed: () => void) => {
+            images_upload_handler: (blob: any, success: (url: string) => void, failure: (message: string) => void) => {
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
                 self.assetUploader.uploadFile(file)
@@ -119,26 +117,27 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
-                            failed();
+                            failure('Failed');
                         }
                     });
             },
 
             setup: (editor: any) => {
-                self.tinyEditor = editor;
-                self.tinyEditor.addButton('assets', {
-                    onclick: self.showSelector,
-                    icon: 'assets',
+                editor.ui.registry.addButton('assets', {
+                    onAction: self.showSelector,
+                    icon: 'gallery',
                     text: '',
                     tooltip: 'Insert Assets'
                 });
 
-                self.tinyEditor.on('init', () => {
+                editor.on('init', () => {
+                    self.tinyEditor = editor;
+
                     self.setContent();
                     self.setReadOnly();
                 });
 
-                self.tinyEditor.on('change', () => {
+                editor.on('change', () => {
                     const value = editor.getContent();
 
                     if (this.value !== value) {
@@ -148,7 +147,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     }
                 });
 
-                self.tinyEditor.on('paste', (event: ClipboardEvent) => {
+                editor.on('paste', (event: ClipboardEvent) => {
                     if (event.clipboardData) {
                         for (let i = 0; i < event.clipboardData.items.length; i++) {
                             const file = event.clipboardData.items[i].getAsFile();
@@ -160,7 +159,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     }
                 });
 
-                self.tinyEditor.on('drop', (event: DragEvent) => {
+                editor.on('drop', (event: DragEvent) => {
                     if (event.dataTransfer) {
                         for (let i = 0; i < event.dataTransfer.files.length; i++) {
                             const file = event.dataTransfer.files.item(i);
@@ -174,21 +173,19 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     return false;
                 });
 
-                self.tinyEditor.on('blur', () => {
+                editor.on('blur', () => {
                     self.callTouched();
                 });
-
-                self.setReadOnly();
             },
 
-            target: self.editor.nativeElement
+            target
         };
     }
 
     public writeValue(obj: any) {
         this.value = Types.isString(obj) ? obj : '';
 
-        if (this.tinyEditor) {
+        if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setContent();
         }
     }
@@ -196,7 +193,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        if (this.tinyEditor) {
+        if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setReadOnly();
         }
     }
@@ -266,3 +263,15 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
             });
     }
 }
+
+const DEFAULT_PROPS = {
+    convert_fonts_to_spans: true,
+    convert_urls: false,
+    paste_data_images: true,
+    plugins: 'code image media link lists advlist paste',
+    min_height: 400,
+    max_height: 800,
+    removed_menuitems: 'newdocument',
+    resize: true,
+    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets'
+};
