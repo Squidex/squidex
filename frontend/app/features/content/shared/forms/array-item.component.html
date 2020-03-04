@@ -11,16 +11,16 @@
                 </div>
             </div>
             <div class="col-auto pr-4">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="Move this item to top">
                     <i class="icon-caret-top"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="Move this item up">
                     <i class="icon-caret-up"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="Move this item down">
                     <i class="icon-caret-down"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="Move this item to bottom">
                     <i class="icon-caret-bottom"></i>
                 </button>
                 <button type="button" class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="expand()" title="Expand this item">
@@ -31,7 +31,7 @@
                 </button>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="Clone this item">
                     <i class="icon-clone"></i>
                 </button>
         
