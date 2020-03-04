@@ -54,8 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
         private async Task UpsertAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, UpsertIndexEntry upsert)
         {
-            upsert.Texts["en"] = "Foo";
-
             var data = new
             {
                 appId = appId.Id,

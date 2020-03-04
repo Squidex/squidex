@@ -49,11 +49,6 @@ namespace Squidex.Config.Orleans
                 options.Configure();
             });
 
-            builder.Configure<ProcessExitHandlingOptions>(options =>
-            {
-                options.FastKillOnProcessExit = false;
-            });
-
             builder.Configure<DashboardOptions>(options =>
             {
                 options.HideTrace = true;
