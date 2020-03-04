@@ -35,6 +35,10 @@ p {
             overflow: hidden;
         }
 
+        &-footer {
+            border: 0;
+        }
+
         &-close {
             color: $color-dark-foreground;
             cursor: pointer;
@@ -56,7 +60,7 @@ p {
 }
 
 .footer {
-    @include absolute($b: 5rem, $l: 2rem);
+    @include absolute($t: 18rem, $l: 2rem);
 }
 
 .onboarding {
@@ -65,6 +69,7 @@ p {
             @include force-width(28rem);
             margin: 4rem auto 0;
             text-align: center;
+            text-decoration: none;
         }
 
         p {

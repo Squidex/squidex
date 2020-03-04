@@ -52,11 +52,11 @@ export class AppsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        const shouldShowOnboarding = this.onboardingService.shouldShow('dialog');
+        const shouldShowOnboarding = true || this.onboardingService.shouldShow('dialog');
 
         this.appsState.apps.pipe(take(1))
             .subscribe(apps => {
-                if (shouldShowOnboarding && apps.length === 0) {
+                if (shouldShowOnboarding) { // && apps.length === 0) {
                     this.onboardingService.disable('dialog');
                     this.onboardingDialog.show();
                 } else if (!this.uiOptions.get('hideNews')) {
