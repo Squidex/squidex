@@ -334,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 await CreateContextAsync(reader);
             }
 
-            if (@event.Payload is SquidexEvent squidexEvent)
+            if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
             {
                 if (restoreContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
                 {
