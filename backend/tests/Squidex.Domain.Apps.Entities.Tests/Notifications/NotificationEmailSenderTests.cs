@@ -17,14 +17,14 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Notifications
 {
     public class NotificationEmailSenderTests
     {
         private readonly IEmailSender emailSender = A.Fake<IEmailSender>();
         private readonly IEmailUrlGenerator emailUrlGenerator = A.Fake<IEmailUrlGenerator>();
         private readonly IUser assigner = A.Fake<IUser>();
-        private readonly IUser assignee = A.Fake<IUser>();
+        private readonly IUser user = A.Fake<IUser>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly List<Claim> assignerClaims = new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Sebastian Stehle") };
         private readonly List<Claim> assigneeClaims = new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Qaisar Ahmad") };
@@ -40,9 +40,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
             A.CallTo(() => assigner.Claims)
                 .Returns(assignerClaims);
 
-            A.CallTo(() => assignee.Email)
+            A.CallTo(() => user.Email)
                 .Returns("qaisar@squidex.io");
-            A.CallTo(() => assignee.Claims)
+            A.CallTo(() => user.Claims)
                 .Returns(assigneeClaims);
 
             A.CallTo(() => emailUrlGenerator.GenerateUIUrl())
@@ -54,83 +54,117 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
         [Fact]
         public async Task Should_format_assigner_email_and_send_email()
         {
-            await TestFormattingAsync("Email: $ASSIGNER_EMAIL", "Email: sebastian@squidex.io");
-        }
-
-        [Fact]
-        public async Task Should_format_assignee_email_and_send_email()
-        {
-            await TestFormattingAsync("Email: $ASSIGNEE_EMAIL", "Email: qaisar@squidex.io");
+            await TestInvitationFormattingAsync("Email: $ASSIGNER_EMAIL", "Email: sebastian@squidex.io");
         }
 
         [Fact]
         public async Task Should_format_assigner_name_and_send_email()
         {
-            await TestFormattingAsync("Name: $ASSIGNER_NAME", "Name: Sebastian Stehle");
+            await TestInvitationFormattingAsync("Name: $ASSIGNER_NAME", "Name: Sebastian Stehle");
         }
 
         [Fact]
-        public async Task Should_format_assignee_name_and_send_email()
+        public async Task Should_format_user_email_and_send_email()
         {
-            await TestFormattingAsync("Name: $ASSIGNEE_NAME", "Name: Qaisar Ahmad");
+            await TestInvitationFormattingAsync("Email: $USER_EMAIL", "Email: qaisar@squidex.io");
+        }
+
+        [Fact]
+        public async Task Should_format_user_name_and_send_email()
+        {
+            await TestInvitationFormattingAsync("Name: $USER_NAME", "Name: Qaisar Ahmad");
         }
 
         [Fact]
         public async Task Should_format_app_name_and_send_email()
         {
-            await TestFormattingAsync("App: $APP_NAME", "App: my-app");
+            await TestInvitationFormattingAsync("App: $APP_NAME", "App: my-app");
         }
 
         [Fact]
         public async Task Should_format_ui_url_and_send_email()
         {
-            await TestFormattingAsync("UI: $UI_URL", "UI: my-ui");
+            await TestInvitationFormattingAsync("UI: $UI_URL", "UI: my-ui");
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_texts_for_new_user_are_empty()
+        public async Task Should_format_api_calls_and_send_email()
         {
-            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
+            await TestUsageFormattingAsync("ApiCalls: $API_CALLS", "ApiCalls: 100");
+        }
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>._, A<string>._))
+        [Fact]
+        public async Task Should_format_api_calls_limit_and_send_email()
+        {
+            await TestUsageFormattingAsync("ApiCallsLimit: $API_CALLS_LIMIT", "ApiCallsLimit: 120");
+        }
+
+        [Fact]
+        public async Task Should_not_send_invitation_email_if_texts_for_new_user_are_empty()
+        {
+            await sut.SendInviteAsync(assigner, user, appName);
+
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_texts_for_existing_user_are_empty()
+        public async Task Should_not_send_invitation_email_if_texts_for_existing_user_are_empty()
         {
-            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
+            await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>._, A<string>._))
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
         }
 
         [Fact]
-        public async Task Should_send_email_when_consent_given()
+        public async Task Should_not_send_usage_email_if_texts_empty()
+        {
+            await sut.SendUsageAsync(user, appName, 100, 120);
+
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
+                .MustNotHaveHappened();
+
+            MustLogWarning();
+        }
+
+        [Fact]
+        public async Task Should_send_invitation_email_when_consent_given()
         {
             assigneeClaims.Add(new Claim(SquidexClaimTypes.Consent, "True"));
 
             texts.ExistingUserSubject = "email-subject";
             texts.ExistingUserBody = "email-body";
 
-            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
+            await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, "email-subject", "email-body"))
+            A.CallTo(() => emailSender.SendAsync(user.Email, "email-subject", "email-body"))
                 .MustHaveHappened();
         }
 
-        private async Task TestFormattingAsync(string pattern, string result)
+        private async Task TestUsageFormattingAsync(string pattern, string result)
+        {
+            texts.UsageSubject = pattern;
+            texts.UsageBody = pattern;
+
+            await sut.SendUsageAsync(user, appName, 100, 120);
+
+            A.CallTo(() => emailSender.SendAsync(user.Email, result, result))
+                .MustHaveHappened();
+        }
+
+        private async Task TestInvitationFormattingAsync(string pattern, string result)
         {
             texts.NewUserSubject = pattern;
             texts.NewUserBody = pattern;
 
-            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
+            await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(assignee.Email, result, result))
+            A.CallTo(() => emailSender.SendAsync(user.Email, result, result))
                 .MustHaveHappened();
         }
 

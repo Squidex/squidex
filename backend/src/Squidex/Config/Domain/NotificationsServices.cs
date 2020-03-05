@@ -8,7 +8,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications;
+using Squidex.Domain.Apps.Entities.Apps.Invitation;
+using Squidex.Domain.Apps.Entities.Apps.Notifications;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -18,7 +19,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
         {
-            var emailOptions = config.GetSection("email:smtp").Get<SmptOptions>();
+            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>();
 
             if (emailOptions.IsConfigured())
             {
@@ -31,15 +32,15 @@ namespace Squidex.Config.Domain
                     .As<IEmailSender>();
 
                 services.AddSingletonAs<NotificationEmailSender>()
-                    .AsOptional<INotificationEmailSender>();
+                    .AsOptional<INotificationSender>();
             }
             else
             {
-                services.AddSingletonAs<NoopNotificationEmailSender>()
-                    .AsOptional<INotificationEmailSender>();
+                services.AddSingletonAs<NoopNotificationSender>()
+                    .AsOptional<INotificationSender>();
             }
 
-            services.AddSingletonAs<NotificationEmailEventConsumer>()
+            services.AddSingletonAs<InvitationEventConsumer>()
                 .As<IEventConsumer>();
         }
     }

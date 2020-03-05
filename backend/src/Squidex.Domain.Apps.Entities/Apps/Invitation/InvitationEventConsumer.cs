@@ -7,18 +7,19 @@
 
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Apps.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public sealed class NotificationEmailEventConsumer : IEventConsumer
+    public sealed class InvitationEventConsumer : IEventConsumer
     {
         private static readonly Duration MaxAge = Duration.FromDays(2);
-        private readonly INotificationEmailSender emailSender;
+        private readonly INotificationSender emailSender;
         private readonly IUserResolver userResolver;
         private readonly ISemanticLog log;
 
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
             get { return "^app-";  }
         }
 
-        public NotificationEmailEventConsumer(INotificationEmailSender emailSender, IUserResolver userResolver, ISemanticLog log)
+        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver, ISemanticLog log)
         {
             Guard.NotNull(emailSender);
             Guard.NotNull(userResolver);
@@ -103,9 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
                 var appName = appContributorAssigned.AppId.Name;
 
-                var isCreated = appContributorAssigned.IsCreated;
-
-                await emailSender.SendContributorEmailAsync(assigner, assignee, appName, isCreated);
+                await emailSender.SendInviteAsync(assigner, assignee, appName);
             }
         }
 

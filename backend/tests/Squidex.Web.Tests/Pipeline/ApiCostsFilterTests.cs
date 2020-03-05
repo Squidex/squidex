@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
-using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 
 namespace Squidex.Web.Pipeline
@@ -24,15 +23,11 @@ namespace Squidex.Web.Pipeline
     public class ApiCostsFilterTests
     {
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
-        private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
-        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
-        private readonly IApiUsageTracker usageTracker = A.Fake<IApiUsageTracker>();
+        private readonly UsageGate usageGate = A.Fake<UsageGate>();
         private readonly ActionExecutingContext actionContext;
-        private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ActionExecutionDelegate next;
+        private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ApiCostsFilter sut;
-        private long apiCallsBlocking;
-        private long apiCallsCurrent;
         private bool isNextCalled;
 
         public ApiCostsFilterTests()
@@ -43,18 +38,6 @@ namespace Squidex.Web.Pipeline
                         new ActionDescriptor()),
                     new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            A.CallTo(() => appPlansProvider.GetPlan(null))
-                .Returns(appPlan);
-
-            A.CallTo(() => appPlansProvider.GetPlanForApp(appEntity))
-                .Returns((appPlan, "free"));
-
-            A.CallTo(() => appPlan.BlockingApiCalls)
-                .ReturnsLazily(x => apiCallsBlocking);
-
-            A.CallTo(() => usageTracker.GetMonthCostsAsync(A<string>._, DateTime.Today))
-                .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
-
             next = () =>
             {
                 isNextCalled = true;
@@ -62,18 +45,18 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult<ActionExecutedContext?>(null);
             };
 
-            sut = new ApiCostsFilter(appPlansProvider, usageTracker);
+            sut = new ApiCostsFilter(usageGate);
         }
 
         [Fact]
-        public async Task Should_return_429_status_code_if_max_calls_over_blocking_limit()
+        public async Task Should_return_429_status_code_if_blocked()
         {
             sut.FilterDefinition = new ApiCostsAttribute(1);
 
             SetupApp();
 
-            apiCallsCurrent = 1000;
-            apiCallsBlocking = 600;
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, DateTime.Today))
+                .Returns(true);
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
@@ -82,14 +65,14 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_track_if_calls_left()
+        public async Task Should_continue_if_not_blocked()
         {
             sut.FilterDefinition = new ApiCostsAttribute(13);
 
             SetupApp();
 
-            apiCallsCurrent = 1000;
-            apiCallsBlocking = 1600;
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, DateTime.Today))
+                .Returns(false);
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
@@ -97,18 +80,31 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_allow_small_buffer()
+        public async Task Should_continue_if_costs_are_zero()
         {
-            sut.FilterDefinition = new ApiCostsAttribute(13);
+            sut.FilterDefinition = new ApiCostsAttribute(0);
 
             SetupApp();
 
-            apiCallsCurrent = 1099;
-            apiCallsBlocking = 1000;
+            await sut.OnActionExecutionAsync(actionContext, next);
+
+            Assert.True(isNextCalled);
+
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, DateTime.Today))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_continue_if_not_app_request()
+        {
+            sut.FilterDefinition = new ApiCostsAttribute(12);
 
             await sut.OnActionExecutionAsync(actionContext, next);
 
-            Assert.False(isNextCalled);
+            Assert.True(isNextCalled);
+
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, DateTime.Today))
+                .MustNotHaveHappened();
         }
 
         private void SetupApp()

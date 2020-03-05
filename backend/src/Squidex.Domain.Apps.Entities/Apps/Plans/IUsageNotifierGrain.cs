@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
+using System.Threading.Tasks;
+using Orleans;
+using Orleans.Concurrency;
+
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class NotificationEmailTextOptions
+    public interface IUsageNotifierGrain : IGrainWithStringKey
     {
-        public string NewUserSubject { get; set; }
-
-        public string NewUserBody { get; set; }
-
-        public string ExistingUserSubject { get; set; }
-
-        public string ExistingUserBody { get; set; }
+        [OneWay]
+        Task NotifyAsync(UsageNotification notification);
     }
 }
