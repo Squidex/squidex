@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         {
             EnsureNotDisposed();
 
-            var file = FindFile(name) ?? throw new FileNotFoundException();
+            var file = FindFile(name) ?? throw new FileNotFoundException(null, GetFullName(name));
 
             return file.Length;
         }

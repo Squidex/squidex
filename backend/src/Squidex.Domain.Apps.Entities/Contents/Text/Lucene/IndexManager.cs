@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return indexStorage.ClearAsync();
         }
 
-        public async Task<IIndex> AcquireAsync(Guid schemaId)
+        public async Task<IIndex> AcquireAsync(Guid ownerId)
         {
             IndexHolder? indexHolder;
 
@@ -53,24 +53,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             {
                 await lockObject.WaitAsync();
 
-                if (indices.TryGetValue(schemaId, out indexHolder))
+                if (indices.TryGetValue(ownerId, out indexHolder))
                 {
                     log.LogWarning(w => w
                         .WriteProperty("message", "Unreleased index found.")
-                        .WriteProperty("schemaId", schemaId.ToString()));
+                        .WriteProperty("ownerId", ownerId.ToString()));
 
                     await CommitInternalAsync(indexHolder, true);
                 }
 
-                indexHolder = new IndexHolder(schemaId);
-                indices[schemaId] = indexHolder;
+                indexHolder = new IndexHolder(ownerId);
+                indices[ownerId] = indexHolder;
             }
             finally
             {
                 lockObject.Release();
             }
 
-            var directory = await indexStorage.CreateDirectoryAsync(schemaId);
+            var directory = await indexStorage.CreateDirectoryAsync(ownerId);
 
             indexHolder.Open(directory);
 

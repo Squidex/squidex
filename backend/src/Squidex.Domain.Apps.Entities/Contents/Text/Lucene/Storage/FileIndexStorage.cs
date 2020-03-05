@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
 {
     public sealed class FileIndexStorage : IIndexStorage
     {
-        public Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
+        public Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
         {
-            var folderName = $"Indexes/{schemaId}";
+            var folderName = $"Indexes/{ownerId}";
             var folderPath = Path.Combine(Path.GetTempPath(), folderName);
 
             return Task.FromResult<LuceneDirectory>(FSDirectory.Open(folderPath));

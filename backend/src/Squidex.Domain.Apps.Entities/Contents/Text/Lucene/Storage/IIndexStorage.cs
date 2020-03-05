@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public interface IIndexStorage
     {
-        Task<Directory> CreateDirectoryAsync(Guid schemaId);
+        Task<Directory> CreateDirectoryAsync(Guid ownerId);
 
         Task ClearAsync();
 

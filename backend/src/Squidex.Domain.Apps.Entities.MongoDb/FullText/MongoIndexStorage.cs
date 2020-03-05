@@ -27,9 +27,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             this.bucket = bucket;
         }
 
-        public Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
+        public Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
         {
-            var folderName = schemaId.ToString();
+            var folderName = ownerId.ToString();
 
             var tempFolder = Path.Combine(Path.GetTempPath(), "Indices", folderName);
             var tempDirectory = new DirectoryInfo(tempFolder);
