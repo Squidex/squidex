@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
                         zipArchive.ExtractToDirectory(directoryInfo.FullName);
                     }
                 }
-                catch (GridFSFileNotFoundException)
+                catch (AssetNotFoundException)
                 {
                 }
             }

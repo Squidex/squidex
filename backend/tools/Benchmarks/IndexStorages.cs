@@ -13,9 +13,9 @@ using Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage;
 using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Infrastructure.Assets;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Benchmarks
 {
-    public static class TestStorages
+    public static class IndexStorages
     {
         public static IIndexStorage Assets()
         {

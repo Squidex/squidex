@@ -7,8 +7,10 @@
 
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using Lucene.Net.Index;
+using Lucene.Net.Store;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Infrastructure;
@@ -18,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
     public sealed class MongoIndexStorage : IIndexStorage
     {
+        private const string ArchiveFile = "Archive.zip";
+        private const string LockFile = "write.lock";
         private readonly IGridFSBucket<string> bucket;
 
         public MongoIndexStorage(IGridFSBucket<string> bucket)
@@ -27,16 +31,47 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             this.bucket = bucket;
         }
 
-        public Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
         {
-            var folderName = ownerId.ToString();
+            var fileId = $"index_{ownerId}";
 
-            var tempFolder = Path.Combine(Path.GetTempPath(), "Indices", folderName);
-            var tempDirectory = new DirectoryInfo(tempFolder);
+            var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), fileId));
 
-            var directory = new MongoDirectory(bucket, folderName, tempDirectory);
+            if (directoryInfo.Exists)
+            {
+                directoryInfo.Delete(true);
+            }
 
-            return Task.FromResult<LuceneDirectory>(directory);
+            directoryInfo.Create();
+
+            try
+            {
+                using (var stream = await bucket.OpenDownloadStreamAsync(fileId))
+                {
+                    using (var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read, true))
+                    {
+                        foreach (var entry in zipArchive.Entries)
+                        {
+                            var file = new FileInfo(Path.Combine(directoryInfo.FullName, entry.Name));
+
+                            using (var entryStream = entry.Open())
+                            {
+                                using (var fileStream = file.OpenWrite())
+                                {
+                                    await entryStream.CopyToAsync(fileStream);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (GridFSFileNotFoundException)
+            {
+            }
+
+            var directory = FSDirectory.Open(directoryInfo);
+
+            return directory;
         }
 
         public Task ClearAsync()
@@ -44,9 +79,62 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return bucket.DropAsync();
         }
 
-        public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
+        public async Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
-            return Task.CompletedTask;
+            Guard.NotNull(directory);
+            Guard.NotNull(snapshotter);
+
+            var directoryInfo = ((FSDirectory)directory).Directory;
+
+            var commit = snapshotter.Snapshot();
+            try
+            {
+                var fileId = directoryInfo.Name;
+
+                try
+                {
+                    await bucket.DeleteAsync(fileId);
+                }
+                catch (GridFSFileNotFoundException)
+                {
+                }
+
+                using (var stream = await bucket.OpenUploadStreamAsync(fileId, fileId))
+                {
+                    using (var zipArchive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+                    {
+                        foreach (var fileName in commit.FileNames)
+                        {
+                            var file = new FileInfo(Path.Combine(directoryInfo.FullName, fileName));
+
+                            try
+                            {
+                                if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) &&
+                                    !file.Name.Equals(LockFile, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    using (var fileStream = file.OpenRead())
+                                    {
+                                        var entry = zipArchive.CreateEntry(fileStream.Name);
+
+                                        using (var entryStream = entry.Open())
+                                        {
+                                            await fileStream.CopyToAsync(entryStream);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (IOException)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                snapshotter.Release(commit);
+            }
         }
     }
 }
