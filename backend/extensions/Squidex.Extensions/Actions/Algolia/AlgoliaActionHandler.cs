@@ -8,12 +8,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Algolia.Search;
+using Algolia.Search.Clients;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using AlgoliaIndex = Algolia.Search.Index;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 
@@ -21,14 +20,14 @@ namespace Squidex.Extensions.Actions.Algolia
 {
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
     {
-        private readonly ClientPool<(string AppId, string ApiKey, string IndexName), AlgoliaIndex> clients;
+        private readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> clients;
 
         public AlgoliaActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
-            clients = new ClientPool<(string AppId, string ApiKey, string IndexName), AlgoliaIndex>(key =>
+            clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
             {
-                var client = new AlgoliaClient(key.AppId, key.ApiKey);
+                var client = new SearchClient(key.AppId, key.ApiKey);
 
                 return client.InitIndex(key.IndexName);
             });
@@ -102,18 +101,18 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 if (job.Content != null)
                 {
-                    var response = await index.PartialUpdateObjectAsync(job.Content, true, ct);
+                    var response = await index.PartialUpdateObjectAsync(job.Content, null, ct, true);
 
-                    return Result.Success(response.ToString(Formatting.Indented));
+                    return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
                 else
                 {
-                    var response = await index.DeleteObjectAsync(job.ContentId, ct);
+                    var response = await index.DeleteObjectAsync(job.ContentId, null, ct);
 
-                    return Result.Success(response.ToString(Formatting.Indented));
+                    return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             }
-            catch (AlgoliaException ex)
+            catch (Exception ex)
             {
                 return Result.Failed(ex);
             }

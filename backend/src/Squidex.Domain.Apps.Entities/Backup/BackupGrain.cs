@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                            if (@event.Payload is SquidexEvent squidexEvent)
+                            if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
                             {
                                 context.UserMapping.Backup(squidexEvent.Actor);
                             }

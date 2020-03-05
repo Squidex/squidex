@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Equals.Fody" Version="1.9.5" />
-    <PackageReference Include="FluentFTP" Version="31.3.2" />
+    <PackageReference Include="FluentFTP" Version="32.1.0" />
     <PackageReference Include="Fody" Version="4.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,12 +21,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.2" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.3" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.1.1">
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.1.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Core" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NJsonSchema" Version="10.1.5" />
     <PackageReference Include="NodaTime" Version="2.4.7" />

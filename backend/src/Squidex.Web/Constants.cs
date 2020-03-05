@@ -18,7 +18,7 @@ namespace Squidex.Web
 
         public static readonly string ApiScope = "squidex-api";
 
-        public static readonly string OrleansClusterId = "squidex";
+        public static readonly string OrleansClusterId = "squidex-v2";
 
         public static readonly string OrleansPrefix = "/orleans";
 
