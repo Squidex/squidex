@@ -44,6 +44,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await IndexAndSearchAsync(TestStorages.MongoDB());
         }
 
+        [Fact]
+        public async Task Should_index_and_search_in_mongoDBCopy()
+        {
+            await IndexAndSearchAsync(TestStorages.MongoDBCopy());
+        }
+
         private async Task IndexAndSearchAsync(IIndexStorage storage)
         {
             var factory = new IndexManager(storage, A.Fake<ISemanticLog>());
@@ -91,6 +97,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 await grain.IndexAsync(schemaId, commands.AsImmutable());
             }
+
+            await grain.CommitAsync();
 
             return watch.Stop();
         }

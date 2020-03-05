@@ -45,5 +45,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             return storage;
         }
+
+        public static IIndexStorage MongoDBCopy()
+        {
+            var mongoClient = new MongoClient("mongodb://localhost");
+            var mongoDatabase = mongoClient.GetDatabase("FullText");
+
+            var mongoBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
+            {
+                BucketName = $"bucket_{DateTime.UtcNow.Ticks}"
+            });
+
+            var storage = new MongoIndexStorageCopyZipped(mongoBucket);
+
+            return storage;
+        }
     }
 }

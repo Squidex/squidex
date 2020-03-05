@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             cacheDirectoryInfo.Create();
             cacheDirectory = FSDirectory.Open(cacheDirectoryInfo);
 
-            SetLockFactory(new NativeFSLockFactory(cacheDirectoryInfo));
+            SetLockFactory(cacheDirectory.LockFactory);
         }
 
         protected override void Dispose(bool disposing)
@@ -71,65 +71,134 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public override IndexOutput CreateOutput(string name, IOContext context)
         {
-            return new MongoIndexOutput(this, context, name);
+            try
+            {
+                var file = FindFile(name);
+
+                if (file != null)
+                {
+                    using (var fs = new FileStream(GetFullPath(name), FileMode.Create, FileAccess.Write))
+                    {
+                        Bucket.DownloadToStream(file.Id, fs);
+                    }
+                }
+            }
+            catch (GridFSFileNotFoundException)
+            {
+                throw new FileNotFoundException();
+            }
+
+            return cacheDirectory.CreateOutput(name, context);
         }
 
         public override IndexInput OpenInput(string name, IOContext context)
         {
-            return new MongoIndexInput(this, context, name);
+            return cacheDirectory.OpenInput(name, context);
         }
 
         public override void DeleteFile(string name)
         {
             EnsureNotDisposed();
 
-            var fullName = GetFullName(name);
-
             try
             {
-                Bucket.Delete(fullName);
+                Bucket.Delete(GetFileId(name));
             }
             catch (GridFSFileNotFoundException)
             {
             }
+
+            cacheDirectory.DeleteFile(name);
         }
 
         public override long FileLength(string name)
         {
             EnsureNotDisposed();
 
-            var file = FindFile(name) ?? throw new FileNotFoundException(null, GetFullName(name));
+            try
+            {
+                return cacheDirectory.FileLength(name);
+            }
+            catch (FileNotFoundException)
+            {
+                var file = FindFile(name);
 
-            return file.Length;
+                if (file == null)
+                {
+                     throw new FileNotFoundException(null, GetFileId(name));
+                }
+
+                return file.Length;
+            }
         }
 
         public override string[] ListAll()
         {
             EnsureNotDisposed();
 
-            var files = Bucket.Find(Builders<GridFSFileInfo<string>>.Filter.Regex(x => x.Id, new BsonRegularExpression($"^{directory}/"))).ToList();
+            var files = new HashSet<string>(cacheDirectory.ListAll());
 
-            return files.Select(x => x.Filename).ToArray();
+            try
+            {
+                var mongoFiles = Bucket.Find(CreateFilter()).ToList();
+
+                foreach (var file in mongoFiles)
+                {
+                    files.Add(file.Filename);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (files.Count == 0)
+                {
+                    throw ex;
+                }
+            }
+
+            return files.ToArray();
         }
 
         public GridFSFileInfo<string>? FindFile(string name)
         {
-            var fullName = GetFullName(name);
+            var fullName = GetFileId(name);
 
             return Bucket.Find(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, fullName)).FirstOrDefault();
         }
 
         public override void Sync(ICollection<string> names)
         {
+            EnsureNotDisposed();
+
+            foreach (var name in names)
+            {
+                var file = new FileInfo(GetFullPath(name));
+
+                if (file.Exists)
+                {
+                    using (var fs = file.OpenRead())
+                    {
+                        var fullName = GetFileId(name);
+
+                        try
+                        {
+                            Bucket.UploadFromStream(fullName, name, fs);
+                        }
+                        catch (MongoBulkWriteException ex) when (ex.WriteErrors.Any(x => x.Category == ServerErrorCategory.DuplicateKey))
+                        {
+                            Bucket.Delete(fullName);
+                            Bucket.UploadFromStream(fullName, name, fs);
+                        }
+                        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                        {
+                            Bucket.Delete(fullName);
+                            Bucket.UploadFromStream(fullName, name, fs);
+                        }
+                    }
+                }
+            }
         }
 
-        [Obsolete]
-        public override bool FileExists(string name)
-        {
-            throw new NotSupportedException();
-        }
-
-        public string GetFullName(string name)
+        public string GetFileId(string name)
         {
             return $"{directory}/{name}";
         }
@@ -139,12 +208,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return Path.Combine(cacheDirectoryInfo.FullName, name);
         }
 
+        private FilterDefinition<GridFSFileInfo<string>> CreateFilter()
+        {
+            return Builders<GridFSFileInfo<string>>.Filter.Regex(x => x.Id, new BsonRegularExpression($"^{directory}/"));
+        }
+
         private void EnsureNotDisposed()
         {
             if (isDisposed)
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
+        }
+
+        [Obsolete]
+        public override bool FileExists(string name)
+        {
+            throw new NotSupportedException();
         }
     }
 }
