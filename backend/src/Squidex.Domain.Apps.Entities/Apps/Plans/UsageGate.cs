@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                         AppId = appId,
                         AppName = app.Name,
                         Usage = usage,
-                        UsageLimit = plan.BlockingApiCalls,
+                        UsageLimit = plan.MaxApiCalls,
                         Users = users
                     };
 
