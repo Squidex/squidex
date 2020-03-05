@@ -24,12 +24,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
             return Task.FromResult<LuceneDirectory>(FSDirectory.Open(folderPath));
         }
 
-        public Task ClearAsync()
+        public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
             return Task.CompletedTask;
         }
 
-        public Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
+        public Task ClearAsync()
         {
             return Task.CompletedTask;
         }

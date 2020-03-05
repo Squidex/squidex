@@ -20,8 +20,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
     public sealed class MongoIndexStorage : IIndexStorage
     {
-        private const string ArchiveFile = "Archive.zip";
-        private const string LockFile = "write.lock";
         private readonly IGridFSBucket<string> bucket;
 
         public MongoIndexStorage(IGridFSBucket<string> bucket)
@@ -74,16 +72,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return directory;
         }
 
-        public Task ClearAsync()
-        {
-            return bucket.DropAsync();
-        }
-
         public async Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
-            Guard.NotNull(directory);
-            Guard.NotNull(snapshotter);
-
             var directoryInfo = ((FSDirectory)directory).Directory;
 
             var commit = snapshotter.Snapshot();
@@ -107,25 +97,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                         {
                             var file = new FileInfo(Path.Combine(directoryInfo.FullName, fileName));
 
-                            try
+                            using (var fileStream = file.OpenRead())
                             {
-                                if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) &&
-                                    !file.Name.Equals(LockFile, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    using (var fileStream = file.OpenRead())
-                                    {
-                                        var entry = zipArchive.CreateEntry(fileStream.Name);
+                                var entry = zipArchive.CreateEntry(fileStream.Name);
 
-                                        using (var entryStream = entry.Open())
-                                        {
-                                            await fileStream.CopyToAsync(entryStream);
-                                        }
-                                    }
+                                using (var entryStream = entry.Open())
+                                {
+                                    await fileStream.CopyToAsync(entryStream);
                                 }
-                            }
-                            catch (IOException)
-                            {
-                                continue;
                             }
                         }
                     }
@@ -135,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             {
                 snapshotter.Release(commit);
             }
+        }
+
+        public Task ClearAsync()
+        {
+            return bucket.DropAsync();
         }
     }
 }
