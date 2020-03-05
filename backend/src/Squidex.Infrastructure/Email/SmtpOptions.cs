@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.Email
 {
-    public sealed class SmptOptions
+    public sealed class SmtpOptions
     {
         public string Server { get; set; }
 
@@ -18,6 +18,8 @@ namespace Squidex.Infrastructure.Email
         public string Password { get; set; }
 
         public bool EnableSsl { get; set; }
+
+        public int Timeout { get; set; } = 5000;
 
         public int Port { get; set; } = 587;
 

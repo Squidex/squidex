@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Apps.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -18,9 +19,9 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 {
-    public class NotificationEmailEventConsumerTests
+    public class InvitationEventConsumerTests
     {
-        private readonly INotificationEmailSender emailSender = A.Fake<INotificationEmailSender>();
+        private readonly INotificationSender notificatíonSender = A.Fake<INotificationSender>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IUser assigner = A.Fake<IUser>();
         private readonly IUser assignee = A.Fake<IUser>();
@@ -28,11 +29,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
         private readonly string assignerId = Guid.NewGuid().ToString();
         private readonly string assigneeId = Guid.NewGuid().ToString();
         private readonly string appName = "my-app";
-        private readonly NotificationEmailEventConsumer sut;
+        private readonly InvitationEventConsumer sut;
 
-        public NotificationEmailEventConsumerTests()
+        public InvitationEventConsumerTests()
         {
-            A.CallTo(() => emailSender.IsActive)
+            A.CallTo(() => notificatíonSender.IsActive)
                 .Returns(true);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
                 .Returns(assignee);
 
-            sut = new NotificationEmailEventConsumer(emailSender, userResolver, log);
+            sut = new InvitationEventConsumer(notificatíonSender, userResolver, log);
         }
 
         [Fact]
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
         {
             var @event = CreateEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => emailSender.IsActive)
+            A.CallTo(() => notificatíonSender.IsActive)
                 .Returns(false);
 
             await sut.On(@event);
@@ -136,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
             await sut.On(@event);
 
-            A.CallTo(() => emailSender.SendContributorEmailAsync(assigner, assignee, appName, true))
+            A.CallTo(() => notificatíonSender.SendInviteAsync(assigner, assignee, appName))
                 .MustHaveHappened();
         }
 
@@ -147,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
             await sut.On(@event);
 
-            A.CallTo(() => emailSender.SendContributorEmailAsync(assigner, assignee, appName, false))
+            A.CallTo(() => notificatíonSender.SendInviteAsync(assigner, assignee, appName))
                 .MustHaveHappened();
         }
 
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
 
         private void MustNotSendEmail()
         {
-            A.CallTo(() => emailSender.SendContributorEmailAsync(A<IUser>._, A<IUser>._, A<string>._, A<bool>._))
+            A.CallTo(() => notificatíonSender.SendInviteAsync(A<IUser>._, A<IUser>._, A<string>._))
                 .MustNotHaveHappened();
         }
 

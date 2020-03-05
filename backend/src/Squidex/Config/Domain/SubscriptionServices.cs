@@ -27,6 +27,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .AsOptional<IAppPlanBillingManager>();
 
+            services.AddSingletonAs<UsageGate>()
+                .AsOptional<IUserEvents>();
+
             services.AddSingletonAs<NoopUserEvents>()
                 .AsOptional<IUserEvents>();
         }

@@ -12,23 +12,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
     {
-        private readonly IAppPlansProvider appPlansProvider;
-        private readonly IApiUsageTracker usageTracker;
+        private readonly UsageGate usageGate;
 
-        public ApiCostsFilter(IAppPlansProvider appPlansProvider, IApiUsageTracker usageTracker)
+        public ApiCostsFilter(UsageGate usageGate)
         {
-            Guard.NotNull(appPlansProvider);
-            Guard.NotNull(usageTracker);
+            Guard.NotNull(usageGate);
 
-            this.appPlansProvider = appPlansProvider;
-
-            this.usageTracker = usageTracker;
+            this.usageGate = usageGate;
         }
 
         IFilterMetadata IFilterContainer.FilterDefinition { get; set; }
@@ -53,17 +48,13 @@ namespace Squidex.Web.Pipeline
 
             if (app != null)
             {
-                var appId = app.Id.ToString();
-
                 if (FilterDefinition.Costs > 0)
                 {
                     using (Profiler.Trace("CheckUsage"))
                     {
-                        var (plan, _) = appPlansProvider.GetPlanForApp(app);
+                        var isBlocked = await usageGate.IsBlockedAsync(app, DateTime.Today);
 
-                        var usage = await usageTracker.GetMonthCostsAsync(appId, DateTime.Today);
-
-                        if (plan.BlockingApiCalls >= 0 && usage > plan.BlockingApiCalls)
+                        if (isBlocked)
                         {
                             context.Result = new StatusCodeResult(429);
                             return;
