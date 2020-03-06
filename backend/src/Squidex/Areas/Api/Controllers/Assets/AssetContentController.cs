@@ -164,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             });
 
-            if (query.Download == 1 || asset.Type != AssetType.Image)
+            if (query.Download == 1)
             {
                 return new FileCallbackResult(asset.MimeType, asset.FileName, true, handler);
             }
