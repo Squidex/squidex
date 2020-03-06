@@ -6,10 +6,17 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Xunit;
@@ -18,38 +25,93 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
     public class JintScriptEngineTests
     {
-        private readonly JintScriptEngine sut = new JintScriptEngine { Timeout = TimeSpan.FromSeconds(1) };
+        private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
+        private readonly JintScriptEngine sut;
+
+        public JintScriptEngineTests()
+        {
+            sut = new JintScriptEngine(httpClientFactory)
+            {
+                Timeout = TimeSpan.FromSeconds(1)
+            };
+        }
 
         [Fact]
         public void Should_throw_validation_exception_when_calling_reject()
         {
-            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "reject()"));
-            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "reject('Not valid')"));
+            const string script = @"
+                reject()
+            ";
+
+            var ex = Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), script));
+
+            Assert.Empty(ex.Errors);
+        }
+
+        [Fact]
+        public void Should_throw_validation_exception_when_calling_reject_with_message()
+        {
+            const string script = @"
+                reject('Not valid')
+            ";
+
+            var ex = Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), script));
+
+            Assert.Equal("Not valid", ex.Errors.Single().Message);
         }
 
         [Fact]
         public void Should_throw_security_exception_when_calling_reject()
         {
-            Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), "disallow()"));
-            Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), "disallow('Not allowed')"));
+            const string script = @"
+                disallow()
+            ";
+
+            var ex = Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), script));
+
+            Assert.Equal("Not allowed", ex.Message);
+        }
+
+        [Fact]
+        public void Should_throw_security_exception_when_calling_reject_with_message()
+        {
+            const string script = @"
+                disallow('Operation not allowed')
+            ";
+
+            var ex = Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), script));
+
+            Assert.Equal("Operation not allowed", ex.Message);
         }
 
         [Fact]
         public void Should_catch_script_syntax_errors()
         {
-            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "invalid()"));
+            const string script = @"
+                invalid()
+            ";
+
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), script));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors()
         {
-            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "throw 'Error';"));
+            const string script = @"
+                throw 'Error';
+            ";
+
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), script));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors_on_execute_and_transform()
         {
-            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(new ScriptContext(), "throw 'Error';"));
+            const string script = @"
+                throw 'Error';
+            ";
+
+            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(new ScriptContext(), script));
         }
 
         [Fact]
@@ -58,7 +120,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = sut.Transform(context, "x => x");
+            const string script = @"
+                x => x
+            ";
+
+            var result = sut.Transform(context, script);
 
             Assert.Same(content, result);
         }
@@ -69,7 +135,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(context, "invalid()"));
+            const string script = @"
+                invalid();
+            ";
+
+            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(context, script));
         }
 
         [Fact]
@@ -78,7 +148,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = sut.ExecuteAndTransform(context, "var x = 0;");
+            const string script = @"
+                var x = 0;
+            ";
+
+            var result = sut.ExecuteAndTransform(context, script);
 
             Assert.Same(content, result);
         }
@@ -96,12 +170,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content, Operation = "MyOperation" };
 
-            var result = sut.ExecuteAndTransform(context, @"
+            const string script = @"
                 var data = ctx.data;
 
                 data.operation = { iv: ctx.operation };
 
-                replace(data)");
+                replace(data);
+            ";
+
+            var result = sut.ExecuteAndTransform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -128,7 +205,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = sut.Transform(context, @"
+            const string script = @"
                 var data = ctx.data;
 
                 delete data.number0;
@@ -136,7 +213,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number1.iv = data.number1.iv + 1;
                 data.number2 = { 'iv': 10 };
 
-                replace(data);");
+                replace(data);
+            ";
+
+            var result = sut.Transform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -161,12 +241,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = sut.Transform(context, @"
+            const string script = @"
                 var data = ctx.data;
 
                 data.slug = { iv: slugify(data.title.iv) };
 
-                replace(data);");
+                replace(data);
+            ";
+
+            var result = sut.Transform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -191,12 +274,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = sut.Transform(context, @"
+            const string script = @"
                 var data = ctx.data;
 
                 data.slug = { iv: slugify(data.title.iv, true) };
 
-                replace(data);");
+                replace(data);
+            ";
+
+            var result = sut.Transform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -223,7 +309,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = sut.ExecuteAndTransform(context, @"
+            const string script = @"
                 var data = ctx.data;
 
                 delete data.number0;
@@ -231,7 +317,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number1.iv = data.number1.iv + 1;
                 data.number2 = { 'iv': 10 };
 
-                replace(data);");
+                replace(data);
+            ";
+
+            var result = sut.ExecuteAndTransform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -264,10 +353,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content, DataOld = oldContent, User = userPrincipal };
 
-            var result = sut.ExecuteAndTransform(context, @"
+            const string script = @"
                 ctx.data.number0.iv = ctx.data.number0.iv + ctx.oldData.number0.iv * parseInt(ctx.user.id, 10);
 
-                replace(ctx.data);");
+                replace(ctx.data);
+            ";
+
+            var result = sut.ExecuteAndTransform(context, script);
 
             Assert.Equal(expected, result);
         }
@@ -275,7 +367,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_evaluate_to_true_when_expression_match()
         {
-            var result = sut.Evaluate("value", new { i = 2 }, "value.i == 2");
+            const string script = @"
+                value.i == 2
+            ";
+
+            var result = sut.Evaluate("value", new { i = 2 }, script);
 
             Assert.True(result);
         }
@@ -283,7 +379,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_evaluate_to_true_when_status_match()
         {
-            var result = sut.Evaluate("value", new { status = Status.Published }, "value.status == 'Published'");
+            const string script = @"
+                value.status == 'Published'
+            ";
+
+            var result = sut.Evaluate("value", new { status = Status.Published }, script);
 
             Assert.True(result);
         }
@@ -291,7 +391,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_evaluate_to_false_when_expression_match()
         {
-            var result = sut.Evaluate("value", new { i = 2 }, "value.i == 3");
+            const string script = @"
+                value.i == 3
+            ";
+
+            var result = sut.Evaluate("value", new { i = 2 }, script);
 
             Assert.False(result);
         }
@@ -299,9 +403,111 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_evaluate_to_false_when_script_is_invalid()
         {
-            var result = sut.Evaluate("value", new { i = 2 }, "function()");
+            const string script = @"
+                function();
+            ";
+
+            var result = sut.Evaluate("value", new { i = 2 }, script);
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_make_json_request()
+        {
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{ \"key\": 42 }")
+            };
+
+            var httpHandler = new MockupHander(httpResponse);
+
+            A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
+                .Returns(new HttpClient(httpHandler));
+
+            const string script = @"
+                getJSON('http://squidex.io', function(result) {
+                    complete(result);
+                });
+            ";
+
+            var result = await sut.GetAsync(new ScriptContext(), script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Get);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_json_request_with_headers()
+        {
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{ \"key\": 42 }")
+            };
+
+            var httpHandler = new MockupHander(httpResponse);
+
+            A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
+                .Returns(new HttpClient(httpHandler));
+
+            const string script = @"
+                var headers = {
+                    'X-Header1': 1,
+                    'X-Header2': '2'                
+                };
+
+                getJSON('http://squidex.io', function(result) {
+                    complete(result);
+                }, headers);
+            ";
+
+            var result = await sut.GetAsync(new ScriptContext(), script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Get);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeHeader("X-Header1", "1");
+            httpHandler.ShouldBeHeader("X-Header2", "2");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        private sealed class MockupHander : HttpMessageHandler
+        {
+            private readonly HttpResponseMessage response;
+            private HttpRequestMessage madeRequest;
+
+            public void ShouldBeMethod(HttpMethod method)
+            {
+                Assert.Equal(method, madeRequest.Method);
+            }
+
+            public void ShouldBeUrl(string url)
+            {
+                Assert.Equal(url, madeRequest.RequestUri.ToString());
+            }
+
+            public void ShouldBeHeader(string key, string value)
+            {
+                Assert.Equal(value, madeRequest.Headers.GetValues(key).FirstOrDefault());
+            }
+
+            public MockupHander(HttpResponseMessage response)
+            {
+                this.response = response;
+            }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                madeRequest = request;
+
+                return Task.FromResult(response);
+            }
         }
     }
 }

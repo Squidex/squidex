@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             var trigger = new CommentTrigger { Condition = condition };
 
-            var handler = new CommentTriggerHandler(new JintScriptEngine(), userResolver);
+            var handler = new CommentTriggerHandler(new JintScriptEngine(null), userResolver);
 
             action(handler, trigger);
         }

@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            sut = new DynamicContentWorkflow(new JintScriptEngine(), appProvider);
+            sut = new DynamicContentWorkflow(new JintScriptEngine(null), appProvider);
         }
 
         [Fact]
