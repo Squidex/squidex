@@ -5,19 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
+using BenchmarkDotNet.Running;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
+namespace Benchmarks
 {
-    public interface IIndexStorage
+    public static class Program
     {
-        Task<Directory> CreateDirectoryAsync(Guid ownerId);
-
-        Task WriteAsync(Directory directory, SnapshotDeletionPolicy snapshotter);
-
-        Task ClearAsync();
+        public static void Main()
+        {
+            BenchmarkRunner.Run<IndexingBenchmarks>();
+        }
     }
 }

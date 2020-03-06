@@ -214,7 +214,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                         index.Writer.DeleteDocuments(new Term(MetaId, delete.DocId));
                         break;
                     case UpdateIndexEntry update:
-                        index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, GetValue(update.ServeAll, update.ServePublished));
+                        try
+                        {
+                            var values = GetValue(update.ServeAll, update.ServePublished);
+
+                            index.Writer.UpdateBinaryDocValue(new Term(MetaId, update.DocId), MetaFor, values);
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
+
                         break;
                     case UpsertIndexEntry upsert:
                         {

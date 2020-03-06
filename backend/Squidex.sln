@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Rabb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.GoogleCloud", "src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj", "{945871B1-77B8-43FB-B53C-27CF385AB756}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{94207AA6-4923-4183-A558-E0F8196B8CA3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{94207AA6-4923-4183-A558-E0F8196B8CA3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrate_00", "tools\Migrate_00\Migrate_00.csproj", "{B51126A8-0D75-4A79-867D-10724EC6AC84}"
 EndProject
@@ -65,7 +65,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{7EDE8C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Web", "src\Squidex.Web\Squidex.Web.csproj", "{5B2D251F-46E3-486A-AE16-E3FE06B559ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.Amazon", "src\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj", "{32DA4B56-7EFA-4E34-A29D-30E00579A894}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Amazon", "src\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj", "{32DA4B56-7EFA-4E34-A29D-30E00579A894}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "tools\Benchmarks\Benchmarks.csproj", "{F36EF843-BDDD-45A8-B9C6-360001161AAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -353,6 +355,18 @@ Global
 		{32DA4B56-7EFA-4E34-A29D-30E00579A894}.Release|x64.Build.0 = Release|Any CPU
 		{32DA4B56-7EFA-4E34-A29D-30E00579A894}.Release|x86.ActiveCfg = Release|Any CPU
 		{32DA4B56-7EFA-4E34-A29D-30E00579A894}.Release|x86.Build.0 = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|x64.Build.0 = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Debug|x86.Build.0 = Debug|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|x64.ActiveCfg = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|x64.Build.0 = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|x86.ActiveCfg = Release|Any CPU
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -382,6 +396,7 @@ Global
 		{F3C41B82-6A67-409A-B7FE-54543EE4F38B} = {FB8BC3A2-2010-4C3C-A87D-D4A98C05EE52}
 		{5B2D251F-46E3-486A-AE16-E3FE06B559ED} = {7EDE8CF1-B1E4-4005-B154-834B944E0D7A}
 		{32DA4B56-7EFA-4E34-A29D-30E00579A894} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+		{F36EF843-BDDD-45A8-B9C6-360001161AAA} = {94207AA6-4923-4183-A558-E0F8196B8CA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}

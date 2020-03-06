@@ -20,7 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
     public sealed class AssetIndexStorage : IIndexStorage
     {
         private const string ArchiveFile = "Archive.zip";
-        private const string LockFile = "write.lock";
         private readonly IAssetStore assetStore;
 
         public AssetIndexStorage(IAssetStore assetStore)
@@ -64,16 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
             return directory;
         }
 
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
         public async Task WriteAsync(LuceneDirectory directory, SnapshotDeletionPolicy snapshotter)
         {
-            Guard.NotNull(directory);
-            Guard.NotNull(snapshotter);
-
             var directoryInfo = ((FSDirectory)directory).Directory;
 
             var commit = snapshotter.Snapshot();
@@ -87,18 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
                         {
                             var file = new FileInfo(Path.Combine(directoryInfo.FullName, fileName));
 
-                            try
-                            {
-                                if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) &&
-                                    !file.Name.Equals(LockFile, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    zipArchive.CreateEntryFromFile(file.FullName, file.Name);
-                                }
-                            }
-                            catch (IOException)
-                            {
-                                continue;
-                            }
+                            zipArchive.CreateEntryFromFile(file.FullName, file.Name);
                         }
                     }
 
@@ -124,6 +104,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
                 FileShare.None,
                 4096,
                 FileOptions.DeleteOnClose);
+        }
+
+        public Task ClearAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }
