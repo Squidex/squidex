@@ -5,49 +5,32 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Jint;
+using Jint.Native;
 using Jint.Native.Object;
-using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     internal static class ScriptContextExtensions
     {
-        public static Engine AddContext(this Engine engine, ScriptContext context)
+        public static ExecutionContext AddContext(this ExecutionContext context, ScriptContext scriptContext)
         {
+            var engine = context.Engine;
+
             var contextInstance = new ObjectInstance(engine);
 
-            if (context.Data != null)
+            foreach (var (key, value) in scriptContext)
             {
-                contextInstance.FastAddProperty("data", new ContentDataObject(engine, context.Data), true, true, true);
-            }
-
-            if (context.DataOld != null)
-            {
-                contextInstance.FastAddProperty("oldData", new ContentDataObject(engine, context.DataOld), true, true, true);
-            }
-
-            if (context.User != null)
-            {
-                contextInstance.FastAddProperty("user", JintUser.Create(engine, context.User), false, true, false);
-            }
-
-            if (!string.IsNullOrWhiteSpace(context.Operation))
-            {
-                contextInstance.FastAddProperty("operation", context.Operation, false, false, false);
-            }
-
-            contextInstance.FastAddProperty("status", context.Status.ToString(), false, false, false);
-
-            if (context.StatusOld != default)
-            {
-                contextInstance.FastAddProperty("oldStatus", context.StatusOld.ToString(), false, false, false);
+                if (value != null)
+                {
+                    contextInstance.FastAddProperty(key, JsValue.FromObject(engine, value), true, true, true);
+                    context[key] = value;
+                }
             }
 
             engine.SetValue("ctx", contextInstance);
             engine.SetValue("context", contextInstance);
 
-            return engine;
+            return context;
         }
     }
 }

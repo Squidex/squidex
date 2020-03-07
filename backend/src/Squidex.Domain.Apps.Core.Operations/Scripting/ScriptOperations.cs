@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     internal static class ScriptOperations
     {
-        public static Engine AddDisallow(this Engine engine)
+        public static ExecutionContext AddDisallow(this ExecutionContext context)
         {
-            engine.SetValue("disallow", new DisallowDelegate(Disallow));
+            context.Engine.SetValue("disallow", new DisallowDelegate(Disallow));
 
-            return engine;
+            return context;
         }
 
         private delegate void DisallowDelegate(string? message);
@@ -29,11 +29,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
             throw new DomainForbiddenException(message);
         }
 
-        public static Engine AddReject(this Engine engine)
+        public static ExecutionContext AddReject(this ExecutionContext context)
         {
-            engine.SetValue("reject", new RejectDelegate(Reject));
+            context.Engine.SetValue("reject", new RejectDelegate(Reject));
 
-            return engine;
+            return context;
         }
 
         private delegate void RejectDelegate(string? message);

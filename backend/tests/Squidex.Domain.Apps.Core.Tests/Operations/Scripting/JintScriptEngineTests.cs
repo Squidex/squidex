@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
@@ -30,10 +31,65 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
         public JintScriptEngineTests()
         {
-            sut = new JintScriptEngine(httpClientFactory)
+            var extensions = new IScriptExtension[]
+            {
+                new DateTimeScriptExtension(),
+                new HttpScriptExtension(httpClientFactory),
+                new StringScriptExtension()
+            };
+
+            sut = new JintScriptEngine(extensions)
             {
                 Timeout = TimeSpan.FromSeconds(1)
             };
+        }
+
+        [Fact]
+        public void Should_camel_case_value()
+        {
+            const string script = @"
+                return toCamelCase(value);
+            ";
+
+            var result = sut.Interpolate("value", "hello-world", script);
+
+            Assert.Equal("helloWorld", result);
+        }
+
+        [Fact]
+        public void Should_pascal_case_value()
+        {
+            const string script = @"
+                return toPascalCase(value);
+            ";
+
+            var result = sut.Interpolate("value", "hello-world", script);
+
+            Assert.Equal("HelloWorld", result);
+        }
+
+        [Fact]
+        public void Should_slugify_value()
+        {
+            const string script = @"
+                return slugify(value);
+            ";
+
+            var result = sut.Interpolate("value", "4 Häuser", script);
+
+            Assert.Equal("4-haeuser", result);
+        }
+
+        [Fact]
+        public void Should_slugify_value_with_single_char()
+        {
+            const string script = @"
+                return slugify(value, true);
+            ";
+
+            var result = sut.Interpolate("value", "4 Häuser", script);
+
+            Assert.Equal("4-hauser", result);
         }
 
         [Fact]
@@ -222,72 +278,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_slugify_value()
-        {
-            var content =
-                new NamedContentData()
-                    .AddField("title",
-                        new ContentFieldData()
-                            .AddValue("iv", "4 Häuser"));
-
-            var expected =
-                new NamedContentData()
-                    .AddField("title",
-                        new ContentFieldData()
-                            .AddValue("iv", "4 Häuser"))
-                    .AddField("slug",
-                        new ContentFieldData()
-                            .AddValue("iv", "4-haeuser"));
-
-            var context = new ScriptContext { Data = content };
-
-            const string script = @"
-                var data = ctx.data;
-
-                data.slug = { iv: slugify(data.title.iv) };
-
-                replace(data);
-            ";
-
-            var result = sut.Transform(context, script);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_slugify_value_with_single_char()
-        {
-            var content =
-                new NamedContentData()
-                    .AddField("title",
-                        new ContentFieldData()
-                            .AddValue("iv", "4 Häuser"));
-
-            var expected =
-                new NamedContentData()
-                    .AddField("title",
-                        new ContentFieldData()
-                            .AddValue("iv", "4 Häuser"))
-                    .AddField("slug",
-                        new ContentFieldData()
-                            .AddValue("iv", "4-hauser"));
-
-            var context = new ScriptContext { Data = content };
-
-            const string script = @"
-                var data = ctx.data;
-
-                data.slug = { iv: slugify(data.title.iv, true) };
-
-                replace(data);
-            ";
-
-            var result = sut.Transform(context, script);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
         public void Should_transform_content_and_return_with_execute_transform()
         {
             var content =
@@ -426,6 +416,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 .Returns(new HttpClient(httpHandler));
 
             const string script = @"
+                async = true;
+
                 getJSON('http://squidex.io', function(result) {
                     complete(result);
                 });
@@ -455,6 +447,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 .Returns(new HttpClient(httpHandler));
 
             const string script = @"
+                async = true;
+
                 var headers = {
                     'X-Header1': 1,
                     'X-Header2': '2'                
@@ -502,11 +496,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 this.response = response;
             }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
+                await Task.Delay(1000);
+
                 madeRequest = request;
 
-                return Task.FromResult(response);
+                return response;
             }
         }
     }

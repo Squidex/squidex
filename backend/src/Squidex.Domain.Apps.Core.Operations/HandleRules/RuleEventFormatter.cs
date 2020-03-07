@@ -90,13 +90,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 var script = trimmed.Substring(ScriptPrefix.Length, trimmed.Length - ScriptPrefix.Length - ScriptSuffix.Length);
 
-                var customFunctions = new Dictionary<string, Func<string>>
-                {
-                    ["contentUrl"] = () => ContentUrl(@event),
-                    ["contentAction"] = () => ContentAction(@event)
-                };
-
-                return scriptEngine.Interpolate("event", @event, script, customFunctions);
+                return scriptEngine.Interpolate("event", @event, script);
             }
 
             var current = text.AsSpan();

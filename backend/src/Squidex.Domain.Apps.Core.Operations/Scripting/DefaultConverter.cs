@@ -44,6 +44,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 case ClaimsPrincipal principal:
                     result = JintUser.Create(engine, principal);
                     return true;
+                case Guid guid:
+                    result = guid.ToString();
+                    return true;
                 case Instant instant:
                     result = JsValue.FromObject(engine, instant.ToDateTimeUtc());
                     return true;

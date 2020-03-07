@@ -7,14 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Esprima;
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
-using Jint.Runtime.Interop;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
@@ -25,13 +24,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class JintScriptEngine : IScriptEngine
     {
-        private readonly IHttpClientFactory? httpClientFactory;
+        private readonly IScriptExtension[] extensions;
 
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
 
-        public JintScriptEngine(IHttpClientFactory? httpClientFactory = null)
+        public TimeSpan ExecutionTimeout { get; set; } = TimeSpan.FromMilliseconds(4000);
+
+        public JintScriptEngine(IEnumerable<IScriptExtension>? extensions = null)
         {
-            this.httpClientFactory = httpClientFactory;
+            this.extensions = extensions?.ToArray() ?? Array.Empty<IScriptExtension>();
         }
 
         public void Execute(ScriptContext context, string script)
@@ -40,13 +41,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var engine =
+                var ctx =
                     CreateScriptEngine()
                         .AddContext(context)
                         .AddDisallow()
                         .AddReject();
 
-                Execute(engine, script);
+                Execute(ctx.Engine, script);
             }
         }
 
@@ -58,15 +59,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var engine =
+                var ctx =
                     CreateScriptEngine()
                         .AddContext(context)
                         .AddDisallow()
                         .AddReject();
 
-                engine.SetValue("replace", new Action(() =>
+                ctx.Engine.SetValue("replace", new Action(() =>
                 {
-                    var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
+                    var dataInstance = ctx.Engine.GetValue("ctx").AsObject().Get("data");
 
                     if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
                     {
@@ -74,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     }
                 }));
 
-                Execute(engine, script);
+                Execute(ctx.Engine, script);
             }
 
             return result;
@@ -90,13 +91,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 try
                 {
-                    var engine =
+                    var ctx =
                         CreateScriptEngine()
                             .AddContext(context);
 
-                    engine.SetValue("replace", new Action(() =>
+                    ctx.Engine.SetValue("replace", new Action(() =>
                     {
-                        var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
+                        var dataInstance = ctx.Engine.GetValue("ctx").AsObject().Get("data");
 
                         if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
                         {
@@ -104,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                         }
                     }));
 
-                    engine.Execute(script);
+                    ctx.Engine.Execute(script);
                 }
                 catch (Exception)
                 {
@@ -135,29 +136,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        private Engine CreateScriptEngine(IReferenceResolver? resolver = null)
-        {
-            var engine = new Engine(options =>
-            {
-                if (resolver != null)
-                {
-                    options.SetReferencesResolver(resolver);
-                }
-
-                options.TimeoutInterval(Timeout).Strict().AddObjectConverter(DefaultConverter.Instance);
-            });
-
-            engine.AddHelpers();
-
-            return engine;
-        }
-
         public bool Evaluate(string name, object context, string script)
         {
             try
             {
                 var result =
-                    CreateScriptEngine(NullPropagation.Instance)
+                    CreateScriptEngine()
+                        .SetValue(name, context).Engine
                         .SetValue(name, context)
                         .Execute(script)
                         .GetCompletionValue()
@@ -171,19 +156,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public string? Interpolate(string name, object context, string script, Dictionary<string, Func<string>>? customFormatters = null)
+        public string? Interpolate(string name, object context, string script)
         {
             try
             {
                 var result =
-                    CreateScriptEngine(NullPropagation.Instance)
-                        .AddFormatters(customFormatters)
+                    CreateScriptEngine()
+                        .SetValue(name, context).Engine
                         .SetValue(name, context)
                         .Execute(script)
                         .GetCompletionValue()
                         .ToObject();
 
-                var converted = result.ToString();
+                var converted = result?.ToString() ?? "null";
 
                 return converted == "undefined" ? "null" : converted;
             }
@@ -195,36 +180,69 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public Task<IJsonValue> GetAsync(ScriptContext context, string script)
         {
-            using (var cts = new CancellationTokenSource(Timeout))
+            if (string.IsNullOrWhiteSpace(script))
+            {
+                return Task.FromResult(JsonValue.Null);
+            }
+
+            using (var cts = new CancellationTokenSource(ExecutionTimeout))
             {
                 var tcs = new TaskCompletionSource<IJsonValue>();
 
                 using (cts.Token.Register(() =>
                 {
-                    tcs.SetCanceled();
+                    tcs.TrySetCanceled();
                 }))
                 {
-                    var engine =
-                        CreateScriptEngine()
+                    var ctx =
+                        CreateScriptEngine(cts.Token, ex => tcs.TrySetException(ex), true)
                             .AddContext(context);
 
-                    if (httpClientFactory != null)
+                    ctx.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
-                        var http = new JintHttp(httpClientFactory, cts.Token, tcs.SetException);
-
-                        http.Add(engine);
-                    }
-
-                    engine.SetValue("complete", new Action<JsValue?>(value =>
-                    {
-                        tcs.SetResult(JsonMapper.Map(value));
+                        tcs.TrySetResult(JsonMapper.Map(value));
                     }));
 
-                    engine.Execute(script);
+                    ctx.Engine.Execute(script);
+
+                    if (ctx.Engine.GetValue("async") != true)
+                    {
+                        tcs.TrySetResult(JsonMapper.Map(ctx.Engine.GetCompletionValue()));
+                    }
                 }
 
                 return tcs.Task;
             }
+        }
+
+        private ExecutionContext CreateScriptEngine(CancellationToken cancellationToken = default, Action<Exception>? exceptionHandler = null, bool async = false)
+        {
+            var engine = new Engine(options =>
+            {
+                options.AddObjectConverter(DefaultConverter.Instance);
+                options.SetReferencesResolver(NullPropagation.Instance);
+                options.Strict();
+                options.TimeoutInterval(Timeout);
+            });
+
+            if (async)
+            {
+                engine.SetValue("async", false);
+            }
+
+            foreach (var extension in extensions)
+            {
+                extension.Extend(engine);
+            }
+
+            var context = new ExecutionContext(engine, cancellationToken, exceptionHandler);
+
+            foreach (var extension in extensions)
+            {
+                extension.Extend(context, async);
+            }
+
+            return context;
         }
     }
 }
