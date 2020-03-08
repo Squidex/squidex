@@ -71,7 +71,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         protected override bool Trigger(EnrichedSchemaEvent @event, SchemaChangedTrigger trigger)
         {
-            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
+            if (string.IsNullOrWhiteSpace(trigger.Condition))
+            {
+                return true;
+            }
+
+            var context = new ScriptContext
+            {
+                ["event"] = @event
+            };
+
+            return scriptEngine.Evaluate(context, trigger.Condition);
         }
     }
 }

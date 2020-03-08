@@ -9,11 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.Scripting;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Identity;
@@ -46,7 +50,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine(null));
+            var extensions = new IScriptExtension[]
+            {
+                new DateTimeScriptExtension(),
+                new EventScriptExtension(urlGenerator),
+                new StringScriptExtension()
+            };
+
+            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+
+            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine(cache, extensions));
         }
 
         [Fact]
@@ -187,6 +200,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [InlineData("$CONTENT_STATUS")]
+        [InlineData("Script(contentAction())")]
         [InlineData("Script(`${event.status}`)")]
         public void Should_format_content_status_when_found(string script)
         {
@@ -200,7 +214,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_ACTION")]
         [InlineData("Script(contentAction())")]
-        public void Should_null_when_content_status_not_found(string script)
+        public void Should_return_null_when_content_status_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
@@ -224,7 +238,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_ACTION")]
         [InlineData("Script(contentAction())")]
-        public void Should_null_when_content_action_not_found(string script)
+        public void Should_return_null_when_content_action_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 

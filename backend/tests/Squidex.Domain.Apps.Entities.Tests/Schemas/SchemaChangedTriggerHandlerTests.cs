@@ -31,10 +31,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
                 .Returns(false);
 
             sut = new SchemaChangedTriggerHandler(scriptEngine);
@@ -136,12 +136,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
                     .MustHaveHappened();
             }
         }
