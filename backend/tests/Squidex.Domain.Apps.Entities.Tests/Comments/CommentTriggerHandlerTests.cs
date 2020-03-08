@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -31,10 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
                 .Returns(false);
 
             sut = new CommentTriggerHandler(scriptEngine, userResolver);
@@ -265,27 +267,35 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, CommentTrigger> action)
         {
-            var trigger = new CommentTrigger { Condition = condition };
+            var trigger = new CommentTrigger
+            {
+                Condition = condition
+            };
 
-            var handler = new CommentTriggerHandler(new JintScriptEngine(), userResolver);
+            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+
+            var handler = new CommentTriggerHandler(new JintScriptEngine(memoryCache), userResolver);
 
             action(handler, trigger);
         }
 
         private void TestForCondition(string condition, Action<CommentTrigger> action)
         {
-            var trigger = new CommentTrigger { Condition = condition };
+            var trigger = new CommentTrigger
+            {
+                Condition = condition
+            };
 
             action(trigger);
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate("event", A<object>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
                     .MustHaveHappened();
             }
         }

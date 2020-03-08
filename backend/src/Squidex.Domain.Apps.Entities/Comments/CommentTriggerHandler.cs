@@ -71,7 +71,17 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         protected override bool Trigger(EnrichedCommentEvent @event, CommentTrigger trigger)
         {
-            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
+            if (string.IsNullOrWhiteSpace(trigger.Condition))
+            {
+                return true;
+            }
+
+            var context = new ScriptContext
+            {
+                ["event"] = @event
+            };
+
+            return scriptEngine.Evaluate(context, trigger.Condition);
         }
     }
 }

@@ -12,15 +12,18 @@ using Jint;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
+    public delegate bool ExceptionHandler(Exception exception);
+
     public sealed class ExecutionContext : Dictionary<string, object>
     {
-        private readonly Action<Exception>? exceptionHandler;
+        private readonly ExceptionHandler? exceptionHandler;
 
         public Engine Engine { get; }
 
         public CancellationToken CancellationToken { get; }
 
-        public ExecutionContext(Engine engine, CancellationToken cancellationToken, Action<Exception>? exceptionHandler = null)
+        internal ExecutionContext(Engine engine, CancellationToken cancellationToken, ExceptionHandler? exceptionHandler = null)
+            : base(StringComparer.OrdinalIgnoreCase)
         {
             Engine = engine;
 

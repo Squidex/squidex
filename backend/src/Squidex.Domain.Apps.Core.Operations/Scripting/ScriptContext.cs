@@ -9,12 +9,20 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using Jint.Native;
+using Jint.Native.Object;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class ScriptContext : Dictionary<string, object?>
     {
+        public ScriptContext()
+            : base(StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
         public ClaimsPrincipal? User
         {
             get => GetValue<ClaimsPrincipal?>();
@@ -73,6 +81,43 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
 
             return default!;
+        }
+
+        internal void Add(ExecutionContext context, bool nested)
+        {
+            var engine = context.Engine;
+
+            if (nested)
+            {
+                var contextInstance = new ObjectInstance(engine);
+
+                foreach (var (key, value) in this)
+                {
+                    var property = key.ToCamelCase();
+
+                    if (value != null)
+                    {
+                        contextInstance.FastAddProperty(property, JsValue.FromObject(engine, value), true, true, true);
+                        context[property] = value;
+                    }
+                }
+
+                engine.SetValue("ctx", contextInstance);
+                engine.SetValue("context", contextInstance);
+            }
+            else
+            {
+                foreach (var (key, value) in this)
+                {
+                    var property = key.ToCamelCase();
+
+                    if (value != null)
+                    {
+                        engine.SetValue(property, value);
+                        context[property] = value;
+                    }
+                }
+            }
         }
     }
 }

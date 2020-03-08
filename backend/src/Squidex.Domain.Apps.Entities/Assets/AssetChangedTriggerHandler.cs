@@ -68,7 +68,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override bool Trigger(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
         {
-            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
+            if (string.IsNullOrWhiteSpace(trigger.Condition))
+            {
+                return true;
+            }
+
+            var context = new ScriptContext
+            {
+                ["event"] = @event
+            };
+
+            return scriptEngine.Evaluate(context, trigger.Condition);
         }
     }
 }

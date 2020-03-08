@@ -96,22 +96,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
         {
             Enrich(context);
 
-            var result = scriptEngine.ExecuteAndTransform(context, GetScript(script));
-
-            return Task.FromResult(result);
+            return await scriptEngine.ExecuteAndTransformAsync(context, GetScript(script));
         }
 
-        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
         {
             Enrich(context);
 
-            scriptEngine.Execute(context, GetScript(script));
-
-            return Task.CompletedTask;
+            await scriptEngine.ExecuteAsync(context, GetScript(script));
         }
 
         private void Enrich(ScriptContext context)

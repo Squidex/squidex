@@ -90,7 +90,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 var script = trimmed.Substring(ScriptPrefix.Length, trimmed.Length - ScriptPrefix.Length - ScriptSuffix.Length);
 
-                return scriptEngine.Interpolate("event", @event, script);
+                var context = new ScriptContext
+                {
+                    ["event"] = @event
+                };
+
+                return scriptEngine.Interpolate(context, script);
             }
 
             var current = text.AsSpan();

@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -55,7 +57,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 new StringScriptExtension()
             };
 
-            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine(extensions));
+            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+
+            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine(cache, extensions));
         }
 
         [Fact]

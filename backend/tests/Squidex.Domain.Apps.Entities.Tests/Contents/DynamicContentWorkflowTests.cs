@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -90,7 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            sut = new DynamicContentWorkflow(new JintScriptEngine(), appProvider);
+            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+
+            sut = new DynamicContentWorkflow(new JintScriptEngine(memoryCache), appProvider);
         }
 
         [Fact]
