@@ -100,12 +100,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Enrich(context);
 
-            return await scriptEngine.ExecuteAndTransformAsync(context, GetScript(script));
+            var actualScript = GetScript(script);
+
+            if (string.IsNullOrWhiteSpace(actualScript))
+            {
+                return context.Data!;
+            }
+
+            return await scriptEngine.ExecuteAndTransformAsync(context, actualScript);
         }
 
         public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
         {
             Enrich(context);
+
+            var actualScript = GetScript(script);
+
+            if (string.IsNullOrWhiteSpace(actualScript))
+            {
+                return;
+            }
 
             await scriptEngine.ExecuteAsync(context, GetScript(script));
         }

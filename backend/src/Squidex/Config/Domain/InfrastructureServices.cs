@@ -16,6 +16,7 @@ using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
@@ -57,6 +58,15 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
+
+            services.AddSingletonAs<DateTimeScriptExtension>()
+                .As<IScriptExtension>();
+
+            services.AddSingletonAs<StringScriptExtension>()
+                .As<IScriptExtension>();
+
+            services.AddSingletonAs<HttpScriptExtension>()
+                .As<IScriptExtension>();
 
             services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }
