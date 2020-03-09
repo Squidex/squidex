@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetQuery query)
+        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetContentQueryDto query)
         {
             IAssetEntity? asset;
 
@@ -99,16 +99,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] AssetQuery query)
+        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] AssetContentQueryDto query)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
             return DeliverAsset(asset, query);
         }
 
-        private IActionResult DeliverAsset(IAssetEntity? asset, AssetQuery query)
+        private IActionResult DeliverAsset(IAssetEntity? asset, AssetContentQueryDto query)
         {
-            query ??= new AssetQuery();
+            query ??= new AssetContentQueryDto();
 
             if (asset == null || asset.FileVersion < query.Version)
             {

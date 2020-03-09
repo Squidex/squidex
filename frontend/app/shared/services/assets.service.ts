@@ -149,6 +149,16 @@ export interface MoveAssetItemDto {
     readonly parentId?: string;
 }
 
+export interface AssetQueryDto {
+    readonly ids?: ReadonlyArray<string>;
+    readonly maxLength?: number;
+    readonly parentId?: string;
+    readonly query?: Query;
+    readonly skip?: number;
+    readonly tags?: ReadonlyArray<string>;
+    readonly take?: number;
+}
+
 @Injectable()
 export class AssetsService {
     constructor(
@@ -164,13 +174,17 @@ export class AssetsService {
         return this.http.get<{ [name: string]: number }>(url);
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: ReadonlyArray<string>, ids?: ReadonlyArray<string>, parentId?: string): Observable<AssetsDto> {
+    public getAssets(appName: string, q?: AssetQueryDto): Observable<AssetsDto> {
+        const { ids, maxLength, parentId, query, skip, tags, take } = q || {};
+
         let fullQuery = '';
 
-        if (ids) {
+        let queryObj: Query | undefined = undefined;
+
+        if (ids && ids.length > 0) {
             fullQuery = `ids=${ids.join(',')}`;
         } else {
-            const queryObj: Query = {};
+            queryObj = {};
 
             const filters: any[] = [];
 
@@ -190,11 +204,11 @@ export class AssetsService {
                 queryObj.filter = { and: filters };
             }
 
-            if (take > 0) {
+            if (take && take > 0) {
                 queryObj.take = take;
             }
 
-            if (skip > 0) {
+            if (skip && skip > 0) {
                 queryObj.skip = skip;
             }
 
@@ -205,15 +219,39 @@ export class AssetsService {
             }
         }
 
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
+        if (fullQuery.length > (maxLength || 2000)) {
+            const body: any = {};
 
-        return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
-            map(({ total, items, _links }) => {
-                const assets = items.map(item => parseAsset(item));
+            if (ids && ids.length > 0) {
+                body.ids = ids;
+            } else if (queryObj) {
+                body.q = queryObj;
+            }
 
-                return new AssetsDto(total, assets, _links);
-            }),
-            pretifyError('Failed to load assets. Please reload.'));
+            if (parentId) {
+                body.parentId = parentId;
+            }
+
+            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
+
+            return this.http.post<{ total: number, items: any[], folders: any[] } & Resource>(url, body).pipe(
+                map(({ total, items, _links }) => {
+                    const assets = items.map(item => parseAsset(item));
+
+                    return new AssetsDto(total, assets, _links);
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
+        } else {
+            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
+
+            return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
+                map(({ total, items, _links }) => {
+                    const assets = items.map(item => parseAsset(item));
+
+                    return new AssetsDto(total, assets, _links);
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
+        }
     }
 
     public getAssetFolders(appName: string, parentId?: string): Observable<AssetFoldersDto> {

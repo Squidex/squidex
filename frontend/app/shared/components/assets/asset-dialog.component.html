@@ -7,17 +7,17 @@
                 </li>
             </ul>
             
-                <ng-container [ngSwitch]="selectedTab">
-                    <ng-container *ngSwitchCase="'Image'">
-                        <button type="button" class="btn btn-primary ml-auto mr-4" (click)="cropImage()" [class.invisible]="!isUploadable" [disabled]="progress > 0">Save</button>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'Focus Point'">
-                        <button type="button" class="btn btn-primary ml-auto mr-4" (click)="setFocusPoint()" [class.invisible]="!isEditable">Save</button>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'Metadata'">
-                        <button type="submit" class="btn btn-primary ml-auto mr-4" [class.invisible]="!isEditable">Save</button>
-                    </ng-container>
+            <ng-container [ngSwitch]="selectedTab">
+                <ng-container *ngSwitchCase="'Image'">
+                    <button type="button" class="btn btn-primary ml-auto mr-4" (click)="cropImage()" [class.invisible]="!isUploadable" [disabled]="progress > 0">Save</button>
                 </ng-container>
+                <ng-container *ngSwitchCase="'Focus Point'">
+                    <button type="button" class="btn btn-primary ml-auto mr-4" (click)="setFocusPoint()" [class.invisible]="!isEditable">Save</button>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Metadata'">
+                    <button type="submit" class="btn btn-primary ml-auto mr-4" [class.invisible]="!isEditable">Save</button>
+                </ng-container>
+            </ng-container>
         </ng-container>
 
         <ng-container content>

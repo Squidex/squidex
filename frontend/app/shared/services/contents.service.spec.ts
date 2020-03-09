@@ -21,7 +21,8 @@ import {
     Version,
     Versioned
 } from '@app/shared/internal';
-import { encodeQuery } from './../state/query';
+
+import { encodeQuery, sanitize } from './../state/query';
 
 describe('ContentsService', () => {
     const version = new Version('1');
@@ -48,7 +49,7 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13).subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13 }).subscribe(result => {
             contents = result;
         });
 
@@ -75,12 +76,16 @@ describe('ContentsService', () => {
             ]));
     }));
 
-    it('should append query to get request as search',
+    it('should make get request to get contents with json query',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, { fullText: 'my-query' }).subscribe();
+        const query = { fullText: 'my-query' };
 
-        const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery({ fullText: 'my-query', take: 17, skip: 13 })}`);
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
+
+        const expectedQuery = { ...query, take: 17, skip: 13 };
+
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery(expectedQuery)}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -88,12 +93,32 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should append ids to get request with ids',
+    it('should make post request to get contents with json query when request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe();
+        const query = { fullText: 'my-query' };
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?ids=id1,id2');
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query, maxLength: 5 }).subscribe();
+
+        const expectedQuery = { ...query, take: 17, skip: 13 };
+
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema/query`);
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
+
+        req.flush({ total: 10, items: [] });
+    }));
+
+    it('should make get request to get contents with ids',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const ids = ['1', '2'];
+
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, ids }).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?ids=1,2');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -101,10 +126,28 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should append odata query to get request as plain query string',
+    it('should make post request to get contents with ids when request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, { fullText: '$filter=my-filter' }).subscribe();
+        const ids = ['1', '2'];
+
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, ids, maxLength: 5 }).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.body).toEqual({ ids });
+
+        req.flush({ total: 10, items: [] });
+    }));
+
+    it('should make get request to get contents with odata filter',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const query = { fullText: '$filter=my-filter' };
+
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 
@@ -114,36 +157,51 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
+    it('should make post request to get contents with odata filter when request limit reached',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const query = { fullText: '$filter=my-filter' };
+
+        contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query, maxLength: 5 }).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.body).toEqual({ odataQuery: '$filter=my-filter&$top=17&$skip=13' });
+
+        req.flush({ total: 10, items: [] });
+    }));
+
     it('should make get request to get contents by ids',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto;
+        const ids = ['1', '2', '3'];
 
-        contentsService.getContentsByIds('my-app', ['1', '2', '3']).subscribe(result => {
-            contents = result;
-        });
+        contentsService.getContentsByIds('my-app', ids).subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/content/my-app/?ids=1,2,3`);
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app?ids=1,2,3`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            total: 10,
-            items: [
-                contentResponse(12),
-                contentResponse(13)
-            ],
-            statuses: [{
-                status: 'Draft', color: 'Gray'
-            }]
-        });
+        req.flush({ total: 10, items: [] });
+    }));
 
-        expect(contents!).toEqual(
-            new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
-                createContent(12),
-                createContent(13)
-            ]));
+    it('should make post request to get contents by ids when request limit reached',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const ids = ['1', '2', '3'];
+
+        contentsService.getContentsByIds('my-app', ids, 5).subscribe();
+
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app`);
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.body).toEqual({ ids });
+
+        req.flush({ total: 10, items: [] });
     }));
 
     it('should make get request to get content',

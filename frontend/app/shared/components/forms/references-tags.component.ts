@@ -121,7 +121,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
             this.resetState();
 
             if (this.isValid) {
-                this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
+                this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
                     .subscribe(contents => {
                         this.contentItems = contents.items;
 

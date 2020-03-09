@@ -134,6 +134,35 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="query">The required query object.</param>
+        /// <returns>
+        /// 200 => Contents retrieved.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermission]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
+        {
+            var contents = await contentQuery.QueryAsync(Context, query.Ids);
+
+            var response = Deferred.AsyncResponse(() =>
+            {
+                return ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
+            });
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Queries contents.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
@@ -153,11 +182,39 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            var contents = await contentQuery.QueryAsync(Context, name,
-                Q.Empty
-                    .WithIds(ids)
-                    .WithJsonQuery(q)
-                    .WithODataQuery(Request.QueryString.ToString()));
+            var contents = await contentQuery.QueryAsync(Context, name, CreateQuery(ids, q));
+
+            var response = Deferred.AsyncResponse(async () =>
+            {
+                return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
+            });
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Queries contents.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="query">The required query object.</param>
+        /// <returns>
+        /// 200 => Contents retrieved.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/{name}/query")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermission]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetContentsPost(string app, string name, [FromBody] QueryDto query)
+        {
+            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
+
+            var contents = await contentQuery.QueryAsync(Context, name, query?.ToQuery() ?? Q.Empty);
 
             var response = Deferred.AsyncResponse(async () =>
             {
@@ -473,6 +530,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = ContentDto.FromContent(Context, result, this);
 
             return response;
+        }
+
+        private Q CreateQuery(string? ids, string? q)
+        {
+            return Q.Empty
+                .WithIds(ids)
+                .WithJsonQuery(q)
+                .WithODataQuery(Request.QueryString.ToString());
         }
     }
 }
