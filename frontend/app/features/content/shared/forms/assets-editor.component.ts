@@ -79,7 +79,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
             if (!Types.equals(obj, this.snapshot.assets.map(x => x.id))) {
                 const assetIds: string[] = obj;
 
-                this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)
+                this.assetsService.getAssets(this.appsState.appName, { ids: obj })
                     .subscribe(dtos => {
                         this.setAssets(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a));
 

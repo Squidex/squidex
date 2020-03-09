@@ -22,8 +22,8 @@ import {
     MathHelper,
     Resource,
     ResourceLinks,
-    Version,
-    sanitize
+    sanitize,
+    Version
 } from '@app/shared/internal';
 
 describe('AssetsService', () => {
