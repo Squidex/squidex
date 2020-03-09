@@ -174,7 +174,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var today = DateTime.UtcNow.Date;
 
-            return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", false, stream =>
+            return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", stream =>
             {
                 return appLogStore.ReadLogAsync(Guid.Parse(appId), today.AddDays(-30), today, stream);
             });

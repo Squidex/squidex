@@ -164,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 {
                     if (entity.IsPictureUrlStored())
                     {
-                        return new FileCallbackResult("image/png", null, false, async stream =>
+                        return new FileCallbackResult("image/png", null, async stream =>
                         {
                             try
                             {

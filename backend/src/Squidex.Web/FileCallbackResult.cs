@@ -17,18 +17,18 @@ namespace Squidex.Web
 {
     public sealed class FileCallbackResult : FileResult
     {
-        public bool Send404 { get; }
+        public bool Send404 { get; set; }
+
+        public bool SendInline { get; set; }
 
         public Func<Stream, Task> Callback { get; }
 
-        public FileCallbackResult(string contentType, string? name, bool send404, Func<Stream, Task> callback)
+        public FileCallbackResult(string contentType, string? name, Func<Stream, Task> callback)
             : base(contentType)
         {
             Guard.NotNull(callback);
 
             FileDownloadName = name;
-
-            Send404 = send404;
 
             Callback = callback;
         }

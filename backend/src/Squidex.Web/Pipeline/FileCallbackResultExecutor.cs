@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class FileCallbackResultExecutor : FileResultExecutorBase
     {
         public FileCallbackResultExecutor(ILoggerFactory loggerFactory)
-            : base(CreateLogger<VirtualFileResultExecutor>(loggerFactory))
+            : base(CreateLogger<FileCallbackResultExecutor>(loggerFactory))
         {
         }
 
@@ -25,6 +26,15 @@ namespace Squidex.Web.Pipeline
             try
             {
                 SetHeadersAndLog(context, result, null, false);
+
+                if (!string.IsNullOrWhiteSpace(result.FileDownloadName) && result.SendInline)
+                {
+                    var headerValue = new ContentDispositionHeaderValue("inline");
+
+                    headerValue.SetHttpFileName(result.FileDownloadName);
+
+                    context.HttpContext.Response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
+                }
 
                 await result.Callback(context.HttpContext.Response.Body);
             }

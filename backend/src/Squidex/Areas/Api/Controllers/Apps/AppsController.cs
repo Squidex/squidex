@@ -250,7 +250,10 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 }
             });
 
-            return new FileCallbackResult(App.Image.MimeType, null, true, handler);
+            return new FileCallbackResult(App.Image.MimeType, null, handler)
+            {
+                Send404 = true
+            };
         }
 
         /// <summary>

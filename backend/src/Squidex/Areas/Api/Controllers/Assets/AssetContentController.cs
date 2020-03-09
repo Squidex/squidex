@@ -164,14 +164,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             });
 
-            if (query.Download == 1)
+            var inline = query.Download != 1;
+
+            return new FileCallbackResult(asset.MimeType, asset.FileName, handler)
             {
-                return new FileCallbackResult(asset.MimeType, asset.FileName, true, handler);
-            }
-            else
-            {
-                return new FileCallbackResult(asset.MimeType, null, true, handler);
-            }
+                LastModified = asset.LastModified.ToDateTimeOffset(),
+                Send404 = true,
+                SendInline = inline,
+            };
         }
 
         private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, long fileVersion, ResizeOptions resizeOptions, bool overwrite)
