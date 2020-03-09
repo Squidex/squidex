@@ -104,6 +104,14 @@ export class ContentDto {
     }
 }
 
+export interface ContentQueryDto {
+    readonly ids?: ReadonlyArray<string>;
+    readonly maxLength?: number;
+    readonly query?: Query;
+    readonly skip?: number;
+    readonly take?: number;
+}
+
 @Injectable()
 export class ContentsService {
     constructor(
@@ -113,30 +121,36 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: ReadonlyArray<string>): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { ids, maxLength, query, skip, take } = q || {};
+
         const queryParts: string[] = [];
+        const queryOdataParts: string[] = [];
+
+        let queryObj: Query | undefined;
 
         if (ids && ids.length > 0) {
             queryParts.push(`ids=${ids.join(',')}`);
         } else {
-            const queryObj: Query = { ...query };
 
-            if (queryObj.fullText && queryObj.fullText.indexOf('$') >= 0) {
-                queryParts.push(`${queryObj.fullText.trim()}`);
+            if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
+                queryOdataParts.push(`${query.fullText.trim()}`);
 
-                if (take > 0) {
-                    queryParts.push(`$top=${take}`);
+                if (take && take > 0) {
+                    queryOdataParts.push(`$top=${take}`);
                 }
 
-                if (skip > 0) {
-                    queryParts.push(`$skip=${skip}`);
+                if (skip && skip > 0) {
+                    queryOdataParts.push(`$skip=${skip}`);
                 }
             } else {
-                if (take > 0) {
+                queryObj = { ...query };
+
+                if (take && take > 0) {
                     queryObj.take = take;
                 }
 
-                if (skip > 0) {
+                if (skip && skip > 0) {
                     queryObj.skip = skip;
                 }
 
@@ -144,29 +158,70 @@ export class ContentsService {
             }
         }
 
-        const fullQuery = queryParts.join('&');
+        let fullQuery = [...queryParts, ...queryOdataParts].join('&');
 
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
+        if (fullQuery.length > (maxLength || 2000)) {
+            const body: any = {};
 
-        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(x => parseContent(x));
+            if (ids && ids.length > 0) {
+                body.ids = ids;
+            } else {
+                if (queryOdataParts.length > 0) {
+                    body.odataQuery = queryOdataParts.join('&');
+                } else if (queryObj) {
+                    body.q = queryObj;
+                }
+            }
 
-                return new ContentsDto(statuses, total, contents, _links);
-            }),
-            pretifyError('Failed to load contents. Please reload.'));
+            const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
+
+            return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
+                map(({ total, items, statuses, _links }) => {
+                    const contents = items.map(x => parseContent(x));
+
+                    return new ContentsDto(statuses, total, contents, _links);
+                }),
+                pretifyError('Failed to load contents. Please reload.'));
+        } else {
+            const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
+
+            return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+                map(({ total, items, statuses, _links }) => {
+                    const contents = items.map(x => parseContent(x));
+
+                    return new ContentsDto(statuses, total, contents, _links);
+                }),
+                pretifyError('Failed to load contents. Please reload.'));
+        }
     }
 
-    public getContentsByIds(appName: string, ids: ReadonlyArray<string>): Observable<ContentsDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/?ids=${ids.join(',')}`);
+    public getContentsByIds(appName: string, ids: ReadonlyArray<string>, maxLength?: number): Observable<ContentsDto> {
+        const fullQuery = `ids=${ids.join(',')}`;
 
-        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(x => parseContent(x));
+        if (fullQuery.length > (maxLength || 2000)) {
+            const body = { ids };
 
-                return new ContentsDto(statuses, total, contents, _links);
-            }),
-            pretifyError('Failed to load contents. Please reload.'));
+            const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
+
+            return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
+                map(({ total, items, statuses, _links }) => {
+                    const contents = items.map(x => parseContent(x));
+
+                    return new ContentsDto(statuses, total, contents, _links);
+                }),
+                pretifyError('Failed to load contents. Please reload.'));
+
+        } else {
+            const url = this.apiUrl.buildUrl(`/api/content/${appName}?${fullQuery}`);
+
+            return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+                map(({ total, items, statuses, _links }) => {
+                    const contents = items.map(x => parseContent(x));
+
+                    return new ContentsDto(statuses, total, contents, _links);
+                }),
+                pretifyError('Failed to load contents. Please reload.'));
+        }
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {

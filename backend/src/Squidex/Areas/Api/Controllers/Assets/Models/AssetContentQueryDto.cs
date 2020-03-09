@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetQuery
+    public sealed class AssetContentQueryDto
     {
         /// <summary>
         /// The optional version of the asset.

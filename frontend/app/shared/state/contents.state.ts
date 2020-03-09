@@ -164,10 +164,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         this.previousId = this.schemaId;
 
-        return this.contentsService.getContents(this.appName, this.schemaId,
-                this.snapshot.contentsPager.pageSize,
-                this.snapshot.contentsPager.skip,
-                this.snapshot.contentsQuery, undefined).pipe(
+        const query: any = {
+             take: this.snapshot.contentsPager.pageSize,
+             skip: this.snapshot.contentsPager.skip
+        };
+
+        if (this.snapshot.contentsQuery) {
+            query.query = this.snapshot.contentsQuery;
+        }
+
+        return this.contentsService.getContents(this.appName, this.schemaId, query).pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');

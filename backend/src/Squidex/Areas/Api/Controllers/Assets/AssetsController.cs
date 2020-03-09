@@ -96,11 +96,36 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] Guid? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, parentId,
-                Q.Empty
-                    .WithIds(ids)
-                    .WithJsonQuery(q)
-                    .WithODataQuery(Request.QueryString.ToString()));
+            var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q));
+
+            var response = Deferred.Response(() =>
+            {
+                return AssetsDto.FromAssets(assets, this, app);
+            });
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get assets.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="query">The required query object.
+        /// <returns>
+        /// 200 => Assets returned.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Get all assets for the app.
+        /// </remarks>
+        [HttpPost]
+        [Route("apps/{app}/assets/query")]
+        [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ApiPermission(Permissions.AppAssetsRead)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
+        {
+            var assets = await assetQuery.QueryAsync(Context, query?.ParentId, query?.ToQuery() ?? Q.Empty);
 
             var response = Deferred.Response(() =>
             {
@@ -308,6 +333,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
             }
 
             return file.ToAssetFile();
+        }
+
+        private Q CreateQuery(string? ids, string? q)
+        {
+            return Q.Empty
+                .WithIds(ids)
+                .WithJsonQuery(q)
+                .WithODataQuery(Request.QueryString.ToString());
         }
     }
 }

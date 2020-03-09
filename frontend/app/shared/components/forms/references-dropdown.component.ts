@@ -113,7 +113,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             this.resetState();
 
             if (this.isValid) {
-                this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0)
+                this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
                     .subscribe(contents => {
                         const contentItems = contents.items;
                         const contentNames = this.createContentNames(contentItems);
