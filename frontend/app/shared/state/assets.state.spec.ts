@@ -140,7 +140,7 @@ describe('AssetsState', () => {
 
     describe('Navigating', () => {
         beforeEach(() => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: It.isAny() }))
+            assetsService.setup(x => x.getAssets(app, It.isAny()))
                 .returns(() => of(new AssetsDto(0, [])));
 
             assetsService.setup(x => x.getAssetFolders(app, It.isAny()))
