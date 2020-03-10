@@ -1,13 +1,10 @@
-.form-check {
-    display: block;
-    margin-bottom: .5rem;
-    margin-left: 0;
-}
+.form-check-block {
+    & {
+        margin-bottom: .5rem;
+        margin-left: 0;
+    }
 
-.form-check-input {
-    margin-top: .4rem;
-}
-
-label {
-    min-width: 5rem;
+    .form-check-input {
+        margin-top: .4rem;
+    }
 }

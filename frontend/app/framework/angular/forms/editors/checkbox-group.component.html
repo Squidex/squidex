@@ -1,9 +1,11 @@
-<div class="form-check" *ngFor="let value of values">
-    <input type="checkbox" class="form-check-input" id="{{controlId}}{{value}}"
-        (blur)="callTouched()"
-        (change)="check($event.target.checked, value)" 
-        [checked]="isChecked(value)"
-        [disabled]="snapshot.isDisabled">
-
-    <label class="form-check-label" for="{{controlId}}{{value}}">{{value}}</label>
+<div #container (sqxResized)="updateContainerWidth($event.width)">
+    <div class="form-check" [class.form-check-block]="!isSingleLine" [class.form-check-inline]="isSingleLine" *ngFor="let value of values">
+        <input type="checkbox" class="form-check-input" id="{{controlId}}{{value}}"
+            (blur)="callTouched()"
+            (change)="check($event.target.checked, value)" 
+            [checked]="isChecked(value)"
+            [disabled]="snapshot.isDisabled">
+    
+        <label class="form-check-label" for="{{controlId}}{{value}}">{{value}}</label>
+    </div>
 </div>
