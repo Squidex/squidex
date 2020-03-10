@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.Queries
 {
     public sealed class ClrValue
     {
+        private static readonly Func<object?, string> ToStringDelegate = ToString;
+
         public static readonly ClrValue Null = new ClrValue(null, ClrValueType.Null, false);
 
         public object? Value { get; }
@@ -121,7 +123,7 @@ namespace Squidex.Infrastructure.Queries
         {
             if (Value is IList list)
             {
-                return $"[{string.Join(", ", list.OfType<object>().Select(ToString).ToArray())}]";
+                return $"[{string.Join(", ", list.OfType<object>().Select(ToStringDelegate).ToArray())}]";
             }
 
             return ToString(Value);

@@ -16,6 +16,7 @@ namespace Squidex.Infrastructure.Validation
     [Serializable]
     public class ValidationException : DomainException
     {
+        private static readonly char[] TrimChars = { ' ', '.', ':' };
         private static readonly List<ValidationError> FallbackErrors = new List<ValidationError>();
         private readonly IReadOnlyList<ValidationError> errors;
 
@@ -69,7 +70,7 @@ namespace Squidex.Infrastructure.Validation
         {
             var sb = new StringBuilder();
 
-            sb.Append(summary.TrimEnd(' ', '.', ':'));
+            sb.Append(summary.TrimEnd(TrimChars));
 
             if (errors?.Count > 0)
             {
