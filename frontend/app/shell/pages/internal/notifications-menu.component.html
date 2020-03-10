@@ -17,10 +17,10 @@
 
             <sqx-comment *ngFor="let comment of comments; trackBy: trackByComment"
                 [comment]="comment"
+                [commentsState]="commentsState"
                 [confirmDelete]="false"
                 [canDelete]="true"
                 [canFollow]="true"
-                (delete)="delete(comment)"
                 [userToken]="userToken">
             </sqx-comment>
         </ng-container>

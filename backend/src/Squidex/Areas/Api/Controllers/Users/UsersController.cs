@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
@@ -27,6 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Users
     public sealed class UsersController : ApiController
     {
         private static readonly byte[] AvatarBytes;
+        private readonly IHttpClientFactory httpClientFactory;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserResolver userResolver;
         private readonly ISemanticLog log;
@@ -45,11 +47,13 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         public UsersController(
             ICommandBus commandBus,
+            IHttpClientFactory httpClientFactory,
             IUserPictureStore userPictureStore,
             IUserResolver userResolver,
             ISemanticLog log)
             : base(commandBus)
         {
+            this.httpClientFactory = httpClientFactory;
             this.userPictureStore = userPictureStore;
             this.userResolver = userResolver;
 
@@ -177,7 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                         });
                     }
 
-                    using (var client = new HttpClient())
+                    using (var client = httpClientFactory.CreateClient())
                     {
                         var url = entity.PictureNormalizedUrl();
 
@@ -189,7 +193,16 @@ namespace Squidex.Areas.Api.Controllers.Users
                             {
                                 var contentType = response.Content.Headers.ContentType.ToString();
 
-                                return new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+                                var etag = response.Headers.ETag;
+
+                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+
+                                if (!string.IsNullOrWhiteSpace(etag?.Tag))
+                                {
+                                    result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
+                                }
+
+                                return result;
                             }
                         }
                     }
