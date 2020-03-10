@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get assets.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="query">The required query object.
+        /// <param name="query">The required query object.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
