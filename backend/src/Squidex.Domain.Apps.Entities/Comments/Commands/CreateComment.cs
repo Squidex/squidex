@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
     {
         public bool IsMention { get; set; }
 
+        public Uri? Url { get; set; }
+
         public CreateComment()
         {
             CommentId = Guid.NewGuid();

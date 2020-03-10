@@ -14,7 +14,5 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
         public string Text { get; set; }
 
         public string[]? Mentions { get; set; }
-
-        public Uri? Url { get; set; }
     }
 }
