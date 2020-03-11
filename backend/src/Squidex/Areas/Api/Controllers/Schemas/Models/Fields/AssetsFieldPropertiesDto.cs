@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
@@ -69,9 +70,19 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool MustBeImage { get; set; }
 
         /// <summary>
+        /// True to resolve first asset in the content list.
+        /// </summary>
+        public bool ResolveFirst { get; set; }
+
+        /// <summary>
         /// True to resolve first image in the content list.
         /// </summary>
-        public bool ResolveImage { get; set; }
+        [Obsolete("Use ResolveFirst now")]
+        public bool ResolveImage
+        {
+            get => ResolveFirst;
+            set => ResolveFirst = value;
+        }
 
         /// <summary>
         /// The allowed file extensions.

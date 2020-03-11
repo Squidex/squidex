@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static IEnumerable<IField<AssetsFieldProperties>> ResolvingAssets(this Schema schema)
         {
             return schema.Fields.OfType<IField<AssetsFieldProperties>>()
-                .Where(x => x.Properties.ResolveImage);
+                .Where(x => x.Properties.ResolveFirst);
         }
     }
 }

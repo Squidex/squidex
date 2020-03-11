@@ -90,8 +90,12 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
             let formatted: FieldValue = value!;
 
             if (value) {
-                if (Types.isString(value) && isAssets) {
-                    formatted = new HtmlValue(`<img src="${value}?width=50&height=50" />`);
+                if (Types.isString(value) && isAssets && Types.isArray(value)) {
+                    if (value.length === 2) {
+                        formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" /> ${value[1]}`);
+                    } else if (value.length === 1) {
+                        formatted = value[0];
+                    }
                 }
             } else {
                 value = formatted = '- No Value -';

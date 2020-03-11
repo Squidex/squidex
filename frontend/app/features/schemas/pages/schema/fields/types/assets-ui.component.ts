@@ -26,7 +26,7 @@ export class AssetsUIComponent implements OnInit {
     public properties: AssetsFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('resolveImage',
-            new FormControl(this.properties.resolveImage));
+        this.editForm.setControl('resolveFirst',
+            new FormControl(this.properties.resolveFirst));
     }
 }

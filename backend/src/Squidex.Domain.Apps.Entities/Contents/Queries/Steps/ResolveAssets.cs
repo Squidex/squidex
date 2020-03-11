@@ -82,19 +82,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     {
                         foreach (var (partitionKey, partitionValue) in fieldData)
                         {
-                            var referencedImage =
+                            var referencedAsset =
                                 field.GetReferencedIds(partitionValue)
                                     .Select(x => assets[x])
                                     .SelectMany(x => x)
-                                    .FirstOrDefault(x => x.Type == AssetType.Image);
+                                    .FirstOrDefault();
 
-                            if (referencedImage != null)
+                            if (referencedAsset != null)
                             {
-                                var url = urlGenerator.AssetContent(Guid.Parse(referencedImage.Id.ToString()));
+                                IJsonValue array;
 
-                                requestCache.AddDependency(referencedImage.Id, referencedImage.Version);
+                                if (referencedAsset.Type == AssetType.Image)
+                                {
+                                    var url = urlGenerator.AssetContent(Guid.Parse(referencedAsset.Id.ToString()));
 
-                                fieldReference.AddJsonValue(partitionKey, JsonValue.Create(url));
+                                    array = JsonValue.Array(url, referencedAsset.FileName);
+                                }
+                                else
+                                {
+                                    array = JsonValue.Array(referencedAsset.FileName);
+                                }
+
+                                requestCache.AddDependency(referencedAsset.Id, referencedAsset.Version);
+
+                                fieldReference.AddJsonValue(partitionKey, array);
                             }
                         }
                     }

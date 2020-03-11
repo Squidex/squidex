@@ -43,13 +43,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new Schema(schemaId.Name)
                     .AddAssets(1, "asset1", Partitioning.Invariant, new AssetsFieldProperties
                     {
-                        ResolveImage = true,
+                        ResolveFirst = true,
                         MinItems = 2,
                         MaxItems = 3
                     })
                     .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
                     {
-                        ResolveImage = true,
+                        ResolveFirst = true,
                         MinItems = 1,
                         MaxItems = 1
                     })
@@ -76,51 +76,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_add_assets_id_and_versions_as_dependency()
         {
-            var image1 = CreateAsset(Guid.NewGuid(), 1, AssetType.Image);
-            var image2 = CreateAsset(Guid.NewGuid(), 2, AssetType.Image);
-
-            var document1 = CreateAsset(Guid.NewGuid(), 3, AssetType.Unknown);
-            var document2 = CreateAsset(Guid.NewGuid(), 4, AssetType.Unknown);
+            var document1 = CreateAsset(Guid.NewGuid(), 3, AssetType.Unknown, "Document1.docx");
+            var document2 = CreateAsset(Guid.NewGuid(), 4, AssetType.Unknown, "Document2.docx");
 
             var contents = new[]
             {
                 CreateContent(
-                    new[] { document1.Id, image1.Id },
+                    new[] { document1.Id },
                     new[] { document1.Id }),
                 CreateContent(
-                    new[] { document1.Id },
-                    new[] { document2.Id, image2.Id })
+                    new[] { document2.Id },
+                    new[] { document2.Id }),
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
-                .Returns(ResultList.CreateFrom(4, image1, image2, document1, document2));
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 2)))
+                .Returns(ResultList.CreateFrom(4, document1, document2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            A.CallTo(() => requestCache.AddDependency(image1.Id, image1.Version))
+            A.CallTo(() => requestCache.AddDependency(document1.Id, document1.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(image2.Id, image2.Version))
+            A.CallTo(() => requestCache.AddDependency(document2.Id, document2.Version))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_enrich_with_asset_urls()
         {
-            var image1 = CreateAsset(Guid.NewGuid(), 1, AssetType.Image);
-            var image2 = CreateAsset(Guid.NewGuid(), 2, AssetType.Image);
+            var image1 = CreateAsset(Guid.NewGuid(), 1, AssetType.Image, "Image1.png");
+            var image2 = CreateAsset(Guid.NewGuid(), 2, AssetType.Image, "Image2.png");
 
-            var document1 = CreateAsset(Guid.NewGuid(), 3, AssetType.Unknown);
-            var document2 = CreateAsset(Guid.NewGuid(), 4, AssetType.Unknown);
+            var document1 = CreateAsset(Guid.NewGuid(), 3, AssetType.Unknown, "Document1.png");
+            var document2 = CreateAsset(Guid.NewGuid(), 4, AssetType.Unknown, "Document2.png");
 
             var contents = new[]
             {
                 CreateContent(
-                    new[] { document1.Id, image1.Id },
-                    new[] { document1.Id }),
+                    new[] { image1.Id },
+                    new[] { image2.Id, image1.Id }),
                 CreateContent(
                     new[] { document1.Id },
-                    new[] { document2.Id, image2.Id })
+                    new[] { document2.Id, document1.Id })
             };
 
             A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 4)))
@@ -132,18 +129,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new NamedContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv", $"url/to/{image1.Id}"))
+                            .AddValue("iv", JsonValue.Array($"url/to/{image1.Id}", image1.FileName)))
                     .AddField("asset2",
-                        new ContentFieldData()),
+                        new ContentFieldData()
+                            .AddValue("en", JsonValue.Array($"url/to/{image2.Id}", image2.FileName))),
                 contents[0].ReferenceData);
 
             Assert.Equal(
                 new NamedContentData()
                     .AddField("asset1",
-                        new ContentFieldData())
+                        new ContentFieldData()
+                            .AddValue("iv", JsonValue.Array(document1.FileName)))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en", $"url/to/{image2.Id}")),
+                            .AddValue("en", JsonValue.Array(document2.FileName))),
                 contents[1].ReferenceData);
         }
 
@@ -215,9 +214,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private static IEnrichedAssetEntity CreateAsset(Guid id, int version, AssetType type)
+        private static IEnrichedAssetEntity CreateAsset(Guid id, int version, AssetType type, string fileName)
         {
-            return new AssetEntity { Id = id, Type = type, Version = version };
+            return new AssetEntity { Id = id, Type = type, Version = version, FileName = fileName };
         }
     }
 }
