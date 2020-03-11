@@ -5,9 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public sealed class UpdateComment : CommentTextCommand
+    public abstract class CommentTextCommand : CommentsCommand
     {
+        public string Text { get; set; }
+
+        public string[]? Mentions { get; set; }
     }
 }

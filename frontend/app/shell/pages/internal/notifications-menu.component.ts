@@ -92,10 +92,6 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
         this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
     }
 
-    public delete(comment: CommentDto) {
-        this.commentsState.delete(comment);
-    }
-
     public trackByComment(comment: CommentDto) {
         return comment.id;
     }

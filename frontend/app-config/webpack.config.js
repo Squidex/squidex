@@ -40,6 +40,7 @@ module.exports = function (env) {
     const isTests = env && env.target === 'tests';
     const isTestCoverage = env && env.coverage;
     const isAnalyzing = isProduction && env.analyze;
+    const isAot = isProduction;
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
@@ -296,7 +297,7 @@ module.exports = function (env) {
                 directTemplateLoading: true,
                 entryModule: 'app/app.module#AppModule',
                 sourceMap: !isProduction,
-                skipCodeGeneration: false,
+                skipCodeGeneration: !isAot,
                 tsConfigPath: configFile
             })
         );
