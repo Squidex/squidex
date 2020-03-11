@@ -198,6 +198,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustNotHaveHappened();
         }
 
+        [Fact]
+        public async Task Should_only_query_first_assets()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var contents = new[]
+            {
+                CreateContent(new[] { id1, id2 }, new Guid[0])
+            };
+
+            await sut.EnrichAsync(requestContext, contents, schemaProvider);
+
+            Assert.NotNull(contents[0].ReferenceData);
+
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 1)))
+                .MustHaveHappened();
+        }
+
         private ContentEntity CreateContent(Guid[] assets1, Guid[] assets2)
         {
             return new ContentEntity

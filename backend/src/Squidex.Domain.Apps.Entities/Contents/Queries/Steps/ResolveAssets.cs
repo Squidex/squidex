@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             foreach (var content in contents)
             {
-                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, 1);
             }
         }
 

@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     internal sealed class ReferencesExtractor : IFieldVisitor<None>
     {
         private readonly HashSet<Guid> result;
+        private readonly int referencesPerField;
         private IJsonValue? value;
 
         public HashSet<Guid> Result
@@ -24,11 +25,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             get { return result; }
         }
 
-        public ReferencesExtractor(HashSet<Guid> result)
+        public ReferencesExtractor(HashSet<Guid> result, int referencesPerField)
         {
             Guard.NotNull(result);
 
             this.result = result;
+            this.referencesPerField = referencesPerField;
         }
 
         public void SetValue(IJsonValue? newValue)
@@ -59,14 +61,14 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public None Visit(IField<AssetsFieldProperties> field)
         {
-            value.AddIds(result);
+            value.AddIds(result, referencesPerField);
 
             return None.Value;
         }
 
         public None Visit(IField<ReferencesFieldProperties> field)
         {
-            value.AddIds(result);
+            value.AddIds(result, referencesPerField);
 
             return None.Value;
         }

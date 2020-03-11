@@ -460,7 +460,7 @@ describe('GetContentValue', () => {
     const fieldLocalized = createField({ properties: createProperties('Number') });
     const fieldAssets = createField({ properties: createProperties('Assets') });
 
-    it('should resolve image url and filename from references asset', () => {
+    it('should resolve image url and filename from referenced asset', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -471,10 +471,10 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldAssets);
 
-        expect(result).toEqual({ value: '13', formatted: new HtmlValue('<img src="13?width=50&height=50" /> file13') });
+        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50" /> file13') });
     });
 
-    it('should resolve filename from references asset', () => {
+    it('should resolve filename from referenced asset', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -485,7 +485,7 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldAssets);
 
-        expect(result).toEqual({ value: '13', formatted: 'file13' });
+        expect(result).toEqual({ value: ['file13'], formatted: 'file13' });
     });
 
     it('should not image url if not found', () => {
