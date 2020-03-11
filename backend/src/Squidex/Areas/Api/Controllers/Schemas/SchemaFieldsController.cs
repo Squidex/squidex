@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Add a nested schema field.
+        /// Add a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -183,7 +183,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Update a nested schema field.
+        /// Update a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -237,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Lock a nested schema field.
+        /// Lock a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -292,7 +292,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Hide a nested schema field.
+        /// Hide a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -347,7 +347,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Show a nested schema field.
+        /// Show a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -402,7 +402,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Enable a nested schema field.
+        /// Enable a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -457,7 +457,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Disable nested a schema field.
+        /// Disable a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -510,7 +510,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Delete a nested schema field.
+        /// Delete a nested field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>

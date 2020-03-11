@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Update an existing app role.
+        /// Update an app role.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the role to be updated.</param>

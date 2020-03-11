@@ -14,12 +14,26 @@
 
     <style>
         body { margin: 0; padding: 0; }
+
+        .menu-content {
+            position: fixed !important;
+        }
+
+        .api-content {
+            margin-left: 260px;
+        }
+
+        @@media print, screen and (max-width: 50rem) {
+            .api-content {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="redoc-container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.22/bundles/redoc.standalone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.23/bundles/redoc.standalone.js"></script>
     <script>
         Redoc.init('@Url.Content(Model.Specification)', {
             theme: {
@@ -28,7 +42,8 @@
                         main: '#3f83df'
                     }
                 }
-            }
+            },
+            nativeScrollbars: true
         }, document.getElementById('redoc-container'))
     </script>
 </body>

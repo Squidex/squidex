@@ -36,7 +36,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool AllowDuplicates { get; set; }
 
-        public bool ResolveImage { get; set; }
+        public bool ResolveFirst { get; set; }
+
+        public bool ResolveImage
+        {
+            get => ResolveFirst;
+            set => ResolveFirst = value;
+        }
 
         public ReadOnlyCollection<string>? AllowedExtensions { get; set; }
 

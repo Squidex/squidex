@@ -54,6 +54,25 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
+        public void Should_get_limited_ids_from_name_data()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var input =
+                new NamedContentData()
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
+
+            var ids = new HashSet<Guid>();
+
+            input.AddReferencedIds(schema, ids, 1);
+
+            Assert.Equal(new[] { id1 }, ids);
+        }
+
+        [Fact]
         public void Should_cleanup_deleted_ids()
         {
             var id1 = Guid.NewGuid();
