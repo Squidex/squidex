@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
         }
 
         /// <summary>
-        /// Get general info status of the API.
+        /// Get API information.
         /// </summary>
         /// <returns>
         /// 200 => Infos returned.

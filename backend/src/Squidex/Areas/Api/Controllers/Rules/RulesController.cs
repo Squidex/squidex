@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
-        /// Get the supported rule actions.
+        /// Get supported rule actions.
         /// </summary>
         /// <returns>
         /// 200 => Rule actions returned.
@@ -291,7 +291,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
-        /// Cancels the event and retries.
+        /// Cancels an event.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>

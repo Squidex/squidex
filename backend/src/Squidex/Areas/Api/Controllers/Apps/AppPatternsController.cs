@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Update an existing app pattern.
+        /// Update an app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be updated.</param>
@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Delete an existing app pattern.
+        /// Delete an app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be deleted.</param>
