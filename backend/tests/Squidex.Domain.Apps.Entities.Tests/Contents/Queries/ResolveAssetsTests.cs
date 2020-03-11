@@ -12,7 +12,6 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ResolveAssetsTests
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
@@ -56,8 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     })
                     .SetFieldsInLists("asset1", "asset2");
 
-            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>._))
-                .ReturnsLazily(new Func<string, string>(id => $"url/to/{id}"));
+            A.CallTo(() => urlGenerator.AssetContent(A<Guid>._))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<Guid>(0)}");
 
             schemaProvider = x =>
             {
@@ -71,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
             };
 
-            sut = new ResolveAssets(assetUrlGenerator, assetQuery, requestCache);
+            sut = new ResolveAssets(urlGenerator, assetQuery, requestCache);
         }
 
         [Fact]

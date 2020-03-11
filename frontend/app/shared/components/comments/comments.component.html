@@ -4,31 +4,37 @@
     </ng-container>
 
     <ng-container content>
-        <div class="comments-list" #scrollMe [scrollTop]="scrollMe.scrollHeight">
-            <sqx-comment *ngFor="let comment of commentsState.comments | async; trackBy: trackByComment"
-                [comment]="comment"
-                [canDelete]="true"
-                [canFollow]="false"
-                (delete)="delete(comment)"
-                [userToken]="userToken">
-            </sqx-comment>
-        </div>
-        
-        <div class="comments-footer">
-            <ng-template #mentionListTemplate let-item="item">
-                {{item['contributorEmail']}}
-            </ng-template>
+        <ng-container *ngIf="mentionUsers | async; let users">
+
+            <div class="comments-list" #commentsList>
+                <div (sqxResized)="scrollDown()">
+                    <sqx-comment *ngFor="let comment of commentsState.comments | async; trackBy: trackByComment"
+                        [comment]="comment"
+                        [commentsState]="commentsState"
+                        [mentionUsers]="users"
+                        [canEdit]="true"
+                        [canFollow]="false"
+                        [userToken]="userToken">
+                    </sqx-comment>
+                </div>
+            </div>
             
-            <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-                <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" 
-                    [mention]="mentionUsers | async" 
-                    [mentionConfig]="mentionConfig" 
-                    [mentionListTemplate]="mentionListTemplate"
-                    autocomplete="off" 
-                    autocorrect="off"
-                    autocapitalize="off" />
-            </form>
-        </div>
+            <div class="comments-footer">
+                <ng-template #mentionListTemplate let-item="item">
+                    {{item['contributorEmail']}}
+                </ng-template>
+                
+                <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
+                    <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" 
+                        [mention]="users" 
+                        [mentionConfig]="mentionConfig" 
+                        [mentionListTemplate]="mentionListTemplate"
+                        autocomplete="off" 
+                        autocorrect="off"
+                        autocapitalize="off" />
+                </form>
+            </div>
+        </ng-container>
     </ng-container>
 </sqx-panel>
 

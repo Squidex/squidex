@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ConvertDataTests
     {
         private readonly ISchemaEntity schema;
-        private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             schema = Mocks.Schema(appId, schemaId, schemaDef);
             schemaProvider = x => Task.FromResult(schema);
 
-            sut = new ConvertData(assetUrlGenerator, assetRepository, contentRepository);
+            sut = new ConvertData(urlGenerator, assetRepository, contentRepository);
         }
 
         [Fact]

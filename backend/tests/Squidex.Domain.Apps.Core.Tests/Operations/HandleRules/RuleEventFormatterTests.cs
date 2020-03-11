@@ -12,6 +12,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Scripting;
@@ -34,21 +35,25 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly Guid assetId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
         public RuleEventFormatterTests()
         {
+            A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
+                .Returns("content-url");
+
+            A.CallTo(() => urlGenerator.AssetContent(assetId))
+                .Returns("asset-content-url");
+
             A.CallTo(() => user.Id)
-                .Returns("123");
+                .Returns("user123");
 
             A.CallTo(() => user.Email)
                 .Returns("me@email.com");
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
-
-            A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
-                .Returns("content-url");
 
             var extensions = new IScriptExtension[]
             {
@@ -93,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Name $APP_NAME has id $APP_ID")]
         [InlineData("Script(`Name ${event.appId.name} has id ${event.appId.id}`)")]
-        public void Should_replace_app_information_from_event(string script)
+        public void Should_format_app_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
@@ -105,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Name $SCHEMA_NAME has id $SCHEMA_ID")]
         [InlineData("Script(`Name ${event.schemaId.name} has id ${event.schemaId.id}`)")]
-        public void Should_replace_schema_information_from_event(string script)
+        public void Should_format_schema_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaId };
 
@@ -117,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME")]
         [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}, Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
-        public void Should_replace_timestamp_information_from_event(string script)
+        public void Should_format_timestamp_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
 
@@ -135,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal("From me (me@email.com, 123)", result);
+            Assert.Equal("From me (me@email.com, user123)", result);
         }
 
         [Theory]
@@ -147,7 +152,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal("From me (me@email.com, 123)", result);
+            Assert.Equal("From me (me@email.com, user123)", result);
         }
 
         [Theory]
@@ -175,9 +180,69 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
+        [InlineData("Version: $ASSET_VERSION")]
+        [InlineData("Script(`Version: ${event.version}`)")]
+        public void Should_format_base_property(string script)
+        {
+            var @event = new EnrichedAssetEvent { Version = 13 };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Version: 13", result);
+        }
+
+        [Theory]
+        [InlineData("File: $ASSET_FILENAME")]
+        [InlineData("Script(`File: ${event.fileName}`)")]
+        public void Should_format_asset_file_name_from_event(string script)
+        {
+            var @event = new EnrichedAssetEvent { FileName = "my-file.png" };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("File: my-file.png", result);
+        }
+
+        [Theory]
+        [InlineData("Type: $ASSET_ASSETTYPE")]
+        [InlineData("Script(`Type: ${event.assetType}`)")]
+        public void Should_format_asset_asset_type_from_event(string script)
+        {
+            var @event = new EnrichedAssetEvent { AssetType = AssetType.Audio };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Type: Audio", result);
+        }
+
+        [Theory]
+        [InlineData("Download at $ASSET_CONTENT_URL")]
+        [InlineData("Script(`Download at ${assetContentUrl()}`)")]
+        public void Should_format_asset_content_url_from_event(string script)
+        {
+            var @event = new EnrichedAssetEvent { Id = assetId };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Download at asset-content-url", result);
+        }
+
+        [Theory]
+        [InlineData("Download at $ASSET_CONTENT_URL")]
+        [InlineData("Script(`Download at ${assetContentUrl()}`)")]
+        public void Should_return_null_when_asset_content_url_not_found(string script)
+        {
+            var @event = new EnrichedContentEvent();
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("Download at null", result);
+        }
+
+        [Theory]
         [InlineData("Go to $CONTENT_URL")]
         [InlineData("Script(`Go to ${contentUrl()}`)")]
-        public void Should_replace_content_url_from_event(string script)
+        public void Should_format_content_url_from_event(string script)
         {
             var @event = new EnrichedContentEvent { AppId = appId, Id = contentId, SchemaId = schemaId };
 
@@ -189,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Go to $CONTENT_URL")]
         [InlineData("Script(`Go to ${contentUrl()}`)")]
-        public void Should_format_content_url_when_not_found(string script)
+        public void Should_return_null_when_content_url_when_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 

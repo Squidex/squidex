@@ -5,10 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.ConvertContent
+using System;
+
+namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public interface IAssetUrlGenerator
+    public abstract class CommentTextCommand : CommentsCommand
     {
-        string GenerateUrl(string assetId);
+        public string Text { get; set; }
+
+        public string[]? Mentions { get; set; }
     }
 }

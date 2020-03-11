@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MentionConfig } from 'angular-mentions';
 import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
@@ -23,12 +24,20 @@ import {
     UpsertCommentForm
 } from '@app/shared/internal';
 
+import { CommentComponent } from './comment.component';
+
 @Component({
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html'
 })
 export class CommentsComponent extends ResourceOwner implements OnInit {
+    @ViewChild('commentsList', { static: false })
+    public commentsList: ElementRef<HTMLDivElement>;
+
+    @ViewChildren(CommentComponent)
+    public children: QueryList<CommentComponent>;
+
     @Input()
     public commentsId: string;
 
@@ -37,7 +46,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     public commentForm = new UpsertCommentForm(this.formBuilder);
 
     public mentionUsers = this.contributorsState.contributors;
-    public mentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
+    public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
 
     public userToken: string;
 
@@ -64,12 +73,20 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
         this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
     }
 
-    public delete(comment: CommentDto) {
-        this.commentsState.delete(comment);
-    }
+    public scrollDown() {
+        if (this.commentsList && this.commentsList.nativeElement) {
+            let isEditing = false;
 
-    public update(comment: CommentDto, text: string) {
-        this.commentsState.update(comment, text);
+            this.children.forEach(x => {
+                isEditing = isEditing || x.isEditing;
+            });
+
+            if (!isEditing) {
+                const height = this.commentsList.nativeElement.scrollHeight;
+
+                this.commentsList.nativeElement.scrollTop = height;
+            }
+        }
     }
 
     public comment() {

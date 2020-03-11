@@ -5,9 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { MentionConfig } from 'angular-mentions';
 
-import { CommentDto } from '@app/shared/internal';
+import {
+    CommentDto,
+    CommentsState,
+    ContributorDto,
+    DialogService,
+    Keys
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-comment',
@@ -15,15 +22,18 @@ import { CommentDto } from '@app/shared/internal';
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CommentComponent {
-    @Output()
-    public delete = new EventEmitter();
+export class CommentComponent implements OnChanges {
+    @Input()
+    public canFollow = false;
 
     @Input()
     public canDelete = false;
 
     @Input()
-    public canFollow = false;
+    public canEdit = false;
+
+    @Input()
+    public commentsState: CommentsState;
 
     @Input()
     public confirmDelete = true;
@@ -33,4 +43,75 @@ export class CommentComponent {
 
     @Input()
     public userToken: string;
+
+    @Input()
+    public mentionUsers: ReadonlyArray<ContributorDto>;
+
+    public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
+
+    public isDeletable = false;
+    public isEditable = false;
+
+    public isEditing = false;
+
+    public editingText: string;
+
+    constructor(
+        private readonly dialogs: DialogService
+    ) {
+    }
+
+    public ngOnChanges() {
+        const isMyComment = this.comment.user === this.userToken;
+
+        this.isDeletable = isMyComment;
+        this.isEditable = isMyComment;
+    }
+
+    public startEdit() {
+        this.editingText = this.comment.text;
+
+        this.isEditing = true;
+    }
+
+    public cancelEdit() {
+        this.isEditing = false;
+    }
+
+    public delete() {
+        if (!this.isDeletable) {
+            return;
+        }
+
+        this.commentsState.delete(this.comment);
+    }
+
+    public updateWhenEnter(event: KeyboardEvent) {
+        if (event.keyCode === Keys.ENTER && !event.altKey && !event.shiftKey && !event.defaultPrevented) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+
+            this.update();
+        }
+    }
+
+    public update() {
+        if (!this.isEditable) {
+            return;
+        }
+
+        const text = this.editingText;
+
+        if (!text || text.length === 0) {
+            this.dialogs.confirm('Delete comment', 'Do you really want to delete the comment?')
+                .subscribe(() => {
+                    this.delete();
+                });
+        } else {
+            this.commentsState.update(this.comment, text);
+
+            this.cancelEdit();
+        }
+    }
 }

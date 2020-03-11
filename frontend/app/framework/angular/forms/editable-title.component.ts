@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-const ESCAPE_KEY = 27;
+import { Keys } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-editable-title',
@@ -56,7 +56,7 @@ export class EditableTitleComponent {
     }
 
     public onKeyDown(keyCode: number) {
-        if (keyCode === ESCAPE_KEY) {
+        if (keyCode === Keys.ESCAPE) {
             this.toggleRename();
         }
     }

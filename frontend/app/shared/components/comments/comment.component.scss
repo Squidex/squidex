@@ -1,5 +1,7 @@
-.item-remove {
+.actions {
     @include absolute(-5px, -15px, auto, auto);
+    background: $color-table-background;
+    border: 0;
     display: none;
 }
 
@@ -17,7 +19,7 @@
     }
 }
 
-.col-right {
+.col-text {
     overflow-wrap: break-word;
     overflow-x: hidden;
 }
@@ -41,7 +43,7 @@
     }
 
     &:hover {
-        .item-remove {
+        .actions {
             display: block;
         }
     }

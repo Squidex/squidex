@@ -43,29 +43,34 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 if (commentsCommand is CreateComment createComment && !IsMention(createComment))
                 {
-                    await MentionUsersAsync(createComment);
-
-                    if (createComment.Mentions != null)
-                    {
-                        foreach (var userId in createComment.Mentions)
-                        {
-                            var notificationCommand = SimpleMapper.Map(createComment, new CreateComment());
-
-                            notificationCommand.AppId = null!;
-                            notificationCommand.Mentions = null;
-                            notificationCommand.CommentsId = userId;
-                            notificationCommand.ExpectedVersion = EtagVersion.Any;
-                            notificationCommand.IsMention = true;
-
-                            context.CommandBus.PublishAsync(notificationCommand).Forget();
-                        }
-                    }
+                    await ReplicateCommandAsync(context, createComment);
                 }
 
                 await ExecuteCommandAsync(context, commentsCommand);
             }
 
             await next(context);
+        }
+
+        private async Task ReplicateCommandAsync(CommandContext context, CommentTextCommand command)
+        {
+            await MentionUsersAsync(command);
+
+            if (command.Mentions != null)
+            {
+                foreach (var userId in command.Mentions)
+                {
+                    var notificationCommand = SimpleMapper.Map(command, new CreateComment());
+
+                    notificationCommand.AppId = null!;
+                    notificationCommand.Mentions = null;
+                    notificationCommand.CommentsId = userId;
+                    notificationCommand.ExpectedVersion = EtagVersion.Any;
+                    notificationCommand.IsMention = true;
+
+                    context.CommandBus.PublishAsync(notificationCommand).Forget();
+                }
+            }
         }
 
         private async Task ExecuteCommandAsync(CommandContext context, CommentsCommand commentsCommand)
@@ -82,11 +87,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
             return createComment.IsMention;
         }
 
-        private async Task MentionUsersAsync(CreateComment createComment)
+        private async Task MentionUsersAsync(CommentTextCommand command)
         {
-            if (!string.IsNullOrWhiteSpace(createComment.Text))
+            if (!string.IsNullOrWhiteSpace(command.Text))
             {
-                var emails = MentionRegex.Matches(createComment.Text).Select(x => x.Value.Substring(1)).ToArray();
+                var emails = MentionRegex.Matches(command.Text).Select(x => x.Value.Substring(1)).ToArray();
 
                 if (emails.Length > 0)
                 {
@@ -104,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                     if (mentions.Count > 0)
                     {
-                        createComment.Mentions = mentions.ToArray();
+                        command.Mentions = mentions.ToArray();
                     }
                 }
             }

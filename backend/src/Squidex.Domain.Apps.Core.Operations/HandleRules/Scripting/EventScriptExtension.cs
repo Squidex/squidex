@@ -45,6 +45,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Scripting
 
                 return JsValue.Null;
             }));
+
+            context.Engine.SetValue("assetContentUrl", new EventDelegate(() =>
+            {
+                if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+                {
+                    return urlGenerator.AssetContent(assetEvent.Id);
+                }
+
+                return JsValue.Null;
+            }));
         }
     }
 }

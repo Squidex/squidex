@@ -7,8 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public sealed class UpdateComment : CommentsCommand
+    public sealed class UpdateComment : CommentTextCommand
     {
-        public string Text { get; set; }
     }
 }

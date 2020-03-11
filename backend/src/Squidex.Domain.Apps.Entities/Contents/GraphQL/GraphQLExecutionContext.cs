@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.DataLoader;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
         private readonly IDependencyResolver resolver;
 
-        public IGraphQLUrlGenerator UrlGenerator { get; }
+        public IUrlGenerator UrlGenerator { get; }
 
         public ISemanticLog Log { get; }
 
@@ -37,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 resolver.Resolve<IAssetQueryService>(),
                 resolver.Resolve<IContentQueryService>())
         {
-            UrlGenerator = resolver.Resolve<IGraphQLUrlGenerator>();
+            UrlGenerator = resolver.Resolve<IUrlGenerator>();
 
             dataLoaderContextAccessor = resolver.Resolve<IDataLoaderContextAccessor>();
 
