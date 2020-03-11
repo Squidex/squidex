@@ -7,6 +7,7 @@
 
 using System;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
@@ -33,11 +34,16 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public long FileSize { get; set; }
 
-        public bool IsImage { get; set; }
-
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
+
+        public AssetType AssetType { get; set; }
+
+        public bool IsImage
+        {
+            get { return AssetType == AssetType.Image; }
+        }
 
         public override long Partition
         {

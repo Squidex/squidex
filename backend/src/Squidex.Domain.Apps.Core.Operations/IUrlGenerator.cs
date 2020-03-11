@@ -6,17 +6,26 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core
 {
     public interface IUrlGenerator
     {
+        bool CanGenerateAssetSourceUrl { get; }
+
+        string? AssetSource(Guid assetId, long fileVersion);
+
+        string? AssetThumbnail(Guid assetId, AssetType assetType);
+
         string AppSettingsUI(NamedId<Guid> appId);
 
         string AssetsUI(NamedId<Guid> appId);
 
         string AssetsUI(NamedId<Guid> appId, string? query = null);
+
+        string AssetContent(Guid assetId);
 
         string BackupsUI(NamedId<Guid> appId);
 
@@ -47,5 +56,7 @@ namespace Squidex.Domain.Apps.Core
         string SchemaUI(NamedId<Guid> appId, NamedId<Guid> schemaId);
 
         string WorkflowsUI(NamedId<Guid> appId);
+
+        string UI();
     }
 }

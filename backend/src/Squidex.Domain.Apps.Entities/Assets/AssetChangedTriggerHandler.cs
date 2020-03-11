@@ -45,6 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SimpleMapper.Map(asset, result);
 
+            result.AssetType = asset.Type;
+
             switch (@event.Payload)
             {
                 case AssetCreated _:
