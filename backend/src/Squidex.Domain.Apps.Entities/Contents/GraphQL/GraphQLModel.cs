@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             IEnumerable<ISchemaEntity> schemas,
             int pageSizeContents,
             int pageSizeAssets,
-            IGraphQLUrlGenerator urlGenerator)
+            IUrlGenerator urlGenerator)
         {
             this.app = app;
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetUrl(app, c.Source);
+                return context.UrlGenerator.AssetContent(c.Source.Id);
             });
 
             return resolver;
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetSourceUrl(c.Source);
+                return context.UrlGenerator.AssetSource(c.Source.Id, c.Source.FileVersion);
             });
 
             return resolver;
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetThumbnailUrl(app, c.Source);
+                return context.UrlGenerator.AssetThumbnail(c.Source.Id, c.Source.Type);
             });
 
             return resolver;
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateContentUrl(app, schema, c.Source);
+                return context.UrlGenerator.ContentUI(app.NamedId(), schema.NamedId(), c.Source.Id);
             });
 
             return resolver;

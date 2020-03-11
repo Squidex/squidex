@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IAssetUrlGenerator urlGenerator)
+        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
         {
             if (fields?.Any() != true)
             {
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         var id = array[i].ToString();
 
-                        array[i] = JsonValue.Create(urlGenerator.GenerateUrl(id));
+                        array[i] = JsonValue.Create(urlGenerator.AssetContent(Guid.Parse(id)));
                     }
                 }
             }

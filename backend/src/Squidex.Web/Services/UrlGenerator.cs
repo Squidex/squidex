@@ -9,18 +9,12 @@ using System;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web.Services
 {
-    public sealed class UrlGenerator : IGraphQLUrlGenerator, IUrlGenerator, IAssetUrlGenerator, IEmailUrlGenerator
+    public sealed class UrlGenerator : IUrlGenerator
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly UrlsOptions urlsOptions;
@@ -39,44 +33,29 @@ namespace Squidex.Web.Services
             CanGenerateAssetSourceUrl = allowAssetSourceUrl;
         }
 
-        public string? GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
+        public string? AssetThumbnail(Guid assetId, AssetType assetType)
         {
-            if (asset.Type != AssetType.Image)
+            if (assetType != AssetType.Image)
             {
                 return null;
             }
 
-            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.FileVersion}&width=100&mode=Max");
-        }
-
-        public string GenerateUrl(string assetId)
-        {
-            return urlsOptions.BuildUrl($"api/assets/{assetId}");
-        }
-
-        public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)
-        {
-            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.FileVersion}");
-        }
-
-        public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
-        {
-            return urlsOptions.BuildUrl($"api/content/{app.Name}/{schema.SchemaDef.Name}/{content.Id}");
-        }
-
-        public string GenerateContentUIUrl(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId)
-        {
-            return urlsOptions.BuildUrl($"app/{appId.Name}/content/{schemaId.Name}/{contentId}/history");
-        }
-
-        public string GenerateUIUrl()
-        {
-            return urlsOptions.BuildUrl("app", false);
+            return urlsOptions.BuildUrl($"api/assets/{assetId}?width=100&mode=Max");
         }
 
         public string AppSettingsUI(NamedId<Guid> appId)
         {
             return urlsOptions.BuildUrl($"app/{appId.Name}/settings", false);
+        }
+
+        public string AssetContent(Guid assetId)
+        {
+            return urlsOptions.BuildUrl($"api/assets/{assetId}");
+        }
+
+        public string? AssetSource(Guid assetId, long fileVersion)
+        {
+            return assetFileStore.GeneratePublicUrl(assetId, fileVersion);
         }
 
         public string AssetsUI(NamedId<Guid> appId)
@@ -164,9 +143,9 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"app/{appId.Name}/settings/workflows", false);
         }
 
-        public string? GenerateAssetSourceUrl(IAssetEntity asset)
+        public string UI()
         {
-            return assetFileStore.GeneratePublicUrl(asset.Id, asset.FileVersion);
+            return urlsOptions.BuildUrl("app", false);
         }
     }
 }

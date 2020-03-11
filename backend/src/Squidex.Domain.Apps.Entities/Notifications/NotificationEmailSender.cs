@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
     public sealed class NotificationEmailSender : INotificationSender
     {
         private readonly IEmailSender emailSender;
-        private readonly IEmailUrlGenerator emailUrlGenerator;
+        private readonly IUrlGenerator urlGenerator;
         private readonly ISemanticLog log;
         private readonly NotificationEmailTextOptions texts;
 
@@ -45,17 +46,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
         public NotificationEmailSender(
             IOptions<NotificationEmailTextOptions> texts,
             IEmailSender emailSender,
-            IEmailUrlGenerator emailUrlGenerator,
+            IUrlGenerator urlGenerator,
             ISemanticLog log)
         {
             Guard.NotNull(texts);
             Guard.NotNull(emailSender);
-            Guard.NotNull(emailUrlGenerator);
+            Guard.NotNull(urlGenerator);
             Guard.NotNull(log);
 
             this.texts = texts.Value;
             this.emailSender = emailSender;
-            this.emailUrlGenerator = emailUrlGenerator;
+            this.urlGenerator = urlGenerator;
             this.log = log;
         }
 
@@ -115,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
                 return;
             }
 
-            vars.URL = emailUrlGenerator.GenerateUIUrl();
+            vars.URL = urlGenerator.UI();
 
             vars.User = user;
 

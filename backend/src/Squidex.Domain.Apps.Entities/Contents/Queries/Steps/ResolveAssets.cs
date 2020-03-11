@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -26,17 +26,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     {
         private static readonly ILookup<Guid, IEnrichedAssetEntity> EmptyAssets = Enumerable.Empty<IEnrichedAssetEntity>().ToLookup(x => x.Id);
 
-        private readonly IAssetUrlGenerator assetUrlGenerator;
+        private readonly IUrlGenerator urlGenerator;
         private readonly IAssetQueryService assetQuery;
         private readonly IRequestCache requestCache;
 
-        public ResolveAssets(IAssetUrlGenerator assetUrlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
+        public ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
         {
-            Guard.NotNull(assetUrlGenerator);
+            Guard.NotNull(urlGenerator);
             Guard.NotNull(assetQuery);
             Guard.NotNull(requestCache);
 
-            this.assetUrlGenerator = assetUrlGenerator;
+            this.urlGenerator = urlGenerator;
             this.assetQuery = assetQuery;
             this.requestCache = requestCache;
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                             if (referencedImage != null)
                             {
-                                var url = assetUrlGenerator.GenerateUrl(referencedImage.Id.ToString());
+                                var url = urlGenerator.AssetContent(Guid.Parse(referencedImage.Id.ToString()));
 
                                 requestCache.AddDependency(referencedImage.Id, referencedImage.Version);
 

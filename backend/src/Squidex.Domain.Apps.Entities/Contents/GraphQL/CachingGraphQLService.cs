@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using GraphQL;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     allSchemas,
                     GetPageSizeForContents(),
                     GetPageSizeForAssets(),
-                    resolver.Resolve<IGraphQLUrlGenerator>());
+                    resolver.Resolve<IUrlGenerator>());
             });
         }
 

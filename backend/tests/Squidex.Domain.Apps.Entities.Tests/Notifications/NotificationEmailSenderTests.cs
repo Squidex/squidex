@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
     public class NotificationEmailSenderTests
     {
         private readonly IEmailSender emailSender = A.Fake<IEmailSender>();
-        private readonly IEmailUrlGenerator emailUrlGenerator = A.Fake<IEmailUrlGenerator>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IUser assigner = A.Fake<IUser>();
         private readonly IUser user = A.Fake<IUser>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
@@ -45,10 +46,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
             A.CallTo(() => user.Claims)
                 .Returns(assigneeClaims);
 
-            A.CallTo(() => emailUrlGenerator.GenerateUIUrl())
+            A.CallTo(() => urlGenerator.UI())
                 .Returns(uiUrl);
 
-            sut = new NotificationEmailSender(Options.Create(texts), emailSender, emailUrlGenerator, log);
+            sut = new NotificationEmailSender(Options.Create(texts), emailSender, urlGenerator, log);
         }
 
         [Fact]
