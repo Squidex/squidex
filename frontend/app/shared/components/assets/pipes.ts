@@ -11,7 +11,9 @@ import {
     ApiUrlConfig,
     AssetDto,
     AuthService,
-    MathHelper
+    MathHelper,
+    StringHelper,
+    Types
 } from '@app/shared/internal';
 
 @Pipe({
@@ -24,8 +26,16 @@ export class AssetUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: AssetDto): string {
-        return `${asset.fullUrl(this.apiUrl)}&sq=${MathHelper.guid()}`;
+    public transform(asset: AssetDto, version?: number): string {
+        let url = asset.fullUrl(this.apiUrl);
+
+        url = StringHelper.appendToUrl(url, 'sq', MathHelper.guid());
+
+        if (Types.isNumber(version)) {
+            url = StringHelper.appendToUrl(url, 'version', version);
+        }
+
+        return url;
     }
 }
 

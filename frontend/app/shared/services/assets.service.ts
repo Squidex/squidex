@@ -22,6 +22,7 @@ import {
     Resource,
     ResourceLinks,
     ResultSet,
+    StringHelper,
     Types,
     Version,
     Versioned
@@ -94,7 +95,7 @@ export class AssetDto {
         let url = apiUrl.buildUrl(this.contentUrl);
 
         if (this.isProtected && authService && authService.user) {
-            url += `&access_token=${authService.user.accessToken}`;
+            url = StringHelper.appendToUrl(url, 'access_token', authService.user.accessToken);
         }
 
         return url;
@@ -215,7 +216,7 @@ export class AssetsService {
             fullQuery = `q=${encodeQuery(queryObj)}`;
 
             if (parentId) {
-                fullQuery += `&parentId=${parentId}`;
+                fullQuery = StringHelper.appendToUrl(fullQuery, 'parentId', parentId);
             }
         }
 

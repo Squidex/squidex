@@ -86,37 +86,41 @@ export module HTTP {
 
 export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
-        if (Types.is(response, ErrorDto)) {
-            return throwError(response);
-        }
+        const error = parseError(response, message);
 
-        let result: ErrorDto | null = null;
-
-        if (!Types.is(response.error, Error)) {
-            try {
-                let errorDto = Types.isObject(response.error) ? response.error : JSON.parse(response.error);
-
-                if (!errorDto) {
-                    errorDto = { message: 'Failed to make the request.', details: [] };
-                }
-
-                switch (response.status) {
-                    case 412:
-                        result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
-                        break;
-                    case 429:
-                        result = new ErrorDto(response.status, 'You have exceeded the maximum limit of API calls.', [], response);
-                        break;
-                    case 500:
-                        result = new ErrorDto(response.status, errorDto.message, errorDto.details, response);
-                        break;
-                }
-            } catch (e) {
-                result = new ErrorDto(500, 'Failed to make the request.', [], response);
-            }
-        }
-
-        result = result || new ErrorDto(500, message);
-
-        return throwError(result);
+        return throwError(error);
     }));
+
+export function parseError(response: HttpErrorResponse, fallback: string) {
+    if (Types.is(response, ErrorDto)) {
+        return response;
+    }
+
+    const { error, status } = response;
+
+    if (status === 412) {
+        return new ErrorDto(412, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
+    }
+
+    if (status === 429) {
+        return new ErrorDto(429, 'You have exceeded the maximum limit of API calls.', [], response);
+    }
+
+    let parsed: any;
+
+    if (Types.isObject(error)) {
+        parsed = error;
+    } else if (Types.isString(error)) {
+        try {
+            parsed = JSON.parse(error);
+        } catch (e) {
+            parsed = undefined;
+        }
+    }
+
+    if (parsed && Types.isString(parsed.message)) {
+        return new ErrorDto(status, parsed.message, parsed.details, response);
+    }
+
+    return new ErrorDto(500, fallback, [], response);
+}

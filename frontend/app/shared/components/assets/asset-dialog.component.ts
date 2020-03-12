@@ -23,6 +23,9 @@ import {
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
+const TABS_IMAGE: ReadonlyArray<string> = ['Metadata', 'Image', 'Focus Point', 'History'];
+const TABS_DEFAULT: ReadonlyArray<string> = ['Metadata', 'History'];
+
 @Component({
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
@@ -77,9 +80,9 @@ export class AssetDialogComponent implements OnChanges {
         this.annotateForm.setEnabled(this.isEditable);
 
         if (this.asset.type === 'Image') {
-            this.selectableTabs = ['Metadata', 'Image', 'Focus Point'];
+            this.selectableTabs = TABS_IMAGE;
         } else {
-            this.selectableTabs = ['Metadata'];
+            this.selectableTabs = TABS_DEFAULT;
         }
 
         if (this.selectableTabs.indexOf(this.selectedTab) < 0) {

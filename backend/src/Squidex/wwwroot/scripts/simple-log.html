@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+</head>
+
+<body>
+    <button id="button">New Value</button>
+
+    <script>
+        var numberGenerator = 1;
+
+        var button = document.getElementById('button');
+
+        var field = new SquidexFormField();
+
+        function logState(message) {
+            console.log(`${message}. Value: <${JSON.stringify(field.getValue(), 2)}>, Form Value: <${JSON.stringify(field.getFormValue())}>`);
+        }
+        
+        logState('Init');
+
+        if (button) {
+            button.addEventListener('click', function () {
+                numberGenerator++;
+
+                field.valueChanged(numberGenerator);
+
+                logState('Click');
+            });
+        }
+
+        // Handle the value change event and set the text to the editor.
+        field.onValueChanged(function (value) {
+            logState(`Value changed: <${JSON.stringify(value, 2)}>`);
+        });
+
+        // Disable the editor when it should be disabled.
+        field.onDisabled(function (disabled) {
+            logState(`Disabled: <${JSON.stringify(disabled, 2)}>`);
+        });
+    </script>
+</body>
+
+</html>

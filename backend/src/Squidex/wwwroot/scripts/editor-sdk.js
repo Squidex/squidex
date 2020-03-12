@@ -3,7 +3,7 @@ function SquidexFormField() {
     var initHandler;
     var initCalled = false;
     var disabledHandler;
-    var disabled;
+    var disabled = false;
     var valueHandler;
     var value;
     var formValueHandler;
@@ -42,9 +42,11 @@ function SquidexFormField() {
             var type = event.data.type;
 
             if (type === 'disabled') {
-                disabled = event.data.isDisabled;
+                if (disabled !== event.data.isDisabled) {
+                    disabled = event.data.isDisabled;
 
-                raiseDisabled();
+                    raiseDisabled();
+                }
             } else if (type === 'valueChanged') {
                 value = event.data.value;
 
@@ -113,9 +115,11 @@ function SquidexFormField() {
         /**
          * Notifies the control container that the value has been changed.
          */
-        valueChanged: function (value) {
+        valueChanged: function (newValue) {
+            value = newValue;
+
             if (window.parent) {
-                window.parent.postMessage({ type: 'valueChanged', value: value }, '*');
+                window.parent.postMessage({ type: 'valueChanged', value: newValue }, '*');
             }
         },
 

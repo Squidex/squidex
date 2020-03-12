@@ -38,4 +38,16 @@ describe('StringHelper', () => {
     it('should return empty string if also fallback not found', () => {
         expect(StringHelper.firstNonEmpty(null!, undefined!, '')).toBe('');
     });
+
+    it('should append query string to url when url already contains query', () => {
+        const url = StringHelper.appendToUrl('http://squidex.io?query=value', 'other', 1);
+
+        expect(url).toEqual('http://squidex.io?query=value&other=1');
+    });
+
+    it('should append query string to url when url already contains no query', () => {
+        const url = StringHelper.appendToUrl('http://squidex.io', 'other', 1);
+
+        expect(url).toEqual('http://squidex.io?other=1');
+    });
 });

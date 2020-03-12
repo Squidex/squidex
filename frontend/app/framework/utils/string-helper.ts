@@ -19,4 +19,16 @@ export module StringHelper {
 
         return '';
     }
+
+    export function appendToUrl(url: string, key: string, value: any) {
+        if (url.indexOf('?') > 0) {
+            url += '&';
+        } else {
+            url += '?';
+        }
+
+        url += `${key}=${value}`;
+
+        return url;
+    }
 }

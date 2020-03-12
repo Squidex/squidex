@@ -13,6 +13,7 @@ export * from './components/table-header.component';
 export * from './components/assets/asset-dialog.component';
 export * from './components/assets/asset-folder-dialog.component';
 export * from './components/assets/asset-folder.component';
+export * from './components/assets/asset-history.component';
 export * from './components/assets/asset-path.component';
 export * from './components/assets/asset-uploader.component';
 export * from './components/assets/asset.component';
