@@ -13,8 +13,10 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtensions
     {
-        public static void AddIds(this IJsonValue? value, HashSet<Guid> result)
+        public static void AddIds(this IJsonValue? value, HashSet<Guid> result, int take)
         {
+            var added = 0;
+
             if (value is JsonArray array)
             {
                 foreach (var id in array)
@@ -22,6 +24,13 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     if (id.Type == JsonValueType.String && Guid.TryParse(id.ToString(), out var guid))
                     {
                         result.Add(guid);
+
+                        added++;
+
+                        if (added >= take)
+                        {
+                            break;
+                        }
                     }
                 }
             }

@@ -28,6 +28,7 @@
         },
     },
     "angularCompilerOptions": {
+        "disableTypeScriptVersionCheck": true,
         "fullTemplateTypeCheck": true,
         "strictInjectionParameters": true,
         "strictTemplate": true
