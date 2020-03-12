@@ -79,10 +79,10 @@ export class ConfirmClickDirective implements OnDestroy {
 
             const subscription =
                 this.dialogs.confirm(this.confirmTitle, this.confirmText)
-                    .subscribe(result => {
+                    .subscribe(confiormed => {
                         this.isOpen = false;
 
-                        if (result) {
+                        if (confiormed) {
                             this.clickConfirmed.delayEmit();
                         }
 

@@ -105,8 +105,10 @@ export class CommentComponent implements OnChanges {
 
         if (!text || text.length === 0) {
             this.dialogs.confirm('Delete comment', 'Do you really want to delete the comment?')
-                .subscribe(() => {
-                    this.delete();
+                .subscribe(confirmed => {
+                    if (confirmed) {
+                        this.delete();
+                    }
                 });
         } else {
             this.commentsState.update(this.comment, text);
