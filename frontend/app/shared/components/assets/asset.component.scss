@@ -288,6 +288,19 @@ img {
     cursor: pointer;
 }
 
-.tags {
-    min-height: 26px;
+.icon-close {
+    font-size: .6rem;
+}
+
+.tag {
+    background: $color-border;
+    border: 0;
+    border-radius: 2px;
+    color: $color-text;
+    display: inline-block;
+    margin-bottom: .25rem;
+    margin-right: 2px;
+    padding: 1px .5rem;
+    vertical-align: top;
+    white-space: nowrap;
 }

@@ -20,14 +20,18 @@ export module StringHelper {
         return '';
     }
 
-    export function appendToUrl(url: string, key: string, value: any) {
+    export function appendToUrl(url: string, key: string, value?: any) {
         if (url.indexOf('?') > 0) {
             url += '&';
         } else {
             url += '?';
         }
 
-        url += `${key}=${value}`;
+        if (value !== undefined) {
+            url += `${key}=${value}`;
+        } else {
+            url += key;
+        }
 
         return url;
     }

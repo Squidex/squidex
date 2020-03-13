@@ -209,16 +209,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return null;
         }
 
-        private static string? ContentStatus(EnrichedEvent @event)
-        {
-            if (@event is EnrichedContentEvent contentEvent)
-            {
-                return contentEvent.Status.ToString();
-            }
-
-            return null;
-        }
-
         private string? AssetContentUrl(EnrichedEvent @event)
         {
             if (@event is EnrichedAssetEvent assetEvent)
