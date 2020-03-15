@@ -93,8 +93,8 @@ describe('BackupsService', () => {
 
         expect(restore!).toEqual(
             new RestoreDto('http://url',
-                DateTime.parseISO_UTC('2017-02-03'),
-                DateTime.parseISO_UTC('2017-02-04'),
+                DateTime.parseISO('2017-02-03'),
+                DateTime.parseISO('2017-02-04'),
                 'Failed',
                 [
                     'log1',
@@ -194,8 +194,8 @@ describe('BackupsService', () => {
     function backupResponse(id: number) {
         return {
             id: `id${id}`,
-            started: `${id % 1000 + 2000}-12-12T10:10:00`,
-            stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00` : null,
+            started: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00Z` : null,
             handledEvents: id * 17,
             handledAssets: id * 23,
             status: id % 2 === 0 ? 'Success' : 'Failed',
@@ -213,8 +213,8 @@ export function createBackup(id: number) {
 
     return new BackupDto(links,
         `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
-        id % 2 === 0 ? DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`) : null,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
+        id % 2 === 0 ? DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`) : null,
         id * 17,
         id * 23,
         id % 2 === 0 ? 'Success' : 'Failed');

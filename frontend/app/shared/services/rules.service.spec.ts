@@ -357,7 +357,7 @@ describe('RulesService', () => {
     function ruleEventResponse(id: number, suffix = '') {
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             eventName: `event${id}${suffix}`,
             nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
             jobResult: `Failed${id}${suffix}`,
@@ -381,7 +381,7 @@ describe('RulesService', () => {
             name: `Name${id}${suffix}`,
             numSucceeded: id * 3,
             numFailed: id * 4,
-            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00`,
+            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00Z`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -407,8 +407,8 @@ export function createRuleEvent(id: number, suffix = '') {
     };
 
     return new RuleEventDto(links, `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`),
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
         `event${id}${suffix}`,
         `url${id}${suffix}`,
         `dump${id}${suffix}`,
@@ -424,8 +424,8 @@ export function createRule(id: number, suffix = '') {
 
     return new RuleDto(links,
         `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
         new Version(`${id}${suffix}`),
         id % 2 === 0,
         {
@@ -443,5 +443,5 @@ export function createRule(id: number, suffix = '') {
         `Name${id}${suffix}`,
         id * 3,
         id * 4,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-10-10T10:10:00`));
+        DateTime.parseISO(`${id % 1000 + 2000}-10-10T10:10:00Z`));
 }

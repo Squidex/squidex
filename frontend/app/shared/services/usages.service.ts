@@ -82,8 +82,8 @@ export class UsagesService {
             pretifyError('Failed to load todays storage size. Please reload.'));
     }
 
-    public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
+    public getCallsUsages(app: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate}/${toDate}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -92,7 +92,7 @@ export class UsagesService {
                 for (let category of Object.keys(body.details)) {
                     details[category] = body.details[category].map((item: any) =>
                         new CallsUsagePerDateDto(
-                            DateTime.parseISO_UTC(item.date),
+                            DateTime.parseISO(item.date),
                             item.totalBytes,
                             item.totalCalls,
                             item.averageElapsedMs));
@@ -111,14 +111,14 @@ export class UsagesService {
             pretifyError('Failed to load calls usage. Please reload.'));
     }
 
-    public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
+    public getStorageUsages(app: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate}/${toDate}`);
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
                 const usages = body.map(item =>
                     new StorageUsagePerDateDto(
-                        DateTime.parseISO_UTC(item.date),
+                        DateTime.parseISO(item.date),
                         item.totalCount,
                         item.totalSize));
 

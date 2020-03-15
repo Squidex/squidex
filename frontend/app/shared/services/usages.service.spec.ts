@@ -40,7 +40,7 @@ describe('UsagesService', () => {
 
         let usages: CallsUsageDto;
 
-        usagesService.getCallsUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
+        usagesService.getCallsUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
             usages = result;
         });
 
@@ -75,8 +75,8 @@ describe('UsagesService', () => {
         expect(usages!).toEqual(
             new CallsUsageDto(100, 1024, 40, 12.4, {
                 category1: [
-                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130, 12.3),
-                    new CallsUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170, 33.3)
+                    new CallsUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130, 12.3),
+                    new CallsUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170, 33.3)
                 ]
             })
         );
@@ -87,7 +87,7 @@ describe('UsagesService', () => {
 
         let usages: ReadonlyArray<StorageUsagePerDateDto>;
 
-        usagesService.getStorageUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
+        usagesService.getStorageUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
             usages = result;
         });
 
@@ -111,8 +111,8 @@ describe('UsagesService', () => {
 
         expect(usages!).toEqual(
             [
-                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
-                new StorageUsagePerDateDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
+                new StorageUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130),
+                new StorageUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170)
             ]);
     }));
 

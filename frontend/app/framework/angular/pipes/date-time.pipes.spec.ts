@@ -20,7 +20,7 @@ import {
     ShortTimePipe
 } from './date-time.pipes';
 
-const dateTime = DateTime.parse('2013-10-03T12:13:14.125', DateTime.iso8601());
+const dateTime = DateTime.parseISO('2013-10-03T12:13:14.125', false);
 
 describe('DurationPipe', () => {
     it('should format to standard duration string', () => {
@@ -86,7 +86,7 @@ describe('DayOfWeekPipe', () => {
         const pipe = new DayOfWeekPipe();
 
         const actual = pipe.transform(dateTime);
-        const expected = 'Th';
+        const expected = 'Thu';
 
         expect(actual).toBe(expected);
     });
@@ -124,7 +124,7 @@ describe('FullDateTimePipe', () => {
         const pipe = new FullDateTimePipe();
 
         const actual = pipe.transform(dateTime);
-        const expected = 'October 3, 2013 12:13 PM';
+        const expected = 'Oct 3, 2013, 12:13:14 PM';
 
         expect(actual).toBe(expected);
     });

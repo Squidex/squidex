@@ -5,7 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import moment from 'moment';
+import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
+
+import { DateHelper } from './date-helper';
+
+const DATE_FORMAT = 'yyyy-MM-dd';
 
 export class DateTime {
     public get raw(): Date {
@@ -49,19 +53,11 @@ export class DateTime {
     }
 
     public get date(): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setUTCHours(0, 0, 0, 0);
-
-        return new DateTime(clone);
+        return new DateTime(startOfDay(this.value));
     }
 
     constructor(private readonly value: Date) {
         Object.freeze(this);
-    }
-
-    public static iso8601(): any {
-        return moment.ISO_8601;
     }
 
     public static now(): DateTime {
@@ -69,63 +65,49 @@ export class DateTime {
     }
 
     public static today(): DateTime {
-        return DateTime.now().date;
+        return new DateTime(startOfDay(new Date()));
     }
 
     public static tomorrow(): DateTime {
-        return DateTime.today().addDays(1);
+        return new DateTime(startOfTomorrow());
     }
 
     public static yesterday(): DateTime {
-        return DateTime.today().addDays(-1);
+        return new DateTime(startOfYesterday());
     }
 
-    public static parseMSDate(value: string): DateTime {
-        let off = parseInt(value.substr(19, 3), 10);
+    public static parseISO(value: string, assumeUtc = true): DateTime {
+        const result = DateTime.tryParseISO(value, assumeUtc);
 
-        if (isNaN(off)) {
-            off = 0;
+        if (!result) {
+            throw new Error(`${value} is not a valid datetime.`);
         }
 
-        const date = new Date(parseInt(value.substr(6), 10));
-        const time = (date.getTime());
-        const offs = (date.getTimezoneOffset() + off * 60) * 60000;
+        return result;
+    }
 
-        date.setTime(time + offs);
+    public static tryParseISO(value: string, assumeUtc = true): DateTime | null {
+        if (!value) {
+            return null;
+        }
+
+        let date: Date;
+
+        if (value.length === DATE_FORMAT.length) {
+            date = parse(value, DATE_FORMAT, new Date());
+        } else {
+            date = date = parseISO(value);
+        }
+
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+
+        if (assumeUtc && (value.length === DATE_FORMAT.length || !value.endsWith('Z'))) {
+            date = DateHelper.getLocalDate(date);
+        }
 
         return new DateTime(date);
-    }
-
-    public static parseISO(value: string): DateTime {
-        return DateTime.parse(value, DateTime.iso8601());
-    }
-
-    public static parseISO_UTC(value: string): DateTime {
-        return DateTime.parseUTC(value, DateTime.iso8601());
-    }
-
-    public static parse(value: string, format: string): DateTime {
-        const parsedMoment = moment(value, format);
-
-        if (parsedMoment.isValid()) {
-            return new DateTime(parsedMoment.toDate());
-        } else {
-            throw Error(`DateTime: ${value} is not a valid date time string`);
-        }
-    }
-
-    public static parseUTC(value: string, format: string): DateTime {
-        const parsedMoment = moment.utc(value, format);
-
-        if (parsedMoment.isValid()) {
-            return new DateTime(parsedMoment.toDate());
-        } else {
-            throw Error(`DateTime: ${value} is not a valid date time string`);
-        }
-    }
-
-    private cloneDate(): Date {
-        return new Date(this.value.getTime());
     }
 
     public eq(v: DateTime): boolean {
@@ -153,86 +135,68 @@ export class DateTime {
     }
 
     public firstOfWeek(): DateTime {
-        const date = this.date;
-
-        return date.addDays(-date.value.getUTCDay() + 1);
+        return new DateTime(startOfWeek(this.value, { weekStartsOn: 1 }));
     }
 
     public firstOfMonth(): DateTime {
-        const monthStart = new Date(Date.UTC(this.year, this.month - 1, 1));
-
-        return new DateTime(monthStart);
+        return new DateTime(startOfMonth(this.value));
     }
 
     public addYears(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setUTCFullYear(clone.getUTCFullYear() + value, clone.getUTCMonth(), clone.getUTCDay());
-
-        return new DateTime(clone);
+        return new DateTime(addYears(this.value, value));
     }
 
     public addMonths(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setUTCMonth(clone.getUTCMonth() + value, clone.getUTCDate());
-
-        return new DateTime(clone);
+        return new DateTime(addMonths(this.value, value));
     }
 
     public addDays(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setUTCDate(clone.getUTCDate() + value);
-
-        return new DateTime(clone);
+        return new DateTime(addDays(this.value, value));
     }
 
     public addHours(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setTime(clone.getTime() + (value * 60 * 60 * 1000));
-
-        return new DateTime(clone);
+        return new DateTime(addHours(this.value, value));
     }
 
     public addMinutes(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setTime(clone.getTime() + (value * 60 * 1000));
-
-        return new DateTime(clone);
+        return new DateTime(addMinutes(this.value, value));
     }
 
     public addSeconds(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setTime(clone.getTime() + (value * 1000));
-
-        return new DateTime(clone);
+        return new DateTime(addSeconds(this.value, value));
     }
 
     public addMilliseconds(value: number): DateTime {
-        const clone = this.cloneDate();
-
-        clone.setTime(clone.getTime() + value);
-
-        return new DateTime(clone);
+        return new DateTime(addMilliseconds(this.value, value));
     }
 
-    public toISOString(): string {
-        return moment(this.value).toISOString();
+    public toISODateUTC(): string {
+        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT);
     }
 
-    public toStringFormat(format: string): string {
-        return moment(this.value).format(format);
+    public toISODate(): string {
+        return format(this.value, DATE_FORMAT);
+    }
+    public toStringFormat(pattern: string): string {
+        return format(this.value, pattern);
     }
 
-    public toUTCStringFormat(format: string): string {
-        return moment.utc(this.value).format(format);
+    public toStringFormatUTC(pattern: string): string {
+        return format(DateHelper.getUTCDate(this.value), pattern);
     }
 
     public toFromNow(): string {
-        return moment.utc(this.value).fromNow();
+        return formatDistanceToNow(this.value, { includeSeconds: true, addSuffix: true });
     }
+
+    public toISOString(withoutMilliseconds = true): string {
+        let result = this.value.toISOString();
+
+        if (withoutMilliseconds) {
+            result = result.slice(0, 19) + 'Z';
+        }
+
+        return result;
+    }
+
 }

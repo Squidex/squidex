@@ -682,8 +682,8 @@ function parseSchemas(response: any) {
             new SchemaPropertiesDto(item.properties.label, item.properties.hints, item.properties.tags),
             item.isSingleton,
             item.isPublished,
-            DateTime.parseISO_UTC(item.created), item.createdBy,
-            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
+            DateTime.parseISO(item.created), item.createdBy,
+            DateTime.parseISO(item.lastModified), item.lastModifiedBy,
             new Version(item.version.toString())));
 
     const _links = response._links;
@@ -703,8 +703,8 @@ function parseSchemaWithDetails(response: any) {
         properties,
         response.isSingleton,
         response.isPublished,
-        DateTime.parseISO_UTC(response.created), response.createdBy,
-        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         new Version(response.version.toString()),
         fields,
         response.fieldsInLists,

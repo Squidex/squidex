@@ -352,8 +352,8 @@ function parseContent(response: any) {
         response.statusColor,
         response.newStatus,
         response.newStatusColor,
-        DateTime.parseISO_UTC(response.created), response.createdBy,
-        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         parseScheduleJob(response.scheduleJob),
         response.data,
         response.schemaName,
@@ -372,5 +372,5 @@ function parseScheduleJob(response: any) {
         response.status,
         response.scheduledBy,
         response.color,
-        DateTime.parseISO_UTC(response.dueTime));
+        DateTime.parseISO(response.dueTime));
 }

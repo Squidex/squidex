@@ -135,9 +135,12 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                     this.history = dto;
                 }));
 
+        const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
+        const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
+
         this.own(
             this.appsState.selectedApp.pipe(
-                    switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
+                    switchMap(app => this.usagesService.getStorageUsages(app.name, dateFrom, dateTo)))
                 .subscribe(dtos => {
                     const labels = createLabels(dtos);
 
@@ -174,7 +177,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
 
         this.own(
             this.appsState.selectedApp.pipe(
-                    switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
+                    switchMap(app => this.usagesService.getCallsUsages(app.name, dateFrom, dateTo)))
                 .subscribe(({ details, totalBytes, totalCalls, allowedCalls, averageElapsedMs }) => {
                     const labels = createLabelsFromSet(details);
 
@@ -234,7 +237,7 @@ function label(category: string) {
 }
 
 function createLabels(dtos: ReadonlyArray<{ date: DateTime }>): ReadonlyArray<string> {
-    return dtos.map(d => d.date.toStringFormat('M-DD'));
+    return dtos.map(d => d.date.toStringFormat('M-dd'));
 }
 
 function createLabelsFromSet(dtos: { [category: string]: ReadonlyArray<{ date: DateTime }> }): ReadonlyArray<string> {

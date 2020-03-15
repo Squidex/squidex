@@ -97,7 +97,7 @@ export class HistoryService {
                         item.actor,
                         item.eventType,
                         item.message,
-                        DateTime.parseISO_UTC(item.created),
+                        DateTime.parseISO(item.created),
                         new Version(item.version.toString())));
 
                 return history;

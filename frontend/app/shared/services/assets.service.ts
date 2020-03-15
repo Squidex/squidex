@@ -418,8 +418,8 @@ export class AssetsService {
 function parseAsset(response: any) {
     return new AssetDto(response._links, response._meta,
         response.id,
-        DateTime.parseISO_UTC(response.created), response.createdBy,
-        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         response.fileName,
         response.fileHash,
         response.fileType,

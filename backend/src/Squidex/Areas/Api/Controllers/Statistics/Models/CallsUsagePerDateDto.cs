@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
@@ -15,6 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The date when the usage was tracked.
         /// </summary>
+        [JsonConverter(typeof(DateConverter))]
         public DateTime Date { get; set; }
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         {
             var result = new CallsUsagePerDateDto
             {
-                Date = stats.Date,
+                Date = DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc),
                 TotalBytes = stats.TotalBytes,
                 TotalCalls = stats.TotalCalls,
                 AverageElapsedMs = stats.AverageElapsedMs,
