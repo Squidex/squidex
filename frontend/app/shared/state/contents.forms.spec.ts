@@ -248,7 +248,7 @@ describe('BooleanField', () => {
 });
 
 describe('DateTimeField', () => {
-    const now = DateTime.parseISO_UTC('2017-10-12T16:30:10Z');
+    const now = DateTime.parseISO('2017-10-12T16:30:10Z');
     const field = createField({ properties: createProperties('DateTime', { editor: 'DateTime', isRequired: true }) });
 
     it('should create validators', () => {
@@ -261,6 +261,12 @@ describe('DateTimeField', () => {
 
     it('should format to input if parsing failed', () => {
         expect(FieldFormatter.format(field, true)).toBe(true);
+    });
+
+    it('should format old format to date', () => {
+        const dateField = createField({ properties: createProperties('DateTime', { editor: 'Date' }) });
+
+        expect(FieldFormatter.format(dateField, '2017-12-12')).toBe('2017-12-12');
     });
 
     it('should format to date', () => {

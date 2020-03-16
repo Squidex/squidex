@@ -169,7 +169,6 @@ module.exports = function (env) {
 
         plugins: [
             new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, root('./app'), {}),
-            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
 
             /**
              * Puts each bundle into a file and appends the hash of the file to the path.

@@ -8,6 +8,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { MathHelper, ResourceOwner } from '@app/framework/internal';
+import { StringHelper } from '../utils/string-helper';
 
 const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
 
@@ -122,10 +123,12 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
         const h = Math.round(this.size.height);
 
         if (w > 0 && h > 0) {
-            let source = `${this.imageSource}&width=${w}&height=${h}&mode=Pad&nofocus`;
+            let source = this.imageSource;
+
+            source = StringHelper.appendToUrl(source, `${this.imageSource}&width=${w}&height=${h}&mode=Pad&nofocus`);
 
             if (this.loadQuery) {
-                source += `&q=${this.loadQuery}`;
+                source = StringHelper.appendToUrl(source, 'q', this.loadQuery);
             }
 
             this.renderer.setProperty(this.element.nativeElement, 'src', source);

@@ -51,11 +51,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             throw new NotSupportedException();
         }
 
-        public string AssetSource(Guid assetId)
-        {
-            throw new NotSupportedException();
-        }
-
         public string BackupsUI(NamedId<Guid> appId)
         {
             throw new NotSupportedException();

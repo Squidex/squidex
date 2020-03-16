@@ -357,8 +357,8 @@ export class RulesService {
                 const ruleEvents = new RuleEventsDto(body.total, items.map(item =>
                     new RuleEventDto(item._links,
                         item.id,
-                        DateTime.parseISO_UTC(item.created),
-                        item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
+                        DateTime.parseISO(item.created),
+                        item.nextAttempt ? DateTime.parseISO(item.nextAttempt) : null,
                         item.eventName,
                         item.description,
                         item.lastDump,
@@ -399,8 +399,8 @@ export class RulesService {
 function parseRule(response: any) {
     return new RuleDto(response._links,
         response.id,
-        DateTime.parseISO_UTC(response.created), response.createdBy,
-        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         new Version(response.version.toString()),
         response.isEnabled,
         response.trigger,
@@ -410,5 +410,5 @@ function parseRule(response: any) {
         response.name,
         response.numSucceeded,
         response.numFailed,
-        response.lastExecuted ? DateTime.parseISO_UTC(response.lastExecuted) : undefined);
+        response.lastExecuted ? DateTime.parseISO(response.lastExecuted) : undefined);
 }

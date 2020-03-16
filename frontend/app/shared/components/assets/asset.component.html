@@ -81,11 +81,7 @@
                     </div>
                 </div>
                 <div class="file-tags tags">
-                    <sqx-tag-editor [ngModel]="asset.tags"  
-                        styleBlank="true"
-                        styleGray="true"
-                        readonly="true">
-                    </sqx-tag-editor>
+                    <div class="tag" *ngFor="let tag of asset.tags">{{tag}}</div>
                 </div>
                 <div class="file-info">
                     {{asset.metadataText}}

@@ -69,7 +69,7 @@ export class CommentsService {
                     body.createdComments.map((item: any) => {
                         return new CommentDto(
                             item.id,
-                            DateTime.parseISO_UTC(item.time),
+                            DateTime.parseISO(item.time),
                             item.text,
                             item.url,
                             item.user);
@@ -77,7 +77,7 @@ export class CommentsService {
                     body.updatedComments.map((item: any) => {
                         return new CommentDto(
                             item.id,
-                            DateTime.parseISO_UTC(item.time),
+                            DateTime.parseISO(item.time),
                             item.text,
                             item.url,
                             item.user);
@@ -98,7 +98,7 @@ export class CommentsService {
             map(body => {
                 const comment = new CommentDto(
                     body.id,
-                    DateTime.parseISO_UTC(body.time),
+                    DateTime.parseISO(body.time),
                     body.text,
                     body.url,
                     body.user);

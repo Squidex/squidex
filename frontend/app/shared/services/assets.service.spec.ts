@@ -451,9 +451,9 @@ describe('AssetsService', () => {
 
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             createdBy: `creator${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
             fileName: `My Name${id}${suffix}.png`,
             fileHash: `My Hash${id}${suffix}`,
@@ -510,8 +510,8 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
 
     return new AssetDto(links, meta,
         `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
         `My Name${id}${suffix}.png`,
         `My Hash${id}${suffix}`,
         'png',

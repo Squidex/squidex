@@ -148,8 +148,8 @@ export class BackupsService {
 function parseRestore(response: any) {
     return new RestoreDto(
         response.url,
-        DateTime.parseISO_UTC(response.started),
-        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+        DateTime.parseISO(response.started),
+        response.stopped ? DateTime.parseISO(response.stopped) : null,
         response.status,
         response.log);
 }
@@ -157,8 +157,8 @@ function parseRestore(response: any) {
 function parseBackup(response: any) {
     return new BackupDto(response._links,
         response.id,
-        DateTime.parseISO_UTC(response.started),
-        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+        DateTime.parseISO(response.started),
+        response.stopped ? DateTime.parseISO(response.stopped) : null,
         response.handledEvents,
         response.handledAssets,
         response.status);

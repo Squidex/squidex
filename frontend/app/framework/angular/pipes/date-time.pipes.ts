@@ -19,7 +19,7 @@ export class ShortDatePipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('DD. MMM');
+        return value.toStringFormat('dd. MMM');
     }
 }
 
@@ -47,7 +47,7 @@ export class DatePipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('DD. MMM YYYY');
+        return value.toStringFormat('dd. LLL yyyy');
     }
 }
 
@@ -61,7 +61,7 @@ export class MonthPipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('MMMM');
+        return value.toStringFormat('LLLL');
     }
 }
 
@@ -89,7 +89,7 @@ export class DayOfWeekPipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('dd');
+        return value.toStringFormat('E');
     }
 }
 
@@ -103,7 +103,7 @@ export class DayPipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('DD');
+        return value.toStringFormat('dd');
     }
 }
 
@@ -131,7 +131,7 @@ export class FullDateTimePipe implements PipeTransform {
             return fallback;
         }
 
-        return value.toStringFormat('LLL');
+        return value.toStringFormat('PPpp');
     }
 }
 

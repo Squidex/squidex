@@ -68,8 +68,8 @@ describe('HistoryService', () => {
 
         expect(events!).toEqual(
             [
-                new HistoryEventDto('1', 'User1', 'Type 1', 'Message 1', DateTime.parseISO_UTC('2016-12-12T10:10'), new Version('2')),
-                new HistoryEventDto('2', 'User2', 'Type 2', 'Message 2', DateTime.parseISO_UTC('2016-12-13T10:10'), new Version('3'))
+                new HistoryEventDto('1', 'User1', 'Type 1', 'Message 1', DateTime.parseISO('2016-12-12T10:10Z'), new Version('2')),
+                new HistoryEventDto('2', 'User2', 'Type 2', 'Message 2', DateTime.parseISO('2016-12-13T10:10Z'), new Version('3'))
             ]);
     }));
 });

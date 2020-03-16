@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import moment from 'moment';
-
 import { DateTime } from './date-time';
 
 export class Duration {
@@ -23,21 +21,29 @@ export class Duration {
     }
 
     public toString(): string {
-        const duration = moment.duration(this.value);
+        let seconds = this.value / 1000;
 
-        let hoursString = Math.floor(duration.asHours()).toString();
+        const hours = Math.floor(seconds / 3600);
+
+        let hoursString = hours.toString();
 
         if (hoursString.length === 1) {
             hoursString = `0${hoursString}`;
         }
 
-        let minutesString = duration.minutes().toString();
+        seconds = seconds % 3600;
+
+        const minutes = Math.floor(seconds / 60);
+
+        let minutesString = minutes.toString();
 
         if (minutesString.length === 1) {
             minutesString = `0${minutesString}`;
         }
 
-        let secondsString = duration.seconds().toString();
+        seconds = seconds % 60;
+
+        let secondsString = seconds.toString();
 
         if (secondsString.length === 1) {
             secondsString = `0${secondsString}`;

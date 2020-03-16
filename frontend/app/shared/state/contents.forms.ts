@@ -159,12 +159,12 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
         try {
-            const parsed = DateTime.parseISO_UTC(this.value);
+            const parsed = DateTime.parseISO(this.value);
 
             if (properties.editor === 'Date') {
-                return parsed.toUTCStringFormat('YYYY-MM-DD');
+                return parsed.toStringFormatUTC('yyyy-MM-dd');
             } else {
-                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
+                return parsed.toStringFormatUTC('yyyy-MM-dd HH:mm:ss');
             }
         } catch (ex) {
             return this.value;
@@ -388,9 +388,9 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         const now = this.now || DateTime.now();
 
         if (properties.calculatedDefaultValue === 'Now') {
-            return `${now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss')}Z`;
+            return `${now.toStringFormatUTC('yyyy-MM-dd\'T\'HH:mm:ss')}Z`;
         } else if (properties.calculatedDefaultValue === 'Today') {
-            return `${now.toUTCStringFormat('YYYY-MM-DD')}T00:00:00Z`;
+            return `${now.toISODate()}T00:00:00Z`;
         } else {
             return properties.defaultValue;
         }

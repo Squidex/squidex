@@ -5,16 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import moment from 'moment';
-
 export module DateHelper {
-    let momentInstance: any;
+    let locale: string | null;
 
-    export function setMoment(value: any) {
-        momentInstance = value;
+    export function setlocale(code: string | null) {
+        locale = code;
     }
 
-    export function locale(code: string) {
-        (momentInstance || moment).locale(code);
+    export function getLocale() {
+        return locale || 'en';
+    }
+
+    export function getUTCDate(date: Date) {
+        return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+    }
+
+    export function getLocalDate (date: Date) {
+        return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
     }
 }

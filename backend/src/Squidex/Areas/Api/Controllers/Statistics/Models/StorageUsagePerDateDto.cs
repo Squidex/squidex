@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
@@ -15,6 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The date when the usage was tracked.
         /// </summary>
+        [JsonConverter(typeof(DateConverter))]
         public DateTime Date { get; set; }
 
         /// <summary>

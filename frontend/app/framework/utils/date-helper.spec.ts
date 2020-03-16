@@ -5,27 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import moment from 'moment';
-
 import { DateHelper } from './date-helper';
 
 describe('DateHelper', () => {
-    it('should call config method of moment object', () => {
-        let called: string;
+    it('should use default locale if not configured', () => {
+        DateHelper.setlocale(null);
 
-        DateHelper.setMoment({
-            locale: (l: string) => { called = l; }
-        });
+        const locale = DateHelper.getLocale();
 
-        DateHelper.locale('en');
-
-        expect(called!).toBe('en');
+        expect(locale).toBe('en');
     });
 
-    it('should use global moment if not configured', () => {
-        DateHelper.setMoment(null);
-        DateHelper.locale('en');
+    it('should use configured locale', () => {
+        DateHelper.setlocale('it');
 
-        expect(moment.locale()).toBe('en');
+        const locale = DateHelper.getLocale();
+
+        expect(locale).toBe('it');
     });
 });
