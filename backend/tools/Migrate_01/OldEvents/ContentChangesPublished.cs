@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
+using ContentStatusChangedV2 = Squidex.Domain.Apps.Events.Contents.ContentStatusChanged;
 
 namespace Migrate_01.OldEvents
 {
@@ -19,7 +21,11 @@ namespace Migrate_01.OldEvents
     {
         public IEvent Migrate()
         {
-            return SimpleMapper.Map(this, new ContentSchedulingCancelled());
+            return SimpleMapper.Map(this, new ContentStatusChangedV2
+            {
+                Status = Status.Published,
+                Change = StatusChange.Published
+            });
         }
     }
 }

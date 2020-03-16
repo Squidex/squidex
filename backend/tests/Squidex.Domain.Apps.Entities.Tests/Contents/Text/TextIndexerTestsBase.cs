@@ -175,6 +175,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
+        public async Task Should_simulate_new_version_with_migration()
+        {
+            await TestCombinations(0,
+                Create(ids1[0], "iv", "V1"),
+
+                // Publish the content.
+                Publish(ids1[0]),
+
+                Search(expected: ids1, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
+
+                // Create a new version, his updates the new version also.
+                CreateDraftWithData(ids1[0], "iv", "V2"),
+
+                Search(expected: null, text: "V1", target: SearchScope.All),
+                Search(expected: ids1, text: "V1", target: SearchScope.Published),
+
+                Search(expected: ids1, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published)
+            );
+        }
+
+        [Fact]
         public async Task Should_simulate_content_reversion()
         {
             await TestCombinations(
@@ -273,6 +296,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             .AddValue(language, text));
 
             return Op(id, new ContentUpdated { Data = data });
+        }
+
+        private IndexOperation CreateDraftWithData(Guid id, string language, string text)
+        {
+            var data =
+                new NamedContentData()
+                    .AddField("text",
+                        new ContentFieldData()
+                            .AddValue(language, text));
+
+            return Op(id, new ContentDraftCreated { MigratedData = data });
         }
 
         private IndexOperation CreateDraft(Guid id)

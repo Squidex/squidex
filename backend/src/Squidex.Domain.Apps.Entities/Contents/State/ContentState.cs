@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
                 case ContentDraftCreated e:
                     {
-                        NewVersion = new ContentVersion(e.Status, CurrentVersion.Data);
+                        NewVersion = new ContentVersion(e.Status, e.MigratedData ?? CurrentVersion.Data);
 
                         ScheduleJob = null;
 

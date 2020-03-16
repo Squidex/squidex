@@ -19,7 +19,7 @@ namespace Migrate_01.OldEvents
     {
         public IEvent Migrate()
         {
-            return SimpleMapper.Map(this, new NoopConventEvent());
+            return SimpleMapper.Map(this, new ContentDraftDeleted());
         }
     }
 }

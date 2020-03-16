@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Events.Contents
     [EventType(nameof(ContentDraftCreated))]
     public sealed class ContentDraftCreated : ContentEvent
     {
+        public NamedContentData? MigratedData { get; set; }
+
         public Status Status { get; set; }
     }
 }

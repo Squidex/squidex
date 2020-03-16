@@ -60,10 +60,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             switch (@event.Payload)
             {
                 case ContentCreated created:
-                    await CreateAsync(created);
+                    await CreateAsync(created, created.Data);
                     break;
                 case ContentUpdated updated:
-                    await UpdateAsync(updated);
+                    await UpdateAsync(updated, updated.Data);
                     break;
                 case ContentStatusChanged statusChanged when statusChanged.Status == Status.Published:
                     await PublishAsync(statusChanged);
@@ -71,19 +71,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 case ContentStatusChanged statusChanged:
                     await UnpublishAsync(statusChanged);
                     break;
-                case ContentDraftCreated draftCreated:
-                    await CreateDraftAsync(draftCreated);
-                    break;
                 case ContentDraftDeleted draftDelted:
                     await DeleteDraftAsync(draftDelted);
                     break;
                 case ContentDeleted deleted:
                     await DeleteAsync(deleted);
                     break;
+                case ContentDraftCreated draftCreated:
+                    {
+                        await CreateDraftAsync(draftCreated);
+
+                        if (draftCreated.MigratedData != null)
+                        {
+                            await UpdateAsync(draftCreated, draftCreated.MigratedData);
+                        }
+                    }
+
+                    break;
             }
         }
 
-        private async Task CreateAsync(ContentCreated @event)
+        private async Task CreateAsync(ContentEvent @event, NamedContentData data)
         {
             var state = new TextContentState
             {
@@ -99,13 +107,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     DocId = state.DocIdCurrent,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = @event.Data.ToTexts(),
+                    Texts = data.ToTexts(),
                 });
 
             await textIndexerState.SetAsync(state);
         }
 
-        private async Task CreateDraftAsync(ContentDraftCreated @event)
+        private async Task CreateDraftAsync(ContentEvent @event)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
@@ -117,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task UpdateAsync(ContentUpdated @event)
+        private async Task UpdateAsync(ContentEvent @event, NamedContentData data)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
@@ -132,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             DocId = state.DocIdNew,
                             ServeAll = true,
                             ServePublished = false,
-                            Texts = @event.Data.ToTexts()
+                            Texts = data.ToTexts()
                         },
                         new UpdateIndexEntry
                         {
@@ -154,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             DocId = state.DocIdCurrent,
                             ServeAll = true,
                             ServePublished = isPublished,
-                            Texts = @event.Data.ToTexts()
+                            Texts = data.ToTexts()
                         });
 
                     state.DocIdForPublished = state.DocIdNew;
@@ -164,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task UnpublishAsync(ContentStatusChanged @event)
+        private async Task UnpublishAsync(ContentEvent @event)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
@@ -184,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task PublishAsync(ContentStatusChanged @event)
+        private async Task PublishAsync(ContentEvent @event)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
@@ -226,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task DeleteDraftAsync(ContentDraftDeleted @event)
+        private async Task DeleteDraftAsync(ContentEvent @event)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
@@ -250,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task DeleteAsync(ContentDeleted @event)
+        private async Task DeleteAsync(ContentEvent @event)
         {
             var state = await textIndexerState.GetAsync(@event.ContentId);
 
