@@ -6,9 +6,11 @@
  */
 
 import { Component } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 
-import { DialogModel } from '@app/shared';
+import { DialogModel, UIOptions } from '@app/shared';
+
+const OPTION_IMMEDIATELY = 'Immediately';
 
 @Component({
     selector: 'sqx-due-time-selector',
@@ -16,14 +18,23 @@ import { DialogModel } from '@app/shared';
     templateUrl: './due-time-selector.component.html'
 })
 export class DueTimeSelectorComponent {
+    private disabled: boolean;
     private dueTimeResult: Subject<string | null>;
 
     public dueTimeDialog = new DialogModel();
     public dueTime: string | null = '';
     public dueTimeAction: string | null = '';
-    public dueTimeMode = 'Immediately';
+    public dueTimeMode = OPTION_IMMEDIATELY;
+
+    constructor(uiOptions: UIOptions) {
+        this.disabled = uiOptions.get('disableScheduledChanges') === true;
+    }
 
     public selectDueTime(action: string): Observable<string | null> {
+        if (this.disabled) {
+            return of(null);
+        }
+
         this.dueTimeAction = action;
         this.dueTimeResult = new Subject<string | null>();
         this.dueTimeDialog.show();
@@ -32,7 +43,7 @@ export class DueTimeSelectorComponent {
     }
 
     public confirmStatusChange() {
-        const result = this.dueTimeMode === 'Immediately' ? null : this.dueTime;
+        const result = this.dueTimeMode === OPTION_IMMEDIATELY ? null : this.dueTime;
 
         this.dueTimeResult.next(result);
         this.dueTimeResult.complete();
@@ -41,7 +52,7 @@ export class DueTimeSelectorComponent {
     }
 
     public cancelStatusChange() {
-        this.dueTimeMode = 'Immediately';
+        this.dueTimeMode = OPTION_IMMEDIATELY;
         this.dueTimeDialog.hide();
         this.dueTimeResult = null!;
         this.dueTime = null;

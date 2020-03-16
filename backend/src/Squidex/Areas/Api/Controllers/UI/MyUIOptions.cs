@@ -27,6 +27,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public bool HideDateButtons { get; set; }
 
+        public bool DisableScheduledChanges { get; set; }
+
         public bool RedirectToLogin { get; set; }
 
         public bool OnlyAdminsCanCreateApps { get; set; }
