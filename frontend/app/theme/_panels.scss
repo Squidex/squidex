@@ -10,6 +10,15 @@
     text-align: center;
     text-decoration: none;
 
+    &:not([href]) {
+        color: $color-border-dark;
+
+        &:hover,
+        &:focus {
+            color: darken($color-border-dark, 10%);
+        }
+    }
+
     &:hover,
     &:focus {
         color: darken($color-border-dark, 10%);
