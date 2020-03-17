@@ -334,6 +334,22 @@ namespace Squidex.Infrastructure.Queries
             Assert.Throws<ValidationException>(() => AssertQuery(json, null));
         }
 
+        [Fact]
+        public void Should_not_throw_exception_when_parsing_null_string()
+        {
+            string? json = null;
+
+            Assert.NotNull(schema.Parse(json!, JsonHelper.DefaultSerializer));
+        }
+
+        [Fact]
+        public void Should_not_throw_exception_when_parsing_null_json()
+        {
+            var json = "null";
+
+            Assert.NotNull(schema.Parse(json, JsonHelper.DefaultSerializer));
+        }
+
         private void AssertQuery(object json, string? expectedFilter)
         {
             var filter = ConvertQuery(json);
@@ -374,9 +390,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = JsonHelper.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = schema.Parse(json, JsonHelper.DefaultSerializer);
+            var jsonQuery = schema.Parse(json, JsonHelper.DefaultSerializer);
 
-            return jsonFilter.ToString();
+            return jsonQuery.ToString();
         }
     }
 }

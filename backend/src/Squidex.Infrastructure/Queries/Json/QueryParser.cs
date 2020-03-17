@@ -20,7 +20,17 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         public static ClrQuery Parse(this JsonSchema schema, string json, IJsonSerializer jsonSerializer)
         {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return new ClrQuery();
+            }
+
             var query = ParseFromJson(json, jsonSerializer);
+
+            if (query == null)
+            {
+                return new ClrQuery();
+            }
 
             var result = SimpleMapper.Map(query, new ClrQuery());
 

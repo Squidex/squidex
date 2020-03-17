@@ -7,7 +7,6 @@
 
 using System;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
@@ -17,7 +16,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(ContentUpdateProposed))]
     [Obsolete]
-    public sealed class ContentUpdateProposed : SquidexEvent, IMigrated<IEvent>
+    public sealed class ContentUpdateProposed : ContentEvent, IMigrated<IEvent>
     {
         public NamedContentData Data { get; set; }
 
