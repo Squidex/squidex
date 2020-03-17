@@ -4,8 +4,8 @@
   <xs:element name="Weavers">
     <xs:complexType>
       <xs:all>
+        <xs:element name="SquidexFreezable" minOccurs="0" maxOccurs="1" type="xs:anyType" />
         <xs:element name="Equals" minOccurs="0" maxOccurs="1" type="xs:anyType" />
-        <xs:element name="Freezable" minOccurs="0" maxOccurs="1" type="xs:anyType" />
       </xs:all>
       <xs:attribute name="VerifyAssembly" type="xs:boolean">
         <xs:annotation>
