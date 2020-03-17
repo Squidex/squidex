@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
             }
 
-            return ids.Select(cachedAssets.GetOrDefault).Where(x => x != null).ToList();
+            return ids.Select(cachedAssets.GetOrDefault).NotNull().ToList();
         }
 
         public virtual async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(ICollection<Guid> ids)
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
             }
 
-            return ids.Select(cachedContents.GetOrDefault).Where(x => x != null).ToList();
+            return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
         }
     }
 }

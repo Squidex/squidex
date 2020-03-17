@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations;
 using Migrate_01.Migrations.MongoDb;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
@@ -32,7 +33,7 @@ namespace Migrate_01
                 return (CurrentVersion, null);
             }
 
-            var migrations = ResolveMigrators(version).Where(x => x != null).ToList();
+            var migrations = ResolveMigrators(version).NotNull().ToList();
 
             return (CurrentVersion, migrations);
         }

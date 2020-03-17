@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 var checkErrors = await Task.WhenAll(tasks);
 
-                errors.AddRange(checkErrors.Where(x => x != null));
+                errors.AddRange(checkErrors.NotNull());
             }
 
             return errors;

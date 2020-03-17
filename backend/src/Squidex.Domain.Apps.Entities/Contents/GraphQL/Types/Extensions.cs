@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             var contents = await Task.WhenAll(keys.Select(dataLoader.LoadAsync));
 
-            return contents.Where(x => x != null).ToList();
+            return contents.NotNull().ToList();
         }
     }
 }

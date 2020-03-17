@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     await Task.WhenAll(
                         ids.Select(id => GetSchemaAsync(appId, id, allowDeleted)));
 
-                return schemas.Where(x => x != null).ToList();
+                return schemas.NotNull().ToList();
             }
         }
 

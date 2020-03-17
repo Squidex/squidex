@@ -56,22 +56,10 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 try
                 {
-                    Collection CreateCollection(string name)
-                    {
-                        var collection = new Collection();
-
-                        collection.CollectionName = name;
-                        collection.DatabaseName = store.DatabaseId;
-                        collection.MasterKey = store.MasterKey;
-                        collection.Uri = store.ServiceUri;
-
-                        return collection;
-                    }
-
                     var processor =
                         await new Builder()
-                            .WithFeedCollection(CreateCollection(Constants.Collection))
-                            .WithLeaseCollection(CreateCollection(Constants.LeaseCollection))
+                            .WithFeedCollection(CreateCollection(store, Constants.Collection))
+                            .WithLeaseCollection(CreateCollection(store, Constants.LeaseCollection))
                             .WithHostName(hostName)
                             .WithProcessorOptions(new Options { StartFromBeginning = fromBeginning, LeasePrefix = hostName })
                             .WithObserverFactory(this)
@@ -86,6 +74,18 @@ namespace Squidex.Infrastructure.EventSourcing
                     await subscriber.OnErrorAsync(this, ex);
                 }
             });
+        }
+
+        private static Collection CreateCollection(CosmosDbEventStore store, string name)
+        {
+            var collection = new Collection();
+
+            collection.CollectionName = name;
+            collection.DatabaseName = store.DatabaseId;
+            collection.MasterKey = store.MasterKey;
+            collection.Uri = store.ServiceUri;
+
+            return collection;
         }
 
         public IChangeFeedObserver CreateObserver()

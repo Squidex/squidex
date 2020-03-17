@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                     await Task.WhenAll(
                         ids.Select(GetRuleAsync));
 
-                return rules.Where(x => x != null).ToList();
+                return rules.NotNull().ToList();
             }
         }
 

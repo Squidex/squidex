@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Queries
 
         public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn)
         {
-            var pruned = nodeIn.Filters.Select(x => x.Accept(this)!).Where(x => x != null).ToList();
+            var pruned = nodeIn.Filters.Select(x => x.Accept(this)!).NotNull().ToList();
 
             if (pruned.Count == 1)
             {
