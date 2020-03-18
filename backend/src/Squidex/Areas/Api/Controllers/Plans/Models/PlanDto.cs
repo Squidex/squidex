@@ -32,6 +32,16 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string Costs { get; set; }
 
         /// <summary>
+        /// An optional confirm text for the monthly subscription.
+        /// </summary>
+        public string? ConfirmText { get; set; }
+
+        /// <summary>
+        /// An optional confirm text for the yearly subscription.
+        /// </summary>
+        public string? YearlyConfirmText { get; set; }
+
+        /// <summary>
         /// The yearly costs of the plan.
         /// </summary>
         public string? YearlyCosts { get; set; }

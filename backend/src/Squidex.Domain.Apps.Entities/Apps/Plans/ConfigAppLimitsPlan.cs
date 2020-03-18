@@ -15,9 +15,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public string Costs { get; set; }
 
+        public string? ConfirmText { get; set; }
+
         public string? YearlyCosts { get; set; }
 
         public string? YearlyId { get; set; }
+
+        public string? YearlyConfirmText { get; set; }
 
         public long BlockingApiCalls { get; set; }
 

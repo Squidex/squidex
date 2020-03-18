@@ -97,6 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [InlineData("Name $APP_NAME has id $APP_ID")]
+        [InlineData("Name ${$EVENT_APPID.NAME} has id ${EVENT_APPID.ID}")]
         [InlineData("Script(`Name ${event.appId.name} has id ${event.appId.id}`)")]
         public void Should_format_app_information_from_event(string script)
         {
@@ -120,19 +121,32 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME")]
-        [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}, Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
+        [InlineData("Full: $TIMESTAMP_DATETIME")]
+        [InlineData("Script(`Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
         public void Should_format_timestamp_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal($"Date: {now:yyyy-MM-dd}, Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
+            Assert.Equal($"Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
+        }
+
+        [Theory]
+        [InlineData("Date: $TIMESTAMP_DATE")]
+        [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}`)")]
+        public void Should_format_timestamp_date_information_from_event(string script)
+        {
+            var @event = new EnrichedContentEvent { Timestamp = now };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal($"Date: {now:yyyy-MM-dd}", result);
         }
 
         [Theory]
         [InlineData("From $MENTIONED_NAME ($MENTIONED_EMAIL, $MENTIONED_ID)")]
+        [InlineData("From ${COMMENT_MENTIONEDUSER.NAME} (${COMMENT_MENTIONEDUSER.EMAIL}, ${COMMENT_MENTIONEDUSER.ID})")]
         [InlineData("Script(`From ${event.mentionedUser.name} (${event.mentionedUser.email}, ${event.mentionedUser.id})`)")]
         public void Should_format_email_and_display_name_from_mentioned_user(string script)
         {

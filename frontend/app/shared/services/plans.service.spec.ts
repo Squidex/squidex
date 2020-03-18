@@ -60,18 +60,22 @@ describe('PlansService', () => {
                     id: 'free',
                     name: 'Free',
                     costs: '14 €',
+                    confirmText: 'Change for 14 € per month?',
                     yearlyId: 'free_yearly',
-                    yearlyCosts: '12 €',
+                    yearlyCosts: '120 €',
+                    yearlyConfirmText: 'Change for 120 € per year?',
                     maxApiCalls: 1000,
                     maxAssetSize: 1500,
                     maxContributors: 2500
                 },
                 {
-                    id: 'prof',
-                    name: 'Prof',
+                    id: 'professional',
+                    name: 'Professional',
                     costs: '18 €',
-                    yearlyId: 'prof_yearly',
-                    yearlyCosts: '16 €',
+                    confirmText: 'Change for 18 € per month?',
+                    yearlyId: 'professional_yearly',
+                    yearlyCosts: '160 €',
+                    yearlyConfirmText: 'Change for 160 € per year?',
                     maxApiCalls: 4000,
                     maxAssetSize: 5500,
                     maxContributors: 6500
@@ -89,8 +93,18 @@ describe('PlansService', () => {
                 currentPlanId: '123',
                 planOwner: '456',
                 plans: [
-                    new PlanDto('free', 'Free', '14 €', 'free_yearly', '12 €', 1000, 1500, 2500),
-                    new PlanDto('prof', 'Prof', '18 €', 'prof_yearly', '16 €', 4000, 5500, 6500)
+                    new PlanDto(
+                        'free', 'Free', '14 €',
+                        'Change for 14 € per month?',
+                        'free_yearly', '120 €',
+                        'Change for 120 € per year?',
+                        1000, 1500, 2500),
+                    new PlanDto(
+                        'professional', 'Professional', '18 €',
+                        'Change for 18 € per month?',
+                        'professional_yearly', '160 €',
+                        'Change for 160 € per year?',
+                        4000, 5500, 6500)
                 ],
                 hasPortal: true
             },

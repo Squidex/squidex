@@ -12,12 +12,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -27,8 +30,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private const string Fallback = "null";
         private const string ScriptSuffix = ")";
         private const string ScriptPrefix = "Script(";
-        private static readonly Regex RegexPatternOld = new Regex(@"^(?<Type>[^_]*)_(?<Path>.*)", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<Type>[^_]*)_(?<Path>.*)\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternOld = new Regex(@"^(?<Type>[^_]*)_(?<Path>[^\s]*)", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<Type>[^_]*)_(?<Path>[^\s]*)\}", RegexOptions.Compiled);
         private readonly List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
         private readonly IUrlGenerator urlGenerator;
@@ -324,6 +327,24 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else if (current != null)
                 {
+                    if (current is IUser user)
+                    {
+                        var type = segment;
+
+                        if (string.Equals(type, "Name", StringComparison.OrdinalIgnoreCase))
+                        {
+                            type = SquidexClaimTypes.DisplayName;
+                        }
+
+                        var claim = user.Claims.FirstOrDefault(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase));
+
+                        if (claim != null)
+                        {
+                            current = claim.Value;
+                            continue;
+                        }
+                    }
+
                     const BindingFlags bindingFlags =
                         BindingFlags.FlattenHierarchy |
                         BindingFlags.Public |

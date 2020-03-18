@@ -22,7 +22,11 @@
             &#10003; Selected
         </button>
         
-        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="changeMonthly()">
+        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
+            (sqxConfirmClick)="changeMonthly()"
+            [confirmTitle]="'Change subscription'"
+            [confirmText]="planInfo.plan.confirmText"
+            [confirmRequired]="planInfo.plan.confirmText">
             Change
         </button>
     </div>
@@ -37,7 +41,11 @@
             &#10003; Selected
         </button>
         
-        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="changeYearly()">
+        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" 
+            (sqxConfirmClick)="changeYearly()"
+            [confirmTitle]="'Change subscription'"
+            [confirmText]="planInfo.plan.yearlyConfirmText"
+            [confirmRequired]="planInfo.plan.yearlyConfirmText">
             Change
         </button>
     </div>
