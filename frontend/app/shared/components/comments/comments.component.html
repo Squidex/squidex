@@ -19,16 +19,11 @@
                 </div>
             </div>
             
-            <div class="comments-footer">
-                <ng-template #mentionListTemplate let-item="item">
-                    {{item['contributorEmail']}}
-                </ng-template>
-                
+            <div class="comments-footer">                
                 <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
                     <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" 
                         [mention]="users" 
                         [mentionConfig]="mentionConfig" 
-                        [mentionListTemplate]="mentionListTemplate"
                         autocomplete="off" 
                         autocorrect="off"
                         autocapitalize="off" />

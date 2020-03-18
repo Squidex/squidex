@@ -30,7 +30,6 @@
                     [(ngModel)]="editingText"
                     [mention]="mentionUsers" 
                     [mentionConfig]="mentionConfig" 
-                    [mentionListTemplate]="mentionListTemplate"
                     (keydown)="updateWhenEnter($event)"></textarea>
     
                 <div>
@@ -59,7 +58,3 @@
         </button>
     </div>
 </div>
-
-<ng-template #mentionListTemplate let-item="item">
-    {{item['contributorEmail']}}
-</ng-template>
