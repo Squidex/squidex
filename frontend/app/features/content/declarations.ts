@@ -35,5 +35,6 @@ export * from './shared/list/content.component';
 
 export * from './shared/references/content-selector-item.component';
 export * from './shared/references/content-selector.component';
+export * from './shared/references/content-creator.component';
 export * from './shared/references/reference-item.component';
 export * from './shared/references/references-editor.component';

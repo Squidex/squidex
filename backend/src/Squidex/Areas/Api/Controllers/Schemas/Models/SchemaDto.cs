@@ -105,6 +105,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 AddGetLink("contents", controller.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
+            if (controller.HasPermission(Permissions.AppContentsCreate, app, Name))
+            {
+                AddPostLink("contents/create", controller.Url<ContentsController>(x => nameof(x.PostContent), values));
+
+                AddPostLink("contents/create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
+            }
+
             if (controller.HasPermission(Permissions.AppSchemasPublish, app, Name))
             {
                 if (IsPublished)

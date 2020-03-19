@@ -79,14 +79,14 @@
         <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
 
         <div class="float-right" *ngIf="!editing">
-            <button type="button" class="btn btn-outline-success mr-1" (click)="addField(false)">Create and close</button>
-            <button type="button" class="btn btn-success mr-1" (click)="addField(true)">Create and add field</button>
-            <button type="button" class="btn btn-success" (click)="addField(false, true)">Create and edit field</button>
+            <button type="button" class="btn btn-outline-success" (click)="addField(false)">Create and close</button>
+            <button type="button" class="btn btn-success ml-1" (click)="addField(true)">Create and add field</button>
+            <button type="button" class="btn btn-success ml-1" (click)="addField(false, true)">Create and edit field</button>
         </div>
 
         <div class="float-right" *ngIf="editing">
-            <button type="button" class="btn btn-success mr-1" (click)="save(true)">Save and add field</button>
-            <button type="button" class="btn btn-primary" (click)="save()">Save and close</button>
+            <button type="button" class="btn btn-success" (click)="save(true)">Save and add field</button>
+            <button type="button" class="btn btn-primary ml-1" (click)="save()">Save and close</button>
         </div>
     </ng-container>
 </sqx-modal-dialog>

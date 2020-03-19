@@ -29,14 +29,10 @@
                     </sqx-search-form>
                 </div>
                     
-                <div class="-auto pl-1" *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
-                </div>
-                    
-                <div class="-auto pl-1">
-                    <a class="btn btn-success" [routerLink]="['../..', schema.name]" target="_blank">
-                        <i class="icon-plus"></i>
-                    </a>
+                <div class="col-auto pl-1" *ngIf="languages.length > 1">
+                    <sqx-language-selector class="languages-buttons"
+                        (selectedLanguageChange)="selectLanguage($event)" [languages]="languages">
+                    </sqx-language-selector>
                 </div>
             </ng-container>
         </div>

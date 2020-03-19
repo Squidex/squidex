@@ -4,8 +4,12 @@
     [sqxResizeMaxWidth]="0">
     <ng-container>
         <div class="drop-area-container">
-            <div class="drop-area" (click)="selectorDialog.show()">
-                Click here to link content items.
+            <div class="drop-area">
+                <a (click)="contentCreatorDialog.show()">Add New</a>
+
+                &middot;
+
+                <a (click)="contentSelectorDialog.show()">Select Existing</a>
             </div>
         </div>
         
@@ -19,10 +23,10 @@
                 class="table-drag"
                 cdkDrag
                 cdkDragLockAxis="y"
-                [language]="language"
                 [columns]="snapshot.columns"
                 [isCompact]="snapshot.isCompact"
                 [isDisabled]="snapshot.isDisabled"
+                [language]="language"
                 (delete)="remove(content)">
                 <i cdkDragHandle class="icon-drag2 drag-handle"></i>
             </tbody>
@@ -30,13 +34,22 @@
     </ng-container>
 </div>
 
-<ng-container *sqxModal="selectorDialog">
+<ng-container *sqxModal="contentCreatorDialog">
+    <sqx-content-creator 
+        (select)="select($event)"
+        [language]="language"
+        [languages]="languages"
+        [schemaIds]="schemaIds">
+    </sqx-content-creator>
+</ng-container>
+
+<ng-container *sqxModal="contentSelectorDialog">
     <sqx-content-selector 
+        (select)="select($event)"
         [allowDuplicates]="allowDuplicates"
         [alreadySelected]="snapshot.contentItems"
         [language]="language"
         [languages]="languages"
-        [schemaIds]="schemaIds"
-        (select)="select($event)">
+        [schemaIds]="schemaIds">
     </sqx-content-selector>
 </ng-container>

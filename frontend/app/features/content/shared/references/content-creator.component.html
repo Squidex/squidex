@@ -1,0 +1,56 @@
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [showFooter]="false">
+    <ng-container title>
+        <div class="row">
+            <div class="col-selector">
+                <select class="form-control form-control-dark"
+                    [ngModel]="schema?.id"
+                    (ngModelChange)="selectSchema($event)">
+                    <option *ngFor="let schema of schemas" [ngValue]="schema.id">
+                        Select {{schema.displayName}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container tabs>
+        <div class="row no-gutters">
+            <div class="col-auto">          
+                <div *ngIf="schema && languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" 
+                        (selectedLanguageChange)="selectLanguage($event)" [languages]="languages">
+                    </sqx-language-selector>
+                </div>
+            </div>
+
+            <div class="col text-right">
+                <button type="button" class="btn btn-outline-success" (click)="save()">
+                    Create
+                </button>
+
+                <button type="button" class="btn btn-success ml-1" (click)="saveAndPublish()" *ngIf="schema?.canContentsCreateAndPublish">
+                    Create and Publish
+                </button>
+
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm?.error | async"></sqx-form-error>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="schema && contentForm">
+            <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
+                <sqx-content-field *ngFor="let field of schema.fields"
+                    (languageChange)="selectLanguage($event)"
+                    [field]="field"
+                    [fieldForm]="contentForm.form.get(field.name)"
+                    [form]="contentForm"
+                    [formContext]="contentFormContext"
+                    [language]="language"
+                    [languages]="languages"
+                    [schema]="schema">
+                </sqx-content-field>
+            </form>
+        </ng-container>
+    </ng-container>
+</sqx-modal-dialog>

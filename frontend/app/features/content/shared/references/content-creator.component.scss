@@ -1,0 +1,11 @@
+:host ::ng-deep {
+    .modal-tabs {
+        background: $color-white;
+        padding-left: 1.75rem;
+        padding-right: 1.75rem;
+    }
+
+    .modal-content {
+        background: $color-background;
+    }
+}

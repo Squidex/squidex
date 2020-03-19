@@ -150,10 +150,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.saveContent(true);
     }
 
-    public saveAsDraft() {
-        this.saveContent(false);
-    }
-
     public save() {
         this.saveContent(false);
     }

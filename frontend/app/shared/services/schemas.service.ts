@@ -55,6 +55,9 @@ export class SchemaDto {
     public readonly _links: ResourceLinks;
 
     public readonly canAddField: boolean;
+    public readonly canContentsRead: boolean;
+    public readonly canContentsCreate: boolean;
+    public readonly canContentsCreateAndPublish: boolean;
     public readonly canDelete: boolean;
     public readonly canOrderFields: boolean;
     public readonly canPublish: boolean;
@@ -85,6 +88,9 @@ export class SchemaDto {
         this._links = links;
 
         this.canAddField = hasAnyLink(links, 'fields/add');
+        this.canContentsRead = hasAnyLink(links, 'contents');
+        this.canContentsCreate = hasAnyLink(links, 'contents/create');
+        this.canContentsCreateAndPublish = hasAnyLink(links, 'contents/create/publish');
         this.canDelete = hasAnyLink(links, 'delete');
         this.canOrderFields = hasAnyLink(links, 'fields/order');
         this.canPublish = hasAnyLink(links, 'publish');

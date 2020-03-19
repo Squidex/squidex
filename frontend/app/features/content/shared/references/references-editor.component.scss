@@ -32,8 +32,10 @@
         transition: border-color .4s ease;
     }
 
-    &:hover {
-        text-decoration: underline;
+    a {
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 

@@ -57,7 +57,8 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     @Input()
     public allowDuplicates = true;
 
-    public selectorDialog = new DialogModel();
+    public contentCreatorDialog = new DialogModel();
+    public contentSelectorDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
@@ -104,7 +105,8 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
             this.updateValue();
         }
 
-        this.selectorDialog.hide();
+        this.contentSelectorDialog.hide();
+        this.contentCreatorDialog.hide();
     }
 
     public remove(content: ContentDto) {

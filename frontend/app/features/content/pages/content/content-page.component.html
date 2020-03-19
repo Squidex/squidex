@@ -82,14 +82,14 @@
 
                 <div content>
                     <sqx-content-field *ngFor="let field of schema.fields; trackBy: trackByField"
-                        [form]="contentForm"
-                        [formContext]="formContext"
+                        [(language)]="language"
                         [field]="field"
                         [fieldForm]="contentForm.form.get(field.name)"
                         [fieldFormCompare]="contentFormCompare?.form.get(field.name)"
-                        [schema]="schema"
+                        [form]="contentForm"
+                        [formContext]="formContext"
                         [languages]="languages"
-                        [(language)]="language">
+                        [schema]="schema">
                     </sqx-content-field>
                 </div>
             </sqx-list-view>
