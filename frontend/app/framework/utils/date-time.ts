@@ -186,7 +186,7 @@ export class DateTime {
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value, { includeSeconds: true, addSuffix: true });
+        return formatDistanceToNow(this.value);
     }
 
     public toISOString(withoutMilliseconds = true): string {

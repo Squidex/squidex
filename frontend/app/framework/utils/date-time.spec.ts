@@ -115,7 +115,7 @@ describe('DateTime', () => {
 
     it('should print to from now string', () => {
         const value = DateTime.now().addMinutes(-4);
-        const expected = '4 minutes ago';
+        const expected = '4 minutes';
 
         expect(value.toFromNow()).toBe(expected);
     });

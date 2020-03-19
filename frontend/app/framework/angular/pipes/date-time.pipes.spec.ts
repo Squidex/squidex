@@ -105,7 +105,7 @@ describe('FromNowPipe', () => {
         const pipe = new FromNowPipe();
 
         const actual = pipe.transform(DateTime.now().addMinutes(-4));
-        const expected = '4 minutes ago';
+        const expected = '4 minutes';
 
         expect(actual).toBe(expected);
     });
