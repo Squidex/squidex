@@ -88,6 +88,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
+                    .AddNumber(14, "2_numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(15, "2-numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
@@ -123,6 +127,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-assets",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Array(assetId.ToString())))
+                    .AddField("2_numbers",
+                        new ContentFieldData()
+                            .AddValue("iv", 22))
+                    .AddField("2-numbers",
+                        new ContentFieldData()
+                            .AddValue("iv", 23))
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0))

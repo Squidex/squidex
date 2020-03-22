@@ -784,7 +784,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_with_duplicate_names()
+        public async Task Should_return_single_content_with_fixed_names()
         {
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
@@ -793,6 +793,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 query {
                   findMySchemaContent(id: ""<ID>"") {
                     data {
+                      gql_2Numbers {
+                        iv
+                      }
+                      gql_2Numbers2 {
+                        iv
+                      }
                       myNumber {
                         iv
                       }
@@ -822,6 +828,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         data = new
                         {
+                            gql_2Numbers = new
+                            {
+                                iv = 22
+                            },
+                            gql_2Numbers2 = new
+                            {
+                                iv = 23
+                            },
                             myNumber = new
                             {
                                 iv = 1
