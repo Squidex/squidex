@@ -150,35 +150,32 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddGetLink("previous", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
-            if (!content.IsSingleton)
+            if (NewStatus.HasValue)
             {
-                if (NewStatus.HasValue)
+                if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
                 {
-                    if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
-                    {
-                        AddDeleteLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
-                    }
+                    AddDeleteLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                 }
-                else if (Status == Status.Published)
+            }
+            else if (Status == Status.Published)
+            {
+                if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
                 {
-                    if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
-                    {
-                        AddPostLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
-                    }
+                    AddPostLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                 }
+            }
 
-                if (content.NextStatuses != null)
+            if (content.NextStatuses != null)
+            {
+                foreach (var next in content.NextStatuses)
                 {
-                    foreach (var next in content.NextStatuses)
-                    {
-                        AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
-                    }
+                    AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
                 }
+            }
 
-                if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
-                {
-                    AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
-                }
+            if (content.IsSingleton == false && controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+            {
+                AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
             if (content.CanUpdate)

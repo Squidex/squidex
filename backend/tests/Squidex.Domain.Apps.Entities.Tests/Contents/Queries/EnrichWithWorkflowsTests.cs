@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,9 +28,53 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public EnrichWithWorkflowsTests()
         {
-            requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
+            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
             sut = new EnrichWithWorkflows(contentWorkflow);
+        }
+
+        [Fact]
+        public async Task Should_enrich_content_with_next_statuses()
+        {
+            var content = new ContentEntity { SchemaId = schemaId };
+
+            var nexts = new[]
+            {
+                new StatusInfo(Status.Published, StatusColors.Published)
+            };
+
+            A.CallTo(() => contentWorkflow.GetNextAsync(content, content.Status, requestContext.User))
+                .Returns(nexts);
+
+            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+
+            Assert.Equal(nexts, content.NextStatuses);
+        }
+
+        [Fact]
+        public async Task Should_enrich_content_with_next_statuses_if_draft_singleton()
+        {
+            var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Draft };
+
+            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+
+            Assert.Equal(Status.Published, content.NextStatuses.Single().Status);
+
+            A.CallTo(() => contentWorkflow.GetNextAsync(content, A<Status>._, requestContext.User))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_enrich_content_with_next_statuses_if_published_singleton()
+        {
+            var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Published };
+
+            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+
+            Assert.Empty(content.NextStatuses);
+
+            A.CallTo(() => contentWorkflow.GetNextAsync(content, A<Status>._, requestContext.User))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -108,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaId };
 
-            var ctx = requestContext.WithResolveFlow(false);
+            var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).WithResolveFlow(false);
 
             await sut.EnrichAsync(ctx, new[] { content }, null!);
 

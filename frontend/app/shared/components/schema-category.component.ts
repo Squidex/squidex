@@ -88,7 +88,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
     public schemaRoute(schema: SchemaDto) {
         if (schema.isSingleton && this.forContent) {
-            return [schema.name, schema.id];
+            return [schema.name, schema.id, 'history'];
         } else {
             return [schema.name];
         }

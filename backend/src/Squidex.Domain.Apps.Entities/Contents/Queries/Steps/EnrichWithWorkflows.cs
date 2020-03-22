@@ -46,7 +46,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             var editingStatus = content.NewStatus ?? content.Status;
 
-            content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.User);
+            if (content.IsSingleton)
+            {
+                if (editingStatus == Status.Draft)
+                {
+                    content.NextStatuses = new[]
+                    {
+                        new StatusInfo(Status.Published, StatusColors.Published)
+                    };
+                }
+                else
+                {
+                    content.NextStatuses = Array.Empty<StatusInfo>();
+                }
+            }
+            else
+            {
+                content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.User);
+            }
         }
 
         private async Task EnrichCanUpdateAsync(ContentEntity content, Context context)

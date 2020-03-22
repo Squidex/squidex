@@ -9,7 +9,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, timer } from 'rxjs';
-import { filter, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -62,22 +62,25 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.schema = schema;
+                    if (schema) {
+                        this.schema = schema;
+                    }
                 }));
 
         this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
                     if (content) {
-                        const channel = `contents.${content.id}`;
-
-                        this.contentEvents =
-                            timer(0, 5000).pipe(
-                                switchSafe((() =>  this.historyService.getHistory(this.appsState.appName, channel))));
-
                         this.content = content;
                     }
                 }));
+
+        this.contentEvents =
+            this.contentsState.selectedContent.pipe(
+                filter(x => !!x),
+                map(content => `contents.${content?.id}`),
+                switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
+                switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel)));
     }
 
     public changeStatus(status: string) {

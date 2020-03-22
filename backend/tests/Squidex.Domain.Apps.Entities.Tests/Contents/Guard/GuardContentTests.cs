@@ -205,6 +205,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
+        public async Task CanChangeStatus_should_not_throw_exception_if_singleton_is_published()
+        {
+            var schema = CreateSchema(true);
+
+            var content = CreateDraftContent(Status.Draft);
+            var command = new ChangeContentStatus { Status = Status.Published };
+
+            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
+        }
+
+        [Fact]
         public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_valid()
         {
             var schema = CreateSchema(false);

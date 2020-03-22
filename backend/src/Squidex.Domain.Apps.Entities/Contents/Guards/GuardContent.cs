@@ -23,11 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command);
 
-            Validate.It(() => "Cannot created content.", e =>
-            {
-                ValidateData(command, e);
-            });
-
             if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
             {
                 throw new DomainException("Singleton content cannot be created.");
@@ -37,6 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             {
                 throw new DomainException("Content workflow prevents publishing.");
             }
+
+            Validate.It(() => "Cannot created content.", e =>
+            {
+                ValidateData(command, e);
+            });
         }
 
         public static async Task CanUpdate(ContentState content, IContentWorkflow contentWorkflow, UpdateContent command)
@@ -99,7 +99,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (schema.SchemaDef.IsSingleton)
             {
-                throw new DomainException("Singleton content cannot be updated.");
+                if (content.NewVersion == null || command.Status != Status.Published)
+                {
+                    throw new DomainException("Singleton content cannot be updated.");
+                }
+
+                return Task.CompletedTask;
             }
 
             return Validate.It(() => "Cannot change status.", async e =>
