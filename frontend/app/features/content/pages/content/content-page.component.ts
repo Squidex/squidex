@@ -98,6 +98,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                     this.content = content;
 
+                    this.formContext['initialContent'] = this.content;
+
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
                         schemaVersion: this.schema.version,
