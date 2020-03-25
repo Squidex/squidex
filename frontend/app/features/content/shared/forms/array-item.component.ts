@@ -45,7 +45,7 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     public form: EditContentForm;
 
     @Input()
-    public contentFormContext: any;
+    public formContext: any;
 
     @Input()
     public field: RootFieldDto;

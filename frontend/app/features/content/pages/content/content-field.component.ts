@@ -37,7 +37,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public form: EditContentForm;
 
     @Input()
-    public contentFormContext: any;
+    public formContext: any;
 
     @Input()
     public field: RootFieldDto;
