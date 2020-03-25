@@ -46,7 +46,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public schema: SchemaDetailsDto;
 
-    public formContext: any;
+    public contentFormContext: any;
 
     public content?: ContentDto | null;
     public contentVersion: Version | null;
@@ -70,7 +70,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     ) {
         super();
 
-        this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
+        this.contentFormContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }
 
     public ngOnInit() {
@@ -98,7 +98,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                     this.content = content;
 
-                    this.formContext['initialContent'] = this.content;
+                    this.contentFormContext = { user: this.contentFormContext.user, apiUrl : this.contentFormContext.apiUrl, initialContent : this.content };
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,

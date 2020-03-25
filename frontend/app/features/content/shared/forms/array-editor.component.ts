@@ -29,7 +29,7 @@ export class ArrayEditorComponent {
     public form: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public contentFormContext: any;
 
     @Input()
     public field: RootFieldDto;

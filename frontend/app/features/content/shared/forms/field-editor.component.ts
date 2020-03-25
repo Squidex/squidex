@@ -27,7 +27,7 @@ export class FieldEditorComponent {
     public form: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public contentFormContext: any;
 
     @Input()
     public field: FieldDto;

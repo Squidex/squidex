@@ -46,7 +46,7 @@
         <div class="form-group" *ngFor="let fieldControl of fieldControls; trackBy: trackByField">
             <sqx-field-editor
                 [form]="form"
-                [formContext]="formContext"
+                [contentFormContext]="contentFormContext"
                 [field]="fieldControl.field"
                 [language]="language"
                 [languages]="languages"
