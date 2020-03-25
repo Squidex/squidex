@@ -83,7 +83,7 @@ function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string
     -d 'grant_type=client_credentials&
         client_id=${app}:${client.id}&
         client_secret=${client.secret}&
-        scope=squidex-api`;
+        scope=squidex-api'`;
 }
 
 function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
