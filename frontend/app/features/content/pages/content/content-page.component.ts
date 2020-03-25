@@ -97,8 +97,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     const isNewContent = isOtherContent(content, this.content);
 
                     this.content = content;
-                    
-                    this.formContext["selectedContent"] = this.content;
+
+                    this.formContext['initialContent'] = this.content;
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
