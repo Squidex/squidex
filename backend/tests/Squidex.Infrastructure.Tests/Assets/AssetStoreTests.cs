@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.Assets
 
             var readData = new MemoryStream();
 
-            await Sut.DownloadAsync(fileName, readData, new Range(1, 2));
+            await Sut.DownloadAsync(fileName, readData, new BytesRange(1, 2));
 
             Assert.Equal(new Span<byte>(assetData.ToArray()).Slice(1, 2).ToArray(), readData.ToArray());
         }

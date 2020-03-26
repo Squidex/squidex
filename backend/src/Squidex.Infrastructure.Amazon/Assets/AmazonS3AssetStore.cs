@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
             Guard.NotNull(stream);
@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.Assets
 
                 if (range.IsDefined)
                 {
-                    request.ByteRange = new ByteRange(range.Start, range.End);
+                    request.ByteRange = new ByteRange(range.ToString());
                 }
 
                 using (var response = await s3Client.GetObjectAsync(request, ct))
@@ -152,8 +152,7 @@ namespace Squidex.Infrastructure.Assets
 
                 ConfigureDefaults(request);
 
-                // Amazon S3 requires a seekable stream, but does not seek anything.
-                request.InputStream = new SeekFakerStream(stream);
+                SetStream(stream, request);
 
                 await transferUtility.UploadAsync(request, ct);
             }
@@ -209,6 +208,12 @@ namespace Squidex.Infrastructure.Assets
         {
             request.AutoCloseStream = false;
             request.BucketName = options.Bucket;
+        }
+
+        private static void SetStream(Stream stream, TransferUtilityUploadRequest request)
+        {
+            // Amazon S3 requires a seekable stream, but does not seek anything.
+            request.InputStream = new SeekFakerStream(stream);
         }
     }
 }

@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -209,13 +210,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             Response.Headers[HeaderNames.ETag] = etag;
 
-            var handler = new Func<Stream, Task>(async bodyStream =>
+            var callback = new Func<Stream, CancellationToken, Task>(async (body, ct) =>
             {
                 var resizedAsset = $"{App.Id}_{etag}_Resized";
 
                 try
                 {
-                    await assetStore.DownloadAsync(resizedAsset, bodyStream);
+                    await assetStore.DownloadAsync(resizedAsset, body);
                 }
                 catch (AssetNotFoundException)
                 {
@@ -243,16 +244,16 @@ namespace Squidex.Areas.Api.Controllers.Apps
                                     destinationStream.Position = 0;
                                 }
 
-                                await destinationStream.CopyToAsync(bodyStream);
+                                await destinationStream.CopyToAsync(body, ct);
                             }
                         }
                     }
                 }
             });
 
-            return new FileCallbackResult(App.Image.MimeType, null, handler)
+            return new FileCallbackResult(App.Image.MimeType, callback)
             {
-                Send404 = true
+                ErrorAs404 = true
             };
         }
 

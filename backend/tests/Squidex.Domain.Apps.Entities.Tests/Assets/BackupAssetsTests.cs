@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.BackupEventAsync(Envelope.Create(@event), context);
 
-            A.CallTo(() => assetFileStore.DownloadAsync(assetId, version, assetStream, default))
+            A.CallTo(() => assetFileStore.DownloadAsync(assetId, version, assetStream, default, default))
                 .MustHaveHappened();
         }
 

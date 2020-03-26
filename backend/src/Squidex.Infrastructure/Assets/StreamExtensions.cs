@@ -17,25 +17,42 @@ namespace Squidex.Infrastructure.Assets
     {
         private static readonly ArrayPool<byte> Pool = ArrayPool<byte>.Create();
 
-        public static async Task CopyToAsync(this Stream source, Stream target, Range range, CancellationToken ct, bool skip = true)
+        public static async Task CopyToAsync(this Stream source, Stream target, BytesRange range, CancellationToken ct, bool skip = true)
         {
             var buffer = Pool.Rent(8192);
 
             try
             {
-                if (skip && range.Offset > 0)
+                if (skip && range.From > 0)
                 {
-                    source.Seek(range.Offset, SeekOrigin.Begin);
+                    source.Seek(range.From.Value, SeekOrigin.Begin);
                 }
 
-                var bytesLeft = range.Length > 0 ? range.Length : long.MaxValue;
-                int bytesRead;
+                var bytesLeft = range.Length;
 
-                while (bytesLeft > 0 && !ct.IsCancellationRequested && (bytesRead = source.Read(buffer, 0, (int)Math.Min(buffer.Length, bytesLeft))) > 0)
+                while (true)
                 {
-                    await target.WriteAsync(buffer, 0, bytesRead);
+                    if (bytesLeft <= 0)
+                    {
+                        return;
+                    }
 
-                    bytesLeft -= bytesRead;
+                    ct.ThrowIfCancellationRequested();
+
+                    var readLength = (int)Math.Min(buffer.Length, bytesLeft);
+
+                    var read = await source.ReadAsync(buffer, 0, readLength, ct);
+
+                    bytesLeft -= read;
+
+                    if (read == 0)
+                    {
+                        return;
+                    }
+
+                    ct.ThrowIfCancellationRequested();
+
+                    await target.WriteAsync(buffer, 0, read, ct);
                 }
             }
             finally

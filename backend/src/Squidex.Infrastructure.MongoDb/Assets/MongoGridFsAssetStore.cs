@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, Range range, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
             Guard.NotNull(stream);
 

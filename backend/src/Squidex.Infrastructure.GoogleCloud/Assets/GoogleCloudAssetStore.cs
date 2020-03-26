@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Assets
 
                 if (range.IsDefined)
                 {
-                    downloadOptions.Range = new RangeHeaderValue(range.Start, range.End);
+                    downloadOptions.Range = new RangeHeaderValue(range.From, range.To);
                 }
 
                 await storageClient.DownloadObjectAsync(bucketName, fileName, stream, downloadOptions, ct);

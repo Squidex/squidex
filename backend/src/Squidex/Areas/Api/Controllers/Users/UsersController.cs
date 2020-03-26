@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -168,17 +169,19 @@ namespace Squidex.Areas.Api.Controllers.Users
                 {
                     if (entity.IsPictureUrlStored())
                     {
-                        return new FileCallbackResult("image/png", null, async stream =>
+                        var callback = new Func<Stream, CancellationToken, Task>(async (body, ct) =>
                         {
                             try
                             {
-                                await userPictureStore.DownloadAsync(entity.Id, stream);
+                                await userPictureStore.DownloadAsync(entity.Id, body, ct);
                             }
                             catch
                             {
-                                await stream.WriteAsync(AvatarBytes);
+                                await body.WriteAsync(AvatarBytes);
                             }
                         });
+
+                        return new FileCallbackResult("image/png", callback);
                     }
 
                     using (var client = httpClientFactory.CreateClient())

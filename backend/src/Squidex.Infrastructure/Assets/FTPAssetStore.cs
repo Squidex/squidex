@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
             Guard.NotNull(stream);
@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 try
                 {
-                    using (var ftpStream = await client.OpenReadAsync(fileName, range.Offset, ct))
+                    using (var ftpStream = await client.OpenReadAsync(fileName, range.From ?? 0, ct))
                     {
                         await ftpStream.CopyToAsync(stream, range, ct, false);
                     }
