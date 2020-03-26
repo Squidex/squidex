@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
             Guard.NotNull(stream);
@@ -116,6 +116,11 @@ namespace Squidex.Infrastructure.Assets
             try
             {
                 var request = new GetObjectRequest { BucketName = options.Bucket, Key = GetKey(fileName) };
+
+                if (range.IsDefined)
+                {
+                    request.ByteRange = new ByteRange(range.Start, range.End);
+                }
 
                 using (var response = await s3Client.GetObjectAsync(request, ct))
                 {

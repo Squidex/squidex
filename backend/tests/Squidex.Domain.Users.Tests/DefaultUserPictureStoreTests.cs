@@ -47,7 +47,7 @@ namespace Squidex.Domain.Users
 
             await sut.DownloadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(file, stream, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(file, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
     }

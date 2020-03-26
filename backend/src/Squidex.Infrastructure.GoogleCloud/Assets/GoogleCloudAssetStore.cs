@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Google;
@@ -67,13 +68,20 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
 
             try
             {
-                await storageClient.DownloadObjectAsync(bucketName, fileName, stream, cancellationToken: ct);
+                var downloadOptions = new DownloadObjectOptions();
+
+                if (range.IsDefined)
+                {
+                    downloadOptions.Range = new RangeHeaderValue(range.Start, range.End);
+                }
+
+                await storageClient.DownloadObjectAsync(bucketName, fileName, stream, downloadOptions, ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {

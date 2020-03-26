@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var fileName = GetFileName(id, fileVersion);
 
-            return assetStore.DownloadAsync(fileName, stream, ct);
+            return assetStore.DownloadAsync(fileName, stream, default, ct);
         }
 
         public Task DeleteAsync(Guid id, long fileVersion)

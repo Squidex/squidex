@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.DownloadAsync(assetId, assetFileVersion, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
 

@@ -67,20 +67,43 @@ namespace Squidex.Infrastructure.Assets
 
                 using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose))
                 {
-                    await DownloadAsync(client, sourceFileName, stream, ct);
+                    try
+                    {
+                        var found = await client.DownloadAsync(stream, sourceFileName, token: ct);
+
+                        if (!found)
+                        {
+                            throw new AssetNotFoundException(sourceFileName);
+                        }
+                    }
+                    catch (FtpException ex) when (IsNotFound(ex))
+                    {
+                        throw new AssetNotFoundException(sourceFileName, ex);
+                    }
+
                     await UploadAsync(client, targetFileName, stream, false, ct);
                 }
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
             Guard.NotNull(stream);
 
             using (var client = GetFtpClient())
             {
-                await DownloadAsync(client, fileName, stream, ct);
+                try
+                {
+                    using (var ftpStream = await client.OpenReadAsync(fileName, range.Offset, ct))
+                    {
+                        await ftpStream.CopyToAsync(stream, range, ct, false);
+                    }
+                }
+                catch (FtpException ex) when (IsNotFound(ex))
+                {
+                    throw new AssetNotFoundException(fileName, ex);
+                }
             }
         }
 
@@ -92,18 +115,6 @@ namespace Squidex.Infrastructure.Assets
             using (var client = GetFtpClient())
             {
                 await UploadAsync(client, fileName, stream, overwrite, ct);
-            }
-        }
-
-        private static async Task DownloadAsync(IFtpClient client, string fileName, Stream stream, CancellationToken ct)
-        {
-            try
-            {
-                await client.DownloadAsync(stream, fileName, token: ct);
-            }
-            catch (FtpException ex) when (IsNotFound(ex))
-            {
-                throw new AssetNotFoundException(fileName, ex);
             }
         }
 

@@ -103,6 +103,18 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public async Task Should_write_and_read_file_with_range()
+        {
+            await Sut.UploadAsync(fileName, assetData, true);
+
+            var readData = new MemoryStream();
+
+            await Sut.DownloadAsync(fileName, readData, new Range(1, 2));
+
+            Assert.Equal(new Span<byte>(assetData.ToArray()).Slice(1, 2).ToArray(), readData.ToArray());
+        }
+
+        [Fact]
         public async Task Should_write_and_read_file_and_overwrite_non_existing()
         {
             await Sut.UploadAsync(fileName, assetData, true);

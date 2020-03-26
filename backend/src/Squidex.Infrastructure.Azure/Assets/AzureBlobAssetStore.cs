@@ -98,15 +98,19 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, Range range = default, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName);
+            Guard.NotNull(stream);
 
             try
             {
                 var blob = blobContainer.GetBlockBlobReference(fileName);
 
-                await blob.DownloadToStreamAsync(stream, null, null, null, ct);
+                using (var blobStream = await blob.OpenReadAsync(null, null, null, ct))
+                {
+                    await blobStream.CopyToAsync(stream, range, ct);
+                }
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
