@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#define LOG_ALL_IDENTITY_SERVER_NONE
+
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,6 +94,17 @@ namespace Squidex.Config.Domain
         {
             builder.AddFilter((category, level) =>
             {
+#if LOG_ALL_IDENTITY_SERVER
+                if (category.StartsWith("Microsoft.AspNetCore.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+#endif
                 if (level < LogLevel.Information)
                 {
                     return false;
@@ -126,12 +139,7 @@ namespace Squidex.Config.Domain
                 {
                     return level >= LogLevel.Warning;
                 }
-#if LOG_ALL_IDENTITY_SERVER
-                if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-#endif
+
                 return true;
             });
         }

@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var fileName = GetFileName(backupId);
 
-            return assetStore.DownloadAsync(fileName, stream, ct);
+            return assetStore.DownloadAsync(fileName, stream, default, ct);
         }
 
         public Task UploadAsync(Guid backupId, Stream stream, CancellationToken ct = default)

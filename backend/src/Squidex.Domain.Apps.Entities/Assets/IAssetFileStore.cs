@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Task UploadAsync(Guid id, long fileVersion, Stream stream, CancellationToken ct = default);
 
-        Task DownloadAsync(Guid id, long fileVersion, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(Guid id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default);
 
         Task DeleteAsync(string tempFile);
 

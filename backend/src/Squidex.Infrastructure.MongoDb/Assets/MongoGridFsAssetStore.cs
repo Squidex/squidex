@@ -17,7 +17,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class MongoGridFsAssetStore : IAssetStore, IInitializable
     {
-        private const int BufferSize = 81920;
+        private static readonly GridFSDownloadOptions DownloadDefault = new GridFSDownloadOptions();
+        private static readonly GridFSDownloadOptions DownloadSeekable = new GridFSDownloadOptions { Seekable = true };
         private readonly IGridFSBucket<string> bucket;
 
         public MongoGridFsAssetStore(IGridFSBucket<string> bucket)
@@ -63,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
             Guard.NotNull(stream);
 
@@ -71,9 +72,11 @@ namespace Squidex.Infrastructure.Assets
             {
                 var name = GetFileName(fileName, nameof(fileName));
 
-                using (var readStream = await bucket.OpenDownloadStreamAsync(name, cancellationToken: ct))
+                var options = range.IsDefined ? DownloadSeekable : DownloadDefault;
+
+                using (var readStream = await bucket.OpenDownloadStreamAsync(name, options, ct))
                 {
-                    await readStream.CopyToAsync(stream, BufferSize, ct);
+                    await readStream.CopyToAsync(stream, range, ct);
                 }
             }
             catch (GridFSFileNotFoundException ex)

@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -134,17 +135,19 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers[HeaderNames.CacheControl] = $"public,max-age={query.CacheDuration}";
             }
 
-            var handler = new Func<Stream, Task>(async bodyStream =>
-            {
-                var resizeOptions = query.ToResizeOptions(asset);
+            var inline = query.Download != 1;
 
-                if (asset.Type == AssetType.Image && resizeOptions.IsValid)
+            var resizeOptions = query.ToResizeOptions(asset);
+
+            if (asset.Type == AssetType.Image && resizeOptions.IsValid)
+            {
+                var handler = new Func<Stream, CancellationToken, Task>(async (bodyStream, ct) =>
                 {
                     var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
                     if (query.ForceResize)
                     {
-                        await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, true);
+                        await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, true, ct);
                     }
                     else
                     {
@@ -154,27 +157,40 @@ namespace Squidex.Areas.Api.Controllers.Assets
                         }
                         catch (AssetNotFoundException)
                         {
-                            await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, false);
+                            await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, false, ct);
                         }
                     }
-                }
-                else
+                });
+
+                return new FileCallbackResult(asset.MimeType, handler)
                 {
-                    await assetFileStore.DownloadAsync(asset.Id, fileVersion, bodyStream);
-                }
-            });
-
-            var inline = query.Download != 1;
-
-            return new FileCallbackResult(asset.MimeType, asset.FileName, handler)
+                    ErrorAs404 = true,
+                    FileDownloadName = asset.FileName,
+                    FileSize = null,
+                    LastModified = asset.LastModified.ToDateTimeOffset(),
+                    SendInline = inline
+                };
+            }
+            else
             {
-                LastModified = asset.LastModified.ToDateTimeOffset(),
-                Send404 = true,
-                SendInline = inline,
-            };
+                var handler = new Func<Stream, BytesRange, CancellationToken, Task>(async (bodyStream, range, ct) =>
+                {
+                    await assetFileStore.DownloadAsync(asset.Id, fileVersion, bodyStream, range, ct);
+                });
+
+                return new FileCallbackResult(asset.MimeType, handler)
+                {
+                    EnableRangeProcessing = true,
+                    ErrorAs404 = true,
+                    FileDownloadName = asset.FileName,
+                    FileSize = asset.FileSize,
+                    LastModified = asset.LastModified.ToDateTimeOffset(),
+                    SendInline = inline
+                };
+            }
         }
 
-        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, long fileVersion, ResizeOptions resizeOptions, bool overwrite)
+        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, long fileVersion, ResizeOptions resizeOptions, bool overwrite, CancellationToken ct)
         {
             using (Profiler.Trace("Resize"))
             {
@@ -200,7 +216,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                             destinationStream.Position = 0;
                         }
 
-                        await destinationStream.CopyToAsync(bodyStream);
+                        await destinationStream.CopyToAsync(bodyStream, ct);
                     }
                 }
             }

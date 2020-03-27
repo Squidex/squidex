@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,10 +61,15 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             var fileName = $"backup-{app}-{backup.Started:yyyy-MM-dd_HH-mm-ss}.zip";
 
-            return new FileCallbackResult("application/zip", fileName, bodyStream =>
+            var callback = new Func<Stream, CancellationToken, Task>((body, ct) =>
             {
-                return backupArchiveStore.DownloadAsync(id, bodyStream);
+                return backupArchiveStore.DownloadAsync(id, body, ct);
             });
+
+            return new FileCallbackResult("application/zip", callback)
+            {
+                FileDownloadName = fileName
+            };
         }
     }
 }

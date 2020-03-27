@@ -12,14 +12,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 

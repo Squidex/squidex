@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
             Guard.NotNull(stream);
 
@@ -89,7 +89,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 using (var fileStream = file.OpenRead())
                 {
-                    await fileStream.CopyToAsync(stream, BufferSize, ct);
+                    await fileStream.CopyToAsync(stream, range, ct);
                 }
             }
             catch (FileNotFoundException ex)

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
@@ -25,7 +26,7 @@ namespace Squidex.Web.Pipeline
         {
             try
             {
-                SetHeadersAndLog(context, result, null, false);
+                var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize.HasValue);
 
                 if (!string.IsNullOrWhiteSpace(result.FileDownloadName) && result.SendInline)
                 {
@@ -36,11 +37,16 @@ namespace Squidex.Web.Pipeline
                     context.HttpContext.Response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
                 }
 
-                await result.Callback(context.HttpContext.Response.Body);
+                if (serveBody)
+                {
+                    var bytesRange = new BytesRange(range?.From, range?.To);
+
+                    await result.Callback(context.HttpContext.Response.Body, bytesRange, context.HttpContext.RequestAborted);
+                }
             }
             catch (Exception e)
             {
-                if (!context.HttpContext.Response.HasStarted && result.Send404)
+                if (!context.HttpContext.Response.HasStarted && result.ErrorAs404)
                 {
                     context.HttpContext.Response.Headers.Clear();
                     context.HttpContext.Response.StatusCode = 404;

@@ -126,7 +126,10 @@ namespace Squidex.Config.Web
             {
                 return new ForwardedHeadersOptions
                 {
-                    AllowedHosts = new List<string> { new Uri(urlsOptions.BaseUrl).Host },
+                    AllowedHosts = new List<string>
+                    {
+                        new Uri(urlsOptions.BaseUrl).Host
+                    },
                     ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
                     ForwardLimit = null,
                     RequireHeaderSymmetry = false

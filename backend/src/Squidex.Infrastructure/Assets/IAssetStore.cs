@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Assets
 
         Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default);
 
-        Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default);
 
         Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default);
 

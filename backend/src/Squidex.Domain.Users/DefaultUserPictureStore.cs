@@ -35,7 +35,7 @@ namespace Squidex.Domain.Users
         {
             var fileName = GetFileName(userId);
 
-            return assetStore.DownloadAsync(fileName, stream, ct);
+            return assetStore.DownloadAsync(fileName, stream, default, ct);
         }
 
         private static string GetFileName(string userId)

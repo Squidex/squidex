@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Assets
             throw new NotSupportedException();
         }
 
-        public Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
