@@ -30,6 +30,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.GeneratePublicUrl(fileName);
         }
 
+        public Task<long> GetFileSizeAsync(Guid id, long fileVersion, CancellationToken ct = default)
+        {
+            var fileName = GetFileName(id, fileVersion);
+
+            return assetStore.GetSizeAsync(fileName, ct);
+        }
+
         public Task UploadAsync(Guid id, long fileVersion, Stream stream, CancellationToken ct = default)
         {
             var fileName = GetFileName(id, fileVersion);

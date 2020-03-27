@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +15,8 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex.Web
 {
+    public delegate Task FileCallback(Stream body, BytesRange range, CancellationToken ct);
+
     public sealed class FileCallbackResult : FileResult
     {
         public bool ErrorAs404 { get; set; }
@@ -24,17 +25,9 @@ namespace Squidex.Web
 
         public long? FileSize { get; set; }
 
-        public Func<Stream, BytesRange, CancellationToken, Task> Callback { get; }
+        public FileCallback Callback { get; }
 
-        public FileCallbackResult(string contentType, Func<Stream, CancellationToken, Task> callback)
-            : base(contentType)
-        {
-            Guard.NotNull(callback);
-
-            Callback = (stream, _, ct) => callback(stream, ct);
-        }
-
-        public FileCallbackResult(string contentType, Func<Stream, BytesRange, CancellationToken, Task> callback)
+        public FileCallbackResult(string contentType, FileCallback callback)
             : base(contentType)
         {
             Guard.NotNull(callback);

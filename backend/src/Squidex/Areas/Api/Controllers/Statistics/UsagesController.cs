@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -178,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var fileName = $"Usage-{today:yyy-MM-dd}.csv";
 
-            var callback = new Func<Stream, CancellationToken, Task>((body, ct) =>
+            var callback = new FileCallback((body, range, ct) =>
             {
                 return appLogStore.ReadLogAsync(Guid.Parse(appId), today.AddDays(-30), today, body, ct);
             });

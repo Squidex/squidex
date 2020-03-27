@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -169,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 {
                     if (entity.IsPictureUrlStored())
                     {
-                        var callback = new Func<Stream, CancellationToken, Task>(async (body, ct) =>
+                        var callback = new FileCallback(async (body, range, ct) =>
                         {
                             try
                             {

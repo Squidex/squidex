@@ -45,6 +45,20 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
+        public async Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
+        {
+            var name = GetFileName(fileName, nameof(fileName));
+
+            var file = await bucket.Find(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name)).FirstOrDefaultAsync();
+
+            if (file == null)
+            {
+                throw new AssetNotFoundException(fileName);
+            }
+
+            return file.Length;
+        }
+
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(targetFileName);
