@@ -34,11 +34,6 @@ namespace Squidex.Infrastructure.Assets
             this.log = log;
         }
 
-        public string? GeneratePublicUrl(string fileName)
-        {
-            return null;
-        }
-
         public async Task InitializeAsync(CancellationToken ct = default)
         {
             using (var client = factory())
@@ -54,6 +49,35 @@ namespace Squidex.Infrastructure.Assets
             log.LogInformation(w => w
                 .WriteProperty("action", "FTPAssetStoreConfigured")
                 .WriteProperty("path", path));
+        }
+
+        public string? GeneratePublicUrl(string fileName)
+        {
+            return null;
+        }
+
+        public async Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(fileName);
+
+            using (var client = GetFtpClient())
+            {
+                try
+                {
+                    var size = await client.GetFileSizeAsync(fileName, ct);
+
+                    if (size < 0)
+                    {
+                        throw new AssetNotFoundException(fileName);
+                    }
+
+                    return size;
+                }
+                catch (FtpException ex) when (IsNotFound(ex))
+                {
+                    throw new AssetNotFoundException(fileName, ex);
+                }
+            }
         }
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)

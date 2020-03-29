@@ -55,13 +55,24 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
+        public Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
+        {
+            var file = GetFile(fileName, nameof(fileName));
+
+            try
+            {
+                return Task.FromResult(file.Length);
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new AssetNotFoundException(fileName, ex);
+            }
+        }
+
         public Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(sourceFileName);
-            Guard.NotNullOrEmpty(targetFileName);
-
-            var targetFile = GetFile(targetFileName);
-            var sourceFile = GetFile(sourceFileName);
+            var targetFile = GetFile(targetFileName, nameof(targetFileName));
+            var sourceFile = GetFile(sourceFileName, nameof(sourceFileName));
 
             try
             {
@@ -83,7 +94,7 @@ namespace Squidex.Infrastructure.Assets
         {
             Guard.NotNull(stream);
 
-            var file = GetFile(fileName);
+            var file = GetFile(fileName, nameof(fileName));
 
             try
             {
@@ -102,7 +113,7 @@ namespace Squidex.Infrastructure.Assets
         {
             Guard.NotNull(stream);
 
-            var file = GetFile(fileName);
+            var file = GetFile(fileName, nameof(fileName));
 
             try
             {
@@ -119,16 +130,16 @@ namespace Squidex.Infrastructure.Assets
 
         public Task DeleteAsync(string fileName)
         {
-            var file = GetFile(fileName);
+            var file = GetFile(fileName, nameof(fileName));
 
             file.Delete();
 
             return Task.CompletedTask;
         }
 
-        private FileInfo GetFile(string fileName)
+        private FileInfo GetFile(string fileName, string parameterName)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, parameterName);
 
             return new FileInfo(GetPath(fileName));
         }

@@ -62,6 +62,24 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
+        public async Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(fileName);
+
+            try
+            {
+                var blob = blobContainer.GetBlockBlobReference(fileName);
+
+                await blob.FetchAttributesAsync();
+
+                return blob.Properties.Length;
+            }
+            catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
+            {
+                throw new AssetNotFoundException(fileName, ex);
+            }
+        }
+
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(sourceFileName);
@@ -90,7 +108,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
             {
-                throw new AssetAlreadyExistsException(targetFileName);
+                throw new AssetAlreadyExistsException(targetFileName, ex);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
@@ -130,7 +148,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
             {
-                throw new AssetAlreadyExistsException(fileName);
+                throw new AssetAlreadyExistsException(fileName, ex);
             }
         }
 

@@ -44,6 +44,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_invoke_asset_store_to_get_file_size()
+        {
+            var size = 1024L;
+
+            A.CallTo(() => assetStore.GetSizeAsync(fileName, default))
+                .Returns(size);
+
+            var result = await sut.GetFileSizeAsync(assetId, assetFileVersion);
+
+            Assert.Equal(size, result);
+        }
+
+        [Fact]
         public async Task Should_invoke_asset_store_to_temporary_upload_file()
         {
             var stream = new MemoryStream();

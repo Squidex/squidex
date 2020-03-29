@@ -49,6 +49,27 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
+        public async Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(fileName);
+
+            try
+            {
+                var obj = await storageClient.GetObjectAsync(bucketName, fileName, null, ct);
+
+                if (!obj.Size.HasValue)
+                {
+                    throw new AssetNotFoundException(fileName);
+                }
+
+                return (long)obj.Size.Value;
+            }
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
+            {
+                throw new AssetNotFoundException(fileName, ex);
+            }
+        }
+
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(sourceFileName);

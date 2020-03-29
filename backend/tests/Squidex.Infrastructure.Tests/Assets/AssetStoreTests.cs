@@ -37,6 +37,12 @@ namespace Squidex.Infrastructure.Assets
         public abstract T CreateStore();
 
         [Fact]
+        public virtual async Task Should_throw_exception_if_asset_to_get_size_is_not_found()
+        {
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.GetSizeAsync(fileName));
+        }
+
+        [Fact]
         public virtual async Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
             await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
@@ -112,6 +118,16 @@ namespace Squidex.Infrastructure.Assets
             await Sut.DownloadAsync(fileName, readData, new BytesRange(1, 2));
 
             Assert.Equal(new Span<byte>(assetData.ToArray()).Slice(1, 2).ToArray(), readData.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_write_and_and_get_size()
+        {
+            await Sut.UploadAsync(fileName, assetData, true);
+
+            var size = await Sut.GetSizeAsync(fileName);
+
+            Assert.Equal(assetData.Length, size);
         }
 
         [Fact]

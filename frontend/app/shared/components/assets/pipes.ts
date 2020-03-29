@@ -51,7 +51,11 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     }
 
     public transform(asset: AssetDto): string {
-        return asset.fullUrl(this.apiUrl, this.authService);
+        let url =  asset.fullUrl(this.apiUrl, this.authService);
+
+        url = StringHelper.appendToUrl(url, 'version', asset.fileVersion);
+
+        return url;
     }
 }
 

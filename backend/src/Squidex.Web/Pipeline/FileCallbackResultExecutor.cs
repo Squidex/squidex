@@ -44,6 +44,10 @@ namespace Squidex.Web.Pipeline
                     await result.Callback(context.HttpContext.Response.Body, bytesRange, context.HttpContext.RequestAborted);
                 }
             }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
             catch (Exception e)
             {
                 if (!context.HttpContext.Response.HasStarted && result.ErrorAs404)

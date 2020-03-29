@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -210,7 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             Response.Headers[HeaderNames.ETag] = etag;
 
-            var callback = new Func<Stream, CancellationToken, Task>(async (body, ct) =>
+            var callback = new FileCallback(async (body, range, ct) =>
             {
                 var resizedAsset = $"{App.Id}_{etag}_Resized";
 

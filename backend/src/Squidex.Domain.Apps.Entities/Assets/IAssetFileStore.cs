@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         string? GeneratePublicUrl(Guid id, long fileVersion);
 
+        Task<long> GetFileSizeAsync(Guid id, long fileVersion, CancellationToken ct = default);
+
         Task CopyAsync(string tempFile, Guid id, long fileVersion, CancellationToken ct = default);
 
         Task UploadAsync(string tempFile, Stream stream, CancellationToken ct = default);
