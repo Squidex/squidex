@@ -30,9 +30,9 @@ namespace Squidex.Web
             }
             set
             {
-                if (!string.IsNullOrWhiteSpace(value))
+                if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
                 {
-                    allTrustedHosts.Add(value);
+                    allTrustedHosts.Add(uri.Host);
                 }
 
                 baseUrl = value;
@@ -63,7 +63,7 @@ namespace Squidex.Web
 
         public bool IsAllowedHost(Uri uri)
         {
-            return !uri.IsAbsoluteUri || trustedHosts.Contains(uri.Host);
+            return !uri.IsAbsoluteUri || allTrustedHosts.Contains(uri.Host);
         }
 
         public string BuildUrl(string path, bool trailingSlash = true)

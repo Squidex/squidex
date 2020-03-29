@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Extensions;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -167,7 +168,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var context = await interactions.GetLogoutContextAsync(logoutId);
 
-            return RedirectToReturnUrl(context.PostLogoutRedirectUri);
+            return RedirectToLogoutUrl(context);
         }
 
         [HttpGet]
@@ -392,9 +393,21 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             return MakeIdentityOperation(() => userManager.SyncClaimsAsync(user.Identity, newClaims));
         }
 
+        private IActionResult RedirectToLogoutUrl(LogoutRequest context)
+        {
+            if (!string.IsNullOrWhiteSpace(context.PostLogoutRedirectUri))
+            {
+                return Redirect(context.PostLogoutRedirectUri);
+            }
+            else
+            {
+                return Redirect("~/../");
+            }
+        }
+
         private IActionResult RedirectToReturnUrl(string? returnUrl)
         {
-            if (urlsOptions.IsAllowedHost(returnUrl))
+            if (urlsOptions.IsAllowedHost(returnUrl) || interactions.IsValidReturnUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
