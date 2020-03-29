@@ -35,6 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetRepository assetRepository;
+        private readonly IAssetLoader assetLoader;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
@@ -42,12 +43,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
             ICommandBus commandBus,
             IAssetFileStore assetFileStore,
             IAssetRepository assetRepository,
+            IAssetLoader assetLoader,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.assetFileStore = assetFileStore;
             this.assetRepository = assetRepository;
+            this.assetLoader = assetLoader;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
@@ -111,7 +114,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             query ??= new AssetContentQueryDto();
 
-            if (asset == null || asset.FileVersion < query.Version)
+            if (asset == null)
             {
                 return NotFound();
             }
@@ -121,24 +124,23 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return StatusCode(403);
             }
 
+            if (query.Version > EtagVersion.Any && asset.Version != query.Version)
+            {
+                asset = await assetLoader.GetAsync(asset.Id, query.Version);
+            }
+
             var resizeOptions = query.ToResizeOptions(asset);
 
             FileCallback callback;
 
-            var fileSize = (long?)null;
-            var fileVersion = query.Version;
-
-            if (fileVersion <= EtagVersion.Any)
-            {
-                fileVersion = asset.FileVersion;
-            }
-
-            Response.Headers[HeaderNames.ETag] = fileVersion.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
 
             if (query.CacheDuration > 0)
             {
                 Response.Headers[HeaderNames.CacheControl] = $"public,max-age={query.CacheDuration}";
             }
+
+            var contentLength = (long?)null;
 
             if (asset.Type == AssetType.Image && resizeOptions.IsValid)
             {
@@ -148,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                     if (query.ForceResize)
                     {
-                        await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, true, ct);
+                        await ResizeAsync(asset, bodyStream, resizedAsset, resizeOptions, true, ct);
                     }
                     else
                     {
@@ -158,40 +160,33 @@ namespace Squidex.Areas.Api.Controllers.Assets
                         }
                         catch (AssetNotFoundException)
                         {
-                            await ResizeAsync(asset, bodyStream, resizedAsset, fileVersion, resizeOptions, false, ct);
+                            await ResizeAsync(asset, bodyStream, resizedAsset, resizeOptions, false, ct);
                         }
                     }
                 });
             }
             else
             {
-                if (fileVersion == asset.FileVersion)
-                {
-                    fileSize = asset.FileSize;
-                }
-                else
-                {
-                    fileSize = await assetFileStore.GetFileSizeAsync(asset.Id, fileVersion);
-                }
+                contentLength = asset.FileSize;
 
                 callback = new FileCallback(async (bodyStream, range, ct) =>
                 {
-                    await assetFileStore.DownloadAsync(asset.Id, fileVersion, bodyStream, range, ct);
+                    await assetFileStore.DownloadAsync(asset.Id, asset.FileVersion, bodyStream, range, ct);
                 });
             }
 
             return new FileCallbackResult(asset.MimeType, callback)
             {
-                EnableRangeProcessing = fileSize.HasValue,
+                EnableRangeProcessing = contentLength > 0,
                 ErrorAs404 = true,
                 FileDownloadName = asset.FileName,
-                FileSize = fileSize,
+                FileSize = contentLength,
                 LastModified = asset.LastModified.ToDateTimeOffset(),
                 SendInline = query.Download != 1
             };
         }
 
-        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, long fileVersion, ResizeOptions resizeOptions, bool overwrite, CancellationToken ct)
+        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, string fileName, ResizeOptions resizeOptions, bool overwrite, CancellationToken ct)
         {
             using (Profiler.Trace("Resize"))
             {
@@ -201,7 +196,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     {
                         using (Profiler.Trace("ResizeDownload"))
                         {
-                            await assetFileStore.DownloadAsync(asset.Id, fileVersion, sourceStream);
+                            await assetFileStore.DownloadAsync(asset.Id, asset.FileVersion, sourceStream);
                             sourceStream.Position = 0;
                         }
 
