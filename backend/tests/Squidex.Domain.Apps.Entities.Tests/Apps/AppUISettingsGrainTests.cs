@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppUISettingsGrainTests
     {
-        private readonly IGrainState<AppUISettingsGrain.GrainState> grainState = A.Fake<IGrainState<AppUISettingsGrain.GrainState>>();
+        private readonly IGrainState<AppUISettingsGrain.State> grainState = A.Fake<IGrainState<AppUISettingsGrain.State>>();
         private readonly AppUISettingsGrain sut;
 
         public AppUISettingsGrainTests()

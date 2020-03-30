@@ -46,10 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task TransformAsync(Context context, string script, ContentEntity content)
         {
-            var scriptContext = new ScriptContext { User = context.User };
-
-            scriptContext.Data = content.Data;
-            scriptContext.ContentId = content.Id;
+            var scriptContext = new ScriptContext
+            {
+                ContentId = content.Id,
+                Data = content.Data,
+                AppId = context.App.Id,
+                AppName = context.App.Name,
+                User = context.User
+            };
 
             content.Data = await scriptEngine.TransformAsync(scriptContext, script);
         }

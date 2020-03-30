@@ -20,14 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Tags
 {
     public class TagGrainTests
     {
-        private readonly IGrainState<TagGrain.GrainState> grainState = A.Fake<IGrainState<TagGrain.GrainState>>();
+        private readonly IGrainState<TagGrain.State> grainState = A.Fake<IGrainState<TagGrain.State>>();
         private readonly string id = Guid.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()
         {
             A.CallTo(() => grainState.ClearAsync())
-                .Invokes(() => grainState.Value = new TagGrain.GrainState());
+                .Invokes(() => grainState.Value = new TagGrain.State());
 
             sut = new TagGrain(grainState);
             sut.ActivateAsync(id).Wait();

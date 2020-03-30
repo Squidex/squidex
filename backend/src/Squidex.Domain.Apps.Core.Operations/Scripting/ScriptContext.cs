@@ -29,6 +29,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
+        public Guid AppId
+        {
+            get => GetValue<Guid>();
+            set => SetValue(value);
+        }
+
         public Guid ContentId
         {
             get => GetValue<Guid>();
@@ -56,6 +62,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
         public Status StatusOld
         {
             get => GetValue<Status>();
+            set => SetValue(value);
+        }
+
+        public string? AppName
+        {
+            get => GetValue<string?>();
             set => SetValue(value);
         }
 

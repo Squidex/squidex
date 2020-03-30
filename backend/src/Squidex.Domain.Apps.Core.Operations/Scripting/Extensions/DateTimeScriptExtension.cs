@@ -14,12 +14,17 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
     public sealed class DateTimeScriptExtension : IScriptExtension
     {
-        private delegate JsValue FormatDateDelegate(DateTime date, string format);
+        private readonly Func<DateTime, string, JsValue> formatDate;
+
+        public DateTimeScriptExtension()
+        {
+            formatDate = new Func<DateTime, string, JsValue>(FormatDate);
+        }
 
         public void Extend(Engine engine)
         {
-            engine.SetValue("formatTime", new FormatDateDelegate(FormatDate));
-            engine.SetValue("formatDate", new FormatDateDelegate(FormatDate));
+            engine.SetValue("formatTime", formatDate);
+            engine.SetValue("formatDate", formatDate);
         }
 
         private static JsValue FormatDate(DateTime date, string format)
