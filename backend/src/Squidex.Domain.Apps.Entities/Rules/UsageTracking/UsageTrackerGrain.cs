@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
     [Reentrant]
     public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
     {
-        private readonly IGrainState<GrainState> state;
+        private readonly IGrainState<State> state;
         private readonly IApiUsageTracker usageTracker;
 
         public sealed class Target
@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [CollectionName("UsageTracker")]
-        public sealed class GrainState
+        public sealed class State
         {
             public Dictionary<Guid, Target> Targets { get; set; } = new Dictionary<Guid, Target>();
         }
 
-        public UsageTrackerGrain(IGrainState<GrainState> state, IApiUsageTracker usageTracker)
+        public UsageTrackerGrain(IGrainState<State> state, IApiUsageTracker usageTracker)
         {
             Guard.NotNull(state);
             Guard.NotNull(usageTracker);

@@ -17,15 +17,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppUISettingsGrain : GrainOfString, IAppUISettingsGrain
     {
-        private readonly IGrainState<GrainState> state;
+        private readonly IGrainState<State> state;
 
         [CollectionName("UISettings")]
-        public sealed class GrainState
+        public sealed class State
         {
             public JsonObject Settings { get; set; } = JsonValue.Object();
         }
 
-        public AppUISettingsGrain(IGrainState<GrainState> state)
+        public AppUISettingsGrain(IGrainState<State> state)
         {
             Guard.NotNull(state);
 

@@ -127,7 +127,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private void Enrich(ScriptContext context)
         {
             context.ContentId = command.ContentId;
-
+            context.AppId = appEntity.Id;
+            context.AppName = appEntity.Name;
             context.User = command.User;
         }
 

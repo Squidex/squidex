@@ -273,12 +273,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             var executionContext = new ExecutionContext(engine, cancellationToken, exceptionHandler);
 
+            context.Add(executionContext, nested);
+
             foreach (var extension in extensions)
             {
                 extension.Extend(executionContext, async);
             }
-
-            context.Add(executionContext, nested);
 
             return executionContext.Engine;
         }

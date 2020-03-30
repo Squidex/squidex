@@ -18,15 +18,15 @@ namespace Squidex.Domain.Apps.Entities.Tags
 {
     public sealed class TagGrain : GrainOfString, ITagGrain
     {
-        private readonly IGrainState<GrainState> state;
+        private readonly IGrainState<State> state;
 
         [CollectionName("Index_Tags")]
-        public sealed class GrainState
+        public sealed class State
         {
             public TagsExport Tags { get; set; } = new TagsExport();
         }
 
-        public TagGrain(IGrainState<GrainState> state)
+        public TagGrain(IGrainState<State> state)
         {
             Guard.NotNull(state);
 
