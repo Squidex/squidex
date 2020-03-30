@@ -37,6 +37,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IUserEvents userEvents;
+        private readonly UrlsOptions urlsOptions;
         private readonly MyIdentityOptions identityOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
@@ -46,17 +47,19 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             UserManager<IdentityUser> userManager,
             IUserFactory userFactory,
             IUserEvents userEvents,
+            IOptions<UrlsOptions> urlsOptions,
             IOptions<MyIdentityOptions> identityOptions,
             ISemanticLog log,
             IIdentityServerInteractionService interactions)
         {
-            this.log = log;
-            this.userEvents = userEvents;
-            this.userManager = userManager;
-            this.userFactory = userFactory;
-            this.interactions = interactions;
             this.identityOptions = identityOptions.Value;
+            this.interactions = interactions;
             this.signInManager = signInManager;
+            this.urlsOptions = urlsOptions.Value;
+            this.userEvents = userEvents;
+            this.userFactory = userFactory;
+            this.userManager = userManager;
+            this.log = log;
         }
 
         [HttpGet]
@@ -404,7 +407,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private IActionResult RedirectToReturnUrl(string? returnUrl)
         {
-            if (!string.IsNullOrWhiteSpace(returnUrl))
+            if (urlsOptions.IsAllowedHost(returnUrl) || interactions.IsValidReturnUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
