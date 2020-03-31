@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var validator = new ContentValidator(partitionResolver, context, Enumerable.Repeat(Factory, 1));
 
-            await validator.ValidatePartialAsync(data);
+            await validator.ValidateInputPartialAsync(data);
 
             foreach (var error in validator.Errors)
             {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var validator = new ContentValidator(partitionResolver, context, Enumerable.Repeat(Factory, 1));
 
-            await validator.ValidateAsync(data);
+            await validator.ValidateInputAsync(data);
 
             foreach (var error in validator.Errors)
             {

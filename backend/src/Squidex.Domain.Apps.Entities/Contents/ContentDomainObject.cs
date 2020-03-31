@@ -54,6 +54,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var status = await contentWorkflow.GetInitialStatusAsync(context.Schema);
 
+                        if (!c.DoNotValidate)
+                        {
+                            await context.ValidateInputAsync(c.Data);
+                        }
+
                         if (!c.DoNotScript)
                         {
                             c.Data = await context.ExecuteScriptAndTransformAsync(s => s.Create,
@@ -70,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (!c.DoNotValidate)
                         {
-                            await context.ValidateAsync(c.Data);
+                            await context.ValidateContentAsync(c.Data);
                         }
 
                         if (c.Publish)
@@ -212,11 +217,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (partial)
                 {
-                    await context.ValidatePartialAsync(command.Data);
+                    await context.ValidateInputPartialAsync(command.Data);
                 }
                 else
                 {
-                    await context.ValidateAsync(command.Data);
+                    await context.ValidateInputAsync(command.Data);
                 }
 
                 newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
@@ -228,6 +233,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         Status = Snapshot.EditingStatus,
                         StatusOld = default
                     });
+
+                await context.ValidateContentAsync(newData);
 
                 Update(command, newData);
             }

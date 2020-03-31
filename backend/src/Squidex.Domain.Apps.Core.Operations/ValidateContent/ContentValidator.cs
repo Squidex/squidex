@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message, pathString));
         }
 
-        public Task ValidatePartialAsync(NamedContentData data)
+        public Task ValidateInputPartialAsync(NamedContentData data)
         {
             Guard.NotNull(data);
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateAsync(NamedContentData data)
+        public Task ValidateInputAsync(NamedContentData data)
         {
             Guard.NotNull(data);
 
@@ -86,10 +86,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 fieldsValidators[field.Name] = (!field.RawProperties.IsRequired, CreateFieldValidator(field, isPartial));
             }
 
-            return new AggregateValidator(
-                CreateContentValidators()
-                    .Union(Enumerable.Repeat(
-                        new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field"), 1)));
+            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field");
         }
 
         private IValidator CreateFieldValidator(IRootField field, bool isPartial)

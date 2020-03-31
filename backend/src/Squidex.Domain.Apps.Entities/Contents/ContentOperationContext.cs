@@ -76,24 +76,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.CompletedTask;
         }
 
-        public async Task ValidateAsync(NamedContentData data)
+        public async Task ValidateInputAsync(NamedContentData data)
         {
             var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
 
-            await validator.ValidateAsync(data);
+            await validator.ValidateInputAsync(data);
 
-            if (validator.Errors.Count > 0)
-            {
-                throw new ValidationException(message(), validator.Errors.ToList());
-            }
+            CheckErrors(validator);
         }
 
-        public async Task ValidatePartialAsync(NamedContentData data)
+        public async Task ValidateInputPartialAsync(NamedContentData data)
         {
             var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
 
-            await validator.ValidatePartialAsync(data);
+            await validator.ValidateInputPartialAsync(data);
 
+            CheckErrors(validator);
+        }
+
+        public async Task ValidateContentAsync(NamedContentData data)
+        {
+            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
+
+            await validator.ValidateContentAsync(data);
+
+            CheckErrors(validator);
+        }
+
+        private void CheckErrors(ContentValidator validator)
+        {
             if (validator.Errors.Count > 0)
             {
                 throw new ValidationException(message(), validator.Errors.ToList());
