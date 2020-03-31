@@ -5,27 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public static class Extensions
+    public interface IValidatorsFactory
     {
-        public static FieldValidator CreateValidator(this IField field)
+        IEnumerable<IValidator> CreateFieldValidators(ValidationContext context, IField field, Func<IField, IValidator> createFieldValidator)
         {
-            return new FieldValidator(CreateValueValidators(field), field);
+            yield break;
         }
 
-        private static IEnumerable<IValidator> CreateValueValidators(IField field)
+        IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, Func<IField, IValidator> createFieldValidator)
         {
-            return FieldValueValidatorsFactory.CreateValidators(field);
+            yield break;
         }
 
-        public static IEnumerable<IValidator> CreateBagValidator(this IField field)
+        IEnumerable<IValidator> CreateContentValidators(ValidationContext context, Func<IField, IValidator> createFieldValidator)
         {
-            return FieldBagValidatorsFactory.CreateValidators(field);
+            yield break;
         }
     }
 }

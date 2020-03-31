@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var sut = new CollectionValidator(true, 1, 3);
 
-            await sut.ValidateOptionalAsync(null, errors);
+            await sut.ValidateAsync(null, errors, updater: c => c.Optional(true));
 
             Assert.Empty(errors);
         }

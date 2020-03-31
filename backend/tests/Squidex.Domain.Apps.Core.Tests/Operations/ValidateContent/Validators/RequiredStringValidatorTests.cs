@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var sut = new RequiredStringValidator();
 
-            await sut.ValidateOptionalAsync(string.Empty, errors);
+            await sut.ValidateAsync(string.Empty, errors, updater: c => c.Optional(true));
 
             Assert.Empty(errors);
         }

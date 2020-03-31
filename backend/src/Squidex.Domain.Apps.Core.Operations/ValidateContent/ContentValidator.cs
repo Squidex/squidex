@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class ContentValidator
     {
-        private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
+        private readonly IEnumerable<IValidatorsFactory> factories;
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
         public IReadOnlyCollection<ValidationError> Errors
@@ -32,14 +32,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             get { return errors; }
         }
 
-        public ContentValidator(Schema schema, PartitionResolver partitionResolver, ValidationContext context)
+        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories)
         {
-            Guard.NotNull(schema);
             Guard.NotNull(context);
+            Guard.NotNull(factories);
             Guard.NotNull(partitionResolver);
 
-            this.schema = schema;
             this.context = context;
+            this.factories = factories;
             this.partitionResolver = partitionResolver;
         }
 
@@ -68,23 +68,35 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
+        public Task ValidateContentAsync(NamedContentData data)
+        {
+            Guard.NotNull(data);
+
+            var validator = new AggregateValidator(CreateContentValidators());
+
+            return validator.ValidateAsync(data, context, AddError);
+        }
+
         private IValidator CreateSchemaValidator(bool isPartial)
         {
-            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
+            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(context.Schema.Fields.Count);
 
-            foreach (var field in schema.Fields)
+            foreach (var field in context.Schema.Fields)
             {
                 fieldsValidators[field.Name] = (!field.RawProperties.IsRequired, CreateFieldValidator(field, isPartial));
             }
 
-            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field");
+            return new AggregateValidator(
+                CreateContentValidators()
+                    .Union(Enumerable.Repeat(
+                        new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field"), 1)));
         }
 
         private IValidator CreateFieldValidator(IRootField field, bool isPartial)
         {
             var partitioning = partitionResolver(field.Partitioning);
 
-            var fieldValidator = field.CreateValidator();
+            var fieldValidator = CreateFieldValidator(field);
             var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
             foreach (var partitionKey in partitioning.AllKeys)
@@ -97,9 +109,29 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             var typeName = partitioning.ToString()!;
 
             return new AggregateValidator(
-                field.CreateBagValidator()
+                CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
                         new ObjectValidator<IJsonValue>(fieldsValidators, isPartial, typeName), 1)));
+        }
+
+        private IValidator CreateFieldValidator(IField field)
+        {
+            return new FieldValidator(CreateValueValidators(field), field);
+        }
+
+        private IEnumerable<IValidator> CreateContentValidators()
+        {
+            return factories.SelectMany(x => x.CreateContentValidators(context, CreateFieldValidator));
+        }
+
+        private IEnumerable<IValidator> CreateValueValidators(IField field)
+        {
+            return factories.SelectMany(x => x.CreateValueValidators(context, field, CreateFieldValidator));
+        }
+
+        private IEnumerable<IValidator> CreateFieldValidators(IField field)
+        {
+            return factories.SelectMany(x => x.CreateFieldValidators(context, field, CreateFieldValidator));
         }
     }
 }

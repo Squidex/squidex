@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,8 +13,17 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
+    public delegate Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> CheckUniqueness(FilterNode<ClrValue> filter);
+
     public sealed class UniqueValidator : IValidator
     {
+        private readonly CheckUniqueness checkUniqueness;
+
+        public UniqueValidator(CheckUniqueness checkUniqueness)
+        {
+            this.checkUniqueness = checkUniqueness;
+        }
+
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (context.Mode == ValidationMode.Optimized)
@@ -38,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 if (filter != null)
                 {
-                    var found = await context.GetContentIdsAsync(context.SchemaId, filter);
+                    var found = await checkUniqueness(filter);
 
                     if (found.Any(x => x.Id != context.ContentId))
                     {
