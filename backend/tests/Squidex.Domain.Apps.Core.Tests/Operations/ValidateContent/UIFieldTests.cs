@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new UIFieldProperties());
 
-            await sut.ValidateAsync(Undefined.Value, errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(Undefined.Value, errors);
 
             Assert.Empty(errors);
         }
@@ -76,12 +75,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddField("my-ui2", new ContentFieldData()
                         .AddValue("iv", null));
 
-            var validationContext = ValidationTestExtensions.ValidContext;
-            var validator = new ContentValidator(schema, x => InvariantPartitioning.Instance, validationContext);
+            var dataErrors = new List<ValidationError>();
 
-            await validator.ValidateAsync(data);
+            await data.ValidateAsync(x => InvariantPartitioning.Instance, dataErrors, schema);
 
-            validator.Errors.Should().BeEquivalentTo(
+            dataErrors.Should().BeEquivalentTo(
                 new[]
                 {
                     new ValidationError("Value must not be defined.", "my-ui1"),
@@ -105,20 +103,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                                 JsonValue.Object()
                                     .Add("my-ui", null))));
 
-            var validationContext =
-                new ValidationContext(
-                    Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    (c, s) => null!,
-                    (s) => null!,
-                    (c) => null!);
+            var dataErrors = new List<ValidationError>();
 
-            var validator = new ContentValidator(schema, x => InvariantPartitioning.Instance, validationContext);
+            await data.ValidateAsync(x => InvariantPartitioning.Instance, dataErrors, schema);
 
-            await validator.ValidateAsync(data);
-
-            validator.Errors.Should().BeEquivalentTo(
-                new[] { new ValidationError("Value must not be defined.", "my-array[1].my-ui") });
+            dataErrors.Should().BeEquivalentTo(
+                new[]
+                {
+                    new ValidationError("Value must not be defined.", "my-array[1].my-ui")
+                });
         }
 
         private static NestedField<UIFieldProperties> Field(UIFieldProperties properties)

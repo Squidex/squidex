@@ -9,47 +9,71 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
     public static class ValidationTestExtensions
     {
-        private static readonly Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> EmptyReferences = Task.FromResult<IReadOnlyList<(Guid SchemaId, Guid Id)>>(new List<(Guid SchemaId, Guid Id)>());
-        private static readonly Task<IReadOnlyList<IAssetInfo>> EmptyAssets = Task.FromResult<IReadOnlyList<IAssetInfo>>(new List<IAssetInfo>());
+        private static readonly NamedId<Guid> AppId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private static readonly NamedId<Guid> SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private static readonly IValidatorsFactory Factory = new DefaultValidatorsFactory();
 
-        public static readonly ValidationContext ValidContext = new ValidationContext(Guid.NewGuid(), Guid.NewGuid(),
-            (x, y) => EmptyReferences,
-            (x) => EmptyReferences,
-            (x) => EmptyAssets);
-
-        public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors, ValidationContext? context = null)
+        public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors,
+            Schema? schema = null, ValidationMode mode = ValidationMode.Default, Func<ValidationContext, ValidationContext>? updater = null)
         {
-            return validator.ValidateAsync(value,
-                CreateContext(context),
-                CreateFormatter(errors));
+            var context = CreateContext(schema, mode, updater);
+
+            return validator.ValidateAsync(value, context, CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this IValidator validator, object? value, IList<string> errors, ValidationContext? context = null)
+        public static Task ValidateAsync(this IField field, object? value, IList<string> errors,
+            Schema? schema = null, ValidationMode mode = ValidationMode.Default, Func<ValidationContext, ValidationContext>? updater = null)
         {
-            return validator.ValidateAsync(
-                value,
-                CreateContext(context).Optional(true),
-                CreateFormatter(errors));
+            var context = CreateContext(schema, mode, updater);
+
+            var validators = Factory.CreateValueValidators(context, field, null!);
+
+            return new FieldValidator(validators.ToArray(), field)
+                .ValidateAsync(value, context, CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this IField field, object? value, IList<string> errors, ValidationContext? context = null)
+        public static async Task ValidatePartialAsync(this NamedContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+            Schema? schema = null, ValidationMode mode = ValidationMode.Default, Func<ValidationContext, ValidationContext>? updater = null)
         {
-            return new FieldValidator(FieldValueValidatorsFactory.CreateValidators(field).ToArray(), field)
-                .ValidateAsync(
-                    value,
-                    CreateContext(context),
-                    CreateFormatter(errors));
+            var context = CreateContext(schema, mode, updater);
+
+            var validator = new ContentValidator(partitionResolver, context, Enumerable.Repeat(Factory, 1));
+
+            await validator.ValidateInputPartialAsync(data);
+
+            foreach (var error in validator.Errors)
+            {
+                errors.Add(error);
+            }
         }
 
-        private static AddError CreateFormatter(IList<string> errors)
+        public static async Task ValidateAsync(this NamedContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+            Schema? schema = null, ValidationMode mode = ValidationMode.Default, Func<ValidationContext, ValidationContext>? updater = null)
+        {
+            var context = CreateContext(schema, mode, updater);
+
+            var validator = new ContentValidator(partitionResolver, context, Enumerable.Repeat(Factory, 1));
+
+            await validator.ValidateInputAsync(data);
+
+            foreach (var error in validator.Errors)
+            {
+                errors.Add(error);
+            }
+        }
+
+        public static AddError CreateFormatter(IList<string> errors)
         {
             return (field, message) =>
             {
@@ -64,23 +88,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             };
         }
 
-        private static ValidationContext CreateContext(ValidationContext? context)
+        public static ValidationContext CreateContext(Schema? schema = null, ValidationMode mode = ValidationMode.Default, Func<ValidationContext, ValidationContext>? updater = null)
         {
-            return context ?? ValidContext;
-        }
+            var context = new ValidationContext(
+                AppId,
+                SchemaId,
+                schema ?? new Schema(SchemaId.Name),
+                Guid.NewGuid(),
+                mode);
 
-        public static ValidationContext Assets(params IAssetInfo[] assets)
-        {
-            var actual = Task.FromResult<IReadOnlyList<IAssetInfo>>(assets.ToList());
+            if (updater != null)
+            {
+                context = updater(context);
+            }
 
-            return new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => EmptyReferences, x => EmptyReferences, x => actual);
-        }
-
-        public static ValidationContext References(params (Guid Id, Guid SchemaId)[] referencesIds)
-        {
-            var actual = Task.FromResult<IReadOnlyList<(Guid Id, Guid SchemaId)>>(referencesIds.ToList());
-
-            return new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => actual, x => actual, x => EmptyAssets);
+            return context;
         }
     }
 }

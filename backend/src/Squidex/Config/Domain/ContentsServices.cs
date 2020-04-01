@@ -8,11 +8,13 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
@@ -35,6 +37,15 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<ContentDomainObject>()
                 .AsSelf();
+
+            services.AddTransientAs<ContentOperationContext>()
+                .AsSelf();
+
+            services.AddSingletonAs<DefaultValidatorsFactory>()
+                .As<IValidatorsFactory>();
+
+            services.AddSingletonAs<DependencyValidatorsFactory>()
+                .As<IValidatorsFactory>();
 
             services.AddSingletonAs<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();

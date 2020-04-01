@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+
 namespace Squidex.Infrastructure.Queries
 {
     public static class ClrFilter
@@ -14,7 +16,17 @@ namespace Squidex.Infrastructure.Queries
             return new LogicalFilter<ClrValue>(LogicalFilterType.And, filters);
         }
 
+        public static LogicalFilter<ClrValue> And(IReadOnlyList<FilterNode<ClrValue>> filters)
+        {
+            return new LogicalFilter<ClrValue>(LogicalFilterType.And, filters);
+        }
+
         public static LogicalFilter<ClrValue> Or(params FilterNode<ClrValue>[] filters)
+        {
+            return new LogicalFilter<ClrValue>(LogicalFilterType.Or, filters);
+        }
+
+        public static LogicalFilter<ClrValue> Or(IReadOnlyList<FilterNode<ClrValue>> filters)
         {
             return new LogicalFilter<ClrValue>(LogicalFilterType.Or, filters);
         }

@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("tag"), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue("tag"), errors);
 
             Assert.Empty(errors);
         }

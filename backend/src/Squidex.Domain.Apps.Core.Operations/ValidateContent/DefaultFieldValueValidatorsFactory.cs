@@ -15,19 +15,22 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed class FieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
+    internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
     {
-        private static readonly FieldValueValidatorsFactory Instance = new FieldValueValidatorsFactory();
+        private readonly FieldValidatorFactory createFieldValidator;
 
-        private FieldValueValidatorsFactory()
+        private DefaultFieldValueValidatorsFactory(FieldValidatorFactory createFieldValidator)
         {
+            this.createFieldValidator = createFieldValidator;
         }
 
-        public static IEnumerable<IValidator> CreateValidators(IField field)
+        public static IEnumerable<IValidator> CreateValidators(IField field, FieldValidatorFactory createFieldValidator)
         {
             Guard.NotNull(field);
 
-            return field.Accept(Instance);
+            var visitor = new DefaultFieldValueValidatorsFactory(createFieldValidator);
+
+            return field.Accept(visitor);
         }
 
         public IEnumerable<IValidator> Visit(IArrayField field)
@@ -41,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             foreach (var nestedField in field.Fields)
             {
-                nestedSchema[nestedField.Name] = (false, nestedField.CreateValidator());
+                nestedSchema[nestedField.Name] = (false, createFieldValidator(nestedField));
             }
 
             yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field"));
@@ -58,8 +61,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return new UniqueValuesValidator<Guid>();
             }
-
-            yield return new AssetsValidator(field.Properties);
         }
 
         public IEnumerable<IValidator> Visit(IField<BooleanFieldProperties> field)
@@ -115,11 +116,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues);
             }
-
-            if (field.Properties.IsUnique)
-            {
-                yield return new UniqueValidator();
-            }
         }
 
         public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field)
@@ -133,8 +129,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return new UniqueValuesValidator<Guid>();
             }
-
-            yield return new ReferencesValidator(field.Properties.SchemaIds);
         }
 
         public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field)
@@ -157,11 +151,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (field.Properties.AllowedValues != null)
             {
                 yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues);
-            }
-
-            if (field.Properties.IsUnique)
-            {
-                yield return new UniqueValidator();
             }
         }
 

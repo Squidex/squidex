@@ -15,13 +15,21 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
+    public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<Guid> ids);
+
     public sealed class AssetsValidator : IValidator
     {
         private readonly AssetsFieldProperties properties;
+        private readonly CheckAssets checkAssets;
 
-        public AssetsValidator(AssetsFieldProperties properties)
+        public AssetsValidator(AssetsFieldProperties properties, CheckAssets checkAssets)
         {
+            Guard.NotNull(properties);
+            Guard.NotNull(checkAssets);
+
             this.properties = properties;
+
+            this.checkAssets = checkAssets;
         }
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
@@ -33,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (value is ICollection<Guid> assetIds && assetIds.Count > 0)
             {
-                var assets = await context.GetAssetInfosAsync(assetIds);
+                var assets = await checkAssets(assetIds);
                 var index = 0;
 
                 foreach (var assetId in assetIds)

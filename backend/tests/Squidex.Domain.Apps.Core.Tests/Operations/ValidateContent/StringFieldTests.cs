@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -113,17 +112,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Custom Error Message." });
-        }
-
-        [Fact]
-        public async Task Should_add_error_if_unique_constraint_failed()
-        {
-            var sut = Field(new StringFieldProperties { IsUnique = true });
-
-            await sut.ValidateAsync(CreateValue("abc"), errors, ValidationTestExtensions.References((Guid.NewGuid(), Guid.NewGuid())));
-
-            errors.Should().BeEquivalentTo(
-                new[] { "Another content with the same value exists." });
         }
 
         private static IJsonValue CreateValue(string? v)

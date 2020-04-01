@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
@@ -14,86 +15,100 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
+
+#pragma warning disable IDE0016 // Use 'throw' expression
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOperationContext
     {
-        private IContentRepository contentRepository;
-        private IAssetRepository assetRepository;
-        private IScriptEngine scriptEngine;
-        private ISchemaEntity schemaEntity;
-        private IAppEntity appEntity;
+        private readonly IScriptEngine scriptEngine;
+        private readonly IAppProvider appProvider;
+        private readonly IEnumerable<IValidatorsFactory> factories;
+        private ISchemaEntity schema;
+        private IAppEntity app;
         private ContentCommand command;
-        private Guid schemaId;
+        private ValidationContext validationContext;
         private Func<string> message;
+
+        public ContentOperationContext(IAppProvider appProvider, IEnumerable<IValidatorsFactory> factories, IScriptEngine scriptEngine)
+        {
+            this.appProvider = appProvider;
+            this.factories = factories;
+            this.scriptEngine = scriptEngine;
+        }
 
         public ISchemaEntity Schema
         {
-            get { return schemaEntity; }
+            get { return schema; }
         }
 
-        public static async Task<ContentOperationContext> CreateAsync(
-            Guid appId,
-            Guid schemaId,
-            ContentCommand command,
-            IAppProvider appProvider,
-            IAssetRepository assetRepository,
-            IContentRepository contentRepository,
-            IScriptEngine scriptEngine,
-            Func<string> message)
+        public async Task LoadAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized)
         {
-            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(appId, schemaId);
+            var (app, schema) = await appProvider.GetAppWithSchemaAsync(appId.Id, schemaId.Id);
 
-            if (appEntity == null)
+            if (app == null)
             {
                 throw new InvalidOperationException("Cannot resolve app.");
             }
 
-            if (schemaEntity == null)
+            if (schema == null)
             {
                 throw new InvalidOperationException("Cannot resolve schema.");
             }
 
-            var context = new ContentOperationContext
-            {
-                appEntity = appEntity,
-                assetRepository = assetRepository,
-                command = command,
-                contentRepository = contentRepository,
-                message = message,
-                schemaId = schemaId,
-                schemaEntity = schemaEntity,
-                scriptEngine = scriptEngine
-            };
+            this.app = app;
+            this.schema = schema;
+            this.command = command;
+            this.message = message;
 
-            return context;
+            validationContext = new ValidationContext(appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
         }
 
         public Task GenerateDefaultValuesAsync(NamedContentData data)
         {
-            data.GenerateDefaultValues(schemaEntity.SchemaDef, appEntity.PartitionResolver());
+            data.GenerateDefaultValues(schema.SchemaDef, app.PartitionResolver());
 
             return Task.CompletedTask;
         }
 
-        public Task ValidateAsync(NamedContentData data, bool optimized)
+        public async Task ValidateInputAsync(NamedContentData data)
         {
-            var ctx = CreateValidationContext(optimized);
+            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
 
-            return data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
+            await validator.ValidateInputAsync(data);
+
+            CheckErrors(validator);
         }
 
-        public Task ValidatePartialAsync(NamedContentData data, bool optimized)
+        public async Task ValidateInputPartialAsync(NamedContentData data)
         {
-            var ctx = CreateValidationContext(optimized);
+            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
 
-            return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
+            await validator.ValidateInputPartialAsync(data);
+
+            CheckErrors(validator);
+        }
+
+        public async Task ValidateContentAsync(NamedContentData data)
+        {
+            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories);
+
+            await validator.ValidateContentAsync(data);
+
+            CheckErrors(validator);
+        }
+
+        private void CheckErrors(ContentValidator validator)
+        {
+            if (validator.Errors.Count > 0)
+            {
+                throw new ValidationException(message(), validator.Errors.ToList());
+            }
         }
 
         public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
@@ -127,38 +142,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private void Enrich(ScriptContext context)
         {
             context.ContentId = command.ContentId;
-            context.AppId = appEntity.Id;
-            context.AppName = appEntity.Name;
+            context.AppId = app.Id;
+            context.AppName = app.Name;
             context.User = command.User;
-        }
-
-        private ValidationContext CreateValidationContext(bool optimized)
-        {
-            return new ValidationContext(command.ContentId, schemaId,
-                    QueryContentsAsync,
-                    QueryContentsAsync,
-                    QueryAssetsAsync)
-                .Optimized(optimized);
-        }
-
-        private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
-        {
-            return await assetRepository.QueryAsync(appEntity.Id, new HashSet<Guid>(assetIds));
-        }
-
-        private async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryContentsAsync(Guid filterSchemaId, FilterNode<ClrValue> filterNode)
-        {
-            return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
-        }
-
-        private async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryContentsAsync(HashSet<Guid> ids)
-        {
-            return await contentRepository.QueryIdsAsync(appEntity.Id, ids, SearchScope.All);
         }
 
         private string GetScript(Func<SchemaScripts, string> script)
         {
-            return script(schemaEntity.SchemaDef.Scripts);
+            return script(schema.SchemaDef.Scripts);
         }
     }
 }

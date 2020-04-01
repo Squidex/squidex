@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(JsonValue.Object()), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue(JsonValue.Object()), errors);
 
             Assert.Empty(errors);
         }
