@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             this.contentRepository = contentRepository;
         }
 
-        public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, Func<IField, IValidator> createFieldValidator)
+        public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, FieldValidatorFactory createFieldValidator)
         {
             if (field is IField<AssetsFieldProperties> assetsField)
             {
