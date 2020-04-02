@@ -19,6 +19,7 @@ using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
+using Squidex.Web.Pipeline;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -37,6 +38,7 @@ namespace Squidex
         {
             services.AddHttpClient();
             services.AddMemoryCache();
+            services.AddNonBreakingSameSiteCookies();
 
             services.AddSquidexMvcWithPlugins(config);
 
@@ -72,6 +74,8 @@ namespace Squidex
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseCookiePolicy();
+
             app.UseSquidexForwardingRules(config);
             app.UseSquidexTracking();
             app.UseSquidexLocalCache();
