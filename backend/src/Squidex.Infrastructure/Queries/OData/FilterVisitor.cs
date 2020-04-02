@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 return ClrFilter.Empty(PropertyPathVisitor.Visit(fieldNode));
             }
 
-            var valueNode = nodeIn.Parameters.ElementAt(1);
+            var valueNode = nodeIn.Parameters.ElementAtOrDefault(1);
 
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
             {
