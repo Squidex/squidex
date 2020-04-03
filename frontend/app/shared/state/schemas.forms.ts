@@ -46,14 +46,20 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                 ]
             ],
             isSingleton: false,
-            import: {}
+            importing: {}
         }));
     }
 
-    public transformSubmit(value: any) {
-        const result = { ...value.import || {}, name: value.name, isSingleton: value.isSingleton };
+    public transformLoad(value: CreateSchemaDto) {
+        const { name, isSingleton, ...importing } = value;
 
-        return result;
+        return { name, isSingleton, importing };
+    }
+
+    public transformSubmit(value: any): CreateSchemaDto {
+        const { name, isSingleton, importing } = value;
+
+        return { name, isSingleton, ...importing };
     }
 }
 
