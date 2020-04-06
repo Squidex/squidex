@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Net.Http;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Configuration;
 
 namespace TestSuite.Fixtures
 {
     public class ClientManagerFixture : IDisposable
     {
-        public string ServerUrl { get; } = "http://localhost:5000";
+        public string ServerUrl { get; } = "https://localhost:5001";
 
         public string ClientId { get; } = "root";
 
@@ -22,6 +24,18 @@ namespace TestSuite.Fixtures
 
         public SquidexClientManager ClientManager { get; }
 
+        public sealed class Configurator : IHttpConfigurator
+        {
+            public void Configure(HttpClient httpClient)
+            {
+            }
+
+            public void Configure(HttpClientHandler httpClientHandler)
+            {
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, error) => true;
+            }
+        }
+
         public ClientManagerFixture()
         {
             ClientManager = new SquidexClientManager(new SquidexOptions
@@ -29,6 +43,7 @@ namespace TestSuite.Fixtures
                 AppName = AppName,
                 ClientId = ClientId,
                 ClientSecret = ClientSecret,
+                Configurator = new Configurator(),
                 ReadResponseAsString = true,
                 Url = ServerUrl
             });

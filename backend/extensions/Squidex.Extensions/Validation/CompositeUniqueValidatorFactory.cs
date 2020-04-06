@@ -35,6 +35,11 @@ namespace Squidex.Extensions.Validation
 
         private static IEnumerable<string> ValidatorTags(IEnumerable<string> tags)
         {
+            if (tags == null)
+            {
+                yield break;
+            }
+
             foreach (var tag in tags)
             {
                 if (tag.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase) && tag.Length > Prefix.Length)

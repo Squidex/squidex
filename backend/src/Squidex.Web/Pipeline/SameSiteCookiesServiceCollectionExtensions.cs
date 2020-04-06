@@ -25,7 +25,7 @@ namespace Squidex.Web.Pipeline
         /// Configures a cookie policy to properly set the SameSite attribute
         /// for Browsers that handle unknown values as Strict. Ensure that you
         /// add the <seealso cref="Microsoft.AspNetCore.CookiePolicy.CookiePolicyMiddleware" />
-        /// into the pipeline before sending any cookies!
+        /// into the pipeline before sending any cookies!.
         /// </summary>
         /// <remarks>
         /// Minimum ASPNET Core Version required for this code:
@@ -45,7 +45,7 @@ namespace Squidex.Web.Pipeline
         /// - https://tools.ietf.org/html/draft-west-cookie-incrementalism-00
         /// - https://www.chromium.org/updates/same-site
         /// - https://devblogs.microsoft.com/aspnet/upcoming-samesite-cookie-changes-in-asp-net-and-asp-net-core/
-        /// - https://bugs.webkit.org/show_bug.cgi?id=198181
+        /// - https://bugs.webkit.org/show_bug.cgi?id=198181.
         /// </remarks>
         /// <param name="services">The service collection to register <see cref="CookiePolicyOptions" /> into.</param>
         /// <returns>The modified <see cref="IServiceCollection" />.</returns>
@@ -82,7 +82,7 @@ namespace Squidex.Web.Pipeline
         /// </summary>
         /// <remarks>
         /// This code is taken from Microsoft:
-        /// https://devblogs.microsoft.com/aspnet/upcoming-samesite-cookie-changes-in-asp-net-and-asp-net-core/
+        /// https://devblogs.microsoft.com/aspnet/upcoming-samesite-cookie-changes-in-asp-net-and-asp-net-core/.
         /// </remarks>
         /// <param name="userAgent">The user agent string to check.</param>
         /// <returns>Whether the specified user agent (browser) accepts SameSite=None or not.</returns>

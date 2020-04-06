@@ -209,6 +209,7 @@ module.exports = function (env) {
             headers: {
                 'Access-Control-Allow-Origin': '*'
             },
+            https: true,
             historyApiFallback: true
         }
     };

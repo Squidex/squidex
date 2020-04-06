@@ -62,7 +62,7 @@ namespace Squidex.Extensions.Validation
             }
         }
 
-        private static ClrValue? TryGetValue(IRootField field, NamedContentData data)
+        private static ClrValue TryGetValue(IRootField field, NamedContentData data)
         {
             var value = JsonValue.Null;
 
@@ -97,7 +97,9 @@ namespace Squidex.Extensions.Validation
 
         private bool IsValidateableField(IRootField field)
         {
-            return field.Partitioning == Partitioning.Invariant && field.RawProperties.Tags.Contains(tag) &&
+            return
+                field.Partitioning == Partitioning.Invariant &&
+                field.RawProperties.Tags?.Contains(tag) == true &&
                 (field.RawProperties is BooleanFieldProperties ||
                  field.RawProperties is NumberFieldProperties ||
                  field.RawProperties is ReferencesFieldProperties ||

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string? EditorUrl { get; set; }
 
-        public ReadOnlyCollection<string> Tags { get; set; }
+        public ReadOnlyCollection<string>? Tags { get; set; }
 
         public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
 
