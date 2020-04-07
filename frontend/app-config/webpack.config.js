@@ -10,6 +10,14 @@ function root() {
     return path.join.apply(path, [appRoot].concat(newArgs));
 };
 
+function tryGetFile(file) {
+    try {
+        return fs.readFileSync(path.resolve(__dirname, file));
+    } catch (ex) {
+        return undefined;
+    }
+}
+
 const plugins = {
     // https://github.com/webpack-contrib/mini-css-extract-plugin
     MiniCssExtractPlugin: require('mini-css-extract-plugin'),
@@ -211,8 +219,8 @@ module.exports = function (env) {
                 'Access-Control-Allow-Origin': '*'
             },
             https: {
-                 key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
-                cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
+                 key: tryGetFile('localhost-key.pem'),
+                cert: tryGetFile('localhost.pem'),
             },
             historyApiFallback: true,
         }
