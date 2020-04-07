@@ -35,11 +35,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_throw_exception_if_add_pattern_with_same_id()
+        public void Should_do_nothing_if_adding_pattern_with_same_id()
         {
             var patterns_1 = patterns_0.Add(id, "NewPattern", "New Pattern", "Message");
 
-            Assert.Throws<ArgumentException>(() => patterns_1.Add(id, "NewPattern", "New Pattern", "Message"));
+            patterns_1.Add(id, "NewPattern", "New Pattern", "Message");
         }
 
         [Fact]

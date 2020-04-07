@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (inner.ContainsKey(name))
             {
-                throw new ArgumentException("Name already exists.", nameof(name));
+                return this;
             }
 
             if (IsDefault(name))

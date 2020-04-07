@@ -45,11 +45,12 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_throw_exception_if_add_role_with_same_name()
+        public void Should_return_same_instance_if_adding_role_with_existing_name()
         {
             var roles_1 = roles_0.Add(role);
+            var roles_2 = roles_1.Add(role);
 
-            Assert.Throws<ArgumentException>(() => roles_1.Add(role));
+            Assert.Same(roles_1, roles_2);
         }
 
         [Fact]

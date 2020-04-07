@@ -37,11 +37,6 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             var newPattern = new AppPattern(name, pattern, message);
 
-            if (ContainsKey(id))
-            {
-                throw new ArgumentException("Id already exists.", nameof(id));
-            }
-
             return With<AppPatterns>(id, newPattern);
         }
 

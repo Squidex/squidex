@@ -216,7 +216,7 @@ export class AssetsService {
             fullQuery = `q=${encodeQuery(queryObj)}`;
 
             if (parentId) {
-                fullQuery = StringHelper.appendToUrl(fullQuery, 'parentId', parentId);
+                fullQuery = StringHelper.appendToUrl(fullQuery, 'parentId', parentId, true);
             }
         }
 

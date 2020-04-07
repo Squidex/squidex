@@ -1,5 +1,6 @@
 const webpack = require('webpack'),
-         path = require('path');
+         path = require('path'),
+           fs = require('fs');
 
 const appRoot = path.resolve(__dirname, '..');
 
@@ -209,8 +210,11 @@ module.exports = function (env) {
             headers: {
                 'Access-Control-Allow-Origin': '*'
             },
-            https: true,
-            historyApiFallback: true
+            https: {
+                 key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
+                cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
+            },
+            historyApiFallback: true,
         }
     };
 
@@ -257,7 +261,7 @@ module.exports = function (env) {
                 /**
                  * Set the public path, because we are running the website from another port (5000).
                  */
-                publicPath: 'http://localhost:3000/'
+                publicPath: 'https://localhost:3000/'
             };
         }
 

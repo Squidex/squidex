@@ -20,8 +20,8 @@ export module StringHelper {
         return '';
     }
 
-    export function appendToUrl(url: string, key: string, value?: any) {
-        if (url.indexOf('?') > 0) {
+    export function appendToUrl(url: string, key: string, value?: any, ambersand = false) {
+        if (url.indexOf('?') >= 0 || ambersand) {
             url += '&';
         } else {
             url += '?';

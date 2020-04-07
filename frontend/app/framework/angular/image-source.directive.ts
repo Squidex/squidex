@@ -125,7 +125,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
         if (w > 0 && h > 0) {
             let source = this.imageSource;
 
-            source = StringHelper.appendToUrl(source, `${this.imageSource}&width=${w}&height=${h}&mode=Pad&nofocus`);
+            source = StringHelper.appendToUrl(source, `width=${w}&height=${h}&mode=Pad&nofocus`);
 
             if (this.loadQuery) {
                 source = StringHelper.appendToUrl(source, 'q', this.loadQuery);
@@ -138,7 +138,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     private retryLoadingImage() {
         this.loadRetries++;
 
-        if (this.loadRetries <= 10) {
+        if (this.loadRetries <= 3) {
             this.loadTimer =
                 setTimeout(() => {
                     this.loadQuery = MathHelper.guid();

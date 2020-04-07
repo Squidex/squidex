@@ -40,11 +40,6 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(id);
             Guard.NotNull(client);
 
-            if (ContainsKey(id))
-            {
-                throw new ArgumentException("Id already exists.", nameof(id));
-            }
-
             return With<AppClients>(id, client);
         }
 
