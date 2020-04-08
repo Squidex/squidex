@@ -79,6 +79,7 @@ namespace Squidex.Config.Web
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })
+            .AddRazorRuntimeCompilation()
             .AddSquidexPlugins(config)
             .AddSquidexSerializers();
         }

@@ -30,6 +30,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public bool HasPasswordAuth { get; set; }
 
+        public List<UserProperty> Properties { get; set; }
+
         public IList<UserLoginInfo> ExternalLogins { get; set; }
 
         public IList<ExternalProvider> ExternalProviders { get; set; }
