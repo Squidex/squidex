@@ -133,13 +133,7 @@ namespace Squidex.Domain.Users
             try
             {
                 await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
-
-                var claims = values.ToClaims(true);
-
-                if (claims.Count > 0)
-                {
-                    await DoChecked(() => userManager.AddClaimsAsync(user, claims), "Cannot add user.");
-                }
+                await DoChecked(() => values.SyncClaims(userManager, user), "Cannot add user.");
 
                 if (!string.IsNullOrWhiteSpace(values.Password))
                 {
@@ -172,9 +166,12 @@ namespace Squidex.Domain.Users
 
         public static Task<IdentityResult> GenerateClientSecretAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
         {
-            var claims = new List<Claim> { new Claim(SquidexClaimTypes.ClientSecret, RandomHash.New()) };
+            var update = new UserValues
+            {
+                ClientSecret = RandomHash.New()
+            };
 
-            return userManager.SyncClaimsAsync(user, claims);
+            return update.SyncClaims(userManager, user);
         }
 
         public static async Task<IdentityResult> UpdateSafeAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
@@ -204,7 +201,7 @@ namespace Squidex.Domain.Users
                 await DoChecked(() => userManager.SetUserNameAsync(user, values.Email), "Cannot update email.");
             }
 
-            await DoChecked(() => userManager.SyncClaimsAsync(user, values.ToClaims(false)), "Cannot update user.");
+            await DoChecked(() => values.SyncClaims(userManager, user), "Cannot update user.");
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
@@ -251,36 +248,9 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public static async Task<IdentityResult> SyncClaimsAsync(this UserManager<IdentityUser> userManager, IdentityUser user, List<Claim> claims)
+        public static Task<IdentityResult> SyncClaims(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
         {
-            if (claims.Any())
-            {
-                var oldClaims = await userManager.GetClaimsAsync(user);
-
-                var oldClaimsToRemove = new List<Claim>();
-
-                foreach (var oldClaim in oldClaims)
-                {
-                    if (claims.Any(x => x.Type == oldClaim.Type))
-                    {
-                        oldClaimsToRemove.Add(oldClaim);
-                    }
-                }
-
-                if (oldClaimsToRemove.Count > 0)
-                {
-                    var result = await userManager.RemoveClaimsAsync(user, oldClaimsToRemove);
-
-                    if (!result.Succeeded)
-                    {
-                        return result;
-                    }
-                }
-
-                return await userManager.AddClaimsAsync(user, claims.Where(x => !string.IsNullOrWhiteSpace(x.Value)));
-            }
-
-            return IdentityResult.Success;
+            return values.SyncClaims(userManager, user);
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
     public class ChangeProfileModel
     {
         [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Email is not valid.")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "DisplayName is required.")]

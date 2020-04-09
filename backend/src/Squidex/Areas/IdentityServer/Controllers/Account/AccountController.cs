@@ -24,6 +24,7 @@ using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -361,36 +362,27 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private Task<bool> AddClaimsAsync(UserWithClaims user, ExternalLoginInfo externalLogin, string email, bool isFirst = false)
         {
-            var newClaims = new List<Claim>();
-
-            void AddClaim(Claim claim)
+            var update = new UserValues
             {
-                newClaims.Add(claim);
-
-                user.Claims.Add(claim);
-            }
-
-            foreach (var squidexClaim in externalLogin.Principal.GetSquidexClaims())
-            {
-                AddClaim(squidexClaim);
-            }
+                CustomClaims = externalLogin.Principal.GetSquidexClaims().ToList()
+            };
 
             if (!user.HasPictureUrl())
             {
-                AddClaim(new Claim(SquidexClaimTypes.PictureUrl, GravatarHelper.CreatePictureUrl(email)));
+                update.PictureUrl = GravatarHelper.CreatePictureUrl(email);
             }
 
             if (!user.HasDisplayName())
             {
-                AddClaim(new Claim(SquidexClaimTypes.DisplayName, email));
+                update.DisplayName = email;
             }
 
             if (isFirst)
             {
-                AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
+                update.Permissions = new PermissionSet(Permissions.Admin);
             }
 
-            return MakeIdentityOperation(() => userManager.SyncClaimsAsync(user.Identity, newClaims));
+            return MakeIdentityOperation(() => userManager.SyncClaims(user.Identity, update));
         }
 
         private IActionResult RedirectToLogoutUrl(LogoutRequest context)
