@@ -30,7 +30,7 @@ export class AnalyticsService {
             window['dataLayer'].push(arguments);
         };
 
-        if (analyticsId && router && resourceLoader && window.location.hostname !== 'localhost') {
+        if (analyticsId && router && resourceLoader) { // && window.location.hostname !== 'localhost'
             this.gtag('config', analyticsId.value, { anonymize_ip: true });
 
             router.events.pipe(
