@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
@@ -76,7 +77,14 @@ namespace Squidex.Shared.Users
 
         public static string[] GetClaimValues(this IUser user, string type)
         {
-            return user.Claims.Where(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase)).Select(x => x.Value).ToArray();
+            return user.Claims.Where(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Value).ToArray();
+        }
+
+        public static List<(string Name, string Value)> GetCustomProperties(this IUser user)
+        {
+            return user.Claims.Where(x => x.Type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase))
+                .Select(x => (x.Type.Substring(SquidexClaimTypes.CustomPrefix.Length + 1), x.Value)).ToList();
         }
 
         public static bool HasClaim(this IUser user, string type)

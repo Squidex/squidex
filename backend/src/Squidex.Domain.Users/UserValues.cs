@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 
@@ -21,7 +24,11 @@ namespace Squidex.Domain.Users
 
         public string? Password { get; set; }
 
+        public string? ClientSecret { get; set; }
+
         public string Email { get; set; }
+
+        public bool? Hidden { get; set; }
 
         public bool? Invited { get; set; }
 
@@ -29,59 +36,108 @@ namespace Squidex.Domain.Users
 
         public bool? ConsentForEmails { get; set; }
 
-        public bool? Hidden { get; set; }
+        public PermissionSet? Permissions { get; set; }
 
-        public PermissionSet Permissions { get; set; }
+        public List<Claim>? CustomClaims { get; set; }
 
-        public List<Claim> ToClaims(bool initial)
+        public List<(string Name, string Value)>? Properties { get; set; }
+
+        internal async Task<IdentityResult> SyncClaims(UserManager<IdentityUser> userManager, IdentityUser user)
         {
-            return ToClaimsCore(initial).ToList();
-        }
+            var current = await userManager.GetClaimsAsync(user);
 
-        private IEnumerable<Claim> ToClaimsCore(bool initial)
-        {
-            if (!string.IsNullOrWhiteSpace(DisplayName))
+            var claimsToRemove = new List<Claim>();
+            var claimsToAdd = new List<Claim>();
+
+            void RemoveClaims(Func<Claim, bool> predicate)
             {
-                yield return new Claim(SquidexClaimTypes.DisplayName, DisplayName);
+                claimsToRemove.AddRange(current.Where(predicate));
             }
 
-            if (!string.IsNullOrWhiteSpace(PictureUrl))
+            void AddClaim(string type, string value)
             {
-                yield return new Claim(SquidexClaimTypes.PictureUrl, PictureUrl);
+                claimsToAdd.Add(new Claim(type, value));
             }
 
-            if (Hidden.HasValue)
+            void SyncString(string type, string? value)
             {
-                yield return new Claim(SquidexClaimTypes.Hidden, Hidden.ToString());
+                if (value != null)
+                {
+                    RemoveClaims(x => x.Type == type);
+
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        AddClaim(type, value);
+                    }
+                }
             }
 
-            if (Invited.HasValue)
+            void SyncBoolean(string type, bool? value)
             {
-                yield return new Claim(SquidexClaimTypes.Invited, Invited.ToString());
+                if (value != null)
+                {
+                    RemoveClaims(x => x.Type == type);
+
+                    if (value == true)
+                    {
+                        AddClaim(type, value.ToString()!);
+                    }
+                }
             }
 
-            if (Consent.HasValue)
-            {
-                yield return new Claim(SquidexClaimTypes.Consent, Consent.ToString());
-            }
+            SyncString(SquidexClaimTypes.ClientSecret, ClientSecret);
+            SyncString(SquidexClaimTypes.DisplayName, DisplayName);
+            SyncString(SquidexClaimTypes.PictureUrl, PictureUrl);
 
-            if (ConsentForEmails.HasValue)
+            SyncBoolean(SquidexClaimTypes.Hidden, Hidden);
+            SyncBoolean(SquidexClaimTypes.Invited, Invited);
+            SyncBoolean(SquidexClaimTypes.Consent, Consent);
+            SyncBoolean(SquidexClaimTypes.ConsentForEmails, ConsentForEmails);
+
+            if (CustomClaims != null)
             {
-                yield return new Claim(SquidexClaimTypes.ConsentForEmails, ConsentForEmails.ToString());
+                foreach (var claim in CustomClaims)
+                {
+                    SyncString(claim.Type, claim.Value);
+                }
             }
 
             if (Permissions != null)
             {
-                if (!initial)
-                {
-                    yield return new Claim(SquidexClaimTypes.Permissions, string.Empty);
-                }
+                RemoveClaims(x => x.Type == SquidexClaimTypes.Permissions);
 
                 foreach (var permission in Permissions)
                 {
-                    yield return new Claim(SquidexClaimTypes.Permissions, permission.Id);
+                    AddClaim(SquidexClaimTypes.Permissions, permission.Id);
                 }
             }
+
+            if (Properties != null)
+            {
+                RemoveClaims(x => x.Type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase));
+
+                foreach (var (name, value) in Properties)
+                {
+                    AddClaim($"{SquidexClaimTypes.CustomPrefix}:{name}", value);
+                }
+            }
+
+            if (claimsToRemove.Count > 0)
+            {
+                var result = await userManager.RemoveClaimsAsync(user, claimsToRemove);
+
+                if (!result.Succeeded)
+                {
+                    return result;
+                }
+            }
+
+            if (claimsToAdd.Count > 0)
+            {
+                return await userManager.AddClaimsAsync(user, claimsToAdd);
+            }
+
+            return IdentityResult.Success;
         }
     }
 }
