@@ -24,15 +24,13 @@ export const AnalyticsServiceFactory = (uiOptions: UIOptions, router: Router, re
 export class AnalyticsService {
     private readonly gtag: any;
     private readonly analyticsId: AnalyticsIdConfig;
-    private readonly router?: Router;
-    private readonly resourceLoader?: ResourceLoaderService;
 
-    constructor(uiOptions: UIOptions, router?: Router, resourceLoader?: ResourceLoaderService) {
+    constructor(private readonly uiOptions: UIOptions,
+        private readonly router?: Router,
+        private readonly resourceLoader?: ResourceLoaderService
+    ) {
         window['dataLayer'] = window['dataLayer'] || [];
-
-        this.analyticsId = new AnalyticsIdConfig(uiOptions.get('google.analyticsId'));
-        this.router = router;
-        this.resourceLoader = resourceLoader;
+        this.analyticsId = new AnalyticsIdConfig(this.uiOptions.get('google.analyticsId'));
 
         this.gtag = function () {
             window['dataLayer'].push(arguments);
