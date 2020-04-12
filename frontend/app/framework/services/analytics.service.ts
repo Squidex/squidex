@@ -50,7 +50,7 @@ export class AnalyticsService {
     }
 
     private configureGtag() {
-        if (this.analyticsId && this.router && this.resourceLoader ) { // && window.location.hostname !== 'localhost' 
+        if (this.analyticsId && this.router && this.resourceLoader && window.location.hostname !== 'localhost' ) {
 
             this.gtag('config', this.analyticsId.value, { anonymize_ip: true });
 
