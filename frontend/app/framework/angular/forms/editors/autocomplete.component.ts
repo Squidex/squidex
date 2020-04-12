@@ -66,7 +66,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public displayProperty: string;
 
     @Input()
-    public placeholder: string;
+    public placeholder = '';
 
     @Input()
     public icon: string;
