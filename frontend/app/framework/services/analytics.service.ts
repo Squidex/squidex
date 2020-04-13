@@ -23,15 +23,14 @@ export const AnalyticsServiceFactory = (uiOptions: UIOptions, router: Router, re
 @Injectable()
 export class AnalyticsService {
     private readonly gtag: any;
-    private readonly analyticsId: AnalyticsIdConfig;
+    private analyticsId: AnalyticsIdConfig;
 
-    constructor(private readonly uiOptions: UIOptions,
+    constructor(private readonly uiOptions?: UIOptions,
         private readonly router?: Router,
         private readonly resourceLoader?: ResourceLoaderService
     ) {
         window['dataLayer'] = window['dataLayer'] || [];
-        this.analyticsId = new AnalyticsIdConfig(this.uiOptions.get('google.analyticsId'));
-
+        this.setAnaltyicsId();
         this.gtag = function () {
             window['dataLayer'].push(arguments);
         };
@@ -65,6 +64,12 @@ export class AnalyticsService {
     private loadGoogletagmanagerScript() {
         if (document.cookie.indexOf('ga-disable') < 0 && this.resourceLoader) {
             this.resourceLoader.loadScript(`https://www.googletagmanager.com/gtag/js?id=${this.analyticsId.value}`);
+        }
+    }
+
+    private setAnaltyicsId() {
+        if (this.uiOptions) {
+            this.analyticsId = new AnalyticsIdConfig(this.uiOptions.get('google.analyticsId'));
         }
     }
 }
