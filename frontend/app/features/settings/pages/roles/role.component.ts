@@ -93,7 +93,7 @@ export class RoleComponent implements OnChanges {
         if (value) {
             this.rolesState.update(this.role, value)
                 .subscribe(() => {
-                    this.editForm.submitCompleted();
+                    this.editForm.submitCompleted({ noReset: true });
 
                     this.toggleEditing();
                 }, error => {
