@@ -141,12 +141,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         var job = new RuleJob
                         {
-                            Id = Guid.NewGuid(),
                             ActionData = json,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,
                             Created = now,
                             Description = actionData.Description,
+                            EventId = @event.Headers.EventId(),
                             EventName = enrichedEvent.Name,
                             ExecutionPartition = enrichedEvent.Partition,
                             Expires = expires,

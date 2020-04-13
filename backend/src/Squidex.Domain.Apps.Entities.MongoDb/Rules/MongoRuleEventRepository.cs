@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 
@@ -93,11 +94,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
 
-        public Task EnqueueAsync(RuleJob job, Instant nextAttempt)
+        public async Task EnqueueAsync(RuleJob job, Instant nextAttempt)
         {
             var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
 
-            return Collection.InsertOneIfNotExistsAsync(entity);
+            if (job.EventId != default)
+            {
+                entity.Id = job.EventId;
+            }
+            else
+            {
+                entity.Id = Guid.NewGuid();
+            }
+
+            try
+            {
+                await Collection.InsertOneIfNotExistsAsync(entity);
+            }
+            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            {
+                throw new UniqueConstraintException();
+            }
         }
 
         public Task CancelAsync(Guid id)
@@ -119,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, finished);
             }
 
-            await Collection.UpdateOneAsync(x => x.Id == job.Id,
+            await Collection.UpdateOneAsync(x => x.Id == job.EventId,
                 Update
                     .Set(x => x.Result, result)
                     .Set(x => x.LastDump, dump)
