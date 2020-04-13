@@ -30,7 +30,7 @@ export class AnalyticsService {
         private readonly resourceLoader?: ResourceLoaderService
     ) {
         window['dataLayer'] = window['dataLayer'] || [];
-        this.setAnaltyicsId();
+        this.setAnalyticsId();
         this.gtag = function () {
             window['dataLayer'].push(arguments);
         };
@@ -67,7 +67,7 @@ export class AnalyticsService {
         }
     }
 
-    private setAnaltyicsId() {
+    private setAnalyticsId() {
         if (this.uiOptions) {
             this.analyticsId = new AnalyticsIdConfig(this.uiOptions.get('google.analyticsId'));
         }
