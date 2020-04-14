@@ -17,6 +17,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public MapOptions Map { get; set; }
 
+        public GoogleOptions Google { get; set; }
+
         public int ReferencesDropdownItemCount { get; set; } = 100;
 
         public bool ShowInfo { get; set; }
@@ -43,6 +45,11 @@ namespace Squidex.Areas.Api.Controllers.UI
         public sealed class MapGoogleOptions
         {
             public string Key { get; set; }
+        }
+
+        public sealed class GoogleOptions
+        {
+            public string AnalyticsId { get; set; }
         }
     }
 }

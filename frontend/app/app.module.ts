@@ -16,7 +16,6 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
 import {
-    AnalyticsIdConfig,
     ApiUrlConfig,
     CurrencyConfig,
     DecimalSeparatorConfig,
@@ -58,10 +57,6 @@ export function configTitles() {
     return new TitlesConfig(undefined, 'Squidex Headless CMS');
 }
 
-export function configAnalyticsId() {
-    return new AnalyticsIdConfig('UA-99989790-2');
-}
-
 export function configDecimalSeparator() {
     return new DecimalSeparatorConfig('.');
 }
@@ -88,7 +83,6 @@ export function configCurrency() {
         AppComponent
     ],
     providers: [
-        { provide: AnalyticsIdConfig, useFactory: configAnalyticsId },
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
