@@ -8,12 +8,7 @@
 /* tslint:disable:component-selector */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    ContentDto,
-    LanguageDto,
-    SchemaDetailsDto
-} from '@app/shared';
+import { ContentDto, LanguageDto, SchemaDetailsDto } from '@app/shared';
 
 @Component({
     selector: '[sqxContentSelectorItem]',

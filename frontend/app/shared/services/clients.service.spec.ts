@@ -7,19 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AccessTokenDto,
-    AnalyticsService,
-    ApiUrlConfig,
-    ClientDto,
-    ClientsDto,
-    ClientsPayload,
-    ClientsService,
-    Resource,
-    ResourceLinks,
-    Version
-} from '@app/shared/internal';
+import { AccessTokenDto, AnalyticsService, ApiUrlConfig, ClientDto, ClientsDto, ClientsPayload, ClientsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('ClientsService', () => {
     const version = new Version('1');

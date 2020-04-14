@@ -6,18 +6,8 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-import {
-    Form,
-    hasNoValue$,
-    ValidatorsEx
-} from '@app/framework';
-
-import {
-    ClientDto,
-    CreateClientDto,
-    UpdateClientDto
-} from './../services/clients.service';
+import { Form, hasNoValue$, ValidatorsEx } from '@app/framework';
+import { ClientDto, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 
 export class RenameClientForm extends Form<FormGroup, UpdateClientDto, ClientDto> {
     constructor(formBuilder: FormBuilder) {

@@ -7,14 +7,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-
-import {
-    AppsPageComponent,
-    NewsDialogComponent,
-    OnboardingDialogComponent
-} from './declarations';
+import { AppsPageComponent, NewsDialogComponent, OnboardingDialogComponent } from './declarations';
 
 const routes: Routes = [
     {

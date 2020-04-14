@@ -7,17 +7,8 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { DialogModel, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm } from '@app/shared/internal';
 import { Observable } from 'rxjs';
-
-import {
-    DialogModel,
-    hasFilter,
-    LanguageDto,
-    Queries,
-    Query,
-    QueryModel,
-    SaveQueryForm
-} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-search-form',

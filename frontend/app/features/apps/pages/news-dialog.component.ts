@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { FeatureDto } from '@app/shared';
 
 @Component({

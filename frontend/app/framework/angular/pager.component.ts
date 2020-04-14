@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { Pager } from '@app/framework/internal';
 
 @Component({

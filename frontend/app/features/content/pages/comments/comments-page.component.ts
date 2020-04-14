@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
 import { allParams } from '@app/shared';
 
 @Component({

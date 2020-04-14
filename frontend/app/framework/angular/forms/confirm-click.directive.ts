@@ -8,7 +8,6 @@
 // tslint:disable: readonly-array
 
 import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
-
 import { DialogService } from '@app/framework/internal';
 
 class DelayEventEmitter<T> extends EventEmitter<T> {

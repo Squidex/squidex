@@ -7,12 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    ApiUrlConfig,
-    AppsState,
-    CreateAppForm
-} from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-app-form',

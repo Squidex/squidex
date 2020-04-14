@@ -8,13 +8,7 @@
 // tslint:disable: component-selector
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    ActionsDto,
-    RuleDto,
-    RulesState,
-    TriggersDto
-} from '@app/shared';
+import { ActionsDto, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule',

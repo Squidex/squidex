@@ -9,15 +9,8 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { fadeAnimation, Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-
-import {
-    fadeAnimation,
-    Keys,
-    ModalModel,
-    StatefulControlComponent,
-    Types
-} from '@app/framework/internal';
 
 export const CONVERSION_FAILED = {};
 

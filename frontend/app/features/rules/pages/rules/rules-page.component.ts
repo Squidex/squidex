@@ -6,16 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ALL_TRIGGERS,
-    DialogModel,
-    RuleDto,
-    RuleElementDto,
-    RulesService,
-    RulesState,
-    SchemasState
-} from '@app/shared';
+import { ALL_TRIGGERS, DialogModel, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rules-page',

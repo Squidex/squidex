@@ -6,9 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
-
 import { slideRightAnimation } from '@app/framework/internal';
-
 import { PanelContainerDirective } from './panel-container.directive';
 
 @Component({

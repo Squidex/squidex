@@ -6,7 +6,6 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
-
 import { fadeAnimation } from '@app/framework/internal';
 
 @Component({

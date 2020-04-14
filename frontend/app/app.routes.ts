@@ -7,24 +7,8 @@
 
 import { ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import {
-    AppAreaComponent,
-    ForbiddenPageComponent,
-    HomePageComponent,
-    InternalAreaComponent,
-    LoginPageComponent,
-    LogoutPageComponent,
-    NotFoundPageComponent
-} from './shell';
-
-import {
-    AppMustExistGuard,
-    LoadAppsGuard,
-    MustBeAuthenticatedGuard,
-    MustBeNotAuthenticatedGuard,
-    UnsetAppGuard
-} from './shared';
+import { AppMustExistGuard, LoadAppsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, UnsetAppGuard } from './shared';
+import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent } from './shell';
 
 export const routes: Routes = [
     {

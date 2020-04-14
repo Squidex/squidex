@@ -8,7 +8,6 @@
 // tslint:disable: component-selector
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
 @Component({

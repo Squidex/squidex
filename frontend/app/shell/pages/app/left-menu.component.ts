@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-
 import { AppsState } from '@app/shared';
 
 @Component({

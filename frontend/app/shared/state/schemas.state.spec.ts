@@ -5,23 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DialogService, FieldDto, SchemaDetailsDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import { SchemaCategory, SchemasState } from './schemas.state';
-
-import {
-    DialogService,
-    FieldDto,
-    SchemaDetailsDto,
-    SchemasService,
-    UpdateSchemaCategoryDto,
-    versioned
-} from '@app/shared/internal';
-
 import { createSchema, createSchemaDetails } from './../services/schemas.service.spec';
-
+import { SchemaCategory, SchemasState } from './schemas.state';
 import { TestValues } from './_test-helpers';
 
 describe('SchemasState', () => {

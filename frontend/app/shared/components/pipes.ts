@@ -8,14 +8,9 @@
 // tslint:disable:no-pipe-impure
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/internal';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import {
-    ApiUrlConfig,
-    UserDto,
-    UsersProviderService
-} from '@app/shared/internal';
 
 class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;

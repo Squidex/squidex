@@ -7,15 +7,9 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FieldDto, ResourceOwner, StringFieldPropertiesDto, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import {
-    FieldDto,
-    ResourceOwner,
-    StringFieldPropertiesDto,
-    value$
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',

@@ -6,9 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import { Form, ValidatorsEx } from '@app/framework';
-
 import { EditPatternDto, PatternDto } from './../services/patterns.service';
 
 export class EditPatternForm extends Form<FormGroup, EditPatternDto, PatternDto> {

@@ -6,12 +6,10 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
+import { DialogModel, ResourceOwner } from '@app/shared';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-
-import { DialogModel, ResourceOwner } from '@app/shared';
-
-import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-event-consumers-page',

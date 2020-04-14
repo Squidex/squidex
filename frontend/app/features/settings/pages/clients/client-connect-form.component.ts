@@ -6,16 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-
-import {
-    AccessTokenDto,
-    ApiUrlConfig,
-    AppsState,
-    ClientDto,
-    ClientsService,
-    DialogService,
-    RoleDto
-} from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, DialogService, RoleDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',

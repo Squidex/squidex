@@ -9,7 +9,6 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-
 import { Types } from './../utils/types';
 
 export const LoadingServiceFactory = (router: Router) => {

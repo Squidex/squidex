@@ -6,7 +6,6 @@
  */
 
 import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
-
 import { DateHelper } from './date-helper';
 
 const DATE_FORMAT = 'yyyy-MM-dd';

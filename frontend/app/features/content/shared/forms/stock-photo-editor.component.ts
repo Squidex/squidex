@@ -7,17 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$ } from '@app/shared';
 import { of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-
-import {
-    StatefulControlComponent,
-    StockPhotoDto,
-    StockPhotoService,
-    thumbnail,
-    Types,
-    value$
-} from '@app/shared';
 
 interface State {
     // True when loading assets.

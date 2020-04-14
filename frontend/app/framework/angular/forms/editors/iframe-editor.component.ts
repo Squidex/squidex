@@ -7,7 +7,6 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {

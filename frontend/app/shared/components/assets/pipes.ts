@@ -6,15 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-
-import {
-    ApiUrlConfig,
-    AssetDto,
-    AuthService,
-    MathHelper,
-    StringHelper,
-    Types
-} from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
 
 @Pipe({
     name: 'sqxAssetUrl',

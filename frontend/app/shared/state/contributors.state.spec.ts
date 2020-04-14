@@ -5,24 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ErrorDto } from '@app/framework';
+import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, LocalStoreService, Pager, versioned } from '@app/shared/internal';
 import { empty, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    ContributorDto,
-    ContributorsPayload,
-    ContributorsService,
-    ContributorsState,
-    DialogService,
-    LocalStoreService,
-    Pager,
-    versioned
-} from '@app/shared/internal';
-
 import { createContributors } from './../services/contributors.service.spec';
-
-import { ErrorDto } from '@app/framework';
 import { TestValues } from './_test-helpers';
 
 describe('ContributorsState', () => {

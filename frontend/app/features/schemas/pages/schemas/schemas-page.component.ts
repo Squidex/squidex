@@ -8,18 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CreateCategoryForm, DialogModel, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
-
-import {
-    CreateCategoryForm,
-    DialogModel,
-    MessageBus,
-    ResourceOwner,
-    SchemaCategory,
-    SchemaDto,
-    SchemasState
-} from '@app/shared';
-
 import { SchemaCloning } from './../messages';
 
 @Component({

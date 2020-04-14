@@ -6,12 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    equalsQuery,
-    Query,
-    SavedQuery
-} from '@app/shared/internal';
+import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query-list',

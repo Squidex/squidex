@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-
 import { LocalStoreService, SchemaCategory, SchemasState } from '@app/shared';
 
 @Component({

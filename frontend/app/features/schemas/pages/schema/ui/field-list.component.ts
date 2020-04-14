@@ -9,7 +9,6 @@
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-
 import { MetaFields, SchemaDetailsDto } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(MetaFields);

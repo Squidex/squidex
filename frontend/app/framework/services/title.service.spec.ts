@@ -5,11 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    TitlesConfig,
-    TitleService,
-    TitleServiceFactory
-} from './title.service';
+import { TitlesConfig, TitleService, TitleServiceFactory } from './title.service';
 
 describe('TitleService', () => {
     beforeEach(() => {

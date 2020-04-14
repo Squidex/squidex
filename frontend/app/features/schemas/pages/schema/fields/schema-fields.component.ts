@@ -7,16 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
-
-import {
-    DialogModel,
-    FieldDto,
-    fieldTypes,
-    PatternsState,
-    SchemaDetailsDto,
-    SchemasState,
-    sorted
-} from '@app/shared';
+import { DialogModel, FieldDto, fieldTypes, PatternsState, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-fields',

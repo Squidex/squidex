@@ -5,22 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AssetDto, AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever, Types } from '@app/shared/internal';
 import { never, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
-
-import {
-    AssetDto,
-    AssetsService,
-    AssetsState,
-    AssetUploaderState,
-    DialogService,
-    ofForever,
-    Types
-} from '@app/shared/internal';
-
 import { createAsset } from './../services/assets.service.spec';
-
 import { TestValues } from './_test-helpers';
 
 describe('AssetUploaderState', () => {

@@ -6,24 +6,8 @@
  */
 
 import { NgModule } from '@angular/core';
-
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-
-import {
-    AppAreaComponent,
-    AppsMenuComponent,
-    ForbiddenPageComponent,
-    HomePageComponent,
-    InternalAreaComponent,
-    LeftMenuComponent,
-    LoginPageComponent,
-    LogoComponent,
-    LogoutPageComponent,
-    NotFoundPageComponent,
-    NotificationsMenuComponent,
-    ProfileMenuComponent,
-    SearchMenuComponent
-} from './declarations';
+import { AppAreaComponent, AppsMenuComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LeftMenuComponent, LoginPageComponent, LogoComponent, LogoutPageComponent, NotFoundPageComponent, NotificationsMenuComponent, ProfileMenuComponent, SearchMenuComponent } from './declarations';
 
 @NgModule({
     imports: [

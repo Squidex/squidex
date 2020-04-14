@@ -6,12 +6,9 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import { Form } from '@app/framework';
-
-import { LanguageDto } from './../services/languages.service';
-
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
+import { LanguageDto } from './../services/languages.service';
 
 export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppLanguageDto> {
     constructor(formBuilder: FormBuilder) {

@@ -7,15 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { fadeAnimation, Keys, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
-
-import {
-    fadeAnimation,
-    Keys,
-    StatefulControlComponent,
-    Types
-} from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;

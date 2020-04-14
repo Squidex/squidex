@@ -7,12 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    ApiUrlConfig,
-    LanguageDto,
-    LanguagesService
-} from '@app/shared/internal';
+import { ApiUrlConfig, LanguageDto, LanguagesService } from '@app/shared/internal';
 
 describe('LanguageService', () => {
     beforeEach(() => {

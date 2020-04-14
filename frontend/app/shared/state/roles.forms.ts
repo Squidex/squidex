@@ -6,18 +6,8 @@
  */
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-
-import {
-    Form,
-    hasNoValue$,
-    hasValue$
-} from '@app/framework';
-
-import {
-    CreateRoleDto,
-    RoleDto,
-    UpdateRoleDto
-} from './../services/roles.service';
+import { Form, hasNoValue$, hasValue$ } from '@app/framework';
+import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<FormArray, UpdateRoleDto, RoleDto> {
     public get controls() {

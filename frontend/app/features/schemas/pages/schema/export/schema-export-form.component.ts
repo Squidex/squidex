@@ -7,12 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    SchemaDetailsDto,
-    SchemasState,
-    SynchronizeSchemaForm
-} from '@app/shared';
+import { SchemaDetailsDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-export-form',

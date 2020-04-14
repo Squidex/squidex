@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { QueryModel, QuerySorting } from '@app/shared/internal';
 
  @Component({

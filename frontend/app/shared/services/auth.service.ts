@@ -6,17 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig, Types } from '@app/framework';
+import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client';
 import { Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
 import { concat, delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
-
-import {
-    Log,
-    User,
-    UserManager,
-    WebStorageStateStore
-} from 'oidc-client';
-
-import { ApiUrlConfig, Types } from '@app/framework';
 
 export class Profile {
     public get id(): string {

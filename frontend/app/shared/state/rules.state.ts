@@ -6,22 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareSubscribed, State } from '@app/framework';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareSubscribed,
-    State
-} from '@app/framework';
-
+import { RuleDto, RulesService, UpsertRuleDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
-
-import {
-    RuleDto,
-    RulesService,
-    UpsertRuleDto
-} from './../services/rules.service';
 
 interface Snapshot {
     // The current rules.

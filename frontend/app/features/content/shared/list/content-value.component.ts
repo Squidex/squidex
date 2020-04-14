@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
 import { HtmlValue, Types } from '@app/shared';
 
 @Component({

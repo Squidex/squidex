@@ -6,27 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
+import { compareStrings, DialogService, LocalStoreService, MathHelper, Pager, shareSubscribed, State } from '@app/framework';
 import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-
-import {
-    compareStrings,
-    DialogService,
-    LocalStoreService,
-    MathHelper,
-    Pager,
-    shareSubscribed,
-    State
-} from '@app/framework';
-
-import {
-    AnnotateAssetDto,
-    AssetDto,
-    AssetFolderDto,
-    AssetsService,
-    RenameAssetFolderDto
-} from './../services/assets.service';
-
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { Query } from './query';
 

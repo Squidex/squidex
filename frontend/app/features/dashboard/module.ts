@@ -7,13 +7,9 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ChartModule } from 'angular2-chartjs';
-
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-
-import {
-    DashboardPageComponent
-} from './declarations';
+import { ChartModule } from 'angular2-chartjs';
+import { DashboardPageComponent } from './declarations';
 
 const routes: Routes = [
     {

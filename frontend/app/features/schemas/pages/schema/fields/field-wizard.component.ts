@@ -7,19 +7,7 @@
 
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AddFieldForm,
-    createProperties,
-    EditFieldForm,
-    FieldDto,
-    fieldTypes,
-    PatternsState,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SchemasState,
-    Types
-} from '@app/shared';
+import { AddFieldForm, createProperties, EditFieldForm, FieldDto, fieldTypes, PatternsState, RootFieldDto, SchemaDetailsDto, SchemasState, Types } from '@app/shared';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 

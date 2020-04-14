@@ -7,12 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-
-import {
-    ArrayFieldPropertiesDto,
-    FieldDto,
-    SchemaTagSource
-} from '@app/shared';
+import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared';
 
 @Component({
     selector: 'sqx-array-validation',

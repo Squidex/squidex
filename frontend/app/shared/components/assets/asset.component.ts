@@ -6,16 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-
-import {
-    AssetDto,
-    AssetsState,
-    AssetUploaderState,
-    DialogModel,
-    DialogService,
-    Types,
-    UploadCanceled
-} from '@app/shared/internal';
+import { AssetDto, AssetsState, AssetUploaderState, DialogModel, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset',

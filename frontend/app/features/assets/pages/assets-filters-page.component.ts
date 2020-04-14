@@ -6,13 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-
-import {
-    AssetsState,
-    Queries,
-    Query,
-    UIState
-} from '@app/shared';
+import { AssetsState, Queries, Query, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-filters-page',

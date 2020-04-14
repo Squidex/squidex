@@ -6,14 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
-import {
-    AppsState,
-    ClientDto,
-    ClientsState,
-    DialogModel,
-    RoleDto
-} from '@app/shared';
+import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-client',

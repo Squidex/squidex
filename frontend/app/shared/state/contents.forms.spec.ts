@@ -6,28 +6,7 @@
  */
 
 import { AbstractControl, FormArray } from '@angular/forms';
-
-import {
-    AppLanguageDto,
-    createProperties,
-    DateTime,
-    EditContentForm,
-    FieldDefaultValue,
-    FieldFormatter,
-    FieldPropertiesDto,
-    FieldsValidators,
-    getContentValue,
-    HtmlValue,
-    LanguageDto,
-    MetaFields,
-    NestedFieldDto,
-    PartitionConfig,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SchemaPropertiesDto,
-    Version
-} from '@app/shared/internal';
-
+import { AppLanguageDto, createProperties, DateTime, EditContentForm, FieldDefaultValue, FieldFormatter, FieldPropertiesDto, FieldsValidators, getContentValue, HtmlValue, LanguageDto, MetaFields, NestedFieldDto, PartitionConfig, RootFieldDto, SchemaDetailsDto, SchemaPropertiesDto, Version } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 const {

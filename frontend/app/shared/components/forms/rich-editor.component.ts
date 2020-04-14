@@ -9,17 +9,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
-import {
-    ApiUrlConfig,
-    AssetDto,
-    AssetUploaderState,
-    DialogModel,
-    ResourceLoaderService,
-    StatefulControlComponent,
-    Types,
-    UploadCanceled
-} from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 declare var tinymce: any;
 

@@ -8,7 +8,6 @@
 // tslint:disable:prefer-for-of
 
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
-
 import { Types } from '@app/framework/internal';
 
 const ImageTypes: ReadonlyArray<string> = [

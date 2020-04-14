@@ -7,11 +7,9 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { allParams } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
-import { allParams } from '@app/framework';
-
 import { ContentsState } from './../state/contents.state';
 
 @Injectable()

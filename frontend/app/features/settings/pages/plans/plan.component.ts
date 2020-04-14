@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
 import { PlanInfo, PlansState } from '@app/shared';
 
 @Component({

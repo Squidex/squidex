@@ -6,16 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-
-import {
-    ContentDto,
-    fadeAnimation,
-    interpolate,
-    LocalStoreService,
-    ModalModel,
-    SchemaDetailsDto,
-    StatefulComponent
-} from '@app/shared';
+import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDetailsDto, StatefulComponent } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.

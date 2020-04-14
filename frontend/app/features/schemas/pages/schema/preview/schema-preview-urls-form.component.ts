@@ -7,13 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AddPreviewUrlForm,
-    ConfigurePreviewUrlsForm,
-    SchemaDetailsDto,
-    SchemasState
-} from '@app/shared';
+import { AddPreviewUrlForm, ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',

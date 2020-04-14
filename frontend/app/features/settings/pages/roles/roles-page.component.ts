@@ -6,15 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState } from '@app/shared';
 import { Observable, of } from 'rxjs';
-
-import {
-    AppsState,
-    AutocompleteSource,
-    RoleDto,
-    RolesService,
-    RolesState
-} from '@app/shared';
 
 class PermissionsAutocomplete implements AutocompleteSource {
     private permissions: ReadonlyArray<string> = [];

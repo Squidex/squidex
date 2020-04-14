@@ -6,12 +6,7 @@
  */
 
 import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
-
-import {
-    DialogService,
-    Notification,
-    Types
-} from '@app/framework/internal';
+import { DialogService, Notification, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopy]'

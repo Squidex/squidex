@@ -7,16 +7,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import {
-    SqxFrameworkModule,
-    SqxSharedModule
-} from '@app/shared';
-
-import {
-    ApiAreaComponent,
-    GraphQLPageComponent
-} from './declarations';
+import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { ApiAreaComponent, GraphQLPageComponent } from './declarations';
 
 const routes: Routes = [
     {

@@ -5,20 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DateTime, Version } from '@app/framework';
+import { createProperties, MetaFields, RootFieldDto, SchemaDetailsDto, TableField, TableFields, UIState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { DateTime, Version } from '@app/framework';
-
-import {
-    createProperties,
-    MetaFields,
-    RootFieldDto,
-    SchemaDetailsDto,
-    TableField,
-    TableFields,
-    UIState
-} from '@app/shared/internal';
 
 describe('TableFields', () => {
     let uiState: IMock<UIState>;

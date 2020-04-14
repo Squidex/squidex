@@ -7,14 +7,8 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
+import { fadeAnimation, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
-
-import {
-    fadeAnimation,
-    StatefulComponent,
-    Types
-} from '@app/framework/internal';
-
 import { formatError } from './error-formatting';
 
 interface State {

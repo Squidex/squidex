@@ -6,11 +6,9 @@
  */
 
 import { Router } from '@angular/router';
+import { UserDto, UsersState } from '@app/features/administration/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { UserDto, UsersState } from '@app/features/administration/internal';
-
 import { UserMustExistGuard } from './user-must-exist.guard';
 
 describe('UserMustExistGuard', () => {

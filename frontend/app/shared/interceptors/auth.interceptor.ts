@@ -6,13 +6,11 @@
  */
 
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { ApiUrlConfig, ErrorDto } from '@app/framework';
 import { empty, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
-
-import { ApiUrlConfig, ErrorDto } from '@app/framework';
-
 import { AuthService, Profile } from './../services/auth.service';
 
 @Injectable()

@@ -6,7 +6,6 @@
  */
 
 import { CurrencyConfig, DecimalSeparatorConfig } from '@app/framework/internal';
-
 import { MoneyPipe } from './money.pipe';
 
 describe('MoneyPipe', () => {

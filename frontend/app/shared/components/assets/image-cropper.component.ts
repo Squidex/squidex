@@ -6,9 +6,8 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
-import Cropper from 'cropperjs';
-
 import { Types } from '@app/framework';
+import Cropper from 'cropperjs';
 
 @Component({
     selector: 'sqx-image-editor',

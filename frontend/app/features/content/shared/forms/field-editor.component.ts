@@ -7,15 +7,7 @@
 
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl } from '@angular/forms';
-
-import {
-    AppLanguageDto,
-    EditContentForm,
-    FieldDto,
-    MathHelper,
-    RootFieldDto,
-    Types
-} from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-editor',

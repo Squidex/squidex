@@ -8,37 +8,13 @@
 // tslint:disable:prefer-for-of
 
 import { FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { DateTime, Form, formControls, StringFormControl, Types, ValidatorsEx, value$ } from '@app/framework';
 import { BehaviorSubject } from 'rxjs';
-
-import {
-    DateTime,
-    Form,
-    formControls,
-    StringFormControl,
-    Types,
-    ValidatorsEx,
-    value$
-} from '@app/framework';
-
 import { AppLanguageDto } from './../services/app-languages.service';
 import { ContentDto, ContentReferencesValue } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
-import {
-    ArrayFieldPropertiesDto,
-    AssetsFieldPropertiesDto,
-    BooleanFieldPropertiesDto,
-    DateTimeFieldPropertiesDto,
-    fieldInvariant,
-    FieldPropertiesVisitor,
-    GeolocationFieldPropertiesDto,
-    JsonFieldPropertiesDto,
-    NumberFieldPropertiesDto,
-    ReferencesFieldPropertiesDto,
-    StringFieldPropertiesDto,
-    TagsFieldPropertiesDto,
-    UIFieldPropertiesDto
-} from './../services/schemas.types';
+import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
 
 export class HtmlValue {
     constructor(

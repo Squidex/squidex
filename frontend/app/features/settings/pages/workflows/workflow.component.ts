@@ -8,18 +8,7 @@
 // tslint:disable: readonly-array
 
 import { Component, Input, OnChanges } from '@angular/core';
-
-import {
-    ErrorDto,
-    MathHelper,
-    SchemaTagSource,
-    WorkflowDto,
-    WorkflowsState,
-    WorkflowStep,
-    WorkflowStepValues,
-    WorkflowTransition,
-    WorkflowTransitionValues
-} from '@app/shared';
+import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflow',
