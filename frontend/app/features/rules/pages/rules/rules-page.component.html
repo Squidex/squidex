@@ -26,7 +26,7 @@
             <ng-container topHeader>
                 <div class="panel-alert panel-alert-danger" *ngIf="rulesState.runningRule | async; let runningRule">
                     <div class="float-right">
-                        <a class="force" (click)="cancel()">Cancel</a>
+                        <a class="force" (click)="cancelRun()">Cancel</a>
                     </div>
 
                     Rule '{{runningRule.name || 'Unnamed Rule'}}' is currently running.
