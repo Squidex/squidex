@@ -22,9 +22,10 @@ export const AnalyticsServiceFactory = (uiOptions: UIOptions, router: Router, re
 @Injectable()
 export class AnalyticsService {
     private readonly gtag: any;
-    private analyticsId: string;
+    private readonly analyticsId: string;
 
-    constructor(private readonly uiOptions?: UIOptions,
+    constructor(
+        private readonly uiOptions?: UIOptions,
         private readonly router?: Router,
         private readonly resourceLoader?: ResourceLoaderService
     ) {
@@ -33,7 +34,12 @@ export class AnalyticsService {
         this.gtag = function () {
             window['dataLayer'].push(arguments);
         };
-         this.configureGtag();
+
+        if (this.uiOptions) {
+            this.analyticsId = this.uiOptions.get('google.analyticsId');
+        }
+
+        this.configureGtag();
     }
 
     public trackEvent(category: string, action: string, label?: string, value?: number) {
@@ -50,24 +56,18 @@ export class AnalyticsService {
             this.gtag('config', this.analyticsId, { anonymize_ip: true });
 
             this.router.events.pipe(
-                    filter(e => Types.is(e, NavigationEnd)))
+                filter(e => Types.is(e, NavigationEnd)))
                 .subscribe(() => {
                     this.gtag('config', this.analyticsId, { page_path: window.location.pathname, anonymize_ip: true });
                 });
 
-            this.loadGoogletagmanagerScript();
+            this.loadScript();
         }
     }
 
-    private loadGoogletagmanagerScript() {
+    private loadScript() {
         if (document.cookie.indexOf('ga-disable') < 0 && this.resourceLoader) {
             this.resourceLoader.loadScript(`https://www.googletagmanager.com/gtag/js?id=${this.analyticsId}`);
-        }
-    }
-
-    private setAnalyticsId() {
-        if (this.uiOptions) {
-            this.analyticsId = this.uiOptions.get('google.analyticsId');
         }
     }
 }

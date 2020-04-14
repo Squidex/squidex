@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job = new RuleJob
             {
-                Id = id,
+                EventId = id,
                 ActionData = actionData,
                 ActionName = actionName,
                 Created = clock.GetCurrentInstant()
