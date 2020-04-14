@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                if (ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
+                if (!ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
                     return result;
                 }
