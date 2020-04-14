@@ -39,4 +39,3 @@ export * from './utils/rxjs-extensions';
 export * from './utils/string-helper';
 export * from './utils/types';
 export * from './utils/version';
-

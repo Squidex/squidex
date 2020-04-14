@@ -7,4 +7,3 @@
 
 export * from './api-area.component';
 export * from './pages/graphql/graphql-page.component';
-

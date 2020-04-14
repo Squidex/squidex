@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -31,17 +32,20 @@ namespace Squidex.Areas.Api.Controllers.Rules
     public sealed class RulesController : ApiController
     {
         private readonly IRuleQueryService ruleQuery;
+        private readonly IRuleRunnerService ruleRunnerService;
         private readonly IRuleEventRepository ruleEventsRepository;
         private readonly RuleRegistry ruleRegistry;
 
         public RulesController(ICommandBus commandBus,
             IRuleEventRepository ruleEventsRepository,
             IRuleQueryService ruleQuery,
+            IRuleRunnerService ruleRunnerService,
             RuleRegistry ruleRegistry)
             : base(commandBus)
         {
             this.ruleEventsRepository = ruleEventsRepository;
             this.ruleQuery = ruleQuery;
+            this.ruleRunnerService = ruleRunnerService;
             this.ruleRegistry = ruleRegistry;
         }
 
@@ -87,9 +91,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var rules = await ruleQuery.QueryAsync(Context);
 
+            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
+
             var response = Deferred.Response(() =>
             {
-                return RulesDto.FromRules(rules, this, app);
+                return RulesDto.FromRules(rules, runningRuleId, this, app);
             });
 
             return Ok(response);
@@ -120,6 +126,25 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Cancel the current run.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 204 => Rule run cancelled.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/rules/run")]
+        [ProducesResponseType(204)]
+        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteRuleRun(string app)
+        {
+            await ruleRunnerService.CancelAsync(App.Id);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Update a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -130,9 +155,6 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// 400 => Rule is not valid.
         /// 404 => Rule or app not found.
         /// </returns>
-        /// <remarks>
-        /// All events for the specified schemas will be sent to the url. The timeout is 2 seconds.
-        /// </remarks>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/")]
         [ProducesResponseType(typeof(RuleDto), 200)]
@@ -216,6 +238,26 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Run a rule.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to run.</param>
+        /// <returns>
+        /// 204 => Rule started.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/rules/{id}/run")]
+        [ProducesResponseType(204)]
+        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutRuleRun(string app, Guid id)
+        {
+            await ruleRunnerService.RunAsync(App.Id, id);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Delete a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -253,12 +295,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] Guid? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var taskForItems = ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
-            var taskForCount = ruleEventsRepository.CountByAppAsync(AppId);
+            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
 
-            await Task.WhenAll(taskForItems, taskForCount);
-
-            var response = RuleEventsDto.FromRuleEvents(taskForItems.Result, taskForCount.Result, this, app);
+            var response = RuleEventsDto.FromRuleEvents(ruleEvents, this, app);
 
             return Ok(response);
         }
@@ -321,8 +360,10 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var context = await CommandBus.PublishAsync(command);
 
+            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
+
             var result = context.Result<IEnrichedRuleEntity>();
-            var response = RuleDto.FromRule(result, this, app);
+            var response = RuleDto.FromRule(result, runningRuleId, this, app);
 
             return response;
         }

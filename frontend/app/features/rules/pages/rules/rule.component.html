@@ -11,14 +11,28 @@
                     [disabled]="!rule.canUpdate">
                 </sqx-editable-title>
             </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-text-danger"
-                    [disabled]="!rule.canDelete"
-                    (sqxConfirmClick)="delete()"
-                    confirmTitle="Delete rule"
-                    confirmText="Do you really want to delete the rule?">
-                    <i class="icon-bin2"></i>
+            <div class="col-auto" *ngIf="rule.canDelete || rule.canRun">
+                <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                    <i class="icon-dots"></i>
                 </button>
+        
+                <ng-container *sqxModal="dropdown;closeAlways:true">
+                    <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-right" @fade>
+                        <a class="dropdown-item" *ngIf="rule.canRun"
+                            (sqxConfirmClick)="run()"
+                            confirmTitle="Run rule" 
+                            confirmText="Do you really want to run the rule for all events?">
+                            Run
+                        </a>
+            
+                        <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="Delete rule" 
+                            confirmText="Do you really want to delete the rule?">
+                            Delete
+                        </a>
+                    </div>
+                </ng-container>
             </div>
         </div>
     </div>

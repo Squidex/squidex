@@ -44,6 +44,10 @@ export class RulesPageComponent implements OnInit {
         this.rulesState.load(true);
     }
 
+    public cancelRun() {
+        this.rulesState.runCancel();
+    }
+
     public delete(rule: RuleDto) {
         this.rulesState.delete(rule);
     }

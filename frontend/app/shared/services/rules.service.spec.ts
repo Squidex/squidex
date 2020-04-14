@@ -109,14 +109,15 @@ describe('RulesService', () => {
             items: [
                 ruleResponse(12),
                 ruleResponse(13)
-            ]
+            ],
+            runningRuleId: '12'
         });
 
         expect(rules!).toEqual(
             new RulesDto([
                 createRule(12),
                 createRule(13)
-            ]));
+            ], {}, '12'));
     }));
 
     it('should make post request to create rule',
@@ -268,6 +269,38 @@ describe('RulesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/trigger');
 
         expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
+    it('should make put request to run rule',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                run: { method: 'PUT', href: '/api/apps/my-app/rules/123/run' }
+            }
+        };
+
+        rulesService.runRule('my-app', resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/run');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
+    it('should make delete request to cancel run rule',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        rulesService.runCancel('my-app').subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/run');
+
+        expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({});

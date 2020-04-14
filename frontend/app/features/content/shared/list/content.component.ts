@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
 import { ContentListFieldComponent } from './content-list-field.component';
 
-/* tslint:disable:component-selector */
+/* tslint:disable: component-selector */
 
 @Component({
     selector: '[sqxContent]',

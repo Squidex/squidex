@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:no-pipe-impure
+// tslint:disable: no-pipe-impure
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';

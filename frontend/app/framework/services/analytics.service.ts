@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:only-arrow-functions
+// tslint:disable: only-arrow-functions
 
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';

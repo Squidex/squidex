@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
+// tslint:disable: max-line-length
+// tslint:disable: prefer-for-of
 
 import { FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Form, formControls, StringFormControl, Types, ValidatorsEx, value$ } from '@app/framework';
