@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { parseError } from './http-extensions';
-
 import { ErrorDto } from './../../utils/error';
+import { parseError } from './http-extensions';
 
 describe('ErrorParsing', () => {
     it('should return default when error is javascript exception', () => {

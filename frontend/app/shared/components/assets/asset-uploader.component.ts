@@ -6,16 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-
-import {
-    AssetsState,
-    AssetUploaderState,
-    fadeAnimation,
-    ModalModel,
-    Upload
-} from '@app/shared/internal';
-
-import { AppsState } from '@app/shared/internal';
+import { AppsState, AssetsState, AssetUploaderState, fadeAnimation, ModalModel, Upload } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-uploader',

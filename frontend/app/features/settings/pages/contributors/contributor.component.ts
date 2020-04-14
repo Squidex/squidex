@@ -8,12 +8,7 @@
 // tslint:disable: component-selector
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
-import {
-    ContributorDto,
-    ContributorsState,
-    RoleDto
-} from '@app/shared';
+import { ContributorDto, ContributorsState, RoleDto } from '@app/shared';
 
 @Component({
     selector: '[sqxContributor]',

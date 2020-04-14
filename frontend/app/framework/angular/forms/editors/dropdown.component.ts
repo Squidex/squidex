@@ -7,14 +7,8 @@
 
 import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { map } from 'rxjs/operators';
-
-import {
-    Keys,
-    ModalModel,
-    StatefulControlComponent,
-    Types
-} from '@app/framework/internal';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true

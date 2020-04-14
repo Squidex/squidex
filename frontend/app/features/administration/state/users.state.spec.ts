@@ -5,25 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
+import { DialogService, LocalStoreService, Pager } from '@app/shared';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    DialogService,
-    LocalStoreService,
-    Pager
-} from '@app/shared';
-
-import {
-    UserDto,
-    UsersDto,
-    UsersService
-} from '@app/features/administration/internal';
-
-import { UsersState } from './users.state';
-
 import { createUser } from './../services/users.service.spec';
+import { UsersState } from './users.state';
 
 describe('UsersState', () => {
     const user1 = createUser(1);

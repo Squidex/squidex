@@ -5,16 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AppDto, AppsService, AppsState, DialogService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-
-import {
-    AppDto,
-    AppsService,
-    AppsState,
-    DialogService
-} from '@app/shared/internal';
-
 import { createApp } from './../services/apps.service.spec';
 
 describe('AppsState', () => {

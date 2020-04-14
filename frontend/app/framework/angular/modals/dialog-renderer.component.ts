@@ -6,17 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Tooltip } from '@app/framework/internal';
 import { timer } from 'rxjs';
-
-import {
-    DialogModel,
-    DialogRequest,
-    DialogService,
-    fadeAnimation,
-    Notification,
-    StatefulComponent,
-    Tooltip
-} from '@app/framework/internal';
 
 interface State {
     // The pending dialog request.

@@ -6,25 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import '@app/framework/utils/rxjs-extensions';
+import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-
-import '@app/framework/utils/rxjs-extensions';
-
-import {
-    DialogService,
-    LocalStoreService,
-    Pager,
-    shareSubscribed,
-    State
-} from '@app/shared';
-
-import {
-    CreateUserDto,
-    UpdateUserDto,
-    UserDto,
-    UsersService
-} from './../services/users.service';
+import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
 
 interface Snapshot {
     // The current users.

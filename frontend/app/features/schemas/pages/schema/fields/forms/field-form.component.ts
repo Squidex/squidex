@@ -7,7 +7,6 @@
 
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-
 import { FieldDto, PatternDto } from '@app/shared';
 
 @Component({

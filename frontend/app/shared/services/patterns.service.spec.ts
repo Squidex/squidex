@@ -7,18 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    PatternDto,
-    PatternsDto,
-    PatternsPayload,
-    PatternsService,
-    Resource,
-    ResourceLinks,
-    Version
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, PatternDto, PatternsDto, PatternsPayload, PatternsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('PatternsService', () => {
     const version = new Version('1');

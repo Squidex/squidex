@@ -5,21 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DialogService, RulesDto, RulesService, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import { RulesState } from './rules.state';
-
-import {
-    DialogService,
-    RulesDto,
-    RulesService,
-    versioned
-} from '@app/shared/internal';
-
+import { RuleDto } from './../services/rules.service';
 import { createRule } from './../services/rules.service.spec';
-
+import { RulesState } from './rules.state';
 import { TestValues } from './_test-helpers';
 
 describe('RulesState', () => {
@@ -53,13 +45,22 @@ describe('RulesState', () => {
     describe('Loading', () => {
         it('should load rules', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
+                .returns(() => of(new RulesDto([rule1, rule2], {}, rule1.id))).verifiable();
 
             rulesState.load().subscribe();
 
             expect(rulesState.snapshot.isLoaded).toBeTruthy();
             expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
+
+            let runningRule: RuleDto | undefined;
+
+            rulesState.runningRule.subscribe(result => {
+                runningRule = result;
+            });
+
+            expect(runningRule).toBe(rule1);
+            expect(rulesState.snapshot.runningRuleId).toBe(rule1.id);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
@@ -174,6 +175,17 @@ describe('RulesState', () => {
             expect(rule1New).toEqual(rule1);
         });
 
+        it('should not update rule when run', () => {
+            rulesService.setup(x => x.runRule(app, rule1))
+                .returns(() => of()).verifiable();
+
+            rulesState.run(rule1).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(rule1);
+        });
+
         it('should update rule when disabled', () => {
             const updated = createRule(1, '_new');
 
@@ -194,6 +206,13 @@ describe('RulesState', () => {
             rulesState.delete(rule1).subscribe();
 
             expect(rulesState.snapshot.rules).toEqual([rule2]);
+        });
+
+        it('should invoke rule service when run is cancelled', () => {
+            rulesService.setup(x => x.runCancel(app))
+                .returns(() => of()).verifiable();
+
+            rulesState.runCancel().subscribe();
         });
     });
 });

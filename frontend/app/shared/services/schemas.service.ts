@@ -9,24 +9,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    DateTime,
-    hasAnyLink,
-    HTTP,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    StringHelper,
-    Types,
-    Version,
-    Versioned
-} from '@app/framework';
-
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export type SchemasDto = {

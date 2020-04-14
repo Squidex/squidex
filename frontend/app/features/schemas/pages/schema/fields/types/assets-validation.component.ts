@@ -7,7 +7,6 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-
 import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({

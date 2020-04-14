@@ -7,15 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AddPermissionForm,
-    AutocompleteComponent,
-    AutocompleteSource,
-    EditRoleForm,
-    RoleDto,
-    RolesState
-} from '@app/shared';
+import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState } from '@app/shared';
 
 const Descriptions = {
     Developer: 'Can use the API view, edit assets, contents, schemas, rules, workflows and patterns.',

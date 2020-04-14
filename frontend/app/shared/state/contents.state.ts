@@ -6,21 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, ErrorDto, LocalStoreService, Pager, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    ErrorDto,
-    LocalStoreService,
-    Pager,
-    shareSubscribed,
-    State,
-    Types,
-    Version,
-    Versioned
-} from '@app/framework';
-
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';

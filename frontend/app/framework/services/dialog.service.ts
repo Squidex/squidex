@@ -7,7 +7,6 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
-
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
 

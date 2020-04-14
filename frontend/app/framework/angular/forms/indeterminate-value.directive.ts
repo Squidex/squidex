@@ -6,8 +6,7 @@
  */
 
 import { Directive, ElementRef, forwardRef, HostListener, Renderer2 } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
-
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
 export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {

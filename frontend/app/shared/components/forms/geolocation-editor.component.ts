@@ -7,15 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-
-import {
-    LocalStoreService,
-    ResourceLoaderService,
-    StatefulControlComponent,
-    Types,
-    UIOptions,
-    ValidatorsEx
-} from '@app/shared/internal';
+import { LocalStoreService, ResourceLoaderService, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare var L: any;
 declare var google: any;

@@ -7,13 +7,8 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$ } from '@app/shared';
 import { Observable } from 'rxjs';
-
-import {
-    BooleanFieldPropertiesDto,
-    FieldDto,
-    hasNoValue$
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',

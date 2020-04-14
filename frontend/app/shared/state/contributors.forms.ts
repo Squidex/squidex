@@ -6,17 +6,9 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, hasNoValue$, Types, value$ } from '@app/framework';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
-
-import {
-    Form,
-    hasNoValue$,
-    Types,
-    value$
-} from '@app/framework';
-
 import { AssignContributorDto } from './../services/contributors.service';
-
 import { UserDto } from './../services/users.service';
 
 export class AssignContributorForm extends Form<FormGroup, AssignContributorDto> {

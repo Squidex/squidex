@@ -7,7 +7,6 @@
 
 import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({

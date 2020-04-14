@@ -5,30 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: max-line-length
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import {
-    SqxFrameworkModule,
-    SqxSharedModule
-} from '@app/shared';
-
-import {
-    AdministrationAreaComponent,
-    ClusterPageComponent,
-    EventConsumerComponent,
-    EventConsumersPageComponent,
-    EventConsumersService,
-    EventConsumersState,
-    RestorePageComponent,
-    UnsetUserGuard,
-    UserComponent,
-    UserMustExistGuard,
-    UserPageComponent,
-    UsersPageComponent,
-    UsersService,
-    UsersState
-} from './declarations';
+import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { AdministrationAreaComponent, ClusterPageComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UnsetUserGuard, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
 
 const routes: Routes = [
     {

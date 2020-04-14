@@ -9,11 +9,10 @@ import { HttpClient, HttpHeaders, HTTP_INTERCEPTORS } from '@angular/common/http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ApiUrlConfig, AuthService } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { ApiUrlConfig, AuthService } from '@app/shared/internal';
 import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {

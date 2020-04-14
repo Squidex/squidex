@@ -7,12 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AssetFolderDto,
-    AssetsState,
-    RenameAssetFolderForm
-} from '@app/shared/internal';
+import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder-dialog',

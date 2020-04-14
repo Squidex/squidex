@@ -7,15 +7,8 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { FieldDto, hasNoValue$, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
 import { Observable } from 'rxjs';
-
-import {
-    FieldDto,
-    hasNoValue$,
-    NumberFieldPropertiesDto,
-    RootFieldDto,
-    Types
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',

@@ -6,23 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareSubscribed, State, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareSubscribed,
-    State,
-    Version
-} from '@app/framework';
-
+import { WorkflowDto, WorkflowsPayload, WorkflowsService } from './../services/workflows.service';
 import { AppsState } from './apps.state';
-
-import {
-    WorkflowDto,
-    WorkflowsPayload,
-    WorkflowsService
-} from './../services/workflows.service';
 
 interface Snapshot {
     // The current workflow.

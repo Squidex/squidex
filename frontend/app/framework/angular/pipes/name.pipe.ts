@@ -6,7 +6,6 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-
 import { StringHelper } from '@app/framework/internal';
 
 @Pipe({

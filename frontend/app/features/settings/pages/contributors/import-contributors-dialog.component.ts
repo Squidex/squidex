@@ -7,15 +7,9 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { ContributorsState, ErrorDto, ImportContributorsForm, RoleDto } from '@app/shared';
 import { empty, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-
-import {
-    ContributorsState,
-    ErrorDto,
-    ImportContributorsForm,
-    RoleDto
-} from '@app/shared';
 
 type ImportStatus = {
     email: string;

@@ -6,22 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-
-import {
-    ApiUrlConfig,
-    AppsState,
-    ContentDto,
-    LanguageDto,
-    ManualContentsState,
-    Query,
-    QueryModel,
-    queryModelFromSchema,
-    ResourceOwner,
-    SchemaDetailsDto,
-    SchemaDto,
-    SchemasState,
-    Types
-} from '@app/shared';
+import { ApiUrlConfig, AppsState, ContentDto, LanguageDto, ManualContentsState, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-selector',

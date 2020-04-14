@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:directive-selector
+// tslint:disable: directive-selector
 
 import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
-
 import { DialogService, Tooltip } from '@app/framework/internal';
 
 @Directive({

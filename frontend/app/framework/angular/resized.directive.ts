@@ -6,12 +6,7 @@
  */
 
 import { Directive, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, Output } from '@angular/core';
-
-import {
-    ResizeListener,
-    ResizeService,
-    ResourceOwner
-} from '@app/framework/internal';
+import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]'

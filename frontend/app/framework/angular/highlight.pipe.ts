@@ -8,7 +8,6 @@
 // tslint:disable: no-pipe-impure
 
 import { Pipe, PipeTransform } from '@angular/core';
-
 import { Types } from '@app/framework/internal';
 
 @Pipe({

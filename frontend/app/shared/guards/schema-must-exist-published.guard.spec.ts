@@ -6,10 +6,9 @@
  */
 
 import { Router } from '@angular/router';
+import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
 import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.guard';
 
 describe('SchemaMustExistPublishedGuard', () => {

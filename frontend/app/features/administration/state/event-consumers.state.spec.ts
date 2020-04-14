@@ -5,16 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { EventConsumersDto, EventConsumersService } from '@app/features/administration/internal';
+import { DialogService } from '@app/framework';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import { DialogService } from '@app/framework';
-
-import { EventConsumersDto, EventConsumersService } from '@app/features/administration/internal';
-import { EventConsumersState } from './event-consumers.state';
-
 import { createEventConsumer } from './../services/event-consumers.service.spec';
+import { EventConsumersState } from './event-consumers.state';
 
 describe('EventConsumersState', () => {
     const eventConsumer1 = createEventConsumer(1);

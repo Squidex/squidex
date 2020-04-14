@@ -6,15 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    LanguageDto,
-    MetaFields,
-    Query,
-    RootFieldDto,
-    TableField,
-    Types
-} from '@app/shared';
+import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-list-header',

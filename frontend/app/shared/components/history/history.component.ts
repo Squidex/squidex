@@ -7,18 +7,9 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, switchSafe } from '@app/shared/internal';
 import { merge, Observable, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
-
-import {
-    allParams,
-    AppsState,
-    HistoryChannelUpdated,
-    HistoryEventDto,
-    HistoryService,
-    MessageBus,
-    switchSafe
-} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-history',

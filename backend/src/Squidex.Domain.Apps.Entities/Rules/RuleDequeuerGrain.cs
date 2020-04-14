@@ -105,7 +105,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.MarkSentAsync(@event.Job, response.Dump, response.Status, jobResult, elapsed, now, jobDelay);
+                var update = new RuleJobUpdate
+                {
+                    Elapsed = elapsed,
+                    ExecutionDump = response.Dump,
+                    ExecutionResult = response.Status,
+                    Finished = now,
+                    JobNext = jobDelay,
+                    JobResult = ComputeJobResult(response.Status, jobDelay),
+                };
+
+                await ruleEventRepository.UpdateAsync(@event.Job, update);
             }
             catch (Exception ex)
             {

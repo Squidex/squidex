@@ -6,15 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-
-import {
-    AppDto,
-    AppsState,
-    DialogModel,
-    fadeAnimation,
-    ModalModel,
-    UIState
-} from '@app/shared';
+import { AppDto, AppsState, DialogModel, fadeAnimation, ModalModel, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-menu',

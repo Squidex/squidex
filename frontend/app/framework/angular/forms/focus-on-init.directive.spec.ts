@@ -6,7 +6,6 @@
  */
 
 import { ElementRef } from '@angular/core';
-
 import { FocusOnInitDirective } from './focus-on-init.directive';
 
 describe('FocusOnInitDirective', () => {

@@ -6,7 +6,6 @@
  */
 
 import { Injectable } from '@angular/core';
-
 import * as Mousetrap from 'mousetrap';
 
 export const ShortcutServiceFactory = () => {

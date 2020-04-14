@@ -8,7 +8,6 @@
 // tslint:disable: readonly-array
 
 import { Types } from '@app/framework';
-
 import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';

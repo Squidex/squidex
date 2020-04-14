@@ -7,12 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    ApiUrlConfig,
-    UIService,
-    UISettingsDto
-} from '@app/shared/internal';
+import { ApiUrlConfig, UIService, UISettingsDto } from '@app/shared/internal';
 
 describe('UIService', () => {
     beforeEach(() => {

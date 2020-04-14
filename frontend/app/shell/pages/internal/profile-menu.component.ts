@@ -6,15 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-
-import {
-    ApiUrlConfig,
-    AuthService,
-    fadeAnimation,
-    ModalModel,
-    StatefulComponent,
-    UIState
-} from '@app/shared';
+import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.

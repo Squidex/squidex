@@ -8,23 +8,9 @@
 // tslint:disable: triple-equals
 
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { AppsState, ContentDto, ContentsState, fadeAnimation, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, switchSafe } from '@app/shared';
 import { Observable, timer } from 'rxjs';
 import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
-
-import {
-    AppsState,
-    ContentDto,
-    ContentsState,
-    fadeAnimation,
-    HistoryEventDto,
-    HistoryService,
-    ModalModel,
-    ResourceOwner,
-    SchemaDetailsDto,
-    SchemasState,
-    switchSafe
-} from '@app/shared';
-
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 import { ContentPageComponent } from './content-page.component';
 

@@ -7,18 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, HTTP, mapVersioned, pretifyError, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    HTTP,
-    mapVersioned,
-    pretifyError,
-    Version,
-    Versioned
-} from '@app/framework';
 
 export type PlansDto = Versioned<{
     readonly currentPlanId: string,

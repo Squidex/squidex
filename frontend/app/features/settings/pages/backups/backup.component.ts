@@ -6,13 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
-import {
-    ApiUrlConfig,
-    BackupDto,
-    BackupsState,
-    Duration
-} from '@app/shared';
+import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
 
 @Component({
     selector: 'sqx-backup',

@@ -7,23 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    createProperties,
-    DateTime,
-    NestedFieldDto,
-    Resource,
-    ResourceLinks,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SchemaDto,
-    SchemaPropertiesDto,
-    SchemasDto,
-    SchemasService,
-    Version
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new Version('1');

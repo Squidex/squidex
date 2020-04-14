@@ -7,12 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    EditSchemaForm,
-    SchemaDetailsDto,
-    SchemasState
-} from '@app/shared';
+import { EditSchemaForm, SchemaDetailsDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',

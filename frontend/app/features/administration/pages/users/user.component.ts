@@ -8,7 +8,6 @@
 // tslint:disable: component-selector
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
 import { UserDto, UsersState } from '@app/features/administration/internal';
 
 @Component({

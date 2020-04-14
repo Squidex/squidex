@@ -7,12 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    EditPatternForm,
-    PatternDto,
-    PatternsState
-} from '@app/shared';
+import { EditPatternForm, PatternDto, PatternsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-pattern',

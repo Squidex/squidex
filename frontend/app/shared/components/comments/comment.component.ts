@@ -6,15 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { CommentDto, CommentsState, ContributorDto, DialogService, Keys } from '@app/shared/internal';
 import { MentionConfig } from 'angular-mentions';
-
-import {
-    CommentDto,
-    CommentsState,
-    ContributorDto,
-    DialogService,
-    Keys
-} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-comment',

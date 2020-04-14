@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AppsState } from '@app/shared';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { AppsState } from '@app/shared';
-
 import { LoadAppsGuard } from './load-apps.guard';
 
 describe('LoadAppsGuard', () => {

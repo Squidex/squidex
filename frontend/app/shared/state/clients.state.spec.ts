@@ -5,20 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ClientsPayload, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    ClientsPayload,
-    ClientsService,
-    ClientsState,
-    DialogService,
-    versioned
-} from '@app/shared/internal';
-
 import { createClients } from './../services/clients.service.spec';
-
 import { TestValues } from './_test-helpers';
 
 describe('ClientsState', () => {

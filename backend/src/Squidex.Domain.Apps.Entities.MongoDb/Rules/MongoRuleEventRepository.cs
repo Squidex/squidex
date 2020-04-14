@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
-        public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20)
+        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20)
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
@@ -68,11 +68,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId));
             }
 
-            var ruleEventEntities =
-                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created)
-                    .ToListAsync();
+            var taskForItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
+            var taskForCount = Collection.Find(filter).CountDocumentsAsync();
 
-            return ruleEventEntities;
+            await Task.WhenAll(taskForItems, taskForCount);
+
+            return ResultList.Create(taskForCount.Result, taskForItems.Result);
         }
 
         public async Task<IRuleEventEntity> FindAsync(Guid id)
@@ -84,37 +85,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return ruleEvent;
         }
 
-        public async Task<int> CountByAppAsync(Guid appId)
-        {
-            return (int)await Collection.CountDocumentsAsync(x => x.AppId == appId);
-        }
-
         public Task EnqueueAsync(Guid id, Instant nextAttempt)
         {
             return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
 
-        public async Task EnqueueAsync(RuleJob job, Instant nextAttempt)
+        public async Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default)
         {
             var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
 
-            if (job.EventId != default)
-            {
-                entity.Id = job.EventId;
-            }
-            else
-            {
-                entity.Id = Guid.NewGuid();
-            }
-
-            try
-            {
-                await Collection.InsertOneIfNotExistsAsync(entity);
-            }
-            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-            {
-                throw new UniqueConstraintException();
-            }
+            await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }
 
         public Task CancelAsync(Guid id)
@@ -125,23 +105,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
         }
 
-        public async Task MarkSentAsync(RuleJob job, string? dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant finished, Instant? nextCall)
+        public async Task UpdateAsync(RuleJob job, RuleJobUpdate update)
         {
-            if (result == RuleResult.Success)
+            Guard.NotNull(job);
+            Guard.NotNull(update);
+
+            if (update.ExecutionResult == RuleResult.Success)
             {
-                await statisticsCollection.IncrementSuccess(job.AppId, job.RuleId, finished);
+                await statisticsCollection.IncrementSuccess(job.AppId, job.RuleId, update.Finished);
             }
             else
             {
-                await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, finished);
+                await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, update.Finished);
             }
 
-            await Collection.UpdateOneAsync(x => x.Id == job.EventId,
+            await Collection.UpdateOneAsync(x => x.Id == job.Id,
                 Update
-                    .Set(x => x.Result, result)
-                    .Set(x => x.LastDump, dump)
-                    .Set(x => x.JobResult, jobResult)
-                    .Set(x => x.NextAttempt, nextCall)
+                    .Set(x => x.Result, update.ExecutionResult)
+                    .Set(x => x.LastDump, update.ExecutionDump)
+                    .Set(x => x.JobResult, update.JobResult)
+                    .Set(x => x.NextAttempt, update.JobNext)
                     .Inc(x => x.NumCalls, 1));
         }
 

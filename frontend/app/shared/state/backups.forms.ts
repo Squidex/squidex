@@ -6,13 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-import {
-    Form,
-    hasNoValue$,
-    ValidatorsEx
-} from '@app/framework';
-
+import { Form, hasNoValue$, ValidatorsEx } from '@app/framework';
 import { StartRestoreDto } from './../services/backups.service';
 
 export class RestoreForm extends Form<FormGroup, StartRestoreDto> {

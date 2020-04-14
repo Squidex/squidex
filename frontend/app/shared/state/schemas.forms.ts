@@ -6,23 +6,9 @@
  */
 
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
-
-import {
-    Form,
-    ValidatorsEx,
-    value$
-} from '@app/framework';
-
-import {
-    AddFieldDto,
-    CreateSchemaDto,
-    SchemaDetailsDto,
-    SchemaPropertiesDto,
-    SynchronizeSchemaDto,
-    UpdateSchemaDto
-} from './../services/schemas.service';
-
+import { AddFieldDto, CreateSchemaDto, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };

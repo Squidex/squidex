@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
-
 import { ShortcutService, StatefulComponent } from '@app/framework/internal';
 
 @Component({

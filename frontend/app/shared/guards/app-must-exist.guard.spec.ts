@@ -6,11 +6,9 @@
  */
 
 import { Router } from '@angular/router';
+import { AppsState } from '@app/shared';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { AppsState } from '@app/shared';
-
 import { AppMustExistGuard } from './app-must-exist.guard';
 
 describe('AppMustExistGuard', () => {

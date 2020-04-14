@@ -7,17 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks, ResultSet } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import {
-    ApiUrlConfig,
-    hasAnyLink,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    ResultSet
-} from '@app/shared';
 
 export class UsersDto extends ResultSet<UserDto> {
     public get canCreate() {

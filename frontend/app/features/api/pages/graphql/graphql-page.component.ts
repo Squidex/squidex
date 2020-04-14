@@ -6,15 +6,12 @@
  */
 
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
+import { AppsState, GraphQlService } from '@app/shared';
+import GraphiQL from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-
-import GraphiQL from 'graphiql';
-
-import { AppsState, GraphQlService } from '@app/shared';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-graphql-page',

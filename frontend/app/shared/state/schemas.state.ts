@@ -6,35 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { compareStrings, defined, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { empty, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-
-import {
-    compareStrings,
-    defined,
-    DialogService,
-    shareMapSubscribed,
-    shareSubscribed,
-    State,
-    Types,
-    Version
-} from '@app/framework';
-
+import { AddFieldDto, CreateSchemaDto, FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
-
-import {
-    AddFieldDto,
-    CreateSchemaDto,
-    FieldDto,
-    NestedFieldDto,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SchemaDto,
-    SchemasService,
-    UpdateFieldDto,
-    UpdateSchemaDto,
-    UpdateUIFields
-} from './../services/schemas.service';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
 

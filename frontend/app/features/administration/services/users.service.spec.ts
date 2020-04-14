@@ -7,14 +7,8 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
 import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
-
-import {
-    UserDto,
-    UsersDto,
-    UsersService
-} from './users.service';
+import { UserDto, UsersDto, UsersService } from './users.service';
 
 describe('UsersService', () => {
      beforeEach(() => {

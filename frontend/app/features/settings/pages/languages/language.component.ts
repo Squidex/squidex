@@ -8,14 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AppLanguageDto,
-    EditLanguageForm,
-    LanguageDto,
-    LanguagesState,
-    sorted
-} from '@app/shared';
+import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',

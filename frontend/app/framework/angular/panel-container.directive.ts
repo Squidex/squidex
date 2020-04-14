@@ -8,7 +8,6 @@
 // tslint:disable: readonly-array
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
-
 import { PanelComponent } from './panel.component';
 
 @Directive({

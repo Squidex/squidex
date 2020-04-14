@@ -51,6 +51,7 @@ namespace Squidex.Domain.Users
 
             void RemoveClaims(Func<Claim, bool> predicate)
             {
+                claimsToAdd.RemoveAll(x => predicate(x));
                 claimsToRemove.AddRange(current.Where(predicate));
             }
 

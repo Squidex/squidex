@@ -6,20 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/framework';
 import { empty, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    LocalStoreService,
-    Pager,
-    shareSubscribed,
-    State
-} from '@app/framework';
-
-import { AppsState } from './apps.state';
-
 import { RuleEventDto, RulesService } from './../services/rules.service';
+import { AppsState } from './apps.state';
 
 interface Snapshot {
     // The current rule events.

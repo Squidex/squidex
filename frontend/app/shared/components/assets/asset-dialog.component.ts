@@ -7,19 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AnnotateAssetDto,
-    AnnotateAssetForm,
-    AssetDto,
-    AssetsState,
-    AssetUploaderState,
-    AuthService,
-    DialogService,
-    Types,
-    UploadCanceled
-} from '@app/shared/internal';
-
+import { AnnotateAssetDto, AnnotateAssetForm, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 

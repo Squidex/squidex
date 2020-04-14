@@ -7,22 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ResultSet, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    DateTime,
-    hasAnyLink,
-    HTTP,
-    Model,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    ResultSet,
-    Version
-} from '@app/framework';
 
 export type RuleElementMetadataDto = {
     description: string;
@@ -124,7 +111,13 @@ export class RulesDto extends ResultSet<RuleDto> {
         return hasAnyLink(this._links, 'events');
     }
 
-    constructor(items: ReadonlyArray<RuleDto>, links?: {}) {
+    public get canCancelRun() {
+        return hasAnyLink(this._links, 'run/cancel');
+    }
+
+    constructor(items: ReadonlyArray<RuleDto>, links?: {},
+        public readonly runningRuleId?: string
+    ) {
         super(items.length, items, links);
     }
 }
@@ -135,6 +128,7 @@ export class RuleDto {
     public readonly canDelete: boolean;
     public readonly canDisable: boolean;
     public readonly canEnable: boolean;
+    public readonly canRun: boolean;
     public readonly canTrigger: boolean;
     public readonly canUpdate: boolean;
 
@@ -161,6 +155,7 @@ export class RuleDto {
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
+        this.canRun = hasAnyLink(links, 'run');
         this.canTrigger = hasAnyLink(links, 'logs');
         this.canUpdate = hasAnyLink(links, 'update');
     }
@@ -254,11 +249,11 @@ export class RulesService {
     public getRules(appName: string): Observable<RulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return this.http.get<{ items: [] } & Resource>(url).pipe(
-            map(({ items, _links }) => {
+        return this.http.get<{ items: [] } & Resource & { runningRuleId?: string }>(url).pipe(
+            map(({ items, _links, runningRuleId }) => {
                 const rules = items.map(item => parseRule(item));
 
-                return new RulesDto(rules, _links);
+                return new RulesDto(rules, _links, runningRuleId);
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
@@ -331,6 +326,28 @@ export class RulesService {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
             pretifyError('Failed to delete rule. Please reload.'));
+    }
+
+    public runRule(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['run'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url, {}).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'Run', appName);
+            }),
+            pretifyError('Failed to run rule. Please reload.'));
+    }
+
+    public runCancel(appName: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/run`);
+
+        return this.http.delete(url).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'RunCancel', appName);
+            }),
+            pretifyError('Failed to cancel rule. Please reload.'));
     }
 
     public triggerRule(appName: string, resource: Resource): Observable<any> {

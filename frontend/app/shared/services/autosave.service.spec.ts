@@ -5,13 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AutoSaveService, LocalStoreService, Version } from '@app/shared/internal';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    AutoSaveService,
-    LocalStoreService,
-    Version
-} from '@app/shared/internal';
 
 describe('AutoSaveService', () => {
     let localStore: IMock<LocalStoreService>;

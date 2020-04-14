@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -26,12 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public long Total { get; set; }
 
-        public static RuleEventsDto FromRuleEvents(IReadOnlyList<IRuleEventEntity> items, long total, ApiController controller, string app)
+        public static RuleEventsDto FromRuleEvents(IResultList<IRuleEventEntity> ruleEvents, ApiController controller, string app)
         {
             var result = new RuleEventsDto
             {
-                Total = total,
-                Items = items.Select(x => RuleEventDto.FromRuleEvent(x, controller, app)).ToArray()
+                Total = ruleEvents.Total,
+                Items = ruleEvents.Select(x => RuleEventDto.FromRuleEvent(x, controller, app)).ToArray()
             };
 
             return result.CreateLinks(controller, app);

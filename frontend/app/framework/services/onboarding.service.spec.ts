@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { OnboardingService, OnboardingServiceFactory } from './onboarding.service';
-
 import { UIOptions } from './../configurations';
+import { OnboardingService, OnboardingServiceFactory } from './onboarding.service';
 
 class LocalStoreMock {
     private store = {};

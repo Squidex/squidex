@@ -7,11 +7,9 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ResourceLoaderService, StatefulControlComponent } from '@app/framework/internal';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-
-import { ResourceLoaderService, StatefulControlComponent } from '@app/framework/internal';
-
 import { FocusComponent } from './../forms-helper';
 
 declare var ace: any;

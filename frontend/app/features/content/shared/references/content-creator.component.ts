@@ -6,22 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-
-import {
-    ApiUrlConfig,
-    AppLanguageDto,
-    AppsState,
-    AuthService,
-    ContentDto,
-    EditContentForm,
-    LanguageDto,
-    ManualContentsState,
-    ResourceOwner,
-    SchemaDetailsDto,
-    SchemaDto,
-    SchemasState,
-    Types
-} from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, ContentDto, EditContentForm, LanguageDto, ManualContentsState, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',

@@ -5,14 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    animate,
-    AnimationTriggerMetadata,
-    state,
-    style,
-    transition,
-    trigger
-} from '@angular/animations';
+import { animate, AnimationTriggerMetadata, state, style, transition, trigger } from '@angular/animations';
 
 export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'): AnimationTriggerMetadata {
     return trigger(
