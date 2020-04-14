@@ -14,7 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { AnalyticsIdConfig, ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
 export function configApiUrl() {
@@ -45,10 +45,6 @@ export function configTitles() {
     return new TitlesConfig(undefined, 'Squidex Headless CMS');
 }
 
-export function configAnalyticsId() {
-    return new AnalyticsIdConfig('UA-99989790-2');
-}
-
 export function configDecimalSeparator() {
     return new DecimalSeparatorConfig('.');
 }
@@ -75,7 +71,6 @@ export function configCurrency() {
         AppComponent
     ],
     providers: [
-        { provide: AnalyticsIdConfig, useFactory: configAnalyticsId },
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
