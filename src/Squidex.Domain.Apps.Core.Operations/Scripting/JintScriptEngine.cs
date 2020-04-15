@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Esprima;
 using Jint;
 using Jint.Native;
 using Jint.Native.Date;
@@ -120,6 +121,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
             catch (ArgumentException ex)
             {
                 throw new ValidationException($"Failed to execute script with javascript syntax error: {ex.Message}", new ValidationError(ex.Message));
+            }
+            catch (ParserException ex)
+            {
+                throw new ValidationException($"Failed to execute script with javascript error: {ex.Message}", new ValidationError(ex.Message));
             }
             catch (JavaScriptException ex)
             {
