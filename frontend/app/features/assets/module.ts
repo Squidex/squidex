@@ -7,14 +7,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-
-import {
-    AssetsFiltersPageComponent,
-    AssetsPageComponent,
-    AssetTagsComponent
-} from './declarations';
+import { AssetsFiltersPageComponent, AssetsPageComponent, AssetTagsComponent } from './declarations';
 
 const routes: Routes = [
     {

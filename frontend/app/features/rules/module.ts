@@ -5,30 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: max-line-length
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import {
-    HelpComponent,
-    SqxFrameworkModule,
-    SqxSharedModule
-} from '@app/shared';
-
-import {
-    AssetChangedTriggerComponent,
-    CommentTriggerComponent,
-    ContentChangedTriggerComponent,
-    GenericActionComponent,
-    RuleComponent,
-    RuleElementComponent,
-    RuleEventBadgeClassPipe,
-    RuleEventsPageComponent,
-    RuleIconComponent,
-    RulesPageComponent,
-    RuleWizardComponent,
-    SchemaChangedTriggerComponent,
-    UsageTriggerComponent
-} from './declarations';
+import { HelpComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleComponent, RuleElementComponent, RuleEventBadgeClassPipe, RuleEventsPageComponent, RuleIconComponent, RulesPageComponent, RuleWizardComponent, SchemaChangedTriggerComponent, UsageTriggerComponent } from './declarations';
 
 const routes: Routes = [
     {

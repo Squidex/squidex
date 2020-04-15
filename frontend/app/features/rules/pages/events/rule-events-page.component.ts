@@ -7,12 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
-import {
-    ResourceOwner,
-    RuleEventDto,
-    RuleEventsState
-} from '@app/shared';
+import { ResourceOwner, RuleEventDto, RuleEventsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',

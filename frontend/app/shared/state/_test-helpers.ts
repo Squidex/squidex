@@ -7,13 +7,7 @@
 
 import { of } from 'rxjs';
 import { Mock } from 'typemoq';
-
-import {
-    AppsState,
-    AuthService,
-    DateTime,
-    Version
-} from './../';
+import { AppsState, AuthService, DateTime, Version } from './../';
 
 const app = 'my-app';
 const creation = DateTime.today().addDays(-2);

@@ -7,13 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
-import {
-    DialogService,
-    LoadingService,
-    Notification,
-    ResourceOwner
-} from '@app/shared';
+import { DialogService, LoadingService, Notification, ResourceOwner } from '@app/shared';
 
 @Component({
     selector: 'sqx-internal-area',

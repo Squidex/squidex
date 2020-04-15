@@ -6,14 +6,7 @@
  */
 
 import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
-
-import {
-    DialogModel,
-    ModalModel,
-    ResourceOwner,
-    Types
-} from '@app/framework/internal';
-
+import { DialogModel, ModalModel, ResourceOwner, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
 declare type Model = DialogModel | ModalModel | any;

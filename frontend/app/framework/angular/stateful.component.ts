@@ -11,10 +11,8 @@ import { ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { onErrorResumeNext, skip } from 'rxjs/operators';
-
-import { Types } from './../utils/types';
-
 import { State } from './../state';
+import { Types } from './../utils/types';
 
 declare type UnsubscribeFunction = () => void;
 

@@ -6,15 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-
-import {
-    WorkflowDto,
-    WorkflowStep,
-    WorkflowStepValues,
-    WorkflowTransition,
-    WorkflowTransitionValues,
-    WorkflowTransitionView
-} from '@app/shared';
+import { WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflow-step',

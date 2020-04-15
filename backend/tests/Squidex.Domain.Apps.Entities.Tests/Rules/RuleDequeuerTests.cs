@@ -126,7 +126,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Job, requestDump, result, jobResult, requestElapsed, now, nextCall))
+            A.CallTo(() => ruleEventRepository.UpdateAsync(@event.Job,
+                    A<RuleJobUpdate>.That.Matches(x =>
+                        x.Elapsed == requestElapsed &&
+                        x.ExecutionDump == requestDump &&
+                        x.ExecutionResult == result &&
+                        x.Finished == now &&
+                        x.JobNext == nextCall &&
+                        x.JobResult == jobResult)))
                 .MustHaveHappened();
         }
 
@@ -141,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job = new RuleJob
             {
-                EventId = id,
+                Id = id,
                 ActionData = actionData,
                 ActionName = actionName,
                 Created = clock.GetCurrentInstant()

@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { UsersState } from '@app/features/administration/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { UsersState } from '@app/features/administration/internal';
-
 import { UnsetUserGuard } from './unset-user.guard';
 
 describe('UnsetUserGuard', () => {

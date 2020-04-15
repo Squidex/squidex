@@ -7,9 +7,8 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-
 import { FieldDto, FloatConverter, NumberFieldPropertiesDto } from '@app/shared';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-date-time-ui',

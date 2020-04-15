@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-
 import { ContentDto, HistoryEventDto } from '@app/shared';
 
 @Component({

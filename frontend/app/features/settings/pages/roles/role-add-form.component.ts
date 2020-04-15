@@ -7,7 +7,6 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
 import { AddRoleForm, RolesState } from '@app/shared';
 
 @Component({

@@ -5,13 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    DialogRequest,
-    DialogService,
-    DialogServiceFactory,
-    Notification,
-    Tooltip
-} from './dialog.service';
+import { DialogRequest, DialogService, DialogServiceFactory, Notification, Tooltip } from './dialog.service';
 
 describe('DialogService', () => {
     it('should instantiate from factory', () => {

@@ -6,14 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-
-import {
-    AssetDto,
-    AssetsState,
-    LocalStoreService,
-    Query,
-    StatefulComponent
-} from '@app/shared/internal';
+import { AssetDto, AssetsState, LocalStoreService, Query, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     // The selected assets.

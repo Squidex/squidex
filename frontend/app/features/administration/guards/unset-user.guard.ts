@@ -7,10 +7,9 @@
 
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
+import { UsersState } from '@app/features/administration/internal';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import { UsersState } from '@app/features/administration/internal';
 
 @Injectable()
 export class UnsetUserGuard implements CanActivate {

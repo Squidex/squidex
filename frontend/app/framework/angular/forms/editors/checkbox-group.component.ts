@@ -9,12 +9,7 @@
 
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
-import {
-    MathHelper,
-    StatefulControlComponent,
-    Types
-} from '@app/framework/internal';
+import { MathHelper, StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true

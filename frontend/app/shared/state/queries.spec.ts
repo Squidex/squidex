@@ -5,14 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Queries, SavedQuery, UIState } from '@app/shared/internal';
 import { BehaviorSubject } from 'rxjs';
-import { IMock,  Mock, Times } from 'typemoq';
-
-import {
-    Queries,
-    SavedQuery,
-    UIState
-} from '@app/shared/internal';
+import { IMock, Mock, Times } from 'typemoq';
 
 describe('Queries', () => {
     const prefix = 'schemas.my-schema';

@@ -7,18 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    Resource,
-    ResourceLinks,
-    RoleDto,
-    RolesDto,
-    RolesPayload,
-    RolesService,
-    Version
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, Resource, ResourceLinks, RoleDto, RolesDto, RolesPayload, RolesService, Version } from '@app/shared/internal';
 
 describe('RolesService', () => {
     const version = new Version('1');

@@ -6,7 +6,6 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
-
 import { Types } from '@app/framework/internal';
 
 @Directive({

@@ -7,14 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    AssetDto,
-    AssetFolderDto,
-    AssetsState,
-    getFiles,
-    Types
-} from '@app/shared/internal';
+import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-assets-list',

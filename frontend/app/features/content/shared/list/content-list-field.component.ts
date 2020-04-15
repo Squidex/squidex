@@ -7,16 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-
-import {
-    ContentDto,
-    getContentValue,
-    LanguageDto,
-    MetaFields,
-    RootFieldDto,
-    TableField,
-    Types
-} from '@app/shared';
+import { ContentDto, getContentValue, LanguageDto, MetaFields, RootFieldDto, TableField, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-list-field',

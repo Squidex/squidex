@@ -7,31 +7,13 @@
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    DateTime,
-    ErrorDto,
-    hasAnyLink,
-    HTTP,
-    Metadata,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    ResultSet,
-    StringHelper,
-    Types,
-    Version,
-    Versioned
-} from '@app/framework';
-
-const SVG_PREVIEW_LIMIT = 10 * 1024;
-
 import { encodeQuery, Query } from './../state/query';
 import { AuthService } from './auth.service';
+
+const SVG_PREVIEW_LIMIT = 10 * 1024;
 
 export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {

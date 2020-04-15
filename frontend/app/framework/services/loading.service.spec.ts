@@ -7,7 +7,6 @@
 
 import { Event, NavigationError, NavigationStart } from '@angular/router';
 import { Subject } from 'rxjs';
-
 import { LoadingService, LoadingServiceFactory } from './loading.service';
 
 describe('LoadingService', () => {

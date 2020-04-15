@@ -6,8 +6,8 @@
  */
 
 import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
-
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Types } from '@app/framework/internal';
 import slugify from 'slugify';
 
 type Transform = (value: string) => string;
@@ -17,8 +17,6 @@ export const TransformLowerCase: Transform = value => value.toLowerCase();
 export const TransformSlugify: Transform = value => slugify(value, { lower: true });
 export const TransformSlugifyCased: Transform = value => slugify(value, { lower: false });
 export const TransformUpperCase: Transform = value => value.toUpperCase();
-
-import { Types } from '@app/framework/internal';
 
 export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TransformInputDirective), multi: true

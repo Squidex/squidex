@@ -6,25 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareMapSubscribed,
-    shareSubscribed,
-    State,
-    Version
-} from '@app/framework';
-
+import { EditPatternDto, PatternDto, PatternsPayload, PatternsService } from './../services/patterns.service';
 import { AppsState } from './apps.state';
-
-import {
-    EditPatternDto,
-    PatternDto,
-    PatternsPayload,
-    PatternsService
-} from './../services/patterns.service';
 
 interface Snapshot {
     // The current patterns.

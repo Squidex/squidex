@@ -7,14 +7,8 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, ValidatorsEx } from '@app/shared';
 import { Observable } from 'rxjs';
-
-import {
-    DateTimeFieldPropertiesDto,
-    FieldDto,
-    hasNoValue$,
-    ValidatorsEx
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-validation',

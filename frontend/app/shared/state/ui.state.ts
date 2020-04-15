@@ -6,19 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { hasAnyLink, State, Types } from '@app/framework';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-
-import {
-    hasAnyLink,
-    State,
-    Types
-} from '@app/framework';
-
-import { AppsState } from './apps.state';
-
 import { UIService, UISettingsDto } from './../services/ui.service';
-
 import { UsersService } from './../services/users.service';
+import { AppsState } from './apps.state';
 
 interface Snapshot {
     // All common settings.

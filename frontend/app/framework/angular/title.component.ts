@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
-
 import { TitleService } from '@app/framework/internal';
 
 @Component({

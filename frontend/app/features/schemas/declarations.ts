@@ -5,12 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export * from './pages/schema/schema-page.component';
-
 export * from './pages/schema/common/schema-edit-form.component';
-
 export * from './pages/schema/export/schema-export-form.component';
-
 export * from './pages/schema/fields/field-wizard.component';
 export * from './pages/schema/fields/field.component';
 export * from './pages/schema/fields/forms/field-form-common.component';
@@ -37,13 +33,10 @@ export * from './pages/schema/fields/types/string-ui.component';
 export * from './pages/schema/fields/types/string-validation.component';
 export * from './pages/schema/fields/types/tags-ui.component';
 export * from './pages/schema/fields/types/tags-validation.component';
-
 export * from './pages/schema/preview/schema-preview-urls-form.component';
-
+export * from './pages/schema/schema-page.component';
 export * from './pages/schema/scripts/schema-scripts-form.component';
-
 export * from './pages/schema/ui/field-list.component';
 export * from './pages/schema/ui/schema-ui-form.component';
-
 export * from './pages/schemas/schema-form.component';
 export * from './pages/schemas/schemas-page.component';

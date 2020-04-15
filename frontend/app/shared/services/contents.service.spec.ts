@@ -7,21 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    ContentDto,
-    ContentsDto,
-    ContentsService,
-    DateTime,
-    Resource,
-    ResourceLinks,
-    ScheduleDto,
-    Version,
-    Versioned
-} from '@app/shared/internal';
-
+import { AnalyticsService, ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
 import { encodeQuery, sanitize } from './../state/query';
 
 describe('ContentsService', () => {

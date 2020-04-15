@@ -6,11 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    PatternDto,
-    PatternsState
-} from '@app/shared';
+import { PatternDto, PatternsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-patterns-page',

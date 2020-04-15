@@ -6,9 +6,8 @@
  */
 
 import { Component } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
-
 import { DialogModel, UIOptions } from '@app/shared';
+import { Observable, of, Subject } from 'rxjs';
 
 const OPTION_IMMEDIATELY = 'Immediately';
 

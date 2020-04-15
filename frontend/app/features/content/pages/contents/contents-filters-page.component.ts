@@ -6,15 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ContentsState,
-    Queries,
-    Query,
-    ResourceOwner,
-    SchemasState,
-    UIState
-} from '@app/shared';
+import { ContentsState, Queries, Query, ResourceOwner, SchemasState, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-filters-page',

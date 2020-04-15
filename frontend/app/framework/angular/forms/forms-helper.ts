@@ -8,7 +8,6 @@
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
-
 import { Types } from './../../utils/types';
 
 export interface FocusComponent {

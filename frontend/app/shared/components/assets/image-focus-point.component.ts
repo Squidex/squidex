@@ -8,11 +8,9 @@
 // tslint:disable: readonly-array
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
-import { FocusedImage, FocusPicker } from 'image-focus';
-
 import { Types } from '@app/framework';
-
 import { AnnotateAssetDto, AssetDto } from '@app/shared/services/assets.service';
+import { FocusedImage, FocusPicker } from 'image-focus';
 
 @Component({
     selector: 'sqx-image-focus-point',

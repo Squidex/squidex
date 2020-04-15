@@ -7,16 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import {
-    ApiUrlConfig,
-    hasAnyLink,
-    pretifyError,
-    Resource,
-    ResourceLinks
-} from '@app/shared';
 
 export class EventConsumersDto {
     public readonly _links: ResourceLinks;

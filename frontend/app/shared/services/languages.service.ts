@@ -7,10 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig, pretifyError } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import { ApiUrlConfig, pretifyError } from '@app/framework';
 
 export class LanguageDto {
     constructor(

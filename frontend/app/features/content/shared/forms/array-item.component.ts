@@ -7,18 +7,8 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { AppLanguageDto, EditContentForm, FieldDto, FieldFormatter, invalid$, RootFieldDto, value$ } from '@app/shared';
 import { Observable, Subscription } from 'rxjs';
-
-import {
-    AppLanguageDto,
-    EditContentForm,
-    FieldDto,
-    FieldFormatter,
-    invalid$,
-    RootFieldDto,
-    value$
-} from '@app/shared';
-
 import { FieldEditorComponent } from './field-editor.component';
 
 type FieldControl = { field: FieldDto, control: AbstractControl };

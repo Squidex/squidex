@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+export * from './angular/animations';
 export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
-export * from './angular/animations';
-
+export * from './angular/stateful.component';
+export * from './configurations';
 export * from './services/analytics.service';
 export * from './services/clipboard.service';
 export * from './services/dialog.service';
@@ -21,7 +22,6 @@ export * from './services/resource-loader.service';
 export * from './services/shortcut.service';
 export * from './services/temp.service';
 export * from './services/title.service';
-
 export * from './utils/array-helper';
 export * from './utils/date-helper';
 export * from './utils/date-time';
@@ -39,7 +39,3 @@ export * from './utils/rxjs-extensions';
 export * from './utils/string-helper';
 export * from './utils/types';
 export * from './utils/version';
-
-export * from './angular/stateful.component';
-
-export * from './configurations';

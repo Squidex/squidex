@@ -7,13 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
-import {
-    MathHelper,
-    ModalModel,
-    StatefulControlComponent
-} from '@app/framework/internal';
-
+import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
 
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {

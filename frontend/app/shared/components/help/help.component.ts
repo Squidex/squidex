@@ -7,7 +7,6 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
 import { HelpService } from '@app/shared/internal';
 
 @Component({

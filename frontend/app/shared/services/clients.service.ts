@@ -7,21 +7,9 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    hasAnyLink,
-    HTTP,
-    mapVersioned,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    Version,
-    Versioned
-} from '@app/framework';
 
 export type ClientsDto = Versioned<ClientsPayload>;
 export type ClientsPayload = {

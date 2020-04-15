@@ -6,7 +6,6 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-
 import { CurrencyConfig, DecimalSeparatorConfig } from '@app/framework/internal';
 
 @Pipe({

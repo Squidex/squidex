@@ -9,14 +9,8 @@
 
 import { empty, Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, onErrorResumeNext, publishReplay, refCount, switchMap } from 'rxjs/operators';
-
 import { DialogService } from './../services/dialog.service';
-
-import {
-    Version,
-    versioned,
-    Versioned
-} from './version';
+import { Version, versioned, Versioned } from './version';
 
 export function mapVersioned<T = any, R = any>(project: (value: T, version: Version) => R) {
     return function mapOperation(source: Observable<Versioned<T>>) {

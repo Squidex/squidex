@@ -7,10 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
-import { ApiUrlConfig } from '@app/framework';
 
 export interface UISettingsDto {
     readonly canCreateApps: boolean;

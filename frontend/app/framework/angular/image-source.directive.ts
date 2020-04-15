@@ -6,7 +6,6 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-
 import { MathHelper, ResourceOwner } from '@app/framework/internal';
 import { StringHelper } from '../utils/string-helper';
 

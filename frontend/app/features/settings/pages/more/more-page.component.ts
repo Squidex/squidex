@@ -8,14 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-
-import {
-    AppDto,
-    AppsState,
-    ResourceOwner,
-    Types,
-    UpdateAppForm
-} from '@app/shared';
+import { AppDto, AppsState, ResourceOwner, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',

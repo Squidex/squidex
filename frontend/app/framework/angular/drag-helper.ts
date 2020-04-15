@@ -8,7 +8,6 @@
 // tslint:disable: prefer-for-of
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-
 import { Types } from './../utils/types';
 
 export function sorted<T>(event: CdkDragDrop<ReadonlyArray<T>>): ReadonlyArray<T> {

@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-
 import { fadeAnimation, slideAnimation } from '@app/framework';
 
 @Component({

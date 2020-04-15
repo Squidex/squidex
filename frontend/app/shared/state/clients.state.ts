@@ -6,25 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareSubscribed, State, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareSubscribed,
-    State,
-    Version
-} from '@app/framework';
-
+import { ClientDto, ClientsPayload, ClientsService, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 import { AppsState } from './apps.state';
-
-import {
-    ClientDto,
-    ClientsPayload,
-    ClientsService,
-    CreateClientDto,
-    UpdateClientDto
-} from './../services/clients.service';
 
 interface Snapshot {
     // The current clients.

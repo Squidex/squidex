@@ -91,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public Instant? LastExecuted { get; set; }
 
-        public static RuleDto FromRule(IEnrichedRuleEntity rule, ApiController controller, string app)
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, Guid? runningRuleId, ApiController controller, string app)
         {
             var result = new RuleDto();
 
@@ -103,10 +103,10 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
             }
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(controller, runningRuleId, app);
         }
 
-        private RuleDto CreateLinks(ApiController controller, string app)
+        private RuleDto CreateLinks(ApiController controller, Guid? runningRuleId, string app)
         {
             var values = new { app, id = Id };
 
@@ -127,9 +127,14 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
-            if (controller.HasPermission(Permissions.AppRulesRead))
+            if (controller.HasPermission(Permissions.AppRulesEvents))
             {
                 AddPutLink("trigger", controller.Url<RulesController>(x => nameof(x.TriggerRule), values));
+
+                if (runningRuleId == null)
+                {
+                    AddPutLink("run", controller.Url<RulesController>(x => nameof(x.PutRuleRun), values));
+                }
             }
 
             if (controller.HasPermission(Permissions.AppRulesDelete))

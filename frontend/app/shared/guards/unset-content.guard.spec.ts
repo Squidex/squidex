@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ContentsState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import { ContentsState } from '@app/shared/internal';
 import { UnsetContentGuard } from './unset-content.guard';
 
 describe('UnsetContentGuard', () => {

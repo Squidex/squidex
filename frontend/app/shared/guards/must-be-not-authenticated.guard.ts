@@ -7,11 +7,9 @@
 
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { UIOptions } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
-
-import { UIOptions } from '@app/framework';
-
 import { AuthService } from './../services/auth.service';
 
 @Injectable()

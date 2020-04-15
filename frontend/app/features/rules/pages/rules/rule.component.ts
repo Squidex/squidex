@@ -8,18 +8,15 @@
 // tslint:disable: component-selector
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    ActionsDto,
-    RuleDto,
-    RulesState,
-    TriggersDto
-} from '@app/shared';
+import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
+    animations: [
+        fadeAnimation
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RuleComponent {
@@ -38,6 +35,8 @@ export class RuleComponent {
     @Input()
     public rule: RuleDto;
 
+    public dropdown = new ModalModel();
+
     public get isManual() {
         return this.rule.triggerType === 'Manual';
     }
@@ -49,6 +48,10 @@ export class RuleComponent {
 
     public delete() {
         this.rulesState.delete(this.rule);
+    }
+
+    public run() {
+        this.rulesState.run(this.rule);
     }
 
     public rename(name: string) {

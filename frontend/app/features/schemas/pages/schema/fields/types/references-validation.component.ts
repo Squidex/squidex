@@ -7,12 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-
-import {
-    FieldDto,
-    ReferencesFieldPropertiesDto,
-    SchemaTagSource
-} from '@app/shared';
+import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',

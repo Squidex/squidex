@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { AppLanguageDto, RootFieldDto } from '@app/shared';
 
 @Component({

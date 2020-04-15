@@ -7,12 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    AddLanguageForm,
-    LanguageDto,
-    LanguagesState
-} from '@app/shared';
+import { AddLanguageForm, LanguageDto, LanguagesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-language-add-form',

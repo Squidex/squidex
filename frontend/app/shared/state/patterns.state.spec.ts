@@ -5,20 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DialogService, PatternsPayload, PatternsService, PatternsState, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    DialogService,
-    PatternsPayload,
-    PatternsService,
-    PatternsState,
-    versioned
-} from '@app/shared/internal';
-
 import { createPatterns } from './../services/patterns.service.spec';
-
 import { TestValues } from './_test-helpers';
 
 describe('PatternsState', () => {

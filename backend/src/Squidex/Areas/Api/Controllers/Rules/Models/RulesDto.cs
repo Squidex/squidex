@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,17 +23,24 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [Required]
         public RuleDto[] Items { get; set; }
 
-        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, ApiController controller, string app)
+        /// <summary>
+        /// The id of the rule that is currently rerunning.
+        /// </summary>
+        public Guid? RunningRuleId { get; set; }
+
+        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, Guid? runningRuleId, ApiController controller, string app)
         {
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromRule(x, controller, app)).ToArray()
+                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, controller, app)).ToArray()
             };
 
-            return result.CreateLinks(controller, app);
+            result.RunningRuleId = runningRuleId;
+
+            return result.CreateLinks(controller, runningRuleId, app);
         }
 
-        private RulesDto CreateLinks(ApiController controller, string app)
+        private RulesDto CreateLinks(ApiController controller, Guid? runningRuleId, string app)
         {
             var values = new { app };
 
@@ -46,6 +54,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             if (controller.HasPermission(Permissions.AppRulesEvents, app))
             {
                 AddGetLink("events", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
+
+                if (runningRuleId != null)
+                {
+                    AddDeleteLink("run/cancel", controller.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
+                }
             }
 
             return this;
