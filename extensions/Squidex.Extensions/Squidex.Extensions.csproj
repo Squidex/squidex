@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
+    <PackageReference Include="Datadog.Trace" Version="1.14.2" />
     <PackageReference Include="Elasticsearch.Net" Version="6.7.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.5.4" />
