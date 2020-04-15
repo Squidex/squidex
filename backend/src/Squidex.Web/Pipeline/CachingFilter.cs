@@ -33,10 +33,40 @@ namespace Squidex.Web.Pipeline
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var httpContext = context.HttpContext;
+            cachingManager.Start(context.HttpContext);
 
-            cachingManager.Start(httpContext);
+            AppendAuthHeaders(context.HttpContext);
 
+            var resultContext = await next();
+
+            if (resultContext.HttpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
+            {
+                if (!cachingOptions.StrongETag && IsWeakEtag(etag))
+                {
+                    etag = ToWeakEtag(etag);
+
+                    resultContext.HttpContext.Response.Headers[HeaderNames.ETag] = etag;
+                }
+
+                if (IsCacheable(resultContext.HttpContext, etag))
+                {
+                    resultContext.Result = new StatusCodeResult(304);
+                }
+            }
+
+            cachingManager.Finish(resultContext.HttpContext);
+        }
+
+        private static bool IsCacheable(HttpContext httpContext, string etag)
+        {
+            return HttpMethods.IsGet(httpContext.Request.Method) &&
+                httpContext.Response.StatusCode == 200 &&
+                httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatch) &&
+                string.Equals(etag, noneMatch, StringComparison.Ordinal);
+        }
+
+        private void AppendAuthHeaders(HttpContext httpContext)
+        {
             cachingManager.AddHeader("Auth-State");
 
             if (!string.IsNullOrWhiteSpace(httpContext.User.OpenIdSubject()))
@@ -47,28 +77,16 @@ namespace Squidex.Web.Pipeline
             {
                 cachingManager.AddHeader("Auth-ClientId");
             }
+        }
 
-            var resultContext = await next();
+        private static string ToWeakEtag(string? etag)
+        {
+            return $"W/{etag}";
+        }
 
-            if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
-            {
-                if (!cachingOptions.StrongETag && !etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
-                {
-                    etag = $"W/{etag}";
-
-                    httpContext.Response.Headers[HeaderNames.ETag] = etag;
-                }
-
-                if (HttpMethods.IsGet(httpContext.Request.Method) &&
-                    httpContext.Response.StatusCode == 200 &&
-                    httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatch) &&
-                    string.Equals(etag, noneMatch, StringComparison.Ordinal))
-                {
-                    resultContext.Result = new StatusCodeResult(304);
-                }
-            }
-
-            cachingManager.Finish(httpContext);
+        private static bool IsWeakEtag(string etag)
+        {
+            return !etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

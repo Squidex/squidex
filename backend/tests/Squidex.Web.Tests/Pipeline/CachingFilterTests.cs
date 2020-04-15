@@ -267,6 +267,25 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_not_append_surrogate_keys_if_maximum_is_overriden()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            httpContext.Request.Headers[CachingManager.SurrogateKeySizeHeader] = "20";
+
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddDependency(id2, 12);
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal(StringValues.Empty, httpContext.Response.Headers["Surrogate-Key"]);
+        }
+
+        [Fact]
         public async Task Should_generate_etag_from_ids_and_versions()
         {
             var id1 = Guid.NewGuid();
