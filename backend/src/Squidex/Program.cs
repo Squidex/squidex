@@ -70,7 +70,7 @@ namespace Squidex
                             serverOptions.Listen(
                                 IPAddress.Any,
                                 context.Configuration.GetValue<int>("devMode:port"),
-                                listenOptions => listenOptions.UseHttps("squidex-dev.pfx", "password"));
+                                listenOptions => listenOptions.UseHttps("../../../local_certs/squidex-dev.pfx", "password"));
                         }
                     });
                     builder.UseStartup<Startup>();
