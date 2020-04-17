@@ -65,7 +65,7 @@ namespace Squidex
                 {
                     builder.ConfigureKestrel((context, serverOptions) =>
                     {
-                        if (context.HostingEnvironment.IsDevelopment())
+                        if (context.HostingEnvironment.IsDevelopment() || context.Configuration.GetValue<bool>("devMode:enable"))
                         {
                             serverOptions.Listen(
                                 IPAddress.Any,
