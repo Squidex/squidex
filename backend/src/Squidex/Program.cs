@@ -69,10 +69,11 @@ namespace Squidex
                         {
                             serverOptions.Listen(
                                 IPAddress.Any,
-                                context.Configuration.GetValue<int>("devMode:port"),
-                                listenOptions => listenOptions.UseHttps("../../../local_certs/squidex-dev.pfx", "password"));
+                                5001,
+                                listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
                         }
                     });
+
                     builder.UseStartup<Startup>();
                 });
     }

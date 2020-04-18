@@ -112,6 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="language">The language to delete from the app.</param>
         /// <returns>
         /// 200 => Language deleted.
+        /// 400 => Language is master language.
         /// 404 => Language or app not found.
         /// </returns>
         [HttpDelete]
