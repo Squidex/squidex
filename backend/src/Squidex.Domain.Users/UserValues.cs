@@ -97,9 +97,14 @@ namespace Squidex.Domain.Users
 
             if (CustomClaims != null)
             {
-                foreach (var claim in CustomClaims)
+                foreach (var group in CustomClaims.GroupBy(x => x.Type))
                 {
-                    SyncString(claim.Type, claim.Value);
+                    RemoveClaims(x => x.Type == group.Key);
+
+                    foreach (var claim in group)
+                    {
+                        AddClaim(claim.Type, claim.Value);
+                    }
                 }
             }
 
