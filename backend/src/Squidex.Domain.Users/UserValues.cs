@@ -95,19 +95,6 @@ namespace Squidex.Domain.Users
             SyncBoolean(SquidexClaimTypes.Consent, Consent);
             SyncBoolean(SquidexClaimTypes.ConsentForEmails, ConsentForEmails);
 
-            if (CustomClaims != null)
-            {
-                foreach (var group in CustomClaims.GroupBy(x => x.Type))
-                {
-                    RemoveClaims(x => x.Type == group.Key);
-
-                    foreach (var claim in group)
-                    {
-                        AddClaim(claim.Type, claim.Value);
-                    }
-                }
-            }
-
             if (Permissions != null)
             {
                 RemoveClaims(x => x.Type == SquidexClaimTypes.Permissions);
@@ -125,6 +112,19 @@ namespace Squidex.Domain.Users
                 foreach (var (name, value) in Properties)
                 {
                     AddClaim($"{SquidexClaimTypes.CustomPrefix}:{name}", value);
+                }
+            }
+
+            if (CustomClaims != null)
+            {
+                foreach (var group in CustomClaims.GroupBy(x => x.Type))
+                {
+                    RemoveClaims(x => x.Type == group.Key);
+
+                    foreach (var claim in group)
+                    {
+                        AddClaim(claim.Type, claim.Value);
+                    }
                 }
             }
 
