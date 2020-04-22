@@ -148,8 +148,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             ServeAll = false,
                             ServePublished = true
                         });
-
-                    state.DocIdForPublished = state.DocIdCurrent;
                 }
                 else
                 {
@@ -164,8 +162,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             ServePublished = isPublished,
                             Texts = data.ToTexts()
                         });
-
-                    state.DocIdForPublished = state.DocIdNew;
                 }
 
                 await textIndexerState.SetAsync(state);
