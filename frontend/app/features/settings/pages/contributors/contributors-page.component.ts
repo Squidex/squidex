@@ -6,13 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ContributorDto,
-    ContributorsState,
-    DialogModel,
-    RolesState
-} from '@app/shared';
+import { ContributorDto, ContributorsState, DialogModel, RolesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-contributors-page',

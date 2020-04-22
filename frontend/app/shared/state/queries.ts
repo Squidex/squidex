@@ -5,17 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { compareStrings } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-
-import { compareStrings } from '@app/framework';
-
-import {
-    decodeQuery,
-    equalsQuery,
-    Query
-} from './query';
-
+import { decodeQuery, equalsQuery, Query } from './query';
 import { UIState } from './ui.state';
 
 export interface SavedQuery {

@@ -7,19 +7,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
-import {
-    fadeAnimation,
-    MessageBus,
-    ModalModel,
-    ResourceOwner,
-    SchemaDetailsDto,
-    SchemasState
-} from '@app/shared';
-
-import {
-    SchemaCloning
-} from './../messages';
+import { fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { SchemaCloning } from './../messages';
 
 @Component({
     selector: 'sqx-schema-page',

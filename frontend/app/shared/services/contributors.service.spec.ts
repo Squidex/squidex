@@ -7,18 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    ContributorDto,
-    ContributorsDto,
-    ContributorsPayload,
-    ContributorsService,
-    Resource,
-    ResourceLinks,
-    Version
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, ContributorsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('ContributorsService', () => {
     const version = new Version('1');

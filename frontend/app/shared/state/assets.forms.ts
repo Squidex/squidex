@@ -6,21 +6,9 @@
  */
 
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import { Form, Mutable, Types } from '@app/framework';
 import slugify from 'slugify';
-
-import {
-    Form,
-    Mutable,
-    Types
-} from '@app/framework';
-
-import {
-    AnnotateAssetDto,
-    AssetDto,
-    AssetFolderDto,
-    RenameAssetFolderDto
-} from './../services/assets.service';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto } from './../services/assets.service';
 
 export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {

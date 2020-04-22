@@ -6,7 +6,6 @@
  */
 
 import { FormBuilder } from '@angular/forms';
-
 import { AnnotateAssetForm } from './assets.forms';
 
 describe('AnnotateAssetForm', () => {

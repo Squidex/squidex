@@ -6,23 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
+import { defined, DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-
-import {
-    defined,
-    DialogService,
-    shareSubscribed,
-    State,
-    Types
-} from '@app/framework';
-
-import {
-    AppDto,
-    AppsService,
-    CreateAppDto,
-    UpdateAppDto
-} from './../services/apps.service';
+import { AppDto, AppsService, CreateAppDto, UpdateAppDto } from './../services/apps.service';
 
 interface Snapshot {
     // All apps, loaded once.

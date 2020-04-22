@@ -7,22 +7,9 @@
 
 import { Component, DoCheck, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { AppLanguageDto, AppsState, EditContentForm, fieldInvariant, invalid$, LocalStoreService, RootFieldDto, SchemaDto, TranslationsService, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { combineLatest } from 'rxjs/operators';
-
-import {
-    AppLanguageDto,
-    AppsState,
-    EditContentForm,
-    fieldInvariant,
-    invalid$,
-    LocalStoreService,
-    RootFieldDto,
-    SchemaDto,
-    TranslationsService,
-    Types,
-    value$
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field',

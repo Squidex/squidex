@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-
 import { picasso } from '@app/framework/internal';
 
 @Component({

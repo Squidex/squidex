@@ -5,18 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CommentDto, CommentsDto, CommentsService, CommentsState, DialogService, Version } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-
-import {
-    CommentDto,
-    CommentsDto,
-    CommentsService,
-    CommentsState,
-    DialogService,
-    Version
-} from '@app/shared/internal';
-
 import { TestValues } from './_test-helpers';
 
 describe('CommentsState', () => {

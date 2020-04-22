@@ -6,7 +6,6 @@
  */
 
 import { Injectable } from '@angular/core';
-
 import { Types } from './../utils/types';
 
 export const LocalStoreServiceFactory = () => {

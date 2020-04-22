@@ -6,7 +6,6 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-
 import { value$ } from './forms-helper';
 
 describe('FormHelpers', () => {

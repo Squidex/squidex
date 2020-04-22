@@ -5,16 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AuthService, Profile, UserDto, UsersProviderService, UsersService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-
-import {
-    AuthService,
-    Profile,
-    UserDto,
-    UsersProviderService,
-    UsersService
-} from '@app/shared/internal';
 
 describe('UsersProviderService', () => {
     let authService: IMock<AuthService>;

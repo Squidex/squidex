@@ -6,10 +6,8 @@
  */
 
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-
-import { ValidatorsEx } from './validators';
-
 import { formatError } from './error-formatting';
+import { ValidatorsEx } from './validators';
 
 describe('formatErrors', () => {
     it('should format min', () => {

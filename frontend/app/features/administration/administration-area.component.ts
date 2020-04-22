@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-
 import { UIState } from '@app/shared';
 
 @Component({

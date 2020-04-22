@@ -5,25 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AssetFoldersDto, AssetPathItem, AssetsDto, AssetsService, AssetsState, DialogService, LocalStoreService, MathHelper, Pager, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import {
-    AssetFoldersDto,
-    AssetPathItem,
-    AssetsDto,
-    AssetsService,
-    AssetsState,
-    DialogService,
-    LocalStoreService,
-    MathHelper,
-    Pager,
-    versioned
-} from '@app/shared/internal';
-
 import { createAsset, createAssetFolder } from './../services/assets.service.spec';
-
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {

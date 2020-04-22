@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:only-arrow-functions
+// tslint:disable: only-arrow-functions
 
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
 import { UIOptions } from './../configurations';
 import { Types } from './../utils/types';
 import { ResourceLoaderService } from './resource-loader.service';

@@ -6,20 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, UIOptions, UIState } from '@app/shared';
 import { take } from 'rxjs/operators';
-
-import {
-    AppDto,
-    AppsState,
-    AuthService,
-    DialogModel,
-    FeatureDto,
-    LocalStoreService,
-    NewsService,
-    OnboardingService,
-    UIOptions,
-    UIState
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-page',

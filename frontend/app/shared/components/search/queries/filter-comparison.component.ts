@@ -6,14 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-
-import {
-    FilterComparison,
-    LanguageDto,
-    QueryFieldModel,
-    QueryModel,
-    StatusInfo
-} from '@app/shared/internal';
+import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel, StatusInfo } from '@app/shared/internal';
 
  @Component({
     selector: 'sqx-filter-comparison',

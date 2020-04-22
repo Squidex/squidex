@@ -6,12 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    LanguageDto,
-    Query,
-    QueryModel
-} from '@app/shared/internal';
+import { LanguageDto, Query, QueryModel } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query',

@@ -6,10 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-
-import { LocalStoreService } from './local-store.service';
-
 import { UIOptions } from './../configurations';
+import { LocalStoreService } from './local-store.service';
 
 export const OnboardingServiceFactory = (uiOptions: UIOptions, localStore: LocalStoreService) => {
     return new OnboardingService(uiOptions, localStore);

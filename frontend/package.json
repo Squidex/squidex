@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": "https://github.com/SebastianStehle/Squidex",
   "scripts": {
-    "start": "webpack-dev-server --config app-config/webpack.config.js --inline --port 3000 --hot",
+    "start": "webpack-dev-server --config app-config/webpack.config.js --inline --port 3000 --hot --https --pfx ../dev/squidex-dev.pfx --pfx-passphrase password",
     "test": "karma start",
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",

@@ -5,45 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: max-line-length
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import {
-    HelpComponent,
-    HistoryComponent,
-    SqxFrameworkModule,
-    SqxSharedModule
-} from '@app/shared';
-
-import {
-    BackupComponent,
-    BackupsPageComponent,
-    ClientAddFormComponent,
-    ClientComponent,
-    ClientConnectFormComponent,
-    ClientsPageComponent,
-    ContributorAddFormComponent,
-    ContributorComponent,
-    ContributorsPageComponent,
-    ImportContributorsDialogComponent,
-    LanguageAddFormComponent,
-    LanguageComponent,
-    LanguagesPageComponent,
-    MorePageComponent,
-    PatternComponent,
-    PatternsPageComponent,
-    PlanComponent,
-    PlansPageComponent,
-    RoleAddFormComponent,
-    RoleComponent,
-    RolesPageComponent,
-    SettingsAreaComponent,
-    WorkflowAddFormComponent,
-    WorkflowComponent,
-    WorkflowsPageComponent,
-    WorkflowStepComponent,
-    WorkflowTransitionComponent
-} from './declarations';
+import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PatternComponent, PatternsPageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
 
 const routes: Routes = [
     {

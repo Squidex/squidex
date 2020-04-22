@@ -6,7 +6,6 @@
  */
 
 import { of } from 'rxjs';
-
 import { CanDeactivateGuard } from './can-deactivate.guard';
 
 describe('CanDeactivateGuard', () => {

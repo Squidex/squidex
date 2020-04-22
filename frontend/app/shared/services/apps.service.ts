@@ -7,24 +7,9 @@
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    DateTime,
-    ErrorDto,
-    getLinkUrl,
-    hasAnyLink,
-    HTTP,
-    pretifyError,
-    Resource,
-    ResourceLinks,
-    StringHelper,
-    Types,
-    Version
-} from '@app/framework';
 
 export class AppDto {
     public readonly _links: ResourceLinks;

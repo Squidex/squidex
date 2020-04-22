@@ -7,14 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiUrlConfig, pretifyError, ResourceLinks } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import {
-    ApiUrlConfig,
-    pretifyError,
-    ResourceLinks
-} from '@app/framework';
 
 export class UserDto {
     constructor(

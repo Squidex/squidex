@@ -11,6 +11,6 @@ namespace Squidex.Web.Pipeline
     {
         public bool StrongETag { get; set; }
 
-        public int MaxSurrogateKeysSize { get; set; } = 17000;
+        public int MaxSurrogateKeysSize { get; set; } = 8000;
     }
 }

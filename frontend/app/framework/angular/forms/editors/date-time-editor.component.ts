@@ -7,19 +7,11 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-
-import {
-    DateHelper,
-    DateTime,
-    StatefulControlComponent,
-    UIOptions
-} from '@app/framework/internal';
-
+import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
+import * as Pikaday from 'pikaday/pikaday';
 import { FocusComponent } from './../forms-helper';
 
 declare module 'pikaday/pikaday';
-
-import * as Pikaday from 'pikaday/pikaday';
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true

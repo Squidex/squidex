@@ -6,14 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ResourceOwner,
-    RolesState,
-    SchemaTagSource,
-    WorkflowDto,
-    WorkflowsState
-} from '@app/shared';
+import { ResourceOwner, RolesState, SchemaTagSource, WorkflowDto, WorkflowsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflows-page',

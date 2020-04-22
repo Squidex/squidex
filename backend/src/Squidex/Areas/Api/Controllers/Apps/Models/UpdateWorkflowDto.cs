@@ -35,6 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The initial step.
         /// </summary>
+        [Required]
         public Status Initial { get; set; }
 
         public UpdateWorkflow ToCommand(Guid id)

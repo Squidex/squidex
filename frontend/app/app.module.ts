@@ -12,22 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-
 import { AppComponent } from './app.component';
-
-import {
-    ApiUrlConfig,
-    CurrencyConfig,
-    DecimalSeparatorConfig,
-    SqxFrameworkModule,
-    SqxSharedModule,
-    TitlesConfig,
-    UIOptions
-} from './shared';
-
-import { SqxShellModule } from './shell';
-
 import { routing } from './app.routes';
+import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { SqxShellModule } from './shell';
 
 export function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');

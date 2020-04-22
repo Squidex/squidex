@@ -6,15 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareSubscribed, State } from '@app/shared';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareSubscribed,
-    State
-} from '@app/shared';
-
 import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
 
 interface Snapshot {

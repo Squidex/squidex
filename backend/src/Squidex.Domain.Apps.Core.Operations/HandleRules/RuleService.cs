@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<List<RuleJob>> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
+        public virtual async Task<List<RuleJob>> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
         {
             Guard.NotNull(rule);
             Guard.NotNull(@event);
@@ -107,12 +107,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                var expires = eventTime.Plus(Constants.ExpirationTime);
-
-                if (eventTime.Plus(Constants.StaleTime) < now)
+                if (!ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
                     return result;
                 }
+
+                var expires = eventTime.Plus(Constants.ExpirationTime);
 
                 if (!triggerHandler.Trigger(typed.Payload, rule.Trigger, ruleId))
                 {
@@ -141,12 +141,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         var job = new RuleJob
                         {
+                            Id = Guid.NewGuid(),
                             ActionData = json,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,
                             Created = now,
                             Description = actionData.Description,
-                            EventId = @event.Headers.EventId(),
                             EventName = enrichedEvent.Name,
                             ExecutionPartition = enrichedEvent.Partition,
                             Expires = expires,

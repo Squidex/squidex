@@ -7,24 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    AssetDto,
-    AssetFolderDto,
-    AssetFoldersDto,
-    AssetsDto,
-    AssetsService,
-    DateTime,
-    encodeQuery,
-    ErrorDto,
-    MathHelper,
-    Resource,
-    ResourceLinks,
-    sanitize,
-    Version
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, encodeQuery, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
 
 describe('AssetsService', () => {
     const version = new Version('1');

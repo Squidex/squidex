@@ -6,14 +6,8 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import { Form, ValidatorsEx } from '@app/framework';
-
-import {
-    AppDto,
-    CreateAppDto,
-    UpdateAppDto
-} from './../services/apps.service';
+import { AppDto, CreateAppDto, UpdateAppDto } from './../services/apps.service';
 
 export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
     constructor(formBuilder: FormBuilder) {

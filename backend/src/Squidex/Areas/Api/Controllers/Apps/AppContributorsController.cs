@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Remove contributor from app.
+        /// Remove contributor.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the contributor.</param>

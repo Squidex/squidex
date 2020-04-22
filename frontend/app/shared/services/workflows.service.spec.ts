@@ -7,17 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    AnalyticsService,
-    ApiUrlConfig,
-    Resource,
-    Version,
-    WorkflowDto,
-    WorkflowsDto,
-    WorkflowsPayload,
-    WorkflowsService
-} from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, Resource, Version, WorkflowDto, WorkflowsDto, WorkflowsPayload, WorkflowsService } from '@app/shared/internal';
 
 describe('WorkflowsService', () => {
     const version = new Version('1');

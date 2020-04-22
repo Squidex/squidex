@@ -5,17 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DateTime, DialogService, shareSubscribed, State, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
-import {
-    DateTime,
-    DialogService,
-    shareSubscribed,
-    State,
-    Version
-} from '@app/framework';
-
 import { CommentDto, CommentsService } from './../services/comments.service';
 
 interface Snapshot {

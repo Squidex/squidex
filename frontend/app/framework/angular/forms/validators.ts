@@ -6,7 +6,6 @@
  */
 
 import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
-
 import { DateTime, Types } from '@app/framework/internal';
 
 function isEmptyInputValue(value: any): boolean {

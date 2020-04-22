@@ -6,15 +6,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { ApiUrlConfig, BackupDto, BackupsState, ResourceOwner } from '@app/shared';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-
-import {
-    ApiUrlConfig,
-    BackupDto,
-    BackupsState,
-    ResourceOwner
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-backups-page',

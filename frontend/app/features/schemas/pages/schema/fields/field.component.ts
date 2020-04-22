@@ -8,20 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    createProperties,
-    DialogModel,
-    EditFieldForm,
-    fadeAnimation,
-    ModalModel,
-    NestedFieldDto,
-    PatternDto,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SchemasState,
-    sorted
-} from '@app/shared';
+import { createProperties, DialogModel, EditFieldForm, fadeAnimation, ModalModel, NestedFieldDto, PatternDto, RootFieldDto, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-field',

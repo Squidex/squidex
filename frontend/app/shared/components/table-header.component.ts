@@ -6,13 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-
-import {
-    LanguageDto,
-    Query,
-    SortMode,
-    Types
-} from '@app/shared/internal';
+import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-table-header',

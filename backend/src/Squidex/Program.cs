@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Squidex.Areas.IdentityServer.Config;
@@ -61,6 +63,17 @@ namespace Squidex
                 })
                 .ConfigureWebHostDefaults(builder =>
                 {
+                    builder.ConfigureKestrel((context, serverOptions) =>
+                    {
+                        if (context.HostingEnvironment.IsDevelopment() || context.Configuration.GetValue<bool>("devMode:enable"))
+                        {
+                            serverOptions.Listen(
+                                IPAddress.Any,
+                                5001,
+                                listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
+                        }
+                    });
+
                     builder.UseStartup<Startup>();
                 });
     }

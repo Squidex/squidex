@@ -6,11 +6,9 @@
  */
 
 import { Router } from '@angular/router';
+import { AuthService, UIOptions } from '@app/shared';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-
-import { AuthService, UIOptions } from '@app/shared';
-
 import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 
 describe('MustBeAuthenticatedGuard', () => {

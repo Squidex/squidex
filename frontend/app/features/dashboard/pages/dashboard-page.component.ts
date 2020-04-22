@@ -6,19 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { AppsState, AuthService, DateTime, fadeAnimation, HistoryEventDto, HistoryService, LocalStoreService, ResourceOwner, UsagesService } from '@app/shared';
 import { switchMap } from 'rxjs/operators';
-
-import {
-    AppsState,
-    AuthService,
-    DateTime,
-    fadeAnimation,
-    HistoryEventDto,
-    HistoryService,
-    LocalStoreService,
-    ResourceOwner,
-    UsagesService
-} from '@app/shared';
 
 const COLORS: ReadonlyArray<string> = [
     ' 51, 137, 213',

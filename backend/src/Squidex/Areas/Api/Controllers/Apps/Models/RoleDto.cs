@@ -76,12 +76,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (!IsDefaultRole)
             {
-                if (controller.HasPermission(AllPermissions.AppRolesUpdate, app) && NumClients == 0 && NumContributors == 0)
+                if (controller.HasPermission(AllPermissions.AppRolesUpdate, app))
                 {
                     AddPutLink("update", controller.Url<AppRolesController>(x => nameof(x.PutRole), values));
                 }
 
-                if (controller.HasPermission(AllPermissions.AppRolesDelete, app))
+                if (controller.HasPermission(AllPermissions.AppRolesDelete, app) && NumClients == 0 && NumContributors == 0)
                 {
                     AddDeleteLink("delete", controller.Url<AppRolesController>(x => nameof(x.DeleteRole), values));
                 }

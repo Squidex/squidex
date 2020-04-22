@@ -8,14 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-
-import {
-    AppLanguageDto,
-    EditContentForm,
-    RootFieldDto,
-    sorted
-} from '@app/shared';
-
+import { AppLanguageDto, EditContentForm, RootFieldDto, sorted } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({

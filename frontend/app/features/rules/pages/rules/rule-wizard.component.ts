@@ -7,15 +7,7 @@
 
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-
-import {
-    Form,
-    RuleDto,
-    RuleElementDto,
-    RulesState,
-    SchemaDto,
-    TriggerType
-} from '@app/shared';
+import { Form, RuleDto, RuleElementDto, RulesState, SchemaDto, TriggerType } from '@app/shared';
 
 const MODE_WIZARD = 'Wizard';
 const MODE_EDIT_TRIGGER = 'EditTrigger';

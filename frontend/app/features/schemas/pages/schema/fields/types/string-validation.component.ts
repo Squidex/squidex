@@ -7,21 +7,8 @@
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
-
-import {
-    fadeAnimation,
-    FieldDto,
-    hasNoValue$,
-    hasValue$,
-    ModalModel,
-    PatternDto,
-    ResourceOwner,
-    RootFieldDto,
-    StringFieldPropertiesDto,
-    Types,
-    value$
-} from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',

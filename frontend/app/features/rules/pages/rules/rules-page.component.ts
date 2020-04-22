@@ -6,16 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ALL_TRIGGERS,
-    DialogModel,
-    RuleDto,
-    RuleElementDto,
-    RulesService,
-    RulesState,
-    SchemasState
-} from '@app/shared';
+import { ALL_TRIGGERS, DialogModel, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rules-page',
@@ -51,6 +42,10 @@ export class RulesPageComponent implements OnInit {
 
     public reload() {
         this.rulesState.load(true);
+    }
+
+    public cancelRun() {
+        this.rulesState.runCancel();
     }
 
     public delete(rule: RuleDto) {

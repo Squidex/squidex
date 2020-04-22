@@ -6,28 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, ErrorDto, LocalStoreService, Pager, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    ErrorDto,
-    LocalStoreService,
-    Pager,
-    shareMapSubscribed,
-    shareSubscribed,
-    State,
-    Types,
-    Version
-} from '@app/framework';
-
-import {
-    AssignContributorDto,
-    ContributorDto,
-    ContributorsPayload,
-    ContributorsService
-} from './../services/contributors.service';
-
+import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -18,7 +17,6 @@ namespace Squidex.Extensions.Actions.Webhook
 {
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, WebhookJob>
     {
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(2);
         private readonly IHttpClientFactory httpClientFactory;
 
         public WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
@@ -59,8 +57,6 @@ namespace Squidex.Extensions.Actions.Webhook
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                httpClient.Timeout = DefaultTimeout;
-
                 var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
                 {
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")

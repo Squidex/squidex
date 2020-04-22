@@ -33,11 +33,11 @@ namespace Squidex.Infrastructure.MongoDb
             return (await database.ListCollectionNamesAsync(options)).Any();
         }
 
-        public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document)
+        public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document, CancellationToken ct = default)
         {
             try
             {
-                await collection.InsertOneAsync(document);
+                await collection.InsertOneAsync(document, null, ct);
             }
             catch (MongoWriteException ex)
             {

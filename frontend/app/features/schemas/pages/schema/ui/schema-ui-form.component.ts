@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-
 import { SchemaDetailsDto, SchemasState } from '@app/shared';
 
 type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };

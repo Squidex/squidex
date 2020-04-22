@@ -6,19 +6,7 @@
  */
 
 import { DateTime, Duration } from '@app/framework/internal';
-
-import {
-    DatePipe,
-    DayOfWeekPipe,
-    DayPipe,
-    DurationPipe,
-    FromNowPipe,
-    FullDateTimePipe,
-    ISODatePipe,
-    MonthPipe,
-    ShortDatePipe,
-    ShortTimePipe
-} from './date-time.pipes';
+import { DatePipe, DayOfWeekPipe, DayPipe, DurationPipe, FromNowPipe, FullDateTimePipe, ISODatePipe, MonthPipe, ShortDatePipe, ShortTimePipe } from './date-time.pipes';
 
 const dateTime = DateTime.parseISO('2013-10-03T12:13:14.125', false);
 

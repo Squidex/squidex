@@ -7,14 +7,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-
-import {
-    ApiUrlConfig,
-    AppsState,
-    CreateSchemaForm,
-    SchemaDto,
-    SchemasState
-} from '@app/shared';
+import { ApiUrlConfig, AppsState, CreateSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',

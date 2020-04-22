@@ -8,16 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-
-import {
-    AssetsState,
-    DialogModel,
-    LocalStoreService,
-    Queries,
-    Query,
-    ResourceOwner,
-    UIState
-} from '@app/shared';
+import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-page',

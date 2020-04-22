@@ -6,22 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DialogService, shareSubscribed, State } from '@app/framework';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-
-import {
-    DialogService,
-    shareSubscribed,
-    State
-} from '@app/framework';
-
+import { RuleDto, RulesService, UpsertRuleDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
-
-import {
-    RuleDto,
-    RulesService,
-    UpsertRuleDto
-} from './../services/rules.service';
 
 interface Snapshot {
     // The current rules.
@@ -32,6 +21,12 @@ interface Snapshot {
 
     // Indicates if the rules are loading.
     isLoading?: boolean;
+
+    // The id of the rule that is currently running.
+    runningRuleId?: string;
+
+    // Indicates if a rule run can be cancelled.
+    canCancelRun?: boolean;
 
     // Indicates if the user can create rules.
     canCreate?: boolean;
@@ -56,8 +51,17 @@ export class RulesState extends State<Snapshot> {
     public canCreate =
         this.project(x => x.canCreate === true);
 
+    public canCancelRun =
+        this.project(x => x.canCancelRun === true);
+
     public canReadEvents =
         this.project(x => x.canReadEvents === true);
+
+    public runningRuleId =
+        this.project(x => x.runningRuleId);
+
+    public runningRule =
+        this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
 
     constructor(
         private readonly appsState: AppsState,
@@ -79,16 +83,18 @@ export class RulesState extends State<Snapshot> {
         this.next({ isLoading: true });
 
         return this.rulesService.getRules(this.appName).pipe(
-            tap(({ items: rules, canCreate, canReadEvents }) => {
+            tap(({ items: rules, runningRuleId, canCancelRun, canCreate, canReadEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
 
                 this.next({
+                    canCancelRun,
                     canCreate,
                     canReadEvents,
                     isLoaded: true,
                     isLoading: false,
+                    runningRuleId,
                     rules
                 });
             }),
@@ -162,10 +168,26 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public run(rule: RuleDto): Observable<any> {
+        return this.rulesService.runRule(this.appName, rule).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Rule will start to run in a few seconds.');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public trigger(rule: RuleDto): Observable<any> {
         return this.rulesService.triggerRule(this.appName, rule).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('Rule has been added to the queue.');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public runCancel(): Observable<any> {
+        return this.rulesService.runCancel(this.appName).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Rule will stop soon.');
             }),
             shareSubscribed(this.dialogs));
     }

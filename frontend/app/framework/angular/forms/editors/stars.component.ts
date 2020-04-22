@@ -7,7 +7,6 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {

@@ -1,4 +1,4 @@
-<span class="control-container">
+<div class="control-container">
     <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)" #input
         [sqxFocusOnInit]="autoFocus"
         [name]="inputName" 
@@ -13,7 +13,6 @@
     <div class="icon" *ngIf="icon">
         <i class="icon-{{icon}}" [class.icon-spinner2]="snapshot.isLoading" [class.spin2]="snapshot.isLoading"></i>
     </div>
-
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0" position="bottom-left">
         <div class="control-dropdown" [sqxAnchoredTo]="input" [style.width]="dropdownWidth" position="bottom-left" #container @fade>
@@ -30,4 +29,4 @@
             </div>
         </div>
     </ng-container>
-</span>
+</div>

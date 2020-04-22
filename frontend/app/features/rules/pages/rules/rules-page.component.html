@@ -23,6 +23,16 @@
 
     <ng-container content>
         <sqx-list-view [isLoading]="rulesState.isLoading | async">
+            <ng-container topHeader>
+                <div class="panel-alert panel-alert-danger" *ngIf="rulesState.runningRule | async; let runningRule">
+                    <div class="float-right">
+                        <a class="force" (click)="cancelRun()">Cancel</a>
+                    </div>
+
+                    Rule '{{runningRule.name || 'Unnamed Rule'}}' is currently running.
+                </div>
+            </ng-container>
+
             <div content>
                 <ng-container *ngIf="ruleActions && ruleTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
                     <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">

@@ -100,6 +100,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
+        public async Task Should_update_draft_only_multiple_times()
+        {
+            await TestCombinations(
+                Create(ids1[0], "iv", "V1"),
+
+                Update(ids1[0], "iv", "V2"),
+                Update(ids1[0], "iv", "V3"),
+
+                Search(expected: null, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published),
+
+                Search(expected: ids1, text: "V3", target: SearchScope.All),
+                Search(expected: null, text: "V3", target: SearchScope.Published)
+            );
+        }
+
+        [Fact]
         public async Task Should_also_serve_published_after_publish()
         {
             await TestCombinations(
@@ -127,6 +144,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 Search(expected: ids1, text: "V2", target: SearchScope.All),
                 Search(expected: ids1, text: "V2", target: SearchScope.Published)
+            );
+        }
+
+        [Fact]
+        public async Task Should_also_update_published_content_multiple_times()
+        {
+            await TestCombinations(
+                Create(ids1[0], "iv", "V1"),
+
+                Publish(ids1[0]),
+
+                Update(ids1[0], "iv", "V2"),
+                Update(ids1[0], "iv", "V3"),
+
+                Search(expected: null, text: "V2", target: SearchScope.All),
+                Search(expected: null, text: "V2", target: SearchScope.Published),
+
+                Search(expected: ids1, text: "V3", target: SearchScope.All),
+                Search(expected: ids1, text: "V3", target: SearchScope.Published)
             );
         }
 

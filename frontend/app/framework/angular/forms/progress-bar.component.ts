@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
-
 import * as ProgressBar from 'progressbar.js';
 
 @Component({

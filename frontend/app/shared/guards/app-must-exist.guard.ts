@@ -9,7 +9,6 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
 import { AppsState } from './../state/apps.state';
 
 @Injectable()

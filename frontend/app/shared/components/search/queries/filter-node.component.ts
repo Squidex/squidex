@@ -6,14 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-import {
-    FilterComparison,
-    FilterLogical,
-    FilterNode,
-    LanguageDto,
-    QueryModel
-} from '@app/shared/internal';
+import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-filter-node',

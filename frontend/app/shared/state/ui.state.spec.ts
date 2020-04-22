@@ -5,17 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ResourceLinks, ResourcesDto, UIService, UIState, UsersService } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-
-import {
-    ResourceLinks,
-    ResourcesDto,
-    UIService,
-    UIState,
-    UsersService
-} from '@app/shared/internal';
-
 import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {

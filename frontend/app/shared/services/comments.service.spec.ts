@@ -7,15 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-
-import {
-    ApiUrlConfig,
-    CommentDto,
-    CommentsDto,
-    CommentsService,
-    DateTime,
-    Version
-} from '@app/shared/internal';
+import { ApiUrlConfig, CommentDto, CommentsDto, CommentsService, DateTime, Version } from '@app/shared/internal';
 
 describe('CommentsService', () => {
     const user = 'me';

@@ -8,15 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { CreateUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
 import { ResourceOwner } from '@app/shared';
-
-import {
-    CreateUserDto,
-    UserDto,
-    UserForm,
-    UsersState
-} from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-user-page',

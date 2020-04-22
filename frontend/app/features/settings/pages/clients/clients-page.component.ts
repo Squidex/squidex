@@ -6,12 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-import {
-    ClientDto,
-    ClientsState,
-    RolesState
-} from '@app/shared';
+import { ClientDto, ClientsState, RolesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-clients-page',

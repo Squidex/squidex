@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
 import { HistoryEventDto } from '@app/shared/internal';
 
 @Component({

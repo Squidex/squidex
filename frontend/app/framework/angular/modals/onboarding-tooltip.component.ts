@@ -6,15 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { DialogModel, fadeAnimation, OnboardingService, StatefulComponent, Types } from '@app/framework/internal';
 import { timer } from 'rxjs';
-
-import {
-    DialogModel,
-    fadeAnimation,
-    OnboardingService,
-    StatefulComponent,
-    Types
-} from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-onboarding-tooltip',

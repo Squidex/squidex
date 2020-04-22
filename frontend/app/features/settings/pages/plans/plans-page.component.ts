@@ -7,12 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
-import {
-    ApiUrlConfig,
-    PlanDto,
-    PlansState
-} from '@app/shared';
+import { ApiUrlConfig, PlanDto, PlansState } from '@app/shared';
 
 @Component({
     selector: 'sqx-plans-page',
