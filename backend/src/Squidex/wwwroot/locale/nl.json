@@ -1,3 +1,6 @@
-﻿{
-  "welcome": "Bedankt voor het joinen, tot ziens"
+{
+	"homepage": {
+		"loginButton": "Log in bij Squidex",
+    "loginInfo": "De login-knop opent een nieuwe pop-up. Zodra u succesvol bent ingelogd, zullen we u doorverwijzen naar de Squidex-beheerportal."
+	}
 }

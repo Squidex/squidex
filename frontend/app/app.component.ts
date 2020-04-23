@@ -25,7 +25,7 @@ export class AppComponent {
             const browserLang = translate.getBrowserLang();
             translate.use(browserLang.match(/en|nl/) ? browserLang  : 'en');
         } else {
-            uiOptions.get('ngxLanuage.language');
+            translate.use(uiOptions.get('ngxTranslate.language'));
         }
       }
 
