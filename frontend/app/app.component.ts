@@ -20,8 +20,13 @@ export class AppComponent {
     constructor(translate: TranslateService, uiOptions: UIOptions) {
         translate.addLangs(['en', 'nl']);
         translate.setDefaultLang('en');
-        const browserLang = translate.getBrowserLang();
-        translate.use(browserLang.match(/en|nl/) ? browserLang : uiOptions.get('ngxLanuage.language'));
+
+        if (uiOptions.get('ngxTranslate.useBrowserLanguage')) {
+            const browserLang = translate.getBrowserLang();
+            translate.use(browserLang.match(/en|nl/) ? browserLang  : 'en');
+        } else {
+            uiOptions.get('ngxLanuage.language');
+        }
       }
 
 }
