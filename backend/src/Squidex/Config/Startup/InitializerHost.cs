@@ -26,7 +26,7 @@ namespace Squidex.Config.Startup
 
         protected override async Task StartAsync(ISemanticLog log, CancellationToken ct)
         {
-            foreach (var target in targets.Distinct())
+            foreach (var target in targets.Distinct().OrderBy(x => x.Order))
             {
                 await target.InitializeAsync(ct);
 
