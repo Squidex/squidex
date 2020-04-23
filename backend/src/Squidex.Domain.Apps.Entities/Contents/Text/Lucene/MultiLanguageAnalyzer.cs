@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         protected override Analyzer GetWrappedAnalyzer(string fieldName)
         {
-            if (fieldName.Length > 0)
+            if (fieldName.Length >= 2)
             {
                 var analyzer = analyzers.GetOrDefault(fieldName.Substring(0, 2)) ?? fallbackAnalyzer;
 
