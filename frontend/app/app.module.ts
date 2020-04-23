@@ -56,7 +56,9 @@ export function configCurrency() {
 }
 
 export function HttpLoaderFactory(http: HttpClient) {
-    return new TranslateHttpLoader(http, './locale/', '.json');
+    let languageFolderOption = window['options']['ngxTranslate']['languageFolder'];
+    let languageFolder =  !(languageFolderOption) ? './locale/' : languageFolderOption;
+    return new TranslateHttpLoader(http, languageFolder, '.json');
 }
 
 @NgModule({

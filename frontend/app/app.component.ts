@@ -6,6 +6,7 @@
  */
 
 import { Component } from '@angular/core';
+import { UIOptions } from '@app/shared';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -16,10 +17,11 @@ import { TranslateService } from '@ngx-translate/core';
 export class AppComponent {
     public isLoaded = false;
 
-    constructor(translate: TranslateService) {
+    constructor(translate: TranslateService, uiOptions: UIOptions) {
         translate.addLangs(['en', 'nl']);
         translate.setDefaultLang('en');
-        translate.use('en');
+        const browserLang = translate.getBrowserLang();
+        translate.use(browserLang.match(/en|nl/) ? browserLang : uiOptions.get('ngxLanuage.language'));
       }
 
 }
