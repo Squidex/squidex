@@ -19,6 +19,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public GoogleOptions Google { get; set; }
 
+        public NgxTranslateOptions NgxTranslate { get; set; }
+
         public int ReferencesDropdownItemCount { get; set; } = 100;
 
         public bool ShowInfo { get; set; }
@@ -35,6 +37,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public bool OnlyAdminsCanCreateApps { get; set; }
 
+        public string Language { get; set; }
+
         public sealed class MapOptions
         {
             public string Type { get; set; }
@@ -50,6 +54,15 @@ namespace Squidex.Areas.Api.Controllers.UI
         public sealed class GoogleOptions
         {
             public string AnalyticsId { get; set; }
+        }
+
+        public sealed class NgxTranslateOptions
+        {
+            public string Language { get; set; }
+
+            public bool UseBrowserLanguage { get; set; }
+
+            public string LanguageFolder { get; set; }
         }
     }
 }
