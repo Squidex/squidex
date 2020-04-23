@@ -29,7 +29,7 @@ export class AnalyticsService {
         private readonly resourceLoader?: ResourceLoaderService
     ) {
         window['dataLayer'] = window['dataLayer'] || [];
-        this.setAnalyticsId();
+
         this.gtag = function () {
             window['dataLayer'].push(arguments);
         };

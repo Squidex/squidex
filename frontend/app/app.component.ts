@@ -6,6 +6,7 @@
  */
 
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'sqx-app',
@@ -14,4 +15,11 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
     public isLoaded = false;
+
+    constructor(translate: TranslateService) {
+        translate.addLangs(['en', 'nl']);
+        translate.setDefaultLang('en');
+        translate.use('en');
+      }
+
 }

@@ -6,12 +6,14 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
@@ -53,6 +55,10 @@ export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
+export function HttpLoaderFactory(http: HttpClient) {
+    return new TranslateHttpLoader(http, './locale/', '.json');
+}
+
 @NgModule({
     imports: [
         BrowserAnimationsModule,
@@ -65,7 +71,15 @@ export function configCurrency() {
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,
-        routing
+        routing,
+        TranslateModule.forRoot({
+            defaultLanguage: 'en',
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        })
     ],
     declarations: [
         AppComponent
