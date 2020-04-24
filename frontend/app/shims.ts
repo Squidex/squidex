@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import '@angular/localize/init';
 import 'core-js/es/date';
 import 'core-js/es/math';
 import 'core-js/es/number';
