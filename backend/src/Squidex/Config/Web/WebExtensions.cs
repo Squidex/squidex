@@ -75,7 +75,7 @@ namespace Squidex.Config.Web
 
             app.UseHealthChecks("/readiness", new HealthCheckOptions
             {
-                Predicate = check => true,
+                Predicate = check => !check.Tags.Contains("background"),
                 ResponseWriter = writer
             });
 
@@ -88,6 +88,12 @@ namespace Squidex.Config.Web
             app.UseHealthChecks("/cluster-healthz", new HealthCheckOptions
             {
                 Predicate = check => check.Tags.Contains("cluster"),
+                ResponseWriter = writer
+            });
+
+            app.UseHealthChecks("/background-healthz", new HealthCheckOptions
+            {
+                Predicate = check => check.Tags.Contains("background"),
                 ResponseWriter = writer
             });
 

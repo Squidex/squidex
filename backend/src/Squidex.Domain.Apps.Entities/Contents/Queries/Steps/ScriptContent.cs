@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ScriptContent(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(scriptEngine);
 
             this.scriptEngine = scriptEngine;
         }

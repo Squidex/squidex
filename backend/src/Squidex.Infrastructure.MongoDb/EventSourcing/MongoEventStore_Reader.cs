@@ -30,7 +30,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return Collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoEventCommit>(
-                    Index.Ascending(CreateIndexPath(property))));
+                    Index
+                        .Ascending(CreateIndexPath(property))
+                        .Ascending(TimestampField)));
         }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)

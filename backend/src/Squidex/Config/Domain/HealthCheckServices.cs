@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
 {
@@ -22,7 +23,8 @@ namespace Squidex.Config.Domain
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
                 .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
-                .AddCheck<OrleansAppsHealthCheck>("Orleans App", tags: new[] { "cluster" });
+                .AddCheck<OrleansAppsHealthCheck>("OrleansApp", tags: new[] { "cluster" })
+                .AddCheck<EventConsumersHealthCheck>("EventConsumers", tags: new[] { "background" });
         }
     }
 }
