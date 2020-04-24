@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Core.Schemas;
+using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
@@ -35,13 +35,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The name of fields that are used in content lists.
         /// </summary>
         [Required]
-        public FieldNames FieldsInLists { get; set; }
+        public List<string> FieldsInLists { get; set; }
 
         /// <summary>
         /// The name of fields that are used in content references.
         /// </summary>
         [Required]
-        public FieldNames FieldsInReferences { get; set; }
+        public List<string> FieldsInReferences { get; set; }
 
         /// <summary>
         /// The list of fields.
@@ -57,6 +57,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef, result);
             SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
+
+            result.FieldsInLists = schema.SchemaDef.FieldsInLists.ToList();
+            result.FieldsInReferences = schema.SchemaDef.FieldsInReferences.ToList();
 
             if (schema.SchemaDef.PreviewUrls.Count > 0)
             {
