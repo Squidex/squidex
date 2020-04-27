@@ -1,5 +1,29 @@
 # Changelog
 
+## 4.3.0 - 2020-04-27
+
+### Features
+
+* **API**: Dedicated health check for event consumers and background processes.
+* **Rules**: Integrated a background worker to start rules from beginning.
+* **Users**: Custom user properties.
+* **Scripting**: Incrementing counters.
+
+### Bugfixes
+
+* **API**: Fix in OpenAPI schema to get rid of FieldNames collection that causes problems in code generators.
+* **API**: Short header for surrogate keys and custom request header to turn off keys.
+* **API**: Better error handling for unsupported ODATA features.
+* **UI**: Fix in autocompletion component which was causing issues in role form.
+* **UI**: Fixed a layout bug in the role form.
+* **UI**: Fixed a layout bug in tag editor.
+* **UI**: Time formatting fixed.
+* **UI**: Fixed a bug that was showing all assets and not in their folders.
+* **API**: Fixed index usage for event store.
+* **FullText**: Fixed a small minor in full text index.
+* **Rules**: Fixed a bug in email rule which was using email body as sender and recipient address.
+* **Rules**: Use default timeout in webhook.
+
 ## 4.2.0 Beta 2 - 2020-02-24
 
 This release just contains a lot of bugfixes.
