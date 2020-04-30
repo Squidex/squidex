@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (bulkUpdates.Jobs?.Count > 0)
                 {
-                    var requestContext = contextProvider.Context.WithoutContentEnrichment();
+                    var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
                     var requestedSchema = bulkUpdates.SchemaId.Name;
 
                     var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Count];
