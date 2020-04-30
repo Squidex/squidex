@@ -326,10 +326,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/import")]
-        [ProducesResponseType(typeof(ImportResultDto[]), 200)]
+        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] ImportContentsDto request)
+        public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
@@ -337,8 +337,41 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<ImportResult>();
-            var response = result.Select(x => ImportResultDto.FromImportResult(x, HttpContext)).ToArray();
+            var result = context.Result<BulkUpdateResult>();
+            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Bulk update content items.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The bulk update request.</param>
+        /// <returns>
+        /// 201 => Contents created.
+        /// 404 => Content references, schema or app not found.
+        /// 400 => Content data is not valid.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/{name}/bulk")]
+        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
+        [ApiPermission(Permissions.AppContents)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
+        {
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
+
+            var command = request.ToCommand();
+
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<BulkUpdateResult>();
+            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
 
             return Ok(response);
         }

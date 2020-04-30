@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
 using Xunit;
@@ -101,9 +102,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
+        public void Should_convert_json_query_and_enrich_with_defaults()
+        {
+            var query = Q.Empty.WithJsonQuery(
+                new Query<IJsonValue>
+                {
+                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
+                });
+
+            var parsed = sut.ParseQuery(requestContext, schema, query);
+
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+        }
+
+        [Fact]
         public void Should_parse_json_full_text_query_and_enrich_with_defaults()
         {
             var query = Q.Empty.WithJsonQuery(Json("{ 'fullText': 'Hello' }"));
+
+            var parsed = sut.ParseQuery(requestContext, schema, query);
+
+            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+        }
+
+        [Fact]
+        public void Should_convert_json_full_text_query_and_enrich_with_defaults()
+        {
+            var query = Q.Empty.WithJsonQuery(
+                new Query<IJsonValue>
+                {
+                    FullText = "Hello"
+                });
 
             var parsed = sut.ParseQuery(requestContext, schema, query);
 

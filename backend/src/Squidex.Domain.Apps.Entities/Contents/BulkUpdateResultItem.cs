@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ImportResultItem
+    public sealed class BulkUpdateResultItem
     {
         public Guid? ContentId { get; set; }
 

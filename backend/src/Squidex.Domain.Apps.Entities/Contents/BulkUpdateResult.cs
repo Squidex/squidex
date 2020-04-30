@@ -9,7 +9,15 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ImportResult : List<ImportResultItem>
+    public sealed class BulkUpdateResult : List<BulkUpdateResultItem>
     {
+        public BulkUpdateResult()
+        {
+        }
+
+        public BulkUpdateResult(IEnumerable<BulkUpdateResultItem> source)
+            : base(source)
+        {
+        }
     }
 }
