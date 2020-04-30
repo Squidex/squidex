@@ -96,8 +96,7 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName, appClient: "client1");
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, "client1"));
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
 
             A.CallTo(() => appProvider.GetAppAsync(appName))
                 .Returns(app);
@@ -114,7 +113,7 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName);
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, "client1"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
             actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
@@ -134,8 +133,24 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName);
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, "client1"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+
+            A.CallTo(() => appProvider.GetAppAsync(appName))
+                .Returns(app);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
+            Assert.False(isNextCalled);
+        }
+
+        [Fact]
+        public async Task Should_return_not_found_if_client_is_from_another_app()
+        {
+            var app = CreateApp(appName, appClient: "client1");
+
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
 
             A.CallTo(() => appProvider.GetAppAsync(appName))
                 .Returns(app);
