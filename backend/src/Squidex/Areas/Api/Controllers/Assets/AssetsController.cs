@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, this, app);
+                return AssetsDto.FromAssets(assets, Resources);
             });
 
             return Ok(response);
@@ -129,7 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, this, app);
+                return AssetsDto.FromAssets(assets, Resources);
             });
 
             return Ok(response);
@@ -160,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetDto.FromAsset(asset, this, app);
+                return AssetDto.FromAsset(asset, Resources);
             });
 
             return Ok(response);
@@ -304,11 +304,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (context.PlainResult is AssetCreatedResult created)
             {
-                return AssetDto.FromAsset(created.Asset, this, app, created.IsDuplicate);
+                return AssetDto.FromAsset(created.Asset, Resources, created.IsDuplicate);
             }
             else
             {
-                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), this, app);
+                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), Resources);
             }
         }
 

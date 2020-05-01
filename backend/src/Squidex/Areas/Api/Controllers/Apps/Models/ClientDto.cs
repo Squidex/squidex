@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -45,18 +44,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public ClientDto WithLinks(ApiController controller, string app)
+        public ClientDto WithLinks(Resources resources, string app)
         {
             var values = new { app, id = Id };
 
-            if (controller.HasPermission(Permissions.AppClientsUpdate, app))
+            if (resources.CanUpdateClient)
             {
-                AddPutLink("update", controller.Url<AppClientsController>(x => nameof(x.PutClient), values));
+                AddPutLink("update", resources.Url<AppClientsController>(x => nameof(x.PutClient), values));
             }
 
-            if (controller.HasPermission(Permissions.AppClientsDelete, app))
+            if (resources.CanDeleteClient)
             {
-                AddDeleteLink("delete", controller.Url<AppClientsController>(x => nameof(x.DeleteClient), values));
+                AddDeleteLink("delete", resources.Url<AppClientsController>(x => nameof(x.DeleteClient), values));
             }
 
             return this;

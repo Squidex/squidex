@@ -167,7 +167,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private RolesDto GetResponse(IAppEntity result)
         {
-            return RolesDto.FromApp(result, this);
+            return RolesDto.FromApp(result, Resources);
         }
     }
 }

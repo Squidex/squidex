@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -62,18 +61,20 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return this;
         }
 
-        public ContributorDto WithLinks(ApiController controller, string app)
+        public ContributorDto WithLinks(Resources resources)
         {
-            if (!controller.IsUser(ContributorId))
+            if (!resources.IsUser(ContributorId))
             {
-                if (controller.HasPermission(Permissions.AppContributorsAssign, app))
+                var app = resources.App;
+
+                if (resources.CanAssignContributor)
                 {
-                    AddPostLink("update", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
+                    AddPostLink("update", resources.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
                 }
 
-                if (controller.HasPermission(Permissions.AppContributorsRevoke, app))
+                if (resources.CanRevokeContributor)
                 {
-                    AddDeleteLink("delete", controller.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = ContributorId }));
+                    AddDeleteLink("delete", resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = ContributorId }));
                 }
             }
 

@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -106,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(Context context, IEnrichedContentEntity content, ApiController controller)
+        public static ContentDto FromContent(Context context, IEnrichedContentEntity content, Resources resources)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
@@ -134,60 +133,62 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 SimpleMapper.Map(content.ScheduleJob, response.ScheduleJob);
             }
 
-            return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name);
+            return response.CreateLinksAsync(content, resources, content.SchemaId.Name);
         }
 
-        private ContentDto CreateLinksAsync(IEnrichedContentEntity content, ApiController controller, string app, string schema)
+        private ContentDto CreateLinksAsync(IEnrichedContentEntity content, Resources resources, string schema)
         {
+            var app = resources.App;
+
             var values = new { app, name = schema, id = Id };
 
-            AddSelfLink(controller.Url<ContentsController>(x => nameof(x.GetContent), values));
+            AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContent), values));
 
             if (Version > 0)
             {
                 var versioned = new { app, name = schema, id = Id, version = Version - 1 };
 
-                AddGetLink("previous", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
+                AddGetLink("previous", resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
             if (NewStatus.HasValue)
             {
-                if (controller.HasPermission(Permissions.AppContentsVersionDelete, app, schema))
+                if (resources.CanDeleteContentVersion(schema))
                 {
-                    AddDeleteLink("draft/delete", controller.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                    AddDeleteLink("draft/delete", resources.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                 }
             }
             else if (Status == Status.Published)
             {
-                if (controller.HasPermission(Permissions.AppContentsVersionCreate, app, schema))
+                if (resources.CanCreateContentVersion(schema))
                 {
-                    AddPostLink("draft/create", controller.Url<ContentsController>(x => nameof(x.CreateDraft), values));
+                    AddPostLink("draft/create", resources.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                 }
             }
 
-            if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema) && content.NextStatuses != null)
+            if (content.NextStatuses != null && resources.CanUpdateContent(schema))
             {
                 foreach (var next in content.NextStatuses)
                 {
-                    AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
+                    AddPutLink($"status/{next.Status}", resources.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
                 }
             }
 
-            if (content.IsSingleton == false && controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+            if (content.IsSingleton == false && resources.CanDeleteContent(schema))
             {
-                AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+                AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
             if (content.CanUpdate)
             {
-                if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
+                if (resources.CanUpdateContent(schema))
                 {
-                    AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+                    AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
                 }
 
-                if (controller.HasPermission(Permissions.AppContentsUpdatePartial, app, schema))
+                if (resources.CanUpdateContentPartial(schema))
                 {
-                    AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+                    AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
                 }
             }
 

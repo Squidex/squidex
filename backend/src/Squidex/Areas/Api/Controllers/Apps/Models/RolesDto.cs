@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -21,32 +20,30 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public RoleDto[] Items { get; set; }
 
-        public static RolesDto FromApp(IAppEntity app, ApiController controller)
+        public static RolesDto FromApp(IAppEntity app, Resources resources)
         {
-            var appName = app.Name;
-
             var result = new RolesDto
             {
                 Items =
                     app.Roles.All
                         .Select(x => RoleDto.FromRole(x, app))
-                        .Select(x => x.WithLinks(controller, appName))
+                        .Select(x => x.WithLinks(resources))
                         .OrderBy(x => x.Name)
                         .ToArray()
             };
 
-            return result.CreateLinks(controller, appName);
+            return result.CreateLinks(resources);
         }
 
-        private RolesDto CreateLinks(ApiController controller, string app)
+        private RolesDto CreateLinks(Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            AddSelfLink(controller.Url<AppRolesController>(x => nameof(x.GetRoles), values));
+            AddSelfLink(resources.Url<AppRolesController>(x => nameof(x.GetRoles), values));
 
-            if (controller.HasPermission(Permissions.AppRolesCreate, app))
+            if (resources.CanCreateRole)
             {
-                AddPostLink("create", controller.Url<AppRolesController>(x => nameof(x.PostRole), values));
+                AddPostLink("create", resources.Url<AppRolesController>(x => nameof(x.PostRole), values));
             }
 
             return this;

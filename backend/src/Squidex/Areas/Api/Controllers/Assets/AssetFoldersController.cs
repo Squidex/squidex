@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(assetFolders, this, app);
+                return AssetFoldersDto.FromAssets(assetFolders, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = assetFolders.ToEtag();
@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), this, app);
+            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), Resources);
         }
     }
 }

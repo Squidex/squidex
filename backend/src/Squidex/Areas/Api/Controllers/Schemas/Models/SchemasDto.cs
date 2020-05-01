@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -20,25 +19,25 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public SchemaDto[] Items { get; set; }
 
-        public static SchemasDto FromSchemas(IList<ISchemaEntity> schemas, ApiController controller, string app)
+        public static SchemasDto FromSchemas(IList<ISchemaEntity> schemas, Resources resources)
         {
             var result = new SchemasDto
             {
-                Items = schemas.Select(x => SchemaDto.FromSchema(x, controller, app)).ToArray()
+                Items = schemas.Select(x => SchemaDto.FromSchema(x, resources)).ToArray()
             };
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(resources);
         }
 
-        private SchemasDto CreateLinks(ApiController controller, string app)
+        private SchemasDto CreateLinks(Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchemas), values));
+            AddSelfLink(resources.Url<SchemasController>(x => nameof(x.GetSchemas), values));
 
-            if (controller.HasPermission(Permissions.AppSchemasCreate, app))
+            if (resources.CanCreateSchema)
             {
-                AddPostLink("create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
+                AddPostLink("create", resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
             return this;

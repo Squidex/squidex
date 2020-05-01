@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var jobs = await backupService.GetBackupsAsync(AppId);
 
-            var response = BackupJobsDto.FromBackups(jobs, this, app);
+            var response = BackupJobsDto.FromBackups(jobs, Resources);
 
             return Ok(response);
         }
