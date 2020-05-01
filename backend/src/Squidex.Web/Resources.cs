@@ -209,16 +209,23 @@ namespace Squidex.Web
 
         public bool IsAllowed(string id, string app = Permission.Any, string schema = Permission.Any, PermissionSet? additional = null)
         {
-            if (app == Permission.Any && App != null)
+            if (app == Permission.Any)
             {
-                app = App;
+                var falback = App;
+
+                if (!string.IsNullOrWhiteSpace(falback))
+                {
+                    app = falback;
+                }
             }
 
             if (schema == Permission.Any)
             {
-                if (Controller.RouteData.Values.TryGetValue("name", out var value) && value is string schemaParameter)
+                var falback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.SchemaId.Name;
+
+                if (!string.IsNullOrWhiteSpace(falback))
                 {
-                    schema = schemaParameter;
+                    schema = falback;
                 }
             }
 

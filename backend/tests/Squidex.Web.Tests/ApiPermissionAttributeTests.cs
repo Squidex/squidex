@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,8 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using Squidex.Web.Pipeline;
 using Xunit;
 
 #pragma warning disable IDE0017 // Simplify object initialization
@@ -57,9 +60,9 @@ namespace Squidex.Web
         }
 
         [Fact]
-        public async Task Should_call_next_when_user_has_correct_permission()
+        public async Task Should_make_permission_check_with_app_feature()
         {
-            actionExecutingContext.RouteData.Values["app"] = "my-app";
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
@@ -72,9 +75,25 @@ namespace Squidex.Web
         }
 
         [Fact]
+        public async Task Should_make_permission_check_with_schema_feature()
+        {
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
+            actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(NamedId.Of(Guid.NewGuid(), "my-schema")));
+
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
+
+            var sut = new ApiPermissionAttribute(Permissions.AppSchemasUpdate);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.Null(actionExecutingContext.Result);
+            Assert.True(isNextCalled);
+        }
+
+        [Fact]
         public async Task Should_return_forbidden_when_user_has_wrong_permission()
         {
-            actionExecutingContext.RouteData.Values["app"] = "my-app";
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
