@@ -456,7 +456,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
         {
