@@ -165,7 +165,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.NextStatuses != null)
+            if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema) && content.NextStatuses != null)
             {
                 foreach (var next in content.NextStatuses)
                 {

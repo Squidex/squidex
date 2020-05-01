@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertOrDeletePublishedAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
-            if (value.Status == Status.Published)
+            if (value.Status == Status.Published && !value.IsDeleted)
             {
                 await UpsertPublishedContentAsync(value, oldVersion, newVersion, schema);
             }

@@ -12,7 +12,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ImportResultDto
+    public sealed class BulkResultDto
     {
         /// <summary>
         /// The error when the import failed.
@@ -24,11 +24,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public Guid? ContentId { get; set; }
 
-        public static ImportResultDto FromImportResult(ImportResultItem result, HttpContext httpContext)
+        public static BulkResultDto FromImportResult(BulkUpdateResultItem result, HttpContext httpContext)
         {
             var error = result.Exception?.ToErrorDto(httpContext).Error;
 
-            return new ImportResultDto { ContentId = result.ContentId, Error = error };
+            return new BulkResultDto { ContentId = result.ContentId, Error = error };
         }
     }
 }

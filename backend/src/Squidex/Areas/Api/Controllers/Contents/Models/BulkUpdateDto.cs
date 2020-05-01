@@ -7,19 +7,19 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Core.Contents;
+using System.Linq;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ImportContentsDto
+    public sealed class BulkUpdateDto
     {
         /// <summary>
-        /// The data to import.
+        /// The contents to update or insert.
         /// </summary>
         [Required]
-        public List<NamedContentData> Datas { get; set; }
+        public List<BulkUpdateJobDto> Jobs { get; set; }
 
         /// <summary>
         /// True to automatically publish the content.
@@ -38,7 +38,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public BulkUpdateContents ToCommand()
         {
-            return SimpleMapper.Map(this, new BulkUpdateContents());
+            var result = SimpleMapper.Map(this, new BulkUpdateContents());
+
+            result.Jobs = Jobs?.Select(x => x.ToJob())?.ToList();
+
+            return result;
         }
     }
 }

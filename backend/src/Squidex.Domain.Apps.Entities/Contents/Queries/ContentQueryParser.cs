@@ -21,6 +21,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
@@ -61,6 +62,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     {
                         result = ParseJson(context, schema, q.JsonQuery);
                     }
+                    else if (q?.ParsedJsonQuery != null)
+                    {
+                        result = ParseJson(context, schema, q.ParsedJsonQuery);
+                    }
                     else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
                     {
                         result = ParseOData(context, schema, q.ODataQuery);
@@ -87,6 +92,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 return result;
             }
+        }
+
+        private ClrQuery ParseJson(Context context, ISchemaEntity schema, Query<IJsonValue> query)
+        {
+            var jsonSchema = BuildJsonSchema(context, schema);
+
+            return jsonSchema.Convert(query);
         }
 
         private ClrQuery ParseJson(Context context, ISchemaEntity schema, string json)

@@ -7,12 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public sealed class CreateContents : SquidexCommand, ISchemaCommand, IAppCommand
+    public sealed class BulkUpdateContents : SquidexCommand, ISchemaCommand, IAppCommand
     {
         public NamedId<Guid> AppId { get; set; }
 
@@ -26,6 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool OptimizeValidation { get; set; }
 
-        public List<NamedContentData> Datas { get; set; }
+        public List<BulkUpdateJob>? Jobs { get; set; }
     }
 }
