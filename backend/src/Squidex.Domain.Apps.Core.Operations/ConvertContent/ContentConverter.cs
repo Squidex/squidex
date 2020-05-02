@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -18,47 +19,91 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
 
-        public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
+        public static void Convert(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema);
+
+            if (converters?.Any() != true)
+            {
+                return;
+            }
+
+            foreach (var (fieldName, data) in content.ToList())
+            {
+                ContentFieldData? newData = data;
+
+                if (schema.FieldsByName.TryGetValue(fieldName, out var field))
+                {
+                    for (var i = 0; i < converters.Length; i++)
+                    {
+                        newData = converters[i](newData!, field);
+
+                        if (newData == null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    newData = null;
+                }
+
+                if (newData == null)
+                {
+                    content.Remove(fieldName);
+                }
+                else if (!ReferenceEquals(data, newData))
+                {
+                    content[fieldName] = newData;
+                }
+            }
+        }
+
+        public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema)
         {
             Guard.NotNull(schema);
 
             var result = new NamedContentData(content.Count);
 
-            return ConvertInternal(content, result, schema.FieldsById, KeyNameResolver, converters);
+            foreach (var (fieldName, value) in content)
+            {
+                if (schema.FieldsByName.TryGetValue(fieldName, out var field))
+                {
+                    if (newValue != null)
+                    {
+                        target.Add(targetKey(field), newValue);
+                    }
+                }
+            }
+
+            return result;
         }
 
-        public static IdContentData ConvertId2Id(this IdContentData content, Schema schema, params FieldConverter[] converters)
+        public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema)
         {
             Guard.NotNull(schema);
 
             var result = new IdContentData(content.Count);
 
-            return ConvertInternal(content, result, schema.FieldsById, KeyIdResolver, converters);
-        }
+            foreach (var (fieldName, value) in content)
+            {
+                if (schema.FieldsByName.TryGetValue(fieldName, out var field))
+                {
+                    var clone = value.Clone();
 
-        public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema);
+                    if (field is IArrayField arrayField && field.)
+                }
+            }
 
-            var result = new NamedContentData(content.Count);
-
-            return ConvertInternal(content, result, schema.FieldsByName, KeyNameResolver, converters);
-        }
-
-        public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema);
-
-            var result = new IdContentData(content.Count);
-
-            return ConvertInternal(content, result, schema.FieldsByName, KeyIdResolver, converters);
+            return result;
         }
 
         private static TDict2 ConvertInternal<TKey1, TKey2, TDict1, TDict2>(
             TDict1 source,
             TDict2 target,
             IReadOnlyDictionary<TKey1, RootField> fields,
-            Func<IRootField, TKey2> targetKey, params FieldConverter[] converters)
+            Func<IRootField, TKey2> targetKey)
             where TDict1 : IDictionary<TKey1, ContentFieldData?>
             where TDict2 : IDictionary<TKey2, ContentFieldData?>
             where TKey1 : notnull
@@ -66,32 +111,15 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             foreach (var (fieldName, value) in source)
             {
-                if (!fields.TryGetValue(fieldName, out var field))
+                if (fields.TryGetValue(fieldName, out var field))
                 {
-                    continue;
-                }
+                    if (field is IArrayField arra)
+                    var newValue = value;
 
-                var newValue = value;
-
-                if (newValue != null)
-                {
-                    if (converters != null)
+                    if (newValue != null)
                     {
-                        foreach (var converter in converters)
-                        {
-                            newValue = converter(newValue, field);
-
-                            if (newValue == null)
-                            {
-                                break;
-                            }
-                        }
+                        target.Add(targetKey(field), newValue);
                     }
-                }
-
-                if (newValue != null)
-                {
-                    target.Add(targetKey(field), newValue);
                 }
             }
 

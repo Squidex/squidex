@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -14,13 +16,15 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate IJsonValue ValueConverter(IJsonValue value, IField field);
+    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent);
 
     public static class ValueConverters
     {
+        public static readonly ValueConverter Noop = (value, field, parent) => value;
+
         public static ValueConverter DecodeJson(IJsonSerializer jsonSerializer)
         {
-            return (value, field) =>
+            return (value, field, parent) =>
             {
                 if (field is IField<JsonFieldProperties> && value is JsonScalar<string> s)
                 {
@@ -35,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static ValueConverter EncodeJson(IJsonSerializer jsonSerializer)
         {
-            return (value, field) =>
+            return (value, field, parent) =>
             {
                 if (value.Type != JsonValueType.Null && field is IField<JsonFieldProperties>)
                 {
@@ -48,14 +52,71 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
+        public static ValueConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
+        {
+            if (fields?.Any() != true)
+            {
+                return Noop;
+            }
+
+            Func<IField, IField?, bool> shouldHandle;
+
+            if (fields.Contains("*"))
+            {
+                shouldHandle = (field, parent) => true;
+            }
+            else
+            {
+                var paths = fields.Select(x => x.Split('.')).ToList();
+
+                shouldHandle = (field, parent) =>
+                {
+                    for (var i = 0; i < paths.Count; i++)
+                    {
+                        var path = paths[i];
+
+                        if (path[0] == field.Name)
+                        {
+                            if (parent == null && path.Length == 1)
+                            {
+                                return true;
+                            }
+
+                            if (parent != null && path.Length == 2 && path[i] == parent.Name)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                };
+            }
+
+            return (value, field, parent) =>
+            {
+                if (value is JsonArray array && shouldHandle(field, parent))
+                {
+                    for (var i = 0; i < array.Count; i++)
+                    {
+                        var id = array[i].ToString();
+
+                        array[i] = JsonValue.Create(urlGenerator.AssetContent(Guid.Parse(id)));
+                    }
+                }
+
+                return value;
+            };
+        }
+
         public static ValueConverter ExcludeHidden()
         {
-            return (value, field) => !field.IsForApi() ? Value.Unset : value;
+            return (value, field, parent) => field.IsForApi() ? value : null;
         }
 
         public static ValueConverter ExcludeChangedTypes()
         {
-            return (value, field) =>
+            return (value, field, parent) =>
             {
                 if (value.Type == JsonValueType.Null)
                 {
@@ -68,12 +129,62 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                     if (error != null)
                     {
-                        return Value.Unset;
+                        return null;
                     }
                 }
                 catch
                 {
-                    return Value.Unset;
+                    return null;
+                }
+
+                return value;
+            };
+        }
+
+        public static ValueConverter ConvertNested(params ValueConverter[] converters)
+        {
+            if (converters?.Any() != true)
+            {
+                return Noop;
+            }
+
+            return (value, field, parent) =>
+            {
+                if (value is JsonArray array && field is IArrayField arrayField)
+                {
+                    foreach (var nested in array.OfType<JsonObject>())
+                    {
+                        foreach (var (fieldName, nestedValue) in nested)
+                        {
+                            IJsonValue? newValue = nestedValue;
+
+                            if (arrayField.FieldsByName.TryGetValue(fieldName, out var nestedField))
+                            {
+                                for (var i = 0; i < converters.Length; i++)
+                                {
+                                    newValue = converters[i](newValue!, nestedField, arrayField);
+
+                                    if (newValue == null)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                newValue = null;
+                            }
+
+                            if (newValue == null)
+                            {
+                                nested.Remove(fieldName);
+                            }
+                            else if (!ReferenceEquals(nestedValue, newValue))
+                            {
+                                nested[fieldName] = newValue;
+                            }
+                        }
+                    }
                 }
 
                 return value;

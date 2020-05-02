@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static readonly FieldKeyResolver KeyNameResolver = f => f.Name;
         private static readonly FieldKeyResolver KeyIdResolver = f => f.Id.ToString();
 
+        public static readonly FieldConverter Noop = (data, field) => data;
+
         private delegate IField? FieldResolver(IArrayField field, string key);
 
         private static IField? FieldByIdResolver(IArrayField array, string key)
@@ -52,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ExcludeHidden()
         {
-            return (data, field) => !field.IsForApi() ? null : data;
+            return (data, field) => field.IsForApi() ? data : null;
         }
 
         public static FieldConverter ExcludeChangedTypes()
@@ -85,84 +87,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
-        {
-            if (fields?.Any() != true)
-            {
-                return (data, field) => data;
-            }
-
-            bool ShouldHandle(IField field, IField? parent = null)
-            {
-                if (field is IField<AssetsFieldProperties>)
-                {
-                    if (fields.Contains("*"))
-                    {
-                        return true;
-                    }
-
-                    if (parent == null)
-                    {
-                        return fields.Contains(field.Name);
-                    }
-                    else
-                    {
-                        return fields.Contains($"{parent.Name}.{field.Name}");
-                    }
-                }
-
-                return false;
-            }
-
-            void Resolve(IJsonValue value)
-            {
-                if (value is JsonArray array)
-                {
-                    for (var i = 0; i < array.Count; i++)
-                    {
-                        var id = array[i].ToString();
-
-                        array[i] = JsonValue.Create(urlGenerator.AssetContent(Guid.Parse(id)));
-                    }
-                }
-            }
-
-            return (data, field) =>
-            {
-                if (ShouldHandle(field))
-                {
-                    foreach (var partition in data)
-                    {
-                        Resolve(partition.Value);
-                    }
-                }
-                else if (field is IArrayField arrayField)
-                {
-                    foreach (var partition in data)
-                    {
-                        if (partition.Value is JsonArray array)
-                        {
-                            for (var i = 0; i < array.Count; i++)
-                            {
-                                if (array[i] is JsonObject arrayItem)
-                                {
-                                    foreach (var (key, value) in arrayItem)
-                                    {
-                                        if (arrayField.FieldsByName.TryGetValue(key, out var nestedField) && ShouldHandle(nestedField, field))
-                                        {
-                                            Resolve(value);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return data;
-            };
-        }
-
         public static FieldConverter ResolveInvariant(LanguagesConfig languages)
         {
             var codeForInvariant = InvariantPartitioning.Key;
@@ -170,9 +94,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (data, field) =>
             {
-                if (field.Partitioning.Equals(Partitioning.Invariant))
+                if (field.Partitioning.Equals(Partitioning.Invariant) && (!data.ContainsKey(codeForInvariant) || data.Count != 1))
                 {
-                    var result = new ContentFieldData();
+                    var result = new ContentFieldData(1);
 
                     if (data.TryGetValue(codeForInvariant, out var value))
                     {
@@ -202,21 +126,20 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    var result = new ContentFieldData();
-
                     foreach (var languageCode in languages.AllKeys)
                     {
-                        if (data.TryGetValue(languageCode, out var value))
+                        if (!data.ContainsKey(languageCode))
                         {
-                            result[languageCode] = value;
-                        }
-                        else if (languages.IsMaster(languageCode) && data.TryGetValue(codeForInvariant, out value))
-                        {
-                            result[languageCode] = value;
+                            if (data.TryGetValue(languageCode, out var value))
+                            {
+                                data[languageCode] = value;
+                            }
+                            else if (languages.IsMaster(languageCode) && data.TryGetValue(codeForInvariant, out value))
+                            {
+                                data[languageCode] = value;
+                            }
                         }
                     }
-
-                    return result;
                 }
 
                 return data;
@@ -231,11 +154,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var languageCode in languages.AllKeys)
                     {
-                        if (!data.TryGetValue(languageCode, out var value))
+                        if (!data.ContainsKey(languageCode))
                         {
                             foreach (var fallback in languages.GetPriorities(languageCode))
                             {
-                                if (data.TryGetValue(fallback, out value))
+                                if (data.TryGetValue(fallback, out var value))
                                 {
                                     data[languageCode] = value;
                                     break;
@@ -253,7 +176,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             if (languages?.Any() != true)
             {
-                return (data, field) => data;
+                return Noop;
             }
 
             var languageSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -275,17 +198,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    var result = new ContentFieldData();
-
-                    foreach (var languageCode in languageSet)
+                    foreach (var (key, _) in data.ToList())
                     {
-                        if (data.TryGetValue(languageCode, out var value))
+                        if (!languageSet.Contains(key))
                         {
-                            result[languageCode] = value;
+                            data.Remove(key);
                         }
                     }
-
-                    return result;
                 }
 
                 return data;
@@ -342,25 +261,22 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                                     continue;
                                 }
 
-                                var newValue = value;
-
-                                var isUnset = false;
+                                IJsonValue? newValue = value;
 
                                 if (converters != null)
                                 {
-                                    foreach (var converter in converters)
+                                    for (var i = 0; i < converters.Length; i++)
                                     {
-                                        newValue = converter(newValue, nestedField);
+                                        newValue = converters[i](newValue!, nestedField, arrayField);
 
-                                        if (ReferenceEquals(newValue, Value.Unset))
+                                        if (value == null)
                                         {
-                                            isUnset = true;
                                             break;
                                         }
                                     }
                                 }
 
-                                if (!isUnset)
+                                if (newValue != null)
                                 {
                                     newItem.Add(keyResolver(nestedField), newValue);
                                 }
@@ -383,37 +299,33 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                if (!(field is IArrayField))
+                if (field is IArrayField arrayField)
                 {
-                    var result = new ContentFieldData();
+                    return data;
+                }
 
-                    foreach (var (key, value) in data)
+                foreach (var (key, value) in data.ToList())
+                {
+                    IJsonValue? newValue = value;
+
+                    for (var i = 0; i < converters.Length; i++)
                     {
-                        var newValue = value;
+                        newValue = converters[i](newValue!, field, null);
 
-                        var isUnset = false;
-
-                        if (converters != null)
+                        if (newValue == null)
                         {
-                            foreach (var converter in converters)
-                            {
-                                newValue = converter(newValue, field);
-
-                                if (ReferenceEquals(newValue, Value.Unset))
-                                {
-                                    isUnset = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!isUnset)
-                        {
-                            result.Add(key, newValue);
+                            break;
                         }
                     }
 
-                    return result;
+                    if (newValue == null)
+                    {
+                        data.Remove(key);
+                    }
+                    else if (!ReferenceEquals(newValue, value))
+                    {
+                        data[key] = newValue;
+                    }
                 }
 
                 return data;

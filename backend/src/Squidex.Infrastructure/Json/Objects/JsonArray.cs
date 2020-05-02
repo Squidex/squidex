@@ -30,6 +30,11 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
+        private JsonArray(List<IJsonValue> source)
+            : base(source)
+        {
+        }
+
         internal JsonArray(params object?[] values)
             : base(ToList(values))
         {
@@ -88,6 +93,11 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return hashCode;
+        }
+
+        public IJsonValue Clone()
+        {
+            return new JsonArray(this.Select(x => x.Clone()).ToList());
         }
 
         public string ToJsonString()

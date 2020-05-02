@@ -18,21 +18,21 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (validIds == null)
             {
-                return (value, field) => value;
+                return ValueConverters.Noop;
             }
 
             var cleaner = new ReferencesCleaner(validIds);
 
-            return (value, field) =>
+            return (value, field, parent) =>
             {
                 if (value.Type == JsonValueType.Null)
                 {
-                    return value!;
+                    return (true, value);
                 }
 
                 cleaner.SetValue(value);
 
-                return field.Accept(cleaner);
+                return (true, field.Accept(cleaner));
             };
         }
     }

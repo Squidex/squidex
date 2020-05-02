@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var content in group)
                 {
-                    content.Data = content.Data.ConvertName2Name(schema.SchemaDef, converters);
+                    content.Data = content.Data.Convert(schema.SchemaDef, converters);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (assetUrls.Any())
                 {
-                    yield return FieldConverters.ResolveAssetUrls(assetUrls.ToList(), urlGenerator);
+                    yield return FieldConverters.ForValues(ValueConverters.ResolveAssetUrls(assetUrls.ToList(), urlGenerator));
                 }
             }
         }
