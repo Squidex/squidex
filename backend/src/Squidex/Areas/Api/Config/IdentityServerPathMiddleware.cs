@@ -13,7 +13,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config
 {
-    public class IdentityServerPathMiddleware
+    public sealed class IdentityServerPathMiddleware
     {
         private readonly UrlsOptions urlsOptions;
         private readonly RequestDelegate next;

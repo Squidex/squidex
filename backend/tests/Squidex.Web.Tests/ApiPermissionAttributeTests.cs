@@ -52,11 +52,11 @@ namespace Squidex.Web
         }
 
         [Fact]
-        public void Should_use_bearer_schemes()
+        public void Should_use_custom_authorization_scheme()
         {
             var sut = new ApiPermissionAttribute();
 
-            Assert.Equal("Bearer", sut.AuthenticationSchemes);
+            Assert.Equal(Constants.ApiSecurityScheme, sut.AuthenticationSchemes);
         }
 
         [Fact]
