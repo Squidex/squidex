@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Same(result, context.Result<IEnrichedContentEntity>());
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var enriched = new ContentEntity();
 
-            A.CallTo(() => contentEnricher.EnrichAsync(result, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(result, true, requestContext))
                 .Returns(enriched);
 
             await sut.HandleAsync(context);

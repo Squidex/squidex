@@ -17,6 +17,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public NamedContentData(NamedContentData source)
+            : base(source, StringComparer.Ordinal)
+        {
+        }
+
         public NamedContentData(int capacity)
             : base(capacity, StringComparer.Ordinal)
         {
@@ -44,6 +49,18 @@ namespace Squidex.Domain.Apps.Core.Contents
             this[name] = data;
 
             return this;
+        }
+
+        public NamedContentData Clone()
+        {
+            var clone = new NamedContentData(Count);
+
+            foreach (var (key, value) in this)
+            {
+                clone[key] = value?.Clone()!;
+            }
+
+            return clone;
         }
 
         public bool Equals(NamedContentData other)

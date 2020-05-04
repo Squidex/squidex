@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (context.PlainResult is IContentEntity content && NotEnriched(context))
             {
-                var enriched = await contentEnricher.EnrichAsync(content, contextProvider.Context);
+                var enriched = await contentEnricher.EnrichAsync(content, true, contextProvider.Context);
 
                 context.Complete(enriched);
             }

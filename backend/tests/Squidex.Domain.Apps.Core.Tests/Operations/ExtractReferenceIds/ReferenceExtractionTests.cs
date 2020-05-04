@@ -109,11 +109,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                         .Add("nested", JsonValue.Array(id2)))));
 
             var cleaner = ValueReferencesConverter.CleanReferences(new HashSet<Guid> { id2 });
+            var cleanNested = ValueConverters.ForNested(cleaner);
 
-            var converter = FieldConverters.ForValues(cleaner);
-            var converterNested = FieldConverters.ForNestedName2Name(cleaner);
+            var converter = FieldConverters.ForValues(cleaner, cleanNested);
 
-            var actual = source.ConvertName2Name(schema, converter, converterNested);
+            var actual = source.ConvertName2Name(schema, converter);
 
             Assert.Equal(expected, actual);
         }
@@ -210,7 +210,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_same_value_from_field_when_value_is_json_null(IField field)
         {
-            var result = ValueReferencesConverter.CleanReferences(RandomIds())(JsonValue.Null, field);
+            var result = ValueReferencesConverter.CleanReferences(RandomIds())(JsonValue.Null, field, null);
 
             Assert.Equal(JsonValue.Null, result);
         }
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var value = CreateValue(id1, id2);
 
-            var result = ValueReferencesConverter.CleanReferences(HashSet.Of(id1))(value, field);
+            var result = ValueReferencesConverter.CleanReferences(HashSet.Of(id1))(value, field, null);
 
             Assert.Equal(CreateValue(id1), result);
         }

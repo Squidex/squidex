@@ -26,6 +26,11 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         public JsonArray(JsonArray source)
+            : base(source.ToList())
+        {
+        }
+
+        private JsonArray(List<IJsonValue> source)
             : base(source)
         {
         }
@@ -88,6 +93,11 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return hashCode;
+        }
+
+        public IJsonValue Clone()
+        {
+            return new JsonArray(this.Select(x => x.Clone()).ToList());
         }
 
         public string ToJsonString()
