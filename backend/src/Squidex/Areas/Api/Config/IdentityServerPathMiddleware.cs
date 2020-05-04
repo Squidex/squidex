@@ -15,19 +15,15 @@ namespace Squidex.Areas.Api.Config
 {
     public sealed class IdentityServerPathMiddleware
     {
-        private readonly UrlsOptions urlsOptions;
         private readonly RequestDelegate next;
 
-        public IdentityServerPathMiddleware(IOptions<UrlsOptions> urlsOptions, RequestDelegate next)
+        public IdentityServerPathMiddleware(RequestDelegate next)
         {
-            this.urlsOptions = urlsOptions.Value;
-
             this.next = next;
         }
 
         public Task InvokeAsync(HttpContext context)
         {
-            context.SetIdentityServerOrigin(urlsOptions.BaseUrl);
             context.SetIdentityServerBasePath(Constants.IdentityServerPrefix);
 
             return next(context);
