@@ -22,6 +22,35 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         public static readonly ValueConverter Noop = (value, field, parent) => value;
 
+        public static readonly ValueConverter ExcludeHidden = (value, field, parent) =>
+        {
+            return field.IsForApi() ? value : null;
+        };
+
+        public static readonly ValueConverter ExcludeChangedTypes = (value, field, parent) =>
+        {
+            if (value.Type == JsonValueType.Null)
+            {
+                return value;
+            }
+
+            try
+            {
+                var (_, error) = JsonValueConverter.ConvertValue(field, value);
+
+                if (error != null)
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return value;
+        };
+
         public static ValueConverter DecodeJson(IJsonSerializer jsonSerializer)
         {
             return (value, field, parent) =>
@@ -109,39 +138,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static ValueConverter ExcludeHidden()
-        {
-            return (value, field, parent) => field.IsForApi() ? value : null;
-        }
-
-        public static ValueConverter ExcludeChangedTypes()
-        {
-            return (value, field, parent) =>
-            {
-                if (value.Type == JsonValueType.Null)
-                {
-                    return value;
-                }
-
-                try
-                {
-                    var (_, error) = JsonValueConverter.ConvertValue(field, value);
-
-                    if (error != null)
-                    {
-                        return null;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-
-                return value;
-            };
-        }
-
-        public static ValueConverter ConvertNested(params ValueConverter[] converters)
+        public static ValueConverter ForNested(params ValueConverter[] converters)
         {
             if (converters?.Any() != true)
             {
@@ -154,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var nested in array.OfType<JsonObject>())
                     {
-                        foreach (var (fieldName, nestedValue) in nested)
+                        foreach (var (fieldName, nestedValue) in nested.ToList())
                         {
                             IJsonValue? newValue = nestedValue;
 

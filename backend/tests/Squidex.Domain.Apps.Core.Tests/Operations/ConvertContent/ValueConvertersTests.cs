@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Object();
 
-            var (_, result) = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
 
             Assert.Equal(JsonValue.Create("e30="), result);
         }
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var (_, result) = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
 
             Assert.Same(source, result);
         }
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("NO-JSON");
 
-            var (_, result) = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField, null);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField, null);
 
             Assert.Same(source, result);
         }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("e30=");
 
-            var (_, result) = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
+            var result = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
 
             Assert.Equal(JsonValue.Object(), result);
         }
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var (_, result) = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
+            var result = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField, null);
 
             Assert.Same(source, result);
         }
@@ -85,29 +85,29 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var (_, result) = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField, null);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField, null);
 
             Assert.Same(source, result);
         }
 
         [Fact]
-        public void Should_return_false_if_field_hidden()
+        public void Should_return_null_if_field_hidden()
         {
             var source = JsonValue.Create(123);
 
-            var (keep, _) = ValueConverters.ExcludeHidden()(source, stringField.Hide(), null);
+            var result = ValueConverters.ExcludeHidden(source, stringField.Hide(), null);
 
-            Assert.False(keep);
+            Assert.Null(result);
         }
 
         [Fact]
-        public void Should_return_false_if_field_has_wrong_type()
+        public void Should_return_null_if_field_has_wrong_type()
         {
             var source = JsonValue.Create("invalid");
 
-            var (keep, _) = ValueConverters.ExcludeChangedTypes()(source, numberField, null);
+            var result = ValueConverters.ExcludeChangedTypes(source, numberField, null);
 
-            Assert.False(keep);
+            Assert.Null(result);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var (_, result) = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "assets" }), urlGenerator)(source, field, null);
+            var result = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "assets" }), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var (_, result) = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), urlGenerator)(source, field, null);
+            var result = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = source;
 
-            var (_, result) = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "other" }), urlGenerator)(source, field, null);
+            var result = ValueConverters.ResolveAssetUrls(new HashSet<string>(new[] { "other" }), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }

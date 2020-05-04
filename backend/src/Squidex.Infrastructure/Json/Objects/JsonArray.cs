@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         public JsonArray(JsonArray source)
-            : base(source)
+            : base(source.ToList())
         {
         }
 

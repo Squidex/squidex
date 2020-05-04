@@ -231,5 +231,24 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             Assert.True(lhs.Equals((object)rhs));
             Assert.Equal(lhs.GetHashCode(), rhs.GetHashCode());
         }
+
+        [Fact]
+        public void Should_clone_named_value_and_also_children()
+        {
+            var source = new NamedContentData
+            {
+                ["field1"] = new ContentFieldData(),
+                ["field2"] = new ContentFieldData()
+            };
+
+            var clone = source.Clone();
+
+            Assert.NotSame(source, clone);
+
+            foreach (var (key, value) in clone)
+            {
+                Assert.NotSame(value, source[key]);
+            }
+        }
     }
 }

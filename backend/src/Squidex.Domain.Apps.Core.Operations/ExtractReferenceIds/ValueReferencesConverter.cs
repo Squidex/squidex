@@ -27,12 +27,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             {
                 if (value.Type == JsonValueType.Null)
                 {
-                    return (true, value);
+                    return value;
                 }
 
                 cleaner.SetValue(value);
 
-                return (true, field.Accept(cleaner));
+                return field.Accept(cleaner);
             };
         }
     }

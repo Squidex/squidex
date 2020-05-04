@@ -19,20 +19,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public DataConverter(IJsonSerializer serializer)
         {
+            var decoder = ValueConverters.DecodeJson(serializer);
+
             decodeJsonConverters = new[]
             {
-                FieldConverters.ForValues(
-                    ValueConverters.DecodeJson(serializer)),
-                FieldConverters.ForNestedId2Name(
-                    ValueConverters.DecodeJson(serializer))
+                FieldConverters.ForValues(decoder, ValueConverters.ForNested(decoder))
             };
+
+            var encoder = ValueConverters.EncodeJson(serializer);
 
             encodeJsonConverters = new[]
             {
-                FieldConverters.ForValues(
-                    ValueConverters.EncodeJson(serializer)),
-                FieldConverters.ForNestedName2Id(
-                    ValueConverters.EncodeJson(serializer))
+                FieldConverters.ForValues(encoder, ValueConverters.ForNested(encoder))
             };
         }
 
@@ -43,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public IdContentData ToMongoModel(NamedContentData result, Schema schema)
         {
-            return result.ConvertName2Id(schema, encodeJsonConverters);
+            return result.ConvertName2IdCloned(schema, encodeJsonConverters);
         }
     }
 }

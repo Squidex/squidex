@@ -89,14 +89,23 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (value is JsonArray array)
             {
-                for (var i = 0; i < array.Count; i++)
+                var result = array;
+
+                for (var i = 0; i < result.Count; i++)
                 {
-                    if (!IsValidReference(array[i]))
+                    if (!IsValidReference(result[i]))
                     {
-                        array.RemoveAt(i);
+                        if (ReferenceEquals(result, array))
+                        {
+                            result = new JsonArray(array);
+                        }
+
+                        result.RemoveAt(i);
                         i--;
                     }
                 }
+
+                return result;
             }
 
             return value;
