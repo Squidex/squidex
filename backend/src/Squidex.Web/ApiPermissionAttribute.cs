@@ -26,7 +26,7 @@ namespace Squidex.Web
 
         public ApiPermissionAttribute(params string[] ids)
         {
-            AuthenticationSchemes = "Bearer";
+            AuthenticationSchemes = Constants.ApiSecurityScheme;
 
             permissionIds = ids;
         }
