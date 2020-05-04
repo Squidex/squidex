@@ -9,7 +9,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -37,29 +36,29 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetFolderDto FromAssetFolder(IAssetFolderEntity asset, ApiController controller, string app)
+        public static AssetFolderDto FromAssetFolder(IAssetFolderEntity asset, Resources resources)
         {
             var response = SimpleMapper.Map(asset, new AssetFolderDto());
 
-            return CreateLinks(response, controller, app);
+            return CreateLinks(response, resources);
         }
 
-        private static AssetFolderDto CreateLinks(AssetFolderDto response, ApiController controller, string app)
+        private static AssetFolderDto CreateLinks(AssetFolderDto response, Resources resources)
         {
-            var values = new { app, id = response.Id };
+            var values = new { app = resources.App, id = response.Id };
 
-            response.AddSelfLink(controller.Url<AssetsController>(x => nameof(x.GetAsset), values));
+            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAsset), values));
 
-            if (controller.HasPermission(Permissions.AppAssetsUpdate))
+            if (resources.CanUpdateAsset)
             {
-                response.AddPutLink("update", controller.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
+                response.AddPutLink("update", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
 
-                response.AddPutLink("move", controller.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
+                response.AddPutLink("move", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
             }
 
-            if (controller.HasPermission(Permissions.AppAssetsUpdate))
+            if (resources.CanUpdateAsset)
             {
-                response.AddDeleteLink("delete", controller.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
+                response.AddDeleteLink("delete", resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
             }
 
             return response;

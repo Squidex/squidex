@@ -20,7 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Shared;
 using Squidex.Web;
 
 #pragma warning disable 1573
@@ -119,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            if (asset.IsProtected && !this.HasPermission(Permissions.AppAssetsRead))
+            if (asset.IsProtected && !Resources.CanReadEvents)
             {
                 return StatusCode(403);
             }

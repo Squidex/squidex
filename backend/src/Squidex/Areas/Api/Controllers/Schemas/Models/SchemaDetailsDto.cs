@@ -10,7 +10,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -49,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         public List<FieldDto> Fields { get; set; }
 
-        public static SchemaDetailsDto FromSchemaWithDetails(ISchemaEntity schema, ApiController controller, string app)
+        public static SchemaDetailsDto FromSchemaWithDetails(ISchemaEntity schema, Resources resources)
         {
             var result = new SchemaDetailsDto();
 
@@ -59,6 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
             result.FieldsInLists = schema.SchemaDef.FieldsInLists.ToList();
+
             result.FieldsInReferences = schema.SchemaDef.FieldsInReferences.ToList();
 
             if (schema.SchemaDef.PreviewUrls.Count > 0)
@@ -73,22 +73,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 result.Fields.Add(FieldDto.FromField(field));
             }
 
-            result.CreateLinks(controller, app);
+            result.CreateLinks(resources);
 
             return result;
         }
 
-        protected override void CreateLinks(ApiController controller, string app)
+        protected override void CreateLinks(Resources resources)
         {
-            base.CreateLinks(controller, app);
+            base.CreateLinks(resources);
 
-            var allowUpdate = controller.HasPermission(Permissions.AppSchemasUpdate, app, Name);
+            var allowUpdate = resources.CanUpdateSchema(Name);
 
             if (Fields != null)
             {
                 foreach (var nested in Fields)
                 {
-                    nested.CreateLinks(controller, app, Name, allowUpdate);
+                    nested.CreateLinks(resources, Name, allowUpdate);
                 }
             }
         }

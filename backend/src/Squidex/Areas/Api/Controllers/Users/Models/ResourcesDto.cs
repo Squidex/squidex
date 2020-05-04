@@ -9,40 +9,39 @@ using Squidex.Areas.Api.Controllers.Backups;
 using Squidex.Areas.Api.Controllers.EventConsumers;
 using Squidex.Areas.Api.Controllers.Languages;
 using Squidex.Areas.Api.Controllers.Ping;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
     public sealed class ResourcesDto : Resource
     {
-        public static ResourcesDto FromController(ApiController controller)
+        public static ResourcesDto FromResources(Resources resources)
         {
             var result = new ResourcesDto();
 
-            result.AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetPing)));
+            result.AddGetLink("ping", resources.Url<PingController>(x => nameof(x.GetPing)));
 
-            if (controller.HasPermission(Permissions.AdminEventsRead))
+            if (resources.CanReadEvents)
             {
-                result.AddGetLink("admin/events", controller.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
+                result.AddGetLink("admin/events", resources.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
             }
 
-            if (controller.HasPermission(Permissions.AdminRestore))
+            if (resources.CanRestoreBackup)
             {
-                result.AddGetLink("admin/restore", controller.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
+                result.AddGetLink("admin/restore", resources.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
             }
 
-            if (controller.HasPermission(Permissions.AdminUsersRead))
+            if (resources.CanReadUsers)
             {
-                result.AddGetLink("admin/users", controller.Url<UserManagementController>(x => nameof(x.GetUsers)));
+                result.AddGetLink("admin/users", resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
 
-            if (controller.HasPermission(Permissions.AdminOrleans))
+            if (resources.CanReadOrleans)
             {
                 result.AddGetLink("admin/orleans", "/orleans");
             }
 
-            result.AddGetLink("languages", controller.Url<LanguagesController>(x => nameof(x.GetLanguages)));
+            result.AddGetLink("languages", resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;
         }

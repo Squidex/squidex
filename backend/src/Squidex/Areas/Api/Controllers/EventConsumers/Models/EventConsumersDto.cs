@@ -19,19 +19,19 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
         /// </summary>
         public EventConsumerDto[] Items { get; set; }
 
-        public static EventConsumersDto FromResults(IEnumerable<EventConsumerInfo> items, ApiController controller)
+        public static EventConsumersDto FromResults(IEnumerable<EventConsumerInfo> items, Resources resources)
         {
             var result = new EventConsumersDto
             {
-                Items = items.Select(x => EventConsumerDto.FromEventConsumerInfo(x, controller)).ToArray()
+                Items = items.Select(x => EventConsumerDto.FromEventConsumerInfo(x, resources)).ToArray()
             };
 
-            return result.CreateLinks(controller);
+            return result.CreateLinks(resources);
         }
 
-        private EventConsumersDto CreateLinks(ApiController controller)
+        private EventConsumersDto CreateLinks(Resources resources)
         {
-            AddSelfLink(controller.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
+            AddSelfLink(resources.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
 
             return this;
         }

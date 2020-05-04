@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var response = Deferred.Response(() =>
             {
-                return RulesDto.FromRules(rules, runningRuleId, this, app);
+                return RulesDto.FromRules(rules, runningRuleId, Resources);
             });
 
             return Ok(response);
@@ -363,7 +363,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
 
             var result = context.Result<IEnrichedRuleEntity>();
-            var response = RuleDto.FromRule(result, runningRuleId, this, app);
+            var response = RuleDto.FromRule(result, runningRuleId, Resources);
 
             return response;
         }

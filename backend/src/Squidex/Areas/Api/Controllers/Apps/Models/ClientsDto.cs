@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -21,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public ClientDto[] Items { get; set; }
 
-        public static ClientsDto FromApp(IAppEntity app, ApiController controller)
+        public static ClientsDto FromApp(IAppEntity app, Resources resources)
         {
             var appName = app.Name;
 
@@ -30,22 +29,22 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Items =
                     app.Clients
                         .Select(x => ClientDto.FromClient(x.Key, x.Value))
-                        .Select(x => x.WithLinks(controller, appName))
+                        .Select(x => x.WithLinks(resources, appName))
                         .ToArray()
             };
 
-            return result.CreateLinks(controller, appName);
+            return result.CreateLinks(resources, appName);
         }
 
-        private ClientsDto CreateLinks(ApiController controller, string app)
+        private ClientsDto CreateLinks(Resources resources, string app)
         {
             var values = new { app };
 
-            AddSelfLink(controller.Url<AppClientsController>(x => nameof(x.GetClients), values));
+            AddSelfLink(resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
 
-            if (controller.HasPermission(Permissions.AppClientsCreate, app))
+            if (resources.CanCreateClient)
             {
-                AddPostLink("create", controller.Url<AppClientsController>(x => nameof(x.PostClient), values));
+                AddPostLink("create", resources.Url<AppClientsController>(x => nameof(x.PostClient), values));
             }
 
             return this;

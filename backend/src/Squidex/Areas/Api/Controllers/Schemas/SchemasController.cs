@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = Deferred.Response(() =>
             {
-                return SchemasDto.FromSchemas(schemas, this, app);
+                return SchemasDto.FromSchemas(schemas, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = schemas.ToEtag();
@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = Deferred.Response(() =>
             {
-                return SchemaDetailsDto.FromSchemaWithDetails(schema, this, app);
+                return SchemaDetailsDto.FromSchemaWithDetails(schema, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = schema.ToEtag();
@@ -320,7 +320,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, Resources);
 
             return response;
         }

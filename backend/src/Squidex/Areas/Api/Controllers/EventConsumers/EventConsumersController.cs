@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumers = await GetGrain().GetConsumersAsync();
 
-            var response = EventConsumersDto.FromResults(eventConsumers.Value, this);
+            var response = EventConsumersDto.FromResults(eventConsumers.Value, Resources);
 
             return Ok(response);
         }
@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().StartAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().StopAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }
@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().ResetAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }

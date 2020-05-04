@@ -9,7 +9,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -38,25 +37,25 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? Message { get; set; }
 
-        public static PatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
+        public static PatternDto FromPattern(Guid id, AppPattern pattern, Resources resources)
         {
             var result = SimpleMapper.Map(pattern, new PatternDto { Id = id });
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(resources);
         }
 
-        private PatternDto CreateLinks(ApiController controller, string app)
+        private PatternDto CreateLinks(Resources resources)
         {
-            var values = new { app, id = Id };
+            var values = new { app = resources.App, id = Id };
 
-            if (controller.HasPermission(Permissions.AppPatternsUpdate, app))
+            if (resources.CanUpdatePattern)
             {
-                AddPutLink("update", controller.Url<AppPatternsController>(x => nameof(x.PutPattern), values));
+                AddPutLink("update", resources.Url<AppPatternsController>(x => nameof(x.PutPattern), values));
             }
 
-            if (controller.HasPermission(Permissions.AppPatternsDelete, app))
+            if (resources.CanDeletePattern)
             {
-                AddDeleteLink("delete", controller.Url<AppPatternsController>(x => nameof(x.DeletePattern), values));
+                AddDeleteLink("delete", resources.Url<AppPatternsController>(x => nameof(x.DeletePattern), values));
             }
 
             return this;
