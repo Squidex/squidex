@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent);
+    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent = null);
 
     public static class ValueConverters
     {
@@ -104,17 +104,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         var path = paths[i];
 
-                        if (path[0] == field.Name)
+                        if (parent != null)
                         {
-                            if (parent == null && path.Length == 1)
-                            {
-                                return true;
-                            }
-
-                            if (parent != null && path.Length == 2 && path[i] == parent.Name)
-                            {
-                                return true;
-                            }
+                            return path.Length == 2 && path[0] == parent.Name && path[1] == field.Name;
+                        }
+                        else
+                        {
+                            return path.Length == 1 && path[0] == field.Name;
                         }
                     }
 
