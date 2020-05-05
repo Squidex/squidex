@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config

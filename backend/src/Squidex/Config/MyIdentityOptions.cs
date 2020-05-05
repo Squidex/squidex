@@ -55,8 +55,6 @@ namespace Squidex.Config
 
         public bool AllowPasswordAuth { get; set; }
 
-        public bool LocalApi { get; set; } = true;
-
         public bool LockAutomatically { get; set; }
 
         public bool NoConsent { get; set; }

@@ -179,9 +179,35 @@ namespace Squidex.Infrastructure.Assets
                     Key = key
                 };
 
-                SetStream(stream, request);
+                if (!HasContentLength(stream))
+                {
+                    var tempFileName = Path.GetTempFileName();
 
-                await transferUtility.UploadAsync(request, ct);
+                    var tempStream = new FileStream(tempFileName,
+                        FileMode.Create,
+                        FileAccess.ReadWrite,
+                        FileShare.Delete, 1024 * 16,
+                        FileOptions.Asynchronous |
+                        FileOptions.DeleteOnClose |
+                        FileOptions.SequentialScan);
+
+                    using (tempStream)
+                    {
+                        await stream.CopyToAsync(tempStream);
+
+                        request.InputStream = tempStream;
+
+                        await transferUtility.UploadAsync(request, ct);
+                    }
+                }
+                else
+                {
+                    request.InputStream = new SeekFakerStream(stream);
+
+                    request.AutoCloseStream = false;
+
+                    await transferUtility.UploadAsync(request, ct);
+                }
             }
             catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
             {
@@ -237,11 +263,16 @@ namespace Squidex.Infrastructure.Assets
             throw new AssetAlreadyExistsException(fileName);
         }
 
-        private static void SetStream(Stream stream, TransferUtilityUploadRequest request)
+        private static bool HasContentLength(Stream stream)
         {
-            // Amazon S3 requires a seekable stream, but does not seek anything.
-            request.InputStream = new SeekFakerStream(stream);
-            request.AutoCloseStream = false;
+            try
+            {
+                return stream.Length > 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using IdentityModel.AspNetCore.OAuth2Introspection;
-using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Config.Authentication
@@ -21,41 +17,9 @@ namespace Squidex.Config.Authentication
     {
         public static AuthenticationBuilder AddSquidexIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
-            var apiScope = Constants.ApiScope;
-
-            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-
-            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
+            if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
             {
-                string apiAuthorityUrl;
-
-                if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
-                {
-                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityServerPrefix);
-                }
-                else
-                {
-                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
-                }
-
-                if (identityOptions.LocalApi)
-                {
-                    authBuilder.AddLocalApi(Constants.ApiSecurityScheme, options =>
-                    {
-                        options.ExpectedScope = apiScope;
-                    });
-                }
-                else
-                {
-                    authBuilder.AddIdentityServerAuthentication(Constants.ApiSecurityScheme, options =>
-                    {
-                        options.Authority = apiAuthorityUrl;
-                        options.ApiName = apiScope;
-                        options.ApiSecret = null;
-                        options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                        options.SupportedTokens = SupportedTokens.Jwt;
-                    });
-                }
+                var apiAuthorityUrl = identityOptions.AuthorityUrl;
 
                 authBuilder.AddOpenIdConnect(options =>
                 {
@@ -69,6 +33,13 @@ namespace Squidex.Config.Authentication
                     options.Scope.Add(Constants.ProfileScope);
                     options.Scope.Add(Constants.RoleScope);
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                });
+            }
+            else
+            {
+                authBuilder.AddLocalApi(Constants.ApiSecurityScheme, options =>
+                {
+                    options.ExpectedScope = Constants.ApiScope;
                 });
             }
 
