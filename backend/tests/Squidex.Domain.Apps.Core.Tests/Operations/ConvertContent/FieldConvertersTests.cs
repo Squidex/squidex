@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -21,31 +18,22 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class FieldConvertersTests
     {
-        private readonly IUrlGenerator urlGenerato = A.Fake<IUrlGenerator>();
-        private readonly Guid id1 = Guid.NewGuid();
-        private readonly Guid id2 = Guid.NewGuid();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
-
-        public FieldConvertersTests()
-        {
-            A.CallTo(() => urlGenerato.AssetContent(A<Guid>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<Guid>(0)}");
-        }
 
         [Fact]
         public void Should_filter_for_value_conversion()
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
-            var input =
+            var source =
                 new ContentFieldData()
                     .AddJsonValue(JsonValue.Object());
 
-            var actual = FieldConverters.ForValues((f, i) => Value.Unset)(input, field);
+            var result = FieldConverters.ForValues((value, field, parent) => null)(source, field);
 
             var expected = new ContentFieldData();
 
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -53,133 +41,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var field = Fields.Json(1, "json", Partitioning.Invariant);
 
-            var input =
+            var source =
                 new ContentFieldData()
                     .AddJsonValue(JsonValue.Object());
 
-            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(input, field);
+            var result = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(source, field);
 
             var expected =
                 new ContentFieldData()
                     .AddValue("iv", "e30=");
 
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_name_to_id()
-        {
-            var field =
-                Fields.Array(1, "1", Partitioning.Invariant,
-                    Fields.Number(1, "field1"),
-                    Fields.Number(2, "field2").Hide());
-
-            var input =
-                new ContentFieldData()
-                    .AddJsonValue(
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("field1", 100)
-                                .Add("field2", 200)
-                                .Add("invalid", 300)));
-
-            var actual = FieldConverters.ForNestedName2Id(ValueConverters.ExcludeHidden())(input, field);
-
-            var expected =
-               new ContentFieldData()
-                    .AddJsonValue(
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("1", 100)));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_name_to_name()
-        {
-            var field =
-                Fields.Array(1, "1", Partitioning.Invariant,
-                    Fields.Number(1, "field1"),
-                    Fields.Number(2, "field2").Hide());
-
-            var input =
-                new ContentFieldData()
-                    .AddJsonValue(
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("field1", 100)
-                                .Add("field2", 200)
-                                .Add("invalid", 300)));
-
-            var actual = FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden())(input, field);
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("field1", 100)));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_id_to_id()
-        {
-            var field =
-                Fields.Array(1, "1", Partitioning.Invariant,
-                    Fields.Number(1, "field1"),
-                    Fields.Number(2, "field2").Hide());
-
-            var input =
-               new ContentFieldData()
-                    .AddValue("iv",
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("1", 100)
-                                .Add("2", 200)
-                                .Add("99", 300)));
-
-            var actual = FieldConverters.ForNestedId2Id(ValueConverters.ExcludeHidden())(input, field);
-
-            var expected =
-               new ContentFieldData()
-                    .AddValue("iv",
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("1", 100)));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_id_to_name()
-        {
-            var field =
-                Fields.Array(1, "1", Partitioning.Invariant,
-                    Fields.Number(1, "field1"),
-                    Fields.Number(2, "field2").Hide());
-
-            var input =
-               new ContentFieldData()
-                    .AddValue("iv",
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("1", 100)
-                                .Add("2", 200)
-                                .Add("99", 300)));
-
-            var actual = FieldConverters.ForNestedId2Name(ValueConverters.ExcludeHidden())(input, field);
-
-            var expected =
-               new ContentFieldData()
-                    .AddValue("iv",
-                        JsonValue.Array(
-                            JsonValue.Object()
-                                .Add("field1", 100)));
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -192,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", null)
                     .AddValue("de", 1);
 
-            var result = FieldConverters.ExcludeChangedTypes()(source, field);
+            var result = FieldConverters.ExcludeChangedTypes(source, field);
 
             Assert.Same(source, result);
         }
@@ -207,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", "EN")
                     .AddValue("de", 0);
 
-            var result = FieldConverters.ExcludeChangedTypes()(source, field);
+            var result = FieldConverters.ExcludeChangedTypes(source, field);
 
             Assert.Null(result);
         }
@@ -219,19 +91,19 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ExcludeHidden()(source, field);
+            var result = FieldConverters.ExcludeHidden(source, field);
 
             Assert.Same(source, result);
         }
 
         [Fact]
-        public void Should_return_null_values_if_field_hidden()
+        public void Should_return_null_if_field_hidden()
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
             var source = new ContentFieldData();
 
-            var result = FieldConverters.ExcludeHidden()(source, field.Hide());
+            var result = FieldConverters.ExcludeHidden(source, field.Hide());
 
             Assert.Null(result);
         }
@@ -293,8 +165,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", "A")
-                    .AddValue("it", "B");
+                    .AddValue("iv", "A");
 
             var expected =
                 new ContentFieldData()
@@ -473,126 +344,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var result = FieldConverters.FilterLanguages(languagesConfig, null)(source, field);
 
             Assert.Same(source, result);
-        }
-
-        [Fact]
-        public void Should_convert_asset_ids_to_urls()
-        {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array($"url/to/{id1}", $"url/to/{id2}"));
-
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "assets" }), urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_convert_nested_asset_ids_to_urls()
-        {
-            var field =
-                Fields.Array(1, "array", Partitioning.Invariant,
-                    Fields.Assets(1, "assets"));
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(
-                        JsonValue.Object()
-                            .Add("assets", JsonValue.Array(id1, id2))));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(
-                        JsonValue.Object()
-                            .Add("assets", JsonValue.Array($"url/to/{id1}", $"url/to/{id2}"))));
-
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "array.assets" }), urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_convert_asset_ids_to_urls_for_wildcard_fields()
-        {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array($"url/to/{id1}", $"url/to/{id2}"));
-
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_convert_nested_asset_ids_to_urls_for_wildcard_fields()
-        {
-            var field =
-                Fields.Array(1, "array", Partitioning.Invariant,
-                    Fields.Assets(1, "assets"));
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(
-                        JsonValue.Object()
-                            .Add("assets", JsonValue.Array(id1, id2))));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(
-                        JsonValue.Object()
-                            .Add("assets", JsonValue.Array($"url/to/{id1}", $"url/to/{id2}"))));
-
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_not_convert_asset_ids_to_urls_when_field_does_not_match()
-        {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "other" }), urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_not_convert_asset_ids_to_urls_when_fields_is_null()
-        {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var expected =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Array(id1, id2));
-
-            var result = FieldConverters.ResolveAssetUrls(null, urlGenerato)(source, field);
-
-            Assert.Equal(expected, result);
         }
     }
 }

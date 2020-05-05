@@ -70,6 +70,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
             this.valueControl.valueChanges
                 .subscribe(value => {
                     this.callChange(value);
+                    this.callTouched();
                 }));
     }
 

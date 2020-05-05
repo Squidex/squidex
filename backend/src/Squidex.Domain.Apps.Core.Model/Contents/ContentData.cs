@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        protected ContentData(ContentData<T> source, IEqualityComparer<T> comparer)
+            : base(source, comparer)
+        {
+        }
+
         protected ContentData(int capacity, IEqualityComparer<T> comparer)
             : base(capacity, comparer)
         {

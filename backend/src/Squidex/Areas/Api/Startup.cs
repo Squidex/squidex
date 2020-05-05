@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
+using Squidex.Areas.Api.Config;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Web;
 
@@ -17,6 +18,8 @@ namespace Squidex.Areas.Api
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
+                appApi.UseMiddleware<IdentityServerPathMiddleware>();
+
                 appApi.UseRouting();
 
                 appApi.UseAuthentication();

@@ -61,6 +61,11 @@ namespace Squidex.Infrastructure.Json.Objects
             inner = new Dictionary<string, IJsonValue>(obj.inner);
         }
 
+        private JsonObject(Dictionary<string, IJsonValue> source)
+        {
+            inner = source;
+        }
+
         public JsonObject Add(string key, object? value)
         {
             return Add(key, JsonValue.Create(value));
@@ -121,6 +126,11 @@ namespace Squidex.Infrastructure.Json.Objects
         public override int GetHashCode()
         {
             return inner.DictionaryHashCode();
+        }
+
+        public IJsonValue Clone()
+        {
+            return new JsonObject(this.ToDictionary(x => x.Key, x => x.Value.Clone()));
         }
 
         public string ToJsonString()

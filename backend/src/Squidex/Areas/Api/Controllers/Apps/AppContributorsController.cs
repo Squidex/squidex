@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
         {
-            return ContributorsDto.FromAppAsync(app, this, userResolver, appPlansProvider, invited);
+            return ContributorsDto.FromAppAsync(app, Resources, userResolver, appPlansProvider, invited);
         }
     }
 }

@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private async Task<WorkflowsDto> GetResponse(IAppEntity result)
         {
-            return await WorkflowsDto.FromAppAsync(workflowsValidator, result, this);
+            return await WorkflowsDto.FromAppAsync(workflowsValidator, result, Resources);
         }
     }
 }

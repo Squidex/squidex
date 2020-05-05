@@ -38,24 +38,24 @@ namespace Squidex.Config.Authentication
                     apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
                 }
 
-                authBuilder.AddIdentityServerAuthentication(options =>
+                if (identityOptions.LocalApi)
                 {
-                    options.Authority = apiAuthorityUrl;
-                    options.ApiName = apiScope;
-                    options.ApiSecret = null;
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.SupportedTokens = SupportedTokens.Jwt;
-
-                    var fromHeader = TokenRetrieval.FromAuthorizationHeader();
-                    var fromQuery = TokenRetrieval.FromQueryString();
-
-                    options.TokenRetriever = request =>
+                    authBuilder.AddLocalApi(Constants.ApiSecurityScheme, options =>
                     {
-                        var result = fromHeader(request) ?? fromQuery(request);
-
-                        return result;
-                    };
-                });
+                        options.ExpectedScope = apiScope;
+                    });
+                }
+                else
+                {
+                    authBuilder.AddIdentityServerAuthentication(Constants.ApiSecurityScheme, options =>
+                    {
+                        options.Authority = apiAuthorityUrl;
+                        options.ApiName = apiScope;
+                        options.ApiSecret = null;
+                        options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                        options.SupportedTokens = SupportedTokens.Jwt;
+                    });
+                }
 
                 authBuilder.AddOpenIdConnect(options =>
                 {

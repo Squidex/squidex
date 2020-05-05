@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
     {
         public Guid ContentId { get; set; }
 
+        public bool DoNotScript { get; set; }
+
         Guid IAggregateCommand.AggregateId
         {
             get { return ContentId; }

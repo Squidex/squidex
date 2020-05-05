@@ -18,12 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool Publish { get; set; }
 
-        public bool DoNotValidate { get; set; }
-
-        public bool DoNotScript { get; set; }
-
-        public bool OptimizeValidation { get; set; }
-
         public CreateContent()
         {
             ContentId = Guid.NewGuid();

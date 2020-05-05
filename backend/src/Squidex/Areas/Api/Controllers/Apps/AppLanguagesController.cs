@@ -141,7 +141,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private AppLanguagesDto GetResponse(IAppEntity result)
         {
-            return AppLanguagesDto.FromApp(result, this);
+            return AppLanguagesDto.FromApp(result, Resources);
         }
 
         private static Language ParseLanguage(string language)

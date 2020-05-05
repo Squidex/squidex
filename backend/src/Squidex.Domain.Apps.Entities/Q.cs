@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities
@@ -22,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities
         public string? ODataQuery { get; private set; }
 
         public string? JsonQuery { get; private set; }
+
+        public Query<IJsonValue>? ParsedJsonQuery { get; private set; }
 
         public ClrQuery? Query { get; private set; }
 
@@ -38,6 +41,11 @@ namespace Squidex.Domain.Apps.Entities
         public Q WithJsonQuery(string? jsonQuery)
         {
             return Clone(c => c.JsonQuery = jsonQuery);
+        }
+
+        public Q WithJsonQuery(Query<IJsonValue>? jsonQuery)
+        {
+            return Clone(c => c.ParsedJsonQuery = jsonQuery);
         }
 
         public Q WithIds(params Guid[] ids)

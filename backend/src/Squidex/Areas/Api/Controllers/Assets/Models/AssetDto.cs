@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -158,7 +157,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             get { return Metadata.GetPixelHeight(); }
         }
 
-        public static AssetDto FromAsset(IEnrichedAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
+        public static AssetDto FromAsset(IEnrichedAssetEntity asset, Resources resources, bool isDuplicate = false)
         {
             var response = SimpleMapper.Map(asset, new AssetDto());
 
@@ -174,42 +173,45 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 };
             }
 
-            return CreateLinks(response, controller, app);
+            return CreateLinks(response, resources);
         }
 
-        private static AssetDto CreateLinks(AssetDto response, ApiController controller, string app)
+        private static AssetDto CreateLinks(AssetDto response, Resources resources)
         {
+            var app = resources.App;
+
             var values = new { app, id = response.Id };
 
-            response.AddSelfLink(controller.Url<AssetsController>(x => nameof(x.GetAsset), values));
+            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAsset), values));
 
-            if (controller.HasPermission(Permissions.AppAssetsUpdate))
+            if (resources.CanUpdateAsset)
             {
-                response.AddPutLink("update", controller.Url<AssetsController>(x => nameof(x.PutAsset), values));
+                response.AddPutLink("update", resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
 
-                response.AddPutLink("move", controller.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
+                response.AddPutLink("move", resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
             }
 
-            if (controller.HasPermission(Permissions.AppAssetsUpload))
+            if (resources.CanUploadAsset)
             {
-                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
+                response.AddPutLink("upload", resources.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
             }
 
-            if (controller.HasPermission(Permissions.AppAssetsDelete))
+            if (resources.CanDeleteAsset)
             {
-                response.AddDeleteLink("delete", controller.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
+                response.AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
 
             var version = response.FileVersion;
 
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
-                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, more = response.Slug }));
-                response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug }));
+                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, more = response.Slug }));
+
+                response.AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug }));
             }
             else
             {
-                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id }));
+                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id }));
             }
 
             return response;

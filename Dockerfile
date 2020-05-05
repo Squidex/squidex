@@ -3,7 +3,7 @@
 #
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster as backend
 
-ARG SQUIDEX__VERSION=1.0.0
+ARG SQUIDEX__VERSION=4.0.0
 
 WORKDIR /src
 

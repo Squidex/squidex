@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private PatternsDto GetResponse(IAppEntity result)
         {
-            return PatternsDto.FromApp(result, this);
+            return PatternsDto.FromApp(result, Resources);
         }
     }
 }

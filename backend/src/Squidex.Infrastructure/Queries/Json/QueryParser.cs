@@ -27,6 +27,11 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var query = ParseFromJson(json, jsonSerializer);
 
+            return Convert(schema, query);
+        }
+
+        public static ClrQuery Convert(this JsonSchema schema, Query<IJsonValue> query)
+        {
             if (query == null)
             {
                 return new ClrQuery();

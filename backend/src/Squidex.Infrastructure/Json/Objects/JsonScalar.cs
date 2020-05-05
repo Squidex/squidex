@@ -36,6 +36,11 @@ namespace Squidex.Infrastructure.Json.Objects
             return other != null && other.Type == Type && Equals(other.Value, Value);
         }
 
+        public IJsonValue Clone()
+        {
+            return this;
+        }
+
         public override int GetHashCode()
         {
             return Value.GetHashCode();

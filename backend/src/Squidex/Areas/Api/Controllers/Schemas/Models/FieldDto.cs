@@ -102,53 +102,56 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             return result;
         }
 
-        public void CreateLinks(ApiController controller, string app, string schema, bool allowUpdate)
+        public void CreateLinks(Resources resources, string schema, bool allowUpdate)
         {
             allowUpdate = allowUpdate && !IsLocked;
 
             if (allowUpdate)
             {
-                var values = new { app, name = schema, id = FieldId };
+                var values = new { app = resources.App, name = schema, id = FieldId };
 
-                AddPutLink("update", controller.Url<SchemaFieldsController>(x => nameof(x.PutField), values));
+                AddPutLink("update", resources.Url<SchemaFieldsController>(x => nameof(x.PutField), values));
 
                 if (IsHidden)
                 {
-                    AddPutLink("show", controller.Url<SchemaFieldsController>(x => nameof(x.ShowField), values));
+                    AddPutLink("show", resources.Url<SchemaFieldsController>(x => nameof(x.ShowField), values));
                 }
                 else
                 {
-                    AddPutLink("hide", controller.Url<SchemaFieldsController>(x => nameof(x.HideField), values));
+                    AddPutLink("hide", resources.Url<SchemaFieldsController>(x => nameof(x.HideField), values));
                 }
 
                 if (IsDisabled)
                 {
-                    AddPutLink("enable", controller.Url<SchemaFieldsController>(x => nameof(x.EnableField), values));
+                    AddPutLink("enable", resources.Url<SchemaFieldsController>(x => nameof(x.EnableField), values));
                 }
                 else
                 {
-                    AddPutLink("disable", controller.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
+                    AddPutLink("disable", resources.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
                 }
 
                 if (Properties is ArrayFieldPropertiesDto)
                 {
-                    var parentValues = new { app, name = schema, parentId = FieldId };
+                    var parentValues = new { app = resources.App, name = schema, parentId = FieldId };
 
-                    AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
+                    AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
 
-                    AddPutLink("fields/order", controller.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), parentValues));
+                    AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), parentValues));
                 }
 
-                AddPutLink("lock", controller.Url<SchemaFieldsController>(x => nameof(x.LockField), values));
+                if (!IsLocked)
+                {
+                    AddPutLink("lock", resources.Url<SchemaFieldsController>(x => nameof(x.LockField), values));
+                }
 
-                AddDeleteLink("delete", controller.Url<SchemaFieldsController>(x => nameof(x.DeleteField), values));
+                AddDeleteLink("delete", resources.Url<SchemaFieldsController>(x => nameof(x.DeleteField), values));
             }
 
             if (Nested != null)
             {
                 foreach (var nested in Nested)
                 {
-                    nested.CreateLinks(controller, app, schema, FieldId, allowUpdate);
+                    nested.CreateLinks(resources, schema, FieldId, allowUpdate);
                 }
             }
         }
