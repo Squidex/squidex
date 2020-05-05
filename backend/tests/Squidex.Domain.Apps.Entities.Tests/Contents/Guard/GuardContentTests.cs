@@ -230,17 +230,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
-        public void CreateDraft_should_throw_exception_if_singleton()
-        {
-            var schema = CreateSchema(true);
-
-            var content = CreateContent(Status.Published);
-            var command = new CreateContentDraft();
-
-            Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, schema, content));
-        }
-
-        [Fact]
         public void CreateDraft_should_throw_exception_if_not_published()
         {
             var schema = CreateSchema(false);
@@ -248,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft);
             var command = new CreateContentDraft();
 
-            Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, schema, content));
+            Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, content));
         }
 
         [Fact]
@@ -259,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Published);
             var command = new CreateContentDraft();
 
-            GuardContent.CanCreateDraft(command, schema, content);
+            GuardContent.CanCreateDraft(command, content);
         }
 
         [Fact]
@@ -270,18 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = new ContentState();
             var command = new DeleteContentDraft();
 
-            Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, schema, content));
-        }
-
-        [Fact]
-        public void CanDeleteDraft_should_throw_exception_if_singleton()
-        {
-            var schema = CreateSchema(true);
-
-            var content = CreateDraftContent(Status.Draft);
-            var command = new DeleteContentDraft();
-
-            Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, schema, content));
+            Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, content));
         }
 
         [Fact]
@@ -292,7 +270,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateDraftContent(Status.Draft);
             var command = new DeleteContentDraft();
 
-            GuardContent.CanDeleteDraft(command, schema, content);
+            GuardContent.CanDeleteDraft(command, content);
         }
 
         [Fact]
