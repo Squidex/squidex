@@ -326,7 +326,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public remove(index: number) {
-        this.updateItems(this.snapshot.items.filter((_, i) => i !== index));
+        this.updateItems(this.snapshot.items.filter((_, i) => i !== index), true);
     }
 
     public resetSize() {
@@ -396,7 +396,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
-                this.updateItems(this.snapshot.items.slice(0, this.snapshot.items.length - 1));
+                this.updateItems(this.snapshot.items.slice(0, this.snapshot.items.length - 1), false);
 
                 return false;
             }
@@ -436,7 +436,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
         if (tagValue) {
             if (this.allowDuplicates || !this.isSelected(tagValue)) {
-                this.updateItems([...this.snapshot.items, tagValue]);
+                this.updateItems([...this.snapshot.items, tagValue], true);
             }
 
             this.resetForm();
@@ -449,9 +449,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public toggleValue(isSelected: boolean, tagValue: TagValue) {
         if (isSelected) {
-            this.updateItems([...this.snapshot.items, tagValue]);
+            this.updateItems([...this.snapshot.items, tagValue], true);
         } else {
-            this.updateItems(this.snapshot.items.filter(x => x.id !== tagValue.id));
+            this.updateItems(this.snapshot.items.filter(x => x.id !== tagValue.id), true);
         }
     }
 
@@ -495,7 +495,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         if (!this.hasSelection()) {
             this.onCopy(event);
 
-            this.updateItems([]);
+            this.updateItems([], false);
         }
     }
 
@@ -526,7 +526,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                     }
                 }
 
-                this.updateItems(values);
+                this.updateItems(values, false);
             }
 
             event.preventDefault();
@@ -540,13 +540,17 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         return s && e && (e - s) > 0;
     }
 
-    private updateItems(items: ReadonlyArray<TagValue>) {
+    private updateItems(items: ReadonlyArray<TagValue>, touched: boolean) {
         this.next(s => ({ ...s, items }));
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
         } else {
             this.callChange(items.map(x => x.value));
+        }
+
+        if (touched) {
+            this.callTouched();
         }
 
         this.resetSize();

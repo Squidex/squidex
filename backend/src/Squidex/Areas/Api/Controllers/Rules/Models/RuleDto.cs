@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -91,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public Instant? LastExecuted { get; set; }
 
-        public static RuleDto FromRule(IEnrichedRuleEntity rule, Guid? runningRuleId, ApiController controller, string app)
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, Guid? runningRuleId, Resources resources)
         {
             var result = new RuleDto();
 
@@ -103,48 +102,45 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
             }
 
-            return result.CreateLinks(controller, runningRuleId, app);
+            return result.CreateLinks(resources, runningRuleId);
         }
 
-        private RuleDto CreateLinks(ApiController controller, Guid? runningRuleId, string app)
+        private RuleDto CreateLinks(Resources resources, Guid? runningRuleId)
         {
-            var values = new { app, id = Id };
+            var values = new { app = resources.App, id = Id };
 
-            if (controller.HasPermission(Permissions.AppRulesDisable, app))
+            if (resources.CanDisableRule)
             {
                 if (IsEnabled)
                 {
-                    AddPutLink("disable", controller.Url<RulesController>(x => nameof(x.DisableRule), values));
+                    AddPutLink("disable", resources.Url<RulesController>(x => nameof(x.DisableRule), values));
                 }
                 else
                 {
-                    AddPutLink("enable", controller.Url<RulesController>(x => nameof(x.EnableRule), values));
+                    AddPutLink("enable", resources.Url<RulesController>(x => nameof(x.EnableRule), values));
                 }
             }
 
-            if (controller.HasPermission(Permissions.AppRulesUpdate))
+            if (resources.CanUpdateRule)
             {
-                AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
+                AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
-            if (controller.HasPermission(Permissions.AppRulesEvents))
+            if (resources.CanReadRuleEvents)
             {
-                AddPutLink("trigger", controller.Url<RulesController>(x => nameof(x.TriggerRule), values));
+                AddPutLink("trigger", resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
 
                 if (runningRuleId == null)
                 {
-                    AddPutLink("run", controller.Url<RulesController>(x => nameof(x.PutRuleRun), values));
+                    AddPutLink("run", resources.Url<RulesController>(x => nameof(x.PutRuleRun), values));
                 }
+
+                AddGetLink("logs", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
-            if (controller.HasPermission(Permissions.AppRulesDelete))
+            if (resources.CanDeleteRule)
             {
-                AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
-            }
-
-            if (controller.HasPermission(Permissions.AppRulesEvents))
-            {
-                AddGetLink("logs", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
+                AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteRule), values));
             }
 
             return this;

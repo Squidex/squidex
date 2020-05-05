@@ -59,8 +59,8 @@ namespace Squidex.Extensions.Actions.Email
                 using (ct.Register(client.SendAsyncCancel))
                 {
                     await client.SendMailAsync(
-                        job.MessageBody,
-                        job.MessageBody,
+                        job.MessageFrom,
+                        job.MessageTo,
                         job.MessageSubject,
                         job.MessageBody);
                 }

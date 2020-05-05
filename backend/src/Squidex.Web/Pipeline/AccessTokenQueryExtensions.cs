@@ -5,11 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Web.Pipeline
 {
-    public sealed class ImportResult : List<ImportResultItem>
+    public static class AccessTokenQueryExtensions
     {
+        public static void UseAccessTokenQueryString(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<AccessTokenQueryMiddleware>();
+        }
     }
 }

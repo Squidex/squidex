@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var response = UsersDto.FromResults(taskForItems.Result, taskForCount.Result, this);
+            var response = UsersDto.FromResults(taskForItems.Result, taskForCount.Result, Resources);
 
             return Ok(response);
         }
@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userManager.CreateAsync(userFactory, request.ToValues());
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userManager.UpdateAsync(id, request.ToValues());
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userManager.LockAsync(id);
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userManager.UnlockAsync(id);
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }

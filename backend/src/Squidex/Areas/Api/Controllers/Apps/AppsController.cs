@@ -73,15 +73,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> GetApps()
         {
             var userOrClientId = HttpContext.User.UserOrClientId()!;
-            var userPermissions = HttpContext.Permissions();
+            var userPermissions = Resources.Permissions;
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
 
             var response = Deferred.Response(() =>
             {
-                var userPermissions = HttpContext.Permissions();
-
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, appPlansProvider, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -107,9 +105,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = Deferred.Response(() =>
             {
                 var userOrClientId = HttpContext.User.UserOrClientId()!;
-                var userPermissions = HttpContext.Permissions();
+                var userPermissions = Resources.Permissions;
 
-                return AppDto.FromApp(App, userOrClientId, userPermissions, appPlansProvider, this);
+                return AppDto.FromApp(App, userOrClientId, appPlansProvider, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -299,10 +297,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var userOrClientId = HttpContext.User.UserOrClientId()!;
-            var userPermissions = HttpContext.Permissions();
 
             var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
+            var response = AppDto.FromApp(result, userOrClientId, appPlansProvider, Resources);
 
             return response;
         }

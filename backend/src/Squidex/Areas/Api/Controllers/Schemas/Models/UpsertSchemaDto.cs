@@ -27,12 +27,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The names of the fields that should be used in references.
         /// </summary>
-        public FieldNames? FieldsInReferences { get; set; }
+        public List<string>? FieldsInReferences { get; set; }
 
         /// <summary>
         /// The names of the fields that should be shown in lists, including meta fields.
         /// </summary>
-        public FieldNames? FieldsInLists { get; set; }
+        public List<string>? FieldsInLists { get; set; }
 
         /// <summary>
         /// Optional fields.
@@ -70,6 +70,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 command.Scripts = new SchemaScripts();
 
                 SimpleMapper.Map(dto.Scripts, command.Scripts);
+            }
+
+            if (dto.FieldsInLists != null)
+            {
+                command.FieldsInLists = new FieldNames(dto.FieldsInLists);
+            }
+
+            if (dto.FieldsInReferences != null)
+            {
+                command.FieldsInReferences = new FieldNames(dto.FieldsInReferences);
             }
 
             if (dto.Fields != null)

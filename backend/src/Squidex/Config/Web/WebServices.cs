@@ -37,6 +37,9 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<AppResolver>()
                 .AsSelf();
 
+            services.AddSingletonAs<SchemaResolver>()
+                .AsSelf();
+
             services.AddSingletonAs<RobotsTxtMiddleware>()
                 .AsSelf();
 
@@ -77,6 +80,7 @@ namespace Squidex.Config.Web
                 options.Filters.Add<CachingFilter>();
                 options.Filters.Add<DeferredActionFilter>();
                 options.Filters.Add<AppResolver>();
+                options.Filters.Add<SchemaResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })
             .AddRazorRuntimeCompilation()

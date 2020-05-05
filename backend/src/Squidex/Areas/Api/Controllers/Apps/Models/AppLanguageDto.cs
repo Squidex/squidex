@@ -10,7 +10,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -59,20 +58,20 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public AppLanguageDto WithLinks(ApiController controller, IAppEntity app)
+        public AppLanguageDto WithLinks(Resources resources, IAppEntity app)
         {
             var values = new { app = app.Name, language = Iso2Code };
 
             if (!IsMaster)
             {
-                if (controller.HasPermission(Permissions.AppLanguagesUpdate, app.Name))
+                if (resources.CanUpdateLanguage)
                 {
-                    AddPutLink("update", controller.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
+                    AddPutLink("update", resources.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
                 }
 
-                if (controller.HasPermission(Permissions.AppLanguagesDelete, app.Name) && app.LanguagesConfig.Languages.Count > 1)
+                if (resources.CanDeleteLanguage && app.LanguagesConfig.Languages.Count > 1)
                 {
-                    AddDeleteLink("delete", controller.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
+                    AddDeleteLink("delete", resources.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
                 }
             }
 

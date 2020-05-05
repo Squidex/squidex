@@ -36,20 +36,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.contentQuery = contentQuery;
         }
 
-        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context)
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context)
         {
             Guard.NotNull(content);
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), context);
+            var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
+        public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
             Guard.NotNull(contents);
             Guard.NotNull(context);
 
+            return EnrichInternalAsync(contents, false, context);
+        }
+
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context)
+        {
             using (Profiler.TraceMethod<ContentEnricher>())
             {
                 var results = new List<ContentEntity>();
@@ -64,6 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     foreach (var content in contents)
                     {
                         var result = SimpleMapper.Map(content, new ContentEntity());
+
+                        if (cloneData)
+                        {
+                            result.Data = result.Data.Clone();
+                        }
 
                         results.Add(result);
                     }

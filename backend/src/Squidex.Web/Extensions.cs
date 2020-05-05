@@ -23,8 +23,20 @@ namespace Squidex.Web
             return clientId?.GetClientParts().ClientId;
         }
 
-        public static (string? App, string? ClientId) GetClientParts(this string clientId)
+        public static (string? App, string? ClientId) GetClient(this ClaimsPrincipal principal)
         {
+            var clientId = principal.FindFirst(OpenIdClaims.ClientId)?.Value;
+
+            return clientId.GetClientParts();
+        }
+
+        public static (string? App, string? ClientId) GetClientParts(this string? clientId)
+        {
+            if (clientId == null)
+            {
+                return (null, null);
+            }
+
             var parts = clientId.Split(':', '~');
 
             if (parts.Length == 1)

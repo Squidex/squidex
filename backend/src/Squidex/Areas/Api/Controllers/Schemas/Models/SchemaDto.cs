@@ -12,7 +12,6 @@ using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -79,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static SchemaDto FromSchema(ISchemaEntity schema, ApiController controller, string app)
+        public static SchemaDto FromSchema(ISchemaEntity schema, Resources controller)
         {
             var result = new SchemaDto();
 
@@ -87,64 +86,64 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef, result);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            result.CreateLinks(controller, app);
+            result.CreateLinks(controller);
 
             return result;
         }
 
-        protected virtual void CreateLinks(ApiController controller, string app)
+        protected virtual void CreateLinks(Resources resources)
         {
-            var values = new { app, name = Name };
+            var values = new { app = resources.App, name = Name };
 
-            var allowUpdate = controller.HasPermission(Permissions.AppSchemasUpdate, app, Name);
+            var allowUpdate = resources.CanUpdateSchema(Name);
 
-            AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchema), values));
+            AddSelfLink(resources.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
-            if (controller.HasPermission(Permissions.AppContentsRead, app, Name))
+            if (resources.CanReadContent(Name))
             {
-                AddGetLink("contents", controller.Url<ContentsController>(x => nameof(x.GetContents), values));
+                AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
-            if (controller.HasPermission(Permissions.AppContentsCreate, app, Name))
+            if (resources.CanCreateContent(Name))
             {
-                AddPostLink("contents/create", controller.Url<ContentsController>(x => nameof(x.PostContent), values));
+                AddPostLink("contents/create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                AddPostLink("contents/create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
+                AddPostLink("contents/create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
             }
 
-            if (controller.HasPermission(Permissions.AppSchemasPublish, app, Name))
+            if (resources.CanPublishSchema(Name))
             {
                 if (IsPublished)
                 {
-                    AddPutLink("unpublish", controller.Url<SchemasController>(x => nameof(x.UnpublishSchema), values));
+                    AddPutLink("unpublish", resources.Url<SchemasController>(x => nameof(x.UnpublishSchema), values));
                 }
                 else
                 {
-                    AddPutLink("publish", controller.Url<SchemasController>(x => nameof(x.PublishSchema), values));
+                    AddPutLink("publish", resources.Url<SchemasController>(x => nameof(x.PublishSchema), values));
                 }
             }
 
             if (allowUpdate)
             {
-                AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
+                AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
 
-                AddPutLink("fields/order", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
-                AddPutLink("fields/ui", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaUIFields), values));
+                AddPutLink("fields/ui", resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaUIFields), values));
+                AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
 
-                AddPutLink("update", controller.Url<SchemasController>(x => nameof(x.PutSchema), values));
-                AddPutLink("update/category", controller.Url<SchemasController>(x => nameof(x.PutCategory), values));
-                AddPutLink("update/sync", controller.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
-                AddPutLink("update/urls", controller.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
+                AddPutLink("update", resources.Url<SchemasController>(x => nameof(x.PutSchema), values));
+                AddPutLink("update/sync", resources.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
+                AddPutLink("update/urls", resources.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
+                AddPutLink("update/category", resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
             }
 
-            if (controller.HasPermission(Permissions.AppSchemasScripts, app, Name))
+            if (resources.CanUpdateSchemaScripts(Name))
             {
-                AddPutLink("update/scripts", controller.Url<SchemasController>(x => nameof(x.PutScripts), values));
+                AddPutLink("update/scripts", resources.Url<SchemasController>(x => nameof(x.PutScripts), values));
             }
 
-            if (controller.HasPermission(Permissions.AppSchemasDelete, app, Name))
+            if (resources.CanDeleteSchema(Name))
             {
-                AddDeleteLink("delete", controller.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
+                AddDeleteLink("delete", resources.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
             }
         }
     }

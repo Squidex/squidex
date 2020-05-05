@@ -86,6 +86,7 @@
     <Rule Id="AD0001" Action="None" />
   </Rules>
   <Rules AnalyzerId="Roslyn.Core" RuleNamespace="Microsoft.CodeAnalysis.Diagnostics">
+    <Rule Id="IDE0070" Action="None" />
     <Rule Id="IDE0032" Action="None" />
     <Rule Id="IDE0042" Action="None" />
   </Rules>

@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             await context.ValidateContentAsync(c.Data);
                         }
 
-                        if (c.Publish)
+                        if (!c.DoNotScript && c.Publish)
                         {
                             await context.ExecuteScriptAsync(s => s.Change,
                                 new ScriptContext
@@ -154,14 +154,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             {
                                 var change = GetChange(c);
 
-                                await context.ExecuteScriptAsync(s => s.Change,
-                                    new ScriptContext
-                                    {
-                                        Operation = change.ToString(),
-                                        Data = Snapshot.Data,
-                                        Status = c.Status,
-                                        StatusOld = Snapshot.EditingStatus
-                                    });
+                                if (!c.DoNotScript)
+                                {
+                                    await context.ExecuteScriptAsync(s => s.Change,
+                                        new ScriptContext
+                                        {
+                                            Operation = change.ToString(),
+                                            Data = Snapshot.Data,
+                                            Status = c.Status,
+                                            StatusOld = Snapshot.EditingStatus
+                                        });
+                                }
 
                                 ChangeStatus(c, change);
                             }
@@ -188,14 +191,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         GuardContent.CanDelete(context.Schema, c);
 
-                        await context.ExecuteScriptAsync(s => s.Delete,
-                            new ScriptContext
-                            {
-                                Operation = "Delete",
-                                Data = Snapshot.Data,
-                                Status = Snapshot.EditingStatus,
-                                StatusOld = default
-                            });
+                        if (!c.DoNotScript)
+                        {
+                            await context.ExecuteScriptAsync(s => s.Delete,
+                                new ScriptContext
+                                {
+                                    Operation = "Delete",
+                                    Data = Snapshot.Data,
+                                    Status = Snapshot.EditingStatus,
+                                    StatusOld = default
+                                });
+                        }
 
                         Delete(c);
                     });
@@ -213,28 +219,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!currentData!.Equals(newData))
             {
-                await LoadContext(Snapshot.AppId, Snapshot.SchemaId, command, () => "Failed to update content.");
+                await LoadContext(Snapshot.AppId, Snapshot.SchemaId, command, () => "Failed to update content.", command.OptimizeValidation);
 
-                if (partial)
+                if (!command.DoNotValidate)
                 {
-                    await context.ValidateInputPartialAsync(command.Data);
-                }
-                else
-                {
-                    await context.ValidateInputAsync(command.Data);
-                }
-
-                newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
-                    new ScriptContext
+                    if (partial)
                     {
-                        Operation = "Create",
-                        Data = newData,
-                        DataOld = currentData,
-                        Status = Snapshot.EditingStatus,
-                        StatusOld = default
-                    });
+                        await context.ValidateInputPartialAsync(command.Data);
+                    }
+                    else
+                    {
+                        await context.ValidateInputAsync(command.Data);
+                    }
+                }
 
-                await context.ValidateContentAsync(newData);
+                if (!command.DoNotScript)
+                {
+                    newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
+                        new ScriptContext
+                        {
+                            Operation = "Create",
+                            Data = newData,
+                            DataOld = currentData,
+                            Status = Snapshot.EditingStatus,
+                            StatusOld = default
+                        });
+                }
+
+                if (!command.DoNotValidate)
+                {
+                    await context.ValidateContentAsync(newData);
+                }
 
                 Update(command, newData);
             }

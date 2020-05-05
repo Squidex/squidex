@@ -150,7 +150,12 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 
     public export(): any {
-        const fieldKeys = ['fieldId', '_links', 'parentFieldId'];
+        const fieldKeys = [
+            'fieldId',
+            'parentId',
+            'parentFieldId',
+            '_links'
+        ];
 
         const cleanup = (source: any, ...exclude: string[]): any => {
             const clone = {};

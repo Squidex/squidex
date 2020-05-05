@@ -99,7 +99,12 @@ namespace Squidex.Web.Pipeline
 
         private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
-            var clientId = user.GetClientId();
+            var (appName, clientId) = user.GetClient();
+
+            if (app.Name != appName)
+            {
+                return (null, null);
+            }
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
             {

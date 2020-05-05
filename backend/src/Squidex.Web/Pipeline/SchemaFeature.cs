@@ -6,13 +6,17 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Web.Pipeline
 {
-    public sealed class ImportResultItem
+    public sealed class SchemaFeature : ISchemaFeature
     {
-        public Guid? ContentId { get; set; }
+        public NamedId<Guid> SchemaId { get; }
 
-        public Exception? Exception { get; set; }
+        public SchemaFeature(NamedId<Guid> schemaId)
+        {
+            SchemaId = schemaId;
+        }
     }
 }

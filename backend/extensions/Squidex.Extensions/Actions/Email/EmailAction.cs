@@ -36,15 +36,15 @@ namespace Squidex.Extensions.Actions.Email
         public bool ServerUseSsl { get; set; }
 
         [Required]
-        [Display(Name = "Password", Description = "The password for the SMTP server.")]
-        [DataType(DataType.Password)]
-        public string ServerPassword { get; set; }
-
-        [Required]
         [Display(Name = "Username", Description = "The username for the SMTP server.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string ServerUsername { get; set; }
+
+        [Required]
+        [Display(Name = "Password", Description = "The password for the SMTP server.")]
+        [DataType(DataType.Password)]
+        public string ServerPassword { get; set; }
 
         [Required]
         [Display(Name = "From Address", Description = "The email sending address.")]

@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
         }
@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand(parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
         }
@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand(parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -177,7 +177,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -204,7 +204,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand(id, parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -231,7 +231,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new LockField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -259,7 +259,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new LockField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -286,7 +286,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new HideField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -314,7 +314,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new HideField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -341,7 +341,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new ShowField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -369,7 +369,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new ShowField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -396,7 +396,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new EnableField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -424,7 +424,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new EnableField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -451,7 +451,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new DisableField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -479,7 +479,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new DisableField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -504,7 +504,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new DeleteField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -530,17 +530,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new DeleteField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
 
-        private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<SchemaDetailsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, Resources);
 
             return response;
         }
