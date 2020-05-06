@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_field_updated()
         {
-            var properties = new StringFieldProperties { IsRequired = true };
+            var properties = new StringFieldProperties { Pattern = "a-z" };
 
             var sourceSchema =
                 new Schema("source")

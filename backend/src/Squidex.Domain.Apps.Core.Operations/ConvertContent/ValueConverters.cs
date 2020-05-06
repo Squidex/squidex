@@ -106,11 +106,17 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                         if (parent != null)
                         {
-                            return path.Length == 2 && path[0] == parent.Name && path[1] == field.Name;
+                            if (path.Length == 2 && path[0] == parent.Name && path[1] == field.Name)
+                            {
+                                return true;
+                            }
                         }
                         else
                         {
-                            return path.Length == 1 && path[0] == field.Name;
+                            if (path.Length == 1 && path[0] == field.Name)
+                            {
+                                return true;
+                            }
                         }
                     }
 

@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     if (canUpdate(sourceField, targetField))
                     {
-                        if (!sourceField.RawProperties.Equals(targetField.RawProperties))
+                        if (!sourceField.RawProperties.Equals(targetField.RawProperties as object))
                         {
                             yield return E(new FieldUpdated { FieldId = id, Properties = targetField.RawProperties });
                         }
