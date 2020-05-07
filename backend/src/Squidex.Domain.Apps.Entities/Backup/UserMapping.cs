@@ -74,12 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var (userId, email) in json)
             {
-                var user = await userResolver.FindByIdOrEmailAsync(email);
-
-                if (user == null && await userResolver.CreateUserIfNotExistsAsync(email, false))
-                {
-                    user = await userResolver.FindByIdOrEmailAsync(email);
-                }
+                var (user, _) = await userResolver.CreateUserIfNotExistsAsync(email, false);
 
                 if (user != null)
                 {

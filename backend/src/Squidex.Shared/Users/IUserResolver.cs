@@ -12,9 +12,11 @@ namespace Squidex.Shared.Users
 {
     public interface IUserResolver
     {
-        Task<bool> CreateUserIfNotExistsAsync(string email, bool invited = false);
+        Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false);
 
         Task<IUser?> FindByIdOrEmailAsync(string idOrEmail);
+
+        Task<IUser?> FindByIdAsync(string idOrEmail);
 
         Task<List<IUser>> QueryByEmailAsync(string email);
 

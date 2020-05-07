@@ -74,37 +74,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var userResolver = A.Fake<IUserResolver>();
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(user1.Email))
-                .Returns(user1);
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false))
+                .Returns((user1, false));
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(user2.Email))
-                .Returns(user2);
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false))
+                .Returns((user2, true));
 
             await sut.RestoreAsync(reader, userResolver);
 
             Assert.True(sut.TryMap("user1_old", out var mapped1));
-            Assert.Equal(Subject("user1"), mapped1);
-
             Assert.True(sut.TryMap(Subject("user2_old"), out var mapped2));
+
+            Assert.Equal(Subject("user1"), mapped1);
             Assert.Equal(Subject("user2"), mapped2);
-        }
-
-        [Fact]
-        public async Task Should_create_user_if_not_found()
-        {
-            var user = CreateUser("newId1", "mail1@squidex.io");
-
-            var reader = SetupReader(user);
-
-            var userResolver = A.Fake<IUserResolver>();
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(user.Email))
-                .Returns(Task.FromResult<IUser?>(null));
-
-            await sut.RestoreAsync(reader, userResolver);
-
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, false))
-                .MustHaveHappened();
         }
 
         [Fact]
