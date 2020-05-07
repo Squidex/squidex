@@ -5,29 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Entities;
+using RequestContext = Squidex.Domain.Apps.Entities.Context;
 
 namespace Squidex.Web
 {
     public static class ContextExtensions
     {
-        public static Context Context(this HttpContext httpContext)
+        public static RequestContext Context(this HttpContext httpContext)
         {
-            var context = httpContext.Features.Get<Context>();
+            var context = httpContext.Features.Get<RequestContext>();
 
             if (context == null)
             {
-                context = new Context(httpContext.User);
-
-                foreach (var (key, value) in httpContext.Request.Headers)
-                {
-                    if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
-                    {
-                        context.Headers.Add(key, value.ToString());
-                    }
-                }
+                context = RequestContext.Anonymous();
 
                 httpContext.Features.Set(context);
             }

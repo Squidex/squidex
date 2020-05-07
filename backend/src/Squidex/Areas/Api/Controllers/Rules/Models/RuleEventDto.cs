@@ -64,25 +64,25 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public RuleJobResult JobResult { get; set; }
 
-        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent, ApiController controller, string app)
+        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent, Resources resources)
         {
             var result = new RuleEventDto();
 
             SimpleMapper.Map(ruleEvent, result);
             SimpleMapper.Map(ruleEvent.Job, result);
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(resources);
         }
 
-        private RuleEventDto CreateLinks(ApiController controller, string app)
+        private RuleEventDto CreateLinks(Resources resources)
         {
-            var values = new { app, id = Id };
+            var values = new { app = resources.App, id = Id };
 
-            AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutEvent), values));
+            AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutEvent), values));
 
             if (NextAttempt.HasValue)
             {
-                AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteEvent), values));
+                AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
             }
 
             return this;

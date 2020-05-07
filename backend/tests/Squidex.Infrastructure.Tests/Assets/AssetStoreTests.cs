@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -122,6 +123,20 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public async Task Should_upload_compressed_file()
+        {
+            var source = CreateDeflateStream(20_000);
+
+            await Sut.UploadAsync(fileName, source);
+
+            var readData = new MemoryStream();
+
+            await Sut.DownloadAsync(fileName, readData);
+
+            Assert.True(readData.Length > 0);
+        }
+
+        [Fact]
         public async Task Should_write_and_read_file_with_range()
         {
             await Sut.UploadAsync(fileName, assetSmall, true);
@@ -214,6 +229,27 @@ namespace Squidex.Infrastructure.Assets
             memoryStream.Position = 0;
 
             return memoryStream;
+        }
+
+        private static Stream CreateDeflateStream(int length)
+        {
+            var memoryStream = new MemoryStream();
+
+            using (var archive1 = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                using (var file = archive1.CreateEntry("test").Open())
+                {
+                    var test = CreateFile(length);
+
+                    test.CopyTo(file);
+                }
+            }
+
+            memoryStream.Position = 0;
+
+            var archive2 = new ZipArchive(memoryStream, ZipArchiveMode.Read);
+
+            return archive2.GetEntry("test").Open();
         }
     }
 }

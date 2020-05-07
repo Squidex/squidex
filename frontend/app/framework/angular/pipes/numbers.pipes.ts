@@ -50,5 +50,4 @@ export function calculateFileSize(value: number) {
     }
 
     return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
-
 }

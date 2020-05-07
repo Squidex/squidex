@@ -26,20 +26,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public long Total { get; set; }
 
-        public static RuleEventsDto FromRuleEvents(IResultList<IRuleEventEntity> ruleEvents, ApiController controller, string app)
+        public static RuleEventsDto FromRuleEvents(IResultList<IRuleEventEntity> ruleEvents, Resources resources)
         {
             var result = new RuleEventsDto
             {
                 Total = ruleEvents.Total,
-                Items = ruleEvents.Select(x => RuleEventDto.FromRuleEvent(x, controller, app)).ToArray()
+                Items = ruleEvents.Select(x => RuleEventDto.FromRuleEvent(x, resources)).ToArray()
             };
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(resources);
         }
 
-        private RuleEventsDto CreateLinks(ApiController controller, string app)
+        private RuleEventsDto CreateLinks(Resources resources)
         {
-            AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetEvents), new { app }));
+            var values = new { app = resources.App };
+
+            AddSelfLink(resources.Url<RulesController>(x => nameof(x.GetEvents), values));
 
             return this;
         }

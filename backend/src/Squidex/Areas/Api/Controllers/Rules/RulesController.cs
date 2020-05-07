@@ -297,7 +297,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
 
-            var response = RuleEventsDto.FromRuleEvents(ruleEvents, this, app);
+            var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources);
 
             return Ok(response);
         }

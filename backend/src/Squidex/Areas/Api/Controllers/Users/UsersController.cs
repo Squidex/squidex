@@ -127,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdOrEmailAsync(id);
+                var entity = await userResolver.FindByIdAsync(id);
 
                 if (entity != null)
                 {
@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdOrEmailAsync(id);
+                var entity = await userResolver.FindByIdAsync(id);
 
                 if (entity != null)
                 {

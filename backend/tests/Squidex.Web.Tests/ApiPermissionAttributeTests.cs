@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -66,6 +67,8 @@ namespace Squidex.Web
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
+            SetContext();
+
             var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -82,6 +85,8 @@ namespace Squidex.Web
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
 
+            SetContext();
+
             var sut = new ApiPermissionAttribute(Permissions.AppSchemasUpdate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -97,6 +102,8 @@ namespace Squidex.Web
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
+            SetContext();
+
             var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -110,6 +117,8 @@ namespace Squidex.Web
         {
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
+            SetContext();
+
             var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -121,12 +130,19 @@ namespace Squidex.Web
         [Fact]
         public async Task Should_return_forbidden_when_user_has_no_permission()
         {
+            SetContext();
+
             var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
             Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
             Assert.False(isNextCalled);
+        }
+
+        private void SetContext()
+        {
+            actionExecutingContext.HttpContext.Features.Set(new Context(new ClaimsPrincipal(actionExecutingContext.HttpContext.User)));
         }
     }
 }

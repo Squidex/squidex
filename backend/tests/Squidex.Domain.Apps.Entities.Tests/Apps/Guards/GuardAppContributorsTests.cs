@@ -36,15 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             A.CallTo(() => user2.Id).Returns("2");
             A.CallTo(() => user3.Id).Returns("3");
 
-            A.CallTo(() => users.FindByIdOrEmailAsync("1")).Returns(user1);
-            A.CallTo(() => users.FindByIdOrEmailAsync("2")).Returns(user2);
-            A.CallTo(() => users.FindByIdOrEmailAsync("3")).Returns(user3);
+            A.CallTo(() => users.FindByIdAsync("1")).Returns(user1);
+            A.CallTo(() => users.FindByIdAsync("2")).Returns(user2);
+            A.CallTo(() => users.FindByIdAsync("3")).Returns(user3);
 
-            A.CallTo(() => users.FindByIdOrEmailAsync("1@email.com")).Returns(user1);
-            A.CallTo(() => users.FindByIdOrEmailAsync("2@email.com")).Returns(user2);
-            A.CallTo(() => users.FindByIdOrEmailAsync("3@email.com")).Returns(user3);
-
-            A.CallTo(() => users.FindByIdOrEmailAsync("notfound"))
+            A.CallTo(() => users.FindByIdAsync("notfound"))
                 .Returns(Task.FromResult<IUser?>(null));
 
             A.CallTo(() => appPlan.MaxContributors)
@@ -118,16 +114,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan),
                 new ValidationError("You have reached the maximum number of contributors for your plan."));
-        }
-
-        [Fact]
-        public async Task CanAssign_assign_if_if_user_added_by_email()
-        {
-            var command = new AssignContributor { ContributorId = "1@email.com" };
-
-            await GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
-
-            Assert.Equal("1", command.ContributorId);
         }
 
         [Fact]

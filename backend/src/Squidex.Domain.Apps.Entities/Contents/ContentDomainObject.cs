@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => "Failed to create draft.");
 
-                        GuardContent.CanCreateDraft(c, context.Schema, Snapshot);
+                        GuardContent.CanCreateDraft(c, Snapshot);
 
                         var status = await contentWorkflow.GetInitialStatusAsync(context.Schema);
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => "Failed to delete draft.");
 
-                        GuardContent.CanDeleteDraft(c, context.Schema, Snapshot);
+                        GuardContent.CanDeleteDraft(c, Snapshot);
 
                         DeleteDraft(c);
 

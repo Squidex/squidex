@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPrincipal User { get; }
 
-        public ClaimsPermissions Permissions { get; private set; } = ClaimsPermissions.Empty;
+        public ClaimsPermissions Permissions { get; } = ClaimsPermissions.Empty;
 
         public bool IsFrontendClient { get; private set; }
 
@@ -35,7 +35,9 @@ namespace Squidex.Domain.Apps.Entities
 
             User = user;
 
-            UpdatePermissions();
+            Permissions = User.Permissions();
+
+            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
         }
 
         public Context(ClaimsPrincipal user, IAppEntity app)
@@ -47,13 +49,6 @@ namespace Squidex.Domain.Apps.Entities
         public static Context Anonymous()
         {
             return new Context(new ClaimsPrincipal(new ClaimsIdentity()));
-        }
-
-        public void UpdatePermissions()
-        {
-            Permissions = User.Permissions();
-
-            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
         }
 
         public Context Clone()

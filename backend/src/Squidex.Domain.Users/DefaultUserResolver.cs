@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+
 namespace Squidex.Domain.Users
 {
     public sealed class DefaultUserResolver : IUserResolver
@@ -27,33 +29,58 @@ namespace Squidex.Domain.Users
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<bool> CreateUserIfNotExistsAsync(string email, bool invited)
+        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited)
         {
             Guard.NotNullOrEmpty(email);
+
+            var created = false;
 
             using (var scope = serviceProvider.CreateScope())
             {
                 var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-                var user = userFactory.Create(email);
-
                 try
                 {
+                    var user = userFactory.Create(email);
+
                     var result = await userManager.CreateAsync(user);
 
                     if (result.Succeeded)
                     {
+                        created = true;
+
                         var values = new UserValues { DisplayName = email, Invited = invited };
 
                         await userManager.UpdateAsync(user, values);
                     }
-
-                    return result.Succeeded;
                 }
                 catch
                 {
-                    return false;
+                }
+
+                var found = await userManager.FindByEmailWithClaimsAsync(email);
+
+                return (found, created);
+            }
+        }
+
+        public async Task<IUser?> FindByIdAsync(string idOrEmail)
+        {
+            Guard.NotNullOrEmpty(idOrEmail);
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                if (userFactory.IsId(idOrEmail))
+                {
+                    return await userManager.FindByIdWithClaimsAsync(idOrEmail);
+                }
+                else
+                {
+                    return await userManager.FindByEmailWithClaimsAsync(idOrEmail);
                 }
             }
         }
