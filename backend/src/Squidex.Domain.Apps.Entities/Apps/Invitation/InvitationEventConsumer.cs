@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 var assignerId = appContributorAssigned.Actor.Identifier;
                 var assigneeId = appContributorAssigned.ContributorId;
 
-                var assigner = await userResolver.FindByIdOrEmailAsync(assignerId);
+                var assigner = await userResolver.FindByIdAsync(assignerId);
 
                 if (assigner == null)
                 {
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                     return;
                 }
 
-                var assignee = await userResolver.FindByIdOrEmailAsync(appContributorAssigned.ContributorId);
+                var assignee = await userResolver.FindByIdAsync(appContributorAssigned.ContributorId);
 
                 if (assignee == null)
                 {

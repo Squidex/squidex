@@ -36,14 +36,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else
                 {
-                    var user = await users.FindByIdOrEmailAsync(command.ContributorId);
+                    var user = await users.FindByIdAsync(command.ContributorId);
 
                     if (user == null)
                     {
                         throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
                     }
-
-                    command.ContributorId = user.Id;
 
                     if (!command.Restoring)
                     {

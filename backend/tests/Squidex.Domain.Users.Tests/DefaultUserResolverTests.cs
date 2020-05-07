@@ -19,13 +19,12 @@ namespace Squidex.Domain.Users
 {
     public class DefaultUserResolverTests
     {
+        private readonly IUserFactory userFactory = A.Fake<IUserFactory>();
         private readonly UserManager<IdentityUser> userManager = A.Fake<UserManager<IdentityUser>>();
         private readonly DefaultUserResolver sut;
 
         public DefaultUserResolverTests()
         {
-            var userFactory = A.Fake<IUserFactory>();
-
             A.CallTo(() => userFactory.IsId(A<string>.That.StartsWith("id")))
                 .Returns(true);
 
@@ -57,9 +56,72 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
+        public async Task Should_create_user_and_return_true_when_created()
+        {
+            var (user, claims) = GenerateUser("id1");
+
+            A.CallTo(() => userFactory.Create(user.Email))
+                .Returns(user);
+
+            A.CallTo(() => userManager.CreateAsync(user))
+                .Returns(IdentityResult.Success);
+
+            SetupUser(user, claims);
+
+            var (result, created) = await sut.CreateUserIfNotExistsAsync(user.Email, false);
+
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
+
+            Assert.True(created);
+        }
+
+        [Fact]
+        public async Task Should_create_user_and_return_false_when_already_exists()
+        {
+            var (user, claims) = GenerateUser("id1");
+
+            A.CallTo(() => userFactory.Create(user.Email))
+                .Returns(user);
+
+            A.CallTo(() => userManager.CreateAsync(user))
+                .Returns(IdentityResult.Failed());
+
+            SetupUser(user, claims);
+
+            var (result, created) = await sut.CreateUserIfNotExistsAsync(user.Email, false);
+
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
+
+            Assert.False(created);
+        }
+
+        [Fact]
+        public async Task Should_create_user_and_return_false_when_exception_thrown()
+        {
+            var (user, claims) = GenerateUser("id1");
+
+            A.CallTo(() => userFactory.Create(user.Email))
+                .Throws(new InvalidOperationException());
+
+            A.CallTo(() => userManager.CreateAsync(user))
+                .Returns(IdentityResult.Failed());
+
+            SetupUser(user, claims);
+
+            var (result, created) = await sut.CreateUserIfNotExistsAsync(user.Email, false);
+
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
+
+            Assert.False(created);
+        }
+
+        [Fact]
         public async Task Should_resolve_user_by_email()
         {
-            var (user, claims) = GernerateUser("id1");
+            var (user, claims) = GenerateUser("id1");
 
             A.CallTo(() => userManager.FindByEmailAsync(user.Email))
                 .Returns(user);
@@ -76,9 +138,9 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_resolve_user_by_id1()
+        public async Task Should_resolve_user_by_id()
         {
-            var (user, claims) = GernerateUser("id2");
+            var (user, claims) = GenerateUser("id2");
 
             A.CallTo(() => userManager.FindByIdAsync(user.Id))
                 .Returns(user);
@@ -95,10 +157,29 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
+        public async Task Should_resolve_user_by_id_only()
+        {
+            var (user, claims) = GenerateUser("id2");
+
+            A.CallTo(() => userManager.FindByIdAsync(user.Id))
+                .Returns(user);
+
+            A.CallTo(() => userManager.GetClaimsAsync(user))
+                .Returns(claims);
+
+            var result = await sut.FindByIdAsync(user.Id)!;
+
+            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Email, result!.Email);
+
+            Assert.Equal(claims, result!.Claims);
+        }
+
+        [Fact]
         public async Task Should_query_many_by_email_async()
         {
-            var (user1, claims1) = GernerateUser("id1");
-            var (user2, claims2) = GernerateUser("id2");
+            var (user1, claims1) = GenerateUser("id1");
+            var (user2, claims2) = GenerateUser("id2");
 
             var list = new List<IdentityUser> { user1, user2 };
 
@@ -119,7 +200,7 @@ namespace Squidex.Domain.Users
                 .MustNotHaveHappened();
         }
 
-        private static (IdentityUser, List<Claim>) GernerateUser(string id)
+        private static (IdentityUser, List<Claim>) GenerateUser(string id)
         {
             var user = new IdentityUser { Id = id, Email = $"email_{id}", NormalizedEmail = $"EMAIL_{id}" };
 
@@ -130,6 +211,15 @@ namespace Squidex.Domain.Users
             };
 
             return (user, claims);
+        }
+
+        private void SetupUser(IdentityUser user, List<Claim> claims)
+        {
+            A.CallTo(() => userManager.FindByEmailAsync(user.Email))
+                .Returns(user);
+
+            A.CallTo(() => userManager.GetClaimsAsync(user))
+                .Returns(claims);
         }
     }
 }
