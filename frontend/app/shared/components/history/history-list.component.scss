@@ -27,4 +27,12 @@
     &-created {
         font-size: .75rem;
     }
+
+    &-right {
+        overflow: hidden;
+    }
+
+    &-message {
+        overflow-wrap: break-word;
+    }
 }
