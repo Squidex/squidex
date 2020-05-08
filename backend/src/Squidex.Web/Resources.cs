@@ -43,7 +43,7 @@ namespace Squidex.Web
         public bool CanDeleteSchema(string schema) => IsAllowedForSchema(P.AppSchemasDelete, schema);
 
         [Lazy]
-        public bool CanCreateSchema => IsAllowed(P.AppSchemasUpdate);
+        public bool CanCreateSchema => IsAllowed(P.AppSchemasCreate);
 
         // Contributors
         [Lazy]
