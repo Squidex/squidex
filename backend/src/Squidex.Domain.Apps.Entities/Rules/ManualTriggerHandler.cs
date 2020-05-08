@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
@@ -22,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 Name = "Manual"
             };
+
+            SimpleMapper.Map(@event.Payload, result);
 
             return Task.FromResult<EnrichedManualEvent?>(result);
         }
