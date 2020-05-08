@@ -126,13 +126,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (value, field, parent) =>
             {
-                if (value is JsonArray array && shouldHandle(field, parent))
+                if (field is IField<AssetsFieldProperties> && value is JsonArray array && shouldHandle(field, parent))
                 {
                     for (var i = 0; i < array.Count; i++)
                     {
                         var id = array[i].ToString();
 
-                        array[i] = JsonValue.Create(urlGenerator.AssetContent(Guid.Parse(id)));
+                        if (Guid.TryParse(id, out var assetId))
+                        {
+                            array[i] = JsonValue.Create(urlGenerator.AssetContent(assetId));
+                        }
                     }
                 }
 
