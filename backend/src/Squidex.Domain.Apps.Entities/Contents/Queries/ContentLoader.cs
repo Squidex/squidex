@@ -28,16 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
-                var grain = grainFactory.GetGrain<IContentGrain>(id);
+                var contentGrain = grainFactory.GetGrain<IContentGrain>(id);
+                var contentState = await contentGrain.GetStateAsync(version);
 
-                var content = await grain.GetStateAsync(version);
+                var content = contentState.Value;
 
-                if (content.Value == null || (version > EtagVersion.Any && content.Value.Version != version))
+                if (content == null || content.Version <= EtagVersion.Empty || (version > EtagVersion.Any && content.Version != version))
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return content.Value;
+                return content;
             }
         }
     }

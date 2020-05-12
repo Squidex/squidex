@@ -40,6 +40,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
+        public async Task Should_throw_exception_if_state_empty()
+        {
+            var content = new AssetEntity { Version = EtagVersion.Empty };
+
+            A.CallTo(() => grain.GetStateAsync(10))
+                .Returns(J.Of<IAssetEntity>(content));
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
+        }
+
+        [Fact]
         public async Task Should_throw_exception_if_state_has_other_version()
         {
             var content = new AssetEntity { Version = 5 };
