@@ -32,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public ContentDomainObject(IStore<Guid> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(context);
-            Guard.NotNull(contentWorkflow);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
 
             this.contentWorkflow = contentWorkflow;
             this.context = context;

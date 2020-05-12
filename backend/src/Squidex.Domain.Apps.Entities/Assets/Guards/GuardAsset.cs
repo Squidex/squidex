@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
     {
         public static void CanAnnotate(AnnotateAsset command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot annotate asset.", e =>
             {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static Task CanCreate(CreateAsset command, IAssetQueryService assetQuery)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static Task CanMove(MoveAsset command, IAssetQueryService assetQuery, Guid oldParentId)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
@@ -62,12 +62,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static void CanUpdate(UpdateAsset command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
         }
 
         public static void CanDelete(DeleteAsset command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
         }
 
         private static async Task CheckPathAsync(Guid parentId, IAssetQueryService assetQuery, AddValidation e)

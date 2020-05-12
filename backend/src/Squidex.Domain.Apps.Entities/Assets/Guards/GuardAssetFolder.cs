@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
     {
         public static Task CanCreate(CreateAssetFolder command, IAssetQueryService assetQuery)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static void CanRename(RenameAssetFolder command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot rename asset.", e =>
             {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static Task CanMove(MoveAssetFolder command, IAssetQueryService assetQuery, Guid id, Guid oldParentId)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         public static void CanDelete(DeleteAssetFolder command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
         }
 
         private static async Task CheckPathAsync(Guid parentId, IAssetQueryService assetQuery, Guid id, AddValidation e)

@@ -22,7 +22,7 @@ namespace Squidex.Extensions.Actions.Webhook
         public WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory);
+            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
 
             this.httpClientFactory = httpClientFactory;
         }

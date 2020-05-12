@@ -22,9 +22,9 @@ namespace Migrate_01
 
         public RebuildRunner(Rebuilder rebuilder, IOptions<RebuildOptions> rebuildOptions, PopulateGrainIndexes populateGrainIndexes)
         {
-            Guard.NotNull(rebuilder);
-            Guard.NotNull(rebuildOptions);
-            Guard.NotNull(populateGrainIndexes);
+            Guard.NotNull(rebuilder, nameof(rebuilder));
+            Guard.NotNull(rebuildOptions, nameof(rebuildOptions));
+            Guard.NotNull(populateGrainIndexes, nameof(populateGrainIndexes));
 
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;

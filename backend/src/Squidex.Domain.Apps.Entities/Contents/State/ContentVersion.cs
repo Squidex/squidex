@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         public ContentVersion(Status status, NamedContentData data)
         {
-            Guard.NotNull(data);
+            Guard.NotNull(data, nameof(data));
 
             Status = status;
 

@@ -33,9 +33,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public BackupApps(IAppImageStore appImageStore, IAppsIndex appsIndex, IAppUISettings appUISettings)
         {
-            Guard.NotNull(appImageStore);
-            Guard.NotNull(appsIndex);
-            Guard.NotNull(appUISettings);
+            Guard.NotNull(appImageStore, nameof(appImageStore));
+            Guard.NotNull(appsIndex, nameof(appsIndex));
+            Guard.NotNull(appUISettings, nameof(appUISettings));
 
             this.appsIndex = appsIndex;
             this.appImageStore = appImageStore;

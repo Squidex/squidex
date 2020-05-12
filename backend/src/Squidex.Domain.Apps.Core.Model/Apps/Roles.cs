@@ -107,8 +107,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Update(string name, params string[] permissions)
         {
-            Guard.NotNullOrEmpty(name);
-            Guard.NotNull(permissions);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNull(permissions, nameof(permissions));
 
             if (!inner.TryGetValue(name, out var role))
             {
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public bool TryGet(string app, string name, [MaybeNullWhen(false)] out Role value)
         {
-            Guard.NotNull(app);
+            Guard.NotNull(app, nameof(app));
 
             if (Defaults.TryGetValue(name, out var role) || inner.TryGetValue(name, out role))
             {

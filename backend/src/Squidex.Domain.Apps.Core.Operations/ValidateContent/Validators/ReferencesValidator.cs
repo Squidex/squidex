@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public ReferencesValidator(IEnumerable<Guid>? schemaIds, CheckContentsByIds checkReferences)
         {
-            Guard.NotNull(checkReferences);
+            Guard.NotNull(checkReferences, nameof(checkReferences));
 
             this.schemaIds = schemaIds;
 

@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public OrleansEventNotifier(IGrainFactory factory)
         {
-            Guard.NotNull(factory);
+            Guard.NotNull(factory, nameof(factory));
 
             eventConsumerManagerGrain = new Lazy<IEventConsumerManagerGrain>(() =>
             {

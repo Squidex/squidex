@@ -27,10 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             IAssetFolderRepository assetFolderRepository,
             AssetQueryParser queryParser)
         {
-            Guard.NotNull(assetEnricher);
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(assetFolderRepository);
-            Guard.NotNull(queryParser);
+            Guard.NotNull(assetEnricher, nameof(assetEnricher));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
+            Guard.NotNull(queryParser, nameof(queryParser));
 
             this.assetEnricher = assetEnricher;
             this.assetRepository = assetRepository;
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, Guid appId, string hash)
         {
-            Guard.NotNull(hash);
+            Guard.NotNull(hash, nameof(hash));
 
             var assets = await assetRepository.QueryByHashAsync(appId, hash);
 
@@ -90,8 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Guid? parentId, Q query)
         {
-            Guard.NotNull(context);
-            Guard.NotNull(query);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(query, nameof(query));
 
             IResultList<IAssetEntity> assets;
 

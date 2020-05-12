@@ -172,8 +172,8 @@ namespace Squidex.Web.Pipeline
 
         public CachingManager(IHttpContextAccessor httpContextAccessor, IOptions<CachingOptions> cachingOptions)
         {
-            Guard.NotNull(httpContextAccessor);
-            Guard.NotNull(cachingOptions);
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
+            Guard.NotNull(cachingOptions, nameof(cachingOptions));
 
             this.httpContextAccessor = httpContextAccessor;
 
@@ -187,7 +187,7 @@ namespace Squidex.Web.Pipeline
 
         public void Start(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext);
+            Guard.NotNull(httpContext, nameof(httpContext));
 
             int maxKeysSize = GetKeysSize(httpContext);
 
@@ -247,7 +247,7 @@ namespace Squidex.Web.Pipeline
 
         public void Finish(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext);
+            Guard.NotNull(httpContext, nameof(httpContext));
 
             var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
 

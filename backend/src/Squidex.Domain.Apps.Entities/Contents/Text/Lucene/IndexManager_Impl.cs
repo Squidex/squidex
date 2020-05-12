@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             public void Open(Directory directory)
             {
-                Guard.NotNull(directory);
+                Guard.NotNull(directory, nameof(directory));
 
                 this.directory = directory;
 

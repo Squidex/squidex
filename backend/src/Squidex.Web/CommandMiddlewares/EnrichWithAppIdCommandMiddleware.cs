@@ -21,7 +21,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithAppIdCommandMiddleware(IContextProvider contextProvider)
         {
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.contextProvider = contextProvider;
         }

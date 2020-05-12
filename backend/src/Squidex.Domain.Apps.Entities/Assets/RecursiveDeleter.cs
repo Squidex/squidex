@@ -43,11 +43,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             TypeNameRegistry typeNameRegistry,
             ISemanticLog log)
         {
-            Guard.NotNull(commandBus);
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(assetFolderRepository);
-            Guard.NotNull(typeNameRegistry);
-            Guard.NotNull(log);
+            Guard.NotNull(commandBus, nameof(commandBus));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(log, nameof(log));
 
             this.commandBus = commandBus;
             this.assetRepository = assetRepository;

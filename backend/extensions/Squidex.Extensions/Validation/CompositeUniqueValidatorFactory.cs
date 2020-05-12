@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Validation
 
         public CompositeUniqueValidatorFactory(IContentRepository contentRepository)
         {
-            Guard.NotNull(contentRepository);
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.contentRepository = contentRepository;
         }

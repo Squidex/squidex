@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public GrainTagService(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         private ITagGrain GetGrain(Guid appId, string group)
         {
-            Guard.NotNullOrEmpty(group);
+            Guard.NotNullOrEmpty(group, nameof(group));
 
             return grainFactory.GetGrain<ITagGrain>($"{appId}_{group}");
         }

@@ -32,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
         {
-            Guard.NotNull(contentQuery);
-            Guard.NotNull(requestCache);
+            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.contentQuery = contentQuery;
 

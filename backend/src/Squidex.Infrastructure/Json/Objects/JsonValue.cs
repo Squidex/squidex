@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public static IJsonValue Create(double value)
         {
-            Guard.ValidNumber(value);
+            Guard.ValidNumber(value, nameof(value));
 
             if (value == 0)
             {

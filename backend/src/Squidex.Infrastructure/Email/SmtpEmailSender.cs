@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Email
 
         public SmtpEmailSender(IOptions<SmtpOptions> options)
         {
-            Guard.NotNull(options);
+            Guard.NotNull(options, nameof(options));
 
             this.options = options.Value;
 

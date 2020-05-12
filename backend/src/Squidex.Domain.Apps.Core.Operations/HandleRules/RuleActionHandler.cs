@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected RuleActionHandler(RuleEventFormatter formatter)
         {
-            Guard.NotNull(formatter);
+            Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
         }

@@ -41,10 +41,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IUserResolver userResolver)
             : base(store, log)
         {
-            Guard.NotNull(initialPatterns);
-            Guard.NotNull(userResolver);
-            Guard.NotNull(appPlansProvider);
-            Guard.NotNull(appPlansBillingManager);
+            Guard.NotNull(initialPatterns, nameof(initialPatterns));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;

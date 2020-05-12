@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public static IEnumerable<IValidator> CreateValidators(IField field, FieldValidatorFactory createFieldValidator)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             var visitor = new DefaultFieldValueValidatorsFactory(createFieldValidator);
 

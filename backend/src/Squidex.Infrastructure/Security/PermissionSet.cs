@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Security
 
         public PermissionSet(IEnumerable<Permission> permissions)
         {
-            Guard.NotNull(permissions);
+            Guard.NotNull(permissions, nameof(permissions));
 
             this.permissions = permissions.ToList();
 
@@ -50,14 +50,14 @@ namespace Squidex.Infrastructure.Security
 
         public PermissionSet Add(string permission)
         {
-            Guard.NotNullOrEmpty(permission);
+            Guard.NotNullOrEmpty(permission, nameof(permission));
 
             return Add(new Permission(permission));
         }
 
         public PermissionSet Add(Permission permission)
         {
-            Guard.NotNull(permission);
+            Guard.NotNull(permission, nameof(permission));
 
             return new PermissionSet(permissions.Union(Enumerable.Repeat(permission, 1)).Distinct());
         }

@@ -36,7 +36,7 @@ namespace Squidex.Web
 
         public static (ErrorDto Error, bool WellKnown) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
         {
-            Guard.NotNull(problem);
+            Guard.NotNull(problem, nameof(problem));
 
             var error = new ErrorDto { Message = problem.Title, StatusCode = problem.Status };
 
@@ -47,7 +47,7 @@ namespace Squidex.Web
 
         public static (ErrorDto Error, bool WellKnown) ToErrorDto(this Exception exception, HttpContext? httpContext)
         {
-            Guard.NotNull(exception);
+            Guard.NotNull(exception, nameof(exception));
 
             var result = CreateError(exception);
 

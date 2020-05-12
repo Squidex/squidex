@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public IndexManager(IIndexStorage indexStorage, ISemanticLog log)
         {
-            Guard.NotNull(indexStorage);
-            Guard.NotNull(log);
+            Guard.NotNull(indexStorage, nameof(indexStorage));
+            Guard.NotNull(log, nameof(log));
 
             this.indexStorage = indexStorage;
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public async Task ReleaseAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             var indexHolder = (IndexHolder)index;
 
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public Task CommitAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             return CommitInternalAsync(index, false);
         }

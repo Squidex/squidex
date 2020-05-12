@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static string GetKey(string key)
         {
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             return $"{key}_API";
         }

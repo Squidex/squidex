@@ -25,7 +25,7 @@ namespace Squidex.Extensions.Actions.Comment
         public CommentActionHandler(RuleEventFormatter formatter, ICommandBus commandBus)
             : base(formatter)
         {
-            Guard.NotNull(commandBus);
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             this.commandBus = commandBus;
         }

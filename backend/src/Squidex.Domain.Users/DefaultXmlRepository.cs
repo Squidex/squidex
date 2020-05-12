@@ -26,7 +26,7 @@ namespace Squidex.Domain.Users
 
         public DefaultXmlRepository(ISnapshotStore<State, string> store)
         {
-            Guard.NotNull(store);
+            Guard.NotNull(store, nameof(store));
 
             this.store = store;
         }

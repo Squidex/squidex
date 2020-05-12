@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
             this.jsonSerializer = jsonSerializer;
         }

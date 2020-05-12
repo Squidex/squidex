@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public StateFilter(IGrainRuntime runtime)
         {
-            Guard.NotNull(runtime);
+            Guard.NotNull(runtime, nameof(runtime));
 
             this.runtime = runtime;
         }

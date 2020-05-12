@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupService(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }

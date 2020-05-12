@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public HttpScriptExtension(IHttpClientFactory httpClientFactory)
         {
-            Guard.NotNull(httpClientFactory);
+            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
 
             this.httpClientFactory = httpClientFactory;
         }

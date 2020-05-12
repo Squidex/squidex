@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         public static HashSet<Guid> GetReferencedIds(this NamedContentData source, Schema schema, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var extractor = new ReferencesExtractor(new HashSet<Guid>(), referencesPerField);
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<Guid> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<Guid> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(fields);
+            Guard.NotNull(fields, nameof(fields));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<Guid> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
@@ -94,8 +94,8 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static JsonObject FormatReferences(this NamedContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
         {
-            Guard.NotNull(schema);
-            Guard.NotNull(partitioning);
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(partitioning, nameof(partitioning));
 
             var result = JsonValue.Object();
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partitionKey, string separator)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var sb = new StringBuilder();
 

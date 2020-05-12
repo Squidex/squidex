@@ -28,7 +28,7 @@ namespace Squidex.Web.Pipeline
 
         public AppResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider);
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
         }

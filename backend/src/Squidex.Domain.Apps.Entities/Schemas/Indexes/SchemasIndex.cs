@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasIndex(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var find = Collection.Find(x => x.Id == id);
 

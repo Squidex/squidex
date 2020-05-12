@@ -43,8 +43,8 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public LanguagesConfig(Dictionary<string, LanguageConfig> languages, string master)
         {
-            Guard.NotNull(languages);
-            Guard.NotNullOrEmpty(master);
+            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNullOrEmpty(master, nameof(master));
 
             Cleanup(languages, ref master);
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig MakeMaster(Language language)
         {
-            Guard.NotNull(language);
+            Guard.NotNull(language, nameof(language));
 
             return Build(languages, language);
         }
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig Set(Language language, bool isOptional = false, params Language[]? fallbacks)
         {
-            Guard.NotNull(language);
+            Guard.NotNull(language, nameof(language));
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages)
             {
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig Remove(Language language)
         {
-            Guard.NotNull(language);
+            Guard.NotNull(language, nameof(language));
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages);
 

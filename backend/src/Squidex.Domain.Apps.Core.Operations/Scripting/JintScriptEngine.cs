@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public async Task ExecuteAsync(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
             {
@@ -75,8 +75,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public async Task<NamedContentData> ExecuteAndTransformAsync(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
             {
@@ -128,8 +128,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public async Task<NamedContentData> TransformAsync(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
             {
@@ -178,8 +178,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool Evaluate(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             try
             {
@@ -199,8 +199,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public string? Interpolate(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             try
             {
@@ -220,8 +220,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public Task<IJsonValue> GetAsync(ScriptContext context, string script)
         {
-            Guard.NotNull(context);
-            Guard.NotNullOrEmpty(script);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
             {

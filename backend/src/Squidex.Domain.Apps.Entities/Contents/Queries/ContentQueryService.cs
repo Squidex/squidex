@@ -36,11 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IContentLoader contentVersionLoader,
             ContentQueryParser queryParser)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(contentEnricher);
-            Guard.NotNull(contentRepository);
-            Guard.NotNull(contentVersionLoader);
-            Guard.NotNull(queryParser);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(contentEnricher, nameof(contentEnricher));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
+            Guard.NotNull(queryParser, nameof(queryParser));
 
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {

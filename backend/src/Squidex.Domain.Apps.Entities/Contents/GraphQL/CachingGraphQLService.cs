@@ -27,15 +27,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public CachingGraphQLService(IMemoryCache cache, IDependencyResolver resolver)
             : base(cache)
         {
-            Guard.NotNull(resolver);
+            Guard.NotNull(resolver, nameof(resolver));
 
             this.resolver = resolver;
         }
 
         public async Task<(bool HasError, object Response)> QueryAsync(Context context, params GraphQLQuery[] queries)
         {
-            Guard.NotNull(context);
-            Guard.NotNull(queries);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(queries, nameof(queries));
 
             var model = await GetModelAsync(context.App);
 
@@ -48,8 +48,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public async Task<(bool HasError, object Response)> QueryAsync(Context context, GraphQLQuery query)
         {
-            Guard.NotNull(context);
-            Guard.NotNull(query);
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(query, nameof(query));
 
             var model = await GetModelAsync(context.App);
 

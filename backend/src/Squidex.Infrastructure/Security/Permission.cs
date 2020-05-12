@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.Security
 
         public Permission(string id)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             this.id = id;
         }

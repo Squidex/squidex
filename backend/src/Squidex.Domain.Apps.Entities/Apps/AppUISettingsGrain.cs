@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettingsGrain(IGrainState<State> state)
         {
-            Guard.NotNull(state);
+            Guard.NotNull(state, nameof(state));
 
             this.state = state;
         }
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private JsonObject? GetContainer(string path, bool add, out string key)
         {
-            Guard.NotNullOrEmpty(path);
+            Guard.NotNullOrEmpty(path, nameof(path));
 
             var segments = path.Split('.');
 

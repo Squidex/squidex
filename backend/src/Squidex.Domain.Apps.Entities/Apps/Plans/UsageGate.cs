@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
         {
-            Guard.NotNull(apiUsageTracker);
-            Guard.NotNull(appPlansProvider);
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(apiUsageTracker, nameof(apiUsageTracker));
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, DateTime today)
         {
-            Guard.NotNull(app);
+            Guard.NotNull(app, nameof(app));
 
             var isLocked = false;
 

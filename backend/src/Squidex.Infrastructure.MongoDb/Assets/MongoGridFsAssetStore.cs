@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Assets
 
         public MongoGridFsAssetStore(IGridFSBucket<string> bucket)
         {
-            Guard.NotNull(bucket);
+            Guard.NotNull(bucket, nameof(bucket));
 
             this.bucket = bucket;
         }
@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(targetFileName);
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
             try
             {
@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             try
             {
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             try
             {

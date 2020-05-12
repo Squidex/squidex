@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.scriptEngine = scriptEngine;
         }

@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache)
         {
-            Guard.NotNull(tagService);
-            Guard.NotNull(assetMetadataSources);
-            Guard.NotNull(requestCache);
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.tagService = tagService;
             this.assetMetadataSources = assetMetadataSources;
@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context)
         {
-            Guard.NotNull(asset);
-            Guard.NotNull(context);
+            Guard.NotNull(asset, nameof(asset));
+            Guard.NotNull(context, nameof(context));
 
             var enriched = await EnrichAsync(Enumerable.Repeat(asset, 1), context);
 
@@ -46,8 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context)
         {
-            Guard.NotNull(assets);
-            Guard.NotNull(context);
+            Guard.NotNull(assets, nameof(assets));
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<AssetEnricher>())
             {

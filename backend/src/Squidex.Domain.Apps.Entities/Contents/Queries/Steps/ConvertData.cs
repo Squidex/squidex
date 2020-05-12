@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ConvertData(IUrlGenerator urlGenerator, IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(urlGenerator);
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(contentRepository);
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.urlGenerator = urlGenerator;
             this.assetRepository = assetRepository;

@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         public AppClient(string name, string secret, string role)
             : base(name)
         {
-            Guard.NotNullOrEmpty(secret);
-            Guard.NotNullOrEmpty(role);
+            Guard.NotNullOrEmpty(secret, nameof(secret));
+            Guard.NotNullOrEmpty(role, nameof(role));
 
             Role = role;
 
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClient Update(string newRole)
         {
-            Guard.NotNullOrEmpty(newRole);
+            Guard.NotNullOrEmpty(newRole, nameof(newRole));
 
             return new AppClient(Name, Secret, newRole);
         }
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClient Rename(string newName)
         {
-            Guard.NotNullOrEmpty(newName);
+            Guard.NotNullOrEmpty(newName, nameof(newName));
 
             return new AppClient(newName, Secret, Role);
         }

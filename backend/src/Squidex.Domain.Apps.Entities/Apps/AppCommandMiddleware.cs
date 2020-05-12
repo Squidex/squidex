@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(contextProvider);
-            Guard.NotNull(appImageStore);
-            Guard.NotNull(assetThumbnailGenerator);
+            Guard.NotNull(contextProvider, nameof(contextProvider));
+            Guard.NotNull(appImageStore, nameof(appImageStore));
+            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
 
             this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;

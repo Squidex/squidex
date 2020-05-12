@@ -52,15 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IUserResolver userResolver,
             ISemanticLog log)
         {
-            Guard.NotNull(backupArchiveLocation);
-            Guard.NotNull(backupArchiveStore);
-            Guard.NotNull(clock);
-            Guard.NotNull(eventDataFormatter);
-            Guard.NotNull(eventStore);
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(state);
-            Guard.NotNull(userResolver);
-            Guard.NotNull(log);
+            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
+            Guard.NotNull(backupArchiveStore, nameof(backupArchiveStore));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(log, nameof(log));
 
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;

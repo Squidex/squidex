@@ -107,8 +107,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public async Task UpdateAsync(RuleJob job, RuleJobUpdate update)
         {
-            Guard.NotNull(job);
-            Guard.NotNull(update);
+            Guard.NotNull(job, nameof(job));
+            Guard.NotNull(update, nameof(update));
 
             if (update.ExecutionResult == RuleResult.Success)
             {

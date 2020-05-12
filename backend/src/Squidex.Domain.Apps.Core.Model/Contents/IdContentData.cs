@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public IdContentData AddField(long id, ContentFieldData? data)
         {
-            Guard.GreaterThan(id, 0);
+            Guard.GreaterThan(id, 0, nameof(id));
 
             this[id] = data;
 

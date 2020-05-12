@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
         {
-            Guard.NotNull(app);
-            Guard.NotNull(schema);
-            Guard.NotNull(query);
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(query, nameof(query));
 
             try
             {

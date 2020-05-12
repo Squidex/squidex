@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppContributors Assign(string contributorId, string role)
         {
-            Guard.NotNullOrEmpty(contributorId);
-            Guard.NotNullOrEmpty(role);
+            Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
+            Guard.NotNullOrEmpty(role, nameof(role));
 
             return With<AppContributors>(contributorId, role, EqualityComparer<string>.Default);
         }
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppContributors Remove(string contributorId)
         {
-            Guard.NotNullOrEmpty(contributorId);
+            Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
             return Without<AppContributors>(contributorId);
         }

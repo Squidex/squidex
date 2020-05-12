@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public LuceneTextIndexGrain(IndexManager indexManager)
         {
-            Guard.NotNull(indexManager);
+            Guard.NotNull(indexManager, nameof(indexManager));
 
             this.indexManager = indexManager;
         }

@@ -19,7 +19,7 @@ namespace Squidex.Web.Pipeline
 
         public RequestExceptionMiddleware(ISemanticLog log)
         {
-            Guard.NotNull(log);
+            Guard.NotNull(log, nameof(log));
 
             this.log = log;
         }

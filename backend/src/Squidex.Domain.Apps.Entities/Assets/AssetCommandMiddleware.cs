@@ -33,11 +33,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
             : base(grainFactory)
         {
-            Guard.NotNull(assetEnricher);
-            Guard.NotNull(assetFileStore);
-            Guard.NotNull(assetQuery);
-            Guard.NotNull(assetMetadataSources);
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(assetEnricher, nameof(assetEnricher));
+            Guard.NotNull(assetFileStore, nameof(assetFileStore));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.assetFileStore = assetFileStore;
             this.assetEnricher = assetEnricher;

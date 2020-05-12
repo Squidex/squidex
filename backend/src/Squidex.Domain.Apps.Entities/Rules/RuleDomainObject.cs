@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleDomainObject(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(ruleEnqueuer);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
 
             this.appProvider = appProvider;
 

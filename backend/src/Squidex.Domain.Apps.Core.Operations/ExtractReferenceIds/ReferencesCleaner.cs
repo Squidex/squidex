@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public ReferencesCleaner(HashSet<Guid> validIds)
         {
-            Guard.NotNull(validIds);
+            Guard.NotNull(validIds, nameof(validIds));
 
             this.validIds = validIds;
         }

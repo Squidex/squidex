@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
         {
-            Guard.NotNull(scriptEngine);
-            Guard.NotNull(appProvider);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.scriptEngine = scriptEngine;
 

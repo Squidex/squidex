@@ -24,9 +24,9 @@ namespace Squidex.Web.Pipeline
 
         public UsageMiddleware(IAppLogStore log, IApiUsageTracker usageTracker, IClock clock)
         {
-            Guard.NotNull(log);
-            Guard.NotNull(usageTracker);
-            Guard.NotNull(clock);
+            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(usageTracker, nameof(usageTracker));
+            Guard.NotNull(clock, nameof(clock));
 
             this.log = log;
 

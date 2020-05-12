@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
 
         public AssetIndexStorage(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore);
+            Guard.NotNull(assetStore, nameof(assetStore));
 
             this.assetStore = assetStore;
         }

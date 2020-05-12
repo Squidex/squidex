@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids)
         {
-            Guard.NotNull(ids);
+            Guard.NotNull(ids, nameof(ids));
 
             var find = Collection.Find(CreateFilter(appId, ids));
 

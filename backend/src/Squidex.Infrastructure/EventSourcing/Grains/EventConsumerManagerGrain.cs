@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainRuntime? runtime)
             : base(identity, runtime)
         {
-            Guard.NotNull(eventConsumers);
+            Guard.NotNull(eventConsumers, nameof(eventConsumers));
 
             this.eventConsumers = eventConsumers;
         }

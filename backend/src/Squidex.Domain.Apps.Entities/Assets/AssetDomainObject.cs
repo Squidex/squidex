@@ -31,8 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetDomainObject(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(tagService);
-            Guard.NotNull(assetQuery);
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
 
             this.tagService = tagService;
 

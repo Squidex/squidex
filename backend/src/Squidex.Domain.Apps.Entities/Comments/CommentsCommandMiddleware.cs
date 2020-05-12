@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentsCommandMiddleware(IGrainFactory grainFactory, IUserResolver userResolver)
         {
-            Guard.NotNull(grainFactory);
-            Guard.NotNull(userResolver);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
 

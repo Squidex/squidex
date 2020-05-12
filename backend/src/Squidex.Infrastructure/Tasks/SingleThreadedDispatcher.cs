@@ -30,14 +30,14 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAsync(Func<Task> action)
         {
-            Guard.NotNull(action);
+            Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(action);
         }
 
         public Task DispatchAsync(Action action)
         {
-            Guard.NotNull(action);
+            Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(() => { action(); return Task.CompletedTask; });
         }

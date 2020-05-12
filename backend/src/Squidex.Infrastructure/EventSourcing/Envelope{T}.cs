@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope(T payload, EnvelopeHeaders? headers = null)
         {
-            Guard.NotNull(payload);
+            Guard.NotNull(payload, nameof(payload));
 
             this.payload = payload;
 

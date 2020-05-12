@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public DefaultAppLogStore(IRequestLogStore requestLogStore)
         {
-            Guard.NotNull(requestLogStore);
+            Guard.NotNull(requestLogStore, nameof(requestLogStore));
 
             this.requestLogStore = requestLogStore;
         }
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task ReadLogAsync(Guid appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default)
         {
-            Guard.NotNull(appId);
+            Guard.NotNull(appId, nameof(appId));
 
             var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
             try

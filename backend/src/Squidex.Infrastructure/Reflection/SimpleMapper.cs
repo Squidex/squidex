@@ -179,9 +179,9 @@ namespace Squidex.Infrastructure.Reflection
             where TSource : class
             where TTarget : class
         {
-            Guard.NotNull(source);
-            Guard.NotNull(culture);
-            Guard.NotNull(target);
+            Guard.NotNull(source, nameof(source));
+            Guard.NotNull(culture, nameof(culture));
+            Guard.NotNull(target, nameof(target));
 
             return ClassMapper<TSource, TTarget>.MapClass(source, target, culture);
         }

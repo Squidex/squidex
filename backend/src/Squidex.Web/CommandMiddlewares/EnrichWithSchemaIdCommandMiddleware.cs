@@ -24,8 +24,8 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithSchemaIdCommandMiddleware(IAppProvider appProvider, IActionContextAccessor actionContextAccessor)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(actionContextAccessor);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(actionContextAccessor, nameof(actionContextAccessor));
 
             this.appProvider = appProvider;
 

@@ -25,10 +25,10 @@ namespace Squidex.Infrastructure.Log
             IEnumerable<ILogAppender> appenders,
             IObjectWriterFactory writerFactory)
         {
-            Guard.NotNull(options);
-            Guard.NotNull(channels);
-            Guard.NotNull(appenders);
-            Guard.NotNull(writerFactory);
+            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(channels, nameof(channels));
+            Guard.NotNull(appenders, nameof(appenders));
+            Guard.NotNull(writerFactory, nameof(writerFactory));
 
             this.options = options;
             this.channels = channels.ToArray();
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Log
 
         public void Log<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action)
         {
-            Guard.NotNull(action);
+            Guard.NotNull(action, nameof(action));
 
             if (logLevel < options.Value.Level)
             {
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Log
 
         public void Log(SemanticLogLevel logLevel, Exception? exception, LogFormatter action)
         {
-            Guard.NotNull(action);
+            Guard.NotNull(action, nameof(action));
 
             if (logLevel < options.Value.Level)
             {

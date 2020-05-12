@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(cache);
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(ruleService);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(cache, nameof(cache));
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(ruleService, nameof(ruleService));
 
             this.appProvider = appProvider;
 
@@ -64,8 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule);
-            Guard.NotNull(@event);
+            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(@event, nameof(@event));
 
             var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
 

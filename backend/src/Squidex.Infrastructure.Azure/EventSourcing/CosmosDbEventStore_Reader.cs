@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(subscriber);
+            Guard.NotNull(subscriber, nameof(subscriber));
 
             ThrowIfDisposed();
 
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task CreateIndexAsync(string property)
         {
-            Guard.NotNullOrEmpty(property);
+            Guard.NotNullOrEmpty(property, nameof(property));
 
             ThrowIfDisposed();
 
@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             ThrowIfDisposed();
 
@@ -89,7 +89,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             ThrowIfDisposed();
 
@@ -128,9 +128,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback);
-            Guard.NotNullOrEmpty(property);
-            Guard.NotNull(value);
+            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
 
             ThrowIfDisposed();
 
@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback);
+            Guard.NotNull(callback, nameof(callback));
 
             ThrowIfDisposed();
 

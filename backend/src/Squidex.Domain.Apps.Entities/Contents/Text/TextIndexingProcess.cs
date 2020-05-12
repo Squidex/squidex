@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexingProcess(ITextIndex textIndexer, ITextIndexerState textIndexerState)
         {
-            Guard.NotNull(textIndexer);
-            Guard.NotNull(textIndexerState);
+            Guard.NotNull(textIndexer, nameof(textIndexer));
+            Guard.NotNull(textIndexerState, nameof(textIndexerState));
 
             this.textIndexer = textIndexer;
             this.textIndexerState = textIndexerState;

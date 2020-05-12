@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
         {
             if (resources.CanManageEvents)
             {
-                var values = new { name = Name };
+                var values = new { consumerName = Name };
 
                 if (!IsResetting)
                 {

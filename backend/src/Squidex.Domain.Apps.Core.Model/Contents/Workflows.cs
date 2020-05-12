@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Add(Guid workflowId, string name)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             return With<Workflows>(workflowId, Workflow.CreateDefault(name));
         }
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Set(Workflow workflow)
         {
-            Guard.NotNull(workflow);
+            Guard.NotNull(workflow, nameof(workflow));
 
             return With<Workflows>(Guid.Empty, workflow);
         }
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Set(Guid id, Workflow workflow)
         {
-            Guard.NotNull(workflow);
+            Guard.NotNull(workflow, nameof(workflow));
 
             return With<Workflows>(id, workflow);
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Update(Guid id, Workflow workflow)
         {
-            Guard.NotNull(workflow);
+            Guard.NotNull(workflow, nameof(workflow));
 
             if (id == Guid.Empty)
             {

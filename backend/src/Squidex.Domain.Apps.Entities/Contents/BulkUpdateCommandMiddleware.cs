@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public BulkUpdateCommandMiddleware(IServiceProvider serviceProvider, IContentQueryService contentQuery, IContextProvider contextProvider)
         {
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(contentQuery);
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.serviceProvider = serviceProvider;
             this.contentQuery = contentQuery;

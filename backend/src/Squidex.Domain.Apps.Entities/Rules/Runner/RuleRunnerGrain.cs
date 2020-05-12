@@ -52,13 +52,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             RuleService ruleService,
             ISemanticLog log)
         {
-            Guard.NotNull(state);
-            Guard.NotNull(appProvider);
-            Guard.NotNull(eventStore);
-            Guard.NotNull(eventDataFormatter);
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(ruleService);
-            Guard.NotNull(log);
+            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(ruleService, nameof(ruleService));
+            Guard.NotNull(log, nameof(log));
 
             this.state = state;
             this.appProvider = appProvider;

@@ -23,8 +23,8 @@ namespace Squidex.Infrastructure.Timers
 
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
-            Guard.NotNull(callback);
-            Guard.GreaterThan(delayInMs, 0);
+            Guard.NotNull(callback, nameof(callback));
+            Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
 
             runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }

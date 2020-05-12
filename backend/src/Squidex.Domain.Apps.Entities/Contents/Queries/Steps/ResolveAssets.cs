@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
         {
-            Guard.NotNull(urlGenerator);
-            Guard.NotNull(assetQuery);
-            Guard.NotNull(requestCache);
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.urlGenerator = urlGenerator;
             this.assetQuery = assetQuery;

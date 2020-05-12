@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
     {
         public Task CreateThumbnailAsync(Stream source, Stream destination, ResizeOptions options)
         {
-            Guard.NotNull(options);
+            Guard.NotNull(options, nameof(options));
 
             return Task.Run(() =>
             {

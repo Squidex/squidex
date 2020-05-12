@@ -24,14 +24,14 @@ namespace Squidex.Domain.Users
 
         public DefaultUserResolver(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider);
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             this.serviceProvider = serviceProvider;
         }
 
         public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited)
         {
-            Guard.NotNullOrEmpty(email);
+            Guard.NotNullOrEmpty(email, nameof(email));
 
             var created = false;
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Users
 
         public async Task<IUser?> FindByIdAsync(string idOrEmail)
         {
-            Guard.NotNullOrEmpty(idOrEmail);
+            Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
 
             using (var scope = serviceProvider.CreateScope())
             {
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Users
 
         public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail)
         {
-            Guard.NotNullOrEmpty(idOrEmail);
+            Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
 
             using (var scope = serviceProvider.CreateScope())
             {
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Users
 
         public async Task<List<IUser>> QueryByEmailAsync(string email)
         {
-            Guard.NotNullOrEmpty(email);
+            Guard.NotNullOrEmpty(email, nameof(email));
 
             using (var scope = serviceProvider.CreateScope())
             {
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Users
 
         public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
         {
-            Guard.NotNull(ids);
+            Guard.NotNull(ids, nameof(ids));
 
             using (var scope = serviceProvider.CreateScope())
             {

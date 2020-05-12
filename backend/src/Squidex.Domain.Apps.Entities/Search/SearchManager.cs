@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Search
 
         public SearchManager(IEnumerable<ISearchSource> searchSources, ISemanticLog log)
         {
-            Guard.NotNull(searchSources);
-            Guard.NotNull(log);
+            Guard.NotNull(searchSources, nameof(searchSources));
+            Guard.NotNull(log, nameof(log));
 
             this.searchSources = searchSources;
 

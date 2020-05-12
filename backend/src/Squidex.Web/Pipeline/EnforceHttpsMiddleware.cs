@@ -19,7 +19,7 @@ namespace Squidex.Web.Pipeline
 
         public EnforceHttpsMiddleware(IOptions<UrlsOptions> urlsOptions)
         {
-            Guard.NotNull(urlsOptions);
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
             this.urlsOptions = urlsOptions.Value;
         }

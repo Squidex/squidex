@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public LuceneTextIndex(IGrainFactory grainFactory, IndexManager indexManager)
         {
-            Guard.NotNull(grainFactory);
-            Guard.NotNull(indexManager);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(indexManager, nameof(indexManager));
 
             this.grainFactory = grainFactory;
 

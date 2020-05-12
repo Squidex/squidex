@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public DefaultValueGenerator(Schema schema, PartitionResolver partitionResolver)
         {
-            Guard.NotNull(schema);
-            Guard.NotNull(partitionResolver);
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
             this.schema = schema;
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public void Enrich(NamedContentData data)
         {
-            Guard.NotNull(data);
+            Guard.NotNull(data, nameof(data));
 
             foreach (var field in schema.Fields)
             {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         private static void Enrich(IField field, ContentFieldData fieldData, string partitionKey)
         {
-            Guard.NotNull(fieldData);
+            Guard.NotNull(fieldData, nameof(fieldData));
 
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant());
 

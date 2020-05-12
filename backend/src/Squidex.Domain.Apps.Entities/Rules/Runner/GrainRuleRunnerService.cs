@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         public GrainRuleRunnerService(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
