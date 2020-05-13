@@ -9,108 +9,10 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fadeAnimation, Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
+import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 export const CONVERSION_FAILED = {};
-
-export class TagValue<T = any> {
-    public readonly lowerCaseName: string;
-
-    constructor(
-        public readonly id: any,
-        public readonly name: string,
-        public readonly value: T
-    ) {
-        this.lowerCaseName = name.toLowerCase();
-    }
-
-    public toString() {
-        return this.name;
-    }
-}
-
-export interface Converter {
-    convertInput(input: string): TagValue | null;
-
-    convertValue(value: any): TagValue | null;
-}
-
-export class IntConverter implements Converter {
-    private static ZERO = new TagValue(0, '0', 0);
-
-    public convertInput(input: string) {
-        if (input === '0') {
-            return IntConverter.ZERO;
-        }
-
-        const parsed = parseInt(input, 10);
-
-        if (parsed) {
-            return new TagValue(parsed, input, parsed);
-        }
-
-        return null;
-    }
-
-    public convertValue(value: any) {
-        if (Types.isNumber(value)) {
-            return new TagValue(value, `${value}`, value);
-        }
-
-        return null;
-    }
-}
-
-export class FloatConverter implements Converter {
-    private static ZERO = new TagValue(0, '0', 0);
-
-    public convertInput(input: string) {
-        if (input === '0') {
-            return FloatConverter.ZERO;
-        }
-
-        const parsed = parseFloat(input);
-
-        if (parsed) {
-            return new TagValue(parsed, input, parsed);
-        }
-
-        return null;
-    }
-
-    public convertValue(value: any) {
-        if (Types.isNumber(value)) {
-            return new TagValue(value, `${value}`, value);
-        }
-
-        return null;
-    }
-}
-
-export class StringConverter implements Converter {
-    public convertInput(input: string) {
-        if (input) {
-            const trimmed = input.trim();
-
-            if (trimmed.length > 0) {
-                return new TagValue(trimmed, trimmed, trimmed);
-            }
-        }
-
-        return null;
-    }
-
-    public convertValue(value: any) {
-        if (Types.isString(value)) {
-            const trimmed = value.trim();
-
-            return new TagValue(trimmed, trimmed, trimmed);
-        }
-
-        return null;
-    }
-}
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
@@ -156,7 +58,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Input()
-    public converter: Converter = new StringConverter();
+    public converter = StringConverter.INSTANCE;
 
     @Input()
     public undefinedWhenEmpty = true;
@@ -192,21 +94,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputName = 'tag-editor';
 
     @Input()
-    public set suggestedValues(value: ReadonlyArray<TagValue>) {
-        if (value) {
-            this.suggestionsSorted = value.sortedByString(x => x.lowerCaseName);
-        } else {
-            this.suggestionsSorted = [];
-        }
-    }
-
-    @Input()
-    public set suggestions(value: ReadonlyArray<string>) {
-        if (value) {
-            this.suggestionsSorted = value.map(x => new TagValue(x, x, x)).sortedByString(x => x.lowerCaseName);
-        } else {
-            this.suggestionsSorted = [];
-        }
+    public set suggestions(value: ReadonlyArray<string | TagValue>) {
+        this.suggestionsSorted = getTagValues(value);
     }
 
     @Input()

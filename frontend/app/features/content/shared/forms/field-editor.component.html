@@ -101,6 +101,13 @@
 								[schemaId]="field.rawProperties.singleId">
                             </sqx-references-tags>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'Checkboxes'">
+                            <sqx-references-checkboxes
+                                [formControl]="editorControl" 
+                                [language]="language"
+								[schemaId]="field.rawProperties.singleId">
+                            </sqx-references-checkboxes>
+                        </ng-container>
                     </ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'String'">

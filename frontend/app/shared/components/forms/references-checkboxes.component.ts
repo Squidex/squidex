@@ -10,8 +10,8 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, LanguageDto, StatefulControlComponent, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
-export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true
+export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesCheckboxesComponent), multi: true
 };
 
 interface State {
@@ -22,15 +22,15 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-tags',
-    styleUrls: ['./references-tags.component.scss'],
-    templateUrl: './references-tags.component.html',
+    selector: 'sqx-references-checkboxes',
+    styleUrls: ['./references-checkboxes.component.scss'],
+    templateUrl: './references-checkboxes.component.html',
     providers: [
-        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR
+        SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
+export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
     private itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 

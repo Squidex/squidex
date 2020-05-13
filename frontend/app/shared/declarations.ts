@@ -23,6 +23,7 @@ export * from './components/comments/comments.component';
 export * from './components/forms/geolocation-editor.component';
 export * from './components/forms/language-selector.component';
 export * from './components/forms/markdown-editor.component';
+export * from './components/forms/references-checkboxes.component';
 export * from './components/forms/references-dropdown.component';
 export * from './components/forms/references-tags.component';
 export * from './components/forms/rich-editor.component';

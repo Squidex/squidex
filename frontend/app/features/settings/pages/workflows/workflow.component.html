@@ -64,7 +64,7 @@
                         [converter]="schemasSource.converter | async"
                         [ngModel]="workflow.schemaIds"
                         (ngModelChange)="changeSchemaIds($event)"
-                        [suggestedValues]="(schemasSource.converter | async)?.suggestions">
+                        [suggestions]="(schemasSource.converter | async)?.suggestions">
                     </sqx-tag-editor>
         
                     <sqx-form-hint>

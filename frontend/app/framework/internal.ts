@@ -37,5 +37,6 @@ export * from './utils/pager';
 export * from './utils/picasso';
 export * from './utils/rxjs-extensions';
 export * from './utils/string-helper';
+export * from './utils/tag-values';
 export * from './utils/types';
 export * from './utils/version';
