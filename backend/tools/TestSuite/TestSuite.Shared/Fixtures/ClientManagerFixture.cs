@@ -6,7 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
 
@@ -14,27 +15,15 @@ namespace TestSuite.Fixtures
 {
     public class ClientManagerFixture : IDisposable
     {
-        public string ServerUrl { get; } = "https://localhost:5001";
+        public string AppName { get; } = GetValue("APP__NAME", "integration-tests");
 
-        public string ClientId { get; } = "root";
+        public string ClientId { get; } = GetValue("CLIENT__ID", "root");
 
-        public string ClientSecret { get; } = "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=";
+        public string ClientSecret { get; } = GetValue("CLIENT__SECRET", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
 
-        public string AppName { get; } = "integration-tests";
+        public string ServerUrl { get; } = GetValue("SERVER__URL", "https://localhost:5001");
 
         public SquidexClientManager ClientManager { get; }
-
-        public sealed class Configurator : IHttpConfigurator
-        {
-            public void Configure(HttpClient httpClient)
-            {
-            }
-
-            public void Configure(HttpClientHandler httpClientHandler)
-            {
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, error) => true;
-            }
-        }
 
         public ClientManagerFixture()
         {
@@ -43,10 +32,51 @@ namespace TestSuite.Fixtures
                 AppName = AppName,
                 ClientId = ClientId,
                 ClientSecret = ClientSecret,
-                Configurator = new Configurator(),
-                ReadResponseAsString = true,
+                Configurator = AcceptAllCertificatesConfigurator.Instance,
                 Url = ServerUrl
             });
+
+            if (TryGetTimeout(out var waitSeconds))
+            {
+                Task.Run(async () =>
+                {
+                    var pingClient = ClientManager.CreatePingClient();
+
+                    using (var cts = new CancellationTokenSource(waitSeconds * 1000))
+                    {
+                        while (!cts.IsCancellationRequested)
+                        {
+                            try
+                            {
+                                await pingClient.GetPingAsync(cts.Token);
+
+                                break;
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                }).Wait();
+            }
+        }
+
+        private static bool TryGetTimeout(out int timeout)
+        {
+            return int.TryParse(Environment.GetEnvironmentVariable("TEST_WAIT"), out timeout) && timeout > 10;
+        }
+
+        private static string GetValue(string name, string defaultValue)
+        {
+            var variable = Environment.GetEnvironmentVariable($"CONFIG__{name}");
+
+            if (!string.IsNullOrWhiteSpace(variable))
+            {
+                return variable;
+            }
+
+            return defaultValue;
         }
 
         public virtual void Dispose()
