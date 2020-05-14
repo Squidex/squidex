@@ -15,6 +15,8 @@ namespace TestSuite.Fixtures
 {
     public class ClientManagerFixture : IDisposable
     {
+        private static bool hasWaited;
+
         public string AppName { get; } = GetValue("APP__NAME", "integration-tests");
 
         public string ClientId { get; } = GetValue("CLIENT__ID", "root");
@@ -36,8 +38,10 @@ namespace TestSuite.Fixtures
                 Url = ServerUrl
             });
 
-            if (TryGetTimeout(out var waitSeconds))
+            if (TryGetTimeout(out var waitSeconds) && !hasWaited)
             {
+                hasWaited = true;
+
                 Task.Run(async () =>
                 {
                     var pingClient = ClientManager.CreatePingClient();
@@ -73,6 +77,8 @@ namespace TestSuite.Fixtures
 
             if (!string.IsNullOrWhiteSpace(variable))
             {
+                Console.WriteLine($"Using: {name}={variable}");
+
                 return variable;
             }
 
