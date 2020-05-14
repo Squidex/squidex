@@ -78,7 +78,6 @@ steps:
         - success
       event:
         - push
-        - pull_request
       branch:
         - master
 
