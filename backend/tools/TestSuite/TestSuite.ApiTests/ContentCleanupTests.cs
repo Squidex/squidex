@@ -19,9 +19,9 @@ namespace TestSuite.ApiTests
 {
     public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
     {
-        public ClientFixture _ { get; }
+        public CreatedAppFixture _ { get; }
 
-        public ContentCleanupTests(ClientFixture fixture)
+        public ContentCleanupTests(CreatedAppFixture fixture)
         {
             _ = fixture;
         }
