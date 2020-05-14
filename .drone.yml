@@ -14,7 +14,10 @@ steps:
         path: /var/lib/docker
     when:
       event:
-        - tag
+        - push
+        - pull_request
+      branch:
+        - master
         
   - name: build_dev
     image: docker
@@ -27,10 +30,7 @@ steps:
         path: /var/lib/docker
     when:
       event:
-        - push
-        - pull_request
-      branch:
-        - master
+        - tag
 
   - name: start-squidex
     image: docker
