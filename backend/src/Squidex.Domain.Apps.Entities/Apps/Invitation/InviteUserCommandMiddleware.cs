@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             if (context.Command is AssignContributor assignContributor && ShouldResolve(assignContributor))
             {
-                IUser? user = null;
+                IUser? user;
 
                 var created = false;
 

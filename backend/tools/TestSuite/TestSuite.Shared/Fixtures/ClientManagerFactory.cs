@@ -39,6 +39,7 @@ namespace TestSuite.Fixtures
                 AppName = appName,
                 ClientId = clientId,
                 ClientSecret = clientSecret,
+                ReadResponseAsString = true,
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
                 Url = serviceURl
             });
