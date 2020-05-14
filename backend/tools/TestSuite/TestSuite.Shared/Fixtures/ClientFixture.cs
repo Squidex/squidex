@@ -31,6 +31,10 @@ namespace TestSuite.Fixtures
 
             Languages = ClientManager.CreateLanguagesClient();
 
+            Languages = ClientManager.CreateLanguagesClient();
+
+            Ping = ClientManager.CreatePingClient();
+
             Rules = ClientManager.CreateRulesClient();
 
             Schemas = ClientManager.CreateSchemasClient();
