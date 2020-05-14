@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures
@@ -21,8 +22,18 @@ namespace TestSuite.Fixtures
         {
             Task.Run(async () =>
             {
-                await TestEntityWithReferences.CreateSchemaAsync(Schemas, AppName, SchemaName);
-            }).Wait();
+                try
+                {
+                    await TestEntityWithReferences.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
+                    {
+                        throw;
+                    }
+                }
+        }).Wait();
 
             Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
         }
