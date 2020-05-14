@@ -46,6 +46,8 @@ namespace TestSuite.Fixtures
 
             if (TryGetTimeout(out var waitSeconds))
             {
+                Console.WriteLine("Waiting {} seconds to access server", waitSeconds);
+
                 var pingClient = clientManager.CreatePingClient();
 
                 using (var cts = new CancellationTokenSource(waitSeconds * 1000))
