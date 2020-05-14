@@ -46,7 +46,7 @@ namespace TestSuite.Fixtures
 
             if (TryGetTimeout(out var waitSeconds))
             {
-                Console.WriteLine("Waiting {} seconds to access server", waitSeconds);
+                Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
                 var pingClient = clientManager.CreatePingClient();
 
