@@ -64,7 +64,7 @@ namespace TestSuite.Fixtures
 
         private static bool TryGetTimeout(out int timeout)
         {
-            return int.TryParse(Environment.GetEnvironmentVariable("TEST_WAIT"), out timeout) && timeout > 10;
+            return int.TryParse(Environment.GetEnvironmentVariable("CONFIG__WAIT"), out timeout) && timeout > 10;
         }
 
         private static string GetValue(string name, string defaultValue)
