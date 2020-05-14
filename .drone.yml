@@ -56,6 +56,7 @@ steps:
       CONFIG__WAIT: 60
     commands:
       - dotnet test backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=Dependencies
+    network_mode: host
     when:
       event:
         - push
@@ -171,27 +172,27 @@ steps:
       event:
         - tag
 
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-    when:
-      status:
-        - failure
-        - success
-
-  - name: cleanup-build
+  - name: binaries_cleanup
     image: docker
     commands:
-      - set +e
       - docker rm squidex-container
-      - docker rmi squidex
     volumes:
       - name: docker1
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
+    when:
+      status:
+        - failure
+        - success
+      event:
+        - tag
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
     when:
       status:
         - failure
