@@ -15,6 +15,7 @@ steps:
     when:
       event:
         - push
+        - pull_request
       branch:
         - master
         
@@ -183,8 +184,9 @@ steps:
   - name: cleanup-build
     image: docker
     commands:
-      - docker rm squidex-container && exit 0
-      - docker rmi squidex && exit 0
+      - set +e
+      - docker rm squidex-container
+      - docker rmi squidex
     volumes:
       - name: docker1
         path: /var/run/docker.sock
