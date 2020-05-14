@@ -15,6 +15,7 @@ steps:
     when:
       event:
         - push
+        - pull_request
       branch:
         - master
         
@@ -54,7 +55,7 @@ steps:
       CONFIG__SERVER__URL: http://localhost:8080
       CONFIG__WAIT: 60
     commands:
-      - dotnet test backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=Dependencies
+      - dotnet test backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
     network_mode: host
     when:
       event:
