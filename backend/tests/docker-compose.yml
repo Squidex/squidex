@@ -15,7 +15,7 @@ services:
       - URLS__BASEURL=http://localhost:8080
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - IDENTITY__ADMINCLIENTID=root
-      - IDENTITY__ADMINSCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
     networks:

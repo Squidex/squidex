@@ -58,7 +58,7 @@ namespace TestSuite.Fixtures
                             }
                             catch
                             {
-                                continue;
+                                await Task.Delay(waitSeconds / 100);
                             }
                         }
                     }
