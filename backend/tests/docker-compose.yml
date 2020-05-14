@@ -12,7 +12,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - URLS__BASEURL=https://localhost
+      - URLS__BASEURL=https://squidex.local
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINSCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=

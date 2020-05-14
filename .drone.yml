@@ -15,7 +15,6 @@ steps:
     when:
       event:
         - push
-        - pull_request
       branch:
         - master
         
@@ -52,7 +51,7 @@ steps:
   - name: test_run
     image: mcr.microsoft.com/dotnet/core/sdk:3.1-buster
     environment:
-      CONFIG__SERVER__URL: http://localhost:8080
+      CONFIG__SERVER__URL: http://squidex.local:8080
       CONFIG__WAIT: 60
     commands:
       - dotnet test backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=Dependencies
@@ -132,8 +131,8 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker create --name sqc sq
-      - docker cp sqc:/app/. /build
+      - docker create --name squidex-container squidex
+      - docker cp squidex-container:/app/. /build
     volumes:
       - name: build
         path: /build
@@ -185,8 +184,8 @@ steps:
   - name: cleanup-build
     image: docker
     commands:
-      - docker rm sqc
-      - docker rmi sq
+      - docker rm squidex-container && exit 0
+      - docker rmi squidex && exit 0
     volumes:
       - name: docker1
         path: /var/run/docker.sock
