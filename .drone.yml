@@ -3,7 +3,20 @@ kind: pipeline
 name: default
 
 steps:
-  - name: build
+  - name: build_release
+    image: docker
+    commands:
+      - docker build -t sq --build-arg SQUIDEX__VERSION=4.0.0-dev-$${DRONE_BUILD_NUMBER} .
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      event:
+        - tag
+        
+  - name: build_dev
     image: docker
     commands:
       - docker build -t sq --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
