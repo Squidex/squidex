@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
@@ -73,7 +74,14 @@ namespace TestSuite.Fixtures
 
         private static bool TryGetTimeout(out int timeout)
         {
-            return int.TryParse(Environment.GetEnvironmentVariable("CONFIG__WAIT"), out timeout) && timeout > 10;
+            var variable = Environment.GetEnvironmentVariable("CONFIG__WAIT");
+
+            if (!string.IsNullOrWhiteSpace(variable))
+            {
+                Console.WriteLine("Using: CONFIG__WAIT={0}", variable);
+            }
+
+            return int.TryParse(variable, out timeout) && timeout > 10;
         }
 
         private static string GetValue(string name, string defaultValue)
@@ -82,7 +90,7 @@ namespace TestSuite.Fixtures
 
             if (!string.IsNullOrWhiteSpace(variable))
             {
-                Console.WriteLine($"Using: {name}={variable}");
+                Console.WriteLine("Using: {0}={1}", name, variable);
 
                 return variable;
             }
