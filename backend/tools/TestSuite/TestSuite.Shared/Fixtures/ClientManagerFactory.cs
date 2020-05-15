@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
@@ -63,7 +62,7 @@ namespace TestSuite.Fixtures
                         }
                         catch
                         {
-                            await Task.Delay(waitSeconds / 100);
+                            await Task.Delay(100);
                         }
                     }
                 }
