@@ -2,11 +2,11 @@
 kind: pipeline
 name: default
 
-steps:  
-  - name: test_pull_request
+steps:
+  - name: build_release
     image: docker
     commands:
-      - docker build -t squidex/squidex:test_pull_request .
+      - docker build -t squidex --build-arg SQUIDEX__VERSION=4.0.0-dev-$${DRONE_BUILD_NUMBER} .
     volumes:
       - name: docker1
         path: /var/run/docker.sock
@@ -14,13 +14,82 @@ steps:
         path: /var/lib/docker
     when:
       event:
+        - push
         - pull_request
-
+      branch:
+        - master
+        
   - name: build_dev
     image: docker
     commands:
+      - docker build -t squidex --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      event:
+        - tag
+
+  - name: test_start
+    image: docker/compose
+    commands:
+      - cd backend/tests
+      - docker-compose up -d
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      event:
+        - push
+        - pull_request
+      branch:
+        - master
+
+  - name: test_run
+    image: mcr.microsoft.com/dotnet/core/sdk:3.1-buster
+    environment:
+      CONFIG__SERVER__URL: http://localhost:8080
+      CONFIG__WAIT: 60
+    commands:
+      - dotnet test backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+    network_mode: host
+    when:
+      event:
+        - push
+        - pull_request
+      branch:
+        - master
+
+  - name: test_cleanup
+    image: docker/compose
+    commands:
+      - cd backend/tests
+      - docker-compose down
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      status:
+        - failure
+        - success
+      event:
+        - push
+        - pull_request
+      branch:
+        - master
+
+  - name: push_dev
+    image: docker
+    commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} --build-arg SQUIDEX__VERSION=4.0.0-dev-$${DRONE_BUILD_NUMBER} .
+      - docker tag sq squidex/squidex:dev
+      - docker tag sq squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:
@@ -39,11 +108,12 @@ steps:
       branch:
         - master
 
-  - name: build_release
+  - name: push_release
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
+      - docker tag sq squidex/squidex:latest
+      - docker tag sq squidex/squidex:$${DRONE_TAG}
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
     volumes:
@@ -63,9 +133,8 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build -t squidex-build-image --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
-      - docker create --name squidex-build-container squidex-build-image
-      - docker cp squidex-build-container:/app/. /build
+      - docker create --name squidex-container squidex
+      - docker cp squidex-container:/app/. /build
     volumes:
       - name: build
         path: /build
@@ -104,21 +173,10 @@ steps:
       event:
         - tag
 
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-    when:
-      status:
-        - failure
-        - success
-
-  - name: cleanup-build
+  - name: binaries_cleanup
     image: docker
     commands:
-      - docker rm squidex-build-container
-      - docker rmi squidex-build-image
+      - docker rm squidex-container
     volumes:
       - name: docker1
         path: /var/run/docker.sock
@@ -130,6 +188,16 @@ steps:
         - success
       event:
         - tag
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+    when:
+      status:
+        - failure
+        - success
       
 volumes:
   - name: build

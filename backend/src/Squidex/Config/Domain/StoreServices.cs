@@ -11,7 +11,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01.Migrations.MongoDb;
+using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;

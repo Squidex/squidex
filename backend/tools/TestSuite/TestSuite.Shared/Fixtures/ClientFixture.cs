@@ -11,16 +11,33 @@ namespace TestSuite.Fixtures
 {
     public class ClientFixture : ClientManagerFixture
     {
-        public IAppsClient Apps => ClientManager.CreateAppsClient();
+        public IAppsClient Apps { get; }
 
-        public IBackupsClient Backups => ClientManager.CreateBackupsClient();
+        public IBackupsClient Backups { get; }
 
-        public ILanguagesClient Languages => ClientManager.CreateLanguagesClient();
+        public ILanguagesClient Languages { get; }
 
-        public IPingClient Ping => ClientManager.CreatePingClient();
+        public IPingClient Ping { get; }
 
-        public IRulesClient Rules => ClientManager.CreateRulesClient();
+        public IRulesClient Rules { get; }
 
-        public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
+        public ISchemasClient Schemas { get; }
+
+        public ClientFixture()
+        {
+            Apps = ClientManager.CreateAppsClient();
+
+            Backups = ClientManager.CreateBackupsClient();
+
+            Languages = ClientManager.CreateLanguagesClient();
+
+            Languages = ClientManager.CreateLanguagesClient();
+
+            Ping = ClientManager.CreatePingClient();
+
+            Rules = ClientManager.CreateRulesClient();
+
+            Schemas = ClientManager.CreateSchemasClient();
+        }
     }
 }

@@ -18,6 +18,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [Trait("Category", "NotAutomated")]
     public class BackupTests : IClassFixture<ClientFixture>
     {
         public ClientFixture _ { get; }

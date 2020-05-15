@@ -65,23 +65,16 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public async Task<IUser?> FindByIdAsync(string idOrEmail)
+        public async Task<IUser?> FindByIdAsync(string id)
         {
-            Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             using (var scope = serviceProvider.CreateScope())
             {
                 var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-                if (userFactory.IsId(idOrEmail))
-                {
-                    return await userManager.FindByIdWithClaimsAsync(idOrEmail);
-                }
-                else
-                {
-                    return await userManager.FindByEmailWithClaimsAsync(idOrEmail);
-                }
+                return await userManager.FindByIdWithClaimsAsync(id);
             }
         }
 

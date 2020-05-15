@@ -7,8 +7,8 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01;
-using Migrate_01.Migrations;
+using Migrations;
+using Migrations.Migrations;
 using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Config.Domain

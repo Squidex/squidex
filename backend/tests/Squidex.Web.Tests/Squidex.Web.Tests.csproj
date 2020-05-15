@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
-    <ProjectReference Include="..\..\src\Squidex\Squidex.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />    <ProjectReference Include="..\..\src\Squidex.Web\Squidex.Web.csproj" />
+
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="6.0.0" />
