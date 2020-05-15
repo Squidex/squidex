@@ -8,16 +8,59 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Lazy;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
+using Squidex.ClientLibrary.Management;
 
-namespace TestSuite.Fixtures
+namespace TestSuite
 {
-    public static class ClientManagerFactory
+    public sealed class ClientManagerWrapper
     {
-        private static Task<SquidexClientManager> manager;
+        private static Task<ClientManagerWrapper> manager;
 
-        public static Task<SquidexClientManager> CreateAsync()
+        public SquidexClientManager ClientManager { get; set; }
+
+        [Lazy]
+        public IAppsClient Apps => ClientManager.CreateAppsClient();
+
+        [Lazy]
+        public IAssetsClient Assets => ClientManager.CreateAssetsClient();
+
+        [Lazy]
+        public IBackupsClient Backups => ClientManager.CreateBackupsClient();
+
+        [Lazy]
+        public ILanguagesClient Languages => ClientManager.CreateLanguagesClient();
+
+        [Lazy]
+        public IPingClient Ping => ClientManager.CreatePingClient();
+
+        [Lazy]
+        public IRulesClient Rules => ClientManager.CreateRulesClient();
+
+        [Lazy]
+        public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
+
+        public ClientManagerWrapper()
+        {
+            var appName = GetValue("APP__NAME", "integration-tests");
+            var clientId = GetValue("CLIENT__ID", "root");
+            var clientSecret = GetValue("CLIENT__SECRET", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
+            var serviceURl = GetValue("SERVER__URL", "https://localhost:5001");
+
+            ClientManager = new SquidexClientManager(new SquidexOptions
+            {
+                AppName = appName,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ReadResponseAsString = true,
+                Configurator = AcceptAllCertificatesConfigurator.Instance,
+                Url = serviceURl
+            });
+        }
+
+        public static Task<ClientManagerWrapper> CreateAsync()
         {
             if (manager == null)
             {
@@ -27,28 +70,22 @@ namespace TestSuite.Fixtures
             return manager;
         }
 
-        private static async Task<SquidexClientManager> CreateInternalAsync()
+        private static async Task<ClientManagerWrapper> CreateInternalAsync()
         {
-            var appName = GetValue("APP__NAME", "integration-tests");
-            var clientId = GetValue("CLIENT__ID", "root");
-            var clientSecret = GetValue("CLIENT__SECRET", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serviceURl = GetValue("SERVER__URL", "https://localhost:5001");
+            var clientManager = new ClientManagerWrapper();
 
-            var clientManager = new SquidexClientManager(new SquidexOptions
-            {
-                AppName = appName,
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                ReadResponseAsString = true,
-                Configurator = AcceptAllCertificatesConfigurator.Instance,
-                Url = serviceURl
-            });
+            await clientManager.ConnectAsync();
 
+            return clientManager;
+        }
+
+        public async Task ConnectAsync()
+        {
             if (TryGetTimeout(out var waitSeconds))
             {
                 Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
-                var pingClient = clientManager.CreatePingClient();
+                var pingClient = ClientManager.CreatePingClient();
 
                 using (var cts = new CancellationTokenSource(waitSeconds * 1000))
                 {
@@ -67,8 +104,6 @@ namespace TestSuite.Fixtures
                     }
                 }
             }
-
-            return clientManager;
         }
 
         private static bool TryGetTimeout(out int timeout)

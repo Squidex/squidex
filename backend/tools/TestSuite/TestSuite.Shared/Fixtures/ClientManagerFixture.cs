@@ -12,6 +12,8 @@ namespace TestSuite.Fixtures
 {
     public class ClientManagerFixture : IDisposable
     {
+        public ClientManagerWrapper Squidex { get; }
+
         public string AppName => ClientManager.Options.AppName;
 
         public string ClientId => ClientManager.Options.ClientId;
@@ -20,11 +22,11 @@ namespace TestSuite.Fixtures
 
         public string ServerUrl => ClientManager.Options.Url;
 
-        public SquidexClientManager ClientManager { get; }
+        public SquidexClientManager ClientManager => Squidex.ClientManager;
 
         public ClientManagerFixture()
         {
-            ClientManager = ClientManagerFactory.CreateAsync().Result;
+            Squidex = ClientManagerWrapper.CreateAsync().Result;
         }
 
         public virtual void Dispose()
