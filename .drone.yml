@@ -88,8 +88,8 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker tag sq squidex/squidex:dev
-      - docker tag sq squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
+      - docker tag squidex squidex/squidex:dev
+      - docker tag squidex squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:
@@ -112,8 +112,8 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker tag sq squidex/squidex:latest
-      - docker tag sq squidex/squidex:$${DRONE_TAG}
+      - docker tag squidex squidex/squidex:latest
+      - docker tag squidex squidex/squidex:$${DRONE_TAG}
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
     volumes:
