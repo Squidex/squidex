@@ -56,6 +56,12 @@
     text-align: right;
 }
 
+.form-check {
+    &-input {
+        margin-top: .4rem;
+    }
+}
+
 //
 // Form alerts.
 //
