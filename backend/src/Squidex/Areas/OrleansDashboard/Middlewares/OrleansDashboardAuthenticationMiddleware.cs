@@ -44,9 +44,11 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
             }
             else
             {
+                var redirectUri = context.Request.PathBase + context.Request.Path;
+
                 await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
                 {
-                    RedirectUri = context.Request.PathBase + context.Request.Path
+                    RedirectUri = redirectUri
                 });
             }
         }

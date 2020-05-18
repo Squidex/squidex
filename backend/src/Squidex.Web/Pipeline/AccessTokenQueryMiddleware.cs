@@ -24,12 +24,17 @@ namespace Squidex.Web.Pipeline
         {
             var request = context.Request;
 
-            if (!string.IsNullOrWhiteSpace(request.Headers[HeaderNames.Authorization]) && request.Query.TryGetValue("access_token", out var token))
+            if (HasNoAuthHeader(request) && request.Query.TryGetValue("access_token", out var token))
             {
                 request.Headers[HeaderNames.Authorization] = token;
             }
 
             return next(context);
+        }
+
+        private static bool HasNoAuthHeader(HttpRequest request)
+        {
+            return string.IsNullOrWhiteSpace(request.Headers[HeaderNames.Authorization]);
         }
     }
 }
