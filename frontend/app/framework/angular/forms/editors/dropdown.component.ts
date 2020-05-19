@@ -127,7 +127,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public writeValue(obj: any) {
-        this.selectIndex(this.items && obj ? this.items.indexOf(obj) : 0, false);
+        this.selectIndex(this.items && obj ? this.items.indexOf(obj) : -1, false);
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -193,21 +193,21 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         this.selectIndex(this.snapshot.selectedIndex + 1, true);
     }
 
-    public selectIndex(selectedIndex: number, emitEvents: boolean) {
-        if (selectedIndex < 0) {
+    public selectIndex(selectedIndex: number, fromUserAction: boolean) {
+        if (selectedIndex < 0 && fromUserAction) {
             selectedIndex = 0;
         }
 
         const items = this.snapshot.suggestedItems || [];
 
-        if (selectedIndex >= items.length) {
+        if (selectedIndex >= items.length && fromUserAction) {
             selectedIndex = items.length - 1;
         }
 
         const value = items[selectedIndex];
 
         if (value !== this.snapshot.selectedItem) {
-            if (emitEvents) {
+            if (fromUserAction) {
                 this.callChange(value);
                 this.callTouched();
             }

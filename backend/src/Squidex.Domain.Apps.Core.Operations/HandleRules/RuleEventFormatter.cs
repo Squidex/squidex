@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -86,7 +87,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var trimmed = text.Trim();
 
-            if (trimmed.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) && trimmed.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
+            if (trimmed.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) &&
+                trimmed.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
             {
                 var script = trimmed.Substring(ScriptPrefix.Length, trimmed.Length - ScriptPrefix.Length - ScriptSuffix.Length);
 
@@ -98,33 +100,48 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return scriptEngine.Interpolate(context, script);
             }
 
-            var current = text.AsSpan();
+            var span = text.AsSpan();
 
-            var sb = new StringBuilder();
+            var currentOffset = 0;
 
-            for (var i = 0; i < current.Length; i++)
+            var parts = new List<(int Offset, int Length, ValueTask<string?> Task)>();
+
+            for (var i = 0; i < text.Length; i++)
             {
-                var c = current[i];
+                var c = text[i];
 
                 if (c == '$')
                 {
-                    sb.Append(current.Slice(0, i).ToString());
+                    parts.Add((currentOffset, i - currentOffset, default));
 
-                    current = current.Slice(i);
-
-                    var (replacement, length) = GetReplacement(current.Slice(1), @event);
+                    var (replacement, length) = GetReplacement(span.Slice(i + 1), @event);
 
                     if (length > 0)
                     {
-                        sb.Append(replacement);
+                        parts.Add((0, 0, new ValueTask<string?>(replacement)));
 
-                        current = current.Slice(length + 1);
-                        i = 0;
+                        i += length + 1;
                     }
+
+                    currentOffset = i;
                 }
             }
 
-            sb.Append(current.ToString());
+            parts.Add((currentOffset, text.Length - currentOffset, default));
+
+            var sb = new StringBuilder();
+
+            foreach (var (offset, length, task) in parts)
+            {
+                if (task.Result != null)
+                {
+                    sb.Append(task.Result);
+                }
+                else
+                {
+                    sb.Append(span.Slice(offset, length));
+                }
+            }
 
             return sb.ToString();
         }
@@ -234,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                return userEvent.User?.DisplayName() ?? Fallback;
+                return userEvent.User?.DisplayName();
             }
 
             return null;
@@ -244,50 +261,50 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                return userEvent.User?.Id ?? Fallback;
+                return userEvent.User?.Id;
             }
 
             return null;
         }
 
-        private static string UserEmail(EnrichedEvent @event)
+        private static string? UserEmail(EnrichedEvent @event)
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                return userEvent.User?.Email ?? Fallback;
+                return userEvent.User?.Email;
             }
 
-            return Fallback;
+            return null;
         }
 
-        private static string MentionedName(EnrichedEvent @event)
+        private static string? MentionedName(EnrichedEvent @event)
         {
             if (@event is EnrichedCommentEvent commentEvent)
             {
-                return commentEvent.MentionedUser.DisplayName() ?? Fallback;
+                return commentEvent.MentionedUser.DisplayName();
             }
 
-            return Fallback;
+            return null;
         }
 
-        private static string MentionedId(EnrichedEvent @event)
+        private static string? MentionedId(EnrichedEvent @event)
         {
             if (@event is EnrichedCommentEvent commentEvent)
             {
-                return commentEvent.MentionedUser.Id ?? Fallback;
+                return commentEvent.MentionedUser.Id;
             }
 
-            return Fallback;
+            return null;
         }
 
-        private static string MentionedEmail(EnrichedEvent @event)
+        private static string? MentionedEmail(EnrichedEvent @event)
         {
             if (@event is EnrichedCommentEvent commentEvent)
             {
-                return commentEvent.MentionedUser.Email ?? Fallback;
+                return commentEvent.MentionedUser.Email;
             }
 
-            return Fallback;
+            return null;
         }
 
         private static string? CalculateData(object @event, string[] path)
