@@ -27,8 +27,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string Fallback = "null";
-        private const string ScriptSuffix = ")";
-        private const string ScriptPrefix = "Script(";
         private static readonly Regex RegexPatternOld = new Regex(@"^(?<Type>[^_]*)_(?<Path>[^\s]*)", RegexOptions.Compiled);
         private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<Type>[^_]*)_(?<Path>[^\s]*)\}", RegexOptions.Compiled);
         private readonly List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)>();
@@ -85,13 +83,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return text;
             }
 
-            var trimmed = text.Trim();
-
-            if (trimmed.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) &&
-                trimmed.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
+            if (TryGetScript(text.Trim(), out var script))
             {
-                var script = trimmed.Substring(ScriptPrefix.Length, trimmed.Length - ScriptPrefix.Length - ScriptSuffix.Length);
-
                 var context = new ScriptContext
                 {
                     ["event"] = @event
@@ -382,6 +375,24 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return current?.ToString();
+        }
+
+        private static bool TryGetScript(string text, out string script)
+        {
+            const string ScriptSuffix = ")";
+            const string ScriptPrefix = "Script(";
+
+            script = null!;
+
+            var comparer = StringComparison.OrdinalIgnoreCase;
+
+            if (text.StartsWith(ScriptPrefix, comparer) && text.EndsWith(ScriptSuffix, comparer))
+            {
+                script = text.Substring(ScriptPrefix.Length, text.Length - ScriptPrefix.Length - ScriptSuffix.Length);
+                return true;
+            }
+
+            return false;
         }
     }
 }
