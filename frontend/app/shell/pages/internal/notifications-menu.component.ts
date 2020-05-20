@@ -55,6 +55,7 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
                 commentsUrl,
                 commentsService,
                 dialogs,
+                true,
                 this.versionRead);
     }
 
