@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return ActivateAsync(null);
+            return StartAllAsync();
         }
     }
 }
