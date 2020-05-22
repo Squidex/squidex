@@ -62,11 +62,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_filter()
         {
-            var filter = F.Eq("data.value.iv", _.RandomValue());
+            var filter = F.Eq("data.value.iv", 12);
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(query);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(query, 1000, 9000);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
         [Fact]
@@ -121,12 +121,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var query = new ClrQuery
             {
-                Filter = F.Eq("data.value.iv", _.RandomValue())
+                Filter = F.Eq("data.value.iv", 200)
             };
 
-            var contents = await QueryAsync(query);
+            var contents = await QueryAsync(query, 1000, 0);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
         private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100)

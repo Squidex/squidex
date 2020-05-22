@@ -36,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             [BsonElement("_id")]
             [BsonRepresentation(BsonType.String)]
             public Guid Id { get; set; }
+
+            public MongoContentEntity[] Joined { get; set; }
         }
 
         public QueryContentsByQuery(DataConverter converter, ITextIndex indexer)
@@ -116,18 +118,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     projection = Projection.Include(field);
                 }
 
-                var idDocuments =
+                var joined =
                     await Collection.Aggregate()
                         .Match(filter)
                         .Project<IdOnly>(projection)
                         .QuerySort(query)
-                        .QueryLimit(query)
                         .QuerySkip(query)
+                        .QueryLimit(query)
+                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.Id, x => x.Joined)
                         .ToListAsync();
 
-                var ids = idDocuments.Select(x => x.Id).ToList();
-
-                return await Collection.Find(Filter.In(x => x.Id, ids)).QuerySort(query).ToListAsync();
+                return joined.Select(x => x.Joined[0]).ToList();
             }
 
             var result =
