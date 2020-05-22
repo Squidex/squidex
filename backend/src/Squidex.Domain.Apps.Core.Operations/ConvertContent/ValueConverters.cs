@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field, parent) =>
             {
-                if (field is IField<JsonFieldProperties> && value is JsonScalar<string> s)
+                if (field is IField<JsonFieldProperties> && value is JsonString s)
                 {
                     var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(s.Value));
 

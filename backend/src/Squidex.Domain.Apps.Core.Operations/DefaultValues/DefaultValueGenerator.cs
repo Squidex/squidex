@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         private static bool ShouldApplyDefaultValue(IField field, IJsonValue value)
         {
-            return value.Type == JsonValueType.Null || (field is IField<StringFieldProperties> && value is JsonScalar<string> s && string.IsNullOrEmpty(s.Value));
+            return value.Type == JsonValueType.Null || (field is IField<StringFieldProperties> && value is JsonString s && string.IsNullOrEmpty(s.Value));
         }
     }
 }
