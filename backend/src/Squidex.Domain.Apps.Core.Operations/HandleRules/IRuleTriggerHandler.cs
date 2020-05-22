@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -23,6 +24,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         bool Trigger(EnrichedEvent @event, RuleTrigger trigger);
 
-        bool Trigger(AppEvent @event, RuleTrigger trigger, Guid ruleId);
+        bool Trigger(AppEvent @event, RuleTrigger trigger, DomainId ruleId);
     }
 }

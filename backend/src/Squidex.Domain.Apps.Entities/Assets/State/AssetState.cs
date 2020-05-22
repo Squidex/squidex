@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
@@ -20,9 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public class AssetState : DomainObjectState<AssetState>, IAssetEntity
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         public string FileName { get; set; }
 
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         public AssetType Type { get; set; }
 
-        public Guid AssetId
+        public DomainId AssetId
         {
             get { return Id; }
         }

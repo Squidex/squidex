@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
     public abstract class RuleCommand : SquidexCommand, IAggregateCommand
     {
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
-        Guid IAggregateCommand.AggregateId
+        DomainId IAggregateCommand.AggregateId
         {
             get { return RuleId; }
         }

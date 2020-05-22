@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -59,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (!field.Properties.AllowDuplicates)
             {
-                yield return new UniqueValuesValidator<Guid>();
+                yield return new UniqueValuesValidator<string>();
             }
         }
 
@@ -127,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (!field.Properties.AllowDuplicates)
             {
-                yield return new UniqueValuesValidator<Guid>();
+                yield return new UniqueValuesValidator<string>();
             }
         }
 

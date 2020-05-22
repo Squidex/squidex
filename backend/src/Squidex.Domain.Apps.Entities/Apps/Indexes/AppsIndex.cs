@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             this.grainFactory = grainFactory;
         }
 
-        public async Task RebuildByContributorsAsync(Guid appId, HashSet<string> contributors)
+        public async Task RebuildByContributorsAsync(DomainId appId, HashSet<string> contributors)
         {
             foreach (var contributorId in contributors)
             {
@@ -40,12 +39,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public Task RebuildByContributorsAsync(string contributorId, HashSet<Guid> apps)
+        public Task RebuildByContributorsAsync(string contributorId, HashSet<DomainId> apps)
         {
             return Index(contributorId).RebuildAsync(apps);
         }
 
-        public Task RebuildAsync(Dictionary<string, Guid> appsByName)
+        public Task RebuildAsync(Dictionary<string, DomainId> appsByName)
         {
             return Index().RebuildAsync(appsByName);
         }
@@ -55,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().RemoveReservationAsync(token);
         }
 
-        public Task<List<Guid>> GetIdsAsync()
+        public Task<List<DomainId>> GetIdsAsync()
         {
             return Index().GetIdsAsync();
         }
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().AddAsync(token);
         }
 
-        public Task<string?> ReserveAsync(Guid id, string name)
+        public Task<string?> ReserveAsync(DomainId id, string name)
         {
             return Index().ReserveAsync(id, name);
         }
@@ -117,11 +116,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity?> GetAppAsync(Guid appId)
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<AppsIndex>())
             {
-                var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+                var app = await grainFactory.GetGrain<IAppGrain>(appId.Id).GetStateAsync();
 
                 if (IsFound(app.Value, false))
                 {
@@ -132,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetAppIdsByUserAsync(string userId)
+        private async Task<List<DomainId>> GetAppIdsByUserAsync(string userId)
         {
             using (Profiler.TraceMethod<AppProvider>())
             {
@@ -140,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetAppIdsAsync()
+        private async Task<List<DomainId>> GetAppIdsAsync()
         {
             using (Profiler.TraceMethod<AppProvider>())
             {
@@ -148,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetAppIdsAsync(string[] names)
+        private async Task<List<DomainId>> GetAppIdsAsync(string[] names)
         {
             using (Profiler.TraceMethod<AppProvider>())
             {
@@ -156,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<Guid> GetAppIdAsync(string name)
+        private async Task<DomainId> GetAppIdAsync(string name)
         {
             using (Profiler.TraceMethod<AppProvider>())
             {
@@ -252,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var appId = command.AppId;
 
-            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+            var app = await grainFactory.GetGrain<IAppGrain>(appId.Id).GetStateAsync();
 
             if (IsFound(app.Value, true))
             {

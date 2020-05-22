@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             this.grainFactory = grainFactory;
         }
 
-        public Task RebuildAsync(Guid appId, Dictionary<string, Guid> schemas)
+        public Task RebuildAsync(DomainId appId, Dictionary<string, DomainId> schemas)
         {
             return Index(appId).RebuildAsync(schemas);
         }
 
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId, bool allowDeleted = false)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -63,11 +62,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                var schema = await grainFactory.GetGrain<ISchemaGrain>(id.Id).GetStateAsync();
 
                 if (IsFound(schema.Value, allowDeleted))
                 {
@@ -78,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
+        private async Task<DomainId> GetSchemaIdAsync(DomainId appId, string name)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -86,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetSchemaIdsAsync(Guid appId)
+        private async Task<List<DomainId>> GetSchemaIdsAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -160,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schemaId = commmand.SchemaId;
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync();
+            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId.Id).GetStateAsync();
 
             if (IsFound(schema.Value, true))
             {
@@ -168,9 +167,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private ISchemasByAppIndexGrain Index(Guid appId)
+        private ISchemasByAppIndexGrain Index(DomainId appId)
         {
-            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId);
+            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.Id);
         }
 
         private static bool IsFound(ISchemaEntity entity, bool allowDeleted)

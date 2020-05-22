@@ -5,32 +5,32 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public interface IAppProvider
     {
-        Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(Guid appId, Guid id);
+        Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id);
 
-        Task<IAppEntity?> GetAppAsync(Guid appId);
+        Task<IAppEntity?> GetAppAsync(DomainId appId);
 
         Task<IAppEntity?> GetAppAsync(string appName);
 
         Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions);
 
-        Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false);
+        Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted = false);
 
-        Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name);
+        Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name);
 
-        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
+        Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId);
 
-        Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
+        Task<List<IRuleEntity>> GetRulesAsync(DomainId appId);
     }
 }

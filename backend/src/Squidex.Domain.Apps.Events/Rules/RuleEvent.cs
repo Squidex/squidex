@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Events.Rules
 {
     public abstract class RuleEvent : AppEvent
     {
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
     }
 }

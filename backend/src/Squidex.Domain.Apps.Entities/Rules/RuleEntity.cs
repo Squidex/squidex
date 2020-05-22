@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class RuleEntity : IEnrichedRuleEntity
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         public NamedId<Guid> AppId { get; set; }
 

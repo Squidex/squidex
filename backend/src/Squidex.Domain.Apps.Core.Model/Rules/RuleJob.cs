@@ -7,6 +7,7 @@
 
 using System;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
@@ -14,9 +15,9 @@ namespace Squidex.Domain.Apps.Core.Rules
     {
         public Guid Id { get; set; }
 
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
         public string EventName { get; set; }
 

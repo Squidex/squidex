@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities
         IEntityWithVersion
         where T : class
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         public RefToken CreatedBy { get; set; }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,16 +15,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     internal sealed class ReferencesExtractor : IFieldVisitor<None>
     {
-        private readonly HashSet<Guid> result;
+        private readonly HashSet<DomainId> result;
         private readonly int take;
         private IJsonValue? value;
 
-        public HashSet<Guid> Result
+        public HashSet<DomainId> Result
         {
             get { return result; }
         }
 
-        public ReferencesExtractor(HashSet<Guid> result, int take)
+        public ReferencesExtractor(HashSet<DomainId> result, int take)
         {
             Guard.NotNull(result, nameof(result));
 

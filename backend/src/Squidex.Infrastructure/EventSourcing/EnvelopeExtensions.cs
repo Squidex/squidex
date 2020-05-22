@@ -51,12 +51,12 @@ namespace Squidex.Infrastructure.EventSourcing
             return envelope;
         }
 
-        public static Guid AggregateId(this EnvelopeHeaders headers)
+        public static DomainId AggregateId(this EnvelopeHeaders headers)
         {
-            return headers.GetGuid(CommonHeaders.AggregateId);
+            return headers.GetString(CommonHeaders.AggregateId);
         }
 
-        public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
+        public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, DomainId value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.AggregateId, value.ToString());
 

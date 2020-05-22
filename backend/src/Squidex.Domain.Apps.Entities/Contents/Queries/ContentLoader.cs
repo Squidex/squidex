@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
@@ -24,11 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity> GetAsync(Guid id, long version)
+        public async Task<IContentEntity> GetAsync(DomainId id, long version)
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
-                var contentGrain = grainFactory.GetGrain<IContentGrain>(id);
+                var contentGrain = grainFactory.GetGrain<IContentGrain>(id.Id);
                 var contentState = await contentGrain.GetStateAsync(version);
 
                 var content = contentState.Value;

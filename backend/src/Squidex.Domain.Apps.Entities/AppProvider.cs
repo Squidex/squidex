@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -40,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities
             this.indexSchemas = indexSchemas;
         }
 
-        public Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(Guid appId, Guid id)
+        public Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id)
         {
             return localCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
             {
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        private async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaUncachedAsync(Guid appId, Guid id)
+        private async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaUncachedAsync(DomainId appId, DomainId id)
         {
             var app = await GetAppAsync(appId);
 
@@ -67,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities
             return (app, schema);
         }
 
-        public Task<IAppEntity?> GetAppAsync(Guid appId)
+        public Task<IAppEntity?> GetAppAsync(DomainId appId)
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appId})", async () =>
             {
@@ -91,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name)
+        public Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name)
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
@@ -99,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted = false)
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {
@@ -107,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
+        public Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
         {
             return localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
             {
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
+        public Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
             return localCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
             {

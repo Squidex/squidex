@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppDomainObject(
             InitialPatterns initialPatterns,
-            IStore<Guid> store,
+            IStore<DomainId> store,
             ISemanticLog log,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
@@ -489,7 +489,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return new AppCreated { Name = name };
         }
 
-        private static AppPatternAdded CreateInitialPattern(Guid id, AppPattern pattern)
+        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
         {
             return new AppPatternAdded { PatternId = id, Name = pattern.Name, Pattern = pattern.Pattern, Message = pattern.Message };
         }

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
     {
         protected override void WriteValue(JsonWriter writer, Workflows value, JsonSerializer serializer)
         {
-            var json = new Dictionary<Guid, Workflow>(value.Count);
+            var json = new Dictionary<DomainId, Workflow>(value.Count);
 
             foreach (var (key, workflow) in value)
             {
@@ -28,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
         protected override Workflows ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<Guid, Workflow>>(reader);
+            var json = serializer.Deserialize<Dictionary<DomainId, Workflow>>(reader);
 
             return new Workflows(json!);
         }

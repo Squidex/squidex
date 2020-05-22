@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
@@ -15,7 +14,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public abstract class DomainObject<T> : DomainObjectBase<T> where T : class, IDomainState<T>, new()
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<DomainId> store;
         private T snapshot = new T { Version = EtagVersion.Empty };
         private IPersistence<T>? persistence;
 
@@ -24,7 +23,7 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshot; }
         }
 
-        protected DomainObject(IStore<Guid> store, ISemanticLog log)
+        protected DomainObject(IStore<DomainId> store, ISemanticLog log)
             : base(log)
         {
             Guard.NotNull(store, nameof(store));

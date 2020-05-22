@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private static async Task<NamedId<Guid>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Posts")
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Pages")

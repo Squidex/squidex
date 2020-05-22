@@ -29,15 +29,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
-        public Guid AppId
+        public DomainId AppId
         {
-            get => GetValue<Guid>();
+            get => GetValue<DomainId>();
             set => SetValue(value);
         }
 
-        public Guid ContentId
+        public DomainId ContentId
         {
-            get => GetValue<Guid>();
+            get => GetValue<DomainId>();
             set => SetValue(value);
         }
 

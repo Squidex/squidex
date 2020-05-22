@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable IDE0019 // Use pattern matching
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return false;
         }
 
-        bool IRuleTriggerHandler.Trigger(AppEvent @event, RuleTrigger trigger, Guid ruleId)
+        bool IRuleTriggerHandler.Trigger(AppEvent @event, RuleTrigger trigger, DomainId ruleId)
         {
             if (@event is TEvent typed)
             {
@@ -73,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected abstract bool Trigger(TEnrichedEvent @event, TTrigger trigger);
 
-        protected virtual bool Trigger(TEvent @event, TTrigger trigger, Guid ruleId)
+        protected virtual bool Trigger(TEvent @event, TTrigger trigger, DomainId ruleId)
         {
             return true;
         }

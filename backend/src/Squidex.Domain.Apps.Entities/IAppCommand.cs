@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface IAppCommand : ICommand
     {
-        NamedId<Guid> AppId { get; set; }
+        NamedId<DomainId> AppId { get; set; }
     }
 }

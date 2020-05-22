@@ -16,18 +16,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public delegate Task IdSource(Func<Guid, Task> add);
+    public delegate Task IdSource(Func<DomainId, Task> add);
 
     public class Rebuilder
     {
         private readonly ILocalCache localCache;
-        private readonly IStore<Guid> store;
+        private readonly IStore<DomainId> store;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
 
         public Rebuilder(
             ILocalCache localCache,
-            IStore<Guid> store,
+            IStore<DomainId> store,
             IEventStore eventStore,
             IServiceProvider serviceProvider)
         {
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(source, nameof(source));
 
-            var worker = new ActionBlock<Guid>(async id =>
+            var worker = new ActionBlock<DomainId>(async id =>
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.Commands
                 MaxDegreeOfParallelism = Environment.ProcessorCount * 2
             });
 
-            var handledIds = new HashSet<Guid>();
+            var handledIds = new HashSet<DomainId>();
 
             using (localCache.StartContext())
             {

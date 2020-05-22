@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentEntity : IEnrichedContentEntity, IContentEntity
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         public NamedId<Guid> AppId { get; set; }
 

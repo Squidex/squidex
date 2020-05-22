@@ -19,9 +19,9 @@ namespace Squidex.Infrastructure.Commands
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly ISemanticLog log;
         private bool isLoaded;
-        private Guid id;
+        private DomainId id;
 
-        public Guid Id
+        public DomainId Id
         {
             get { return id; }
         }
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public virtual void Setup(Guid id)
+        public virtual void Setup(DomainId id)
         {
             this.id = id;
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -91,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger, Guid ruleId)
+        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger, DomainId ruleId)
         {
             if (trigger.HandleAll)
             {
@@ -133,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<Guid> eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<DomainId> eventId)
         {
             return eventId.Id == schema.SchemaId;
         }

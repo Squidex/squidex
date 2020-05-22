@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public abstract class LogSnapshotDomainObject<T> : DomainObjectBase<T> where T : class, IDomainState<T>, new()
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<DomainId> store;
         private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
         private IPersistence? persistence;
 
@@ -26,7 +25,7 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshots.Last(); }
         }
 
-        protected LogSnapshotDomainObject(IStore<Guid> store, ISemanticLog log)
+        protected LogSnapshotDomainObject(IStore<DomainId> store, ISemanticLog log)
             : base(log)
         {
             Guard.NotNull(log, nameof(log));

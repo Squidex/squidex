@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public interface IEntity
     {
-        Guid Id { get;  }
+        DomainId Id { get;  }
 
         Instant Created { get; }
 
