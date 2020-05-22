@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using LoremNET;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -108,7 +109,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                         new IdContentData()
                                             .AddField(1,
                                                 new ContentFieldData()
-                                                    .AddJsonValue(JsonValue.Create(value)));
+                                                    .AddJsonValue(JsonValue.Create(value)))
+                                            .AddField(2,
+                                                new ContentFieldData()
+                                                    .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
 
                                     var content = new MongoContentEntity
                                     {

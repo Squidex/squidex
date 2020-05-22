@@ -88,6 +88,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
+        public async Task Should_query_contents_with_large_skip()
+        {
+            var query = new ClrQuery
+            {
+                Sort = new List<SortNode>
+                {
+                    new SortNode("data.value.iv", SortOrder.Ascending)
+                }
+            };
+
+            var contents = await QueryAsync(query, 1000, 9000);
+
+            Assert.NotNull(contents);
+        }
+
+        [Fact]
         public async Task Should_query_contents_with_query_fulltext()
         {
             var query = new ClrQuery
@@ -113,11 +129,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             Assert.NotNull(contents);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery)
+        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100)
         {
-            clrQuery.Top = 1000;
-            clrQuery.Skip = 100;
-            clrQuery.Sort = new List<SortNode> { new SortNode("LastModified", SortOrder.Descending) };
+            if (clrQuery.Take == long.MaxValue)
+            {
+                clrQuery.Take = take;
+            }
+
+            if (clrQuery.Skip == 0)
+            {
+                clrQuery.Skip = skip;
+            }
+
+            if (clrQuery.Sort.Count == 0)
+            {
+                clrQuery.Sort = new List<SortNode>
+                {
+                    new SortNode("LastModified", SortOrder.Descending)
+                };
+            }
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), clrQuery, SearchScope.All);
 
