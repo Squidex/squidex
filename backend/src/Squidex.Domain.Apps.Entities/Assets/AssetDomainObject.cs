@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetDomainObject(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
+        public AssetDomainObject(IStore<DomainId> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(tagService, nameof(tagService));
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task<HashSet<string>?> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
+        private async Task<HashSet<string>?> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
         {
             if (tags == null)
             {
