@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public async Task Should_query_from_tracker()
+        public async Task Should_query_calls_from_tracker()
         {
             var counters = new Counters
             {
@@ -58,9 +58,25 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))
                 .Returns(counters);
 
-            var result = await sut.GetMonthCostsAsync(key, date);
+            var result = await sut.GetMonthCallsAsync(key, date);
 
             Assert.Equal(4, result);
+        }
+
+        [Fact]
+        public async Task Should_query_bytes_from_tracker()
+        {
+            var counters = new Counters
+            {
+                [ApiUsageTracker.CounterTotalBytes] = 14
+            };
+
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))
+                .Returns(counters);
+
+            var result = await sut.GetMonthBytesAsync(key, date);
+
+            Assert.Equal(14, result);
         }
 
         [Fact]
