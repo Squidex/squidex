@@ -61,29 +61,6 @@ namespace Squidex.Infrastructure.EventSourcing
             return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
         }
 
-        public Task CreateIndexAsync(string property)
-        {
-            Guard.NotNullOrEmpty(property, nameof(property));
-
-            return projectionClient.CreateProjectionAsync(property, string.Empty);
-        }
-
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
-        {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
-
-            using (Profiler.TraceMethod<GetEventStore>())
-            {
-                var streamName = await projectionClient.CreateProjectionAsync(property, value);
-
-                var sliceStart = projectionClient.ParsePosition(position);
-
-                await QueryAsync(callback, streamName, sliceStart, ct);
-            }
-        }
-
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));

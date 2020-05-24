@@ -12,11 +12,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public interface ITextIndexerState
     {
-        Task<TextContentState?> GetAsync(DomainId contentId);
+        Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId);
 
         Task SetAsync(TextContentState state);
 
-        Task RemoveAsync(DomainId contentId);
+        Task RemoveAsync(DomainId appId, DomainId contentId);
 
         Task ClearAsync();
     }

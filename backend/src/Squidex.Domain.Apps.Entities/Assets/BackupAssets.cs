@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
@@ -129,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetIds.Add(assetId);
 
-            return reader.ReadBlobAsync(GetName(reader.OldGuid(Guid.Empty), fileVersion), stream =>
+            return reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
             {
                 return assetFileStore.UploadAsync(assetId, fileVersion, stream);
             });

@@ -62,7 +62,7 @@ namespace Squidex.Web.CommandMiddlewares
         {
             NamedId<Guid>? appId = null;
 
-            if (context.Command is IAppCommand appCommand)
+            if (context.Command is AppCommandBase appCommand)
             {
                 appId = appCommand.AppId;
             }

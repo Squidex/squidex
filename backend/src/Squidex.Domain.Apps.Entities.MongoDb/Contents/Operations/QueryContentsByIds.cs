@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.appProvider = appProvider;
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(Guid appId, ISchemaEntity? schema, HashSet<Guid> ids)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(DomainId appId, ISchemaEntity? schema, HashSet<DomainId> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -52,9 +52,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return result;
         }
 
-        private async Task<IDictionary<Guid, ISchemaEntity>> GetSchemasAsync(Guid appId, ISchemaEntity? schema, List<MongoContentEntity> contentItems)
+        private async Task<IDictionary<DomainId, ISchemaEntity>> GetSchemasAsync(DomainId appId, ISchemaEntity? schema, List<MongoContentEntity> contentItems)
         {
-            var schemas = new Dictionary<Guid, ISchemaEntity>();
+            var schemas = new Dictionary<DomainId, ISchemaEntity>();
 
             if (schema != null)
             {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return schemas;
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid appId, ICollection<Guid> ids)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, ICollection<DomainId> ids)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -89,19 +89,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (ids != null && ids.Count > 0)
             {
+                var documentIds = ids.Select(x => DomainId.Combine(appId, x).ToString()).ToList();
+
                 if (ids.Count > 1)
                 {
                     filters.Add(
                         Filter.Or(
-                            Filter.In(x => x.Id, ids)));
+                            Filter.In(x => x.DocumentId, documentIds)));
                 }
                 else
                 {
-                    var first = ids.First();
+                    var first = documentIds.First();
 
                     filters.Add(
                         Filter.Or(
-                            Filter.Eq(x => x.Id, first)));
+                            Filter.Eq(x => x.DocumentId, first)));
                 }
             }
 

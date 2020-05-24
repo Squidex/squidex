@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppCommandMiddleware : GrainCommandMiddleware<AppCommand, IAppGrain>
+    public sealed class AppCommandMiddleware : GrainCommandMiddleware<Commands.AppCommand, IAppGrain>
     {
         private readonly IAppImageStore appImageStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             using (var uploadStream = file.OpenRead())
             {
-                await appImageStore.UploadAsync(uploadImage.AppId, uploadStream);
+                await appImageStore.UploadAsync(uploadImage.AppId.Id, uploadStream);
             }
         }
     }

@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 query = query.AdjustToModel(schema.SchemaDef);
 
-                List<Guid>? fullTextIds = null;
+                List<DomainId>? fullTextIds = null;
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, ClrQuery? query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 filters.Add(
                     Filter.Or(
                         Filter.AnyIn(x => x.ReferencedIds, ids),
-                        Filter.In(x => x.Id, ids)));
+                        Filter.In(x => x.DomainId, ids)));
             }
 
             if (query?.Filter != null)

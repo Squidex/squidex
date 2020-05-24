@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return query;
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, Guid appId, Guid? parentId)
+        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, DomainId appId, DomainId? parentId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
@@ -46,12 +47,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 
             if (parentId.HasValue)
             {
-                if (parentId == Guid.Empty)
+                if (parentId == default(DomainId))
                 {
                     filters.Add(
                         Filter.Or(
                             Filter.Exists(x => x.ParentId, false),
-                            Filter.Eq(x => x.ParentId, Guid.Empty)));
+                            Filter.Eq(x => x.ParentId, DomainId.Empty)));
                 }
                 else
                 {

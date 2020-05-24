@@ -10,10 +10,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class CreateSchema : UpsertCommand, IAppCommand
+    public sealed class CreateSchema : UpsertCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public string Name { get; set; }
 
         public bool IsSingleton { get; set; }

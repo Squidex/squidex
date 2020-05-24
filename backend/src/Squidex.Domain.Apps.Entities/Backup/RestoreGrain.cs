@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -40,6 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IUserResolver userResolver;
         private readonly IGrainState<RestoreState2> state;
         private RestoreContext restoreContext;
+        private string oldAppId;
 
         private RestoreJob CurrentJob
         {
@@ -250,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await commandBus.PublishAsync(new AssignContributor
                     {
                         Actor = actor,
-                        AppId = CurrentJob.AppId.Id,
+                        AppId = CurrentJob.AppId,
                         ContributorId = actor.Identifier,
                         Restoring = true,
                         Role = Role.Owner
@@ -320,6 +322,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (@event.Payload is AppCreated appCreated)
             {
+                oldAppId = appCreated.AppId.Id.ToString();
+
                 if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
                 {
                     appCreated.Name = CurrentJob.NewAppName;
@@ -345,6 +349,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             if (@event.Payload is AppEvent appEvent)
             {
                 appEvent.AppId = CurrentJob.AppId;
+            }
+
+            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var aggregateId) && aggregateId is JsonString s)
+            {
+                @event.SetAggregateId(s.Value.Replace(oldAppId, CurrentJob.AppId.ToString()));
             }
 
             foreach (var handler in handlers)

@@ -9,12 +9,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public abstract class CommentsCommand : SquidexCommand, IAppCommand
+    public abstract class CommentsCommand : AppCommandBase
     {
         public string CommentsId { get; set; }
 
         public DomainId CommentId { get; set; }
-
-        public NamedId<DomainId> AppId { get; set; }
     }
 }

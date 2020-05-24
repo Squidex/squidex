@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         {
                             await index.AddAsync(token);
 
-                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
+                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId.Id);
                         }
                         else
                         {
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             if (name.IsSlug())
             {
-                var token = await index.ReserveAsync(command.AppId, name);
+                var token = await index.ReserveAsync(command.AppId.Id, name);
 
                 if (token == null)
                 {
@@ -239,28 +239,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private Task AssignContributorAsync(AssignContributor command)
         {
-            return Index(command.ContributorId).AddAsync(command.AppId);
+            return Index(command.ContributorId).AddAsync(command.AppId.Id);
         }
 
         private Task RemoveContributorAsync(RemoveContributor command)
         {
-            return Index(command.ContributorId).RemoveAsync(command.AppId);
+            return Index(command.ContributorId).RemoveAsync(command.AppId.Id);
         }
 
         private async Task ArchiveAppAsync(ArchiveApp command)
         {
             var appId = command.AppId;
 
-            var app = await grainFactory.GetGrain<IAppGrain>(appId.Id).GetStateAsync();
+            var app = await grainFactory.GetGrain<IAppGrain>(appId.Id.Id).GetStateAsync();
 
             if (IsFound(app.Value, true))
             {
-                await Index().RemoveAsync(appId);
+                await Index().RemoveAsync(appId.Id);
             }
 
             foreach (var contributorId in app.Value.Contributors.Keys)
             {
-                await Index(contributorId).RemoveAsync(appId);
+                await Index(contributorId).RemoveAsync(appId.Id);
             }
         }
 

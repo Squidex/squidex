@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
@@ -16,8 +15,7 @@ namespace Squidex.Infrastructure.MongoDb
     {
         [BsonId]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [BsonRequired]
         [BsonElement]

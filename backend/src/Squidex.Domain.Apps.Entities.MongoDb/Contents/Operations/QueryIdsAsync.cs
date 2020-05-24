@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryIdsAsync : OperationBase
     {
-        private static readonly List<(Guid SchemaId, Guid Id)> EmptyIds = new List<(Guid SchemaId, Guid Id)>();
+        private static readonly List<(DomainId SchemaId, DomainId Id)> EmptyIds = new List<(DomainId SchemaId, DomainId Id)>();
         private readonly IAppProvider appProvider;
 
         public QueryIdsAsync(IAppProvider appProvider)
@@ -37,22 +37,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> DoAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, HashSet<DomainId> ids)
         {
+            var documentIds = ids.Select(x => DomainId.Combine(appId, x).ToString());
+
             var filter =
                 Filter.And(
-                    Filter.Eq(x => x.IndexedAppId, appId),
-                    Filter.In(x => x.Id, ids),
+                    Filter.In(x => x.DocumentId, documentIds),
                     Filter.Ne(x => x.IsDeleted, true));
 
             var contentEntities =
-                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
+                await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["_id"].AsString))).ToList();
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> DoAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             var schema = await appProvider.GetSchemaAsync(appId, schemaId);
 
@@ -64,13 +65,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), schemaId);
 
             var contentEntities =
-                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
+                await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["_id"].AsString))).ToList();
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, Guid schemaId)
+        public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId schemaId)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {

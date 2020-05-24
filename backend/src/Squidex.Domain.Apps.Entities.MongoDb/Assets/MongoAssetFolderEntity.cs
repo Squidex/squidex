@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonId]
         [BsonElement("_id")]
         [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
         [BsonRepresentation(BsonType.String)]
-        public Guid IndexedAppId { get; set; }
+        public DomainId IndexedAppId { get; set; }
 
         [BsonRequired]
         [BsonElement("pi")]
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("ai")]
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("fn")]

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
@@ -43,12 +44,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndexerState";
         }
 
-        public Task<TextContentState?> GetAsync(Guid contentId)
+        public Task<TextContentState?> GetAsync(DomainId contentId)
         {
             return Collection.Find(x => x.ContentId == contentId).FirstOrDefaultAsync()!;
         }
 
-        public Task RemoveAsync(Guid contentId)
+        public Task RemoveAsync(DomainId contentId)
         {
             return Collection.DeleteOneAsync(x => x.ContentId == contentId);
         }

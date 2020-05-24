@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             this.bucket = bucket;
         }
 
-        public async Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(DomainId ownerId)
         {
             var fileId = $"index_{ownerId}";
 

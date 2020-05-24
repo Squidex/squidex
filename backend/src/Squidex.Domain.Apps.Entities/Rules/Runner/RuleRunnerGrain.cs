@@ -12,7 +12,6 @@ using Orleans;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
@@ -158,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     job.Position = storedEvent.EventPosition;
 
                     await state.WriteAsync();
-                }, SquidexHeaders.AppId, Key, job.Position, ct);
+                }, $"\\-{Key}", job.Position, ct);
             }
             catch (OperationCanceledException)
             {

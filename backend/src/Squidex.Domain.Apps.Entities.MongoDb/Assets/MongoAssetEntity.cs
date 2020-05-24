@@ -5,33 +5,35 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<Guid>
+    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<string>
     {
         [BsonId]
         [BsonElement("_id")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public string DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid IndexedAppId { get; set; }
+        public string IndexedAppId { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("ai")]
+        public string AssetId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("pi")]
-        public Guid ParentId { get; set; }
+        public string ParentId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -42,8 +44,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public Instant LastModified { get; set; }
 
         [BsonRequired]
-        [BsonElement("ai")]
-        public NamedId<Guid> AppId { get; set; }
+        [BsonElement("an")]
+        public string AppName { get; set; }
 
         [BsonRequired]
         [BsonElement("mm")]
@@ -102,9 +104,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("md")]
         public AssetMetadata Metadata { get; set; }
 
-        public Guid AssetId
+        DomainId IEntity.Id
         {
-            get { return Id; }
+            get { return AssetId; }
+        }
+
+        DomainId IAssetInfo.AssetId
+        {
+            get { return ParentId; }
+        }
+
+        DomainId IAssetEntity.ParentId
+        {
+            get { return ParentId; }
+        }
+
+        NamedId<DomainId> IAssetEntity.AppId
+        {
+            get { return NamedId.Of(new DomainId(AssetId), ParentId);  }
         }
     }
 }

@@ -41,11 +41,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 result = new CompareFilter<ClrValue>(path, nodeIn.Operator, nodeIn.Value);
             }
 
-            if (value is List<Guid> guidList)
+            if (value is List<DomainId> guidList)
             {
                 result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
             }
-            else if (value is Guid guid)
+            else if (value is DomainId guid)
             {
                 result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guid.ToString());
             }

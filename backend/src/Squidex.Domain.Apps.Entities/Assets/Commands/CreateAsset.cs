@@ -10,10 +10,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class CreateAsset : UploadAssetCommand, IAppCommand
+    public sealed class CreateAsset : UploadAssetCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public DomainId ParentId { get; set; }
 
         public HashSet<string> Tags { get; } = new HashSet<string>();

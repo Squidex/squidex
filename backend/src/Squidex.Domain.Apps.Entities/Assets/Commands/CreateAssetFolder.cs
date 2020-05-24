@@ -9,10 +9,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class CreateAssetFolder : AssetFolderCommand, IAppCommand
+    public sealed class CreateAssetFolder : AssetFolderCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public string FolderName { get; set; }
 
         public DomainId ParentId { get; set; }

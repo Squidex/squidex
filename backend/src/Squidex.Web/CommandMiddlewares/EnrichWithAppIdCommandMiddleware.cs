@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -28,14 +27,14 @@ namespace Squidex.Web.CommandMiddlewares
 
         public Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            if (context.Command is IAppCommand appCommand && appCommand.AppId == null)
+            if (context.Command is Domain.Apps.Entities.AppCommandBase appCommand && appCommand.AppId == null)
             {
                 var appId = GetAppId();
 
                 appCommand.AppId = appId;
             }
 
-            if (context.Command is AppCommand appSelfCommand && appSelfCommand.AppId == Guid.Empty)
+            if (context.Command is Domain.Apps.Entities.Apps.Commands.AppCommand appSelfCommand && appSelfCommand.AppId == Guid.Empty)
             {
                 var appId = GetAppId();
 

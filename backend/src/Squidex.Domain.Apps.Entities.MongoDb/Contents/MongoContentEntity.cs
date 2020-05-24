@@ -21,29 +21,25 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     [BsonIgnoreExtraElements]
-    public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Guid>
+    public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<string>
     {
         private NamedContentData data;
 
         [BsonId]
         [BsonElement("_id")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public string DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid IndexedAppId { get; set; }
+        public string IndexedAppId { get; set; }
 
         [BsonRequired]
         [BsonElement("_si")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid IndexedSchemaId { get; set; }
+        public string IndexedSchemaId { get; set; }
 
         [BsonRequired]
-        [BsonElement("rf")]
-        [BsonRepresentation(BsonType.String)]
-        public HashSet<Guid>? ReferencedIds { get; set; }
+        [BsonElement("ci")]
+        public string ContentId { get; set; }
 
         [BsonRequired]
         [BsonElement("ss")]
@@ -60,11 +56,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("ai")]
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("si")]
-        public NamedId<Guid> SchemaId { get; set; }
+        public NamedId<DomainId> SchemaId { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("sa")]
@@ -104,10 +100,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
+        DomainId IEntity.Id
+        {
+            get { return ContentId; }
+        }
+
         public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
         {
-            ReferencedIds = data.GetReferencedIds(schema);
-
             DataByIds = converter.ToMongoModel(data, schema);
         }
 

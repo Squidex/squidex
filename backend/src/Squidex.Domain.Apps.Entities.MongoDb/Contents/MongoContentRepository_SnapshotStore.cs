@@ -18,14 +18,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
+    public partial class MongoContentRepository : ISnapshotStore<ContentState, string>
     {
-        Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
+        Task ISnapshotStore<ContentState, string>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
         {
             throw new NotSupportedException();
         }
 
-        async Task ISnapshotStore<ContentState, Guid>.ClearAsync()
+        async Task ISnapshotStore<ContentState, string>.ClearAsync()
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
+        async Task ISnapshotStore<ContentState, string>.RemoveAsync(string key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, Guid>.ReadAsync(Guid key)
+        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, string>.ReadAsync(string key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -62,11 +62,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentState, Guid>.WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentState, string>.WriteAsync(string key, ContentState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                if (value.SchemaId.Id == Guid.Empty)
+                if (value.SchemaId.Id == DomainId.Empty)
                 {
                     return;
                 }
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        private Task DeletePublishedContentAsync(Guid key)
+        private Task DeletePublishedContentAsync(DomainId key)
         {
             return collectionPublished.RemoveAsync(key);
         }
@@ -111,15 +111,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             content.LoadData(value.Data, schema.SchemaDef, converter);
 
-            await collectionAll.UpsertVersionedAsync(content.Id, oldVersion, content);
+            await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
         private async Task UpsertPublishedContentAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
+                ContentId = value.Id.ToString(),
+                IndexedAppId = value.AppId.Id.ToString(),
+                IndexedSchemaId = value.SchemaId.Id.ToString(),
                 Version = newVersion
             });
 
@@ -129,10 +130,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             content.LoadData(value.CurrentVersion.Data, schema.SchemaDef, converter);
 
-            await collectionPublished.UpsertVersionedAsync(content.Id, oldVersion, content);
+            await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)
+        private async Task<ISchemaEntity> GetSchemaAsync(DomainId appId, DomainId schemaId)
         {
             var schema = await appProvider.GetSchemaAsync(appId, schemaId, true);
 

@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.States
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public TKey Id { get; set; }
+        public TKey DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement]

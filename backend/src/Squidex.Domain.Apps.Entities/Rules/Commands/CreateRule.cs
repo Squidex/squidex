@@ -9,10 +9,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public sealed class CreateRule : RuleEditCommand, IAppCommand
+    public sealed class CreateRule : RuleEditCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public CreateRule()
         {
             RuleId = DomainId.NewGuid();

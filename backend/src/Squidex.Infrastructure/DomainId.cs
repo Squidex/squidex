@@ -21,11 +21,6 @@ namespace Squidex.Infrastructure
             get { return id == null; }
         }
 
-        public string Id
-        {
-            get { return id ?? "0"; }
-        }
-
         public DomainId(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -50,7 +45,7 @@ namespace Squidex.Infrastructure
 
         public override string ToString()
         {
-            return Id;
+            return id ?? "<EMPTY>";
         }
 
         public int CompareTo([AllowNull] DomainId other)

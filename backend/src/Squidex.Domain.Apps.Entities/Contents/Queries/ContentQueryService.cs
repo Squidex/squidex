@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (version > EtagVersion.Empty)
                 {
-                    content = await FindByVersionAsync(context.App.Id, id, version);
+                    content = await FindByVersionAsync(context, id, version);
                 }
                 else
                 {

@@ -12,6 +12,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
@@ -20,13 +21,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         [BsonRequired]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid AppId { get; set; }
+        public string AppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid RuleId { get; set; }
+        public string RuleId { get; set; }
 
         [BsonRequired]
         [BsonElement]

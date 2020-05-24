@@ -9,10 +9,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public sealed class CreateContent : ContentDataCommand, ISchemaCommand, IAppCommand
+    public sealed class CreateContent : ContentDataCommand, ISchemaCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public NamedId<DomainId> SchemaId { get; set; }
 
         public bool Publish { get; set; }

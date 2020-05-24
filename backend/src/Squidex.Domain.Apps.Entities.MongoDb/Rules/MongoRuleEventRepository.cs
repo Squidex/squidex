@@ -42,8 +42,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
             await collection.Indexes.CreateManyAsync(new[]
             {
-                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.NextAttempt)),
-                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.AppId).Descending(x => x.Created)),
+                new CreateIndexModel<MongoRuleEventEntity>(
+                    Index.Ascending(x => x.NextAttempt)),
+
+                new CreateIndexModel<MongoRuleEventEntity>(
+                    Index.Ascending(x => x.AppId).Descending(x => x.Created)),
+
                 new CreateIndexModel<MongoRuleEventEntity>(
                     Index
                         .Ascending(x => x.Expires),
@@ -59,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
-        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20)
+        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20)
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
@@ -76,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return ResultList.Create(taskForCount.Result, taskForItems.Result);
         }
 
-        public async Task<IRuleEventEntity> FindAsync(Guid id)
+        public async Task<IRuleEventEntity> FindAsync(DomainId id)
         {
             var ruleEvent =
                 await Collection.Find(x => x.Id == id)
@@ -85,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return ruleEvent;
         }
 
-        public Task EnqueueAsync(Guid id, Instant nextAttempt)
+        public Task EnqueueAsync(DomainId id, Instant nextAttempt)
         {
             return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
@@ -97,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }
 
-        public Task CancelAsync(Guid id)
+        public Task CancelAsync(DomainId id)
         {
             return Collection.UpdateOneAsync(x => x.Id == id,
                 Update
@@ -128,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Inc(x => x.NumCalls, 1));
         }
 
-        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId)
+        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId)
         {
             return statisticsCollection.QueryByAppAsync(appId);
         }

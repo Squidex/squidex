@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
-    public class RuleStatistics
+    public sealed class RuleStatistics
     {
         public DomainId AppId { get; set; }
 

@@ -15,6 +15,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         static MongoRuleStatisticsCollection()
         {
-            var guidSerializer = new GuidSerializer().WithRepresentation(BsonType.String);
+            var guidSerializer = new DomainIdSerializer().WithRepresentation(BsonType.String);
 
             BsonClassMap.RegisterClassMap<RuleStatistics>(cm =>
             {
@@ -56,14 +57,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 cancellationToken: ct);
         }
 
-        public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(Guid appId)
+        public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId)
         {
             var statistics = await Collection.Find(x => x.AppId == appId).ToListAsync();
 
             return statistics;
         }
 
-        public Task IncrementSuccess(Guid appId, Guid ruleId, Instant now)
+        public Task IncrementSuccess(DomainId appId, DomainId ruleId, Instant now)
         {
             return Collection.UpdateOneAsync(
                 x => x.AppId == appId && x.RuleId == ruleId,
@@ -75,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 Upsert);
         }
 
-        public Task IncrementFailed(Guid appId, Guid ruleId, Instant now)
+        public Task IncrementFailed(DomainId appId, DomainId ruleId, Instant now)
         {
             return Collection.UpdateOneAsync(
                 x => x.AppId == appId && x.RuleId == ruleId,

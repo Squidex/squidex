@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, SquidexHeaders.AppId, Key.ToString(), null, ct);
+                        }, $"\\-{Key}", null, ct);
 
                         foreach (var handler in handlers)
                         {
