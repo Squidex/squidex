@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this;
         }
 
-        public bool Equals(IdContentData other)
+        public bool Equals([AllowNull] IdContentData other)
         {
             return base.Equals(other);
         }
