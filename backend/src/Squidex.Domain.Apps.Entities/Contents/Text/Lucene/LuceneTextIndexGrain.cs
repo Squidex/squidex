@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
-    public sealed class LuceneTextIndexGrain : GrainOfGuid, ILuceneTextIndexGrain
+    public sealed class LuceneTextIndexGrain : GrainOfString, ILuceneTextIndexGrain
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
@@ -58,14 +58,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             }
         }
 
-        protected override async Task OnActivateAsync(Guid key)
+        protected override async Task OnActivateAsync(string key)
         {
             index = await indexManager.AcquireAsync(key);
         }
 
-        public Task<List<Guid>> SearchAsync(string queryText, SearchFilter? filter, SearchContext context)
+        public Task<List<DomainId>> SearchAsync(string queryText, SearchFilter? filter, SearchContext context)
         {
-            var result = new List<Guid>();
+            var result = new List<DomainId>();
 
             if (!string.IsNullOrWhiteSpace(queryText))
             {
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     {
                         var buffer = new BytesRef(2);
 
-                        var found = new HashSet<Guid>();
+                        var found = new HashSet<DomainId>();
 
                         foreach (var hit in hits)
                         {
@@ -103,11 +103,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                             {
                                 var idString = document.Get(MetaContentId);
 
-                                if (Guid.TryParse(idString, out var id))
+                                if (idString != null)
                                 {
-                                    if (found.Add(id))
+                                    if (found.Add(idString))
                                     {
-                                        result.Add(id);
+                                        result.Add(idString);
                                     }
                                 }
                             }
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             }
         }
 
-        public Task IndexAsync(NamedId<Guid> schemaId, Immutable<IndexCommand[]> updates)
+        public Task IndexAsync(NamedId<DomainId> schemaId, Immutable<IndexCommand[]> updates)
         {
             foreach (var command in updates.Value)
             {

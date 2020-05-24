@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     {
                         result.Add(null);
                     }
-                    else if (item is JsonScalar<string> s)
+                    else if (item is JsonString s)
                     {
                         result.Add(s.Value);
                     }

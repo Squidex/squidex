@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
     [CollectionName("Schemas")]
     public sealed class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public Schema SchemaDef { get; set; }
 

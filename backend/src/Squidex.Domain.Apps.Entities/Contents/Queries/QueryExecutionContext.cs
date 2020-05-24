@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class QueryExecutionContext
     {
-        private readonly ConcurrentDictionary<Guid, IContentEntity?> cachedContents = new ConcurrentDictionary<Guid, IContentEntity?>();
-        private readonly ConcurrentDictionary<Guid, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<Guid, IEnrichedAssetEntity?>();
+        private readonly ConcurrentDictionary<DomainId, IContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IContentEntity?>();
+        private readonly ConcurrentDictionary<DomainId, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<DomainId, IEnrichedAssetEntity?>();
         private readonly IContentQueryService contentQuery;
         private readonly IAssetQueryService assetQuery;
         private readonly Context context;
@@ -39,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.context = context;
         }
 
-        public virtual async Task<IEnrichedAssetEntity?> FindAssetAsync(Guid id)
+        public virtual async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
         {
             var asset = cachedAssets.GetOrDefault(id);
 
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return asset;
         }
 
-        public virtual async Task<IContentEntity?> FindContentAsync(Guid schemaId, Guid id)
+        public virtual async Task<IContentEntity?> FindContentAsync(DomainId schemaId, DomainId id)
         {
             var content = cachedContents.GetOrDefault(id);
 
@@ -97,11 +96,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return result;
         }
 
-        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
+        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 
-            var notLoadedAssets = new HashSet<Guid>(ids.Where(id => !cachedAssets.ContainsKey(id)));
+            var notLoadedAssets = new HashSet<DomainId>(ids.Where(id => !cachedAssets.ContainsKey(id)));
 
             if (notLoadedAssets.Count > 0)
             {
@@ -116,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return ids.Select(cachedAssets.GetOrDefault).NotNull().ToList();
         }
 
-        public virtual async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(ICollection<Guid> ids)
+        public virtual async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 

@@ -25,7 +25,7 @@ using Squidex.Shared.Users;
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class BackupGrain : GrainOfGuid, IBackupGrain
+    public sealed class BackupGrain : GrainOfString, IBackupGrain
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.log = log;
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(string key)
         {
             RecoverAfterRestartAsync().Forget();
 
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return lastTimestamp;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(DomainId id)
         {
             var job = state.Value.Jobs.FirstOrDefault(x => x.Id == id);
 

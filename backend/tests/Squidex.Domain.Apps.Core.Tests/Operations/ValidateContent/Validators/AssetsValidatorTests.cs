@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Xunit;
 
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
         public sealed class AssetInfo : IAssetInfo
         {
-            public Guid AssetId { get; set; }
+            public DomainId AssetId { get; set; }
 
             public string FileName { get; set; }
 
@@ -216,7 +217,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
                 });
         }
 
-        private static object CreateValue(params Guid[] ids)
+        private static object CreateValue(params DomainId[] ids)
         {
             return ids.ToList();
         }

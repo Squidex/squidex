@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -18,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities
     {
         public static readonly Q Empty = new Q();
 
-        public IReadOnlyList<Guid> Ids { get; private set; }
+        public IReadOnlyList<DomainId> Ids { get; private set; }
 
         public string? ODataQuery { get; private set; }
 
@@ -48,12 +47,12 @@ namespace Squidex.Domain.Apps.Entities
             return Clone(c => c.ParsedJsonQuery = jsonQuery);
         }
 
-        public Q WithIds(params Guid[] ids)
+        public Q WithIds(params DomainId[] ids)
         {
             return Clone(c => c.Ids = ids.ToList());
         }
 
-        public Q WithIds(IEnumerable<Guid> ids)
+        public Q WithIds(IEnumerable<DomainId> ids)
         {
             return Clone(c => c.Ids = ids.ToList());
         }
@@ -64,14 +63,11 @@ namespace Squidex.Domain.Apps.Entities
             {
                 return Clone(c =>
                 {
-                    var idsList = new List<Guid>();
+                    var idsList = new List<DomainId>();
 
                     foreach (var id in ids.Split(','))
                     {
-                        if (Guid.TryParse(id, out var guid))
-                        {
-                            idsList.Add(guid);
-                        }
+                        idsList.Add(id);
                     }
 
                     c.Ids = idsList;

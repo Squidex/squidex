@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = AllTypes.NonNullGuid,
+                ResolvedType = AllTypes.NonNullDomainId,
                 Resolver = Resolve(x => x.Id),
                 Description = $"The id of the {schemaName} content."
             });

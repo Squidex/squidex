@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BackupContents : IBackupHandler
     {
-        private readonly Dictionary<Guid, HashSet<Guid>> contentIdsBySchemaId = new Dictionary<Guid, HashSet<Guid>>();
+        private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
         private readonly Rebuilder rebuilder;
 
         public string Name { get; } = "Contents";

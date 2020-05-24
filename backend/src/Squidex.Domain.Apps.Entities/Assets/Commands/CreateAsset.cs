@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
@@ -13,15 +12,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class CreateAsset : UploadAssetCommand, IAppCommand
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         public HashSet<string> Tags { get; } = new HashSet<string>();
 
         public CreateAsset()
         {
-            AssetId = Guid.NewGuid();
+            AssetId = DomainId.NewGuid();
         }
     }
 }

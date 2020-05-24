@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 }
             }
 
-            public Guid Id { get; }
+            public DomainId Id { get; }
 
-            public IndexHolder(Guid id)
+            public IndexHolder(DomainId id)
             {
                 Id = id;
             }

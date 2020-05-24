@@ -39,7 +39,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var content =
                 await contentLoader.GetAsync(
-                    @event.Headers.AggregateId(),
+                    @event.Payload.AppId.Id,
+                    @event.Payload.ContentId,
                     @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(content, result);
@@ -77,6 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var previousContent =
                             await contentLoader.GetAsync(
+                                content.AppId.Id,
                                 content.Id,
                                 content.Version - 1);
 

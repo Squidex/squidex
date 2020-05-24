@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed class RuleRunnerGrain : GrainOfGuid, IRuleRunnerGrain, IRemindable
+    public sealed class RuleRunnerGrain : GrainOfString, IRuleRunnerGrain, IRemindable
     {
         private readonly IGrainState<State> state;
         private readonly IAppProvider appProvider;
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         [CollectionName("Rules_Runner")]
         public sealed class State
         {
-            public Guid? RuleId { get; set; }
+            public DomainId? RuleId { get; set; }
 
             public string? Position { get; set; }
         }
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             this.log = log;
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(string key)
         {
             EnsureIsRunning();
 
@@ -92,12 +92,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             return Task.CompletedTask;
         }
 
-        public Task<Guid?> GetRunningRuleIdAsync()
+        public Task<DomainId?> GetRunningRuleIdAsync()
         {
             return Task.FromResult(state.Value.RuleId);
         }
 
-        public async Task RunAsync(Guid ruleId)
+        public async Task RunAsync(DomainId ruleId)
         {
             if (currentTaskToken != null)
             {
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     job.Position = storedEvent.EventPosition;
 
                     await state.WriteAsync();
-                }, SquidexHeaders.AppId, Key.ToString(), job.Position, ct);
+                }, SquidexHeaders.AppId, Key, job.Position, ct);
             }
             catch (OperationCanceledException)
             {

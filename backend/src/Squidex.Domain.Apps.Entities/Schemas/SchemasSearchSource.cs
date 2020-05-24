@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -62,14 +61,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return result;
         }
 
-        private void AddSchemaUrl(SearchResults result, NamedId<Guid> appId, NamedId<Guid> schemaId, string name)
+        private void AddSchemaUrl(SearchResults result, NamedId<DomainId> appId, NamedId<DomainId> schemaId, string name)
         {
             var schemaUrl = urlGenerator.SchemaUI(appId, schemaId);
 
             result.Add($"{name} Schema", SearchResultType.Schema, schemaUrl);
         }
 
-        private void AddContentsUrl(SearchResults result, NamedId<Guid> appId, ISchemaEntity schema, NamedId<Guid> schemaId, string name)
+        private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
         {
             if (schema.SchemaDef.IsSingleton)
             {
@@ -85,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
-        private static bool HasPermission(Context context, NamedId<Guid> schemaId)
+        private static bool HasPermission(Context context, NamedId<DomainId> schemaId)
         {
             var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaId.Name);
 

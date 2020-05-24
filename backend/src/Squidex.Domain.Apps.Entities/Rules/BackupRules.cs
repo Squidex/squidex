@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -18,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class BackupRules : IBackupHandler
     {
-        private readonly HashSet<Guid> ruleIds = new HashSet<Guid>();
+        private readonly HashSet<DomainId> ruleIds = new HashSet<DomainId>();
         private readonly IRulesIndex indexForRules;
 
         public string Name { get; } = "Rules";

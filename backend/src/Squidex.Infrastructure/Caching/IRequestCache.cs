@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Caching
 {
     public interface IRequestCache
     {
-        void AddDependency(Guid key, long version);
+        void AddDependency(string key, long version);
 
         void AddDependency(object? value);
 

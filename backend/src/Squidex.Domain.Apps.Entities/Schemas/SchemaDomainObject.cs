@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public class SchemaDomainObject : DomainObject<SchemaState>
     {
-        public SchemaDomainObject(IStore<Guid> store, ISemanticLog log)
+        public SchemaDomainObject(IStore<DomainId> store, ISemanticLog log)
             : base(store, log)
         {
         }

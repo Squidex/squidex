@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            var cache = new Dictionary<(Guid, Status), StatusInfo>();
+            var cache = new Dictionary<(DomainId, Status), StatusInfo>();
 
             foreach (var content in contents)
             {
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.User);
         }
 
-        private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
+        private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(DomainId, Status), StatusInfo> cache)
         {
             result.StatusColor = await GetColorAsync(content, content.Status, cache);
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task<string> GetColorAsync(IContentEntity content, Status status, Dictionary<(Guid, Status), StatusInfo> cache)
+        private async Task<string> GetColorAsync(IContentEntity content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
         {
             if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
             {

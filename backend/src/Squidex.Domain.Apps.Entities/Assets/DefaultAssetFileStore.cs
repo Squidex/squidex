@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,21 +22,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetStore = assetStore;
         }
 
-        public string? GeneratePublicUrl(Guid id, long fileVersion)
+        public string? GeneratePublicUrl(DomainId id, long fileVersion)
         {
             var fileName = GetFileName(id, fileVersion);
 
             return assetStore.GeneratePublicUrl(fileName);
         }
 
-        public Task<long> GetFileSizeAsync(Guid id, long fileVersion, CancellationToken ct = default)
+        public Task<long> GetFileSizeAsync(DomainId id, long fileVersion, CancellationToken ct = default)
         {
             var fileName = GetFileName(id, fileVersion);
 
             return assetStore.GetSizeAsync(fileName, ct);
         }
 
-        public Task UploadAsync(Guid id, long fileVersion, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(DomainId id, long fileVersion, Stream stream, CancellationToken ct = default)
         {
             var fileName = GetFileName(id, fileVersion);
 
@@ -49,21 +48,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.UploadAsync(tempFile, stream, false, ct);
         }
 
-        public Task CopyAsync(string tempFile, Guid id, long fileVersion, CancellationToken ct = default)
+        public Task CopyAsync(string tempFile, DomainId id, long fileVersion, CancellationToken ct = default)
         {
             var fileName = GetFileName(id, fileVersion);
 
             return assetStore.CopyAsync(tempFile, fileName, ct);
         }
 
-        public Task DownloadAsync(Guid id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default)
+        public Task DownloadAsync(DomainId id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
             var fileName = GetFileName(id, fileVersion);
 
             return assetStore.DownloadAsync(fileName, stream, range, ct);
         }
 
-        public Task DeleteAsync(Guid id, long fileVersion)
+        public Task DeleteAsync(DomainId id, long fileVersion)
         {
             var fileName = GetFileName(id, fileVersion);
 
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.DeleteAsync(tempFile);
         }
 
-        private static string GetFileName(Guid id, long fileVersion)
+        private static string GetFileName(DomainId id, long fileVersion)
         {
             return $"{id}_{fileVersion}";
         }

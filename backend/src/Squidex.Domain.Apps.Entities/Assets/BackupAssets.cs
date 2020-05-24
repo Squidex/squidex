@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class BackupAssets : IBackupHandler
     {
         private const string TagsFile = "AssetTags.json";
-        private readonly HashSet<Guid> assetIds = new HashSet<Guid>();
-        private readonly HashSet<Guid> assetFolderIds = new HashSet<Guid>();
+        private readonly HashSet<DomainId> assetIds = new HashSet<DomainId>();
+        private readonly HashSet<DomainId> assetFolderIds = new HashSet<DomainId>();
         private readonly Rebuilder rebuilder;
         private readonly IAssetFileStore assetFileStore;
         private readonly ITagService tagService;
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await context.Writer.WriteJsonAsync(TagsFile, tags);
         }
 
-        private Task WriteAssetAsync(Guid assetId, long fileVersion, IBackupWriter writer)
+        private Task WriteAssetAsync(DomainId assetId, long fileVersion, IBackupWriter writer)
         {
             return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {
@@ -125,17 +125,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
             });
         }
 
-        private Task ReadAssetAsync(Guid assetId, long fileVersion, IBackupReader reader)
+        private Task ReadAssetAsync(DomainId assetId, long fileVersion, IBackupReader reader)
         {
             assetIds.Add(assetId);
 
-            return reader.ReadBlobAsync(GetName(reader.OldGuid(assetId), fileVersion), stream =>
+            return reader.ReadBlobAsync(GetName(reader.OldGuid(Guid.Empty), fileVersion), stream =>
             {
                 return assetFileStore.UploadAsync(assetId, fileVersion, stream);
             });
         }
 
-        private static string GetName(Guid assetId, long fileVersion)
+        private static string GetName(DomainId assetId, long fileVersion)
         {
             return $"{assetId}_{fileVersion}.asset";
         }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
 
         public CreateComment()
         {
-            CommentId = Guid.NewGuid();
+            CommentId = DomainId.NewGuid();
         }
     }
 }

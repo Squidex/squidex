@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -13,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class CreateSchema : UpsertCommand, IAppCommand
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public string Name { get; set; }
 
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public CreateSchema()
         {
-            SchemaId = Guid.NewGuid();
+            SchemaId = DomainId.NewGuid();
         }
 
         public Schema ToSchema()

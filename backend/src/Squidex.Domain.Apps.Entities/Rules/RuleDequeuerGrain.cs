@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
-        private readonly ConcurrentDictionary<Guid, bool> executing = new ConcurrentDictionary<Guid, bool>();
+        private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly IClock clock;
         private readonly ISemanticLog log;
 

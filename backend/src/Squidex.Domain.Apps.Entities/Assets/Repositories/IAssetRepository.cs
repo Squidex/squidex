@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 
         Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId);
 
-        Task<IAssetEntity?> FindAssetAsync(DomainId id);
+        Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id);
 
         Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug);
     }

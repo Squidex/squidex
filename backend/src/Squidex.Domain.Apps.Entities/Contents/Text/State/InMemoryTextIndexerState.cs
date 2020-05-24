@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class InMemoryTextIndexerState : ITextIndexerState
     {
-        private readonly Dictionary<Guid, TextContentState> states = new Dictionary<Guid, TextContentState>();
+        private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
 
         public Task ClearAsync()
         {
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return Task.CompletedTask;
         }
 
-        public Task<TextContentState?> GetAsync(Guid contentId)
+        public Task<TextContentState?> GetAsync(DomainId contentId)
         {
             if (states.TryGetValue(contentId, out var result))
             {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return Task.FromResult<TextContentState?>(null);
         }
 
-        public Task RemoveAsync(Guid contentId)
+        public Task RemoveAsync(DomainId contentId)
         {
             states.Remove(contentId);
 

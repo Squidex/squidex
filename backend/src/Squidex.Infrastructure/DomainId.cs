@@ -12,6 +12,8 @@ namespace Squidex.Infrastructure
 {
     public struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
+        public static readonly DomainId Empty = default;
+
         private readonly string? id;
 
         public bool IsEmpty
@@ -79,6 +81,16 @@ namespace Squidex.Infrastructure
         public static DomainId NewGuid()
         {
             return new DomainId(Guid.NewGuid().ToString());
+        }
+
+        public static DomainId Combine(NamedId<DomainId> id1, DomainId id2)
+        {
+            return new DomainId($"{id1}-{id2}");
+        }
+
+        public static DomainId Combine(DomainId id1, DomainId id2)
+        {
+            return new DomainId($"{id1}-{id2}");
         }
     }
 }

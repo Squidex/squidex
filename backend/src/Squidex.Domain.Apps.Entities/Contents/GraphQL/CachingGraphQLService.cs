@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return resolver.Resolve<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl;
         }
 
-        private static object CreateCacheKey(Guid appId, string etag)
+        private static object CreateCacheKey(DomainId appId, string etag)
         {
             return $"GraphQLModel_{appId}_{etag}";
         }

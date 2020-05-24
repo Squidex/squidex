@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -15,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentUnionGraphType : UnionGraphType
     {
-        private readonly Dictionary<Guid, IObjectGraphType> types = new Dictionary<Guid, IObjectGraphType>();
+        private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
 
-        public ContentUnionGraphType(string fieldName, Dictionary<Guid, ContentGraphType> schemaTypes, IEnumerable<Guid>? schemaIds)
+        public ContentUnionGraphType(string fieldName, Dictionary<DomainId, ContentGraphType> schemaTypes, IEnumerable<DomainId>? schemaIds)
         {
             Name = $"{fieldName}ReferenceUnionDto";
 

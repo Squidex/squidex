@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     public sealed class CachingTextIndexerState : ITextIndexerState
     {
         private readonly ITextIndexerState inner;
-        private LRUCache<Guid, Tuple<TextContentState?>> cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
+        private LRUCache<DomainId, Tuple<TextContentState?>> cache = new LRUCache<DomainId, Tuple<TextContentState?>>(1000);
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
@@ -28,10 +28,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             await inner.ClearAsync();
 
-            cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
+            cache = new LRUCache<DomainId, Tuple<TextContentState?>>(1000);
         }
 
-        public async Task<TextContentState?> GetAsync(Guid contentId)
+        public async Task<TextContentState?> GetAsync(DomainId contentId)
         {
             if (cache.TryGetValue(contentId, out var value))
             {
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return inner.SetAsync(state);
         }
 
-        public Task RemoveAsync(Guid contentId)
+        public Task RemoveAsync(DomainId contentId)
         {
             cache.Set(contentId, Tuple.Create<TextContentState?>(null));
 

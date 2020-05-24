@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
+        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)
         {
             var items = await repository.QueryByChannelAsync(appId, channelPrefix, count);
 

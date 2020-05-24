@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -14,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         public IBackupReader Reader { get; }
 
-        public RestoreContext(Guid appId, IUserMapping userMapping, IBackupReader reader)
+        public RestoreContext(DomainId appId, IUserMapping userMapping, IBackupReader reader)
             : base(appId, userMapping)
         {
             Guard.NotNull(reader, nameof(reader));

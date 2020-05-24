@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
@@ -14,8 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
     {
         public string CommentsId { get; set; }
 
-        public Guid CommentId { get; set; }
+        public DomainId CommentId { get; set; }
 
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
     }
 }

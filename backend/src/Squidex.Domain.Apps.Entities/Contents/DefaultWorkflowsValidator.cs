@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.appProvider = appProvider;
         }
 
-        public async Task<IReadOnlyList<string>> ValidateAsync(Guid appId, Workflows workflows)
+        public async Task<IReadOnlyList<string>> ValidateAsync(DomainId appId, Workflows workflows)
         {
             Guard.NotNull(workflows, nameof(workflows));
 

@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             state.Value.Job = new RestoreJob
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 NewAppName = newAppName,
                 Actor = actor,
                 Started = clock.GetCurrentInstant(),

@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentWorkflow contentWorkflow;
         private readonly ContentOperationContext context;
 
-        public ContentDomainObject(IStore<Guid> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
+        public ContentDomainObject(IStore<DomainId> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(context, nameof(context));
@@ -341,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private Task LoadContext(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized = false)
+        private Task LoadContext(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, Func<string> message, bool optimized = false)
         {
             return context.LoadAsync(appId, schemaId, command, message, optimized);
         }

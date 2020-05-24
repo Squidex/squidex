@@ -55,24 +55,24 @@ namespace Migrations.Migrations
 
             bool HasApp(NamedId<Guid> appId, bool consistent, out Guid id)
             {
-                return appsByName.TryGetValue(appId.Name, out id) && (!consistent || id == appId.Id);
+                return appsByName!.TryGetValue(appId.Name, out id) && (!consistent || id == appId.Id);
             }
 
             HashSet<Guid> Index(string contributorId)
             {
-                return appsByUser.GetOrAddNew(contributorId);
+                return appsByUser!.GetOrAddNew(contributorId);
             }
 
             void RemoveApp(NamedId<Guid> appId, bool consistent)
             {
                 if (HasApp(appId, consistent, out var id))
                 {
-                    foreach (var apps in appsByUser.Values)
+                    foreach (var apps in appsByUser!.Values)
                     {
                         apps.Remove(id);
                     }
 
-                    appsByName.Remove(appId.Name);
+                    appsByName!.Remove(appId.Name);
                 }
             }
 
@@ -125,7 +125,7 @@ namespace Migrations.Migrations
 
             HashSet<Guid> Index(RuleEvent @event)
             {
-                return rulesByApp.GetOrAddNew(@event.AppId.Id);
+                return rulesByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
             await eventStore.QueryAsync(storedEvent =>
@@ -157,7 +157,7 @@ namespace Migrations.Migrations
 
             Dictionary<string, Guid> Index(SchemaEvent @event)
             {
-                return schemasByApp.GetOrAddNew(@event.AppId.Id);
+                return schemasByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
             await eventStore.QueryAsync(storedEvent =>

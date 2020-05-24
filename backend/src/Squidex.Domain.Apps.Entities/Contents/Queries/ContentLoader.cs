@@ -23,11 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity> GetAsync(DomainId id, long version)
+        public async Task<IContentEntity> GetAsync(DomainId appId, DomainId id, long version)
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
-                var contentGrain = grainFactory.GetGrain<IContentGrain>(id.Id);
+                var key = DomainId.Combine(appId, id);
+
+                var contentGrain = grainFactory.GetGrain<IContentGrain>(key.Id);
                 var contentState = await contentGrain.GetStateAsync(version);
 
                 var content = contentState.Value;

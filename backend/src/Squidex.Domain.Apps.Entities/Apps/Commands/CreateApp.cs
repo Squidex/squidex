@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public CreateApp()
         {
-            AppId = Guid.NewGuid();
+            AppId = DomainId.NewGuid();
         }
     }
 }

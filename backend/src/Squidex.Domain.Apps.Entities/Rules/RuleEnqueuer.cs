@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return Task.CompletedTask;
         }
 
-        public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
+        public async Task Enqueue(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        private Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
+        private Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
             return cache.GetOrCreateAsync(appId, entry =>
             {

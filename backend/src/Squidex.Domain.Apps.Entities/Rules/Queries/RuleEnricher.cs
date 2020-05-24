@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
                     foreach (var rule in group)
                     {
-                        requestCache.AddDependency(rule.Id, rule.Version);
+                        requestCache.AddDependency(DomainId.Combine(rule.AppId.Id.Id, rule.Id).Id, rule.Version);
 
                         var statistic = statistics.FirstOrDefault(x => x.RuleId == rule.Id);
 

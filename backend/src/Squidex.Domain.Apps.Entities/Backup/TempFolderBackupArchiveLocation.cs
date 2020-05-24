@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<IBackupReader> OpenReaderAsync(Uri url, Guid id)
+        public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
         {
             var stream = OpenStream(id);
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Stream OpenStream(Guid backupId)
+        public Stream OpenStream(DomainId backupId)
         {
             var tempFile = Path.Combine(Path.GetTempPath(), backupId + ".zip");
 

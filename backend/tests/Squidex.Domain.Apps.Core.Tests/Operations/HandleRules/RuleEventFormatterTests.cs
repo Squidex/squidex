@@ -31,11 +31,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IUser user = A.Fake<IUser>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly Guid contentId = Guid.NewGuid();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId contentId = DomainId.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
         public RuleEventFormatterTests()

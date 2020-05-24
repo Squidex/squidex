@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this;
         }
 
-        public bool Equals(IdContentData other)
+        public bool Equals([AllowNull] IdContentData other)
         {
             return base.Equals(other);
         }
