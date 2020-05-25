@@ -27,24 +27,17 @@ namespace Squidex.Web.CommandMiddlewares
 
         public Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            if (context.Command is Domain.Apps.Entities.AppCommandBase appCommand && appCommand.AppId == null)
+            if (context.Command is IAppCommand appCommand && appCommand.AppId == null)
             {
                 var appId = GetAppId();
 
                 appCommand.AppId = appId;
             }
 
-            if (context.Command is Domain.Apps.Entities.Apps.Commands.AppCommand appSelfCommand && appSelfCommand.AppId == Guid.Empty)
-            {
-                var appId = GetAppId();
-
-                appSelfCommand.AppId = appId.Id;
-            }
-
             return next(context);
         }
 
-        private NamedId<Guid> GetAppId()
+        private NamedId<DomainId> GetAppId()
         {
             var context = contextProvider.Context;
 

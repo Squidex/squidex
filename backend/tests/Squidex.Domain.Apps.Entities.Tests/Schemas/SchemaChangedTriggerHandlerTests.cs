@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new AppCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new AppCreated(), trigger, DomainId.NewGuid());
 
                 Assert.False(result);
             });
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new SchemaCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new SchemaCreated(), trigger, DomainId.NewGuid());
 
                 Assert.True(result);
             });

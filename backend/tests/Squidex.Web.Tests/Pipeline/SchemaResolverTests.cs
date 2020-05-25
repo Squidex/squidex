@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,8 +32,8 @@ namespace Squidex.Web.Pipeline
         private readonly ActionExecutingContext actionExecutingContext;
         private readonly ActionExecutionDelegate next;
         private readonly ClaimsIdentity user = new ClaimsIdentity();
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly SchemaResolver sut;
         private bool isNextCalled;
 
@@ -65,7 +64,7 @@ namespace Squidex.Web.Pipeline
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(appId));
             actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);

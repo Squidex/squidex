@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RecursiveDeleter sut;
 
         public RecursiveDeleterTests()
@@ -47,13 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_invoke_delete_commands_for_all_subfolders()
         {
-            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = Guid.NewGuid() };
+            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
 
-            var childFolderId1 = Guid.NewGuid();
-            var childFolderId2 = Guid.NewGuid();
+            var childFolderId1 = DomainId.NewGuid();
+            var childFolderId2 = DomainId.NewGuid();
 
             A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
-                .Returns(new List<Guid> { childFolderId1, childFolderId2 });
+                .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
 
             await sut.On(Envelope.Create(@event));
 
@@ -67,13 +67,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_invoke_delete_commands_for_all_assets()
         {
-            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = Guid.NewGuid() };
+            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
 
-            var childId1 = Guid.NewGuid();
-            var childId2 = Guid.NewGuid();
+            var childId1 = DomainId.NewGuid();
+            var childId2 = DomainId.NewGuid();
 
             A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
-                .Returns(new List<Guid> { childId1, childId2 });
+                .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
 
@@ -87,16 +87,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_ignore_exceptions()
         {
-            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = Guid.NewGuid() };
+            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
 
-            var childId1 = Guid.NewGuid();
-            var childId2 = Guid.NewGuid();
+            var childId1 = DomainId.NewGuid();
+            var childId2 = DomainId.NewGuid();
 
             A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1)))
                 .Throws(new InvalidOperationException());
 
             A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
-                .Returns(new List<Guid> { childId1, childId2 });
+                .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
 

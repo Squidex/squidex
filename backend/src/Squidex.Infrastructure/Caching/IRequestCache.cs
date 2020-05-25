@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure.Caching
 {
     public interface IRequestCache
     {
-        void AddDependency(string key, long version);
+        void AddDependency(DomainId key, long version);
 
         void AddDependency(object? value);
 

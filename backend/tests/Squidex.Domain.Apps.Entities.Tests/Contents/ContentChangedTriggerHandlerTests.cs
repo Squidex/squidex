@@ -33,9 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IRuleTriggerHandler sut;
-        private readonly Guid ruleId = Guid.NewGuid();
-        private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
-        private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly DomainId ruleId = DomainId.NewGuid();
+        private static readonly NamedId<DomainId> SchemaMatch = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+        private static readonly NamedId<DomainId> SchemaNonMatch = NamedId.Of(DomainId.NewGuid(), "my-schema2");
 
         public ContentChangedTriggerHandlerTests()
         {
@@ -62,9 +63,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(ContentEvent @event, EnrichedContentEventType type)
         {
+            @event.AppId = appId;
+
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
                 .Returns(new ContentEntity { SchemaId = SchemaMatch });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
@@ -77,17 +80,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_enrich_with_old_data_when_updated()
         {
-            var @event = new ContentUpdated();
+            var @event = new ContentUpdated { AppId = appId };
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
             var dataNow = new NamedContentData();
             var dataOld = new NamedContentData();
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
                 .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 12, Data = dataNow });
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 11))
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 11))
                 .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 11, Data = dataOld });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
@@ -230,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             });
         }
 
-        private void TestForTrigger(bool handleAll, NamedId<Guid>? schemaId, string? condition, Action<ContentChangedTriggerV2> action)
+        private void TestForTrigger(bool handleAll, NamedId<DomainId>? schemaId, string? condition, Action<ContentChangedTriggerV2> action)
         {
             var trigger = new ContentChangedTriggerV2 { HandleAll = handleAll };
 

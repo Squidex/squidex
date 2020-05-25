@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly AssetsSearchSource sut;
 
         public AssetsSearchSourceTests()
@@ -41,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Empty(result);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<Guid?>._, A<Q>._))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._))
                 .MustNotHaveHappened();
         }
 

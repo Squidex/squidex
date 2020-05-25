@@ -93,6 +93,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task CreateAsync(ContentEvent @event, NamedContentData data)
         {
+            var appId = @event.AppId.Id;
+
             var state = new TextContentState
             {
                 ContentId = @event.ContentId
@@ -110,24 +112,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     Texts = data.ToTexts(),
                 });
 
-            await textIndexerState.SetAsync(state);
+            await textIndexerState.SetAsync(appId, state);
         }
 
         private async Task CreateDraftAsync(ContentEvent @event)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null)
             {
                 state.GenerateDocIdNew();
 
-                await textIndexerState.SetAsync(state);
+                await textIndexerState.SetAsync(appId, state);
             }
         }
 
         private async Task UpdateAsync(ContentEvent @event, NamedContentData data)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null)
             {
@@ -164,13 +170,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         });
                 }
 
-                await textIndexerState.SetAsync(state);
+                await textIndexerState.SetAsync(appId, state);
             }
         }
 
         private async Task UnpublishAsync(ContentEvent @event)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null && state.DocIdForPublished != null)
             {
@@ -184,13 +192,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 state.DocIdForPublished = null;
 
-                await textIndexerState.SetAsync(state);
+                await textIndexerState.SetAsync(appId, state);
             }
         }
 
         private async Task PublishAsync(ContentEvent @event)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null)
             {
@@ -226,13 +236,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 state.DocIdNew = null;
 
-                await textIndexerState.SetAsync(state);
+                await textIndexerState.SetAsync(appId, state);
             }
         }
 
         private async Task DeleteDraftAsync(ContentEvent @event)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null && state.DocIdNew != null)
             {
@@ -250,13 +262,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 state.DocIdNew = null;
 
-                await textIndexerState.SetAsync(state);
+                await textIndexerState.SetAsync(appId, state);
             }
         }
 
         private async Task DeleteAsync(ContentEvent @event)
         {
-            var state = await textIndexerState.GetAsync(@event.ContentId);
+            var appId = @event.AppId.Id;
+
+            var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
             if (state != null)
             {
@@ -270,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         DocId = state.DocIdNew ?? NotFound,
                     });
 
-                await textIndexerState.RemoveAsync(state.ContentId);
+                await textIndexerState.RemoveAsync(appId, state.ContentId);
             }
         }
 

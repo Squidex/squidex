@@ -52,7 +52,9 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserialize<T>(this T value)
         {
-            return DefaultSerializer.Deserialize<Tuple<T>>(DefaultSerializer.Serialize(Tuple.Create(value))).Item1;
+            var json = DefaultSerializer.Serialize(Tuple.Create(value));
+
+            return DefaultSerializer.Deserialize<Tuple<T>>(json).Item1;
         }
 
         public static T Deserialize<T>(string value)

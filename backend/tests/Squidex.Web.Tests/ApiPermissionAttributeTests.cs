@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -63,7 +62,7 @@ namespace Squidex.Web
         [Fact]
         public async Task Should_make_permission_check_with_app_feature()
         {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(DomainId.NewGuid(), "my-app")));
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
@@ -80,8 +79,8 @@ namespace Squidex.Web
         [Fact]
         public async Task Should_make_permission_check_with_schema_feature()
         {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
-            actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(NamedId.Of(Guid.NewGuid(), "my-schema")));
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(DomainId.NewGuid(), "my-app")));
+            actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(NamedId.Of(DomainId.NewGuid(), "my-schema")));
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
 
@@ -98,7 +97,7 @@ namespace Squidex.Web
         [Fact]
         public async Task Should_return_forbidden_when_user_has_wrong_permission()
         {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(Guid.NewGuid(), "my-app")));
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(DomainId.NewGuid(), "my-app")));
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 

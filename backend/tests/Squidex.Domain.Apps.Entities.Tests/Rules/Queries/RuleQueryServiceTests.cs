@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
     {
         private readonly IRulesIndex rulesIndex = A.Fake<IRulesIndex>();
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly RuleQueryService sut;
 

@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                                     array = JsonValue.Array(referencedAsset.FileName);
                                 }
 
-                                requestCache.AddDependency(referencedAsset.Id.Id, referencedAsset.Version);
+                                requestCache.AddDependency(referencedAsset.Id, referencedAsset.Version);
 
                                 fieldReference.AddJsonValue(partitionKey, array);
                             }

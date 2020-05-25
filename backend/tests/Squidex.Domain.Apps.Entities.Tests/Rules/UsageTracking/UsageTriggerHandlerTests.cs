@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -13,6 +12,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public class UsageTriggerHandlerTests
     {
-        private readonly Guid ruleId = Guid.NewGuid();
+        private readonly DomainId ruleId = DomainId.NewGuid();
         private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
         [Fact]
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         [Fact]
         public void Should_not_trigger_precheck_when_rule_id_not_matchs()
         {
-            var result = sut.Trigger(new AppUsageExceeded { RuleId = Guid.NewGuid() }, new UsageTrigger(), ruleId);
+            var result = sut.Trigger(new AppUsageExceeded { RuleId = DomainId.NewGuid() }, new UsageTrigger(), ruleId);
 
             Assert.True(result);
         }

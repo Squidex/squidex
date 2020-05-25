@@ -30,7 +30,7 @@ namespace Squidex.Web.Pipeline
         private readonly CachingOptions cachingOptions;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        internal sealed class CacheContext : IRequestCache, IDisposable
+        internal sealed class CacheContext : IDisposable
         {
             private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             private readonly HashSet<string> keys = new HashSet<string>();
@@ -51,7 +51,7 @@ namespace Squidex.Web.Pipeline
                 slimLock.Dispose();
             }
 
-            public void AddDependency(Guid key, long version)
+            public void AddDependency(string key, long version)
             {
                 if (key != default)
                 {
@@ -59,9 +59,9 @@ namespace Squidex.Web.Pipeline
                     {
                         slimLock.EnterWriteLock();
 
-                        keys.Add(key.ToString());
+                        keys.Add(key);
 
-                        hasher.AppendData(key.ToByteArray());
+                        hasher.AppendData(Encoding.Default.GetBytes(key));
                         hasher.AppendData(BitConverter.GetBytes(version));
 
                         hasDependency = true;
@@ -206,7 +206,7 @@ namespace Squidex.Web.Pipeline
             return Math.Min(MaxAllowedKeysSize, size);
         }
 
-        public void AddDependency(Guid key, long version)
+        public void AddDependency(DomainId key, long version)
         {
             if (httpContextAccessor.HttpContext != null)
             {
@@ -214,7 +214,7 @@ namespace Squidex.Web.Pipeline
 
                 if (cacheContext != null)
                 {
-                    cacheContext.AddDependency(key, version);
+                    cacheContext.AddDependency(key.ToString(), version);
                 }
             }
         }

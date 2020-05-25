@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public DomainId AssetId { get; set; }
 
-        DomainId IAggregateCommand.AggregateId
+        public override DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, AssetId); }
         }

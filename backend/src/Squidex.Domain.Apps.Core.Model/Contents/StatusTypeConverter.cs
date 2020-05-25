@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class StatusConverter : TypeConverter
+    public sealed class StatusTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -25,7 +25,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            return new Status(value?.ToString());
+            if (value is string s)
+            {
+                return new Status(s);
+            }
+
+            return default(Status);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)

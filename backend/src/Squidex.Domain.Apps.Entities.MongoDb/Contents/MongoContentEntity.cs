@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
@@ -36,6 +34,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRequired]
         [BsonElement("_si")]
         public string IndexedSchemaId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("rf")]
+        public HashSet<string>? ReferencedIds { get; set; }
 
         [BsonRequired]
         [BsonElement("ci")]

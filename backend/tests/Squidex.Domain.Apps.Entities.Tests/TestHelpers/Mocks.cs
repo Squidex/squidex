@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public static class Mocks
     {
-        public static IAppEntity App(NamedId<Guid> appId, params Language[] languages)
+        public static IAppEntity App(NamedId<DomainId> appId, params Language[] languages)
         {
             var config = LanguagesConfig.English;
 
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return app;
         }
 
-        public static ISchemaEntity Schema(NamedId<Guid> appId, NamedId<Guid> schemaId, Schema? schemaDef = null)
+        public static ISchemaEntity Schema(NamedId<DomainId> appId, NamedId<DomainId> schemaId, Schema? schemaDef = null)
         {
             var schema = A.Fake<ISchemaEntity>();
 

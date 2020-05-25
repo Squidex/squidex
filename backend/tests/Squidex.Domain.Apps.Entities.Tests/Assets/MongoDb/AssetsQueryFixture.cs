@@ -30,10 +30,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public IAssetRepository AssetRepository { get; }
 
-        public NamedId<Guid>[] AppIds { get; } = new[]
+        public NamedId<DomainId>[] AppIds { get; } = new[]
         {
-            NamedId.Of(Guid.Parse("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
-            NamedId.Of(Guid.Parse("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
+            NamedId.Of(new DomainId("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
+            NamedId.Of(new DomainId("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
         };
 
         public AssetsQueryFixture()
@@ -86,13 +86,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
                                 var asset = new MongoAssetEntity
                                 {
-                                    Id = Guid.NewGuid(),
-                                    AppId = appId,
+                                    DocumentId = DomainId.NewGuid().ToString(),
                                     Tags = new HashSet<string> { tag },
                                     FileHash = fileName,
                                     FileName = fileName,
                                     FileSize = 1024,
-                                    IndexedAppId = appId.Id,
+                                    IndexedAppId = appId.Id.ToString(),
                                     IsDeleted = false,
                                     IsProtected = false,
                                     Metadata = new AssetMetadata
@@ -123,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             BsonJsonConvention.Register(jsonSerializer);
         }
 
-        public Guid RandomAppId()
+        public DomainId RandomAppId()
         {
             return AppIds[random.Next(0, AppIds.Length)].Id;
         }

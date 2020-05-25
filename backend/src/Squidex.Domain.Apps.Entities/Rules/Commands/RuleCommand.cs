@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Commands
     {
         public DomainId RuleId { get; set; }
 
-        DomainId IAggregateCommand.AggregateId
+        public override DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, RuleId); }
         }

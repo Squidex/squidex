@@ -87,21 +87,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
             else
             {
-                await DeletePublishedContentAsync(value.Id);
+                await DeletePublishedContentAsync(value.AppId.Id, value.Id);
             }
         }
 
-        private Task DeletePublishedContentAsync(DomainId key)
+        private Task DeletePublishedContentAsync(DomainId appId, DomainId id)
         {
-            return collectionPublished.RemoveAsync(key);
+            var documentId = DomainId.Combine(appId, id).ToString();
+
+            return collectionPublished.RemoveAsync(documentId);
         }
 
         private async Task UpsertDraftContentAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
+                IndexedAppId = value.AppId.Id.ToString(),
+                IndexedSchemaId = value.SchemaId.Id.ToString(),
                 Version = newVersion
             });
 

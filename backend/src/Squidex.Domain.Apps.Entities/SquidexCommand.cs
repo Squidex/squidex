@@ -11,12 +11,14 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class SquidexCommand : ICommand
+    public abstract class SquidexCommand : ICommand, IAggregateCommand
     {
         public RefToken Actor { get; set; }
 
         public ClaimsPrincipal User { get; set; }
 
         public long ExpectedVersion { get; set; } = EtagVersion.Auto;
+
+        public abstract DomainId AggregateId { get; }
     }
 }

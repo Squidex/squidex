@@ -150,16 +150,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_when_value_item_is_invalid(IField field)
         {
-            var result = field.GetReferencedIds(JsonValue.Array("invalid")).ToArray();
-
-            Assert.Empty(result);
-        }
-
-        [Theory]
-        [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_is_invalid(IField field)
-        {
-            var result = field.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
+            var result = field.GetReferencedIds(JsonValue.Array(1)).ToArray();
 
             Assert.Empty(result);
         }

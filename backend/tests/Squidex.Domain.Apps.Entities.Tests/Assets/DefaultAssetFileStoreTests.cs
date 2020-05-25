@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class DefaultAssetFileStoreTests
     {
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly long assetFileVersion = 21;
         private readonly string fileName;
         private readonly DefaultAssetFileStore sut;

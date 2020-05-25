@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schema = await grainFactory.GetGrain<ISchemaGrain>(id.Id).GetStateAsync();
+                var schema = await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync();
 
                 if (IsFound(schema.Value, allowDeleted))
                 {
@@ -159,17 +159,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schemaId = commmand.SchemaId;
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId.Id).GetStateAsync();
+            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId.ToString()).GetStateAsync();
 
             if (IsFound(schema.Value, true))
             {
-                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId);
+                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId.Id);
             }
         }
 
         private ISchemasByAppIndexGrain Index(DomainId appId)
         {
-            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.Id);
+            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.ToString());
         }
 
         private static bool IsFound(ISchemaEntity entity, bool allowDeleted)

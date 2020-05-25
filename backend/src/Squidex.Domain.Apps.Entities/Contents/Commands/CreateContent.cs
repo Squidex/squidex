@@ -11,8 +11,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class CreateContent : ContentDataCommand, ISchemaCommand
     {
-        public NamedId<DomainId> SchemaId { get; set; }
-
         public bool Publish { get; set; }
 
         public CreateContent()

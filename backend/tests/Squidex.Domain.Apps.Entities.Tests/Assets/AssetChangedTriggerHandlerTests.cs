@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly IRuleTriggerHandler sut;
 
         public AssetChangedTriggerHandlerTests()
@@ -53,9 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
         {
+            @event.AppId = appId;
+
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => assetLoader.GetAsync(@event.AssetId, 12))
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, @event.AssetId, 12))
                 .Returns(new AssetEntity());
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
@@ -80,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new ContentCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new ContentCreated(), trigger, DomainId.NewGuid());
 
                 Assert.False(result);
             });
@@ -91,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new AssetCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new AssetCreated(), trigger, DomainId.NewGuid());
 
                 Assert.True(result);
             });

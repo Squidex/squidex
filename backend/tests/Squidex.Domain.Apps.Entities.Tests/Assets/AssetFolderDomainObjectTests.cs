@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,11 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderState>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly Guid parentId = Guid.NewGuid();
-        private readonly Guid assetFolderId = Guid.NewGuid();
+        private readonly DomainId parentId = DomainId.NewGuid();
+        private readonly DomainId assetFolderId = DomainId.NewGuid();
         private readonly AssetFolderDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
             get { return assetFolderId; }
         }

@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
+    [TypeConverter(typeof(DomainIdTypeConverter))]
     public struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
         public static readonly DomainId Empty = default;
@@ -19,6 +21,11 @@ namespace Squidex.Infrastructure
         public bool IsEmpty
         {
             get { return id == null; }
+        }
+
+        public DomainId(Guid id)
+        {
+            this.id = id.ToString();
         }
 
         public DomainId(string id)
@@ -56,11 +63,6 @@ namespace Squidex.Infrastructure
         public static implicit operator DomainId(string value)
         {
             return new DomainId(value);
-        }
-
-        public static implicit operator DomainId(Guid value)
-        {
-            return new DomainId(value.ToString());
         }
 
         public static bool operator ==(DomainId lhs, DomainId rhs)

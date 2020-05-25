@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
     public class ReferencesFieldTests
     {
         private readonly List<string> errors = new List<string>();
-        private readonly Guid schemaId = Guid.NewGuid();
-        private readonly Guid ref1 = Guid.NewGuid();
-        private readonly Guid ref2 = Guid.NewGuid();
+        private readonly DomainId schemaId = DomainId.NewGuid();
+        private readonly DomainId ref1 = DomainId.NewGuid();
+        private readonly DomainId ref2 = DomainId.NewGuid();
 
         [Fact]
         public void Should_instantiate_field()
@@ -94,17 +94,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_value_is_not_valid()
-        {
-            var sut = Field(new ReferencesFieldProperties());
-
-            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
-
-            errors.Should().BeEquivalentTo(
-                new[] { "Invalid json type, expected array of guid strings." });
-        }
-
-        [Fact]
         public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, MinItems = 3 });
@@ -137,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Must not contain duplicate values." });
         }
 
-        private static IJsonValue CreateValue(params Guid[]? ids)
+        private static IJsonValue CreateValue(params DomainId[]? ids)
         {
             return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }

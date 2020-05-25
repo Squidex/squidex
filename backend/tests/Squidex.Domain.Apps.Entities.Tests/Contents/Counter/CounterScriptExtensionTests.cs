@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
@@ -39,9 +40,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         [Fact]
         public void Should_reset_counter()
         {
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
                 .Returns(counter);
 
             A.CallTo(() => counter.ResetAsync("my", 4))
@@ -64,9 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         [Fact]
         public void Should_increment_counter()
         {
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
                 .Returns(counter);
 
             A.CallTo(() => counter.IncrementAsync("my"))

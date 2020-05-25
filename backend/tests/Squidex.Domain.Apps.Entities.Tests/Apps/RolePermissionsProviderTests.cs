@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RolePermissionsProvider sut;
 
         public RolePermissionsProviderTests()
@@ -35,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_provide_all_permissions()
         {
-            A.CallTo(() => appProvider.GetSchemasAsync(A<Guid>._))
+            A.CallTo(() => appProvider.GetSchemasAsync(A<DomainId>._))
                 .Returns(new List<ISchemaEntity>
                 {
-                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema1")),
-                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema2"))
+                    Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema1")),
+                    Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema2"))
                 });
 
             var result = await sut.GetPermissionsAsync(app);

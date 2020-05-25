@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             {
                 var key = DomainId.Combine(appId, id);
 
-                var ruleEntity = await grainFactory.GetGrain<IRuleGrain>(key.Id).GetStateAsync();
+                var ruleEntity = await grainFactory.GetGrain<IRuleGrain>(key.ToString()).GetStateAsync();
 
                 if (IsFound(ruleEntity.Value))
                 {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var id = command.RuleId;
 
-            var rule = await grainFactory.GetGrain<IRuleGrain>(id.Id).GetStateAsync();
+            var rule = await grainFactory.GetGrain<IRuleGrain>(id.ToString()).GetStateAsync();
 
             if (IsFound(rule.Value))
             {
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private IRulesByAppIndexGrain Index(DomainId appId)
         {
-            return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.Id);
+            return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.ToString());
         }
 
         private static bool IsFound(IRuleEntity rule)

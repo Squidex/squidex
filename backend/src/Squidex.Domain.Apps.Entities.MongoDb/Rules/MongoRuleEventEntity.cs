@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
@@ -57,5 +56,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         [BsonRequired]
         [BsonElement]
         public Instant? NextAttempt { get; set; }
+
+        DomainId IEntity.Id
+        {
+            get { return DocumentId; }
+        }
     }
 }

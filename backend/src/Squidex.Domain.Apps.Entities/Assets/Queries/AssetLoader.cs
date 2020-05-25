@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 var key = DomainId.Combine(appId, id);
 
-                var assetGrain = grainFactory.GetGrain<IAssetGrain>(key.Id);
+                var assetGrain = grainFactory.GetGrain<IAssetGrain>(key.ToString());
                 var assetState = await assetGrain.GetStateAsync(version);
 
                 var asset = assetState.Value;

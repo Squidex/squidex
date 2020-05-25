@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
     public class TagGrainTests
     {
         private readonly IGrainState<TagGrain.State> grainState = A.Fake<IGrainState<TagGrain.State>>();
-        private readonly string id = Guid.NewGuid().ToString();
+        private readonly string id = DomainId.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()

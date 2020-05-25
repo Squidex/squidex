@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         var job = new RuleJob
                         {
-                            Id = Guid.NewGuid(),
+                            Id = DomainId.NewGuid(),
                             ActionData = json,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,

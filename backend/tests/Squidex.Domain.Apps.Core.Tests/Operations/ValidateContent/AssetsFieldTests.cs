@@ -81,17 +81,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_value_is_not_valid()
-        {
-            var sut = Field(new AssetsFieldProperties());
-
-            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
-
-            errors.Should().BeEquivalentTo(
-                new[] { "Invalid json type, expected array of guid strings." });
-        }
-
-        [Fact]
         public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 3 });

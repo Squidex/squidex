@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         [Fact]
         public async Task CanCreate_should_throw_exception_when_folder_not_found()
         {
-            var command = new CreateAssetFolder { FolderName = "My Folder", ParentId = Guid.NewGuid() };
+            var command = new CreateAssetFolder { FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(command.ParentId))
                 .Returns(new List<IAssetFolderEntity>());
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         [Fact]
         public async Task CanCreate_should_not_throw_exception_when_folder_found()
         {
-            var command = new CreateAssetFolder { FolderName = "My Folder", ParentId = Guid.NewGuid() };
+            var command = new CreateAssetFolder { FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(command.ParentId))
                 .Returns(new List<IAssetFolderEntity> { CreateFolder() });
@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         [Fact]
         public async Task CanMove_should_throw_exception_when_adding_to_its_own_child()
         {
-            var id = Guid.NewGuid();
+            var id = DomainId.NewGuid();
 
-            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
+            var command = new MoveAssetFolder { ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(command.ParentId))
                 .Returns(new List<IAssetFolderEntity>
@@ -77,39 +77,39 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                     CreateFolder(command.ParentId)
                 });
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, id, Guid.NewGuid()),
+            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, id, DomainId.NewGuid()),
                 new ValidationError("Cannot add folder to its own child.", "ParentId"));
         }
 
         [Fact]
         public async Task CanMove_should_throw_exception_when_folder_not_found()
         {
-            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
+            var command = new MoveAssetFolder { ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(command.ParentId))
                 .Returns(new List<IAssetFolderEntity>());
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), Guid.NewGuid()),
+            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid()),
                 new ValidationError("Asset folder does not exist.", "ParentId"));
         }
 
         [Fact]
         public async Task CanMove_should_not_throw_exception_when_folder_found()
         {
-            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
+            var command = new MoveAssetFolder { ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(command.ParentId))
                 .Returns(new List<IAssetFolderEntity> { CreateFolder() });
 
-            await GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), Guid.NewGuid());
+            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid());
         }
 
         [Fact]
         public async Task CanMove_should_not_throw_exception_when_folder_has_not_changed()
         {
-            var command = new MoveAssetFolder { ParentId = Guid.NewGuid() };
+            var command = new MoveAssetFolder { ParentId = DomainId.NewGuid() };
 
-            await GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), command.ParentId);
+            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), command.ParentId);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new MoveAssetFolder();
 
-            await GuardAssetFolder.CanMove(command, assetQuery, Guid.NewGuid(), Guid.NewGuid());
+            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid());
         }
 
         [Fact]
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             GuardAssetFolder.CanDelete(command);
         }
 
-        private static IAssetFolderEntity CreateFolder(Guid id = default)
+        private static IAssetFolderEntity CreateFolder(DomainId id = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 

@@ -27,9 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
-                var key = DomainId.Combine(appId, id);
+                var key = DomainId.Combine(appId, id).ToString();
 
-                var contentGrain = grainFactory.GetGrain<IContentGrain>(key.Id);
+                var contentGrain = grainFactory.GetGrain<IContentGrain>(key);
                 var contentState = await contentGrain.GetStateAsync(version);
 
                 var content = contentState.Value;

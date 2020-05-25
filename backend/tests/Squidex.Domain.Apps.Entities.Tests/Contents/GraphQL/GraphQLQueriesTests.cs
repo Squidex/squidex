@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -160,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var asset = CreateAsset(Guid.NewGuid());
+            var asset = CreateAsset(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
@@ -253,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var asset = CreateAsset(Guid.NewGuid());
+            var asset = CreateAsset(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
@@ -316,7 +315,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_null_single_asset()
         {
-            var assetId = Guid.NewGuid();
+            var assetId = DomainId.NewGuid();
 
             var query = @"
                 query {
@@ -344,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_asset_when_finding_asset()
         {
-            var assetId = Guid.NewGuid();
+            var assetId = DomainId.NewGuid();
             var asset = CreateAsset(assetId);
 
             var query = @"
@@ -442,7 +441,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+            var content = CreateContent(DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
@@ -560,7 +559,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+            var content = CreateContent(DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
@@ -701,7 +700,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+            var content = CreateContent(DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(10, content));
@@ -786,8 +785,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_with_fixed_names()
         {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, DomainId.Empty, DomainId.Empty);
 
             var query = @"
                 query {
@@ -871,7 +870,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_null_single_content()
         {
-            var contentId = Guid.NewGuid();
+            var contentId = DomainId.NewGuid();
 
             var query = @"
                 query {
@@ -899,8 +898,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_finding_content()
         {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, DomainId.Empty, DomainId.Empty);
 
             var query = @"
                 query {
@@ -1019,11 +1018,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_also_fetch_referenced_contents_when_field_is_included_in_query()
         {
-            var contentRefId = Guid.NewGuid();
+            var contentRefId = DomainId.NewGuid();
             var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, contentRefId, Guid.Empty);
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, contentRefId, DomainId.Empty);
 
             var query = @"
                 query {
@@ -1044,7 +1043,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<DomainId>>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
@@ -1089,11 +1088,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_also_fetch_union_contents_when_field_is_included_in_query()
         {
-            var contentRefId = Guid.NewGuid();
+            var contentRefId = DomainId.NewGuid();
             var contentRef = CreateRefContent(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, contentRefId, Guid.Empty);
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, contentRefId, DomainId.Empty);
 
             var query = @"
                 query {
@@ -1119,7 +1118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<DomainId>>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
@@ -1165,11 +1164,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_also_fetch_referenced_assets_when_field_is_included_in_query()
         {
-            var assetRefId = Guid.NewGuid();
+            var assetRefId = DomainId.NewGuid();
             var assetRef = CreateAsset(assetRefId);
 
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, assetRefId);
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, DomainId.Empty, assetRefId);
 
             var query = @"
                 query {
@@ -1223,8 +1222,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_make_multiple_queries()
         {
-            var assetId1 = Guid.NewGuid();
-            var assetId2 = Guid.NewGuid();
+            var assetId1 = DomainId.NewGuid();
+            var assetId2 = DomainId.NewGuid();
             var asset1 = CreateAsset(assetId1);
             var asset2 = CreateAsset(assetId2);
 
@@ -1279,8 +1278,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_not_return_data_when_field_not_part_of_content()
         {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, new NamedContentData());
+            var contentId = DomainId.NewGuid();
+            var content = CreateContent(contentId, DomainId.Empty, DomainId.Empty, new NamedContentData());
 
             var query = @"
                 query {
@@ -1310,12 +1309,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Assert.Contains("\"data\":null", json);
         }
 
-        private static IReadOnlyList<Guid> MatchId(Guid contentId)
+        private static IReadOnlyList<DomainId> MatchId(DomainId contentId)
         {
-            return A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 1 && x[0] == contentId);
+            return A<IReadOnlyList<DomainId>>.That.Matches(x => x.Count == 1 && x[0] == contentId);
         }
 
-        private static Q MatchIdQuery(Guid contentId)
+        private static Q MatchIdQuery(DomainId contentId)
         {
             return A<Q>.That.Matches(x => x.Ids.Count == 1 && x.Ids[0] == contentId);
         }

@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.MongoDb
     {
         [BsonId]
         [BsonElement]
-        public string Id { get; set; }
+        public string DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement]

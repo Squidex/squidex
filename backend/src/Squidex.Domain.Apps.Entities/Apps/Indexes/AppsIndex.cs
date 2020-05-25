@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             using (Profiler.TraceMethod<AppsIndex>())
             {
-                var app = await grainFactory.GetGrain<IAppGrain>(appId.Id).GetStateAsync();
+                var app = await grainFactory.GetGrain<IAppGrain>(appId.ToString()).GetStateAsync();
 
                 if (IsFound(app.Value, false))
                 {
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         {
                             await index.AddAsync(token);
 
-                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId.Id);
+                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId.ToString());
                         }
                         else
                         {
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             if (name.IsSlug())
             {
-                var token = await index.ReserveAsync(command.AppId.Id, name);
+                var token = await index.ReserveAsync(command.AppId.ToString(), name);
 
                 if (token == null)
                 {
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var appId = command.AppId;
 
-            var app = await grainFactory.GetGrain<IAppGrain>(appId.Id.Id).GetStateAsync();
+            var app = await grainFactory.GetGrain<IAppGrain>(appId.Id.ToString()).GetStateAsync();
 
             if (IsFound(app.Value, true))
             {

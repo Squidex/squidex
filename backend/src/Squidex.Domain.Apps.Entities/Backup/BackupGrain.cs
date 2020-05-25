@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var job = new BackupJob
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started
             };

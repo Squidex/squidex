@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly SchemasSearchSource sut;
 
         public SchemasSearchSourceTests()
@@ -114,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private ISchemaEntity CreateSchema(string name, bool isSingleton)
         {
-            return Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), name), new Schema(name, null, isSingleton));
+            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), name), new Schema(name, null, isSingleton));
         }
 
         private Context ContextWithPermission(string? permission = null)

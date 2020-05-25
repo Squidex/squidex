@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly NamedId<long> nestedId = NamedId.Of(2L, "age");
         private readonly SchemaDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
             get { return SchemaId; }
         }
@@ -743,7 +742,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
         }
 
-        private async Task<object?> PublishIdempotentAsync(SchemaCommand command)
+        private async Task<object?> PublishIdempotentAsync(SquidexCommand command)
         {
             var result = await PublishAsync(command);
 
@@ -758,7 +757,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return result;
         }
 
-        private async Task<object?> PublishAsync(SchemaCommand command)
+        private async Task<object?> PublishAsync(SquidexCommand command)
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 

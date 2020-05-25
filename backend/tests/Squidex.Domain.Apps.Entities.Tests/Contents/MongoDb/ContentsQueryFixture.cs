@@ -36,19 +36,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public IContentRepository ContentRepository { get; }
 
-        public NamedId<Guid>[] AppIds { get; } = new[]
+        public NamedId<DomainId>[] AppIds { get; } = new[]
         {
-            NamedId.Of(Guid.Parse("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
-            NamedId.Of(Guid.Parse("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
+            NamedId.Of(new DomainId("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
+            NamedId.Of(new DomainId("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
         };
 
-        public NamedId<Guid>[] SchemaIds { get; } = new[]
+        public NamedId<DomainId>[] SchemaIds { get; } = new[]
         {
-            NamedId.Of(Guid.Parse("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-schema1"),
-            NamedId.Of(Guid.Parse("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-schema2"),
-            NamedId.Of(Guid.Parse("76357c9b-0514-4377-9fcc-a632e7ef960d"), "my-schema3"),
-            NamedId.Of(Guid.Parse("164c451e-e5a8-41f8-8aaf-e4b56603d7e7"), "my-schema4"),
-            NamedId.Of(Guid.Parse("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5")
+            NamedId.Of(new DomainId("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-schema1"),
+            NamedId.Of(new DomainId("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-schema2"),
+            NamedId.Of(new DomainId("76357c9b-0514-4377-9fcc-a632e7ef960d"), "my-schema3"),
+            NamedId.Of(new DomainId("164c451e-e5a8-41f8-8aaf-e4b56603d7e7"), "my-schema4"),
+            NamedId.Of(new DomainId("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5")
         };
 
         public ContentsQueryFixture()
@@ -112,11 +112,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
                                     var content = new MongoContentEntity
                                     {
-                                        Id = Guid.NewGuid(),
+                                        DocumentId = DomainId.NewGuid().ToString(),
                                         AppId = appId,
                                         DataByIds = data,
-                                        IndexedAppId = appId.Id,
-                                        IndexedSchemaId = schemaId.Id,
+                                        IndexedAppId = appId.Id.ToString(),
+                                        IndexedSchemaId = schemaId.Id.ToString(),
                                         IsDeleted = false,
                                         SchemaId = schemaId,
                                         Status = Status.Published
@@ -141,8 +141,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<Guid>._, false))
-                .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<Guid>(0)!, x.GetArgument<Guid>(1)!)));
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false))
+                .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
 
             return appProvider;
         }
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var textIndexer = A.Fake<ITextIndex>();
 
             A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<SearchFilter>._, A<SearchScope>._))
-                .Returns(new List<Guid> { Guid.NewGuid() });
+                .Returns(new List<DomainId> { DomainId.NewGuid() });
 
             return textIndexer;
         }
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             BsonJsonConvention.Register(jsonSerializer);
         }
 
-        public Guid RandomAppId()
+        public DomainId RandomAppId()
         {
             return AppIds[random.Next(0, AppIds.Length)].Id;
         }
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return CreateApp(RandomAppId());
         }
 
-        public Guid RandomSchemaId()
+        public DomainId RandomSchemaId()
         {
             return SchemaIds[random.Next(0, SchemaIds.Length)].Id;
         }
@@ -189,12 +189,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return random.Next(0, numValues).ToString();
         }
 
-        private static IAppEntity CreateApp(Guid appId)
+        private static IAppEntity CreateApp(DomainId appId)
         {
             return Mocks.App(NamedId.Of(appId, "my-app"));
         }
 
-        private static ISchemaEntity CreateSchema(Guid appId, Guid schemaId)
+        private static ISchemaEntity CreateSchema(DomainId appId, DomainId schemaId)
         {
             var schemaDef =
                 new Schema("my-schema")

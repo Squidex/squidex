@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var inputEvent = new Envelope<MyEvent>(new MyEvent { MyProperty = "My-Property" });
 
-            inputEvent.SetAggregateId(Guid.NewGuid());
+            inputEvent.SetAggregateId(DomainId.NewGuid());
             inputEvent.SetCommitId(commitId);
             inputEvent.SetEventId(Guid.NewGuid());
             inputEvent.SetEventPosition("1");

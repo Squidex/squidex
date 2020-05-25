@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.Id, fullTextIds, query);
+                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -110,10 +110,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (ids != null && ids.Count > 0)
             {
+                var documentIds = ids.Select(x => DomainId.Combine(appId, x).ToString()).ToList();
+
                 filters.Add(
                     Filter.Or(
-                        Filter.AnyIn(x => x.ReferencedIds, ids),
-                        Filter.In(x => x.DomainId, ids)));
+                        Filter.AnyIn(x => x.ReferencedIds, documentIds),
+                        Filter.In(x => x.DocumentId, documentIds)));
             }
 
             if (query?.Filter != null)

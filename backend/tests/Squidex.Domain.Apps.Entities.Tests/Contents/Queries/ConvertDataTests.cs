@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
         private readonly ConvertData sut;
 
@@ -65,8 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_cleanup_references()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var source = BuildTestData(id1, id2);
 
@@ -87,11 +86,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));
 
-            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2)))
-                .Returns(new List<Guid> { id2 });
+            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2)))
+                .Returns(new List<DomainId> { id2 });
 
-            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2), SearchScope.All))
-                .Returns(new List<(Guid, Guid)> { (id2, id2) });
+            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All))
+                .Returns(new List<(DomainId, DomainId)> { (id2, id2) });
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
@@ -103,8 +102,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_cleanup_references_when_everything_deleted()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var source = BuildTestData(id1, id2);
 
@@ -125,11 +124,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array()))));
 
-            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2)))
-                .Returns(new List<Guid>());
+            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2)))
+                .Returns(new List<DomainId>());
 
-            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<Guid>>.That.Is(id1, id2), SearchScope.All))
-                .Returns(new List<(Guid, Guid)>());
+            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All))
+                .Returns(new List<(DomainId, DomainId)>());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
@@ -138,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(expected, content.Data);
         }
 
-        private static NamedContentData BuildTestData(Guid id1, Guid id2)
+        private static NamedContentData BuildTestData(DomainId id1, DomainId id2)
         {
             return new NamedContentData()
                 .AddField("references",

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -44,18 +43,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndexerState";
         }
 
-        public Task<TextContentState?> GetAsync(DomainId contentId)
+        public Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
         {
+            var documentId = DomainId.Combine(appId, contentId).ToString();
+
             return Collection.Find(x => x.ContentId == contentId).FirstOrDefaultAsync()!;
         }
 
-        public Task RemoveAsync(DomainId contentId)
+        public Task RemoveAsync(DomainId appId, DomainId contentId)
         {
+            var documentId = DomainId.Combine(appId, contentId).ToString();
+
             return Collection.DeleteOneAsync(x => x.ContentId == contentId);
         }
 
-        public Task SetAsync(TextContentState state)
+        public Task SetAsync(DomainId appId, TextContentState state)
         {
+            var documentId = DomainId.Combine(appId, state.ContentId).ToString();
+
             return Collection.ReplaceOneAsync(x => x.ContentId == state.ContentId, state, UpsertReplace);
         }
     }

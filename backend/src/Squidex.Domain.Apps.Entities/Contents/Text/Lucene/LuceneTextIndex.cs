@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 return null;
             }
 
-            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id.Id);
+            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id.ToString());
 
             using (Profiler.TraceMethod<LuceneTextIndex>())
             {

@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public abstract class AppCommand : AppCommandBase, IAggregateCommand
     {
-        DomainId IAggregateCommand.AggregateId
+        public override DomainId AggregateId
         {
             get { return AppId.Id; }
         }

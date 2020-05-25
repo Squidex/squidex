@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     {
         Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId);
 
-        Task SetAsync(TextContentState state);
+        Task SetAsync(DomainId appId, TextContentState state);
 
         Task RemoveAsync(DomainId appId, DomainId contentId);
 

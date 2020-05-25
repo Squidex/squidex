@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         public async Task<IRuleEventEntity> FindAsync(DomainId id)
         {
             var ruleEvent =
-                await Collection.Find(x => x.Id == id)
+                await Collection.Find(x => x.DocumentId == id)
                     .FirstOrDefaultAsync();
 
             return ruleEvent;
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task EnqueueAsync(DomainId id, Instant nextAttempt)
         {
-            return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
+            return Collection.UpdateOneAsync(x => x.DocumentId == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
 
         public async Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default)
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task CancelAsync(DomainId id)
         {
-            return Collection.UpdateOneAsync(x => x.Id == id,
+            return Collection.UpdateOneAsync(x => x.DocumentId == id,
                 Update
                     .Set(x => x.NextAttempt, null)
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
@@ -123,7 +123,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, update.Finished);
             }
 
-            await Collection.UpdateOneAsync(x => x.Id == job.Id,
+            var documentId = job.Id.ToString();
+
+            await Collection.UpdateOneAsync(x => x.DocumentId == documentId,
                 Update
                     .Set(x => x.Result, update.ExecutionResult)
                     .Set(x => x.LastDump, update.ExecutionDump)

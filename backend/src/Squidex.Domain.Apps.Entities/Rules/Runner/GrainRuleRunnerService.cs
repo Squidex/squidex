@@ -24,21 +24,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         public Task CancelAsync(DomainId appId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.CancelAsync();
         }
 
         public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.GetRunningRuleIdAsync();
         }
 
         public Task RunAsync(DomainId appId, DomainId ruleId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.RunAsync(ruleId);
         }

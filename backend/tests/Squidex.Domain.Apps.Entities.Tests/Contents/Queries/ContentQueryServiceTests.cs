@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -35,9 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
         private readonly ISchemaEntity schema;
-        private readonly Guid contentId = Guid.NewGuid();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly DomainId contentId = DomainId.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly NamedContentData contentData = new NamedContentData();
         private readonly NamedContentData contentTransformed = new NamedContentData();
         private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
@@ -102,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<string>._))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<string>._))
                 .Returns((ISchemaEntity?)null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
@@ -159,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentVersionLoader.GetAsync(contentId, 13))
+            A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, contentId, 13))
                 .Returns(content);
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 13);
@@ -205,9 +204,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
-            var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
+            var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, SearchScope.All))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, SearchScope.All))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
             var result = await sut.QueryAsync(ctx, ids);
@@ -226,9 +225,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
-            var ids = Enumerable.Range(0, 5).Select(x => Guid.NewGuid()).ToList();
+            var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, scope))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, scope))
                 .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
 
             var result = await sut.QueryAsync(ctx, ids);
@@ -241,11 +240,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            var result = await sut.QueryAsync(ctx, new List<Guid>());
+            var result = await sut.QueryAsync(ctx, new List<DomainId>());
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<Guid>>._, A<SearchScope>._))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, A<SearchScope>._))
                 .MustNotHaveHappened();
         }
 
@@ -280,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new Context(claimsPrincipal, Mocks.App(appId));
         }
 
-        private IContentEntity CreateContent(Guid id)
+        private IContentEntity CreateContent(DomainId id)
         {
             var content = new ContentEntity
             {

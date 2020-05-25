@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_verify_ids()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
 
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_ids()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), ids, SearchScope.All);
 
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_ids_and_schema()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), ids, SearchScope.All);
 

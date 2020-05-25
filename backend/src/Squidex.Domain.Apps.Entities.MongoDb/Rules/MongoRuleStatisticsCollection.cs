@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         static MongoRuleStatisticsCollection()
         {
-            var guidSerializer = new DomainIdSerializer().WithRepresentation(BsonType.String);
+            var guidSerializer = new GuidSerializer().WithRepresentation(BsonType.String);
 
             BsonClassMap.RegisterClassMap<RuleStatistics>(cm =>
             {

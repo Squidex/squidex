@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Apps
@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns = AppPatterns.Empty;
 
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            var guid1 = DomainId.NewGuid();
+            var guid2 = DomainId.NewGuid();
+            var guid3 = DomainId.NewGuid();
 
             patterns = patterns.Add(guid1, "Name1", "Pattern1", "Default");
             patterns = patterns.Add(guid2, "Name2", "Pattern2", "Default");

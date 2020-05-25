@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly ISchemaEntity schema;
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly Context requestContext;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
         private readonly EnrichForCaching sut;
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private ContentEntity CreateContent()
         {
-            return new ContentEntity { Id = Guid.NewGuid(), SchemaId = schemaId, Version = 13 };
+            return new ContentEntity { Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
         }
     }
 }

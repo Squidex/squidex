@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -18,16 +17,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class ValueConvertersTests
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly Guid id1 = Guid.NewGuid();
-        private readonly Guid id2 = Guid.NewGuid();
+        private readonly DomainId id1 = DomainId.NewGuid();
+        private readonly DomainId id2 = DomainId.NewGuid();
         private readonly RootField<StringFieldProperties> stringField = Fields.String(1, "1", Partitioning.Invariant);
         private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
 
         public ValueConvertersTests()
         {
-            A.CallTo(() => urlGenerator.AssetContent(A<Guid>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<Guid>(0)}");
+            A.CallTo(() => urlGenerator.AssetContent(A<DomainId>._))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<DomainId>(0)}");
         }
 
         [Fact]

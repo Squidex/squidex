@@ -45,10 +45,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly ISchemaEntity schemaRef1;
         protected readonly ISchemaEntity schemaRef2;
         protected readonly Context requestContext;
-        protected readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        protected readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        protected readonly NamedId<Guid> schemaRefId1 = NamedId.Of(Guid.NewGuid(), "my-ref-schema1");
-        protected readonly NamedId<Guid> schemaRefId2 = NamedId.Of(Guid.NewGuid(), "my-ref-schema2");
+        protected readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        protected readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        protected readonly NamedId<DomainId> schemaRefId1 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema1");
+        protected readonly NamedId<DomainId> schemaRefId2 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema2");
         protected readonly IGraphQLService sut;
 
         public GraphQLTestBase()
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddReferences(81, "my-union", Partitioning.Invariant,
                         new ReferencesFieldProperties())
                     .AddReferences(9, "my-invalid", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = Guid.NewGuid() })
+                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
                     .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
                     .AddTags(11, "my-tags", Partitioning.Invariant,
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData? data = null)
+        protected IEnrichedContentEntity CreateContent(DomainId id, DomainId refId, DomainId assetId, NamedContentData? data = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        protected static IEnrichedContentEntity CreateRefContent(NamedId<Guid> schemaId, Guid id, string field, string value)
+        protected static IEnrichedContentEntity CreateRefContent(NamedId<DomainId> schemaId, DomainId id, string field, string value)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -219,7 +219,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        protected static IEnrichedAssetEntity CreateAsset(Guid id)
+        protected static IEnrichedAssetEntity CreateAsset(DomainId id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 

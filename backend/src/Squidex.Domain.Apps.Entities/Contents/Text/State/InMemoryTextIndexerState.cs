@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class InMemoryTextIndexerState : ITextIndexerState
     {
-        private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
+        private readonly Dictionary<(DomainId, DomainId), TextContentState> states = new Dictionary<(DomainId, DomainId), TextContentState>();
 
         public Task ClearAsync()
         {
@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return Task.CompletedTask;
         }
 
-        public Task<TextContentState?> GetAsync(DomainId contentId)
+        public Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
         {
-            if (states.TryGetValue(contentId, out var result))
+            if (states.TryGetValue((appId, contentId), out var result))
             {
                 return Task.FromResult<TextContentState?>(result);
             }
@@ -32,16 +32,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return Task.FromResult<TextContentState?>(null);
         }
 
-        public Task RemoveAsync(DomainId contentId)
+        public Task SetAsync(DomainId appId, TextContentState state)
         {
-            states.Remove(contentId);
+            states[(appId, state.ContentId)] = state;
 
             return Task.CompletedTask;
         }
 
-        public Task SetAsync(TextContentState state)
+        public Task RemoveAsync(DomainId appId, DomainId contentId)
         {
-            states[state.ContentId] = state;
+            states.Remove((appId, contentId));
 
             return Task.CompletedTask;
         }

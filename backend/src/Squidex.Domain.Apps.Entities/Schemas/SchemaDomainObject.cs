@@ -350,7 +350,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             RaiseEvent(command, new SchemaDeleted());
         }
 
-        private void RaiseEvent<TCommand, TEvent>(TCommand command, TEvent @event) where TCommand : SchemaCommand where TEvent : SchemaEvent
+        private void RaiseEvent<TCommand, TEvent>(TCommand command, TEvent @event) where TCommand : class where TEvent : SchemaEvent
         {
             SimpleMapper.Map(command, @event);
 

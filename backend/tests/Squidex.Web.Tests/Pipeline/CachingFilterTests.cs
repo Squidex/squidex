@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,6 +17,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Xunit;
 
@@ -212,8 +212,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_append_surrogate_keys()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             cachingOptions.MaxSurrogateKeysSize = 100;
 
@@ -231,8 +231,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_append_surrogate_keys_if_just_enough_space_for_one()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             cachingOptions.MaxSurrogateKeysSize = 36;
 
@@ -250,8 +250,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_append_surrogate_keys_if_maximum_is_exceeded()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             cachingOptions.MaxSurrogateKeysSize = 20;
 
@@ -269,8 +269,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_append_surrogate_keys_if_maximum_is_overriden()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             httpContext.Request.Headers[CachingManager.SurrogateKeySizeHeader] = "20";
 
@@ -288,8 +288,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_generate_etag_from_ids_and_versions()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             await sut.OnActionExecutionAsync(executingContext, () =>
             {
@@ -306,8 +306,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_generate_etag_when_already_added()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid().ToString();
+            var id2 = DomainId.NewGuid().ToString();
 
             await sut.OnActionExecutionAsync(executingContext, () =>
             {

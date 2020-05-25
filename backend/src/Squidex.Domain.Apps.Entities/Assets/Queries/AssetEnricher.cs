@@ -55,9 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 foreach (var asset in results)
                 {
-                    var key = DomainId.Combine(asset.AppId.Id, asset.Id);
-
-                    requestCache.AddDependency(key.Id, asset.Version);
+                    requestCache.AddDependency(asset.Id, asset.Version);
                 }
 
                 if (ShouldEnrich(context))

@@ -40,14 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_restore_states_for_all_contents()
         {
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
-            var schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
-            var schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
+            var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+            var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
 
-            var contentId1 = Guid.NewGuid();
-            var contentId2 = Guid.NewGuid();
-            var contentId3 = Guid.NewGuid();
+            var contentId1 = DomainId.NewGuid();
+            var contentId2 = DomainId.NewGuid();
+            var contentId3 = DomainId.NewGuid();
 
             var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
 
@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId2
             }), context);
 
-            var rebuildContents = new HashSet<Guid>();
+            var rebuildContents = new HashSet<DomainId>();
 
-            var add = new Func<Guid, Task>(id =>
+            var add = new Func<DomainId, Task>(id =>
             {
                 rebuildContents.Add(id);
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new HashSet<Guid>
+            Assert.Equal(new HashSet<DomainId>
             {
                 contentId1,
                 contentId2

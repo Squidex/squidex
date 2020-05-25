@@ -20,14 +20,14 @@ namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectTests
     {
-        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
+        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
-        private readonly Guid id = Guid.NewGuid();
+        private readonly DomainId id = DomainId.NewGuid();
         private readonly MyDomainObject sut;
 
         public sealed class MyDomainObject : DomainObject<MyDomainState>
         {
-            public MyDomainObject(IStore<Guid> store)
+            public MyDomainObject(IStore<DomainId> store)
                : base(store, A.Dummy<ISemanticLog>())
             {
             }
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.True(result is EntityCreatedResult<Guid>);
+            Assert.True(result is EntityCreatedResult<DomainId>);
 
             Assert.Empty(sut.GetUncomittedEvents());
 

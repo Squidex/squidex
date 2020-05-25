@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var request = new Request
             {
-                Key = appId.Id,
+                Key = appId.ToString(),
                 Properties = new Dictionary<string, string>
                 {
                     [FieldCosts] = costs.ToString(CultureInfo.InvariantCulture)

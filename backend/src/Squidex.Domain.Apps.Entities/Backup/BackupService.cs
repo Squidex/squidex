@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task StartBackupAsync(DomainId appId, RefToken actor)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
 
             return grain.BackupAsync(actor);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
 
             var state = await grain.GetStateAsync();
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
 
             var state = await grain.GetStateAsync();
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task DeleteBackupAsync(DomainId appId, DomainId backupId)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
 
             return grain.DeleteAsync(backupId);
         }

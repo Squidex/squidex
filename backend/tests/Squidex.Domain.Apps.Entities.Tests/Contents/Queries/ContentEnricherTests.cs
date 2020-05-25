@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly ISchemaEntity schema;
         private readonly Context requestContext;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
         private sealed class ResolveSchema : IContentEnricherStep
         {

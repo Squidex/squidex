@@ -376,7 +376,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(now, job.Created);
             Assert.Equal(now.Plus(Duration.FromDays(30)), job.Expires);
 
-            Assert.NotEqual(Guid.Empty, job.Id);
+            Assert.NotEqual(DomainId.Empty, job.Id);
         }
     }
 }

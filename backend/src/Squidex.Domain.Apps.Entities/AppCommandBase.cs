@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class AppCommandBase : SquidexCommand
+    public abstract class AppCommandBase : SquidexCommand, IAppCommand
     {
         public NamedId<DomainId> AppId { get; set; }
     }

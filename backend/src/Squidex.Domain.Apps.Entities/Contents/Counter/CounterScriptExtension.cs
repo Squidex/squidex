@@ -44,14 +44,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         private long Increment(DomainId appId, string name)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
 
             return Task.Run(() => grain.IncrementAsync(name)).Result;
         }
 
         private long Reset(DomainId appId, string name, long value)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId.Id);
+            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
 
             return Task.Run(() => grain.ResetAsync(name, value)).Result;
         }
