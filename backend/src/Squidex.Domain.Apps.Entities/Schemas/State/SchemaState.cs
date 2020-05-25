@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         public long SchemaFieldsTotal { get; set; }
 
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
+
         public override bool ApplyEvent(IEvent @event)
         {
             var previousSchema = SchemaDef;

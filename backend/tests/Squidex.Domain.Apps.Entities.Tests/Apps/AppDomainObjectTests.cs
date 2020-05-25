@@ -687,7 +687,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateApp { Name = AppName });
+            return PublishAsync(new CreateApp { Name = AppName, AppId = AppId });
         }
 
         private Task ExecuteUploadImage()

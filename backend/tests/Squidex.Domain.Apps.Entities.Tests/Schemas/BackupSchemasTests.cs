@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
             var schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
+            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
             await sut.RestoreEventAsync(Envelope.Create(new SchemaCreated
             {

@@ -67,18 +67,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId id)
+        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
-                var assetFolderEntity =
-                    await Collection.Find(x => x.Id == id)
-                        .FirstOrDefaultAsync();
+                var documentId = DomainId.Combine(appId, id).ToString();
 
-                if (assetFolderEntity?.IsDeleted == true)
-                {
-                    return null;
-                }
+                var assetFolderEntity =
+                    await Collection.Find(x => x.Id == id && !x.IsDeleted)
+                        .FirstOrDefaultAsync();
 
                 return assetFolderEntity;
             }

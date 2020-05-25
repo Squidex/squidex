@@ -13,13 +13,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class DomainObjectState<T> :
-        IDomainState<T>,
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-        where T : class
+    public abstract class DomainObjectState<T> : IDomainState<T> where T : class
     {
         public DomainId Id { get; set; }
 

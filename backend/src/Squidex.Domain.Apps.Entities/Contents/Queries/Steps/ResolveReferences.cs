@@ -97,8 +97,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                     var referencedSchema = await schemas(reference.SchemaId.Id);
 
-                                    requestCache.AddDependency(referencedSchema.Id, referencedSchema.Version);
-                                    requestCache.AddDependency(reference.Id, reference.Version);
+                                    requestCache.AddDependency(referencedSchema.UniqueId, referencedSchema.Version);
+                                    requestCache.AddDependency(reference.UniqueId, reference.Version);
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 

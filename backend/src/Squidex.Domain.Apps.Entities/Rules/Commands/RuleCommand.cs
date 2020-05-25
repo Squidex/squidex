@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public abstract class RuleCommand : SquidexCommand, IAggregateCommand
+    public abstract class RuleCommand : SquidexCommand, IAppCommand, IAggregateCommand
     {
         public NamedId<DomainId> AppId { get; set; }
 

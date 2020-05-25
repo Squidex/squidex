@@ -17,5 +17,7 @@ namespace Squidex.Domain.Apps.Entities
         Instant Created { get; }
 
         Instant LastModified { get; }
+
+        DomainId UniqueId { get; }
     }
 }

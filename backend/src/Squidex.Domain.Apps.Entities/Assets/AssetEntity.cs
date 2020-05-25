@@ -60,5 +60,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             get { return Id; }
         }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
     }
 }

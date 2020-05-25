@@ -49,13 +49,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return null;
         }
 
-        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId id)
+        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id)
         {
             var result = new List<IAssetFolderEntity>();
 
             while (id != default)
             {
-                var folder = await assetFolderRepository.FindAssetFolderAsync(id);
+                var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id);
 
                 if (folder == null || result.Any(x => x.Id == folder.Id))
                 {

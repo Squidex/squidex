@@ -394,7 +394,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             if (@event.SchemaId == null)
             {
-                @event.SchemaId = Snapshot.NamedId();
+                @event.SchemaId = NamedId.Of(Snapshot.Id, Snapshot.SchemaDef.Name);
             }
 
             if (@event.AppId == null)

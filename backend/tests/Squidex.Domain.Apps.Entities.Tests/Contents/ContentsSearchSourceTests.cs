@@ -180,8 +180,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .MustNotHaveHappened();
         }
 
-        private async Task TestContentAsyc(IEnrichedContentEntity content, string expectedName)
+        private async Task TestContentAsyc(ContentEntity content, string expectedName)
         {
+            content.AppId = appId;
+
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
             var searchFilter = SearchFilter.MustHaveSchemas(schemaId1.Id, schemaId2.Id);
@@ -192,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(ids);
 
             A.CallTo(() => contentQuery.QueryAsync(ctx, ids))
-                .Returns(ResultList.CreateFrom(1, content));
+                .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");

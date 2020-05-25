@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -93,10 +94,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            A.CallTo(() => requestCache.AddDependency(document1.Id, document1.Version))
+            A.CallTo(() => requestCache.AddDependency(document1.UniqueId, document1.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(document2.Id, document2.Version))
+            A.CallTo(() => requestCache.AddDependency(document2.UniqueId, document2.Version))
                 .MustHaveHappened();
         }
 
@@ -232,9 +233,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private static IEnrichedAssetEntity CreateAsset(DomainId id, int version, AssetType type, string fileName)
+        private IEnrichedAssetEntity CreateAsset(DomainId id, int version, AssetType type, string fileName)
         {
-            return new AssetEntity { Id = id, Type = type, Version = version, FileName = fileName };
+            return new AssetEntity { AppId = appId, Id = id, Type = type, Version = version, FileName = fileName };
         }
     }
 }

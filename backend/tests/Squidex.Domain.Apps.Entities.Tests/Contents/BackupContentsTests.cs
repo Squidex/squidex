@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var contentId2 = DomainId.NewGuid();
             var contentId3 = DomainId.NewGuid();
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
+            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
             await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
             {

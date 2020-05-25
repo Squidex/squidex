@@ -27,6 +27,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         public ScheduleJob? ScheduleJob { get; set; }
 
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
+
         public NamedContentData Data
         {
             get { return NewVersion?.Data ?? CurrentVersion.Data; }

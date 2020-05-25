@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
             Assert.Null(result.LastExecuted);
 
-            A.CallTo(() => requestCache.AddDependency(source.Id, source.Version))
+            A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
             A.CallTo(() => requestCache.AddDependency(null))
@@ -66,14 +66,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
             var result = await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => requestCache.AddDependency(source.Id, source.Version))
+            A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
             A.CallTo(() => requestCache.AddDependency(stats.LastExecuted))
                 .MustHaveHappened();
         }
 
-        private RuleEntity CreateRule()
+        private IRuleEntity CreateRule()
         {
             return new RuleEntity { AppId = appId, Id = DomainId.NewGuid(), Version = 13 };
         }

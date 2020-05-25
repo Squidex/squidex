@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))

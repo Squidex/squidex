@@ -109,22 +109,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var enriched1 = contents[0];
 
-            A.CallTo(() => requestCache.AddDependency(refSchemaId1.Id, 0))
+            A.CallTo(() => requestCache.AddDependency(DomainId.Combine(appId, refSchemaId1.Id), 0))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(refSchemaId2.Id, 0))
+            A.CallTo(() => requestCache.AddDependency(DomainId.Combine(appId, refSchemaId2.Id), 0))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(ref1_1.Id, ref1_1.Version))
+            A.CallTo(() => requestCache.AddDependency(ref1_1.UniqueId, ref1_1.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(ref2_1.Id, ref2_1.Version))
+            A.CallTo(() => requestCache.AddDependency(ref2_1.UniqueId, ref2_1.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(ref1_2.Id, ref1_2.Version))
+            A.CallTo(() => requestCache.AddDependency(ref1_2.UniqueId, ref1_2.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(ref2_2.Id, ref2_2.Version))
+            A.CallTo(() => requestCache.AddDependency(ref2_2.UniqueId, ref2_2.Version))
                 .MustHaveHappened();
         }
 
@@ -288,6 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             return new ContentEntity
             {
+                Id = DomainId.NewGuid(),
                 Data =
                     new NamedContentData()
                         .AddField("ref1",
@@ -296,11 +297,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("ref2",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Array(ref2.Select(x => x.ToString()).ToArray()))),
-                SchemaId = schemaId
+                SchemaId = schemaId, AppId = appId,
+                Version = 0
             };
         }
 
-        private static IEnrichedContentEntity CreateRefContent(DomainId id, int version, string name, int number, NamedId<DomainId> schemaId)
+        private IEnrichedContentEntity CreateRefContent(DomainId id, int version, string name, int number, NamedId<DomainId> refSchemaId)
         {
             return new ContentEntity
             {
@@ -313,7 +315,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("number",
                             new ContentFieldData()
                                 .AddValue("iv", number)),
-                SchemaId = schemaId,
+                SchemaId = refSchemaId, AppId = appId,
                 Version = version
             };
         }

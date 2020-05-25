@@ -38,5 +38,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public int NumFailed { get; set; }
 
         public Instant? LastExecuted { get; set; }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
     }
 }

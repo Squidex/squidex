@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         public DomainId ParentId { get; set; }
 
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
+
         public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)

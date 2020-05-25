@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
                 var existing =
-                    await Collection.Find(x => x.Id == key)
+                    await Collection.Find(x => x.DocumentId == key)
                         .FirstOrDefaultAsync();
 
                 if (existing != null)
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 entity.Version = newVersion;
                 entity.IndexedAppId = value.AppId.Id;
 
-                await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, UpsertReplace);
+                await Collection.UpsertVersionedAsync(key, oldVersion, entity);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
-                await Collection.DeleteOneAsync(x => x.Id == key);
+                await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }
         }
 

@@ -69,19 +69,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
-            A.CallTo(() => requestCache.AddDependency(content.Id, content.Version))
+            A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(schema.Id, schema.Version))
+            A.CallTo(() => requestCache.AddDependency(schema.UniqueId, schema.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(requestContext.App.Id, requestContext.App.Version))
+            A.CallTo(() => requestCache.AddDependency(requestContext.App.UniqueId, requestContext.App.Version))
                 .MustHaveHappened();
         }
 
         private ContentEntity CreateContent()
         {
-            return new ContentEntity { Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
+            return new ContentEntity { AppId = appId, Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
         }
     }
 }

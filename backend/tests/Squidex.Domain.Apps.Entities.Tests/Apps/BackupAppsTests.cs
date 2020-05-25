@@ -341,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private RestoreContext CreateRestoreContext()
         {
-            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>());
+            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
         }
 
         private IUserMapping CreateUserMapping()

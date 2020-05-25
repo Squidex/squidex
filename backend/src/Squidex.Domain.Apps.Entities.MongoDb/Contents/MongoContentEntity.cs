@@ -104,6 +104,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
+
         public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
         {
             ReferencedIds = data.GetReferencedIds(schema).Select(x => DomainId.Combine(AppId, x)).ToHashSet();

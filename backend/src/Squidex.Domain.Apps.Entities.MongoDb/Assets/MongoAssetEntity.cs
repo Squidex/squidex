@@ -10,7 +10,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public DomainId IndexedAppId { get; set; }
 
         [BsonIgnoreIfDefault]
-        [BsonElement("ai")]
+        [BsonElement("id")]
         public DomainId Id { get; set; }
 
         [BsonIgnoreIfDefault]
@@ -104,14 +103,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("md")]
         public AssetMetadata Metadata { get; set; }
 
-        DomainId IAssetInfo.AssetId
+        public DomainId AssetId
         {
-            get { return ParentId; }
+            get { return Id; }
+        }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(IndexedAppId, Id); }
         }
 
         NamedId<DomainId> IAssetEntity.AppId
         {
-            get { return NamedId.Of(Id, AppName);  }
+            get { return NamedId.Of(IndexedAppId, AppName);  }
         }
     }
 }

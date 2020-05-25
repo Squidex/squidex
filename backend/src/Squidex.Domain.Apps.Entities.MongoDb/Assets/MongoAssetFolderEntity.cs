@@ -10,18 +10,23 @@ using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetFolderEntity : IAssetFolderEntity
+    public sealed class MongoAssetFolderEntity : IAssetFolderEntity, IVersionedEntity<string>
     {
         [BsonId]
         [BsonElement("_id")]
-        public DomainId Id { get; set; }
+        public string DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
         public DomainId IndexedAppId { get; set; }
+
+        [BsonId]
+        [BsonElement("id")]
+        public DomainId Id { get; set; }
 
         [BsonRequired]
         [BsonElement("pi")]
@@ -58,5 +63,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
     }
 }

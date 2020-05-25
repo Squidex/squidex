@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var result = await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => requestCache.AddDependency(result.Id, result.Version))
+            A.CallTo(() => requestCache.AddDependency(result.UniqueId, result.Version))
                 .MustHaveHappened();
         }
 

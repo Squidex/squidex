@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
-                await CheckPathAsync(command.ParentId, assetQuery, e);
+                await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
             });
         }
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (command.ParentId != oldParentId)
                 {
-                    await CheckPathAsync(command.ParentId, assetQuery, e);
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
                 }
             });
         }
@@ -69,11 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        private static async Task CheckPathAsync(DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
+        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
         {
             if (parentId != default)
             {
-                var path = await assetQuery.FindAssetFolderAsync(parentId);
+                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
                 if (path.Count == 0)
                 {

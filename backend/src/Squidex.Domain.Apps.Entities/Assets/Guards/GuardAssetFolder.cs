@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                     e(Not.Defined("Folder name"), nameof(command.FolderName));
                 }
 
-                await CheckPathAsync(command.ParentId, assetQuery, DomainId.Empty, e);
+                await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, DomainId.Empty, e);
             });
         }
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (command.ParentId != oldParentId)
                 {
-                    await CheckPathAsync(command.ParentId, assetQuery, id, e);
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, id, e);
                 }
             });
         }
@@ -60,11 +60,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        private static async Task CheckPathAsync(DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
+        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
         {
             if (parentId != default)
             {
-                var path = await assetQuery.FindAssetFolderAsync(parentId);
+                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
                 if (path.Count == 0)
                 {

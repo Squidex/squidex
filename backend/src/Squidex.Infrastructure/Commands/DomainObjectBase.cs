@@ -19,11 +19,11 @@ namespace Squidex.Infrastructure.Commands
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly ISemanticLog log;
         private bool isLoaded;
-        private DomainId id;
+        private DomainId uniqueId;
 
-        public DomainId Id
+        public DomainId UniqueId
         {
-            get { return id; }
+            get { return uniqueId; }
         }
 
         public long Version
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual void Setup(DomainId id)
         {
-            this.id = id;
+            this.uniqueId = id;
 
             OnSetup();
         }
@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.Commands
             }
             else
             {
-                var logContext = (id: id.ToString(), name: GetType().Name);
+                var logContext = (id: uniqueId.ToString(), name: GetType().Name);
 
                 using (log.MeasureInformation(logContext, (ctx, w) => w
                     .WriteProperty("action", "ActivateDomainObject")
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(@event, nameof(@event));
 
-            @event.SetAggregateId(id);
+            @event.SetAggregateId(uniqueId);
 
             if (ApplyEvent(@event, false))
             {
@@ -153,12 +153,12 @@ namespace Squidex.Infrastructure.Commands
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(uniqueId.ToString(), GetType(), Version, command.ExpectedVersion);
             }
 
             if (isUpdate && Version < 0)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), GetType());
+                throw new DomainObjectNotFoundException(uniqueId.ToString(), GetType());
             }
 
             var previousSnapshot = Snapshot;
@@ -179,7 +179,7 @@ namespace Squidex.Infrastructure.Commands
                     }
                     else
                     {
-                        result = EntityCreatedResult.Create(id, Version);
+                        result = EntityCreatedResult.Create(uniqueId, Version);
                     }
                 }
 

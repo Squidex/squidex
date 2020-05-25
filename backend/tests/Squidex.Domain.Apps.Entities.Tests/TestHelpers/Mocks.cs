@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Xml;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -33,6 +34,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             A.CallTo(() => app.Id).Returns(appId.Id);
             A.CallTo(() => app.Name).Returns(appId.Name);
             A.CallTo(() => app.LanguagesConfig).Returns(config);
+            A.CallTo(() => app.UniqueId).Returns(appId.Id);
 
             return app;
         }
@@ -44,6 +46,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             A.CallTo(() => schema.Id).Returns(schemaId.Id);
             A.CallTo(() => schema.AppId).Returns(appId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef ?? new Schema(schemaId.Name));
+            A.CallTo(() => schema.UniqueId).Returns(DomainId.Combine(appId, schemaId.Id));
 
             return schema;
         }

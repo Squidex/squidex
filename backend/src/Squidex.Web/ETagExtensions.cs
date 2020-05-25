@@ -45,7 +45,7 @@ namespace Squidex.Web
 
                 foreach (var item in entities)
                 {
-                    hasher.AppendData(Encoding.Default.GetBytes(item.Id.ToString()));
+                    hasher.AppendData(Encoding.Default.GetBytes(item.UniqueId.ToString()));
                     hasher.AppendData(BitConverter.GetBytes(item.Version));
                 }
 

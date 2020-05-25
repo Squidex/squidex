@@ -142,10 +142,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var folderId1 = DomainId.NewGuid();
             var folder1 = CreateFolder(folderId1);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId1))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1))
                 .Returns(folder1);
 
-            var result = await sut.FindAssetFolderAsync(folderId1);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1);
 
             Assert.Equal(result, new[] { folder1 });
         }
@@ -161,16 +161,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var folder2 = CreateFolder(folderId2, folderId1);
             var folder3 = CreateFolder(folderId3, folderId2);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId1))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1))
                 .Returns(folder1);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId2))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2))
                 .Returns(folder2);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId3))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId3))
                 .Returns(folder3);
 
-            var result = await sut.FindAssetFolderAsync(folderId3);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId3);
 
             Assert.Equal(result, new[] { folder1, folder2, folder3 });
         }
@@ -180,10 +180,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var folderId1 = DomainId.NewGuid();
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId1))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1))
                 .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-            var result = await sut.FindAssetFolderAsync(folderId1);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1);
 
             Assert.Empty(result);
         }
@@ -197,13 +197,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var folder1 = CreateFolder(folderId1);
             var folder2 = CreateFolder(folderId2, folderId1);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId1))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1))
                 .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId2))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(folderId2);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2);
 
             Assert.Empty(result);
         }
@@ -217,13 +217,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var folder1 = CreateFolder(folderId1, folderId2);
             var folder2 = CreateFolder(folderId2, folderId1);
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId1))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1))
                 .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(folderId2))
+            A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(folderId2);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2);
 
             Assert.Empty(result);
         }

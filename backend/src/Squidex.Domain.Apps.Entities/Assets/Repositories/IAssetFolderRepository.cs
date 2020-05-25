@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 
         Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId);
 
-        Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId id);
+        Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id);
     }
 }
