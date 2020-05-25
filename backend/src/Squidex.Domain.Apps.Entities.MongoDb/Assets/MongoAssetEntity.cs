@@ -25,15 +25,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("_ai")]
-        public string IndexedAppId { get; set; }
+        public DomainId IndexedAppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("ai")]
-        public string AssetId { get; set; }
+        public DomainId Id { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("pi")]
-        public string ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -104,24 +104,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("md")]
         public AssetMetadata Metadata { get; set; }
 
-        DomainId IEntity.Id
-        {
-            get { return AssetId; }
-        }
-
         DomainId IAssetInfo.AssetId
-        {
-            get { return ParentId; }
-        }
-
-        DomainId IAssetEntity.ParentId
         {
             get { return ParentId; }
         }
 
         NamedId<DomainId> IAssetEntity.AppId
         {
-            get { return NamedId.Of(new DomainId(AssetId), ParentId);  }
+            get { return NamedId.Of(Id, AppName);  }
         }
     }
 }

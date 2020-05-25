@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class DeleteWorkflow : AppCommand
+    public sealed class DeleteWorkflow : AppUpdateCommand
     {
         public DomainId WorkflowId { get; set; }
     }

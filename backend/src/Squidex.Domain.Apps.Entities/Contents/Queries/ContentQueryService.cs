@@ -156,9 +156,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             ISchemaEntity? schema = null;
 
-            if (Guid.TryParse(schemaIdOrName, out var id))
+            if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, new DomainId(id.ToString()));
+                schema = await appProvider.GetSchemaAsync(context.App.Id, guid);
             }
 
             if (schema == null)

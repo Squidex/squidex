@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +16,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -94,9 +94,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] Guid? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q));
+            DomainId? p = parentId != null ? new DomainId(parentId) : null!;
+
+            var assets = await assetQuery.QueryAsync(Context, p, CreateQuery(ids, q));
 
             var response = Deferred.Response(() =>
             {
@@ -149,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAsset(string app, Guid id)
+        public async Task<IActionResult> GetAsset(string app, string id)
         {
             var asset = await assetQuery.FindAssetAsync(Context, id);
 
@@ -186,7 +188,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [FromQuery] Guid parentId, IFormFile file)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] string parentId, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -216,7 +218,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpload)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, Guid id, IFormFile file)
+        public async Task<IActionResult> PutAssetContent(string app, string id, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -244,7 +246,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AnnotateAssetDto request)
+        public async Task<IActionResult> PutAsset(string app, string id, [FromBody] AnnotateAssetDto request)
         {
             var command = request.ToCommand(id);
 
@@ -269,7 +271,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetParent(string app, string id, [FromBody] MoveAssetItemDto request)
         {
             var command = request.ToCommand(id);
 
@@ -291,7 +293,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ApiPermission(Permissions.AppAssetsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteAsset(string app, Guid id)
+        public async Task<IActionResult> DeleteAsset(string app, string id)
         {
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
 

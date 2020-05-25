@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         protected override DomainId Id
         {
-            get { return contentId; }
+            get { return DomainId.Combine(AppId, contentId); }
         }
 
         public ContentDomainObjectTests()

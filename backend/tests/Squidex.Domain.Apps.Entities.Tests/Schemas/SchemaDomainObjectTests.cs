@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         protected override DomainId Id
         {
-            get { return SchemaId; }
+            get { return DomainId.Combine(AppId, SchemaId); }
         }
 
         public SchemaDomainObjectTests()
@@ -742,7 +742,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
         }
 
-        private async Task<object?> PublishIdempotentAsync(SquidexCommand command)
+        private async Task<object?> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             var result = await PublishAsync(command);
 
@@ -757,7 +757,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return result;
         }
 
-        private async Task<object?> PublishAsync(SquidexCommand command)
+        private async Task<object?> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 

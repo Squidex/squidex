@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
             A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch });
+                .Returns(new ContentEntity { AppId = appId, SchemaId = SchemaMatch });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_enrich_with_old_data_when_updated()
         {
-            var @event = new ContentUpdated { AppId = appId };
+            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid() };
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -88,10 +88,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var dataOld = new NamedContentData();
 
             A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 12, Data = dataNow });
+                .Returns(new ContentEntity { AppId = appId, SchemaId = SchemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });
 
             A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 11))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 11, Data = dataOld });
+                .Returns(new ContentEntity { AppId = appId, SchemaId = SchemaMatch, Version = 11, Data = dataOld });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 

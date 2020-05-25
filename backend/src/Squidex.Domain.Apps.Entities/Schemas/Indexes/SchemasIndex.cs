@@ -66,11 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schema = await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync();
+                var schema = await GetSchemaInternalAsync(appId, id);
 
-                if (IsFound(schema.Value, allowDeleted))
+                if (IsFound(schema, allowDeleted))
                 {
-                    return schema.Value;
+                    return schema;
                 }
 
                 return null;
@@ -157,14 +157,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task DeleteSchemaAsync(DeleteSchema commmand)
         {
-            var schemaId = commmand.SchemaId;
+            var schema = await GetSchemaInternalAsync(commmand.AppId.Id, commmand.SchemaId.Id);
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId.ToString()).GetStateAsync();
-
-            if (IsFound(schema.Value, true))
+            if (IsFound(schema, true))
             {
-                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId.Id);
+                await Index(schema.AppId.Id).RemoveAsync(schema.Id);
             }
+        }
+
+        private async Task<ISchemaEntity> GetSchemaInternalAsync(DomainId appId, DomainId id)
+        {
+            var key = DomainId.Combine(appId, id).ToString();
+
+            var rule = await grainFactory.GetGrain<ISchemaGrain>(key).GetStateAsync();
+
+            return rule.Value;
         }
 
         private ISchemasByAppIndexGrain Index(DomainId appId)

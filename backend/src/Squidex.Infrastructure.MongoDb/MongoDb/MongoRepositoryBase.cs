@@ -54,6 +54,8 @@ namespace Squidex.Infrastructure.MongoDb
             RefTokenSerializer.Register();
 
             InstantSerializer.Register();
+
+            DomainIdSerializer.Register();
         }
 
         protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)

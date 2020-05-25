@@ -51,6 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             {
                 case AppCreated e:
                     {
+                        Id = e.AppId.Id;
+
                         SimpleMapper.Map(e, this);
 
                         return true;

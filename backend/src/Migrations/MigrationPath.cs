@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 21;
+        private const int CurrentVersion = 22;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -46,6 +46,12 @@ namespace Migrations
             if (version < 6)
             {
                 yield return serviceProvider.GetRequiredService<ConvertEventStore>();
+            }
+
+            // Version 22: Also add app id to aggregate id.
+            if (version < 22)
+            {
+                yield return serviceProvider.GetRequiredService<AddAppIdToEventStream>();
             }
 
             // Version 07: Introduces AppId for backups.
@@ -80,7 +86,8 @@ namespace Migrations
                 }
 
                 // Version 18: Rebuild assets.
-                if (version < 18)
+                // Version 22: Introduce domain id.
+                if (version < 22)
                 {
                     yield return serviceProvider.GetService<RebuildAssets>();
                 }
@@ -100,16 +107,11 @@ namespace Migrations
                 }
 
                 // Version 21: Introduce content drafts V2.
-                if (version < 21)
+                // Version 22: Introduce domain id.
+                if (version < 22)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildContents>();
                 }
-            }
-
-            // Version 01: Introduce app patterns.
-            if (version < 1)
-            {
-                yield return serviceProvider.GetRequiredService<AddPatterns>();
             }
 
             // Version 13: Json refactoring

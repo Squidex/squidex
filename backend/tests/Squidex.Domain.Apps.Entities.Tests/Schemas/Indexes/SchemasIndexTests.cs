@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, isDeleted);
 
-            var command = new DeleteSchema { SchemaId = schemaId };
+            var command = new DeleteSchema { SchemaId = schemaId, AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -242,7 +242,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => schemaGrain.GetStateAsync())
                 .Returns(J.Of(schemaEntity));
 
-            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id.ToString(), null))
+            var key = DomainId.Combine(appId, schemaId.Id).ToString();
+
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(key, null))
                 .Returns(schemaGrain);
 
             return schemaEntity;

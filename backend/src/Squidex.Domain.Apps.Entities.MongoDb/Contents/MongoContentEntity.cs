@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
@@ -29,19 +31,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("_ai")]
-        public string IndexedAppId { get; set; }
+        public DomainId IndexedAppId { get; set; }
 
         [BsonRequired]
         [BsonElement("_si")]
-        public string IndexedSchemaId { get; set; }
+        public DomainId IndexedSchemaId { get; set; }
 
         [BsonRequired]
         [BsonElement("rf")]
-        public HashSet<string>? ReferencedIds { get; set; }
+        public HashSet<DomainId>? ReferencedIds { get; set; }
 
         [BsonRequired]
         [BsonElement("ci")]
-        public string ContentId { get; set; }
+        public DomainId Id { get; set; }
 
         [BsonRequired]
         [BsonElement("ss")]
@@ -102,13 +104,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
-        DomainId IEntity.Id
-        {
-            get { return ContentId; }
-        }
-
         public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
         {
+            ReferencedIds = data.GetReferencedIds(schema).Select(x => DomainId.Combine(AppId, x)).ToHashSet();
+
             DataByIds = converter.ToMongoModel(data, schema);
         }
 

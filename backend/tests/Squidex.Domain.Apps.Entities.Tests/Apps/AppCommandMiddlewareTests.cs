@@ -34,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public sealed class MyCommand : SquidexCommand
         {
-            public override DomainId AggregateId => default;
         }
 
         protected override DomainId Id

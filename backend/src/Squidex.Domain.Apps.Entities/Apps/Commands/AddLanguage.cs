@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AddLanguage : AppCommand
+    public sealed class AddLanguage : AppUpdateCommand
     {
         public Language Language { get; set; }
     }

@@ -67,9 +67,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
-            if (ruleId.HasValue)
+            if (ruleId.HasValue && !ruleId.Value.IsEmpty)
             {
-                filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId));
+                filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }
 
             var taskForItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();

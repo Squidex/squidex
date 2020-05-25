@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
     [ApiExplorerSettings(GroupName = nameof(Notifications))]
     public sealed class UserNotificationsController : ApiController
     {
-        private static readonly NamedId<Guid> NoApp = NamedId.Of(Guid.Empty, "none");
+        private static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
         private readonly ICommentsLoader commentsLoader;
 
         public UserNotificationsController(ICommandBus commandBus, ICommentsLoader commentsLoader)

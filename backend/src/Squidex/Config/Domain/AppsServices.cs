@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
@@ -14,6 +13,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
+using Squidex.Infrastructure;
 
 namespace Squidex.Config.Domain
 {
@@ -55,7 +55,7 @@ namespace Squidex.Config.Domain
                         if (!string.IsNullOrWhiteSpace(key) &&
                             !string.IsNullOrWhiteSpace(value))
                         {
-                            result[Guid.NewGuid()] = new AppPattern(key, value);
+                            result[DomainId.NewGuid()] = new AppPattern(key, value);
                         }
                     }
                 }

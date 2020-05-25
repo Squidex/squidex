@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The workflow id.
         /// </summary>
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         /// <summary>
         /// The name of the workflow.
@@ -36,14 +36,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public IReadOnlyList<Guid>? SchemaIds { get; set; }
+        public IReadOnlyList<DomainId>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
         /// </summary>
         public Status Initial { get; set; }
 
-        public static WorkflowDto FromWorkflow(Guid id, Workflow workflow)
+        public static WorkflowDto FromWorkflow(DomainId id, Workflow workflow)
         {
             var result = SimpleMapper.Map(workflow, new WorkflowDto
             {

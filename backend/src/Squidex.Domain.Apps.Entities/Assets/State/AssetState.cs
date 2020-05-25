@@ -56,6 +56,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             {
                 case AssetCreated e:
                     {
+                        Id = e.AssetId;
+
                         SimpleMapper.Map(e, this);
 
                         FileName = e.FileName;

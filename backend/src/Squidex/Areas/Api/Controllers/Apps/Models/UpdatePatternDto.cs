@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -36,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return SimpleMapper.Map(this, new AddPattern());
         }
 
-        public UpdatePattern ToUpdateCommand(Guid id)
+        public UpdatePattern ToUpdateCommand(string id)
         {
             return SimpleMapper.Map(this, new UpdatePattern { PatternId = id });
         }

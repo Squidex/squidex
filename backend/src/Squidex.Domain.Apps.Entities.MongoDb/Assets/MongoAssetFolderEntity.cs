@@ -17,12 +17,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
     {
         [BsonId]
         [BsonElement("_id")]
-        [BsonRepresentation(BsonType.String)]
         public DomainId Id { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.String)]
         public DomainId IndexedAppId { get; set; }
 
         [BsonRequired]

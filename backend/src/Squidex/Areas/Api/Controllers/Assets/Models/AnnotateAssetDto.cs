@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -40,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public AssetMetadata? Metadata { get; set; }
 
-        public AnnotateAsset ToCommand(Guid id)
+        public AnnotateAsset ToCommand(string id)
         {
             return SimpleMapper.Map(this, new AnnotateAsset { AssetId = id });
         }

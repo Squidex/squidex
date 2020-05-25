@@ -81,6 +81,9 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<RenameAssetMetadata>()
                         .As<IMigration>();
 
+                    services.AddTransientAs<AddAppIdToEventStream>()
+                        .As<IMigration>();
+
                     services.AddHealthChecks()
                         .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 
@@ -106,13 +109,13 @@ namespace Squidex.Config.Domain
                         .As<ISigningCredentialStore>().As<IValidationKeysStore>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, Guid>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, string>>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, Guid>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, string>>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentState, Guid>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentState, string>>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .AsSelf();

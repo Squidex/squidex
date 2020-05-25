@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -49,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] Guid parentId)
+        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] string parentId)
         {
             var assetFolders = await assetQuery.QueryAssetFoldersAsync(Context, parentId);
 
@@ -104,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetFolder(string app, Guid id, [FromBody] RenameAssetFolderDto request)
+        public async Task<IActionResult> PutAssetFolder(string app, string id, [FromBody] RenameAssetFolderDto request)
         {
             var command = request.ToCommand(id);
 
@@ -129,7 +128,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetFolderParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetFolderParent(string app, string id, [FromBody] MoveAssetItemDto request)
         {
             var command = request.ToFolderCommand(id);
 
@@ -151,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteAssetFolder(string app, Guid id)
+        public async Task<IActionResult> DeleteAssetFolder(string app, string id)
         {
             await CommandBus.PublishAsync(new DeleteAssetFolder { AssetFolderId = id });
 

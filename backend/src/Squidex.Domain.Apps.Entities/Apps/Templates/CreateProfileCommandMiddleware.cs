@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
                 var publish = new Func<ICommand, Task>(command =>
                 {
-                    if (command is AppCommandBase appCommand)
+                    if (command is IAppCommand appCommand)
                     {
                         appCommand.AppId = appId;
                     }
@@ -70,7 +70,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                                 .AddValue("Doe"))
                         .AddField("profession",
                             new ContentFieldData()
-                                .AddValue("Software Developer"))
+                                .AddValue("Software Developer")),
+                SchemaId = postsId
             });
         }
 

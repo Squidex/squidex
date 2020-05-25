@@ -12,7 +12,5 @@ namespace Squidex.Infrastructure.States
     public interface IStreamNameResolver
     {
         string GetStreamName(Type aggregateType, string id);
-
-        string WithNewId(string streamName, Func<string, string?> idGenerator);
     }
 }

@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -10,11 +10,8 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public abstract class AppCommand : AppCommandBase, IAggregateCommand
+    public abstract class AppCommand : SquidexCommand, IAggregateCommand
     {
-        public override DomainId AggregateId
-        {
-            get { return AppId.Id; }
-        }
+        public abstract DomainId AggregateId { get; }
     }
 }

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -138,6 +139,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         var context = new BackupContext(Key, userMapping, writer);
 
+                        var filter = $"^[^\\-]*-{Regex.Escape(Key)}";
+
                         await eventStore.QueryAsync(async storedEvent =>
                         {
                             var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -158,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, $"\\-{Key}", null, ct);
+                        }, filter, null, ct);
 
                         foreach (var handler in handlers)
                         {

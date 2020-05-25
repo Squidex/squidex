@@ -178,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var callback = new FileCallback((body, range, ct) =>
             {
-                return appLogStore.ReadLogAsync(Guid.Parse(appId), today.AddDays(-30), today, body, ct);
+                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, body, ct);
             });
 
             return new FileCallbackResult("text/csv", callback)

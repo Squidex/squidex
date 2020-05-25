@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         protected T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
         {
             @event.Actor = actor;
-            @event.CommentsId = commentsId.ToString();
+            @event.CommentsId = commentsId;
             @event.CommentId = commentId;
 
             return @event;
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         protected T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
             command.Actor = actor;
-            command.CommentsId = commentsId.ToString();
+            command.CommentsId = commentsId;
             command.CommentId = commentId;
 
             return command;

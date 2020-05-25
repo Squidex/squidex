@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected override void OnSetup()
         {
-            persistence = store.WithEventSourcing(GetType(), Id, x => ApplyEvent(x, true));
+            persistence = store.WithEventSourcing(GetType(), Id.ToString(), x => ApplyEvent(x, true));
         }
 
         public T GetSnapshot(long version)
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Commands
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
                 await persistence.WriteEventsAsync(newEvents);
-                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, Snapshot.Version);
+                await persistedSnapshots.WriteAsync(Id.ToString(), Snapshot, previousVersion, Snapshot.Version);
             }
         }
 
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
-                await persistedSnapshots.WriteAsync(Id, Snapshot, EtagVersion.Any, Snapshot.Version);
+                await persistedSnapshots.WriteAsync(Id.ToString(), Snapshot, EtagVersion.Any, Snapshot.Version);
             }
         }
 

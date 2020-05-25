@@ -21,13 +21,13 @@ namespace Squidex.Infrastructure.Commands
     public class Rebuilder
     {
         private readonly ILocalCache localCache;
-        private readonly IStore<DomainId> store;
+        private readonly IStore<string> store;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
 
         public Rebuilder(
             ILocalCache localCache,
-            IStore<DomainId> store,
+            IStore<string> store,
             IEventStore eventStore,
             IServiceProvider serviceProvider)
         {

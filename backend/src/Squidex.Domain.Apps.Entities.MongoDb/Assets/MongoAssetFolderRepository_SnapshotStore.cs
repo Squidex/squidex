@@ -19,9 +19,9 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderState, DomainId>
+    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderState, string>
     {
-        async Task<(AssetFolderState Value, long Version)> ISnapshotStore<AssetFolderState, DomainId>.ReadAsync(DomainId key)
+        async Task<(AssetFolderState Value, long Version)> ISnapshotStore<AssetFolderState, string>.ReadAsync(string key)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, DomainId>.WriteAsync(DomainId key, AssetFolderState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetFolderState, string>.WriteAsync(string key, AssetFolderState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, DomainId>.ReadAllAsync(Func<AssetFolderState, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetFolderState, string>.ReadAllAsync(Func<AssetFolderState, long, Task> callback, CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, DomainId>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<AssetFolderState, string>.RemoveAsync(string key)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {

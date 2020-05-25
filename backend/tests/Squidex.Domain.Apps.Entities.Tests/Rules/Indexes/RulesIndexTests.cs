@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(0, false);
 
-            var command = new DeleteRule { RuleId = rule.Id };
+            var command = new DeleteRule { RuleId = rule.Id, AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -127,7 +127,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             A.CallTo(() => ruleGrain.GetStateAsync())
                 .Returns(J.Of<IRuleEntity>(ruleEntity));
 
-            A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(ruleId.ToString(), null))
+            var key = DomainId.Combine(appId, ruleId).ToString();
+
+            A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(key, null))
                 .Returns(ruleGrain);
 
             return ruleEntity;

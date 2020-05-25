@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
                 var publish = new Func<ICommand, Task>(command =>
                 {
-                    if (command is AppCommandBase appCommand)
+                    if (command is IAppCommand appCommand)
                     {
                         appCommand.AppId = appId;
                     }

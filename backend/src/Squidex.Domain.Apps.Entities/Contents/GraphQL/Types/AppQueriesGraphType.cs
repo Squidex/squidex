@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = assetType,
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var assetId = c.GetArgument<DomainId>("id");
+                    var assetId = c.GetArgument<string>("id");
 
                     return e.FindAssetAsync(assetId);
                 }),
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = contentType,
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var contentId = c.GetArgument<DomainId>("id");
+                    var contentId = c.GetArgument<string>("id");
 
                     return e.FindContentAsync(contentId);
                 }),

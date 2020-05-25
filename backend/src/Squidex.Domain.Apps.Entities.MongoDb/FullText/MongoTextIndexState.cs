@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
@@ -13,11 +15,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
     {
         [BsonId]
         [BsonElement]
-        public string DocumentId { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string ContentId { get; set; }
+        public DomainId ContentId { get; set; }
 
         [BsonRequired]
         [BsonElement("c")]
@@ -30,5 +32,30 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         [BsonRequired]
         [BsonElement("p")]
         public string? DocIdForPublished { get; set; }
+
+        public MongoTextIndexState()
+        {
+        }
+
+        public MongoTextIndexState(DomainId documentId, TextContentState state)
+        {
+            DocumentId = documentId;
+
+            ContentId = state.ContentId;
+            DocIdNew = state.DocIdNew;
+            DocIdCurrent = state.DocIdCurrent;
+            DocIdForPublished = state.DocIdForPublished;
+        }
+
+        public TextContentState ToState()
+        {
+            return new TextContentState
+            {
+                ContentId = ContentId,
+                DocIdNew = DocIdNew,
+                DocIdCurrent = DocIdCurrent,
+                DocIdForPublished = DocIdForPublished
+            };
+        }
     }
 }

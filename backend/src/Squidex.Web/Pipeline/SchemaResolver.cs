@@ -53,9 +53,9 @@ namespace Squidex.Web.Pipeline
 
         private Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string schemaIdOrName)
         {
-            if (Guid.TryParse(schemaIdOrName, out var id))
+            if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                return appProvider.GetSchemaAsync(appId, new DomainId(id.ToString()));
+                return appProvider.GetSchemaAsync(appId, guid);
             }
             else
             {

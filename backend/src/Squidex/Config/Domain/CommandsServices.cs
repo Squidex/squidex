@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
@@ -113,7 +112,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton(typeof(IEventEnricher<>), typeof(SquidexEventEnricher<>));
+            services.AddSingleton(typeof(IEventEnricher<>), typeof(DefaultEventEnricher<>));
         }
     }
 }

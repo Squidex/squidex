@@ -8,11 +8,12 @@
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class UpsertCommand : AppCommandBase
+    public abstract class UpsertCommand : SchemaCommand, IAppCommand
     {
         public bool IsPublished { get; set; }
 

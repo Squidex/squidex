@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class PublishSchema : SchemaCommand
+    public sealed class PublishSchema : SchemaUpdateCommand
     {
     }
 }

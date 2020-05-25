@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             {
                 case SchemaCreated e:
                     {
+                        Id = e.SchemaId.Id;
+
                         SchemaDef = e.Schema;
                         SchemaFieldsTotal = e.Schema.MaxId();
 

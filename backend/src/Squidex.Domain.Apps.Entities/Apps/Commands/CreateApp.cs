@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class CreateApp : SquidexCommand, IAggregateCommand
+    public sealed class CreateApp : AppCommand, IAggregateCommand
     {
         public DomainId AppId { get; set; }
 
@@ -18,14 +18,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string? Template { get; set; }
 
+        public override DomainId AggregateId
+        {
+            get { return AppId; }
+        }
+
         public CreateApp()
         {
             AppId = DomainId.NewGuid();
-        }
-
-        DomainId IAggregateCommand.AggregateId
-        {
-            get { return AppId; }
         }
     }
 }

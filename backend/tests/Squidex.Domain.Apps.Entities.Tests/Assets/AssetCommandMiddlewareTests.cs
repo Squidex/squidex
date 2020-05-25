@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override DomainId Id
         {
-            get { return assetId; }
+            get { return DomainId.Combine(AppId, assetId); }
         }
 
         public AssetCommandMiddlewareTests()
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, Id, version, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, assetId, version, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
                 .MustHaveHappened();

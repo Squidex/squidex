@@ -8,9 +8,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -23,14 +21,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         static MongoRuleStatisticsCollection()
         {
-            var guidSerializer = new GuidSerializer().WithRepresentation(BsonType.String);
-
             BsonClassMap.RegisterClassMap<RuleStatistics>(cm =>
             {
                 cm.AutoMap();
-
-                cm.MapProperty(x => x.AppId).SetSerializer(guidSerializer);
-                cm.MapProperty(x => x.RuleId).SetSerializer(guidSerializer);
 
                 cm.SetIgnoreExtraElements(true);
             });

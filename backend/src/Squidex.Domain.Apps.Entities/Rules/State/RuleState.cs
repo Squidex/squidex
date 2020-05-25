@@ -30,6 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
             {
                 case RuleCreated e:
                     {
+                        Id = e.RuleId;
+
                         RuleDef = new Rule(e.Trigger, e.Action);
                         RuleDef = RuleDef.Rename(e.Name);
 

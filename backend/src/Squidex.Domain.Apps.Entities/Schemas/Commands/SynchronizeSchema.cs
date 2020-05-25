@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public bool NoFieldRecreation { get; set; }
 
-        DomainId IAggregateCommand.AggregateId
+        public override DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, SchemaId.Id); }
         }

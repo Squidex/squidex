@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         [Fact]
         public async Task Should_create_client()
         {
-            var command = new CreateApp { AppId = DomainId.NewGuid() };
+            var command = new CreateApp { AppId = DomainId.NewGuid(), Name = "my-app" };
 
             var context =
                 new CommandContext(command, commandBus)

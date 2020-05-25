@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             return Filter.And(
                 Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.AssetId, ids),
+                Filter.In(x => x.Id, ids),
                 Filter.Ne(x => x.IsDeleted, true));
         }
     }

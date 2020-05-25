@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         [BsonRequired]
         [BsonElement]
-        public string AppId { get; set; }
+        public DomainId AppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement]
-        public string RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
         [BsonRequired]
         [BsonElement]

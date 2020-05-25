@@ -77,11 +77,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (Guid.TryParse(idOrSlug, out var guid))
             {
-                asset = await assetRepository.FindAssetAsync(guid);
+                asset = await assetRepository.FindAssetAsync(AppId, guid);
             }
             else
             {
-                asset = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
+                asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
             }
 
             return await DeliverAssetAsync(asset, query);
@@ -102,9 +102,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] AssetContentQueryDto query)
+        public async Task<IActionResult> GetAssetContent(string id, [FromQuery] AssetContentQueryDto query)
         {
-            var asset = await assetRepository.FindAssetAsync(id);
+            var asset = await assetRepository.FindAssetAsync(App.Id, new DomainId(id));
 
             return await DeliverAssetAsync(asset, query);
         }
@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (query.Version > EtagVersion.Any && asset.Version != query.Version)
             {
-                asset = await assetLoader.GetAsync(asset.Id, query.Version);
+                asset = await assetLoader.GetAsync(AppId, asset.Id, query.Version);
             }
 
             var resizeOptions = query.ToResizeOptions(asset);

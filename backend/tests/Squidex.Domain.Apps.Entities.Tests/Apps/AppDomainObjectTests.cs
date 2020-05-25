@@ -750,7 +750,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return result;
         }
 
-        private async Task<object?> PublishAsync(SquidexCommand command)
+        private async Task<object?> PublishAsync(AppCommand command)
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 

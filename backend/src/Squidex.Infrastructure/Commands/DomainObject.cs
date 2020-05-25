@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected override void OnSetup()
         {
-            persistence = store.WithSnapshotsAndEventSourcing(GetType(), Id, new HandleSnapshot<T>(ApplySnapshot), x => ApplyEvent(x, true));
+            persistence = store.WithSnapshotsAndEventSourcing(GetType(), Id.ToString(), new HandleSnapshot<T>(ApplySnapshot), x => ApplyEvent(x, true));
         }
 
         protected sealed override bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)

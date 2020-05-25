@@ -45,9 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             typeNameRegistry.Map(typeof(MyEvent));
 
             formatter = new DefaultEventDataFormatter(typeNameRegistry, serializer);
-
-            A.CallTo(() => streamNameResolver.WithNewId(A<string>._, A<Func<string, string>>._))
-                .ReturnsLazily(new Func<string, Func<string, string>, string>((stream, idGenerator) => stream + "^2"));
         }
 
         [Theory]

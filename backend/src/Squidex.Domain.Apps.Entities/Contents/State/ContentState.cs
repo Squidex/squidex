@@ -53,6 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             {
                 case ContentCreated e:
                     {
+                        Id = e.ContentId;
+
                         SimpleMapper.Map(e, this);
 
                         CurrentVersion = new ContentVersion(e.Status, e.Data);

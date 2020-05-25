@@ -49,9 +49,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (@event.Payload)
             {
                 case AssetCreated assetCreated:
-                    return WriteAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, context.Writer);
+                    return WriteAssetAsync(
+                        assetCreated.AssetId,
+                        assetCreated.FileVersion,
+                        context.Writer);
                 case AssetUpdated assetUpdated:
-                    return WriteAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, context.Writer);
+                    return WriteAssetAsync(
+                        assetUpdated.AssetId,
+                        assetUpdated.FileVersion,
+                        context.Writer);
             }
 
             return Task.CompletedTask;
@@ -65,10 +71,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     assetFolderIds.Add(assetFolderCreated.AssetFolderId);
                     break;
                 case AssetCreated assetCreated:
-                    await ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, context.Reader);
+                    await ReadAssetAsync(
+                        assetCreated.AssetId,
+                        assetCreated.FileVersion,
+                        context.Reader);
                     break;
                 case AssetUpdated assetUpdated:
-                    await ReadAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, context.Reader);
+                    await ReadAssetAsync(
+                        assetUpdated.AssetId,
+                        assetUpdated.FileVersion,
+                        context.Reader);
                     break;
             }
 

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override DomainId Id
         {
-            get { return assetFolderId; }
+            get { return DomainId.Combine(AppId, assetFolderId); }
         }
 
         public AssetFolderDomainObjectTests()

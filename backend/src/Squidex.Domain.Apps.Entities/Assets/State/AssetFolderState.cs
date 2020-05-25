@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             {
                 case AssetFolderCreated e:
                     {
+                        Id = e.AssetFolderId;
+
                         SimpleMapper.Map(e, this);
 
                         return true;

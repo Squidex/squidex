@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
@@ -50,20 +49,20 @@ namespace Migrations.Migrations
 
         private async Task RebuildAppIndexes()
         {
-            var appsByName = new Dictionary<string, Guid>();
-            var appsByUser = new Dictionary<string, HashSet<Guid>>();
+            var appsByName = new Dictionary<string, DomainId>();
+            var appsByUser = new Dictionary<string, HashSet<DomainId>>();
 
-            bool HasApp(NamedId<Guid> appId, bool consistent, out Guid id)
+            bool HasApp(NamedId<DomainId> appId, bool consistent, out DomainId id)
             {
                 return appsByName!.TryGetValue(appId.Name, out id) && (!consistent || id == appId.Id);
             }
 
-            HashSet<Guid> Index(string contributorId)
+            HashSet<DomainId> Index(string contributorId)
             {
                 return appsByUser!.GetOrAddNew(contributorId);
             }
 
-            void RemoveApp(NamedId<Guid> appId, bool consistent)
+            void RemoveApp(NamedId<DomainId> appId, bool consistent)
             {
                 if (HasApp(appId, consistent, out var id))
                 {
@@ -121,9 +120,9 @@ namespace Migrations.Migrations
 
         private async Task RebuildRuleIndexes()
         {
-            var rulesByApp = new Dictionary<Guid, HashSet<Guid>>();
+            var rulesByApp = new Dictionary<DomainId, HashSet<DomainId>>();
 
-            HashSet<Guid> Index(RuleEvent @event)
+            HashSet<DomainId> Index(RuleEvent @event)
             {
                 return rulesByApp!.GetOrAddNew(@event.AppId.Id);
             }
@@ -153,9 +152,9 @@ namespace Migrations.Migrations
 
         private async Task RebuildSchemaIndexes()
         {
-            var schemasByApp = new Dictionary<Guid, Dictionary<string, Guid>>();
+            var schemasByApp = new Dictionary<DomainId, Dictionary<string, DomainId>>();
 
-            Dictionary<string, Guid> Index(SchemaEvent @event)
+            Dictionary<string, DomainId> Index(SchemaEvent @event)
             {
                 return schemasByApp!.GetOrAddNew(@event.AppId.Id);
             }

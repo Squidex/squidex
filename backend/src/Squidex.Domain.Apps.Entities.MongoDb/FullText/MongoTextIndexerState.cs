@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
@@ -14,25 +13,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState>, ITextIndexerState
+    public sealed class MongoTextIndexerState : MongoRepositoryBase<MongoTextIndexState>, ITextIndexerState
     {
-        static MongoTextIndexerState()
-        {
-            BsonClassMap.RegisterClassMap<TextContentState>(cm =>
-            {
-                cm.MapIdField(x => x.ContentId);
-
-                cm.MapProperty(x => x.DocIdCurrent)
-                    .SetElementName("c");
-
-                cm.MapProperty(x => x.DocIdNew)
-                    .SetElementName("n").SetIgnoreIfNull(true);
-
-                cm.MapProperty(x => x.DocIdForPublished)
-                    .SetElementName("p").SetIgnoreIfNull(true);
-            });
-        }
-
         public MongoTextIndexerState(IMongoDatabase database, bool setup = false)
             : base(database, setup)
         {
@@ -43,11 +25,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndexerState";
         }
 
-        public Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
+        public async Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
         {
             var documentId = DomainId.Combine(appId, contentId).ToString();
 
-            return Collection.Find(x => x.ContentId == contentId).FirstOrDefaultAsync()!;
+            var result = await Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync()!;
+
+            return result?.ToState();
         }
 
         public Task RemoveAsync(DomainId appId, DomainId contentId)
@@ -60,8 +44,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public Task SetAsync(DomainId appId, TextContentState state)
         {
             var documentId = DomainId.Combine(appId, state.ContentId).ToString();
+            var document = new MongoTextIndexState(documentId, state);
 
-            return Collection.ReplaceOneAsync(x => x.ContentId == state.ContentId, state, UpsertReplace);
+            return Collection.ReplaceOneAsync(x => x.DocumentId == documentId, document, UpsertReplace);
         }
     }
 }

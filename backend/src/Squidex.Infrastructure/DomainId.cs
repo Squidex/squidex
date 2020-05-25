@@ -42,12 +42,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(id, other.id);
+            return string.Equals(ToString(), other.ToString());
         }
 
         public override int GetHashCode()
         {
-            return id?.GetHashCode() ?? 0;
+            return ToString().GetHashCode();
         }
 
         public override string ToString()
@@ -61,6 +61,11 @@ namespace Squidex.Infrastructure
         }
 
         public static implicit operator DomainId(string value)
+        {
+            return new DomainId(value);
+        }
+
+        public static implicit operator DomainId(Guid value)
         {
             return new DomainId(value);
         }
@@ -82,7 +87,7 @@ namespace Squidex.Infrastructure
 
         public static DomainId Combine(NamedId<DomainId> id1, DomainId id2)
         {
-            return new DomainId($"{id1}-{id2}");
+            return new DomainId($"{id1.Id}-{id2}");
         }
 
         public static DomainId Combine(DomainId id1, DomainId id2)

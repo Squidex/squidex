@@ -78,9 +78,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             ISchemaEntity? schema;
 
-            if (Guid.TryParse(name, out var id))
+            if (Guid.TryParse(name, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(AppId, id);
+                schema = await appProvider.GetSchemaAsync(AppId, guid);
             }
             else
             {

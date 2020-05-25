@@ -7,14 +7,15 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Comments.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class CommentsCommand : SquidexCommand, IAppCommand
+    public abstract class SchemaUpdateCommand : SchemaCommand, ISchemaCommand
     {
-        public NamedId<DomainId> AppId { get; set; }
+        public NamedId<DomainId> SchemaId { get; set; }
 
-        public DomainId CommentsId { get; set; }
-
-        public DomainId CommentId { get; set; }
+        public override DomainId AggregateId
+        {
+            get { return DomainId.Combine(AppId, SchemaId.Id); }
+        }
     }
 }

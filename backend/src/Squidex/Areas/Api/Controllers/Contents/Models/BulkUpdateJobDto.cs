@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// An optional id of the content to update.
         /// </summary>
-        public Guid? Id { get; set; }
+        public DomainId? Id { get; set; }
 
         /// <summary>
         /// The data of the content when type is set to 'Upsert'.
