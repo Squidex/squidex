@@ -15,13 +15,20 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class DomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<DomainIdSerializer>
     {
-        private static volatile int isRegistered;
+        private static int isRegistered;
 
         public static void Register()
         {
             if (Interlocked.Increment(ref isRegistered) == 1)
             {
-                BsonSerializer.RegisterSerializer(new DomainIdSerializer());
+                try
+                {
+                    BsonSerializer.RegisterSerializer(new DomainIdSerializer());
+                }
+                catch (BsonSerializationException)
+                {
+                    return;
+                }
             }
         }
 
