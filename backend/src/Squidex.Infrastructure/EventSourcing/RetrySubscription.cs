@@ -45,10 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private void Subscribe()
         {
-            if (currentSubscription == null)
-            {
-                currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
-            }
+            currentSubscription ??= eventStore.CreateSubscription(this, streamFilter, position);
         }
 
         private void Unsubscribe()

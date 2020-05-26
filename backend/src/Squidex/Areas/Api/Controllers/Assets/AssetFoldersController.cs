@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetAssetFolders), new { parentId = request.ParentId, app }, response);
         }
@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToFolderCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -157,7 +157,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             return NoContent();
         }
 
-        private async Task<AssetFolderDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<AssetFolderDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

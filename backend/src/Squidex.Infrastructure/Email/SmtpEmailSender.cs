@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Email
             {
                 var tcs = new TaskCompletionSource<IAsyncResult>();
 
-                var state = socket.BeginConnect(options.Server, options.Port, tcs.SetResult, null);
+                socket.BeginConnect(options.Server, options.Port, tcs.SetResult, null);
 
                 using (ct.Register(() =>
                 {

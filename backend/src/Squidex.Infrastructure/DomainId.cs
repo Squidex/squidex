@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Squidex.Infrastructure
 {
     [TypeConverter(typeof(DomainIdTypeConverter))]
-    public struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
+    public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
         public static readonly DomainId Empty = default;
 

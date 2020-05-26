@@ -99,16 +99,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
                             var document = index.Searcher.Doc(hit.Doc);
 
-                            if (document != null)
-                            {
-                                var idString = document.Get(MetaContentId);
+                            var idString = document?.Get(MetaContentId);
 
-                                if (idString != null)
+                            if (idString != null)
+                            {
+                                if (found.Add(idString))
                                 {
-                                    if (found.Add(idString))
-                                    {
-                                        result.Add(idString);
-                                    }
+                                    result.Add(idString);
                                 }
                             }
                         }

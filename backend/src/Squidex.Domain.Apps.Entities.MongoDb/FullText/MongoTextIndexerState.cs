@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         {
             var documentId = DomainId.Combine(appId, contentId).ToString();
 
-            return Collection.DeleteOneAsync(x => x.ContentId == contentId);
+            return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
         }
 
         public Task SetAsync(DomainId appId, TextContentState state)

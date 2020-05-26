@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Xml;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;

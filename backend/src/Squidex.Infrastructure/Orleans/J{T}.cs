@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Log;
 namespace Squidex.Infrastructure.Orleans
 {
     [Immutable]
-    public struct J<T>
+    public readonly struct J<T>
     {
         public T Value { get; }
 

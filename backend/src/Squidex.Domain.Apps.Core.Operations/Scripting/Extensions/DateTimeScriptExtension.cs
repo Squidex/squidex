@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public DateTimeScriptExtension()
         {
-            formatDate = new Func<DateTime, string, JsValue>(FormatDate);
+            formatDate = FormatDate;
         }
 
         public void Extend(Engine engine)

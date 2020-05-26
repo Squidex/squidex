@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CreateDraft_should_throw_exception_if_not_published()
         {
-            var schema = CreateSchema(false);
+            CreateSchema(false);
 
             var content = CreateContent(Status.Draft);
             var command = new CreateContentDraft();
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
         {
-            var schema = CreateSchema(false);
+            CreateSchema(false);
 
             var content = new ContentState();
             var command = new DeleteContentDraft();

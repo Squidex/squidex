@@ -21,10 +21,10 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public StringScriptExtension()
         {
-            slugify = new StringSlugifyDelegate(Slugify);
+            slugify = Slugify;
 
-            toCamelCase = new Func<string, JsValue>(ToCamelCase);
-            toPascalCase = new Func<string, JsValue>(ToPascalCase);
+            toCamelCase = ToCamelCase;
+            toPascalCase = ToPascalCase;
         }
 
         public void Extend(Engine engine)

@@ -76,8 +76,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var id = DomainId.NewGuid();
 
-            var @event1 = CreateEvent(1, "MyAction", "{}", id);
-            var @event2 = CreateEvent(1, "MyAction", "{}", id);
+            var event1 = CreateEvent(1, "MyAction", "{}", id);
+            var event2 = CreateEvent(1, "MyAction", "{}", id);
 
             A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
                 .ReturnsLazily(async () =>
@@ -88,8 +88,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 });
 
             await Task.WhenAll(
-                sut.HandleAsync(@event1),
-                sut.HandleAsync(@event2));
+                sut.HandleAsync(event1),
+                sut.HandleAsync(event2));
 
             A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();

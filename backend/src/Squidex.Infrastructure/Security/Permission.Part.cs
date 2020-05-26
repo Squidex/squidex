@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Security
 {
     public sealed partial class Permission
     {
-        internal struct Part
+        internal readonly struct Part
         {
             private static readonly char[] AlternativeSeparators = { '|' };
             private static readonly char[] MainSeparators = { '.' };

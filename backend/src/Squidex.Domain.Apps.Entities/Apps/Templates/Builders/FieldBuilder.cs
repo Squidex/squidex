@@ -64,11 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder ShowInList()
         {
-            if (schema.FieldsInReferences == null)
-            {
-                schema.FieldsInReferences = new FieldNames();
-            }
-
+            schema.FieldsInReferences ??= new FieldNames();
             schema.FieldsInReferences.Add(field.Name);
 
             return this;
@@ -76,11 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder ShowInReferences()
         {
-            if (schema.FieldsInLists == null)
-            {
-                schema.FieldsInLists = new FieldNames();
-            }
-
+            schema.FieldsInLists ??= new FieldNames();
             schema.FieldsInLists.Add(field.Name);
 
             return this;

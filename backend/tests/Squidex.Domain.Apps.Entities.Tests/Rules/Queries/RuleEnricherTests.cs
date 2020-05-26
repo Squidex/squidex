@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id))
                 .Returns(new List<RuleStatistics> { stats });
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, requestContext);
 
             A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();

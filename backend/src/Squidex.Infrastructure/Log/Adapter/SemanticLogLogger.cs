@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Log.Adapter
 
             if (state is IReadOnlyList<KeyValuePair<string, object>> parameters)
             {
-                foreach (var (key, value) in parameters)
+                foreach (var (_, value) in parameters)
                 {
                     if (value is Exception ex && exception == null)
                     {

@@ -189,7 +189,7 @@ namespace Squidex.Web.Pipeline
         {
             Guard.NotNull(httpContext, nameof(httpContext));
 
-            int maxKeysSize = GetKeysSize(httpContext);
+            var maxKeysSize = GetKeysSize(httpContext);
 
             httpContext.Features.Set(new CacheContext(maxKeysSize));
         }
@@ -198,7 +198,7 @@ namespace Squidex.Web.Pipeline
         {
             var headers = httpContext.Request.Headers;
 
-            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, out int size))
+            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, out var size))
             {
                 size = cachingOptions.MaxSurrogateKeysSize;
             }
@@ -208,41 +208,23 @@ namespace Squidex.Web.Pipeline
 
         public void AddDependency(DomainId key, long version)
         {
-            if (httpContextAccessor.HttpContext != null)
-            {
-                var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
+            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
-                if (cacheContext != null)
-                {
-                    cacheContext.AddDependency(key.ToString(), version);
-                }
-            }
+            cacheContext?.AddDependency(key.ToString(), version);
         }
 
         public void AddDependency(object? value)
         {
-            if (httpContextAccessor.HttpContext != null)
-            {
-                var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
+            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
-                if (cacheContext != null)
-                {
-                    cacheContext.AddDependency(value);
-                }
-            }
+            cacheContext?.AddDependency(value);
         }
 
         public void AddHeader(string header)
         {
-            if (httpContextAccessor.HttpContext != null)
-            {
-                var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
+            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
-                if (cacheContext != null)
-                {
-                    cacheContext.AddHeader(header);
-                }
-            }
+            cacheContext?.AddHeader(header);
         }
 
         public void Finish(HttpContext httpContext)
@@ -251,10 +233,7 @@ namespace Squidex.Web.Pipeline
 
             var cacheContext = httpContextAccessor.HttpContext.Features.Get<CacheContext>();
 
-            if (cacheContext != null)
-            {
-                cacheContext.Finish(httpContext.Response, stringBuilderPool);
-            }
+            cacheContext?.Finish(httpContext.Response, stringBuilderPool);
         }
     }
 }

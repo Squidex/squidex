@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                         if (options.FocusX.HasValue && options.FocusY.HasValue)
                         {
-                            resizeOptions.CenterCoordinates = new float[]
+                            resizeOptions.CenterCoordinates = new[]
                             {
                                 +(options.FocusX.Value / 2f) + 0.5f,
                                 -(options.FocusX.Value / 2f) + 0.5f

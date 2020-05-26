@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 var documentId = DomainId.Combine(appId, id).ToString();
 
                 var assetFolderEntity =
-                    await Collection.Find(x => x.Id == id && !x.IsDeleted)
+                    await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
                         .FirstOrDefaultAsync();
 
                 return assetFolderEntity;

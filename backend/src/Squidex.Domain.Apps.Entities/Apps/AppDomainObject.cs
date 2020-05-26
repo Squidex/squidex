@@ -482,10 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private void RaiseEvent(AppEvent @event)
         {
-            if (@event.AppId == null)
-            {
-                @event.AppId = NamedId.Of(Snapshot.Id, Snapshot.Name);
-            }
+            @event.AppId ??= Snapshot.NamedId();
 
             RaiseEvent(Envelope.Create(@event));
         }

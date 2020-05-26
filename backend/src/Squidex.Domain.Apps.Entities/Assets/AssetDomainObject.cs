@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Esprima.Ast;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
@@ -176,10 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void RaiseEvent(AppEvent @event)
         {
-            if (@event.AppId == null)
-            {
-                @event.AppId = Snapshot.AppId;
-            }
+            @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));
         }

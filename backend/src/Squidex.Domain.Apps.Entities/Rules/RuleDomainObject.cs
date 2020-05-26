@@ -146,10 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private void RaiseEvent(AppEvent @event)
         {
-            if (@event.AppId == null)
-            {
-                @event.AppId = Snapshot.AppId;
-            }
+            @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));
         }

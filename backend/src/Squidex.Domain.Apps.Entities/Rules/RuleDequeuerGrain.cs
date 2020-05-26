@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                     ExecutionResult = response.Status,
                     Finished = now,
                     JobNext = jobDelay,
-                    JobResult = ComputeJobResult(response.Status, jobDelay),
+                    JobResult = jobResult
                 };
 
                 await ruleEventRepository.UpdateAsync(@event.Job, update);

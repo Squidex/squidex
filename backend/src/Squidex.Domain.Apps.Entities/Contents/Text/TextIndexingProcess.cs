@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     DocId = state.DocIdCurrent,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = data.ToTexts(),
+                    Texts = data.ToTexts()
                 });
 
             await textIndexerState.SetAsync(appId, state);
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
-            if (state != null && state.DocIdForPublished != null)
+            if (state?.DocIdForPublished != null)
             {
                 await IndexAsync(@event,
                     new UpdateIndexEntry
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var state = await textIndexerState.GetAsync(appId, @event.ContentId);
 
-            if (state != null && state.DocIdNew != null)
+            if (state?.DocIdNew != null)
             {
                 await IndexAsync(@event,
                     new UpdateIndexEntry
@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     },
                     new DeleteIndexEntry
                     {
-                        DocId = state.DocIdNew,
+                        DocId = state.DocIdNew
                     });
 
                 state.DocIdNew = null;
@@ -281,7 +281,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     },
                     new DeleteIndexEntry
                     {
-                        DocId = state.DocIdNew ?? NotFound,
+                        DocId = state.DocIdNew ?? NotFound
                     });
 
                 await textIndexerState.RemoveAsync(appId, state.ContentId);

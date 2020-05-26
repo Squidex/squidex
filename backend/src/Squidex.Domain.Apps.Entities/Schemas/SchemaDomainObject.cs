@@ -407,15 +407,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void RaiseEvent(SchemaEvent @event)
         {
-            if (@event.SchemaId == null)
-            {
-                @event.SchemaId = NamedId.Of(Snapshot.Id, Snapshot.SchemaDef.Name);
-            }
-
-            if (@event.AppId == null)
-            {
-                @event.AppId = Snapshot.AppId;
-            }
+            @event.AppId ??= Snapshot.AppId;
+            @event.SchemaId ??= Snapshot.NamedId();
 
             RaiseEvent(Envelope.Create(@event));
         }

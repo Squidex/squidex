@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public void Should_return_type_name_for_name()
         {
-            Assert.Equal(typeof(RuleEnqueuer).Name, sut.Name);
+            Assert.Equal(nameof(RuleEnqueuer), sut.Name);
         }
 
         [Fact]

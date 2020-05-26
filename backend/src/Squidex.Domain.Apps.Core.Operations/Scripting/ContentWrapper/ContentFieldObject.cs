@@ -82,12 +82,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public override void RemoveOwnProperty(string propertyName)
         {
-            if (valuesToDelete == null)
-            {
-                valuesToDelete = new HashSet<string>();
-            }
-
+            valuesToDelete ??= new HashSet<string>();
             valuesToDelete.Add(propertyName);
+
             valueProperties?.Remove(propertyName);
 
             MarkChanged();

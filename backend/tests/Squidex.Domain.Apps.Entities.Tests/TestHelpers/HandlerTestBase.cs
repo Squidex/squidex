@@ -81,11 +81,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             command.ExpectedVersion = EtagVersion.Any;
-
-            if (command.Actor == null)
-            {
-                command.Actor = Actor;
-            }
+            command.Actor ??= Actor;
 
             if (command.User == null && command.Actor.IsSubject)
             {

@@ -76,11 +76,7 @@ namespace Squidex.Infrastructure.Log
                 }
                 catch (Exception ex)
                 {
-                    if (exceptions == null)
-                    {
-                        exceptions = new List<Exception>();
-                    }
-
+                    exceptions ??= new List<Exception>();
                     exceptions.Add(ex);
                 }
             }
