@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, HashSet<DomainId> ids)
         {
-            var documentIds = ids.Select(x => DomainId.Combine(appId, x).ToString());
+            var documentIds = ids.Select(x => DomainId.Combine(appId, x));
 
             var filter =
                 Filter.And(

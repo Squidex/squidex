@@ -18,14 +18,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentState, string>
+    public partial class MongoContentRepository : ISnapshotStore<ContentState, DomainId>
     {
-        Task ISnapshotStore<ContentState, string>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
+        Task ISnapshotStore<ContentState, DomainId>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
         {
             throw new NotSupportedException();
         }
 
-        async Task ISnapshotStore<ContentState, string>.ClearAsync()
+        async Task ISnapshotStore<ContentState, DomainId>.ClearAsync()
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentState, string>.RemoveAsync(string key)
+        async Task ISnapshotStore<ContentState, DomainId>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, string>.ReadAsync(string key)
+        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, DomainId>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentState, string>.WriteAsync(string key, ContentState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentState, DomainId>.WriteAsync(DomainId key, ContentState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -102,8 +102,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
-                IndexedAppId = value.AppId.Id.ToString(),
-                IndexedSchemaId = value.SchemaId.Id.ToString(),
+                IndexedAppId = value.AppId.Id,
+                IndexedSchemaId = value.SchemaId.Id,
                 Version = newVersion
             });
 
@@ -120,9 +120,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
-                Id = value.Id.ToString(),
-                IndexedAppId = value.AppId.Id.ToString(),
-                IndexedSchemaId = value.SchemaId.Id.ToString(),
+                Id = value.Id,
+                IndexedAppId = value.AppId.Id,
+                IndexedSchemaId = value.SchemaId.Id,
                 Version = newVersion
             });
 

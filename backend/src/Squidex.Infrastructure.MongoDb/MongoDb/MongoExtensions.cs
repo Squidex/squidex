@@ -106,7 +106,11 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2).Exclude(exclude3));
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater) where T : IVersionedEntity<TKey> where TKey : notnull
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key,
+            long oldVersion,
+            long newVersion,
+            Func<UpdateDefinition<T>, UpdateDefinition<T>> updater)
+            where T : IVersionedEntity<TKey> where TKey : notnull
         {
             try
             {
@@ -141,10 +145,17 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, T doc) where T : IVersionedEntity<TKey> where TKey : notnull
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key,
+            long oldVersion,
+            long newVersion,
+            T doc)
+            where T : IVersionedEntity<TKey> where TKey : notnull
         {
             try
             {
+                doc.DocumentId = key;
+                doc.Version = newVersion;
+
                 if (oldVersion > EtagVersion.Any)
                 {
                     await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, doc, UpsertReplace);

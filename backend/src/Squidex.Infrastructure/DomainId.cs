@@ -15,6 +15,7 @@ namespace Squidex.Infrastructure
     public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
         public static readonly DomainId Empty = default;
+        public static readonly DomainId EmptyGuid = Guid.Empty;
 
         private readonly string? id;
 

@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (ids != null && ids.Count > 0)
             {
-                var documentIds = ids.Select(x => DomainId.Combine(appId, x).ToString()).ToList();
+                var documentIds = ids.Select(x => DomainId.Combine(appId, x)).ToList();
 
                 if (ids.Count > 1)
                 {

@@ -20,13 +20,13 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     [BsonIgnoreExtraElements]
-    public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<string>
+    public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<DomainId>
     {
         private NamedContentData data;
 
         [BsonId]
         [BsonElement("_id")]
-        public string DocumentId { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
@@ -35,6 +35,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRequired]
         [BsonElement("_si")]
         public DomainId IndexedSchemaId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai")]
+        public NamedId<DomainId> AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("si")]
+        public NamedId<DomainId> SchemaId { get; set; }
 
         [BsonRequired]
         [BsonElement("rf")]
@@ -56,14 +64,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }
-
-        [BsonRequired]
-        [BsonElement("ai")]
-        public NamedId<DomainId> AppId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("si")]
-        public NamedId<DomainId> SchemaId { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("sa")]
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public DomainId UniqueId
         {
-            get { return DomainId.Combine(AppId, Id); }
+            get { return DocumentId; }
         }
 
         public void LoadData(NamedContentData data, Schema schema, DataConverter converter)

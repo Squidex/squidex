@@ -125,17 +125,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<MongoContentEntity> FindAsync(string documentId)
+        public Task<MongoContentEntity> FindAsync(DomainId documentId)
         {
             return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync();
         }
 
-        public Task UpsertVersionedAsync(string documentId, long oldVersion, MongoContentEntity entity)
+        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity);
+            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
         }
 
-        public Task RemoveAsync(string documentId)
+        public Task RemoveAsync(DomainId documentId)
         {
             return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
         }

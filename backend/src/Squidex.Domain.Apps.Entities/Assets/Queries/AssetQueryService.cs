@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var result = new List<IAssetFolderEntity>();
 
-            while (id != default)
+            while (id != default && id != DomainId.EmptyGuid)
             {
                 var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id);
 

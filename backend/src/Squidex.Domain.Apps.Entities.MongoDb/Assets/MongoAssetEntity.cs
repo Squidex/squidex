@@ -15,11 +15,11 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<string>
+    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement("_id")]
-        public string DocumentId { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
@@ -34,16 +34,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public DomainId ParentId { get; set; }
 
         [BsonRequired]
+        [BsonElement("ai")]
+        public NamedId<DomainId> AppId { get; set; }
+
+        [BsonRequired]
         [BsonElement("ct")]
         public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement("mt")]
         public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("an")]
-        public string AppName { get; set; }
 
         [BsonRequired]
         [BsonElement("mm")]
@@ -109,12 +109,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public DomainId UniqueId
         {
-            get { return DomainId.Combine(IndexedAppId, Id); }
-        }
-
-        NamedId<DomainId> IAssetEntity.AppId
-        {
-            get { return NamedId.Of(IndexedAppId, AppName);  }
+            get { return DocumentId; }
         }
     }
 }

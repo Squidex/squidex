@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
         {
-            if (parentId != default)
+            if (parentId != default && parentId != DomainId.EmptyGuid)
             {
                 var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
@@ -70,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 {
                     e("Asset folder does not exist.", nameof(MoveAssetFolder.ParentId));
                 }
-                else if (id != default)
+                else if (id != default && parentId != DomainId.EmptyGuid)
                 {
                     var indexOfThis = path.IndexOf(x => x.Id == id);
                     var indexOfParent = path.IndexOf(x => x.Id == parentId);

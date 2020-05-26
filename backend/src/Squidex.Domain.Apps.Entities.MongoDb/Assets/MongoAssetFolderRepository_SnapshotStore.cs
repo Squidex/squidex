@@ -19,9 +19,9 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderState, string>
+    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderState, DomainId>
     {
-        async Task<(AssetFolderState Value, long Version)> ISnapshotStore<AssetFolderState, string>.ReadAsync(string key)
+        async Task<(AssetFolderState Value, long Version)> ISnapshotStore<AssetFolderState, DomainId>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -38,20 +38,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, string>.WriteAsync(string key, AssetFolderState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetFolderState, DomainId>.WriteAsync(DomainId key, AssetFolderState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
                 var entity = SimpleMapper.Map(value, new MongoAssetFolderEntity());
 
-                entity.Version = newVersion;
                 entity.IndexedAppId = value.AppId.Id;
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, entity);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, string>.ReadAllAsync(Func<AssetFolderState, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetFolderState, DomainId>.ReadAllAsync(Func<AssetFolderState, long, Task> callback, CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -59,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderState, string>.RemoveAsync(string key)
+        async Task ISnapshotStore<AssetFolderState, DomainId>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {

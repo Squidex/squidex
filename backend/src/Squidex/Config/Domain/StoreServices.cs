@@ -109,13 +109,13 @@ namespace Squidex.Config.Domain
                         .As<ISigningCredentialStore>().As<IValidationKeysStore>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, string>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, DomainId>>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, string>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, DomainId>>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentState, string>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentState, DomainId>>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .AsSelf();

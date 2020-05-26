@@ -35,7 +35,10 @@ namespace Migrations.Migrations.MongoDb
                 {
                     var metadata = @event["Metadata"].AsBsonDocument;
 
-                    appId = metadata["AppId"].AsString;
+                    if (metadata.TryGetValue("AppId", out var value))
+                    {
+                        appId = value.AsString;
+                    }
                 }
 
                 if (appId != null)

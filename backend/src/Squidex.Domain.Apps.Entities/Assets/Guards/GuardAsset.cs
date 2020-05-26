@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
         {
-            if (parentId != default)
+            if (parentId != default && parentId != DomainId.EmptyGuid)
             {
                 var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
