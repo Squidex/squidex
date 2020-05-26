@@ -528,5 +528,53 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal("Created", result);
         }
+
+        [Theory]
+        [InlineData("Found in ${ASSET_FILENAME | Upper}.docx", "Found in DONALD DUCK.docx")]
+        [InlineData("Found in ${ASSET_FILENAME| Upper  }.docx", "Found in DONALD DUCK.docx")]
+        [InlineData("Found in ${ASSET_FILENAME|Upper }.docx", "Found in DONALD DUCK.docx")]
+        public void Should_transform_replacements_and_igore_whitepsaces(string script, string expect)
+        {
+            var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal(expect, result);
+        }
+
+        [Theory]
+        [InlineData("Found in ${ASSET_FILENAME | Escape | Upper}.docx", "Found in DONALD\\\"DUCK .docx")]
+        [InlineData("Found in ${ASSET_FILENAME | Escape}.docx", "Found in Donald\\\"Duck .docx")]
+        [InlineData("Found in ${ASSET_FILENAME | Upper}.docx", "Found in DONALD\"DUCK .docx")]
+        [InlineData("Found in ${ASSET_FILENAME | Lower}.docx", "Found in donald\"duck .docx")]
+        [InlineData("Found in ${ASSET_FILENAME | Slugify}.docx", "Found in donald-duck.docx")]
+        [InlineData("Found in ${ASSET_FILENAME | Trim}.docx", "Found in Donald\"Duck.docx")]
+        public void Should_transform_replacements(string script, string expect)
+        {
+            var @event = new EnrichedAssetEvent { FileName = "Donald\"Duck " };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal(expect, result);
+        }
+
+        [Theory]
+        [InlineData("From ${USER_NAME | Escape | Upper}", "From DONALD\\\"DUCK ")]
+        [InlineData("From ${USER_NAME | Escape}", "From Donald\\\"Duck ")]
+        [InlineData("From ${USER_NAME | Upper}", "From DONALD\"DUCK ")]
+        [InlineData("From ${USER_NAME | Lower}", "From donald\"duck ")]
+        [InlineData("From ${USER_NAME | Slugify}", "From donald-duck")]
+        [InlineData("From ${USER_NAME | Trim}", "From Donald\"Duck")]
+        public void Should_transform_replacements_with_simple_pattern(string script, string expect)
+        {
+            var @event = new EnrichedContentEvent { User = user };
+
+            A.CallTo(() => user.Claims)
+                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck ") });
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal(expect, result);
+        }
     }
 }
