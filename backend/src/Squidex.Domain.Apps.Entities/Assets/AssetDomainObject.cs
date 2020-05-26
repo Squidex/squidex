@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Esprima.Ast;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
@@ -39,10 +40,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetQuery = assetQuery;
         }
 
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is AssetCommand;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is AssetCommand assetCommand &&
+                Equals(assetCommand.AppId, Snapshot.AppId) &&
+                Equals(assetCommand.AssetId, Snapshot.Id);
+        }
+
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotDeleted();
-
             switch (command)
             {
                 case CreateAsset createAsset:
@@ -166,14 +182,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private void VerifyNotDeleted()
-        {
-            if (Snapshot.IsDeleted)
-            {
-                throw new DomainException("Asset has already been deleted");
-            }
         }
     }
 }

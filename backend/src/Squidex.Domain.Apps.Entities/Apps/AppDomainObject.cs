@@ -52,10 +52,24 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsArchived;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is CreateApp;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is AppUpdateCommand update &&
+                Equals(update?.AppId?.Id, Snapshot.Id);
+        }
+
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotArchived();
-
             switch (command)
             {
                 case CreateApp createApp:
@@ -464,14 +478,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void ArchiveApp(ArchiveApp command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppArchived()));
-        }
-
-        private void VerifyNotArchived()
-        {
-            if (Snapshot.IsArchived)
-            {
-                throw new DomainException("App has already been archived.");
-            }
         }
 
         private void RaiseEvent(AppEvent @event)

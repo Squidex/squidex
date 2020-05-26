@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        private static void ValidateUpsert(UpsertCommand command, AddValidation e)
+        private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
         {
             if (command.Fields?.Count > 0)
             {
@@ -290,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
+        private static void ValidateFieldNames(IUpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {

@@ -5,22 +5,40 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Commands;
+using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class SynchronizeSchema : UpsertCommand, IAggregateCommand, ISchemaCommand
+    public sealed class SynchronizeSchema : SchemaUpdateCommand, IUpsertCommand, IAggregateCommand, ISchemaCommand
     {
-        public NamedId<DomainId> SchemaId { get; set; }
-
         public bool NoFieldDeletion { get; set; }
 
         public bool NoFieldRecreation { get; set; }
 
-        public override DomainId AggregateId
+        public bool IsPublished { get; set; }
+
+        public string Category { get; set; }
+
+        public SchemaFields Fields { get; set; }
+
+        public FieldNames? FieldsInReferences { get; set; }
+
+        public FieldNames? FieldsInLists { get; set; }
+
+        public SchemaScripts? Scripts { get; set; }
+
+        public SchemaProperties Properties { get; set; }
+
+        public Dictionary<string, string>? PreviewUrls { get; set; }
+
+        public Schema BuildSchema(string name, bool isSingleton)
         {
-            get { return DomainId.Combine(AppId, SchemaId.Id); }
+            IUpsertCommand self = this;
+
+            return self.ToSchema(name, isSingleton);
         }
     }
 }

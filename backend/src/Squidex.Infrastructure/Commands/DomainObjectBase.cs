@@ -40,9 +40,9 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public virtual void Setup(DomainId id)
+        public virtual void Setup(DomainId uniqueId)
         {
-            this.uniqueId = id;
+            this.uniqueId = uniqueId;
 
             OnSetup();
         }
@@ -151,6 +151,26 @@ namespace Squidex.Infrastructure.Commands
                 await EnsureLoadedAsync();
             }
 
+            if (IsDeleted())
+            {
+                throw new DomainException("Object has already been deleted.");
+            }
+
+            if (isUpdate)
+            {
+                if (!CanAccept(command))
+                {
+                    throw new NotSupportedException("Invalid command.");
+                }
+            }
+            else
+            {
+                if (!CanAcceptCreation(command))
+                {
+                    throw new NotSupportedException("Invalid command.");
+                }
+            }
+
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
                 throw new DomainObjectVersionException(uniqueId.ToString(), GetType(), Version, command.ExpectedVersion);
@@ -197,6 +217,21 @@ namespace Squidex.Infrastructure.Commands
             {
                 ClearUncommittedEvents();
             }
+        }
+
+        protected virtual bool CanAcceptCreation(ICommand command)
+        {
+            return true;
+        }
+
+        protected virtual bool CanAccept(ICommand command)
+        {
+            return true;
+        }
+
+        protected virtual bool IsDeleted()
+        {
+            return false;
         }
 
         protected abstract void RestorePreviousSnapshot(T previousSnapshot, long previousVersion);

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("_ai")]
         public DomainId IndexedAppId { get; set; }
 
-        [BsonId]
+        [BsonRequired]
         [BsonElement("id")]
         public DomainId Id { get; set; }
 

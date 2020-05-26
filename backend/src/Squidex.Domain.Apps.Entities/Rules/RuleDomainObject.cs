@@ -37,10 +37,25 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is RuleCommand;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is RuleCommand ruleCommand &&
+                ruleCommand.AppId.Equals(Snapshot.AppId) &&
+                ruleCommand.RuleId.Equals(Snapshot.Id);
+        }
+
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotDeleted();
-
             switch (command)
             {
                 case CreateRule createRule:
@@ -137,14 +152,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private void VerifyNotDeleted()
-        {
-            if (Snapshot.IsDeleted)
-            {
-                throw new DomainException("Rule has already been deleted.");
-            }
         }
     }
 }

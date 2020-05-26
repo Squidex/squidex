@@ -6,13 +6,14 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class DateTimeFieldBuilder : FieldBuilder
     {
-        public DateTimeFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+        public DateTimeFieldBuilder(UpsertSchemaField field, CreateSchema schema)
             : base(field, schema)
         {
         }

@@ -39,6 +39,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.context = context;
         }
 
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is ContentCommand;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is ContentCommand contentCommand &&
+                Equals(contentCommand.AppId, Snapshot.AppId) &&
+                Equals(contentCommand.SchemaId, Snapshot.SchemaId) &&
+                Equals(contentCommand.ContentId, Snapshot.Id);
+        }
+
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();

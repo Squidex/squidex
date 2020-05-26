@@ -694,7 +694,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateSchema { Name = SchemaName });
+            return PublishAsync(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
         }
 
         private Task ExecuteAddArrayFieldAsync()

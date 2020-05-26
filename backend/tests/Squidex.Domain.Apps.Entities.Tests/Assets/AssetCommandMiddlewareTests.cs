@@ -281,7 +281,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
+            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = assetId, File = file }));
         }
 
         private void AssertAssetHasBeenUploaded(long version)
