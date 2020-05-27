@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -27,9 +28,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string Fallback = "null";
-        private static readonly Regex RegexPatternOld = new Regex(@"^(?<Type>[^_]*)_(?<Path>[^\s]*)", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<Type>[^_]*)_(?<Path>[^\s]*)\}", RegexOptions.Compiled);
-        private readonly List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string?> Replacer)>();
+        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))([\s]*\|[\s]*(?<Transform>.*)){0,1}\}", RegexOptions.Compiled);
+        private readonly List<(string Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string?> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
         private readonly IUrlGenerator urlGenerator;
         private readonly IScriptEngine scriptEngine;
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private void AddPattern(string placeholder, Func<EnrichedEvent, string?> generator)
         {
-            patterns.Add((placeholder.ToCharArray(), generator));
+            patterns.Add((placeholder, generator));
         }
 
         public virtual string ToPayload<T>(T @event)
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 {
                     parts.Add((currentOffset, i - currentOffset, default));
 
-                    var (replacement, length) = GetReplacement(span.Slice(i + 1), @event);
+                    var (replacement, length) = GetReplacement(span.Slice(i + 1).ToString(), @event);
 
                     if (length > 0)
                     {
@@ -139,35 +140,61 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return sb.ToString();
         }
 
-        private (string Result, int Length) GetReplacement(ReadOnlySpan<char> test, EnrichedEvent @event)
+        private (string Result, int Length) GetReplacement(string test, EnrichedEvent @event)
         {
+            var (isNewRegex, match) = Match(test);
+
+            if (match.Success)
+            {
+                var (length, text) = ResolveOldPatterns(match, isNewRegex, @event);
+
+                if (length == 0)
+                {
+                    (length, text) = ResolveFromPath(match, @event);
+                }
+
+                return (TransformText(text, match.Groups["Transform"]?.Value), length);
+            }
+
+            return (Fallback, 0);
+        }
+
+        private (bool IsNew, Match) Match(string test)
+        {
+            var match = RegexPatternNew.Match(test);
+
+            if (match.Success)
+            {
+                return (true, match);
+            }
+
+            return (false, RegexPatternOld.Match(test));
+        }
+
+        private (int Length, string? Result) ResolveOldPatterns(Match match, bool isNewRegex, EnrichedEvent @event)
+        {
+            var fullPath = match.Groups["FullPath"].Value;
+
             for (var j = 0; j < patterns.Count; j++)
             {
                 var (pattern, replacer) = patterns[j];
 
-                if (test.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
+                if (fullPath.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (replacer(@event) ?? Fallback, pattern.Length);
+                    var result = replacer(@event);
+
+                    if (isNewRegex)
+                    {
+                        return (match.Length, result);
+                    }
+                    else
+                    {
+                        return (pattern.Length, result);
+                    }
                 }
             }
 
-            var currentString = test.ToString();
-
-            var match = RegexPatternNew.Match(currentString);
-
-            if (!match.Success)
-            {
-                match = RegexPatternOld.Match(currentString);
-            }
-
-            if (match.Success)
-            {
-                var path = match.Groups["Path"].Value.Split('.', StringSplitOptions.RemoveEmptyEntries);
-
-                return (CalculateData(@event, path) ?? Fallback, match.Length);
-            }
-
-            return (Fallback, 0);
+            return default;
         }
 
         private static string TimestampDate(EnrichedEvent @event)
@@ -298,6 +325,48 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return null;
+        }
+
+        private static string TransformText(string? text, string? transform)
+        {
+            if (text != null && !string.IsNullOrWhiteSpace(transform))
+            {
+                var transformations = transform.Split("|", StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var transformation in transformations)
+                {
+                    switch (transformation.Trim().ToLowerInvariant())
+                    {
+                        case "lower":
+                            text = text.ToLowerInvariant();
+                            break;
+                        case "upper":
+                            text = text.ToUpperInvariant();
+                            break;
+                        case "escape":
+                            text = JsonConvert.ToString(text);
+                            text = text[1..^1];
+                            break;
+                        case "slugify":
+                            text = text.Slugify();
+                            break;
+                        case "trim":
+                            text = text.Trim();
+                            break;
+                    }
+                }
+            }
+
+            return text ?? Fallback;
+        }
+
+        private (int Length, string? Result) ResolveFromPath(Match match, EnrichedEvent @event)
+        {
+            var path = match.Groups["Path"].Value.Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+            var result = CalculateData(@event, path);
+
+            return (match.Length, result);
         }
 
         private static string? CalculateData(object @event, string[] path)
