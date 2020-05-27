@@ -76,7 +76,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetCreated
                     {
-                        ParentId = DomainId.EmptyGuid,
                         FileName = file.FileName,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,

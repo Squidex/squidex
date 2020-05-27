@@ -83,10 +83,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 }
                 else if (id != DomainId.Empty)
                 {
-                    var indexOfThis = path.IndexOf(x => x.Id == id);
+                    var indexOfSelf = path.IndexOf(x => x.Id == id);
                     var indexOfParent = path.IndexOf(x => x.Id == parentId);
 
-                    if (indexOfThis >= 0 && indexOfParent > indexOfThis)
+                    if (indexOfSelf >= 0 && indexOfParent > indexOfSelf)
                     {
                         e("Cannot add folder to its own child.", nameof(MoveAssetFolder.ParentId));
                     }

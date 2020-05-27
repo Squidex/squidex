@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Events.Assets
     [EventType(nameof(AssetCreated), 2)]
     public sealed class AssetCreated : AssetEvent
     {
-        public DomainId ParentId { get; set; }
+        public DomainId ParentId { get; set; } = DomainId.EmptyGuid;
 
         public string FileName { get; set; }
 

@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure
 
         public static implicit operator DomainId(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (value == null)
             {
                 return Empty;
             }
