@@ -77,10 +77,8 @@ namespace Squidex.Extensions.Actions.Kafka
                 .WriteProperty("reason", error.Reason));
         }
 
-        public async Task<DeliveryResult<string, string>> Send(string topicName, string key, string value)
+        public async Task<DeliveryResult<string, string>> Send(string topicName, Message<string, string> message)
         {
-            var message = new Message<string, string> { Key = key, Value = value };
-
             return await producer.ProduceAsync(topicName, message);
         }
 
