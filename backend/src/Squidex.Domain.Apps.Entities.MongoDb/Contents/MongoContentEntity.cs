@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public HashSet<DomainId>? ReferencedIds { get; set; }
 
         [BsonRequired]
-        [BsonElement("ci")]
+        [BsonElement("id")]
         public DomainId Id { get; set; }
 
         [BsonRequired]

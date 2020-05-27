@@ -15,14 +15,9 @@ namespace Squidex.Infrastructure
     public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
         public static readonly DomainId Empty = default;
-        public static readonly DomainId EmptyGuid = Guid.Empty;
+        public static readonly DomainId EmptyGuid = new DomainId(Guid.Empty.ToString());
 
         private readonly string? id;
-
-        public bool IsEmpty
-        {
-            get { return id == null; }
-        }
 
         public DomainId(Guid id)
         {
@@ -63,11 +58,21 @@ namespace Squidex.Infrastructure
 
         public static implicit operator DomainId(string value)
         {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return Empty;
+            }
+
             return new DomainId(value);
         }
 
         public static implicit operator DomainId(Guid value)
         {
+            if (value == Guid.Empty)
+            {
+                return EmptyGuid;
+            }
+
             return new DomainId(value);
         }
 

@@ -102,9 +102,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
+        [Obsolete]
         public async Task<IActionResult> GetAssetContent(string id, [FromQuery] AssetContentQueryDto query)
         {
-            var asset = await assetRepository.FindAssetAsync(App.Id, new DomainId(id));
+            var asset = await assetRepository.FindAssetAsync(id);
 
             return await DeliverAssetAsync(asset, query);
         }

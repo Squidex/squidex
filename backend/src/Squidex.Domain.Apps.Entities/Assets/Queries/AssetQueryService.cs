@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var result = new List<IAssetFolderEntity>();
 
-            while (id != default && id != DomainId.EmptyGuid)
+            while (id != DomainId.EmptyGuid && id != DomainId.Empty)
             {
                 var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id);
 
@@ -73,6 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId)
         {
+            if (parentId == DomainId.Empty)
+            {
+                parentId = DomainId.EmptyGuid;
+            }
+
             var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId);
 
             return assetFolders;
@@ -91,6 +96,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
+
+            if (parentId == DomainId.Empty)
+            {
+                parentId = DomainId.EmptyGuid;
+            }
 
             IResultList<IAssetEntity> assets;
 
@@ -111,6 +121,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, DomainId? parentId, Q query)
         {
             var parsedQuery = queryParser.ParseQuery(context, query);
+
+            if (parentId == DomainId.Empty)
+            {
+                parentId = DomainId.EmptyGuid;
+            }
 
             return await assetRepository.QueryAsync(context.App.Id, parentId, parsedQuery);
         }

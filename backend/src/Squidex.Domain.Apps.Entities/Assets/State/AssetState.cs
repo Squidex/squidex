@@ -142,6 +142,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
                     {
                         ParentId = e.ParentId;
 
+                        EnsureProperties();
+
                         return true;
                     }
 

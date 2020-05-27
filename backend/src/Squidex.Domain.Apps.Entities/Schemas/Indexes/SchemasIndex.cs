@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 var id = await GetSchemaIdAsync(appId, name);
 
-                if (id == default)
+                if (id == DomainId.Empty)
                 {
                     return null;
                 }

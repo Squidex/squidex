@@ -172,6 +172,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId id)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetEntity =
+                    await Collection.Find(x => x.Id == id && !x.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                return assetEntity;
+            }
+        }
+
         private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
         {
             return Filter.And(

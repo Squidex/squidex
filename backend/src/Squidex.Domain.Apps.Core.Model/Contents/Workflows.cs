@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow, nameof(workflow));
 
-            if (id.IsEmpty)
+            if (id == DomainId.Empty)
             {
                 return Set(workflow);
             }

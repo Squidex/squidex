@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 var appId = await GetAppIdAsync(name);
 
-                if (appId == default)
+                if (appId == DomainId.Empty)
                 {
                     return null;
                 }

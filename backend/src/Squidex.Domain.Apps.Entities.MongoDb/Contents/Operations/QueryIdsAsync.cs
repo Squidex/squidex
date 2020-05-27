@@ -47,10 +47,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     Filter.Ne(x => x.IsDeleted, true));
 
             var contentEntities =
-                await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
+                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["id"].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)

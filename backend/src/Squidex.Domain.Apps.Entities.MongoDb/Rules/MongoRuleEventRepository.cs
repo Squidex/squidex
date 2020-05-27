@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
-            if (ruleId.HasValue && !ruleId.Value.IsEmpty)
+            if (ruleId.HasValue && ruleId.Value != DomainId.Empty)
             {
                 filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }

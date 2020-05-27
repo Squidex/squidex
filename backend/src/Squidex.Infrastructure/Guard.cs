@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotEmpty(DomainId target, string parameterName)
         {
-            if (target.IsEmpty)
+            if (target == DomainId.Empty)
             {
                 throw new ArgumentException("Value cannot be empty.", parameterName);
             }

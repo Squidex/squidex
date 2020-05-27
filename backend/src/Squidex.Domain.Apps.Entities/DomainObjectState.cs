@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var headers = @event.Headers;
 
-            if (clone.Id == default)
+            if (clone.Id == DomainId.Empty)
             {
                 clone.Id = headers.AggregateId();
             }

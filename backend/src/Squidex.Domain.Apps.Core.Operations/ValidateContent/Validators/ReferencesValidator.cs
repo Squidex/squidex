@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var (schemaId, _) = foundIds.FirstOrDefault(x => x.Id == id);
 
-                    if (schemaId.IsEmpty)
+                    if (schemaId == DomainId.Empty)
                     {
                         addError(context.Path, $"Contains invalid reference '{id}'.");
                     }

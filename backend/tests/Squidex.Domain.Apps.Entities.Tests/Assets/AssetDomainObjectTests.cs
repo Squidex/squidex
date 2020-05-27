@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,6 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetCreated
                     {
+                        ParentId = DomainId.EmptyGuid,
                         FileName = file.FileName,
                         FileSize = file.FileSize,
                         FileHash = command.FileHash,

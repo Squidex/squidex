@@ -19,6 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            if (command.ParentId == DomainId.Empty)
+            {
+                command.ParentId = DomainId.EmptyGuid;
+            }
+
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
@@ -47,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            if (command.ParentId == DomainId.Empty)
+            {
+                command.ParentId = DomainId.EmptyGuid;
+            }
+
             return Validate.It(() => "Cannot move asset.", async e =>
             {
                 if (command.ParentId != oldParentId)
@@ -63,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
         {
-            if (parentId != default && parentId != DomainId.EmptyGuid)
+            if (parentId != DomainId.EmptyGuid)
             {
                 var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
@@ -71,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 {
                     e("Asset folder does not exist.", nameof(MoveAssetFolder.ParentId));
                 }
-                else if (id != default && parentId != DomainId.EmptyGuid)
+                else if (id != DomainId.Empty)
                 {
                     var indexOfThis = path.IndexOf(x => x.Id == id);
                     var indexOfParent = path.IndexOf(x => x.Id == parentId);

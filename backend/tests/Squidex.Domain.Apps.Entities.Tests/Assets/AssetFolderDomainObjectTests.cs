@@ -62,10 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetFolderEvent(new AssetFolderCreated
-                    {
-                        FolderName = command.FolderName
-                    })
+                    CreateAssetFolderEvent(new AssetFolderCreated { FolderName = command.FolderName, ParentId = DomainId.EmptyGuid })
                 );
         }
 

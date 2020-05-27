@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -96,9 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            DomainId? p = parentId != null ? new DomainId(parentId) : null!;
-
-            var assets = await assetQuery.QueryAsync(Context, p, CreateQuery(ids, q));
+            var assets = await assetQuery.QueryAsync(Context, parentId!, CreateQuery(ids, q));
 
             var response = Deferred.Response(() =>
             {
