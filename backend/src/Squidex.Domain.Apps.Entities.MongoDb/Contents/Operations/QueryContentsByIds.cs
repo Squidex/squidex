@@ -82,7 +82,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
-                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
