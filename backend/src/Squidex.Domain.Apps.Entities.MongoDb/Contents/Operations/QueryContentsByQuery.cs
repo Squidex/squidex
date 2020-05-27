@@ -36,6 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.ReferencedIds)
@@ -104,6 +105,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
                 Filter.Ne(x => x.IsDeleted, true)
             };

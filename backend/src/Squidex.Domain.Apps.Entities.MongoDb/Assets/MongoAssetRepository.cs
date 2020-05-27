@@ -186,9 +186,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
         {
+            var documentIds = ids.Select(x => DomainId.Combine(appId, x));
+
             return Filter.And(
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.Id, ids),
+                Filter.In(x => x.Id, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
         }
     }

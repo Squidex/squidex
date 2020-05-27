@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted));
 
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 return EmptyIds;
             }
 
-            var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), schemaId);
+            var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), appId, schemaId);
 
             var contentEntities =
                 await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
@@ -71,10 +72,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["_id"].AsString))).ToList();
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId schemaId)
+        public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId appId, DomainId schemaId)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
                 Filter.Ne(x => x.IsDeleted, true)
             };
