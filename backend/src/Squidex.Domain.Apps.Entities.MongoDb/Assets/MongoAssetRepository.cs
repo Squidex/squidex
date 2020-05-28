@@ -85,16 +85,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                     return ResultList.Create<IAssetEntity>(assetCount.Result, assetItems.Result);
                 }
-                catch (MongoQueryException ex)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {
-                    if (ex.Message.Contains("17406"))
-                    {
-                        throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
                 }
             }
         }
