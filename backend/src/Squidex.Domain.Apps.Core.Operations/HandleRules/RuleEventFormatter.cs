@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         private const string Fallback = "null";
         private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))([\s]*\|[\s]*(?<Transform>.*)){0,1}\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]*)_(?<Path>[\w\.\-]*))[\s]*(\|[\s]*(?<Transform>[^\}]*)){0,1}\}", RegexOptions.Compiled);
         private readonly List<(string Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string?> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
         private readonly IUrlGenerator urlGenerator;

@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [InlineData("Name $APP_NAME has id $APP_ID")]
-        [InlineData("Name ${$EVENT_APPID.NAME} has id ${EVENT_APPID.ID}")]
+        [InlineData("Name ${EVENT_APPID.NAME} has id ${EVENT_APPID.ID}")]
         [InlineData("Script(`Name ${event.appId.name} has id ${event.appId.id}`)")]
         public void Should_format_app_information_from_event(string script)
         {
@@ -543,15 +543,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("Found in ${ASSET_FILENAME | Escape | Upper}.docx", "Found in DONALD\\\"DUCK .docx")]
-        [InlineData("Found in ${ASSET_FILENAME | Escape}.docx", "Found in Donald\\\"Duck .docx")]
-        [InlineData("Found in ${ASSET_FILENAME | Upper}.docx", "Found in DONALD\"DUCK .docx")]
-        [InlineData("Found in ${ASSET_FILENAME | Lower}.docx", "Found in donald\"duck .docx")]
-        [InlineData("Found in ${ASSET_FILENAME | Slugify}.docx", "Found in donald-duck.docx")]
-        [InlineData("Found in ${ASSET_FILENAME | Trim}.docx", "Found in Donald\"Duck.docx")]
-        public void Should_transform_replacements(string script, string expect)
+        [InlineData("Found in ${ASSET_FILENAME | Escape | Upper}.docx", "Found in DONALD\\\"DUCK.docx", "Donald\"Duck")]
+        [InlineData("Found in ${ASSET_FILENAME | Escape}.docx", "Found in Donald\\\"Duck.docx", "Donald\"Duck")]
+        [InlineData("Found in ${ASSET_FILENAME | Upper}.docx", "Found in DONALD DUCK.docx", "Donald Duck")]
+        [InlineData("Found in ${ASSET_FILENAME | Lower}.docx", "Found in donald duck.docx", "Donald Duck")]
+        [InlineData("Found in ${ASSET_FILENAME | Slugify}.docx", "Found in donald-duck.docx", "Donald Duck")]
+        [InlineData("Found in ${ASSET_FILENAME | Trim}.docx", "Found in Donald Duck.docx", "Donald Duck ")]
+        public void Should_transform_replacements(string script, string expect, string name)
         {
-            var @event = new EnrichedAssetEvent { FileName = "Donald\"Duck " };
+            var @event = new EnrichedAssetEvent { FileName = name };
 
             var result = sut.Format(script, @event);
 
@@ -559,18 +559,30 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("From ${USER_NAME | Escape | Upper}", "From DONALD\\\"DUCK ")]
-        [InlineData("From ${USER_NAME | Escape}", "From Donald\\\"Duck ")]
-        [InlineData("From ${USER_NAME | Upper}", "From DONALD\"DUCK ")]
-        [InlineData("From ${USER_NAME | Lower}", "From donald\"duck ")]
-        [InlineData("From ${USER_NAME | Slugify}", "From donald-duck")]
-        [InlineData("From ${USER_NAME | Trim}", "From Donald\"Duck")]
-        public void Should_transform_replacements_with_simple_pattern(string script, string expect)
+        [InlineData("From ${USER_NAME | Escape | Upper}", "From DONALD\\\"DUCK", "Donald\"Duck")]
+        [InlineData("From ${USER_NAME | Escape}", "From Donald\\\"Duck", "Donald\"Duck")]
+        [InlineData("From ${USER_NAME | Upper}", "From DONALD DUCK", "Donald Duck")]
+        [InlineData("From ${USER_NAME | Lower}", "From donald duck", "Donald Duck")]
+        [InlineData("From ${USER_NAME | Slugify}", "From donald-duck", "Donald Duck")]
+        [InlineData("From ${USER_NAME | Trim}", "From Donald Duck", "Donald Duck ")]
+        public void Should_transform_replacements_with_simple_pattern(string script, string expect, string name)
         {
             var @event = new EnrichedContentEvent { User = user };
 
             A.CallTo(() => user.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck ") });
+                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, name) });
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal(expect, result);
+        }
+
+        [Theory]
+        [InlineData("{'Key':'${ASSET_FILENAME | Upper}'}", "{'Key':'DONALD DUCK'}")]
+        [InlineData("{'Key':'${ASSET_FILENAME}'}", "{'Key':'Donald Duck'}")]
+        public void Should_transform_json_examples(string script, string expect)
+        {
+            var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
 
             var result = sut.Format(script, @event);
 
