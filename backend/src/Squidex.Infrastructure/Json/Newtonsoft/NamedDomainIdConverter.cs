@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         private static bool ParseString(ReadOnlySpan<char> value, out DomainId result)
         {
-            result = new DomainId(new string(value));
+            result = new string(value);
 
             return true;
         }

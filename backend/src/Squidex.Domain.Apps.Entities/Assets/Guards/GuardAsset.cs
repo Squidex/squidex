@@ -40,11 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            if (command.ParentId == DomainId.Empty)
-            {
-                command.ParentId = DomainId.EmptyGuid;
-            }
-
             return Validate.It(() => "Cannot upload asset.", async e =>
             {
                 await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
@@ -54,11 +49,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         public static Task CanMove(MoveAsset command, IAssetQueryService assetQuery, DomainId oldParentId)
         {
             Guard.NotNull(command, nameof(command));
-
-            if (command.ParentId == DomainId.Empty)
-            {
-                command.ParentId = DomainId.EmptyGuid;
-            }
 
             return Validate.It(() => "Cannot move asset.", async e =>
             {
@@ -81,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
         private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
         {
-            if (parentId != DomainId.EmptyGuid)
+            if (parentId != DomainId.Empty)
             {
                 var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 

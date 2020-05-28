@@ -14,21 +14,44 @@ namespace Squidex.Infrastructure
     [TypeConverter(typeof(DomainIdTypeConverter))]
     public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
+        private static readonly string EmptyString = Guid.Empty.ToString();
         public static readonly DomainId Empty = default;
-        public static readonly DomainId EmptyGuid = new DomainId(Guid.Empty.ToString());
 
         private readonly string? id;
 
-        public DomainId(Guid id)
+        private DomainId(string id)
         {
-            this.id = id.ToString();
+            this.id = id;
         }
 
-        public DomainId(string id)
+        public static DomainId? CreateNullable(string? value)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            if (value == null)
+            {
+                return null;
+            }
 
-            this.id = id;
+            return new DomainId(value);
+        }
+
+        public static DomainId Create(string value)
+        {
+            if (value == null || string.Equals(value, EmptyString, StringComparison.OrdinalIgnoreCase))
+            {
+                return Empty;
+            }
+
+            return new DomainId(value);
+        }
+
+        public static DomainId Create(Guid value)
+        {
+            if (value == Guid.Empty)
+            {
+                return Empty;
+            }
+
+            return new DomainId(value.ToString());
         }
 
         public override bool Equals(object? obj)
@@ -38,17 +61,17 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(ToString(), other.ToString());
+            return string.Equals(id, other.id);
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return id?.GetHashCode() ?? 0;
         }
 
         public override string ToString()
         {
-            return id ?? "<EMPTY>";
+            return id ?? EmptyString;
         }
 
         public int CompareTo([AllowNull] DomainId other)
@@ -58,22 +81,12 @@ namespace Squidex.Infrastructure
 
         public static implicit operator DomainId(string value)
         {
-            if (value == null)
-            {
-                return Empty;
-            }
-
-            return new DomainId(value);
+            return Create(value);
         }
 
         public static implicit operator DomainId(Guid value)
         {
-            if (value == Guid.Empty)
-            {
-                return EmptyGuid;
-            }
-
-            return new DomainId(value);
+            return Create(value);
         }
 
         public static bool operator ==(DomainId lhs, DomainId rhs)

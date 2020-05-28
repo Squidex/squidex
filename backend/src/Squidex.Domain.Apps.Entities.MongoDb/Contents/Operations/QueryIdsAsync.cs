@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["id"].AsString))).ToList();
+            return contentEntities.Select(x => (DomainId.Create(x["_si"].AsString), DomainId.Create(x["id"].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (new DomainId(x["_si"].AsString), new DomainId(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (DomainId.Create(x["_si"].AsString), DomainId.Create(x["_id"].AsString))).ToList();
         }
 
         public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId appId, DomainId schemaId)

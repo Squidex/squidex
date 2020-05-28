@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetFolderEntities.Select(x => new DomainId(x["_id"].AsString)).ToList();
+                return assetFolderEntities.Select(x => DomainId.Create(x["_id"].AsString)).ToList();
             }
         }
 

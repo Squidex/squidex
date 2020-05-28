@@ -294,9 +294,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] string? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            DomainId? r = ruleId != null ? new DomainId(ruleId) : null!;
-
-            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, r, skip, take);
+            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, DomainId.CreateNullable(ruleId), skip, take);
 
             var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources);
 

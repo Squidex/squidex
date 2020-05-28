@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Events.Assets
     [EventType(nameof(AssetFolderCreated))]
     public sealed class AssetFolderCreated : AssetFolderEvent
     {
-        public DomainId ParentId { get; set; } = DomainId.EmptyGuid;
+        public DomainId ParentId { get; set; }
 
         public string FolderName { get; set; }
     }

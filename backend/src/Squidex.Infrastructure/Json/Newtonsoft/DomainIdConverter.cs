@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             if (reader.TokenType == JsonToken.String)
             {
-                return new DomainId(reader.Value.ToString()!);
+                return DomainId.Create(reader.Value.ToString()!);
             }
 
             if (reader.TokenType == JsonToken.Null && objectType == typeof(DomainId?))

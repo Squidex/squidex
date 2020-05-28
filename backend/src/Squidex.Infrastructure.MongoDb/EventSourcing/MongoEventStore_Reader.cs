@@ -208,10 +208,5 @@ namespace Squidex.Infrastructure.EventSourcing
                 return x => true;
             }
         }
-
-        private static string CreateIndexPath(string property)
-        {
-            return $"Events.Metadata.{property}";
-        }
     }
 }

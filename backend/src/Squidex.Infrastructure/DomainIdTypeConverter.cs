@@ -25,17 +25,17 @@ namespace Squidex.Infrastructure
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string s)
+            if (value is string text)
             {
-                return new DomainId(s);
+                return DomainId.Create(text);
             }
 
-            if (value is Guid g)
+            if (value is Guid guid)
             {
-                return new DomainId(g);
+                return DomainId.Create(guid);
             }
 
-            return default(DomainId);
+            return DomainId.Empty;
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
