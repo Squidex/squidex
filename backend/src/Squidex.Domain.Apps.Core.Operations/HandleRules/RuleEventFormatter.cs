@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         private const string Fallback = "null";
         private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]*)_(?<Path>[\w\.\-]*))[\s]*(\|[\s]*(?<Transform>[^\}]*)){0,1}\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled);
         private readonly List<(string Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string?> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
         private readonly IUrlGenerator urlGenerator;
@@ -153,7 +153,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     (length, text) = ResolveFromPath(match, @event);
                 }
 
-                return (TransformText(text, match.Groups["Transform"]?.Value), length);
+                var result = TransformText(text, match.Groups["Transform"]?.Value);
+
+                if (result == null)
+                {
+                    result = match.Groups["Fallback"]?.Value;
+                }
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    result = Fallback;
+                }
+
+                return (result, length);
             }
 
             return (Fallback, 0);
@@ -327,7 +339,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return null;
         }
 
-        private static string TransformText(string? text, string? transform)
+        private static string? TransformText(string? text, string? transform)
         {
             if (text != null && !string.IsNullOrWhiteSpace(transform))
             {
@@ -357,7 +369,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
             }
 
-            return text ?? Fallback;
+            return text;
         }
 
         private (int Length, string? Result) ResolveFromPath(Match match, EnrichedEvent @event)

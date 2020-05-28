@@ -489,44 +489,26 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal("From client:android", result);
         }
 
-        [Fact]
-        public void Should_format_json()
+        [Theory]
+        [InlineData("${EVENT_INVALID ? file}", "file")]
+        public void Should_provide_fallback_if_path_is_invalid(string script, string expect)
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+            var @event = new EnrichedAssetEvent { FileName = null! };
 
-            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+            var result = sut.Format(script, @event);
 
-            Assert.Equal("{\"actor\":\"client:android\"}", result);
+            Assert.Equal(expect, result);
         }
 
-        [Fact]
-        public void Should_format_json_with_special_characters()
+        [Theory]
+        [InlineData("${ASSET_FILENAME ? file}", "file")]
+        public void Should_provide_fallback_if_value_is_null(string script, string expect)
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "mobile\"android") };
+            var @event = new EnrichedAssetEvent { FileName = null! };
 
-            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+            var result = sut.Format(script, @event);
 
-            Assert.Equal("{\"actor\":\"client:mobile\\\"android\"}", result);
-        }
-
-        [Fact]
-        public void Should_evaluate_script_if_starting_with_whitespace()
-        {
-            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
-
-            var result = sut.Format(" Script(`${event.type}`)", @event);
-
-            Assert.Equal("Created", result);
-        }
-
-        [Fact]
-        public void Should_evaluate_script_if_ends_with_whitespace()
-        {
-            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
-
-            var result = sut.Format("Script(`${event.type}`) ", @event);
-
-            Assert.Equal("Created", result);
+            Assert.Equal(expect, result);
         }
 
         [Theory]
@@ -587,6 +569,46 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = sut.Format(script, @event);
 
             Assert.Equal(expect, result);
+        }
+
+        [Fact]
+        public void Should_format_json()
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+
+            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+
+            Assert.Equal("{\"actor\":\"client:android\"}", result);
+        }
+
+        [Fact]
+        public void Should_format_json_with_special_characters()
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "mobile\"android") };
+
+            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+
+            Assert.Equal("{\"actor\":\"client:mobile\\\"android\"}", result);
+        }
+
+        [Fact]
+        public void Should_evaluate_script_if_starting_with_whitespace()
+        {
+            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+
+            var result = sut.Format(" Script(`${event.type}`)", @event);
+
+            Assert.Equal("Created", result);
+        }
+
+        [Fact]
+        public void Should_evaluate_script_if_ends_with_whitespace()
+        {
+            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+
+            var result = sut.Format("Script(`${event.type}`) ", @event);
+
+            Assert.Equal("Created", result);
         }
     }
 }
