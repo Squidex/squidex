@@ -40,5 +40,9 @@ namespace Squidex.Extensions.Actions.Kafka
         [DataType(DataType.MultilineText)]
         [Formattable]
         public string Headers { get; set; }
+
+        [Display(Name = "Schema (Optional)", Description = "Define a specific AVRO schema in JSON format.")]
+        [DataType(DataType.MultilineText)]
+        public string Schema { get; set; }
     }
 }
