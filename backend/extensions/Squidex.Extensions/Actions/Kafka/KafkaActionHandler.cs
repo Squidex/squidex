@@ -54,7 +54,8 @@ namespace Squidex.Extensions.Actions.Kafka
                 TopicName = action.TopicName,
                 MessageKey = key,
                 MessageValue = value,
-                Headers = ParseHeaders(action.Headers, @event)
+                Headers = ParseHeaders(action.Headers, @event),
+                Schema = action.Schema
             };
 
             return (Description, ruleJob);
@@ -105,13 +106,13 @@ namespace Squidex.Extensions.Actions.Kafka
                     }
                 }
 
-                await kafkaProducer.Send(job.TopicName, message);
+                await kafkaProducer.Send(job.TopicName, message, job.Schema);
 
                 return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
             }
             catch (Exception ex)
             {
-                return Result.Failed(ex, "Push to Kafka failed.");
+                return Result.Failed(ex, $"Push to Kafka failed: {ex}");
             }
         }
     }
@@ -125,5 +126,7 @@ namespace Squidex.Extensions.Actions.Kafka
         public string MessageValue { get; set; }
 
         public Dictionary<string, string> Headers { get; set; }
+
+        public string Schema { get; set; }
     }
 }
