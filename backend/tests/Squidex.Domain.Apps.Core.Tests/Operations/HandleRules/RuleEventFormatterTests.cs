@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -40,6 +39,19 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly Guid assetId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
+        private class FakeContentResolver : IRuleEventFormatter
+        {
+            public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
+            {
+                if (path[0] == "data" && value is JsonArray _)
+                {
+                    return (true, new ValueTask<string?>("Reference"));
+                }
+
+                return default;
+            }
+        }
+
         public RuleEventFormatterTests()
         {
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
@@ -66,9 +78,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            var formatters = Enumerable.Empty<IRuleEventFormatter>();
+            var formatters = new IRuleEventFormatter[]
+            {
+                new PredefinedPatternsFormatter(urlGenerator),
+                new FakeContentResolver()
+            };
 
-            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, urlGenerator, new JintScriptEngine(cache, extensions));
+            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, new JintScriptEngine(cache, extensions));
         }
 
         [Fact]
@@ -480,6 +496,23 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("{\"name\":\"Berlin\"}", result);
+        }
+
+        [Fact]
+        public async Task Should_resolve_reference()
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddJsonValue(JsonValue.Array()))
+            };
+
+            var result = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);
+
+            Assert.Equal("Reference", result);
         }
 
         [Theory]

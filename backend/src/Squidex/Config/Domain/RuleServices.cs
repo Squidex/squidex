@@ -73,6 +73,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EventScriptExtension>()
                 .As<IScriptExtension>();
 
+            services.AddSingletonAs<PredefinedPatternsFormatter>()
+                .As<IRuleEventFormatter>();
+
             services.AddSingletonAs<RuleEventFormatter>()
                 .AsSelf();
 

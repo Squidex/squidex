@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 {
                     if (!data.TryGetValue(segment, out var temp) || temp == null)
                     {
-                        return (null, path.Skip(i).ToArray());
+                        break;
                     }
 
                     current = temp;
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 {
                     if (!field.TryGetValue(segment, out var temp) || temp == null)
                     {
-                        return (null, path.Skip(i).ToArray());
+                        break;
                     }
 
                     current = temp;
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 {
                     if (!json.TryGet(segment, out var temp) || temp == null || temp.Type == JsonValueType.Null)
                     {
-                        return (null, path.Skip(i).ToArray());
+                        break;
                     }
 
                     current = temp;
@@ -84,14 +84,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                     if (property == null)
                     {
-                        return (null, path.Skip(i).ToArray());
+                        break;
                     }
 
                     current = property.GetValue(current);
                 }
                 else
                 {
-                    return (null, path.Skip(i).ToArray());
+                    break;
                 }
             }
 

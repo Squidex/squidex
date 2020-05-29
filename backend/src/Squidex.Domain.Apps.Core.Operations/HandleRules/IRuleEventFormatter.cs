@@ -13,12 +13,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public interface IRuleEventFormatter
     {
-        (bool Match, string, int ReplacedLength) Format(EnrichedEvent @event, string text)
+        (bool Match, string?, int ReplacedLength) Format(EnrichedEvent @event, string text)
         {
             return default;
         }
 
-        (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, string[] path)
+        (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
         {
             return default;
         }
