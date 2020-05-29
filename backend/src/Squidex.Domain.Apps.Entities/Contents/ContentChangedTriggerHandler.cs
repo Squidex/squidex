@@ -40,8 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
         {
-            if (string.Equals(path[0], "data", StringComparison.OrdinalIgnoreCase) &&
-                value is JsonArray array &&
+            if (value is JsonArray array &&
                 array.Count > 0 &&
                 array[0] is JsonString s &&
                 Guid.TryParse(s.Value, out var referenceId))
