@@ -45,10 +45,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 if (path[0] == "data" && value is JsonArray _)
                 {
-                    return (true, new ValueTask<string?>("Reference"));
+                    return (true, GetValueAsync());
                 }
 
                 return default;
+            }
+
+            private async ValueTask<string?> GetValueAsync()
+            {
+                await Task.Delay(5);
+
+                return "Reference";
             }
         }
 
