@@ -23,7 +23,7 @@ namespace Squidex.Extensions.Actions.Email
         {
         }
 
-        protected override (string Description, EmailJob Data) CreateJob(EnrichedEvent @event, EmailAction action)
+        protected override async Task<(string Description, EmailJob Data)> CreateJobAsync(EnrichedEvent @event, EmailAction action)
         {
             var ruleJob = new EmailJob
             {
@@ -31,11 +31,11 @@ namespace Squidex.Extensions.Actions.Email
                 ServerUseSsl = action.ServerUseSsl,
                 ServerPassword = action.ServerPassword,
                 ServerPort = action.ServerPort,
-                ServerUsername = Format(action.ServerUsername, @event),
-                MessageFrom = Format(action.MessageFrom, @event),
-                MessageTo = Format(action.MessageTo, @event),
-                MessageSubject = Format(action.MessageSubject, @event),
-                MessageBody = Format(action.MessageBody, @event)
+                ServerUsername = await FormatAsync(action.ServerUsername, @event),
+                MessageFrom = await FormatAsync(action.MessageFrom, @event),
+                MessageTo = await FormatAsync(action.MessageTo, @event),
+                MessageSubject = await FormatAsync(action.MessageSubject, @event),
+                MessageBody = await FormatAsync(action.MessageBody, @event)
             };
 
             var description = $"Send an email to {action.MessageTo}";

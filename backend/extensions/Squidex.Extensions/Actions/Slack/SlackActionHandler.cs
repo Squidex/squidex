@@ -30,9 +30,9 @@ namespace Squidex.Extensions.Actions.Slack
             this.httpClientFactory = httpClientFactory;
         }
 
-        protected override (string Description, SlackJob Data) CreateJob(EnrichedEvent @event, SlackAction action)
+        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(EnrichedEvent @event, SlackAction action)
         {
-            var body = new { text = Format(action.Text, @event) };
+            var body = new { text = await FormatAsync(action.Text, @event) };
 
             var ruleJob = new SlackJob
             {

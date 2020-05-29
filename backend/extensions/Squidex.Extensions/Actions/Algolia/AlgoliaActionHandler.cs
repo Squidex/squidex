@@ -33,7 +33,7 @@ namespace Squidex.Extensions.Actions.Algolia
             });
         }
 
-        protected override (string Description, AlgoliaJob Data) CreateJob(EnrichedEvent @event, AlgoliaAction action)
+        protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
@@ -45,7 +45,7 @@ namespace Squidex.Extensions.Actions.Algolia
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
                     ContentId = contentId,
-                    IndexName = Format(action.IndexName, @event)
+                    IndexName = await FormatAsync(action.IndexName, @event)
                 };
 
                 if (contentEvent.Type == EnrichedContentEventType.Deleted ||
@@ -64,7 +64,8 @@ namespace Squidex.Extensions.Actions.Algolia
 
                         if (!string.IsNullOrEmpty(action.Document))
                         {
-                            jsonString = Format(action.Document, @event)?.Trim();
+                            jsonString = await FormatAsync(action.Document, @event);
+                            jsonString = jsonString?.Trim();
                         }
                         else
                         {

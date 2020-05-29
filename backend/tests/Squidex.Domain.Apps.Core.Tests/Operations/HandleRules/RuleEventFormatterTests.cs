@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -64,7 +66,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator, new JintScriptEngine(cache, extensions));
+            var formatters = Enumerable.Empty<IRuleEventFormatter>();
+
+            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, urlGenerator, new JintScriptEngine(cache, extensions));
         }
 
         [Fact]
@@ -99,11 +103,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Name $APP_NAME has id $APP_ID")]
         [InlineData("Name ${EVENT_APPID.NAME} has id ${EVENT_APPID.ID}")]
         [InlineData("Script(`Name ${event.appId.name} has id ${event.appId.id}`)")]
-        public void Should_format_app_information_from_event(string script)
+        public async Task Should_format_app_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal($"Name my-app has id {appId.Id}", result);
         }
@@ -111,11 +115,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Name $SCHEMA_NAME has id $SCHEMA_ID")]
         [InlineData("Script(`Name ${event.schemaId.name} has id ${event.schemaId.id}`)")]
-        public void Should_format_schema_information_from_event(string script)
+        public async Task Should_format_schema_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaId };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal($"Name my-schema has id {schemaId.Id}", result);
         }
@@ -123,11 +127,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Full: $TIMESTAMP_DATETIME")]
         [InlineData("Script(`Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
-        public void Should_format_timestamp_information_from_event(string script)
+        public async Task Should_format_timestamp_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal($"Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
         }
@@ -135,11 +139,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Date: $TIMESTAMP_DATE")]
         [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}`)")]
-        public void Should_format_timestamp_date_information_from_event(string script)
+        public async Task Should_format_timestamp_date_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal($"Date: {now:yyyy-MM-dd}", result);
         }
@@ -148,11 +152,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("From $MENTIONED_NAME ($MENTIONED_EMAIL, $MENTIONED_ID)")]
         [InlineData("From ${COMMENT_MENTIONEDUSER.NAME} (${COMMENT_MENTIONEDUSER.EMAIL}, ${COMMENT_MENTIONEDUSER.ID})")]
         [InlineData("Script(`From ${event.mentionedUser.name} (${event.mentionedUser.email}, ${event.mentionedUser.id})`)")]
-        public void Should_format_email_and_display_name_from_mentioned_user(string script)
+        public async Task Should_format_email_and_display_name_from_mentioned_user(string script)
         {
             var @event = new EnrichedCommentEvent { MentionedUser = user };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("From me (me@email.com, user123)", result);
         }
@@ -160,11 +164,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
         [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
-        public void Should_format_email_and_display_name_from_user(string script)
+        public async Task Should_format_email_and_display_name_from_user(string script)
         {
             var @event = new EnrichedContentEvent { User = user };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("From me (me@email.com, user123)", result);
         }
@@ -172,11 +176,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
         [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
-        public void Should_return_null_if_user_is_not_found(string script)
+        public async Task Should_return_null_if_user_is_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("From null (null, null)", result);
         }
@@ -184,11 +188,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
         [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
-        public void Should_format_email_and_display_name_from_client(string script)
+        public async Task Should_format_email_and_display_name_from_client(string script)
         {
             var @event = new EnrichedContentEvent { User = new ClientUser(new RefToken(RefTokenType.Client, "android")) };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("From client:android (client:android, android)", result);
         }
@@ -196,11 +200,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Version: $ASSET_VERSION")]
         [InlineData("Script(`Version: ${event.version}`)")]
-        public void Should_format_base_property(string script)
+        public async Task Should_format_base_property(string script)
         {
             var @event = new EnrichedAssetEvent { Version = 13 };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Version: 13", result);
         }
@@ -208,11 +212,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("File: $ASSET_FILENAME")]
         [InlineData("Script(`File: ${event.fileName}`)")]
-        public void Should_format_asset_file_name_from_event(string script)
+        public async Task Should_format_asset_file_name_from_event(string script)
         {
             var @event = new EnrichedAssetEvent { FileName = "my-file.png" };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("File: my-file.png", result);
         }
@@ -220,11 +224,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Type: $ASSET_ASSETTYPE")]
         [InlineData("Script(`Type: ${event.assetType}`)")]
-        public void Should_format_asset_asset_type_from_event(string script)
+        public async Task Should_format_asset_asset_type_from_event(string script)
         {
             var @event = new EnrichedAssetEvent { AssetType = AssetType.Audio };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Type: Audio", result);
         }
@@ -232,11 +236,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Download at $ASSET_CONTENT_URL")]
         [InlineData("Script(`Download at ${assetContentUrl()}`)")]
-        public void Should_format_asset_content_url_from_event(string script)
+        public async Task Should_format_asset_content_url_from_event(string script)
         {
             var @event = new EnrichedAssetEvent { Id = assetId };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Download at asset-content-url", result);
         }
@@ -244,11 +248,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Download at $ASSET_CONTENT_URL")]
         [InlineData("Script(`Download at ${assetContentUrl()}`)")]
-        public void Should_return_null_when_asset_content_url_not_found(string script)
+        public async Task Should_return_null_when_asset_content_url_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Download at null", result);
         }
@@ -256,11 +260,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Go to $CONTENT_URL")]
         [InlineData("Script(`Go to ${contentUrl()}`)")]
-        public void Should_format_content_url_from_event(string script)
+        public async Task Should_format_content_url_from_event(string script)
         {
             var @event = new EnrichedContentEvent { AppId = appId, Id = contentId, SchemaId = schemaId };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Go to content-url", result);
         }
@@ -268,11 +272,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("Go to $CONTENT_URL")]
         [InlineData("Script(`Go to ${contentUrl()}`)")]
-        public void Should_return_null_when_content_url_when_not_found(string script)
+        public async Task Should_return_null_when_content_url_when_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Go to null", result);
         }
@@ -281,11 +285,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("$CONTENT_STATUS")]
         [InlineData("Script(contentAction())")]
         [InlineData("Script(`${event.status}`)")]
-        public void Should_format_content_status_when_found(string script)
+        public async Task Should_format_content_status_when_found(string script)
         {
             var @event = new EnrichedContentEvent { Status = Status.Published };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Published", result);
         }
@@ -293,11 +297,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_ACTION")]
         [InlineData("Script(contentAction())")]
-        public void Should_return_null_when_content_status_not_found(string script)
+        public async Task Should_return_null_when_content_status_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -305,11 +309,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_ACTION")]
         [InlineData("Script(`${event.type}`)")]
-        public void Should_format_content_actions_when_found(string script)
+        public async Task Should_format_content_actions_when_found(string script)
         {
             var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Created", result);
         }
@@ -317,11 +321,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_ACTION")]
         [InlineData("Script(contentAction())")]
-        public void Should_return_null_when_content_action_not_found(string script)
+        public async Task Should_return_null_when_content_action_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -329,7 +333,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.country.iv")]
         [InlineData("Script(`${event.data.country.iv}`)")]
-        public void Should_return_null_when_field_not_found(string script)
+        public async Task Should_return_null_when_field_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -340,7 +344,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -348,7 +352,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.de")]
         [InlineData("Script(`${event.data.country.iv}`)")]
-        public void Should_return_null_when_partition_not_found(string script)
+        public async Task Should_return_null_when_partition_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -359,7 +363,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -367,7 +371,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv.10")]
         [InlineData("Script(`${event.data.country.de[10]}`)")]
-        public void Should_return_null_when_array_item_not_found(string script)
+        public async Task Should_return_null_when_array_item_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -378,7 +382,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddJsonValue(JsonValue.Array()))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -386,7 +390,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.de.Name")]
         [InlineData("Script(`${event.data.city.de.Location}`)")]
-        public void Should_return_null_when_property_not_found(string script)
+        public async Task Should_return_null_when_property_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -397,7 +401,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("null", result);
         }
@@ -405,7 +409,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv")]
         [InlineData("Script(`${event.data.city.iv}`)")]
-        public void Should_return_plain_value_when_found(string script)
+        public async Task Should_return_plain_value_when_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -416,7 +420,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Berlin", result);
         }
@@ -424,7 +428,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv.0")]
         [InlineData("Script(`${event.data.city.iv[0]}`)")]
-        public void Should_return_plain_value_from_array_when_found(string script)
+        public async Task Should_return_plain_value_from_array_when_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -435,7 +439,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddJsonValue(JsonValue.Array("Berlin")))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Berlin", result);
         }
@@ -443,7 +447,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv.name")]
         [InlineData("Script(`${event.data.city.iv.name}`)")]
-        public void Should_return_plain_value_from_object_when_found(string script)
+        public async Task Should_return_plain_value_from_object_when_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -454,7 +458,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("Berlin", result);
         }
@@ -462,7 +466,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv")]
         [InlineData("Script(`${JSON.stringify(event.data.city.iv)}`)")]
-        public void Should_return_json_string_when_object(string script)
+        public async Task Should_return_json_string_when_object(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -473,40 +477,40 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
             };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("{\"name\":\"Berlin\"}", result);
         }
 
         [Theory]
         [InlineData("Script(`From ${event.actor}`)")]
-        public void Should_format_actor(string script)
+        public async Task Should_format_actor(string script)
         {
             var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("From client:android", result);
         }
 
         [Theory]
         [InlineData("${EVENT_INVALID ? file}", "file")]
-        public void Should_provide_fallback_if_path_is_invalid(string script, string expect)
+        public async Task Should_provide_fallback_if_path_is_invalid(string script, string expect)
         {
             var @event = new EnrichedAssetEvent { FileName = null! };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
 
         [Theory]
         [InlineData("${ASSET_FILENAME ? file}", "file")]
-        public void Should_provide_fallback_if_value_is_null(string script, string expect)
+        public async Task Should_provide_fallback_if_value_is_null(string script, string expect)
         {
             var @event = new EnrichedAssetEvent { FileName = null! };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
@@ -515,11 +519,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Found in ${ASSET_FILENAME | Upper}.docx", "Found in DONALD DUCK.docx")]
         [InlineData("Found in ${ASSET_FILENAME| Upper  }.docx", "Found in DONALD DUCK.docx")]
         [InlineData("Found in ${ASSET_FILENAME|Upper }.docx", "Found in DONALD DUCK.docx")]
-        public void Should_transform_replacements_and_igore_whitepsaces(string script, string expect)
+        public async Task Should_transform_replacements_and_igore_whitepsaces(string script, string expect)
         {
             var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
@@ -531,11 +535,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Found in ${ASSET_FILENAME | Lower}.docx", "Found in donald duck.docx", "Donald Duck")]
         [InlineData("Found in ${ASSET_FILENAME | Slugify}.docx", "Found in donald-duck.docx", "Donald Duck")]
         [InlineData("Found in ${ASSET_FILENAME | Trim}.docx", "Found in Donald Duck.docx", "Donald Duck ")]
-        public void Should_transform_replacements(string script, string expect, string name)
+        public async Task Should_transform_replacements(string script, string expect, string name)
         {
             var @event = new EnrichedAssetEvent { FileName = name };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
@@ -547,14 +551,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("From ${USER_NAME | Lower}", "From donald duck", "Donald Duck")]
         [InlineData("From ${USER_NAME | Slugify}", "From donald-duck", "Donald Duck")]
         [InlineData("From ${USER_NAME | Trim}", "From Donald Duck", "Donald Duck ")]
-        public void Should_transform_replacements_with_simple_pattern(string script, string expect, string name)
+        public async Task Should_transform_replacements_with_simple_pattern(string script, string expect, string name)
         {
             var @event = new EnrichedContentEvent { User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, name) });
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
@@ -562,51 +566,51 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [InlineData("{'Key':'${ASSET_FILENAME | Upper}'}", "{'Key':'DONALD DUCK'}")]
         [InlineData("{'Key':'${ASSET_FILENAME}'}", "{'Key':'Donald Duck'}")]
-        public void Should_transform_json_examples(string script, string expect)
+        public async Task Should_transform_json_examples(string script, string expect)
         {
             var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
 
-            var result = sut.Format(script, @event);
+            var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal(expect, result);
         }
 
         [Fact]
-        public void Should_format_json()
+        public async Task Should_format_json()
         {
             var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
 
-            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+            var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
             Assert.Equal("{\"actor\":\"client:android\"}", result);
         }
 
         [Fact]
-        public void Should_format_json_with_special_characters()
+        public async Task Should_format_json_with_special_characters()
         {
             var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "mobile\"android") };
 
-            var result = sut.Format("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+            var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
             Assert.Equal("{\"actor\":\"client:mobile\\\"android\"}", result);
         }
 
         [Fact]
-        public void Should_evaluate_script_if_starting_with_whitespace()
+        public async Task Should_evaluate_script_if_starting_with_whitespace()
         {
             var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
 
-            var result = sut.Format(" Script(`${event.type}`)", @event);
+            var result = await sut.FormatAsync(" Script(`${event.type}`)", @event);
 
             Assert.Equal("Created", result);
         }
 
         [Fact]
-        public void Should_evaluate_script_if_ends_with_whitespace()
+        public async Task Should_evaluate_script_if_ends_with_whitespace()
         {
             var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
 
-            var result = sut.Format("Script(`${event.type}`) ", @event);
+            var result = await sut.FormatAsync("Script(`${event.type}`) ", @event);
 
             Assert.Equal("Created", result);
         }
