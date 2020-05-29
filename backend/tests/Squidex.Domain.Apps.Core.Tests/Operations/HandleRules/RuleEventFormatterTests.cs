@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -609,6 +610,18 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_transform_json_examples(string script, string expect)
         {
             var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal(expect, result);
+        }
+
+        [Theory]
+        [InlineData("${ASSET_LASTMODIFIED | timestamp_seconds}", "1590769584")]
+        [InlineData("${ASSET_LASTMODIFIED | timestamp_ms}", "1590769584000")]
+        public async Task Should_transform_timestamp(string script, string expect)
+        {
+            var @event = new EnrichedAssetEvent { LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
             var result = await sut.FormatAsync(script, @event);
 

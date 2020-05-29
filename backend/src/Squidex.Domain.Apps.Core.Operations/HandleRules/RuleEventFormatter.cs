@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
@@ -256,6 +257,29 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         case "trim":
                             text = text.Trim();
                             break;
+                        case "timestamp_ms":
+                            {
+                                var instant = InstantPattern.General.Parse(text);
+
+                                if (instant.Success)
+                                {
+                                    text = instant.Value.ToUnixTimeMilliseconds().ToString();
+                                }
+
+                                break;
+                            }
+
+                        case "timestamp_seconds":
+                            {
+                                var instant = InstantPattern.General.Parse(text);
+
+                                if (instant.Success)
+                                {
+                                    text = instant.Value.ToUnixTimeSeconds().ToString();
+                                }
+
+                                break;
+                            }
                     }
                 }
             }

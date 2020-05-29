@@ -70,17 +70,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var referenceId = Guid.NewGuid();
             var referenceValue = JsonValue.Array(referenceId);
 
-            A.CallTo(() => contentLoader.GetAsync(referenceId, EtagVersion.Any))
-                .Returns(new ContentEntity
-                {
-                    Data =
-                        new NamedContentData()
-                            .AddField("field",
-                                new ContentFieldData()
-                                    .AddJsonValue(JsonValue.Create("Hello")))
-                });
+            SetupReference(referenceId);
 
-            var (handled, result) = sut.Format(null!, referenceValue, new[] { "data", "field", "iv" });
+            var (handled, result) = sut.Format(null!, referenceValue, new[] { "data", "field1", "iv" });
 
             Assert.True(handled);
             Assert.Equal("Hello", await result);
@@ -94,18 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 var referenceId = Guid.NewGuid();
                 var referenceValue = JsonValue.Array(referenceId);
 
-                A.CallTo(() => contentLoader.GetAsync(referenceId, EtagVersion.Any))
-                    .Returns(new ContentEntity
-                    {
-                        Data =
-                            new NamedContentData()
-                                .AddField("field1",
-                                    new ContentFieldData()
-                                        .AddJsonValue(JsonValue.Create("Hello")))
-                                .AddField("field2",
-                                    new ContentFieldData()
-                                        .AddJsonValue(JsonValue.Create("World")))
-                    });
+                SetupReference(referenceId);
 
                 var (handled1, result1) = sut.Format(null!, referenceValue, new[] { "data", "field1", "iv" });
                 var (handled2, result2) = sut.Format(null!, referenceValue, new[] { "data", "field2", "iv" });
@@ -127,15 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var referenceId = Guid.NewGuid();
             var referenceValue = JsonValue.Array(referenceId);
 
-            A.CallTo(() => contentLoader.GetAsync(referenceId, EtagVersion.Any))
-                .Returns(new ContentEntity
-                {
-                    Data =
-                        new NamedContentData()
-                            .AddField("field",
-                                new ContentFieldData()
-                                    .AddJsonValue(JsonValue.Create("Hello")))
-                });
+            SetupReference(referenceId);
 
             var (handled, result) = sut.Format(null!, referenceValue, new[] { "data", "invalid", "iv" });
 
@@ -342,6 +315,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
                     .MustHaveHappened();
             }
+        }
+
+        private void SetupReference(Guid referenceId)
+        {
+            A.CallTo(() => contentLoader.GetAsync(referenceId, EtagVersion.Any))
+                .Returns(new ContentEntity
+                {
+                    Data =
+                        new NamedContentData()
+                            .AddField("field1",
+                                new ContentFieldData()
+                                    .AddJsonValue(JsonValue.Create("Hello")))
+                            .AddField("field2",
+                                new ContentFieldData()
+                                    .AddJsonValue(JsonValue.Create("World")))
+                });
         }
     }
 }
