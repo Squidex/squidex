@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
+using ValueTaskSupplement;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -33,21 +34,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             public bool IsText;
 
-            public int Length;
+            public int TextLength;
 
-            public int Offset;
+            public int TextOffset;
 
-            public string Fallback;
+            public string VarFallback;
 
-            public string Transform;
+            public string VarTransform;
 
-            public ValueTask<string?> Replacement;
+            public ValueTask<string?> Var;
 
             public static TextPart Text(int offset, int length)
             {
                 var result = default(TextPart);
-                result.Offset = offset;
-                result.Length = length;
+
+                result.TextOffset = offset;
+                result.TextLength = length;
                 result.IsText = true;
 
                 return result;
@@ -56,9 +58,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             public static TextPart Variable(ValueTask<string?> replacement, string fallback, string transform)
             {
                 var result = default(TextPart);
-                result.Replacement = replacement;
-                result.Fallback = fallback;
-                result.Transform = transform;
+
+                result.Var = replacement;
+                result.VarFallback = fallback;
+                result.VarTransform = transform;
 
                 return result;
             }
@@ -104,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var parts = BuildParts(text, @event);
 
-            await Task.WhenAll(parts.Select(x => x.Replacement.AsTask()));
+            await ValueTaskEx.WhenAll(parts.Select(x => x.Var));
 
             return CombineParts(text, parts);
         }
@@ -119,13 +122,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 if (!part.IsText)
                 {
-                    var result = part.Replacement.Result;
+                    var result = part.Var.Result;
 
-                    result = TransformText(result, part.Transform);
+                    result = TransformText(result, part.VarTransform);
 
                     if (result == null)
                     {
-                        result = part.Fallback;
+                        result = part.VarFallback;
                     }
 
                     if (string.IsNullOrEmpty(result))
@@ -137,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else
                 {
-                    sb.Append(span.Slice(part.Offset, part.Length));
+                    sb.Append(span.Slice(part.TextOffset, part.TextLength));
                 }
             }
 
