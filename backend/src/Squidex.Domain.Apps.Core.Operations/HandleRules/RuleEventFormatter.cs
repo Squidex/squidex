@@ -107,7 +107,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var parts = BuildParts(text, @event);
 
-            await ValueTaskEx.WhenAll(parts.Select(x => x.Var));
+            if (parts.Any(x => !x.Var.IsCompleted))
+            {
+                await ValueTaskEx.WhenAll(parts.Select(x => x.Var));
+            }
 
             return CombineParts(text, parts);
         }
