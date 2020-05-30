@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
                 if (!target.Triggered.HasValue || target.Triggered < from)
                 {
-                    var costs = await usageTracker.GetMonthCostsAsync(target.AppId.Id.ToString(), today);
+                    var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today);
 
                     var limit = target.Limits;
 

@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return formatter.ToEnvelope(@event);
         }
 
-        protected string? Format(Uri uri, EnrichedEvent @event)
+        protected ValueTask<string?> FormatAsync(Uri uri, EnrichedEvent @event)
         {
-            return formatter.Format(uri.ToString(), @event);
+            return formatter.FormatAsync(uri.ToString(), @event);
         }
 
-        protected string? Format(string text, EnrichedEvent @event)
+        protected ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
         {
-            return formatter.Format(text, @event);
+            return formatter.FormatAsync(text, @event);
         }
 
         async Task<(string Description, object Data)> IRuleActionHandler.CreateJobAsync(EnrichedEvent @event, RuleAction action)

@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         {
             state.Value.Names.TryGetValue(name, out var id);
 
-            return Task.FromResult(id);
+            return Task.FromResult(id!);
         }
 
         public Task<List<T>> GetIdsAsync()

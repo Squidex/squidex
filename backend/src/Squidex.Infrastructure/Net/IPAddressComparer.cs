@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Squidex.Infrastructure.Net
@@ -18,8 +19,13 @@ namespace Squidex.Infrastructure.Net
         {
         }
 
-        public int Compare(IPAddress x, IPAddress y)
+        public int Compare([AllowNull] IPAddress x, [AllowNull] IPAddress y)
         {
+            if (x == null || y == null)
+            {
+                return 0;
+            }
+
             var lbytes = x.GetAddressBytes();
             var rbytes = y.GetAddressBytes();
 

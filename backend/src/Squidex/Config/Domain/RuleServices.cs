@@ -44,7 +44,7 @@ namespace Squidex.Config.Domain
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+                .As<IRuleTriggerHandler>().As<IRuleEventFormatter>();
 
             services.AddSingletonAs<ManualTriggerHandler>()
                 .As<IRuleTriggerHandler>();
@@ -72,6 +72,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<EventScriptExtension>()
                 .As<IScriptExtension>();
+
+            services.AddSingletonAs<PredefinedPatternsFormatter>()
+                .As<IRuleEventFormatter>();
 
             services.AddSingletonAs<RuleEventFormatter>()
                 .AsSelf();

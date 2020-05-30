@@ -26,6 +26,23 @@ namespace Squidex.Infrastructure.Queries
 
         public List<SortNode> Sort { get; set; } = new List<SortNode>();
 
+        public HashSet<string> GetAllFields()
+        {
+            var result = new HashSet<string>();
+
+            if (Sort != null)
+            {
+                foreach (var sorting in Sort)
+                {
+                    result.Add(sorting.Path.ToString());
+                }
+            }
+
+            Filter?.AddFields(result);
+
+            return result;
+        }
+
         public override string ToString()
         {
             var parts = new List<string>();

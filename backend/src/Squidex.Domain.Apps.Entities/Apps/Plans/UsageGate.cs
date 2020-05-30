@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             {
                 var appId = app.Id;
 
-                var usage = await apiUsageTracker.GetMonthCostsAsync(appId.ToString(), today);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today);
 
                 if (IsAboutToBeLocked(today, plan.MaxApiCalls, usage) && !HasNotifiedBefore(app.Id))
                 {

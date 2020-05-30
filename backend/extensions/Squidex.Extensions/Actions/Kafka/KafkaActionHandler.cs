@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
@@ -24,29 +27,92 @@ namespace Squidex.Extensions.Actions.Kafka
             this.kafkaProducer = kafkaProducer;
         }
 
-        protected override (string Description, KafkaJob Data) CreateJob(EnrichedEvent @event, KafkaAction action)
+        protected override async Task<(string Description, KafkaJob Data)> CreateJobAsync(EnrichedEvent @event, KafkaAction action)
         {
+            string value, key;
+
+            if (!string.IsNullOrEmpty(action.Payload))
+            {
+                value = await FormatAsync(action.Payload, @event);
+            }
+            else
+            {
+                value = ToEnvelopeJson(@event);
+            }
+
+            if (!string.IsNullOrEmpty(action.Key))
+            {
+                key = await FormatAsync(action.Key, @event);
+            }
+            else
+            {
+                key = @event.Name;
+            }
+
             var ruleJob = new KafkaJob
             {
                 TopicName = action.TopicName,
-                MessageKey = @event.Name,
-                MessageValue = ToEnvelopeJson(@event)
+                MessageKey = key,
+                MessageValue = value,
+                Headers = await ParseHeadersAsync(action.Headers, @event),
+                Schema = action.Schema
             };
 
             return (Description, ruleJob);
+        }
+
+        private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)
+        {
+            if (string.IsNullOrWhiteSpace(headers))
+            {
+                return null;
+            }
+
+            var headersDictionary = new Dictionary<string, string>();
+
+            var lines = headers.Split('\n');
+
+            foreach (var line in lines)
+            {
+                var indexEqual = line.IndexOf('=');
+
+                if (indexEqual > 0 && indexEqual < line.Length - 1)
+                {
+                    var key = line.Substring(0, indexEqual);
+                    var val = line.Substring(indexEqual + 1);
+
+                    val = await FormatAsync(val, @event);
+
+                    headersDictionary[key] = val;
+                }
+            }
+
+            return headersDictionary;
         }
 
         protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct = default)
         {
             try
             {
-                await kafkaProducer.Send(job.TopicName, job.MessageKey, job.MessageValue);
+                var message = new Message<string, string> { Key = job.MessageKey, Value = job.MessageValue };
+
+                if (job.Headers?.Count > 0)
+                {
+                    message.Headers = new Headers();
+
+                    foreach (var header in job.Headers)
+                    {
+                        message.Headers.Add(header.Key, Encoding.UTF8.GetBytes(header.Value));
+                    }
+                }
+
+                await kafkaProducer.Send(job.TopicName, message, job.Schema);
 
                 return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
             }
             catch (Exception ex)
             {
-                return Result.Failed(ex, "Push to Kafka failed.");
+                return Result.Failed(ex, $"Push to Kafka failed: {ex}");
             }
         }
     }
@@ -58,5 +124,9 @@ namespace Squidex.Extensions.Actions.Kafka
         public string MessageKey { get; set; }
 
         public string MessageValue { get; set; }
+
+        public Dictionary<string, string> Headers { get; set; }
+
+        public string Schema { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             });
         }
 
-        protected override (string Description, ElasticSearchJob Data) CreateJob(EnrichedEvent @event, ElasticSearchAction action)
+        protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
@@ -46,7 +46,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
                 var ruleJob = new ElasticSearchJob
                 {
-                    IndexName = Format(action.IndexName, @event),
+                    IndexName = await FormatAsync(action.IndexName, @event),
                     ServerHost = action.Host.ToString(),
                     ServerUser = action.Username,
                     ServerPassword = action.Password,

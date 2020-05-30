@@ -47,19 +47,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
-        public NamedContentData? DataOld
-        {
-            get => GetValue<NamedContentData?>("oldData");
-            set => SetValue(value, "oldData");
-        }
-
         public Status Status
-        {
-            get => GetValue<Status>();
-            set => SetValue(value);
-        }
-
-        public Status StatusOld
         {
             get => GetValue<Status>();
             set => SetValue(value);
@@ -75,6 +63,26 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             get => GetValue<string?>();
             set => SetValue(value);
+        }
+
+        public NamedContentData? DataOld
+        {
+            get => GetValue<NamedContentData?>();
+            set
+            {
+                SetValue(value, "oldData");
+                SetValue(value);
+            }
+        }
+
+        public Status StatusOld
+        {
+            get => GetValue<Status>();
+            set
+            {
+                SetValue(value, "oldStatus");
+                SetValue(value);
+            }
         }
 
         public void SetValue(object? value, [CallerMemberNameAttribute] string? key = null)

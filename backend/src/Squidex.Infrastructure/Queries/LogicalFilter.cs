@@ -25,6 +25,14 @@ namespace Squidex.Infrastructure.Queries
             Type = type;
         }
 
+        public override void AddFields(HashSet<string> fields)
+        {
+            foreach (var filter in Filters)
+            {
+                filter.AddFields(fields);
+            }
+        }
+
         public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)
         {
             return visitor.Visit(this);

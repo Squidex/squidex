@@ -201,7 +201,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task ClearAsync()
         {
-            var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer.Name);
+            var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer!.Name);
 
             log.LogDebug(logContext, (ctx, w) => w
                 .WriteProperty("action", "EventConsumerReset")
@@ -224,7 +224,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;
 
-            var logContext = (eventId, eventType, consumer: eventConsumer.Name);
+            var logContext = (eventId, eventType, consumer: eventConsumer!.Name);
 
             log.LogDebug(logContext, (ctx, w) => w
                 .WriteProperty("action", "HandleEvent")
