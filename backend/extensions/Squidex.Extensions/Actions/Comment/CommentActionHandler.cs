@@ -30,11 +30,11 @@ namespace Squidex.Extensions.Actions.Comment
             this.commandBus = commandBus;
         }
 
-        protected override (string Description, CommentJob Data) CreateJob(EnrichedEvent @event, CommentAction action)
+        protected override async Task<(string Description, CommentJob Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                var text = Format(action.Text, @event);
+                var text = await FormatAsync(action.Text, @event);
 
                 var actor = contentEvent.Actor;
 
