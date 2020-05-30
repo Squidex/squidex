@@ -24,9 +24,9 @@ namespace Squidex.Extensions.Actions.Prerender
             this.httpClientFactory = httpClientFactory;
         }
 
-        protected override (string Description, PrerenderJob Data) CreateJob(EnrichedEvent @event, PrerenderAction action)
+        protected override async Task<(string Description, PrerenderJob Data)> CreateJobAsync(EnrichedEvent @event, PrerenderAction action)
         {
-            var url = Format(action.Url, @event);
+            var url = await FormatAsync(action.Url, @event);
 
             var request = new { prerenderToken = action.Token, url };
             var requestBody = ToJson(request);

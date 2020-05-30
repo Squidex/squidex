@@ -1,5 +1,39 @@
 # Changelog
 
+## 4.4.0 RC - 2020-05-30
+
+### General
+
+* Many improvements to tests and integration of API tests into CI pipeline.
+
+### Features 
+
+* **Rules**: Defined payload, headers and key in kafka rule action.
+* **Rules**: Support for avro serialization in kafka rule action.
+* **Rules**: Define fallback values in formatting, e.g. `${CONTENT_DATA.name.iv ? Fallback}`
+* **Rules**: Define transformations, e.g. `${CONTENT_DATA.name.iv | upper}`: Upper, Lower, Slugify, EncodeJson, Timestamp_Ms, Timestamp_Seconds
+* **Rules**: Resolve reference in formatting, e.g. `${CONTENT_DATA.city.iv.data.name.iv}`
+* **Contents**: Use aggregation framework to order large data sets.
+* **Contents**: Improvements to the bulk endpoint to also allow deletion and updates.
+* **Contents**: Improvements to the enrichment flow of contents when they are queried from the database.
+* **Scripts**: Fallback for `oldStatus`.
+* **Clustering**: Auto restart background processes.
+* **Authentication**: Use local API authentication to bypass the extra call to identity server and to make deployment easier.
+* **Authentication**: Improve performance when checking permissions by simple caching.
+* **Amazon S3**: Allow to upload assets where the stream has no length.
+* **UI**: Additional editor to use checkboxes for references.
+
+### Bugfixes
+
+* **Assets**: Fixed a bug where deleting folders using the UI was not working properly.
+* **Contents**: Use aggregation framework to order large data sets.
+* **Contents**: Fixed a bug where references were cleared in some conditions.
+* **UI**: Do not show first value in dropdowns when no value is defined.
+* **UI**: Fixes for notifications and show newest notifications first.
+* **UI**: Fixed the layout of asset preview in content list.
+* **Authentication**: Fixed a bug where invited collaborators were not added to an app correctly.
+* **Schemas**: Fix for schema synchronizer were some changes were not discovered correctly.
+
 ## 4.3.0 - 2020-04-27
 
 ### Features

@@ -40,7 +40,7 @@ namespace Squidex.Extensions.Actions.Notification
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                var text = Format(action.Text, @event);
+                var text = await FormatAsync(action.Text, @event);
 
                 var actor = userEvent.Actor;
 
@@ -60,7 +60,7 @@ namespace Squidex.Extensions.Actions.Notification
 
                 if (!string.IsNullOrWhiteSpace(action.Url))
                 {
-                    var url = Format(action.Url, @event);
+                    var url = await FormatAsync(action.Url, @event);
 
                     if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
                     {

@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly ILocalCache localCache = A.Fake<ILocalCache>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -43,6 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             sut = new RuleEnqueuer(
                 appProvider,
                 cache,
+                localCache,
                 ruleEventRepository,
                 ruleService);
         }
@@ -80,6 +83,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             await sut.Enqueue(rule.RuleDef, rule.Id, @event);
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now, default))
+                .MustHaveHappened();
+
+            A.CallTo(() => localCache.StartContext())
                 .MustHaveHappened();
         }
 

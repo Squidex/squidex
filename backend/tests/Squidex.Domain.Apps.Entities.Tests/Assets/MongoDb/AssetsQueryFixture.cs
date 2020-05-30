@@ -86,12 +86,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
                                 var asset = new MongoAssetEntity
                                 {
-                                    DocumentId = DomainId.NewGuid().ToString(),
+                                    DocumentId = DomainId.NewGuid(),
                                     Tags = new HashSet<string> { tag },
                                     FileHash = fileName,
                                     FileName = fileName,
                                     FileSize = 1024,
-                                    IndexedAppId = appId.Id.ToString(),
+                                    IndexedAppId = appId.Id,
                                     IsDeleted = false,
                                     IsProtected = false,
                                     Metadata = new AssetMetadata

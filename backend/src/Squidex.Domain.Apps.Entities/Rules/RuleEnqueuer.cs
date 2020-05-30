@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IAppProvider appProvider;
         private readonly IMemoryCache cache;
+        private readonly ILocalCache localCache;
         private readonly RuleService ruleService;
 
         public string Name
@@ -36,18 +38,19 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return ".*"; }
         }
 
-        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, IRuleEventRepository ruleEventRepository,
+        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(cache, nameof(cache));
+            Guard.NotNull(localCache, nameof(localCache));
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
 
             this.appProvider = appProvider;
 
             this.cache = cache;
-
+            this.localCache = localCache;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
         }
@@ -67,11 +70,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
-            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
-
-            foreach (var job in jobs)
+            using (localCache.StartContext())
             {
-                await ruleEventRepository.EnqueueAsync(job, job.Created);
+                var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
+
+                foreach (var job in jobs)
+                {
+                    await ruleEventRepository.EnqueueAsync(job, job.Created);
+                }
             }
         }
 

@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -22,8 +24,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryContentsByQuery : OperationBase
     {
+        private static readonly PropertyPath DefaultOrderField = "mt";
         private readonly DataConverter converter;
         private readonly ITextIndex indexer;
+
+        [BsonIgnoreExtraElements]
+        internal sealed class IdOnly
+        {
+            [BsonId]
+            [BsonElement("_id")]
+            public DomainId Id { get; set; }
+
+            public MongoContentEntity[] Joined { get; set; }
+        }
 
         public QueryContentsByQuery(DataConverter converter, ITextIndex indexer)
         {
@@ -72,12 +85,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
-                var contentItems =
-                    Collection.Find(filter)
-                        .QueryLimit(query)
-                        .QuerySkip(query)
-                        .QuerySort(query)
-                        .ToListAsync();
+                var contentItems = FindContentsAsync(query, filter);
 
                 await Task.WhenAll(contentItems, contentCount);
 
@@ -88,17 +96,53 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
             }
-            catch (MongoQueryException ex)
+            catch (MongoCommandException ex) when (ex.Code == 96)
             {
-                if (ex.Message.Contains("17406"))
-                {
-                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
-                }
-                else
-                {
-                    throw;
-                }
+                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
             }
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            {
+                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
+            }
+        }
+
+        private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter)
+        {
+            if (query.Skip > 0 && !IsSatisfiedByIndex(query))
+            {
+                var projection = Projection.Include("_id");
+
+                foreach (var field in query.GetAllFields())
+                {
+                    projection = Projection.Include(field);
+                }
+
+                var joined =
+                    await Collection.Aggregate()
+                        .Match(filter)
+                        .Project<IdOnly>(projection)
+                        .QuerySort(query)
+                        .QuerySkip(query)
+                        .QueryLimit(query)
+                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.Id, x => x.Joined)
+                        .ToListAsync();
+
+                return joined.Select(x => x.Joined[0]).ToList();
+            }
+
+            var result =
+                Collection.Find(filter)
+                    .QuerySort(query)
+                    .QueryLimit(query)
+                    .QuerySkip(query)
+                    .ToListAsync();
+
+            return await result;
+        }
+
+        private static bool IsSatisfiedByIndex(ClrQuery query)
+        {
+            return query.Sort?.Any(x => x.Path == DefaultOrderField && x.Order == SortOrder.Descending) == true;
         }
 
         private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)

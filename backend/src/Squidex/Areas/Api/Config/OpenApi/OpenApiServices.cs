@@ -73,6 +73,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
             {
                 CreateStringMap<Instant>(JsonFormatStrings.DateTime),
                 CreateStringMap<Language>(),
+                CreateStringMap<DomainId>(),
                 CreateStringMap<RefToken>(),
                 CreateStringMap<Status>(),
 
