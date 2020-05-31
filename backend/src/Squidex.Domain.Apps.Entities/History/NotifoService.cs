@@ -57,24 +57,33 @@ namespace Squidex.Domain.Apps.Entities.History
 
             if (comment.Mentions != null && comment.Mentions.Length > 0)
             {
-                foreach (var userId in comment.Mentions)
+                using (var stream = client.PublishMany())
                 {
-                    var publishRequest = new PublishRequest
+                    foreach (var userId in comment.Mentions)
                     {
-                        AppId = options.AppId
-                    };
+                        var publishRequest = new PublishRequest
+                        {
+                            AppId = options.AppId
+                        };
 
-                    publishRequest.Topic = $"users/{userId}";
+                        publishRequest.Topic = $"users/{userId}";
 
-                    publishRequest.Preformatted = new NotificationFormattingDto();
-                    publishRequest.Preformatted.Subject["en"] = comment.Text;
+                        publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+                        publishRequest.Preformatted = new NotificationFormattingDto();
+                        publishRequest.Preformatted.Subject["en"] = comment.Text;
 
-                    await client.PublishAsync(publishRequest);
+                        publishRequest.CreatorId = comment.Actor.Identifier;
+
+                        await stream.RequestStream.WriteAsync(publishRequest);
+                    }
+
+                    await stream.RequestStream.CompleteAsync();
+                    await stream.ResponseAsync;
                 }
             }
         }
 
-        public async Task PublishAsync(NamedId<Guid> appId, HistoryEvent @event)
+        public async Task PublishAsync(NamedId<Guid> appId, string userId, HistoryEvent @event)
         {
             if (client == null)
             {
@@ -91,8 +100,9 @@ namespace Squidex.Domain.Apps.Entities.History
                 publishRequest.Properties.Add(key, value);
             }
 
-            publishRequest.Properties["AppName"] = appId.Name;
+            publishRequest.Properties["SquidexApp"] = appId.Name;
             publishRequest.TemplateCode = @event.EventType;
+            publishRequest.CreatorId = userId;
 
             SetTopic(appId.Id, @event, publishRequest);
 

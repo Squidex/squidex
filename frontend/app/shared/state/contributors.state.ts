@@ -75,6 +75,10 @@ export class ContributorsState extends State<Snapshot> {
     public contributorsPaged =
         this.projectFrom2(this.contributorsPager, this.filtered, (p, c) => getPagedContributors(c, p));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly contributorsService: ContributorsService,

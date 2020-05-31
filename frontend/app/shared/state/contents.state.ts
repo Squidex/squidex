@@ -81,6 +81,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public statusQueries =
         this.projectFrom(this.statuses, x => buildStatusQueries(x));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
@@ -301,14 +309,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.next(s => ({ ...s, contentsPager }));
 
         return this.loadInternal(false);
-    }
-
-    public get appId() {
-        return this.appsState.appId;
-    }
-
-    public get appName() {
-        return this.appsState.appName;
     }
 
     private replaceContent(content: ContentDto, oldVersion?: Version, updateText?: string) {
