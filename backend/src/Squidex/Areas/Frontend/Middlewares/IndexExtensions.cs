@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
+using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure.Json;
 using Squidex.Web;
 
@@ -50,6 +51,14 @@ namespace Squidex.Areas.Frontend.Middlewares
                 if (values != null)
                 {
                     uiOptions.More["info"] = values.ToString();
+                }
+
+                var notifo = httpContext.RequestServices.GetService<IOptions<NotifoOptions>>();
+
+                if (!string.IsNullOrWhiteSpace(notifo.Value.ApiKey))
+                {
+                    uiOptions.More["notifoKey"] = notifo.Value.ApiKey;
+                    uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
                 }
 
                 var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();

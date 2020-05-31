@@ -34,6 +34,10 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp?.name || '';
     }
 
+    public get appId() {
+        return this.snapshot.selectedApp?.id || '';
+    }
+
     public get appDisplayName() {
         return this.snapshot.selectedApp?.displayName || '';
     }

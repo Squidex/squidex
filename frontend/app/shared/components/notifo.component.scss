@@ -1,0 +1,11 @@
+:host ::ng-deep {
+    .notifo-notifications-button {
+        margin-left: .75rem;
+        margin-right: .75rem;
+        margin-top: .25rem;
+
+        svg {
+            fill: $color-white;
+        }
+    }
+}

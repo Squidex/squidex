@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -21,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
         private readonly List<IHistoryEventsCreator> creators;
         private readonly IHistoryEventRepository repository;
+        private readonly NotifoService notifo;
 
         public string Name
         {
@@ -32,10 +34,11 @@ namespace Squidex.Domain.Apps.Entities.History
             get { return ".*"; }
         }
 
-        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators)
+        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators, NotifoService notifo)
         {
             Guard.NotNull(repository, nameof(repository));
             Guard.NotNull(creators, nameof(creators));
+            Guard.NotNull(notifo, nameof(notifo));
 
             this.creators = creators.ToList();
 
@@ -48,6 +51,8 @@ namespace Squidex.Domain.Apps.Entities.History
             }
 
             this.repository = repository;
+
+            this.notifo = notifo;
         }
 
         public bool Handles(StoredEvent @event)
@@ -62,6 +67,11 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task On(Envelope<IEvent> @event)
         {
+            if (@event.Payload is CommentCreated commentCreated)
+            {
+                await notifo.PublishAsync(commentCreated);
+            }
+
             foreach (var creator in creators)
             {
                 var historyEvent = await creator.CreateEventAsync(@event);
@@ -69,6 +79,8 @@ namespace Squidex.Domain.Apps.Entities.History
                 if (historyEvent != null)
                 {
                     var appEvent = (AppEvent)@event.Payload;
+
+                    await notifo.PublishAsync(appEvent.AppId, historyEvent);
 
                     historyEvent.Actor = appEvent.Actor;
                     historyEvent.AppId = appEvent.AppId.Id;

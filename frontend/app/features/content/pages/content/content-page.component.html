@@ -22,6 +22,8 @@
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
                 <ng-container>
+                    <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents/{{content.id}}"></sqx-notifo>
+
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
                     <div class="dropdown dropdown-options ml-1" *ngIf="content?.canDelete">

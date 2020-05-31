@@ -41,14 +41,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 "changed status of {[Schema]} content to {[Status]}.");
 
             AddEventMessage<ContentStatusScheduled>(
-                "scheduled to change status of {[Schema]} content to {[Status]}.");
+                "scheduled to change status of {[Schemra]} content to {[Status]}.");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             var channel = $"contents.{@event.Headers.AggregateId()}";
-
-            var result = ForEvent(@event.Payload, channel);
 
             if (@event.Payload is SchemaEvent schemaEvent)
             {
@@ -57,7 +55,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     return Task.FromResult<HistoryEvent?>(null);
                 }
 
-                result = result.Param("Schema", schemaEvent.SchemaId.Name);
+                channel = $"schemas.{schemaEvent.SchemaId.Id}.{channel}";
+            }
+
+            var result = ForEvent(@event.Payload, channel);
+
+            if (@event.Payload is SchemaEvent schemaEvent2)
+            {
+                result = result.Param("Schema", schemaEvent2.SchemaId.Name);
             }
 
             if (@event.Payload is ContentStatusChanged contentStatusChanged)

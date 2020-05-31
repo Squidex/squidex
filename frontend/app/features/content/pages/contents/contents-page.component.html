@@ -8,6 +8,8 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col-auto ml-8">
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents"></sqx-notifo>
+
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
                 <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">

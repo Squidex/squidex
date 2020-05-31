@@ -32,6 +32,7 @@ export * from './components/help/help.component';
 export * from './components/history/history-list.component';
 export * from './components/history/history.component';
 export * from './components/history/pipes';
+export * from './components/notifo.component';
 export * from './components/pipes';
 export * from './components/schema-category.component';
 export * from './components/search/queries/filter-comparison.component';
