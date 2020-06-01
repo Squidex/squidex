@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Avro;
 using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
-using GraphQL.Types;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -109,18 +109,48 @@ namespace Squidex.Extensions.Actions.Kafka
                 .WriteProperty("reason", error.Reason));
         }
 
-        public async Task<DeliveryResult<string, string>> Send(string topicName, Message<string, string> message, string schema)
+        public async Task SendAsync(KafkaJob job)
         {
-            if (!string.IsNullOrWhiteSpace(schema))
+            if (!string.IsNullOrWhiteSpace(job.Schema))
             {
-                var value = CreateAvroRecord(message.Value, schema);
+                var value = CreateAvroRecord(job.MessageValue, job.Schema);
 
-                var avroMessage = new Message<string, GenericRecord> { Key = message.Key, Headers = message.Headers, Value = value };
+                var message = new Message<string, GenericRecord> { Value = value };
 
-                await avroProducer.ProduceAsync(topicName, avroMessage);
+                await ProduceAsync(avroProducer, message, job);
+            }
+            else
+            {
+                var message = new Message<string, string> { Value = job.MessageValue };
+
+                await ProduceAsync(textProducer, message, job);
+            }
+        }
+
+        private async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job)
+        {
+            message.Key = job.MessageKey;
+
+            if (job.Headers?.Count > 0)
+            {
+                message.Headers = new Headers();
+
+                foreach (var header in job.Headers)
+                {
+                    message.Headers.Add(header.Key, Encoding.UTF8.GetBytes(header.Value));
+                }
             }
 
-            return await textProducer.ProduceAsync(topicName, message);
+            if (!string.IsNullOrWhiteSpace(job.PartitionKey) && job.PartitionCount > 0)
+            {
+                var partition = Math.Abs(job.PartitionKey.GetHashCode()) % job.PartitionCount;
+
+                await producer.ProduceAsync(new TopicPartition(job.TopicName, partition), message);
+            }
+            else
+            {
+                await producer.ProduceAsync(job.TopicName, message);
+            }
         }
 
         private GenericRecord CreateAvroRecord(string json, string avroSchema)
