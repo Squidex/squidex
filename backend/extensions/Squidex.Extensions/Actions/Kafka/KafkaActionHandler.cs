@@ -25,13 +25,13 @@ namespace Squidex.Extensions.Actions.Kafka
             this.kafkaProducer = kafkaProducer;
         }
 
-        protected override (string Description, KafkaJob Data) CreateJob(EnrichedEvent @event, KafkaAction action)
+        protected override async Task<(string Description, KafkaJob Data)> CreateJobAsync(EnrichedEvent @event, KafkaAction action)
         {
             string value, key;
 
             if (!string.IsNullOrEmpty(action.Payload))
             {
-                value = Format(action.Payload, @event);
+                value = await FormatAsync(action.Payload, @event);
             }
             else
             {
@@ -40,7 +40,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
             if (!string.IsNullOrEmpty(action.Key))
             {
-                key = Format(action.Key, @event);
+                key = await FormatAsync(action.Key, @event);
             }
             else
             {
@@ -52,16 +52,16 @@ namespace Squidex.Extensions.Actions.Kafka
                 TopicName = action.TopicName,
                 MessageKey = key,
                 MessageValue = value,
-                Headers = ParseHeaders(action.Headers, @event),
+                Headers = await ParseHeadersAsync(action.Headers, @event),
                 Schema = action.Schema,
-                PartitionKey = Format(action.PartitionKey, @event),
+                PartitionKey = await FormatAsync(action.PartitionKey, @event),
                 PartitionCount = action.PartitionCount
             };
 
             return (Description, ruleJob);
         }
 
-        private Dictionary<string, string> ParseHeaders(string headers, EnrichedEvent @event)
+        private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)
         {
             if (string.IsNullOrWhiteSpace(headers))
             {
@@ -81,7 +81,7 @@ namespace Squidex.Extensions.Actions.Kafka
                     var key = line.Substring(0, indexEqual);
                     var val = line.Substring(indexEqual + 1);
 
-                    val = Format(val, @event);
+                    val = await FormatAsync(val, @event);
 
                     headersDictionary[key] = val;
                 }

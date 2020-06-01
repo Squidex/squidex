@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using LoremNET;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -102,13 +103,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                             {
                                 for (var i = 0; i < numValues; i++)
                                 {
-                                    var value = i.ToString();
-
                                     var data =
                                         new IdContentData()
                                             .AddField(1,
                                                 new ContentFieldData()
-                                                    .AddJsonValue(JsonValue.Create(value)));
+                                                    .AddJsonValue(JsonValue.Create(i)))
+                                            .AddField(2,
+                                                new ContentFieldData()
+                                                    .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
 
                                     var content = new MongoContentEntity
                                     {
@@ -198,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var schemaDef =
                 new Schema("my-schema")
-                    .AddField(Fields.String(1, "value", Partitioning.Invariant));
+                    .AddField(Fields.Number(1, "value", Partitioning.Invariant));
 
             var schema =
                 Mocks.Schema(
