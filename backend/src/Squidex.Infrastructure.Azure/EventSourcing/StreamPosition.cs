@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private static readonly ObjectPool<StringBuilder> StringBuilderPool =
             new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
-        public static readonly StreamPosition Empty = new StreamPosition();
+        public static readonly StreamPosition Empty = new StreamPosition(0, -1, -1);
 
         public long Timestamp { get; }
 
