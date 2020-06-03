@@ -37,9 +37,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return this;
             }
 
-            protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? streamFilter, string? position)
+            protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? filter, string? position)
             {
-                return store.CreateSubscription(subscriber, streamFilter, position);
+                return store.CreateSubscription(subscriber, filter, position);
             }
         }
 

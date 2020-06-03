@@ -304,9 +304,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return this.AsReference<IEventConsumerGrain>();
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string streamFilter, string? position)
+        protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string filter, string? position)
         {
-            return new RetrySubscription(store, subscriber, streamFilter, position);
+            return new RetrySubscription(store, subscriber, filter, position);
         }
 
         private IEventSubscription CreateSubscription(string streamFilter, string? position)
