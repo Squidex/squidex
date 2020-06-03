@@ -13,11 +13,11 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public sealed class CounterScriptExtension : IScriptExtension
+    public sealed class CounterJintExtension : IJintExtension
     {
         private readonly IGrainFactory grainFactory;
 
-        public CounterScriptExtension(IGrainFactory grainFactory)
+        public CounterJintExtension(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 

@@ -29,11 +29,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
         public JintScriptEngineHelperTests()
         {
-            var extensions = new IScriptExtension[]
+            var extensions = new IJintExtension[]
             {
-                new DateTimeScriptExtension(),
-                new HttpScriptExtension(httpClientFactory),
-                new StringScriptExtension()
+                new DateTimeJintExtension(),
+                new HttpJintExtension(httpClientFactory),
+                new StringJintExtension()
             };
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -51,12 +51,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toCamelCase(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Interpolate(vars, script);
 
             Assert.Equal("helloWorld", result);
         }
@@ -68,12 +68,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toPascalCase(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Interpolate(vars, script);
 
             Assert.Equal("HelloWorld", result);
         }
@@ -85,12 +85,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Interpolate(vars, script);
 
             Assert.Equal("4-haeuser", result);
         }
@@ -102,12 +102,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value, true);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Interpolate(vars, script);
 
             Assert.Equal("4-hauser", result);
         }
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject()
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
 
             Assert.Empty(ex.Errors);
         }
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject('Not valid')
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
 
             Assert.Equal("Not valid", ex.Errors.Single().Message);
         }
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow()
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script));
 
             Assert.Equal("Not allowed", ex.Message);
         }
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow('Operation not allowed')
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script));
 
             Assert.Equal("Operation not allowed", ex.Message);
         }
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
             ";
 
-            var result = await sut.GetAsync(new ScriptContext(), script);
+            var result = await sut.GetAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 }, headers);
             ";
 
-            var result = await sut.GetAsync(new ScriptContext(), script);
+            var result = await sut.GetAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");

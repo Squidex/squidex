@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 return true;
             }
 
-            var context = new ScriptContext
+            var context = new ScriptVars
             {
                 ["event"] = @event
             };

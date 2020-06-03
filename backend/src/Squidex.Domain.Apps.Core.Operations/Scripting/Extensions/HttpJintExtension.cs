@@ -16,12 +16,12 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class HttpScriptExtension : IScriptExtension
+    public sealed class HttpJintExtension : IJintExtension
     {
         private delegate void GetJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null);
         private readonly IHttpClientFactory httpClientFactory;
 
-        public HttpScriptExtension(IHttpClientFactory httpClientFactory)
+        public HttpJintExtension(IHttpClientFactory httpClientFactory)
         {
             Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
 

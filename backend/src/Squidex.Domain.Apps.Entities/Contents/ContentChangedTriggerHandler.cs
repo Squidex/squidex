@@ -14,62 +14,23 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentChangedTriggerHandler : RuleTriggerHandler<ContentChangedTriggerV2, ContentEvent, EnrichedContentEvent>, IRuleEventFormatter
+    public sealed class ContentChangedTriggerHandler : RuleTriggerHandler<ContentChangedTriggerV2, ContentEvent, EnrichedContentEvent>
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IContentLoader contentLoader;
-        private readonly ILocalCache localCache;
 
-        public ContentChangedTriggerHandler(IScriptEngine scriptEngine, IContentLoader contentLoader, ILocalCache localCache)
+        public ContentChangedTriggerHandler(IScriptEngine scriptEngine, IContentLoader contentLoader)
         {
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(contentLoader, nameof(contentLoader));
-            Guard.NotNull(localCache, nameof(localCache));
 
             this.scriptEngine = scriptEngine;
             this.contentLoader = contentLoader;
-            this.localCache = localCache;
-        }
-
-        public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
-        {
-            if (value is JsonArray array &&
-                array.Count > 0 &&
-                array[0] is JsonString s &&
-                Guid.TryParse(s.Value, out var referenceId))
-            {
-                return (true, GetReferenceValueAsync(referenceId, path));
-            }
-
-            return default;
-        }
-
-        private async ValueTask<string?> GetReferenceValueAsync(Guid referenceId, string[] path)
-        {
-            var reference = await GetContentFromCacheAsync(referenceId);
-
-            var (result, remaining) = RuleVariable.GetValue(reference, path);
-
-            if (remaining.Length == 0)
-            {
-                return result?.ToString();
-            }
-
-            return default;
-        }
-
-        private Task<IContentEntity> GetContentFromCacheAsync(Guid referenceId)
-        {
-            var cacheKey = $"FORMAT_REFERENCE_{referenceId}";
-
-            return localCache.GetOrCreate(cacheKey, () => contentLoader.GetAsync(referenceId));
         }
 
         protected override async Task<EnrichedContentEvent?> CreateEnrichedEventAsync(Envelope<ContentEvent> @event)
@@ -183,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return true;
             }
 
-            var context = new ScriptContext
+            var context = new ScriptVars
             {
                 ["event"] = @event
             };

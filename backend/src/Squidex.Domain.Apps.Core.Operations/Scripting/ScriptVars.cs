@@ -16,9 +16,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class ScriptContext : Dictionary<string, object?>
+    public sealed class ScriptVars : Dictionary<string, object?>
     {
-        public ScriptContext()
+        public ScriptVars()
             : base(StringComparer.OrdinalIgnoreCase)
         {
         }

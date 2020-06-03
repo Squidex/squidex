@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -31,5 +32,8 @@ namespace Squidex.Domain.Apps.Core.Rules
         public Instant Created { get; set; }
 
         public Instant Expires { get; set; }
+
+        [JsonIgnore]
+        public Exception? Exception { get; set; }
     }
 }

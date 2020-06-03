@@ -12,14 +12,14 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class StringScriptExtension : IScriptExtension
+    public sealed class StringJintExtension : IJintExtension
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
         private readonly StringSlugifyDelegate slugify;
         private readonly Func<string, JsValue> toCamelCase;
         private readonly Func<string, JsValue> toPascalCase;
 
-        public StringScriptExtension()
+        public StringJintExtension()
         {
             slugify = new StringSlugifyDelegate(Slugify);
 
