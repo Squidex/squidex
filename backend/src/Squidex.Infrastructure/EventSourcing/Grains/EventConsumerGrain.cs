@@ -28,6 +28,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
 
+        private EventConsumerState State
+        {
+            get => state.Value;
+            set => state.Value = value;
+        }
+
         public EventConsumerGrain(
             EventConsumerFactory eventConsumerFactory,
             IGrainState<EventConsumerState> state,
@@ -65,7 +71,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private Immutable<EventConsumerInfo> CreateInfo()
         {
-            return state.Value.ToInfo(eventConsumer!.Name).AsImmutable();
+            return State.ToInfo(eventConsumer!.Name).AsImmutable();
         }
 
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
@@ -87,7 +93,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     }
                 }
 
-                state.Value = state.Value.Handled(storedEvent.Value.EventPosition);
+                State = State.Handled(storedEvent.Value.EventPosition);
             });
         }
 
@@ -102,32 +108,39 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 Unsubscribe();
 
-                state.Value = state.Value.Failed(exception.Value);
+                State = State.Stopped(exception.Value);
             });
         }
 
-        public Task ActivateAsync()
+        public async Task ActivateAsync()
         {
-            if (!state.Value.IsStopped)
+            if (State.IsFailed)
             {
-                Subscribe(state.Value.Position);
-            }
+                await DoAndUpdateStateAsync(() =>
+                {
+                    Subscribe(State.Position);
 
-            return Task.CompletedTask;
+                    State = State.Started();
+                });
+            }
+            else if (!State.IsStopped)
+            {
+                Subscribe(State.Position);
+            }
         }
 
         public async Task<Immutable<EventConsumerInfo>> StartAsync()
         {
-            if (!state.Value.IsStopped)
+            if (!State.IsStopped)
             {
                 return CreateInfo();
             }
 
             await DoAndUpdateStateAsync(() =>
             {
-                Subscribe(state.Value.Position);
+                Subscribe(State.Position);
 
-                state.Value = state.Value.Started();
+                State = State.Started();
             });
 
             return CreateInfo();
@@ -135,7 +148,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public async Task<Immutable<EventConsumerInfo>> StopAsync()
         {
-            if (state.Value.IsStopped)
+            if (State.IsStopped)
             {
                 return CreateInfo();
             }
@@ -144,7 +157,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 Unsubscribe();
 
-                state.Value = state.Value.Stopped();
+                State = State.Stopped();
             });
 
             return CreateInfo();
@@ -160,7 +173,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 Subscribe(null);
 
-                state.Value = state.Value.Reset();
+                State = State.Reset();
             });
 
             return CreateInfo();
@@ -193,7 +206,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     .WriteProperty("status", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer!.Name));
 
-                state.Value = state.Value.Failed(ex);
+                State = State.Stopped(ex);
             }
 
             await state.WriteAsync();
@@ -259,7 +272,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             if (currentSubscription == null)
             {
-                currentSubscription?.StopAsync().Forget();
                 currentSubscription = CreateSubscription(eventConsumer!.EventsFilter, position);
             }
             else

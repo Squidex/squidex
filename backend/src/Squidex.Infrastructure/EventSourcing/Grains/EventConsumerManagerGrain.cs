@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(5));
             RegisterTimer(x => ActivateAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return StartAllAsync();
+            return ActivateAsync(null);
         }
     }
 }

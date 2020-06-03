@@ -108,6 +108,20 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
+        public async Task Should_subscribe_to_event_store_when_failed()
+        {
+            grainState.Value = grainState.Value.Stopped(new InvalidOperationException());
+
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            grainState.Value.Should().BeEquivalentTo(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+                .MustHaveHappened(1, Times.Exactly);
+        }
+
+        [Fact]
         public async Task Should_subscribe_to_event_store_when_not_stopped_in_db()
         {
             await sut.ActivateAsync(consumerName);
