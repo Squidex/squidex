@@ -74,9 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
 
-                foreach (var job in jobs)
+                foreach (var (job, ex) in jobs)
                 {
-                    if (job.Exception != null)
+                    if (ex != null)
                     {
                         await ruleEventRepository.EnqueueAsync(job, null);
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                         {
                             JobResult = RuleJobResult.Failed,
                             ExecutionResult = RuleResult.Failed,
-                            ExecutionDump = job.Exception.ToString(),
+                            ExecutionDump = ex.ToString(),
                             Finished = job.Created
                         });
                     }

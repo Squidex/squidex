@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
+using JobList = System.Collections.Generic.List<(Squidex.Domain.Apps.Core.Rules.RuleJob Job, System.Exception? Exception)>;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -67,12 +68,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<List<RuleJob>> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
+        public virtual async Task<JobList> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
-            var result = new List<RuleJob>();
+            var result = new JobList();
 
             try
             {
@@ -151,20 +152,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         try
                         {
-                            var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
+                            var (description, data) = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
-                            var json = jsonSerializer.Serialize(actionData.Data);
+                            var json = jsonSerializer.Serialize(data);
 
                             job.ActionData = json;
-                            job.Description = actionData.Description;
+                            job.ActionName = actionName;
+                            job.Description = description;
+
+                            result.Add((job, null));
                         }
                         catch (Exception ex)
                         {
                             job.Description = "Failed to create job";
-                            job.Exception = ex;
-                        }
 
-                        result.Add(job);
+                            result.Add((job, ex));
+                        }
                     }
                     catch (Exception ex)
                     {

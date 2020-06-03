@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
