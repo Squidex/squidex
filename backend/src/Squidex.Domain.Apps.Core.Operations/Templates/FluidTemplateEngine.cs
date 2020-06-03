@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Fluid;
-using Squidex.Domain.Apps.Core.Contents;
+using Fluid.Values;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Templates
@@ -40,16 +40,15 @@ namespace Squidex.Domain.Apps.Core.Templates
                     extension.RegisterGlobalTypes(globalTypes);
                 }
 
+                foreach (var type in SquidexCoreModel.Assembly.GetTypes().Where(x => x.IsEnum))
+                {
+                    FluidValue.SetTypeMapping(type, x => new StringValue(x.ToString()));
+                }
+
                 globalTypes.Register<NamedId<Guid>>();
                 globalTypes.Register<NamedId<string>>();
                 globalTypes.Register<NamedId<long>>();
                 globalTypes.Register<RefToken>();
-
-                globalTypes.Register<NamedContentData, object?>(
-                    (value, name) => value.GetOrDefault(name));
-
-                globalTypes.Register<ContentFieldData, object?>(
-                    (value, name) => value.GetOrDefault(name));
             }
         }
 

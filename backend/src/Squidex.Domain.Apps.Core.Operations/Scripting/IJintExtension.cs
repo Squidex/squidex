@@ -9,7 +9,7 @@ using Jint;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public interface IScriptExtension
+    public interface IJintExtension
     {
         void Extend(Engine engine)
         {

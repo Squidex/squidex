@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Fluid;
+using Fluid.Values;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
@@ -16,25 +15,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
     {
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
-            memberAccessStrategy.Register<IUser, object?>((value, name) =>
-            {
-                if (string.Equals(name, "id", StringComparison.OrdinalIgnoreCase))
-                {
-                    return value.Id;
-                }
-
-                if (string.Equals(name, "email", StringComparison.OrdinalIgnoreCase))
-                {
-                    return value.Email;
-                }
-
-                if (string.Equals(name, "name", StringComparison.OrdinalIgnoreCase))
-                {
-                    return value.DisplayName();
-                }
-
-                return value.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase))?.Value;
-            });
+            FluidValue.SetTypeMapping<IUser>(x => new UserFluidValue(x));
         }
     }
 }

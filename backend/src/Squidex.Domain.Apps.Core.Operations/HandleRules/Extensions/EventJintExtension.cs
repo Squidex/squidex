@@ -10,14 +10,14 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.Scripting
+namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 {
-    public sealed class EventScriptExtension : IScriptExtension
+    public sealed class EventJintExtension : IJintExtension
     {
         private delegate JsValue EventDelegate();
         private readonly IUrlGenerator urlGenerator;
 
-        public EventScriptExtension(IUrlGenerator urlGenerator)
+        public EventJintExtension(IUrlGenerator urlGenerator)
         {
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
 

@@ -26,23 +26,23 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class JintScriptEngine : IScriptEngine
     {
-        private readonly IScriptExtension[] extensions;
+        private readonly IJintExtension[] extensions;
         private readonly Parser parser;
 
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
 
         public TimeSpan ExecutionTimeout { get; set; } = TimeSpan.FromMilliseconds(4000);
 
-        public JintScriptEngine(IMemoryCache memoryCache, IEnumerable<IScriptExtension>? extensions = null)
+        public JintScriptEngine(IMemoryCache memoryCache, IEnumerable<IJintExtension>? extensions = null)
         {
             parser = new Parser(memoryCache);
 
-            this.extensions = extensions?.ToArray() ?? Array.Empty<IScriptExtension>();
+            this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
 
-        public async Task ExecuteAsync(ScriptContext context, string script)
+        public async Task ExecuteAsync(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
                     var engine =
-                        CreateEngine(context, true, cts.Token, tcs.TrySetException, true)
+                        CreateEngine(vars, true, cts.Token, tcs.TrySetException, true)
                             .AddDisallow()
                             .AddReject();
 
@@ -73,9 +73,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public async Task<NamedContentData> ExecuteAndTransformAsync(ScriptContext context, string script)
+        public async Task<NamedContentData> ExecuteAndTransformAsync(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
@@ -85,13 +85,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
                     var engine =
-                        CreateEngine(context, true, cts.Token, tcs.TrySetException, true)
+                        CreateEngine(vars, true, cts.Token, tcs.TrySetException, true)
                             .AddDisallow()
                             .AddReject();
 
                     engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
-                        tcs.TrySetResult(context.Data!);
+                        tcs.TrySetResult(vars.Data!);
                     }));
 
                     engine.SetValue("replace", new Action(() =>
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                                 }
                                 else
                                 {
-                                    tcs.TrySetResult(context.Data!);
+                                    tcs.TrySetResult(vars.Data!);
                                 }
                             }
                         }
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                     if (engine.GetValue("async") != true)
                     {
-                        tcs.TrySetResult(context.Data!);
+                        tcs.TrySetResult(vars.Data!);
                     }
 
                     return await tcs.Task;
@@ -126,9 +126,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public async Task<NamedContentData> TransformAsync(ScriptContext context, string script)
+        public async Task<NamedContentData> TransformAsync(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
@@ -137,11 +137,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    var engine = CreateEngine(context, true, cts.Token, tcs.TrySetException, true);
+                    var engine = CreateEngine(vars, true, cts.Token, tcs.TrySetException, true);
 
                     engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
-                        tcs.TrySetResult(context.Data!);
+                        tcs.TrySetResult(vars.Data!);
                     }));
 
                     engine.SetValue("replace", new Action(() =>
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                                 }
                                 else
                                 {
-                                    tcs.TrySetResult(context.Data!);
+                                    tcs.TrySetResult(vars.Data!);
                                 }
                             }
                         }
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                     if (engine.GetValue("async") != true)
                     {
-                        tcs.TrySetResult(context.Data!);
+                        tcs.TrySetResult(vars.Data!);
                     }
 
                     return await tcs.Task;
@@ -176,14 +176,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public bool Evaluate(ScriptContext context, string script)
+        public bool Evaluate(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             try
             {
-                var engine = CreateEngine(context, false);
+                var engine = CreateEngine(vars, false);
 
                 Execute(engine, script);
 
@@ -197,14 +197,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public string? Interpolate(ScriptContext context, string script)
+        public string? Interpolate(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             try
             {
-                var engine = CreateEngine(context, false);
+                var engine = CreateEngine(vars, false);
 
                 Execute(engine, script);
 
@@ -218,9 +218,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public Task<IJsonValue> GetAsync(ScriptContext context, string script)
+        public Task<IJsonValue> GetAsync(ScriptVars vars, string script)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ExecutionTimeout))
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     tcs.TrySetCanceled();
                 }))
                 {
-                    var engine = CreateEngine(context, true, cts.Token, ex => tcs.TrySetException(ex), true);
+                    var engine = CreateEngine(vars, true, cts.Token, ex => tcs.TrySetException(ex), true);
 
                     engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        private Engine CreateEngine(ScriptContext context, bool nested, CancellationToken cancellationToken = default, ExceptionHandler? exceptionHandler = null, bool async = false)
+        private Engine CreateEngine(ScriptVars vars, bool nested, CancellationToken cancellationToken = default, ExceptionHandler? exceptionHandler = null, bool async = false)
         {
             var engine = new Engine(options =>
             {
@@ -271,16 +271,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var executionContext = new ExecutionContext(engine, cancellationToken, exceptionHandler);
+            var executionvars = new ExecutionContext(engine, cancellationToken, exceptionHandler);
 
-            context.Add(executionContext, nested);
+            vars.Add(executionvars, nested);
 
             foreach (var extension in extensions)
             {
-                extension.Extend(executionContext, async);
+                extension.Extend(executionvars, async);
             }
 
-            return executionContext.Engine;
+            return executionvars.Engine;
         }
 
         private void Execute(Engine engine, string script)

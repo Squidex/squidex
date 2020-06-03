@@ -14,12 +14,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public sealed class ExpressionsAttribute : DataAttribute
     {
-        private readonly string script;
+        private readonly string? script;
         private readonly string? interpolationOld;
         private readonly string? interpolationNew;
-        private readonly string liquid;
+        private readonly string? liquid;
 
-        public ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string script, string liquid)
+        public ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string? script, string? liquid)
         {
             this.liquid = liquid;
 
@@ -31,25 +31,31 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
-            if (interpolationNew != null)
-            {
-                yield return new object[] { interpolationNew };
-            }
-
             if (interpolationOld != null)
             {
                 yield return new object[] { interpolationOld };
             }
 
-            yield return new object[]
+            if (interpolationNew != null)
             {
-                string.Format("Script(`{0}`)", script)
-            };
+                yield return new object[] { interpolationNew };
+            }
 
-            yield return new object[]
+            if (script != null)
             {
-                string.Format("Liquid({0})", liquid)
-            };
+                yield return new object[]
+                {
+                    string.Format("Script(`{0}`)", script)
+                };
+            }
+
+            if (liquid != null)
+            {
+                yield return new object[]
+                {
+                    string.Format("Liquid({0})", liquid)
+                };
+            }
         }
     }
 }

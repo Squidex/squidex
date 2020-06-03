@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(condition?.Expression))
             {
-                var context = new ScriptContext
+                var context = new ScriptVars
                 {
                     ["data"] = data
                 };

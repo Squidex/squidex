@@ -8,8 +8,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Scripting;
+using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -70,8 +71,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleRegistry>()
                 .As<ITypeProvider>().AsSelf();
 
-            services.AddSingletonAs<EventScriptExtension>()
-                .As<IScriptExtension>();
+            services.AddSingletonAs<EventJintExtension>()
+                .As<IJintExtension>();
+
+            services.AddSingletonAs<EventFluidExtensions>()
+                .As<IFluidExtension>();
 
             services.AddSingletonAs<PredefinedPatternsFormatter>()
                 .As<IRuleEventFormatter>();

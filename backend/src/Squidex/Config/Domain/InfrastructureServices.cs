@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Fluid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,8 @@ using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
@@ -60,17 +63,29 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
 
-            services.AddSingletonAs<CounterScriptExtension>()
-                .As<IScriptExtension>();
+            services.AddSingletonAs<CounterJintExtension>()
+                .As<IJintExtension>();
 
-            services.AddSingletonAs<DateTimeScriptExtension>()
-                .As<IScriptExtension>();
+            services.AddSingletonAs<DateTimeJintExtension>()
+                .As<IJintExtension>();
 
-            services.AddSingletonAs<StringScriptExtension>()
-                .As<IScriptExtension>();
+            services.AddSingletonAs<StringJintExtension>()
+                .As<IJintExtension>();
 
-            services.AddSingletonAs<HttpScriptExtension>()
-                .As<IScriptExtension>();
+            services.AddSingletonAs<HttpJintExtension>()
+                .As<IJintExtension>();
+
+            services.AddSingletonAs<FluidTemplateEngine>()
+                .AsOptional<ITemplateEngine>();
+
+            services.AddSingletonAs<ContentFluidExtension>()
+                .AsOptional<IFluidExtension>();
+
+            services.AddSingletonAs<DateTimeFluidExtension>()
+                .AsOptional<IFluidExtension>();
+
+            services.AddSingletonAs<UserFluidExtension>()
+                .AsOptional<IFluidExtension>();
 
             services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }

@@ -113,12 +113,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             if (TryGetScript(text.Trim(), out var script))
             {
-                var context = new ScriptContext
+                var vars = new ScriptVars
                 {
                     ["event"] = @event
                 };
 
-                return scriptEngine.Interpolate(context, script);
+                return scriptEngine.Interpolate(vars, script);
             }
 
             var parts = BuildParts(text, @event);
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         case "trim":
                             text = text.Trim();
                             break;
-                        case "timestamp_ms":
+                        case "timestamp":
                             {
                                 var instant = InstantPattern.General.Parse(text);
 
@@ -291,7 +291,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                                 break;
                             }
 
-                        case "timestamp_seconds":
+                        case "timestamp_sec":
                             {
                                 var instant = InstantPattern.General.Parse(text);
 

@@ -15,17 +15,17 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public class CounterScriptExtensionTests
+    public class CounterJintExtensionTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICounterGrain counter = A.Fake<ICounterGrain>();
         private readonly JintScriptEngine sut;
 
-        public CounterScriptExtensionTests()
+        public CounterJintExtensionTests()
         {
-            var extensions = new IScriptExtension[]
+            var extensions = new IJintExtension[]
             {
-                new CounterScriptExtension(grainFactory)
+                new CounterJintExtension(grainFactory)
             };
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 return resetCounter('my', 4);
             ";
 
-            var context = new ScriptContext
+            var context = new ScriptVars
             {
                 ["appId"] = appId
             };
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 return incrementCounter('my');
             ";
 
-            var context = new ScriptContext
+            var context = new ScriptVars
             {
                 ["appId"] = appId
             };

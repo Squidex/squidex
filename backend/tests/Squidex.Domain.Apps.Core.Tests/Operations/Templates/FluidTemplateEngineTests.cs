@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Infrastructure;
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         {
             var extensions = new IFluidExtension[]
             {
-                new DateTimeFluidExtensions()
+                new DateTimeFluidExtension()
             };
 
             sut = new FluidTemplateEngine(extensions);
@@ -66,6 +67,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         }
 
         [Fact]
+        public async Task Should_format_enum()
+        {
+            var value = new
+            {
+                Type = EnrichedContentEventType.Created
+            };
+
+            var template = "{{ e.type }}";
+
+            var (result, errors) = await RenderAync(template, value);
+
+            Assert.Empty(errors);
+            Assert.Equal(value.Type.ToString(), result);
+        }
+
+        [Fact]
         public async Task Should_format_date()
         {
             var now = DateTime.UtcNow;
@@ -75,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Timestamp = now
             };
 
-            var template = "{{ e.timestamp | formatDate: 'yyyy-MM-dd-hh-mm-ss' }}";
+            var template = "{{ e.timestamp | format_date: 'yyyy-MM-dd-hh-mm-ss' }}";
 
             var (result, errors) = await RenderAync(template, value);
 

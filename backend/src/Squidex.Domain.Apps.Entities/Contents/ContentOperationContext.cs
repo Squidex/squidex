@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptVars context)
         {
             Enrich(context);
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return await scriptEngine.ExecuteAndTransformAsync(context, actualScript);
         }
 
-        public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptVars context)
         {
             Enrich(context);
 
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await scriptEngine.ExecuteAsync(context, GetScript(script));
         }
 
-        private void Enrich(ScriptContext context)
+        private void Enrich(ScriptVars context)
         {
             context.ContentId = command.ContentId;
             context.AppId = app.Id;

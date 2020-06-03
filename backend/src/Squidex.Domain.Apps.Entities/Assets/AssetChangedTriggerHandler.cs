@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return true;
             }
 
-            var context = new ScriptContext
+            var context = new ScriptVars
             {
                 ["event"] = @event
             };
