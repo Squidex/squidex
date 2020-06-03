@@ -13,6 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using P = Squidex.Shared.Permissions;
 using ClaimsPermissions = Squidex.Infrastructure.Security.PermissionSet;
 
 namespace Squidex.Domain.Apps.Entities
@@ -48,7 +49,20 @@ namespace Squidex.Domain.Apps.Entities
 
         public static Context Anonymous()
         {
-            return new Context(new ClaimsPrincipal(new ClaimsIdentity()));
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            return new Context(claimsPrincipal);
+        }
+
+        public static Context Admin()
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, P.All));
+
+            return new Context(claimsPrincipal);
         }
 
         public Context Clone()

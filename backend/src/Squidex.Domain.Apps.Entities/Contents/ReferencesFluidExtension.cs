@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
 
                     var appContext =
-                        Context.Anonymous()
+                        Context.Admin()
                             .WithoutContentEnrichment()
                             .WithoutCleanup()
                             .WithUnpublished();
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void RegisterLanguageExtensions(FluidParserFactory factory)
         {
-            factory.RegisterBlock("reference", new ReferenceTag(contentQueryService, appProvider));
+            factory.RegisterTag("reference", new ReferenceTag(contentQueryService, appProvider));
         }
     }
 }

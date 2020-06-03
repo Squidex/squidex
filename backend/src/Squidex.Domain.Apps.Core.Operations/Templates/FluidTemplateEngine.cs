@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Templates
             SquidexTemplate.SetupTypes(extensions);
         }
 
-        public async Task<(string? Result, IEnumerable<string> Errors)> RenderAsync(string template, TemplateVars variables)
+        public async Task<string> RenderAsync(string template, TemplateVars variables)
         {
             Guard.NotNull(variables, nameof(variables));
 
@@ -84,10 +84,10 @@ namespace Squidex.Domain.Apps.Core.Templates
 
                 var result = await parsed.RenderAsync(context);
 
-                return (result, Enumerable.Empty<string>());
+                return result;
             }
 
-            return (null, errors);
+            throw new TemplateParseException(template, errors);
         }
     }
 }

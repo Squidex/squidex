@@ -135,23 +135,34 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         }
 
                         var actionName = typeNameRegistry.GetName(actionType);
-                        var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
-
-                        var json = jsonSerializer.Serialize(actionData.Data);
 
                         var job = new RuleJob
                         {
                             Id = Guid.NewGuid(),
-                            ActionData = json,
+                            ActionData = string.Empty,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,
                             Created = now,
-                            Description = actionData.Description,
                             EventName = enrichedEvent.Name,
                             ExecutionPartition = enrichedEvent.Partition,
                             Expires = expires,
                             RuleId = ruleId
                         };
+
+                        try
+                        {
+                            var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
+
+                            var json = jsonSerializer.Serialize(actionData.Data);
+
+                            job.ActionData = json;
+                            job.Description = actionData.Description;
+                        }
+                        catch (Exception ex)
+                        {
+                            job.Description = "Failed to create job";
+                            job.Exception = ex;
+                        }
 
                         result.Add(job);
                     }

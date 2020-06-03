@@ -45,7 +45,10 @@ namespace Squidex.Config.Domain
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>().As<IRuleEventFormatter>();
+                .As<IRuleTriggerHandler>();
+
+            services.AddSingletonAs<ReferencesFluidExtension>()
+                .As<IFluidExtension>();
 
             services.AddSingletonAs<ManualTriggerHandler>()
                 .As<IRuleTriggerHandler>();

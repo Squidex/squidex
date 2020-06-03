@@ -106,9 +106,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     ["event"] = @event
                 };
 
-                var (result, _) = await templateEngine.RenderAsync(template, vars);
-
-                return result ?? template;
+                return await templateEngine.RenderAsync(template, vars);
             }
 
             if (TryGetScript(text.Trim(), out var script))

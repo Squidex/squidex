@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -43,9 +41,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 User = new RefToken(RefTokenType.Subject, "me")
             };
 
-            var (result, errors) = await RenderAync(template, value);
+            var result = await RenderAync(template, value);
 
-            Assert.Empty(errors);
             Assert.Equal(expected, result);
         }
 
@@ -60,9 +57,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Id = NamedId.Of("42", "my-app")
             };
 
-            var (result, errors) = await RenderAync(template, value);
+            var result = await RenderAync(template, value);
 
-            Assert.Empty(errors);
             Assert.Equal(expected, result);
         }
 
@@ -76,9 +72,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
             var template = "{{ e.type }}";
 
-            var (result, errors) = await RenderAync(template, value);
+            var result = await RenderAync(template, value);
 
-            Assert.Empty(errors);
             Assert.Equal(value.Type.ToString(), result);
         }
 
@@ -94,9 +89,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
             var template = "{{ e.timestamp | format_date: 'yyyy-MM-dd-hh-mm-ss' }}";
 
-            var (result, errors) = await RenderAync(template, value);
+            var result = await RenderAync(template, value);
 
-            Assert.Empty(errors);
             Assert.Equal($"{now:yyyy-MM-dd-hh-mm-ss}", result);
         }
 
@@ -114,13 +108,20 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                                 .AddValue("en", "Hello"))
             };
 
-            var (result, errors) = await RenderAync(template, value);
+            var result = await RenderAync(template, value);
 
-            Assert.Empty(errors);
             Assert.Equal("Hello", result);
         }
 
-        private Task<(string? Result, IEnumerable<string> Errors)> RenderAync(string template, object value)
+        [Fact]
+        public async Task Should_throw_exception_when_template_invalid()
+        {
+            var template = "{% for x of event %}";
+
+            await Assert.ThrowsAsync<TemplateParseException>(() => sut.RenderAsync(template, new TemplateVars()));
+        }
+
+        private Task<string> RenderAync(string template, object value)
         {
             return sut.RenderAsync(template, new TemplateVars { ["e"] = value });
         }
