@@ -13,8 +13,6 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Scripting;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -30,7 +28,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
-    public class RuleEventFormatterTests
+    public class RuleEventFormatterCompareTests
     {
         private readonly IUser user = A.Fake<IUser>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
@@ -61,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             }
         }
 
-        public RuleEventFormatterTests()
+        public RuleEventFormatterCompareTests()
         {
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
@@ -114,36 +112,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             return new JintScriptEngine(cache, extensions);
         }
 
-        [Fact]
-        public void Should_serialize_object_to_json()
-        {
-            var result = sut.ToPayload(new { Value = 1 });
-
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public void Should_create_payload()
-        {
-            var @event = new EnrichedContentEvent { AppId = appId };
-
-            var result = sut.ToPayload(@event);
-
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public void Should_create_envelope_data_from_event()
-        {
-            var @event = new EnrichedContentEvent { AppId = appId, Name = "MyEventName" };
-
-            var result = sut.ToEnvelope(@event);
-
-            Assert.Contains("MyEventName", result);
-        }
-
         [Theory]
         [InlineData("Name $APP_NAME has id $APP_ID")]
+        [Expressions(
+            "Name $APP_NAME has id $APP_ID",
+            "Name ${EVENT_APPID.NAME} has id ${EVENT_APPID.ID}",
+            "Name ${event.appId.name} has id ${event.appId.id}",
+            "Name {{event.appId.name}} has id {{event.appId.id}}"
+        )]
         [InlineData("Name ${EVENT_APPID.NAME} has id ${EVENT_APPID.ID}")]
         [InlineData("Script(`Name ${event.appId.name} has id ${event.appId.id}`)")]
         [InlineData("Liquid(Name {{ event.appId.name }} has id {{ event.appId.id }})")]
@@ -157,9 +133,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("Name $SCHEMA_NAME has id $SCHEMA_ID")]
-        [InlineData("Script(`Name ${event.schemaId.name} has id ${event.schemaId.id}`)")]
-        [InlineData("Liquid(Name {{ event.schemaId.name }} has id {{ event.schemaId.id }})")]
+        [Expressions(
+            "Name $SCHEMA_NAME has id $SCHEMA_ID",
+            "Name ${EVENT_SCHEMAID.NAME} has id ${EVENT_SCHEMAID.ID}",
+            "Name ${event.schemaId.name} has id ${event.schemaId.id}",
+            "Name {{event.schemaId.name}} has id {{event.schemaId.id}}"
+        )]
         public async Task Should_format_schema_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaId };
@@ -170,22 +149,28 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("Full: $TIMESTAMP_DATETIME")]
-        [InlineData("Script(`Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
-        [InlineData("Liquid(Full: {{ event.timestamp | formatDate: 'yyyy-MM-dd-hh-mm-ss' }})")]
+        [Expressions(
+            "DateTime: $TIMESTAMP_DATETIME",
+            null,
+            "DateTime: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}",
+            "DateTime: {{event.timestamp | formatDate: 'yyyy-MM-dd-hh-mm-ss'}}"
+        )]
         public async Task Should_format_timestamp_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
 
             var result = await sut.FormatAsync(script, @event);
 
-            Assert.Equal($"Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
+            Assert.Equal($"DateTime: {now:yyyy-MM-dd-hh-mm-ss}", result);
         }
 
         [Theory]
-        [InlineData("Date: $TIMESTAMP_DATE")]
-        [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}`)")]
-        [InlineData("Liquid(Date: {{ event.timestamp | formatDate: 'yyyy-MM-dd' }})")]
+        [Expressions(
+            "Date: $TIMESTAMP_DATE",
+            null,
+            "Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}",
+            "Date: {{event.timestamp | formatDate: 'yyyy-MM-dd'}}"
+        )]
         public async Task Should_format_timestamp_date_information_from_event(string script)
         {
             var @event = new EnrichedContentEvent { Timestamp = now };
@@ -196,10 +181,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("From $MENTIONED_NAME ($MENTIONED_EMAIL, $MENTIONED_ID)")]
-        [InlineData("From ${COMMENT_MENTIONEDUSER.NAME} (${COMMENT_MENTIONEDUSER.EMAIL}, ${COMMENT_MENTIONEDUSER.ID})")]
-        [InlineData("Script(`From ${event.mentionedUser.name} (${event.mentionedUser.email}, ${event.mentionedUser.id})`)")]
-        [InlineData("Liquid(From {{ event.mentionedUser.name }} ({{ event.mentionedUser.email }}, {{ event.mentionedUser.id }}))")]
+        [Expressions(
+            "From $MENTIONED_NAME ($MENTIONED_EMAIL, $MENTIONED_ID)",
+            "From ${EVENT_MENTIONEDUSER.NAME} (${EVENT_MENTIONEDUSER.EMAIL}, ${EVENT_MENTIONEDUSER.ID})",
+            "From ${event.mentionedUser.name} (${event.mentionedUser.email}, ${event.mentionedUser.id})",
+            "From {{event.mentionedUser.name}} ({{event.mentionedUser.email}}, {{event.mentionedUser.id}})"
+        )]
         public async Task Should_format_email_and_display_name_from_mentioned_user(string script)
         {
             var @event = new EnrichedCommentEvent { MentionedUser = user };
@@ -209,6 +196,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal("From me (me@email.com, user123)", result);
         }
 
+        /*
         [Theory]
         [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
         [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
@@ -714,5 +702,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal("Created", result);
         }
+        */
     }
 }

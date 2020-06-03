@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using ValueTaskSupplement;
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled);
         private readonly IJsonSerializer jsonSerializer;
         private readonly IEnumerable<IRuleEventFormatter> formatters;
+        private readonly ITemplateEngine templateEngine;
         private readonly IScriptEngine scriptEngine;
 
         private struct TextPart
@@ -67,14 +69,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public RuleEventFormatter(IJsonSerializer jsonSerializer, IEnumerable<IRuleEventFormatter> formatters, IScriptEngine scriptEngine)
+        public RuleEventFormatter(IJsonSerializer jsonSerializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(templateEngine, nameof(templateEngine));
             Guard.NotNull(formatters, nameof(formatters));
 
             this.jsonSerializer = jsonSerializer;
             this.formatters = formatters;
+            this.templateEngine = templateEngine;
             this.scriptEngine = scriptEngine;
         }
 
@@ -93,6 +97,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (string.IsNullOrWhiteSpace(text))
             {
                 return text;
+            }
+
+            if (TryGetTemplate(text.Trim(), out var template))
+            {
+                var vars = new TemplateVars
+                {
+                    ["event"] = @event
+                };
+
+                var (result, _) = await templateEngine.RenderAsync(template, vars);
+
+                return result ?? template;
             }
 
             if (TryGetScript(text.Trim(), out var script))
@@ -331,6 +347,24 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (text.StartsWith(ScriptPrefix, comparer) && text.EndsWith(ScriptSuffix, comparer))
             {
                 script = text.Substring(ScriptPrefix.Length, text.Length - ScriptPrefix.Length - ScriptSuffix.Length);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryGetTemplate(string text, out string script)
+        {
+            const string TemplateSuffix = ")";
+            const string TemplatePrefix = "Liquid(";
+
+            script = null!;
+
+            var comparer = StringComparison.OrdinalIgnoreCase;
+
+            if (text.StartsWith(TemplatePrefix, comparer) && text.EndsWith(TemplateSuffix, comparer))
+            {
+                script = text.Substring(TemplatePrefix.Length, text.Length - TemplatePrefix.Length - TemplateSuffix.Length);
                 return true;
             }
 
