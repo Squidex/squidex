@@ -9,6 +9,8 @@ using System;
 using Fluid;
 using Fluid.Values;
 using NodaTime;
+using NodaTime.Text;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
 {
@@ -51,6 +53,20 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                         var value = (DateTimeOffset)dateTime.ToObjectValue();
 
                         return formatter(value);
+                    }
+
+                case StringValue stringValue:
+                    {
+                        var value = stringValue.ToStringValue();
+
+                        var instant = InstantPattern.General.Parse(value);
+
+                        if (instant.Success)
+                        {
+                            return formatter(instant.Value.ToDateTimeOffset());
+                        }
+
+                        break;
                     }
 
                 case ObjectValue objectValue:

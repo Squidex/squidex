@@ -78,13 +78,13 @@ namespace Squidex.Config.Domain
                 .AsOptional<ITemplateEngine>();
 
             services.AddSingletonAs<ContentFluidExtension>()
-                .AsOptional<IFluidExtension>();
+                .As<IFluidExtension>();
 
             services.AddSingletonAs<DateTimeFluidExtension>()
-                .AsOptional<IFluidExtension>();
+                .As<IFluidExtension>();
 
             services.AddSingletonAs<UserFluidExtension>()
-                .AsOptional<IFluidExtension>();
+                .As<IFluidExtension>();
 
             services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }
