@@ -13,8 +13,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using P = Squidex.Shared.Permissions;
 using ClaimsPermissions = Squidex.Infrastructure.Security.PermissionSet;
+using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Entities
 {
