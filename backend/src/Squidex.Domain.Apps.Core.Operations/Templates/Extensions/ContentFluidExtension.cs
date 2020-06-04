@@ -19,6 +19,10 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
         {
             FluidValue.SetTypeMapping<JsonObject>(x => new ObjectValue(x));
             FluidValue.SetTypeMapping<JsonArray>(x => new JsonArrayFluidValue(x));
+            FluidValue.SetTypeMapping<JsonString>(x => FluidValue.Create(x.Value));
+            FluidValue.SetTypeMapping<JsonBoolean>(x => FluidValue.Create(x.Value));
+            FluidValue.SetTypeMapping<JsonNumber>(x => FluidValue.Create(x.Value));
+            FluidValue.SetTypeMapping<JsonNull>(x => FluidValue.Create(null));
 
             memberAccessStrategy.Register<NamedContentData, object?>(
                 (value, name) => value.GetOrDefault(name));
