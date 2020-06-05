@@ -5,18 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Jint;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Templates
 {
-    public interface IScriptExtension
+    public interface ITemplateEngine
     {
-        void Extend(Engine engine)
-        {
-        }
-
-        void Extend(ExecutionContext context, bool async)
-        {
-        }
+        Task<string> RenderAsync(string template, TemplateVars variables);
     }
 }

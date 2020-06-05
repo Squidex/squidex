@@ -12,11 +12,11 @@ using Jint.Native;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class DateTimeScriptExtension : IScriptExtension
+    public sealed class DateTimeJintExtension : IJintExtension
     {
         private readonly Func<DateTime, string, JsValue> formatDate;
 
-        public DateTimeScriptExtension()
+        public DateTimeJintExtension()
         {
             formatDate = new Func<DateTime, string, JsValue>(FormatDate);
         }

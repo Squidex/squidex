@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                     var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event);
 
-                    foreach (var job in jobs)
+                    foreach (var (job, _) in jobs)
                     {
                         await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
                     }

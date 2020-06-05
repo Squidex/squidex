@@ -67,14 +67,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_start_all_grains_on_reminder()
+        public async Task Should_activate_all_grains_on_reminder()
         {
             await sut.ReceiveReminder(null!, default);
 
-            A.CallTo(() => grainA.StartAsync())
+            A.CallTo(() => grainA.ActivateAsync())
                 .MustHaveHappened();
 
-            A.CallTo(() => grainB.StartAsync())
+            A.CallTo(() => grainB.ActivateAsync())
                 .MustHaveHappened();
         }
 

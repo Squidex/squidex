@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         if (!c.DoNotScript)
                         {
                             c.Data = await context.ExecuteScriptAndTransformAsync(s => s.Create,
-                                new ScriptContext
+                                new ScriptVars
                                 {
                                     Operation = "Create",
                                     Data = c.Data,
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         if (!c.DoNotScript && c.Publish)
                         {
                             await context.ExecuteScriptAsync(s => s.Change,
-                                new ScriptContext
+                                new ScriptVars
                                 {
                                     Operation = "Published",
                                     Data = c.Data,
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 if (!c.DoNotScript)
                                 {
                                     await context.ExecuteScriptAsync(s => s.Change,
-                                        new ScriptContext
+                                        new ScriptVars
                                         {
                                             Operation = change.ToString(),
                                             Data = Snapshot.Data,
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         if (!c.DoNotScript)
                         {
                             await context.ExecuteScriptAsync(s => s.Delete,
-                                new ScriptContext
+                                new ScriptVars
                                 {
                                     Operation = "Delete",
                                     Data = Snapshot.Data,
@@ -236,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 if (!command.DoNotScript)
                 {
                     newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
-                        new ScriptContext
+                        new ScriptVars
                         {
                             Operation = "Create",
                             Data = newData,
