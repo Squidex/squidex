@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 {
                     var appEvent = (AppEvent)@event.Payload;
 
-                    await notifo.PublishAsync(appEvent.AppId, appEvent.Actor.Identifier, historyEvent);
+                    await notifo.PublishAsync(appEvent, historyEvent);
 
                     historyEvent.Actor = appEvent.Actor;
                     historyEvent.AppId = appEvent.AppId.Id;
