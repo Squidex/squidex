@@ -7,7 +7,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL;
 using Microsoft.Extensions.Options;
+using NodaTime;
 using Notifo.SDK;
 using Notifo.Services;
 using Squidex.Domain.Apps.Core;
@@ -15,24 +17,28 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using static Notifo.Services.Notifications;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
     public class NotifoService : IInitializable
     {
+        private static readonly Duration MaxAge = Duration.FromHours(12);
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
+        private readonly IClock clock;
         private NotificationsClient? client;
 
-        public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator)
+        public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IClock clock)
         {
             Guard.NotNull(options, nameof(options));
+            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.options = options.Value;
-
             this.urlGenerator = urlGenerator;
+            this.clock = clock;
         }
 
         public Task InitializeAsync(CancellationToken ct = default)
@@ -41,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 var builder =
                     NotificationsClientBuilder.Create()
-                        .SetApiKey(options.ApiKey);
+                        .SetApiKey(options.ApiKeyOwner);
 
                 if (!string.IsNullOrWhiteSpace(options.ApiUrl))
                 {
@@ -54,12 +60,21 @@ namespace Squidex.Domain.Apps.Entities.History
             return Task.CompletedTask;
         }
 
-        public async Task PublishAsync(CommentCreated comment)
+        public async Task PublishAsync(Envelope<CommentCreated> @event)
         {
+            Guard.NotNull(@event, nameof(@event));
+
             if (client == null)
             {
                 return;
             }
+
+            if (IsTooOld(@event.Headers))
+            {
+                return;
+            }
+
+            var comment = @event.Payload;
 
             if (comment.Mentions != null && comment.Mentions.Length > 0)
             {
@@ -83,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.History
                             publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
                         }
 
-                        SetCreator(comment, publishRequest);
+                        SetUser(comment, publishRequest);
 
                         await stream.RequestStream.WriteAsync(publishRequest);
                     }
@@ -94,19 +109,26 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public async Task PublishAsync(AppEvent appEvent, HistoryEvent @event)
+        public async Task PublishAsync(Envelope<AppEvent> @event, HistoryEvent historyEvent)
         {
             if (client == null)
             {
                 return;
             }
 
+            if (IsTooOld(@event.Headers))
+            {
+                return;
+            }
+
+            var appEvent = @event.Payload;
+
             var publishRequest = new PublishRequest
             {
                 AppId = options.AppId
             };
 
-            foreach (var (key, value) in @event.Parameters)
+            foreach (var (key, value) in historyEvent.Parameters)
             {
                 publishRequest.Properties.Add(key, value);
             }
@@ -120,15 +142,22 @@ namespace Squidex.Domain.Apps.Entities.History
                 publishRequest.Properties["SquidexUrl"] = url;
             }
 
-            publishRequest.TemplateCode = @event.EventType;
+            publishRequest.TemplateCode = historyEvent.EventType;
 
-            SetCreator(appEvent, publishRequest);
-            SetTopic(appEvent, @event, publishRequest);
+            SetUser(appEvent, publishRequest);
+            SetTopic(appEvent, publishRequest, historyEvent);
 
             await client.PublishAsync(publishRequest);
         }
 
-        private static void SetCreator(AppEvent appEvent, PublishRequest publishRequest)
+        private bool IsTooOld(EnvelopeHeaders headers)
+        {
+            var now = clock.GetCurrentInstant();
+
+            return now - headers.Timestamp() > MaxAge;
+        }
+
+        private static void SetUser(AppEvent appEvent, PublishRequest publishRequest)
         {
             if (appEvent.Actor.IsSubject)
             {
@@ -136,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private static void SetTopic(AppEvent appEvent, HistoryEvent @event, PublishRequest publishRequest)
+        private static void SetTopic(AppEvent appEvent, PublishRequest publishRequest, HistoryEvent @event)
         {
             var topic = $"apps/{appEvent.AppId.Id}/{@event.Channel.Replace('.', '/').Trim()}";
 

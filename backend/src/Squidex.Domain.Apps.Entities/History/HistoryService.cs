@@ -67,9 +67,9 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is CommentCreated commentCreated)
+            if (@event.Payload is CommentCreated)
             {
-                await notifo.PublishAsync(commentCreated);
+                await notifo.PublishAsync(@event.To<CommentCreated>());
             }
 
             foreach (var creator in creators)
@@ -78,12 +78,12 @@ namespace Squidex.Domain.Apps.Entities.History
 
                 if (historyEvent != null)
                 {
-                    var appEvent = (AppEvent)@event.Payload;
+                    var appEvent = @event.To<AppEvent>();
 
                     await notifo.PublishAsync(appEvent, historyEvent);
 
-                    historyEvent.Actor = appEvent.Actor;
-                    historyEvent.AppId = appEvent.AppId.Id;
+                    historyEvent.Actor = appEvent.Payload.Actor;
+                    historyEvent.AppId = appEvent.Payload.AppId.Id;
                     historyEvent.Created = @event.Headers.Timestamp();
                     historyEvent.Version = @event.Headers.EventStreamNumber();
 

@@ -55,9 +55,9 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 var notifo = httpContext.RequestServices.GetService<IOptions<NotifoOptions>>();
 
-                if (!string.IsNullOrWhiteSpace(notifo.Value.ApiKey))
+                if (notifo.Value.IsConfigured())
                 {
-                    uiOptions.More["notifoKey"] = notifo.Value.ApiKey;
+                    uiOptions.More["notifoKey"] = notifo.Value.ApiKeyWeb;
                     uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
                 }
 

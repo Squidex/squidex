@@ -16,35 +16,45 @@ namespace Squidex.Areas.Frontend.Middlewares
     public class NotifoMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly NotifoOptions options;
+        private readonly string? workerUrl;
 
         public NotifoMiddleware(RequestDelegate next, IOptions<NotifoOptions> options)
         {
             this.next = next;
 
-            this.options = options.Value;
+            workerUrl = GetUrl(options.Value);
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Path.Equals("/notifo-sw.js") && options.IsConfigured())
+            if (context.Request.Path.Equals("/notifo-sw.js") && workerUrl != null)
             {
                 context.Response.Headers[HeaderNames.ContentType] = "text/javascript";
 
-                var url = options.ApiUrl;
-
-                if (options.ApiUrl.Contains("localhost:5002"))
-                {
-                    url = "https://localhost:3002";
-                }
-
-                var script = $"importScripts('{url}/notifo-sdk-worker.js')";
+                var script = $"importScripts('{workerUrl}')";
 
                 await context.Response.WriteAsync(script);
             }
             else
             {
                 await next(context);
+            }
+        }
+
+        private static string? GetUrl(NotifoOptions options)
+        {
+            if (!options.IsConfigured())
+            {
+                return null;
+            }
+
+            if (options.ApiUrl.Contains("localhost:5002"))
+            {
+                return "https://localhost:3002/notifo-sdk-worker.js";
+            }
+            else
+            {
+                return $"{options.ApiUrl}/build/notifo-sdk-worker.js";
             }
         }
     }
