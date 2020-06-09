@@ -45,7 +45,9 @@
     "react": "16.10.2",
     "react-dom": "16.10.2",
     "rxjs": "6.5.4",
+    "simplemde": "^1.11.2",
     "slugify": "1.4.0",
+    "tinymce": "^5.2.0",
     "tslib": "1.11.1",
     "zone.js": "0.10.3"
   },
@@ -62,6 +64,7 @@
     "@types/node": "13.7.4",
     "@types/react": "16.9.21",
     "@types/react-dom": "16.9.5",
+    "@types/simplemde": "^1.11.2",
     "@types/tinymce": "4.5.24",
     "browserslist": "4.9.1",
     "caniuse-lite": "1.0.30001055",

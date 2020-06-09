@@ -7,10 +7,11 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 import marked from 'marked';
 
-declare var SimpleMDE: any;
+import SimpleMDE from 'simplemde';
+import 'simplemde/dist/simplemde.min.css';
 
 export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true
@@ -49,8 +50,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     constructor(changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
-        private readonly renderer: Renderer2,
-        private readonly resourceLoader: ResourceLoaderService
+        private readonly renderer: Renderer2
     ) {
         super(changeDetector, {
             isFullscreen: false
@@ -82,122 +82,119 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     public ngAfterViewInit() {
-        this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
-        this.resourceLoader.loadScript('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js').then(() => {
-            this.simplemde = new SimpleMDE({
-                previewRender: (text: string) => {
-                    return marked(text, { pedantic: true });
+        this.simplemde = new SimpleMDE({
+            previewRender: (text: string) => {
+                return marked(text, { pedantic: true });
+            },
+            autoDownloadFontAwesome: true,
+            toolbar: [
+                {
+                    name: 'bold',
+                    action: SimpleMDE.toggleBold,
+                    className: 'fa fa-bold',
+                    title: 'Bold'
+                }, {
+                    name: 'italic',
+                    action: SimpleMDE.toggleItalic,
+                    className: 'fa fa-italic',
+                    title: 'Italic'
+                }, {
+                    name: 'heading',
+                    action: SimpleMDE.toggleHeadingSmaller,
+                    className: 'fa fa-header',
+                    title: 'Heading'
+                }, {
+                    name: 'quote',
+                    action: SimpleMDE.toggleBlockquote,
+                    className: 'fa fa-quote-left',
+                    title: 'Quote'
+                }, {
+                    name: 'unordered-list',
+                    action: SimpleMDE.toggleUnorderedList,
+                    className: 'fa fa-list-ul',
+                    title: 'Generic List'
+                }, {
+                    name: 'ordered-list',
+                    action: SimpleMDE.toggleOrderedList,
+                    className: 'fa fa-list-ol',
+                    title: 'Numbered List'
                 },
-                autoDownloadFontAwesome: true,
-                toolbar: [
-                    {
-                        name: 'bold',
-                        action: SimpleMDE.toggleBold,
-                        className: 'fa fa-bold',
-                        title: 'Bold'
-                    }, {
-                        name: 'italic',
-                        action: SimpleMDE.toggleItalic,
-                        className: 'fa fa-italic',
-                        title: 'Italic'
-                    }, {
-                        name: 'heading',
-                        action: SimpleMDE.toggleHeadingSmaller,
-                        className: 'fa fa-header',
-                        title: 'Heading'
-                    }, {
-                        name: 'quote',
-                        action: SimpleMDE.toggleBlockquote,
-                        className: 'fa fa-quote-left',
-                        title: 'Quote'
-                    }, {
-                        name: 'unordered-list',
-                        action: SimpleMDE.toggleUnorderedList,
-                        className: 'fa fa-list-ul',
-                        title: 'Generic List'
-                    }, {
-                        name: 'ordered-list',
-                        action: SimpleMDE.toggleOrderedList,
-                        className: 'fa fa-list-ol',
-                        title: 'Numbered List'
-                    },
-                    '|',
-                    {
-                        name: 'link',
-                        action: SimpleMDE.drawLink,
-                        className: 'fa fa-link',
-                        title: 'Create Link'
-                    }, {
-                        name: 'image',
-                        action: SimpleMDE.drawImage,
-                        className: 'fa fa-picture-o',
-                        title: 'Insert Image'
-                    },
-                    '|',
-                    {
-                        name: 'preview',
-                        action: SimpleMDE.togglePreview,
-                        className: 'fa fa-eye no-disable',
-                        title: 'Toggle Preview'
-                    }, {
-                        name: 'fullscreen',
-                        action: SimpleMDE.toggleFullScreen,
-                        className: 'fa fa-arrows-alt no-disable no-mobile',
-                        title: 'Toggle Fullscreen'
-                    }, {
-                        name: 'side-by-side',
-                        action: SimpleMDE.toggleSideBySide,
-                        className: 'fa fa-columns no-disable no-mobile',
-                        title: 'Toggle Side by Side'
-                    },
-                    '|',
-                    {
-                        name: 'guide',
-                        action: 'https://simplemde.com/markdown-guide',
-                        className: 'fa fa-question-circle',
-                        title: 'Markdown Guide'
-                    },
-                    '|',
-                    {
-                        name: 'assets',
-                        action: this.showSelector,
-                        className: 'icon-assets icon-bold',
-                        title: 'Insert Assets'
-                    }
-                ],
-                element: this.editor.nativeElement
-            });
-
-            this.simplemde.value(this.value || '');
-            this.simplemde.codemirror.setOption('readOnly', this.isDisabled);
-
-            this.simplemde.codemirror.on('change', () => {
-                const value = this.simplemde.value();
-
-                if (this.value !== value) {
-                    this.value = value;
-
-                    this.callChange(value);
+                '|',
+                {
+                    name: 'link',
+                    action: SimpleMDE.drawLink,
+                    className: 'fa fa-link',
+                    title: 'Create Link'
+                }, {
+                    name: 'image',
+                    action: SimpleMDE.drawImage,
+                    className: 'fa fa-picture-o',
+                    title: 'Insert Image'
+                },
+                '|',
+                {
+                    name: 'preview',
+                    action: SimpleMDE.togglePreview,
+                    className: 'fa fa-eye no-disable',
+                    title: 'Toggle Preview'
+                }, {
+                    name: 'fullscreen',
+                    action: SimpleMDE.toggleFullScreen,
+                    className: 'fa fa-arrows-alt no-disable no-mobile',
+                    title: 'Toggle Fullscreen'
+                }, {
+                    name: 'side-by-side',
+                    action: SimpleMDE.toggleSideBySide,
+                    className: 'fa fa-columns no-disable no-mobile',
+                    title: 'Toggle Side by Side'
+                },
+                '|',
+                {
+                    name: 'guide',
+                    action: 'https://simplemde.com/markdown-guide',
+                    className: 'fa fa-question-circle',
+                    title: 'Markdown Guide'
+                },
+                '|',
+                {
+                    name: 'assets',
+                    action: this.showSelector,
+                    className: 'icon-assets icon-bold',
+                    title: 'Insert Assets'
                 }
-            });
+            ],
+            element: this.editor.nativeElement
+        });
 
-            this.simplemde.codemirror.on('refresh', () => {
-                const isFullscreen = this.simplemde.isFullscreenActive();
+        this.simplemde.value(this.value || '');
+        this.simplemde.codemirror.setOption('readOnly', this.isDisabled);
 
-                let target = this.container.nativeElement;
+        this.simplemde.codemirror.on('change', () => {
+            const value = this.simplemde.value();
 
-                if (isFullscreen) {
-                    target = document.body;
-                }
+            if (this.value !== value) {
+                this.value = value;
 
-                this.renderer.appendChild(target, this.inner.nativeElement);
+                this.callChange(value);
+            }
+        });
 
-                this.next(s => ({ ...s, isFullscreen }));
-            });
+        this.simplemde.codemirror.on('refresh', () => {
+            const isFullscreen = this.simplemde.isFullscreenActive();
 
-            this.simplemde.codemirror.on('blur', () => {
-                this.callTouched();
-            });
+            let target = this.container.nativeElement;
+
+            if (isFullscreen) {
+                target = document.body;
+            }
+
+            this.renderer.appendChild(target, this.inner.nativeElement);
+
+            this.next(s => ({ ...s, isFullscreen }));
+        });
+
+        this.simplemde.codemirror.on('blur', () => {
+            this.callTouched();
         });
     }
 

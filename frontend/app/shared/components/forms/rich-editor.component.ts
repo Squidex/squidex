@@ -9,9 +9,19 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
-declare var tinymce: any;
+import tinymce from 'tinymce';
+import 'tinymce/themes/silver';
+
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/media';
+import 'tinymce/plugins/paste';
+import 'tinymce/skins/ui/oxide/skin.min.css';
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
@@ -48,8 +58,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly assetUploader: AssetUploaderState,
-        private readonly resourceLoader: ResourceLoaderService
+        private readonly assetUploader: AssetUploaderState
     ) {
         super(changeDetector, undefined);
     }
@@ -62,17 +71,15 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public ngAfterViewInit() {
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.2.0/tinymce.min.js').then(() => {
-            const timer = setInterval(() => {
-                const target = this.editor.nativeElement;
+        const timer = setInterval(() => {
+            const target = this.editor.nativeElement;
 
-                if (document.body.contains(target)) {
-                    tinymce.init(this.getEditorOptions(target));
+            if (document.body.contains(target)) {
+                tinymce.init(this.getEditorOptions(target));
 
-                    clearInterval(timer);
-                }
-            }, 10);
-        });
+                clearInterval(timer);
+            }
+        }, 10);
     }
 
     public reset() {
@@ -96,7 +103,6 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
         return {
             ...DEFAULT_PROPS,
-
             images_upload_handler: (blob: any, success: (url: string) => void, failure: (message: string) => void) => {
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
