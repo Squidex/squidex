@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
@@ -16,13 +19,16 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 using static Notifo.Services.Notifications;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
-    public class NotifoService : IInitializable
+    public class NotifoService : IInitializable, IUserEventHandler
     {
         private static readonly Duration MaxAge = Duration.FromHours(12);
         private readonly NotifoOptions options;
@@ -58,6 +64,25 @@ namespace Squidex.Domain.Apps.Entities.History
             }
 
             return Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<Claim>> OnUserRegisteringAsync(IUser user)
+        {
+            if (client == null)
+            {
+                return Enumerable.Empty<Claim>();
+            }
+
+            var userRequest = new UpsertUserRequest();
+            userRequest.UserId = user.Id;
+            userRequest.EmailAddress = user.Email;
+            userRequest.FullName = user.DisplayName();
+
+            var userResponse = await client.UpsertUserAsync(userRequest);
+
+            var token = userResponse.User.ApiKey;
+
+            return Enumerable.Repeat(new Claim(SquidexClaimTypes.NotifoKey, token), 1);
         }
 
         public async Task PublishAsync(Envelope<CommentCreated> @event)

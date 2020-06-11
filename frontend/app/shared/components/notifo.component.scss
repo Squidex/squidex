@@ -17,4 +17,10 @@
             fill: darken($color-border, 30%);
         }
     }
+
+    .notifo-container {
+        display: inline-block;
+        max-width: 5rem;
+        min-width: 3rem;
+    }
 }

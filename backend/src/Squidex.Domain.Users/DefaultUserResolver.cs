@@ -98,6 +98,18 @@ namespace Squidex.Domain.Users
             }
         }
 
+        public async Task<List<IUser>> QueryAllAsync()
+        {
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                var result = await userManager.QueryByEmailAsync(null);
+
+                return result.OfType<IUser>().ToList();
+            }
+        }
+
         public async Task<List<IUser>> QueryByEmailAsync(string email)
         {
             Guard.NotNullOrEmpty(email, nameof(email));

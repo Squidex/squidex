@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { Pager, ResourceLoaderService, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 
@@ -29,7 +29,8 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     public element: ElementRef<Element>;
 
     constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly renderer: Renderer2
     ) {
         this.notifoApiKey = uiOptions.get('more.notifoKey');
         this.notifoApiUrl = uiOptions.get('more.notifoApi');
@@ -70,6 +71,10 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
                 notifo.push(['show-notifications', element, { position: 'bottom-right' }]);
             } else {
                 notifo.push(['show-topic', element, this.topic, { style: 'bell' }]);
+            }
+
+            if (element) {
+                this.renderer.addClass(element, 'notifo-container');
             }
         }
     }

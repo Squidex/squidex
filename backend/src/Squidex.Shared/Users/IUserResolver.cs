@@ -20,6 +20,8 @@ namespace Squidex.Shared.Users
 
         Task<List<IUser>> QueryByEmailAsync(string email);
 
+        Task<List<IUser>> QueryAllAsync();
+
         Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids);
     }
 }
