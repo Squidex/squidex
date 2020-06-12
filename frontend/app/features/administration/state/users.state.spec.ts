@@ -6,7 +6,7 @@
  */
 
 import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
-import { DialogService, LocalStoreService, Pager } from '@app/shared';
+import { DialogService, Pager } from '@app/shared';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -22,17 +22,14 @@ describe('UsersState', () => {
     const newUser = createUser(3);
 
     let dialogs: IMock<DialogService>;
-    let localStore: IMock<LocalStoreService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        localStore = Mock.ofType<LocalStoreService>();
-
         usersService = Mock.ofType<UsersService>();
-        usersState = new UsersState(dialogs.object, localStore.object, usersService.object);
+        usersState = new UsersState(dialogs.object, usersService.object);
     });
 
     afterEach(() => {
@@ -61,15 +58,6 @@ describe('UsersState', () => {
             usersState.load().pipe(onErrorResumeNext()).subscribe();
 
             expect(usersState.snapshot.isLoading).toBeFalsy();
-        });
-
-        it('should load page size from local store', () => {
-            localStore.setup(x => x.getInt('users.pageSize', 10))
-                .returns(() => 25);
-
-            const state = new UsersState(dialogs.object, localStore.object, usersService.object);
-
-            expect(state.snapshot.usersPager.pageSize).toBe(25);
         });
 
         it('should show notification on load when reload is true', () => {
@@ -107,17 +95,6 @@ describe('UsersState', () => {
                 .returns(() => of(new UsersDto(200, []))).verifiable();
 
             usersState.setPager(new Pager(200, 1, 10)).subscribe();
-
-            expect().nothing();
-        });
-
-        it('should update page size in local store', () => {
-            usersService.setup(x => x.getUsers(50, 0, undefined))
-                .returns(() => of(new UsersDto(200, []))).verifiable();
-
-            usersState.setPager(new Pager(0, 0, 50));
-
-            localStore.verify(x => x.setInt('users.pageSize', 50), Times.atLeastOnce());
 
             expect().nothing();
         });

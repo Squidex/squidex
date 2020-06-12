@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/shared';
+import { DialogService, Pager, shareSubscribed, State } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
@@ -60,16 +60,11 @@ export class UsersState extends State<Snapshot> {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService,
         private readonly usersService: UsersService
     ) {
         super({
             users: [],
-            usersPager: Pager.fromLocalStore('users', localStore)
-        });
-
-        this.usersPager.subscribe(pager => {
-            pager.saveTo('users', this.localStore);
+            usersPager: new Pager(0)
         });
     }
 
@@ -97,9 +92,7 @@ export class UsersState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            const usersPager = this.snapshot.usersPager.reset();
-
-            this.resetState({ usersPager, selectedUser: this.snapshot.selectedUser });
+            this.resetState({ selectedUser: this.snapshot.selectedUser });
         }
 
         return this.loadInternal(isReload);

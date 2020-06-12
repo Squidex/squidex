@@ -8,7 +8,7 @@
 import { compareStrings } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { decodeQuery, equalsQuery, Query } from './query';
+import { deserializeQuery, equalsQuery, Query } from './query';
 import { UIState } from './ui.state';
 
 export interface SavedQuery {
@@ -95,7 +95,7 @@ function parseQueries(settings: {}) {
 }
 
 export function parseStored(name: string, raw?: string) {
-    const query = decodeQuery(raw);
+    const query = deserializeQuery(raw);
 
     return { name, query };
 }

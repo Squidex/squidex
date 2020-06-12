@@ -6,20 +6,28 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ContributorDto, ContributorsState, DialogModel, RolesState } from '@app/shared';
+import { ContributorDto, ContributorsState, DialogModel, RolesState, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
-    templateUrl: './contributors-page.component.html'
+    templateUrl: './contributors-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
 export class ContributorsPageComponent implements OnInit {
     public importDialog = new DialogModel();
 
     constructor(
+        public readonly contributorsSync: Router2State,
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState
     ) {
+        contributorsSync.map(contributorsState)
+            .withString('query', 'q')
+            .withPager('contributorsPager', 'contributors', 10)
+            .build();
     }
 
     public ngOnInit() {

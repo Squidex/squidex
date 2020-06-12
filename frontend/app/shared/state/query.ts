@@ -132,11 +132,15 @@ export function equalsQuery(lhs?: Query, rhs?: Query) {
     return Types.equals(sanitize(lhs), sanitize(rhs));
 }
 
-export function encodeQuery(query?: Query) {
-    return encodeURIComponent(JSON.stringify(sanitize(query)));
+export function serializeQuery(query?: Query) {
+    return JSON.stringify(sanitize(query));
 }
 
-export function decodeQuery(raw?: string): Query | undefined {
+export function encodeQuery(query?: Query) {
+    return encodeURIComponent(serializeQuery(query));
+}
+
+export function deserializeQuery(raw?: string): Query | undefined {
     let query: Query | undefined = undefined;
 
     try {

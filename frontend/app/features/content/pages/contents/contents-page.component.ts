@@ -5,16 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: max-line-length
+
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { AppLanguageDto, ContentDto, ContentsState, deserializeQuery, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, RouteSynchronizer, SchemaDetailsDto, SchemasState, serializeQuery, TableFields, TempService, Types, UIState } from '@app/shared';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
+
+class QuerySynchronizer implements RouteSynchronizer {
+    public getValue(params: Params) {
+        const query = params['q'];
+
+        if (Types.isString(query)) {
+            return deserializeQuery(query);
+        }
+    }
+
+    public writeValue(state: any, params: Params) {
+        if (Types.isObject(state)) {
+            params['q'] = serializeQuery(state);
+        }
+    }
+
+}
 
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
+    providers: [
+        Router2State
+    ],
     animations: [
         fadeAnimation
     ]
@@ -45,6 +67,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
+        public readonly contentsSync: Router2State,
         public readonly contentsState: ContentsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
@@ -54,6 +77,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly uiState: UIState
     ) {
         super();
+
+        contentsSync.map(contentsState)
+            .withPager('contentsPager', 'contents', 10)
+            .withSynchronizer('contentsQuery', new QuerySynchronizer())
+            .build();
     }
 
     public ngOnInit() {

@@ -162,10 +162,15 @@ export class ResultSet<T> {
 
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
+    private readonly stateReset: BehaviorSubject<Readonly<T>>;
     private readonly initialState: Readonly<T>;
 
     public get changes(): Observable<Readonly<T>> {
         return this.state;
+    }
+
+    public get resetChanges(): Observable<Readonly<T>> {
+        return this.stateReset;
     }
 
     public get snapshot(): Readonly<T> {
@@ -191,6 +196,7 @@ export class State<T extends {}> {
         this.initialState = state;
 
         this.state = new BehaviorSubject(state);
+        this.stateReset = new BehaviorSubject(state);
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
@@ -205,6 +211,7 @@ export class State<T extends {}> {
         }
 
         this.state.next(newState);
+        this.stateReset.next(newState);
     }
 
     public next(update: ((v: T) => Readonly<T>) | Partial<T>) {

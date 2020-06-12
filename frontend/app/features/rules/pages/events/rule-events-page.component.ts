@@ -7,21 +7,30 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ResourceOwner, RuleEventDto, RuleEventsState } from '@app/shared';
+import { ResourceOwner, Router2State, RuleEventDto, RuleEventsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
-    templateUrl: './rule-events-page.component.html'
+    templateUrl: './rule-events-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
 export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     public selectedEventId: string | null = null;
 
     constructor(
+        public readonly ruleEventsSync: Router2State,
         public readonly ruleEventsState: RuleEventsState,
         private readonly route: ActivatedRoute
     ) {
         super();
+
+        ruleEventsSync.map(ruleEventsState)
+            .withPager('ruleEventsPager', 'ruleEvents', 30)
+            .withString('ruleId', 'ruleId')
+            .build();
     }
 
     public ngOnInit() {

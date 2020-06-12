@@ -31,9 +31,6 @@ interface Snapshot {
     // The search query.
     query?: string;
 
-    // Query regex.
-    queryRegex?: RegExp;
-
     // The app version.
     version: Version;
 
@@ -52,7 +49,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.query);
 
     public queryRegex =
-        this.project(x => x.queryRegex);
+        this.projectFrom(this.query, q => q ? new RegExp(q, 'i') : undefined);
 
     public maxContributors =
         this.project(x => x.maxContributors);
@@ -94,7 +91,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public load(isReload = false): Observable<any> {
-        if (isReload) {
+        if (!isReload) {
             const contributorsPager = this.snapshot.contributorsPager.reset();
 
             this.resetState({ contributorsPager });
@@ -125,7 +122,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public search(query: string) {
-        this.next(s => ({ ...s, query, queryRegex: new RegExp(query, 'i') }));
+        this.next(s => ({ ...s, query }));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
@@ -158,6 +155,7 @@ export class ContributorsState extends State<Snapshot> {
             const contributorsPager = s.contributorsPager.setCount(contributors.length);
 
             return {
+                ...s,
                 canCreate,
                 contributors,
                 contributorsPager,

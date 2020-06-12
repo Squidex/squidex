@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, LocalStoreService, Pager, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { DialogService, ErrorDto, Pager, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
@@ -84,16 +84,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService
+        private readonly dialogs: DialogService
     ) {
         super({
             contents: [],
-            contentsPager: Pager.fromLocalStore('contents', localStore)
-        });
-
-        this.contentsPager.subscribe(pager => {
-            pager.saveTo('contents', this.localStore);
+            contentsPager: new Pager(0)
         });
     }
 
@@ -123,9 +118,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload && this.schemaId !== this.previousId) {
-            const contentsPager = this.snapshot.contentsPager.reset();
-
-            this.resetState({ contentsPager, selectedContent: this.snapshot.selectedContent });
+            this.resetState({ selectedContent: this.snapshot.selectedContent });
         }
 
         return this.loadInternal(isReload);
@@ -331,10 +324,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
 @Injectable()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService,
+    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs, localStore);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaId() {
@@ -347,9 +340,9 @@ export class ManualContentsState extends ContentsStateBase {
     public schema: SchemaDto;
 
     constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
-        super(appsState, contentsService, dialogs, localStore);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaId() {
