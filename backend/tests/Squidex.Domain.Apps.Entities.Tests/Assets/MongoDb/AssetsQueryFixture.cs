@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                                     {
                                         ["value"] = JsonValue.Create(tag)
                                     },
-                                    Slug = fileName,
+                                    Slug = fileName
                                 };
 
                                 await ExecuteBatchAsync(asset);

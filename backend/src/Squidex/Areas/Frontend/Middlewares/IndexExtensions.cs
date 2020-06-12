@@ -57,7 +57,6 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 if (notifo.Value.IsConfigured())
                 {
-                    uiOptions.More["notifoKey"] = notifo.Value.ApiKeyWeb;
                     uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
                 }
 

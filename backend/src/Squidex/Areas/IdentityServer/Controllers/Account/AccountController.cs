@@ -382,10 +382,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 update.Permissions = new PermissionSet(Permissions.Admin);
             }
 
-            var extraClaims = await userEvents.OnUserRegisteringAsync(user);
-
-            update.CustomClaims.AddRange(extraClaims);
-
             return await MakeIdentityOperation(() => userManager.SyncClaims(user.Identity, update));
         }
 

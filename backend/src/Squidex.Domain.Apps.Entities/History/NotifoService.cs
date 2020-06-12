@@ -5,23 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Notifo.SDK;
 using Notifo.Services;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using static Notifo.Services.Notifications;
@@ -33,17 +31,22 @@ namespace Squidex.Domain.Apps.Entities.History
         private static readonly Duration MaxAge = Duration.FromHours(12);
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
+        private readonly IUserResolver userResolver;
         private readonly IClock clock;
         private NotificationsClient? client;
 
-        public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IClock clock)
+        public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IUserResolver userResolver, IClock clock)
         {
             Guard.NotNull(options, nameof(options));
-            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(clock, nameof(clock));
 
             this.options = options.Value;
+
             this.urlGenerator = urlGenerator;
+            this.userResolver = userResolver;
+
             this.clock = clock;
         }
 
@@ -53,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 var builder =
                     NotificationsClientBuilder.Create()
-                        .SetApiKey(options.ApiKeyOwner);
+                        .SetApiKey(options.ApiKey);
 
                 if (!string.IsNullOrWhiteSpace(options.ApiUrl))
                 {
@@ -66,26 +69,50 @@ namespace Squidex.Domain.Apps.Entities.History
             return Task.CompletedTask;
         }
 
-        public async Task<IEnumerable<Claim>> OnUserRegisteringAsync(IUser user)
+        public void OnUserUpdated(IUser user)
+        {
+            UpsertUserAsync(user).Forget();
+        }
+
+        private async Task UpsertUserAsync(IUser user)
         {
             if (client == null)
             {
-                return Enumerable.Empty<Claim>();
+                return;
             }
 
-            var userRequest = new UpsertUserRequest();
-            userRequest.UserId = user.Id;
-            userRequest.EmailAddress = user.Email;
-            userRequest.FullName = user.DisplayName();
+            var settings = new NotificationSettingsDto();
 
-            var userResponse = await client.UpsertUserAsync(userRequest);
+            settings.Channels[Providers.WebPush] = new NotificationSettingDto
+            {
+                Send = true,
+                DelayInSeconds = null
+            };
 
-            var token = userResponse.User.ApiKey;
+            settings.Channels[Providers.Email] = new NotificationSettingDto
+            {
+                Send = true,
+                DelayInSeconds = 5 * 60
+            };
 
-            return Enumerable.Repeat(new Claim(SquidexClaimTypes.NotifoKey, token), 1);
+            var userRequest = new UpsertUserRequest
+            {
+                AppId = options.AppId,
+                EmailAddress = user.Email,
+                FullName = user.DisplayName(),
+                PreferredLanguage = "en",
+                PreferredTimezone = null,
+                RequiresWhitelistedTopic = true,
+                Settings = settings,
+                UserId = user.Id
+            };
+
+            var response = await client.UpsertUserAsync(userRequest);
+
+            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.User.ApiKey);
         }
 
-        public async Task PublishAsync(Envelope<CommentCreated> @event)
+        public async Task HandleEventAsync(Envelope<IEvent> @event)
         {
             Guard.NotNull(@event, nameof(@event));
 
@@ -94,47 +121,93 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            if (IsTooOld(@event.Headers))
+            switch (@event.Payload)
             {
-                return;
-            }
-
-            var comment = @event.Payload;
-
-            if (comment.Mentions != null && comment.Mentions.Length > 0)
-            {
-                using (var stream = client.PublishMany())
-                {
-                    foreach (var userId in comment.Mentions)
+                case CommentCreated comment:
                     {
-                        var publishRequest = new PublishRequest
+                        if (IsTooOld(@event.Headers))
                         {
-                            AppId = options.AppId
-                        };
-
-                        publishRequest.Topic = $"users/{userId}";
-
-                        publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-                        publishRequest.Preformatted = new NotificationFormattingDto();
-                        publishRequest.Preformatted.Subject["en"] = comment.Text;
-
-                        if (comment.Url?.IsAbsoluteUri == true)
-                        {
-                            publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
+                            return;
                         }
 
-                        SetUser(comment, publishRequest);
+                        if (comment.Mentions == null || comment.Mentions.Length == 0)
+                        {
+                            break;
+                        }
 
-                        await stream.RequestStream.WriteAsync(publishRequest);
+                        using (var stream = client.PublishMany())
+                        {
+                            foreach (var userId in comment.Mentions)
+                            {
+                                var publishRequest = new PublishRequest
+                                {
+                                    AppId = options.AppId
+                                };
+
+                                publishRequest.Topic = $"users/{userId}";
+
+                                publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+                                publishRequest.Preformatted = new NotificationFormattingDto();
+                                publishRequest.Preformatted.Subject["en"] = comment.Text;
+
+                                if (comment.Url?.IsAbsoluteUri == true)
+                                {
+                                    publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
+                                }
+
+                                SetUser(comment, publishRequest);
+
+                                await stream.RequestStream.WriteAsync(publishRequest);
+                            }
+
+                            await stream.RequestStream.CompleteAsync();
+                            await stream.ResponseAsync;
+                        }
+
+                        break;
                     }
 
-                    await stream.RequestStream.CompleteAsync();
-                    await stream.ResponseAsync;
-                }
+                case AppContributorAssigned contributorAssigned:
+                    {
+                        var user = await userResolver.FindByIdAsync(contributorAssigned.ContributorId);
+
+                        if (user != null)
+                        {
+                            await UpsertUserAsync(user);
+                        }
+
+                        var request = BuildAllowedTopicRequest(contributorAssigned, contributorAssigned.ContributorId);
+
+                        await client.AddAllowedTopicAsync(request);
+
+                        break;
+                    }
+
+                case AppContributorRemoved contributorRemoved:
+                    {
+                        var request = BuildAllowedTopicRequest(contributorRemoved, contributorRemoved.ContributorId);
+
+                        await client.RemoveAllowedTopicAsync(request);
+
+                        break;
+                    }
             }
         }
 
-        public async Task PublishAsync(Envelope<AppEvent> @event, HistoryEvent historyEvent)
+        private AllowedTopicRequest BuildAllowedTopicRequest(AppEvent @event, string contributorId)
+        {
+            var topicRequest = new AllowedTopicRequest
+            {
+                AppId = options.AppId
+            };
+
+            topicRequest.UserId = contributorId;
+            topicRequest.TopicPrefix = GetAppPrefix(@event);
+
+            return topicRequest;
+        }
+
+        public async Task HandleHistoryEventAsync(Envelope<AppEvent> @event, HistoryEvent historyEvent)
         {
             if (client == null)
             {
@@ -192,9 +265,15 @@ namespace Squidex.Domain.Apps.Entities.History
 
         private static void SetTopic(AppEvent appEvent, PublishRequest publishRequest, HistoryEvent @event)
         {
-            var topic = $"apps/{appEvent.AppId.Id}/{@event.Channel.Replace('.', '/').Trim()}";
+            var topicPrefix = GetAppPrefix(appEvent);
+            var topicSuffix = @event.Channel.Replace('.', '/').Trim();
 
-            publishRequest.Topic = topic;
+            publishRequest.Topic = $"{topicPrefix}/{topicSuffix}";
+        }
+
+        private static string GetAppPrefix(AppEvent appEvent)
+        {
+            return $"apps/{appEvent.AppId.Id}";
         }
     }
 }

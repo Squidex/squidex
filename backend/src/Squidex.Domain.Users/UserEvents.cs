@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
@@ -22,20 +20,6 @@ namespace Squidex.Domain.Users
             Guard.NotNull(userEventHandlers, nameof(userEventHandlers));
 
             this.userEventHandlers = userEventHandlers;
-        }
-
-        public async Task<IEnumerable<Claim>> OnUserRegisteringAsync(IUser user)
-        {
-            var claims = new List<Claim>();
-
-            foreach (var handler in userEventHandlers)
-            {
-                var handlerClaims = await handler.OnUserRegisteringAsync(user);
-
-                claims.AddRange(handlerClaims);
-            }
-
-            return claims;
         }
 
         public void OnUserRegistered(IUser user)

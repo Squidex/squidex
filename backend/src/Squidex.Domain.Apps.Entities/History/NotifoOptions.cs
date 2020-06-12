@@ -11,17 +11,14 @@ namespace Squidex.Domain.Apps.Entities.History
     {
         public string AppId { get; set; }
 
-        public string ApiKeyOwner { get; set; }
-
-        public string ApiKeyWeb { get; set; }
+        public string ApiKey { get; set; }
 
         public string ApiUrl { get; set; } = "https://app.notifo.io";
 
         public bool IsConfigured()
         {
             return
-                !string.IsNullOrWhiteSpace(ApiKeyOwner) &&
-                !string.IsNullOrWhiteSpace(ApiKeyWeb) &&
+                !string.IsNullOrWhiteSpace(ApiKey) &&
                 !string.IsNullOrWhiteSpace(ApiUrl) &&
                 !string.IsNullOrWhiteSpace(AppId);
         }

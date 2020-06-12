@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Metadata = new AssetMetadata()
                 {
                     ["pixelWidth"] = JsonValue.Create(128),
-                    ["pixelHeight"] = JsonValue.Create(55),
+                    ["pixelHeight"] = JsonValue.Create(55)
                 },
                 Type = AssetType.Image
             };

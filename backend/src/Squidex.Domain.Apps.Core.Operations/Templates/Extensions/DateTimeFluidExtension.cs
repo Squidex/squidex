@@ -10,7 +10,6 @@ using Fluid;
 using Fluid.Values;
 using NodaTime;
 using NodaTime.Text;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
 {

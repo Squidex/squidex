@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -67,10 +66,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is CommentCreated)
-            {
-                await notifo.PublishAsync(@event.To<CommentCreated>());
-            }
+            await notifo.HandleEventAsync(@event);
 
             foreach (var creator in creators)
             {
@@ -80,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 {
                     var appEvent = @event.To<AppEvent>();
 
-                    await notifo.PublishAsync(appEvent, historyEvent);
+                    await notifo.HandleHistoryEventAsync(appEvent, historyEvent);
 
                     historyEvent.Actor = appEvent.Payload.Actor;
                     historyEvent.AppId = appEvent.Payload.AppId.Id;

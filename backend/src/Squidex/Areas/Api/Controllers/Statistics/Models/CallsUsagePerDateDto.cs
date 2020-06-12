@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
                 Date = DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc),
                 TotalBytes = stats.TotalBytes,
                 TotalCalls = stats.TotalCalls,
-                AverageElapsedMs = stats.AverageElapsedMs,
+                AverageElapsedMs = stats.AverageElapsedMs
             };
 
             return result;

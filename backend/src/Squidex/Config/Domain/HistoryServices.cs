@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
@@ -20,7 +21,7 @@ namespace Squidex.Config.Domain
                 config.GetSection("notifo"));
 
             services.AddSingletonAs<NotifoService>()
-                .AsSelf();
+                .AsSelf().As<IUserEventHandler>();
 
             services.AddSingletonAs<HistoryService>()
                 .As<IEventConsumer>().As<IHistoryService>();

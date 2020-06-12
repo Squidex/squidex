@@ -17,7 +17,7 @@ import { AuthService } from '@app/shared/internal';
 })
 export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     private readonly notifoApiUrl: string;
-    private readonly notifoApiKey: string;
+    private readonly notifoApiKey: string | undefined;
 
     @Output()
     public pagerChange = new EventEmitter<Pager>();
@@ -28,11 +28,10 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     @ViewChild('element', { static: false })
     public element: ElementRef<Element>;
 
-    constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions,
-        private readonly authService: AuthService,
+    constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions, authService: AuthService,
         private readonly renderer: Renderer2
     ) {
-        this.notifoApiKey = uiOptions.get('more.notifoKey');
+        this.notifoApiKey = authService.user?.notifoToken;
         this.notifoApiUrl = uiOptions.get('more.notifoApi');
 
         if (this.notifoApiKey) {
@@ -56,10 +55,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
                 }
 
                 notifo.push(['set', 'api-url', this.notifoApiUrl]);
-                notifo.push(['set', 'api-key', this.notifoApiKey]);
-                notifo.push(['set', 'user-email', this.authService.user?.email]);
-                notifo.push(['set', 'user-name', this.authService.user?.email]);
-                notifo.push(['set', 'user-id', this.authService.user?.id]);
+                notifo.push(['set', 'user-token', this.notifoApiKey]);
                 notifo.push(['subscribe']);
 
                 window['notifo'] = notifo;

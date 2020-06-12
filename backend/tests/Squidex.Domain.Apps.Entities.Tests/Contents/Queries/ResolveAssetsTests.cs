@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { document1.Id }),
                 CreateContent(
                     new[] { document2.Id },
-                    new[] { document2.Id }),
+                    new[] { document2.Id })
             };
 
             A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.Matches(x => x.Ids.Count == 2)))

@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     (dateFrom.AddDays(1), new Counters()),
                     (dateFrom.AddDays(2), new Counters()),
                     (dateFrom.AddDays(3), new Counters()),
-                    (dateFrom.AddDays(4), new Counters()),
+                    (dateFrom.AddDays(4), new Counters())
                 }
             };
         }

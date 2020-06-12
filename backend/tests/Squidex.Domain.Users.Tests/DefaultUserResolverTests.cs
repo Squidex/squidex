@@ -119,15 +119,54 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
+        public async Task Should_add_claim_when_not_added_yet()
+        {
+            var (user, claims) = GenerateUser("id2");
+
+            A.CallTo(() => userManager.AddClaimsAsync(user, A<IEnumerable<Claim>>._))
+                .Returns(IdentityResult.Success);
+
+            SetupUser(user, claims);
+
+            await sut.SetClaimAsync("id2", "my-claim", "new-value");
+
+            A.CallTo(() => userManager.AddClaimsAsync(user,
+                    A<IEnumerable<Claim>>.That.Matches(x => x.Any(y => y.Type == "my-claim" && y.Value == "new-value"))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_remove_previous_claim()
+        {
+            var (user, claims) = GenerateUser("id2");
+
+            claims.Add(new Claim("my-claim", "old-value"));
+
+            A.CallTo(() => userManager.AddClaimsAsync(user, A<IEnumerable<Claim>>._))
+                .Returns(IdentityResult.Success);
+
+            A.CallTo(() => userManager.RemoveClaimsAsync(user, A<IEnumerable<Claim>>._))
+                .Returns(IdentityResult.Success);
+
+            SetupUser(user, claims);
+
+            await sut.SetClaimAsync("id2", "my-claim", "new-value");
+
+            A.CallTo(() => userManager.AddClaimsAsync(user,
+                    A<IEnumerable<Claim>>.That.Matches(x => x.Any(y => y.Type == "my-claim" && y.Value == "new-value"))))
+                .MustHaveHappened();
+
+            A.CallTo(() => userManager.RemoveClaimsAsync(user,
+                    A<IEnumerable<Claim>>.That.Matches(x => x.Any(y => y.Type == "my-claim" && y.Value == "old-value"))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_resolve_user_by_email()
         {
             var (user, claims) = GenerateUser("id1");
 
-            A.CallTo(() => userManager.FindByEmailAsync(user.Email))
-                .Returns(user);
-
-            A.CallTo(() => userManager.GetClaimsAsync(user))
-                .Returns(claims);
+            SetupUser(user, claims);
 
             var result = await sut.FindByIdOrEmailAsync(user.Email);
 
@@ -142,11 +181,7 @@ namespace Squidex.Domain.Users
         {
             var (user, claims) = GenerateUser("id2");
 
-            A.CallTo(() => userManager.FindByIdAsync(user.Id))
-                .Returns(user);
-
-            A.CallTo(() => userManager.GetClaimsAsync(user))
-                .Returns(claims);
+            SetupUser(user, claims);
 
             var result = await sut.FindByIdOrEmailAsync(user.Id)!;
 
@@ -161,11 +196,7 @@ namespace Squidex.Domain.Users
         {
             var (user, claims) = GenerateUser("id2");
 
-            A.CallTo(() => userManager.FindByIdAsync(user.Id))
-                .Returns(user);
-
-            A.CallTo(() => userManager.GetClaimsAsync(user))
-                .Returns(claims);
+            SetupUser(user, claims);
 
             var result = await sut.FindByIdAsync(user.Id)!;
 
@@ -216,6 +247,9 @@ namespace Squidex.Domain.Users
         private void SetupUser(IdentityUser user, List<Claim> claims)
         {
             A.CallTo(() => userManager.FindByEmailAsync(user.Email))
+                .Returns(user);
+
+            A.CallTo(() => userManager.FindByIdAsync(user.Id))
                 .Returns(user);
 
             A.CallTo(() => userManager.GetClaimsAsync(user))
