@@ -183,7 +183,7 @@ export class AssetsService {
             }
 
             if (tags) {
-                for (let tag of tags) {
+                for (const tag of tags) {
                     if (tag && tag.length > 0) {
                         filters.push({ path: 'tags', op: 'eq', value: tag });
                     }

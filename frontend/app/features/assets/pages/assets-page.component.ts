@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { AssetsState, DialogModel, LocalStoreService, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
+import { Component, OnInit } from '@angular/core';
+import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, Router2State, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-page',
@@ -17,9 +16,7 @@ import { AssetsState, DialogModel, LocalStoreService, Queries, Query, QueryFullT
         Router2State
     ]
 })
-export class AssetsPageComponent extends ResourceOwner {
-    public assetsFilter = new FormControl();
-
+export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public queries = new Queries(this.uiState, 'assets');
 
     public addAssetFolderDialog = new DialogModel();
@@ -27,21 +24,18 @@ export class AssetsPageComponent extends ResourceOwner {
     public isListView: boolean;
 
     constructor(
-        public readonly assetsSync: Router2State,
+        public readonly assetsRoute: Router2State,
         public readonly assetsState: AssetsState,
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState
     ) {
         super();
 
-        assetsSync.map(assetsState)
-            .withPager('assetsPager', 'assets', 20)
-            .withString('parentId', 'parent')
-            .withStrings('tagsSelected', 'tags')
-            .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
-            .build();
-
         this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
+    }
+
+    public ngOnInit() {
+        this.assetsState.sync(this.assetsRoute);
     }
 
     public reload() {

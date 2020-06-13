@@ -19,11 +19,12 @@ export class Pager {
     constructor(
         public readonly numberOfItems: number,
         public readonly page = 0,
-        public readonly pageSize = 10
+        public readonly pageSize = 10,
+        unsafe = false
     ) {
         const totalPages = Math.ceil(numberOfItems / this.pageSize);
 
-        if (this.page >= totalPages && this.page > 0) {
+        if (this.page >= totalPages && this.page > 0 && !unsafe) {
             this.page = page = totalPages - 1;
         }
 

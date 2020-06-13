@@ -735,7 +735,7 @@ describe('ContentForm', () => {
             const form = parent.get(path);
 
             if (form) {
-                for (let key in test) {
+                for (const key in test) {
                     if (test.hasOwnProperty(key)) {
                         const a = form[key];
                         const e = test[key];

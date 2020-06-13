@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Injectable, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { LocalStoreService, Pager, Types } from '@app/framework/internal';
@@ -48,7 +50,7 @@ class PagerSynchronizer implements RouteSynchronizer {
             page = 0;
         }
 
-        return new Pager(0, page, pageSize);
+        return new Pager(0, page, pageSize, true);
     }
 
     public writeValue(state: any, params: Params) {
@@ -61,7 +63,7 @@ class PagerSynchronizer implements RouteSynchronizer {
         if (pager.pageSize > 0) {
             params['take'] = pager.pageSize.toString();
 
-            this.localStore.getInt(`${this.storeName}.pageSize`, pager.pageSize);
+            this.localStore.setInt(`${this.storeName}.pageSize`, pager.pageSize);
         }
     }
 }
@@ -97,7 +99,7 @@ class StringArraySynchronizer implements RouteSynchronizer {
         const result: { [key: string]: boolean } = {};
 
         if (Types.isString(value)) {
-            for (let item of value.split(',')) {
+            for (const item of value.split(',')) {
                 if (item.length > 0) {
                     result[item] = true;
                 }
@@ -133,7 +135,7 @@ export class Router2State implements OnDestroy {
 
     public map<T extends object>(state: State<T>): Router2StateMap<T> {
         this.mapper?.ngOnDestroy();
-        this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore);
+        this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
         return this.mapper;
     }
@@ -141,9 +143,12 @@ export class Router2State implements OnDestroy {
 
 export class Router2StateMap<T extends object> implements OnDestroy {
     private readonly syncs: { [field: string]: { synchronizer: RouteSynchronizer, value: any } } = {};
+    private readonly keysToKeep: string[] = [];
+    private syncDone: ((state: any) => void)[] = [];
     private subscriptionChanges: Subscription;
-    private subscriptionReset: Subscription;
-    private noNextSyncFromRoute = true;
+    private subscriptionRouter: Subscription;
+    private subscriptionQueryParams: Subscription;
+    private noNextSyncFromRoute = false;
 
     constructor(
         private readonly state: State<T>,
@@ -154,41 +159,27 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     public build() {
+        this.subscriptionQueryParams =
+            this.route.queryParams
+                .subscribe(q =>  this.syncFromRoute(q));
+
         this.subscriptionChanges =
             this.state.changes
-                .subscribe(x => this.onChange(x));
-
-        this.subscriptionReset =
-            this.state.resetChanges
-                .subscribe(_ => this.onReset());
-
-        this.route.queryParams
-            .subscribe(params => {
-                if (!this.noNextSyncFromRoute) {
-                    this.syncFromRoute(params);
-                }
-
-                this.noNextSyncFromRoute = false;
-            });
+                .subscribe(s => this.syncToRoute(s));
     }
 
     public ngOnDestroy() {
+        this.syncDone = [];
+
+        this.subscriptionQueryParams?.unsubscribe();
         this.subscriptionChanges?.unsubscribe();
-        this.subscriptionReset?.unsubscribe();
-    }
-
-    private onChange(state: T) {
-        this.syncToRoute(state);
-    }
-
-    private onReset() {
-        this.syncFromRoute(this.route.snapshot.queryParams);
+        this.subscriptionRouter?.unsubscribe();
     }
 
     private syncToRoute(state: T) {
         let isChanged = false;
 
-        for (let key in this.syncs) {
+        for (const key in this.syncs) {
             if (this.syncs.hasOwnProperty(key)) {
                 const target = this.syncs[key];
 
@@ -209,7 +200,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
 
         const queryParams: Params = {};
 
-        for (let key in this.syncs) {
+        for (const key in this.syncs) {
             if (this.syncs.hasOwnProperty(key)) {
                 const { synchronizer, value } = this.syncs[key];
 
@@ -228,9 +219,14 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     private syncFromRoute(query: Params) {
+        if (this.noNextSyncFromRoute) {
+            this.noNextSyncFromRoute = false;
+            return;
+        }
+
         const update: Partial<T> = {};
 
-        for (let key in this.syncs) {
+        for (const key in this.syncs) {
             if (this.syncs.hasOwnProperty(key)) {
                 const target = this.syncs[key];
 
@@ -242,10 +238,21 @@ export class Router2StateMap<T extends object> implements OnDestroy {
             }
         }
 
-        if (Object.keys(update).length > 0) {
-            this.state.next(update);
+        for (const key of this.keysToKeep) {
+            update[key] = this.state.snapshot[key];
         }
 
+        this.state.resetState(update);
+
+        for (const action of this.syncDone) {
+            action(this.state);
+        }
+    }
+
+    public keep(key: keyof T & string) {
+        this.keysToKeep.push(key);
+
+        return this;
     }
 
     public withString(key: keyof T & string, urlName: string) {
@@ -260,8 +267,16 @@ export class Router2StateMap<T extends object> implements OnDestroy {
         return this.withSynchronizer(key, new PagerSynchronizer(this.localStore, storeName, defaultSize));
     }
 
+    public whenSynced<TState>(action: (state: TState) => void) {
+        this.syncDone.push(action);
+
+        return this;
+    }
+
     public withSynchronizer(key: keyof T & string, synchronizer: RouteSynchronizer) {
-        this.syncs[key] = { synchronizer, value: undefined };
+        const previous = this.syncs[key];
+
+        this.syncs[key] = { synchronizer, value: previous?.value };
 
         return this;
     }

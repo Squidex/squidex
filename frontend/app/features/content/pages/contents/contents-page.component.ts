@@ -9,8 +9,8 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
-import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
+import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { distinctUntilChanged, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -50,7 +50,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
-        public readonly contentsSync: Router2State,
+        public readonly contentsRoute: Router2State,
         public readonly contentsState: ContentsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
@@ -60,26 +60,22 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly uiState: UIState
     ) {
         super();
-
-        contentsSync.map(contentsState)
-            .withPager('contentsPager', 'contents', 10)
-            .withSynchronizer('contentsQuery', new QuerySynchronizer())
-            .build();
     }
 
     public ngOnInit() {
         this.own(
-            this.schemasState.selectedSchema
+            this.route.params.pipe(
+                    switchMap(x => this.schemasState.selectedSchema), distinctUntilChanged())
                 .subscribe(schema => {
                     this.resetSelection();
 
                     this.schema = schema;
 
-                    this.contentsState.load();
-
                     this.updateQueries();
                     this.updateModel();
                     this.updateTable();
+
+                    this.contentsState.sync(this.contentsRoute);
                 }));
 
         this.own(
@@ -149,14 +145,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.search(query);
     }
 
-    public isItemSelected(content: ContentDto): boolean {
-        return this.selectedItems[content.id] === true;
-    }
-
     private selectItems(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
 
+    public isItemSelected(content: ContentDto): boolean {
+        return this.selectedItems[content.id] === true;
+    }
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
     }
@@ -177,7 +172,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents) {
+            for (const content of this.contentsState.snapshot.contents) {
                 this.selectedItems[content.id] = true;
             }
         }
@@ -195,13 +190,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectionCanDelete = true;
         this.nextStatuses = {};
 
-        for (let content of this.contentsState.snapshot.contents) {
+        for (const content of this.contentsState.snapshot.contents) {
             for (const info of content.statusUpdates) {
                 this.nextStatuses[info.status] = info.color;
             }
         }
 
-        for (let content of this.contentsState.snapshot.contents) {
+        for (const content of this.contentsState.snapshot.contents) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 

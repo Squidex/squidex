@@ -6,12 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, LocalStoreService, MathHelper, Pager, shareSubscribed, State } from '@app/framework';
+import { compareStrings, DialogService, MathHelper, Pager, Router2State, shareSubscribed, State } from '@app/framework';
 import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
-import { Query } from './query';
+import { Query, QueryFullTextSynchronizer } from './query';
 
 export type AssetPathItem = { id: string, folderName: string };
 
@@ -117,22 +117,27 @@ export class AssetsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService
+        private readonly dialogs: DialogService
     ) {
         super({
             assetFolders: [],
             assets: [],
-            assetsPager: Pager.fromLocalStore('assets', localStore, 30),
+            assetsPager: new Pager(0, 0, 30),
             parentId: ROOT_ITEM.id,
             path: [ROOT_ITEM],
             tagsAvailable: {},
             tagsSelected: {}
         });
+    }
 
-        this.assetsPager.subscribe(pager => {
-            pager.saveTo('assets', this.localStore);
-        });
+    public sync(route: Router2State) {
+        route.map(this)
+            .withPager('assetsPager', 'assets', 20)
+            .withString('parentId', 'parent')
+            .withStrings('tagsSelected', 'tags')
+            .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
+            .whenSynced<AssetsState>(x => x.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {

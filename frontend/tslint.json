@@ -92,6 +92,7 @@
       true,
       "sqx"
     ],
+    "prefer-const": true,
     "prefer-for-of": true,
     "quotemark": [
       true,

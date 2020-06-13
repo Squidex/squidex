@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, Pager, shareSubscribed, State } from '@app/shared';
+import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
@@ -45,6 +45,9 @@ export class UsersState extends State<Snapshot> {
 
     public usersPager =
         this.project(x => x.usersPager);
+
+    public usersQuery =
+        this.project(x => x.usersQuery);
 
     public selectedUser =
         this.project(x => x.selectedUser);
@@ -88,6 +91,15 @@ export class UsersState extends State<Snapshot> {
         }
 
         return this.usersService.getUser(id).pipe(catchError(() => of(null)));
+    }
+
+    public sync(route: Router2State) {
+        route.map(this)
+            .keep('selectedUser')
+            .withPager('usersPager', 'users', 10)
+            .withString('usersQuery', 'q')
+            .whenSynced<UsersState>(x => x.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {

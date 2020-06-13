@@ -20,20 +20,16 @@ export class ContributorsPageComponent implements OnInit {
     public importDialog = new DialogModel();
 
     constructor(
-        public readonly contributorsSync: Router2State,
+        public readonly contributorsRoute: Router2State,
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState
     ) {
-        contributorsSync.map(contributorsState)
-            .withString('query', 'q')
-            .withPager('contributorsPager', 'contributors', 10)
-            .build();
     }
 
     public ngOnInit() {
         this.rolesState.load();
 
-        this.contributorsState.load();
+        this.contributorsState.sync(this.contributorsRoute);
     }
 
     public reload() {

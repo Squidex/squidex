@@ -6,14 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, Pager, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { DialogService, ErrorDto, Pager, Router2State, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
-import { Query } from './query';
+import { Query, QuerySynchronizer } from './query';
 import { SchemasState } from './schemas.state';
 
 interface Snapshot {
@@ -46,8 +46,6 @@ interface Snapshot {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    private previousId: string;
-
     public selectedContent: Observable<ContentDto | null | undefined> =
         this.project(x => x.selectedContent, Types.equals);
 
@@ -116,8 +114,17 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
+    public sync(route: Router2State) {
+        route.map(this)
+            .keep('selectedContent')
+            .withPager('contentsPager', 'contents', 10)
+            .withSynchronizer('contentsQuery', new QuerySynchronizer())
+            .whenSynced<ContentsState>(x => x.loadInternal(false))
+            .build();
+    }
+
     public load(isReload = false): Observable<any> {
-        if (!isReload && this.schemaId !== this.previousId) {
+        if (!isReload) {
             this.resetState({ selectedContent: this.snapshot.selectedContent });
         }
 
@@ -142,8 +149,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
 
         this.next({ isLoading: true });
-
-        this.previousId = this.schemaId;
 
         const query: any = {
              take: this.snapshot.contentsPager.pageSize,

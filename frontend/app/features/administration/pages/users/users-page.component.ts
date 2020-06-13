@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { UserDto, UsersState } from '@app/features/administration/internal';
-import { Router2State } from '@app/framework';
+import { ResourceOwner, Router2State } from '@app/framework';
 
 @Component({
     selector: 'sqx-users-page',
@@ -18,20 +18,22 @@ import { Router2State } from '@app/framework';
         Router2State
     ]
 })
-export class UsersPageComponent implements OnInit {
+export class UsersPageComponent extends ResourceOwner implements OnInit {
     public usersFilter = new FormControl();
 
     constructor(
-        public readonly usersSync: Router2State,
+        public readonly usersRoute: Router2State,
         public readonly usersState: UsersState
     ) {
-        this.usersSync.map(usersState)
-            .withPager('usersPager', 'users', 10)
-            .withString('usersQuery', 'q');
+        super();
+
+        this.own(
+            this.usersState.usersQuery
+                .subscribe(q => this.usersFilter.setValue(q || '')));
     }
 
     public ngOnInit() {
-        this.usersState.load();
+        this.usersState.sync(this.usersRoute);
     }
 
     public reload() {

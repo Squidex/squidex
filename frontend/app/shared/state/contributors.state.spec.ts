@@ -21,7 +21,7 @@ describe('ContributorsState', () => {
         version
     } = TestValues;
 
-    let allIds: number[] = [];
+    const allIds: number[] = [];
 
     for (let i = 1; i <= 20; i++) {
         allIds.push(i);

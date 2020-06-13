@@ -108,7 +108,7 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     private updateFields() {
         const fields: FieldControl[] = [];
 
-        for (let field of this.field.nested) {
+        for (const field of this.field.nested) {
             const control = this.itemForm.get(field.name)!;
 
             if (control || this.field.properties.isContentField) {
@@ -122,7 +122,7 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     private updateTitle() {
         const values: string[] = [];
 
-        for (let { control, field } of this.fieldControls) {
+        for (const { control, field } of this.fieldControls) {
             const formatted = FieldFormatter.format(field, control.value);
 
             if (formatted) {
