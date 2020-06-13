@@ -663,6 +663,28 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Theory]
         [Expressions(
             null,
+            "${CONTENT_DATA.time.iv | timestamp}",
+            null,
+            "{{event.data.time.iv | timestamp}}")]
+        public async Task Should_return_timestamp_when_string(string script)
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("time",
+                            new ContentFieldData()
+                                .AddValue(JsonValue.Create("2020-06-01T10:10:20Z")))
+            };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("1591006220000", result);
+        }
+
+        [Theory]
+        [Expressions(
+            null,
             "${ASSET_LASTMODIFIED | timestamp_sec}",
             "${event.lastModified.getTime() / 1000}",
             "{{event.lastModified | timestamp_sec}}"

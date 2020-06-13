@@ -62,17 +62,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     await CommitInternalAsync(indexHolder, true);
                 }
 
-                indexHolder = new IndexHolder(ownerId);
+                var directory = await indexStorage.CreateDirectoryAsync(ownerId);
+
+                indexHolder = new IndexHolder(ownerId, directory);
                 indices[ownerId] = indexHolder;
             }
             finally
             {
                 lockObject.Release();
             }
-
-            var directory = await indexStorage.CreateDirectoryAsync(ownerId);
-
-            indexHolder.Open(directory);
 
             return indexHolder;
         }
@@ -87,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             {
                 lockObject.Wait();
 
-                indexHolder.Release();
+                indexHolder.Dispose();
                 indices.Remove(indexHolder.Id);
             }
             finally
@@ -118,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     holder.Commit();
                 }
 
-                await indexStorage.WriteAsync(holder.GetUnsafeWriter().Directory, holder.Snapshotter);
+                await indexStorage.WriteAsync(holder.Directory, holder.Snapshotter);
             }
         }
 

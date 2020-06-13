@@ -176,7 +176,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
             }
 
-            var parseResult = InstantPattern.General.Parse(value.ToString());
+            var parseResult = InstantPattern.General.Parse(value.ToString()!);
 
             if (!parseResult.Success)
             {

@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             if (reader.TokenType == JsonToken.String)
             {
-                return InstantPattern.General.Parse(reader.Value.ToString()).Value;
+                return InstantPattern.General.Parse(reader.Value.ToString()!).Value;
             }
 
             if (reader.TokenType == JsonToken.Date)
