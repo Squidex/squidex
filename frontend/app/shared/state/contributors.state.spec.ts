@@ -6,7 +6,7 @@
  */
 
 import { ErrorDto } from '@app/framework';
-import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, LocalStoreService, Pager, versioned } from '@app/shared/internal';
+import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, Pager, versioned } from '@app/shared/internal';
 import { empty, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -32,18 +32,15 @@ describe('ContributorsState', () => {
     let dialogs: IMock<DialogService>;
     let contributorsService: IMock<ContributorsService>;
     let contributorsState: ContributorsState;
-    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        localStore = Mock.ofType<LocalStoreService>();
 
         contributorsService = Mock.ofType<ContributorsService>();
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable();
 
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
+        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object);
     });
 
     afterEach(() => {
@@ -98,15 +95,6 @@ describe('ContributorsState', () => {
 
             expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
             expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 1, 10));
-        });
-
-        it('should update page size in local store', () => {
-            contributorsState.load().subscribe();
-            contributorsState.setPager(new Pager(0, 0, 50));
-
-            localStore.verify(x => x.setInt('contributors.pageSize', 50), Times.atLeastOnce());
-
-            expect().nothing();
         });
 
         it('should show filtered contributors when searching', () => {

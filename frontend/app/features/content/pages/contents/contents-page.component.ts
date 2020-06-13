@@ -8,27 +8,10 @@
 // tslint:disable: max-line-length
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { AppLanguageDto, ContentDto, ContentsState, deserializeQuery, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, RouteSynchronizer, SchemaDetailsDto, SchemasState, serializeQuery, TableFields, TempService, Types, UIState } from '@app/shared';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
-
-class QuerySynchronizer implements RouteSynchronizer {
-    public getValue(params: Params) {
-        const query = params['q'];
-
-        if (Types.isString(query)) {
-            return deserializeQuery(query);
-        }
-    }
-
-    public writeValue(state: any, params: Params) {
-        if (Types.isObject(state)) {
-            params['q'] = serializeQuery(state);
-        }
-    }
-
-}
 
 @Component({
     selector: 'sqx-contents-page',
@@ -202,7 +185,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 

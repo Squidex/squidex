@@ -5,17 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, UIState } from '@app/shared';
+import { AssetsState, DialogModel, LocalStoreService, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
-    templateUrl: './assets-page.component.html'
+    templateUrl: './assets-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
-export class AssetsPageComponent extends ResourceOwner implements OnInit {
+export class AssetsPageComponent extends ResourceOwner {
     public assetsFilter = new FormControl();
 
     public queries = new Queries(this.uiState, 'assets');
@@ -25,22 +27,21 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public isListView: boolean;
 
     constructor(
+        public readonly assetsSync: Router2State,
         public readonly assetsState: AssetsState,
         private readonly localStore: LocalStoreService,
-        private readonly route: ActivatedRoute,
         private readonly uiState: UIState
     ) {
         super();
 
-        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
-    }
+        assetsSync.map(assetsState)
+            .withPager('assetsPager', 'assets', 20)
+            .withString('parentId', 'parent')
+            .withStrings('tagsSelected', 'tags')
+            .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
+            .build();
 
-    public ngOnInit() {
-        this.own(
-            this.route.queryParams
-                .subscribe(p => {
-                    this.assetsState.search({ fullText: p['query'] });
-                }));
+        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
     }
 
     public reload() {

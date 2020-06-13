@@ -7,7 +7,8 @@
 
 // tslint:disable: readonly-array
 
-import { Types } from '@app/framework';
+import { Params } from '@angular/router';
+import { RouteSynchronizer, Types } from '@app/framework';
 import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';
@@ -111,6 +112,38 @@ const DEFAULT_QUERY = {
     },
     sort: []
 };
+
+export class QueryFullTextSynchronizer implements RouteSynchronizer {
+    public getValue(params: Params) {
+        const query = params['query'];
+
+        if (Types.isString(query)) {
+            return { fullText: query };
+        }
+    }
+
+    public writeValue(state: any, params: Params) {
+        if (Types.isObject(state) && Types.isString(state.fullText) && state.fullText.length > 0) {
+            params['query'] = state.fullText;
+        }
+    }
+}
+
+export class QuerySynchronizer implements RouteSynchronizer {
+    public getValue(params: Params) {
+        const query = params['query'];
+
+        if (Types.isString(query)) {
+            return deserializeQuery(query);
+        }
+    }
+
+    public writeValue(state: any, params: Params) {
+        if (Types.isObject(state)) {
+            params['query'] = serializeQuery(state);
+        }
+    }
+}
 
 export function sanitize(query?: Query) {
     if (!query) {

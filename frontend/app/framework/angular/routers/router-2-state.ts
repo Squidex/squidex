@@ -98,7 +98,9 @@ class StringArraySynchronizer implements RouteSynchronizer {
 
         if (Types.isString(value)) {
             for (let item of value.split(',')) {
-                result[item] = true;
+                if (item.length > 0) {
+                    result[item] = true;
+                }
             }
         }
 
@@ -107,7 +109,9 @@ class StringArraySynchronizer implements RouteSynchronizer {
 
     public writeValue(state: any, params: Params) {
         if (Types.isObject(state)) {
-            params[this.name] = Object.keys(state).join(',');
+            const value = Object.keys(state).join(',');
+
+            params[this.name] = value;
         }
     }
 }
@@ -139,6 +143,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     private readonly syncs: { [field: string]: { synchronizer: RouteSynchronizer, value: any } } = {};
     private subscriptionChanges: Subscription;
     private subscriptionReset: Subscription;
+    private noNextSyncFromRoute = true;
 
     constructor(
         private readonly state: State<T>,
@@ -149,8 +154,22 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     public build() {
-        this.subscriptionChanges = this.state.changes.subscribe(x => this.onChange(x));
-        this.subscriptionReset = this.state.resetChanges.subscribe(_ => this.onReset());
+        this.subscriptionChanges =
+            this.state.changes
+                .subscribe(x => this.onChange(x));
+
+        this.subscriptionReset =
+            this.state.resetChanges
+                .subscribe(_ => this.onReset());
+
+        this.route.queryParams
+            .subscribe(params => {
+                if (!this.noNextSyncFromRoute) {
+                    this.syncFromRoute(params);
+                }
+
+                this.noNextSyncFromRoute = false;
+            });
     }
 
     public ngOnDestroy() {
@@ -159,6 +178,14 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     private onChange(state: T) {
+        this.syncToRoute(state);
+    }
+
+    private onReset() {
+        this.syncFromRoute(this.route.snapshot.queryParams);
+    }
+
+    private syncToRoute(state: T) {
         let isChanged = false;
 
         for (let key in this.syncs) {
@@ -190,21 +217,24 @@ export class Router2StateMap<T extends object> implements OnDestroy {
             }
         }
 
+        this.noNextSyncFromRoute = true;
+
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams,
-            queryParamsHandling: 'merge'
+            queryParamsHandling: 'merge',
+            replaceUrl: true
         });
     }
 
-    private onReset() {
+    private syncFromRoute(query: Params) {
         const update: Partial<T> = {};
 
         for (let key in this.syncs) {
             if (this.syncs.hasOwnProperty(key)) {
                 const target = this.syncs[key];
 
-                const value = target.synchronizer.getValue(this.route.snapshot.queryParams);
+                const value = target.synchronizer.getValue(query);
 
                 if (value) {
                     update[key] = value;
@@ -215,6 +245,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
         if (Object.keys(update).length > 0) {
             this.state.next(update);
         }
+
     }
 
     public withString(key: keyof T & string, urlName: string) {

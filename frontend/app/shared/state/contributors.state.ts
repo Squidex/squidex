@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, LocalStoreService, Pager, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
+import { DialogService, ErrorDto, Pager, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
@@ -75,18 +75,13 @@ export class ContributorsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contributorsService: ContributorsService,
-        private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService
+        private readonly dialogs: DialogService
     ) {
         super({
             contributors: [],
-            contributorsPager: Pager.fromLocalStore('contributors', localStore),
+            contributorsPager: new Pager(0),
             maxContributors: -1,
             version: Version.EMPTY
-        });
-
-        this.contributorsPager.subscribe(pager => {
-            pager.saveTo('contributors', this.localStore);
         });
     }
 
