@@ -86,7 +86,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public sync(router: Router2State) {
-        router.map(this)
+        router.mapTo(this)
             .withString('query', 'q')
             .withPager('contributorsPager', 'contributors', 10)
             .whenSynced<ContributorsState>(s => s.loadInternal(false))

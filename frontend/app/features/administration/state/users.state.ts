@@ -94,7 +94,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public sync(route: Router2State) {
-        route.map(this)
+        route.mapTo(this)
             .keep('selectedUser')
             .withPager('usersPager', 'users', 10)
             .withString('usersQuery', 'q')

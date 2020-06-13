@@ -27,7 +27,7 @@ export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     ) {
         super();
 
-        ruleEventsSync.map(ruleEventsState)
+        ruleEventsSync.mapTo(ruleEventsState)
             .withPager('ruleEventsPager', 'ruleEvents', 30)
             .withString('ruleId', 'ruleId')
             .build();

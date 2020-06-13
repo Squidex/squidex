@@ -131,7 +131,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public sync(route: Router2State) {
-        route.map(this)
+        route.mapTo(this)
             .withPager('assetsPager', 'assets', 20)
             .withString('parentId', 'parent')
             .withStrings('tagsSelected', 'tags')
@@ -405,6 +405,10 @@ export class AssetsState extends State<Snapshot> {
 
     public search(query?: Query): Observable<any> {
         return this.searchInternal(query);
+    }
+
+    public get parentId() {
+        return this.snapshot.parentId;
     }
 
     private get appName() {

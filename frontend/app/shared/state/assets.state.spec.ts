@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AssetFoldersDto, AssetPathItem, AssetsDto, AssetsService, AssetsState, DialogService, MathHelper, Pager, versioned } from '@app/shared/internal';
+import { AssetFoldersDto, AssetsDto, AssetsService, AssetsState, DialogService, MathHelper, Pager, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -109,45 +109,16 @@ describe('AssetsState', () => {
     });
 
     describe('Navigating', () => {
-        beforeEach(() => {
-            assetsService.setup(x => x.getAssets(app, It.isAny()))
-                .returns(() => of(new AssetsDto(0, [])));
+        it('should load with parent id', () => {
+            assetsService.setup(x => x.getAssetFolders(app, '123'))
+                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable();
 
-            assetsService.setup(x => x.getAssetFolders(app, It.isAny()))
-                .returns(() => of(new AssetFoldersDto(0, [], [])));
-        });
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123' }))
+                .returns(() => of(new AssetsDto(200, []))).verifiable();
 
-        it('should move to child', () => {
-            assetsState.navigate('1').subscribe();
-            assetsState.navigate('2').subscribe();
+            assetsState.navigate('123').subscribe();
 
-            let path: ReadonlyArray<AssetPathItem>;
-
-            assetsState.path.subscribe(result => {
-                path = result;
-            });
-
-            expect(path!).toEqual([
-                { id: MathHelper.EMPTY_GUID, folderName: 'Assets' },
-                { id: '1', folderName: 'Folder1' },
-                { id: '2', folderName: 'Folder2' }
-            ]);
-        });
-
-        it('should navigate back to parent', () => {
-            assetsState.navigate('1').subscribe();
-            assetsState.navigate('2').subscribe();
-            assetsState.navigate(MathHelper.EMPTY_GUID).subscribe();
-
-            let path: ReadonlyArray<AssetPathItem>;
-
-            assetsState.path.subscribe(result => {
-                path = result;
-            });
-
-            expect(path!).toEqual([
-                { id: MathHelper.EMPTY_GUID, folderName: 'Assets' }
-            ]);
+            expect().nothing();
         });
     });
 

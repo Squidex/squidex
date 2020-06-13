@@ -115,7 +115,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public sync(route: Router2State) {
-        route.map(this)
+        route.mapTo(this)
             .keep('selectedContent')
             .withPager('contentsPager', 'contents', 10)
             .withSynchronizer('contentsQuery', new QuerySynchronizer())

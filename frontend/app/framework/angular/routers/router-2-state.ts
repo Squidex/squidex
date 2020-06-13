@@ -19,7 +19,7 @@ export interface RouteSynchronizer {
     writeValue(state: any, params: Params): void;
 }
 
-class PagerSynchronizer implements RouteSynchronizer {
+export class PagerSynchronizer implements RouteSynchronizer {
     constructor(
         private readonly localStore: LocalStoreService,
         private readonly storeName: string,
@@ -54,21 +54,21 @@ class PagerSynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
-        const pager: Pager = state;
+        if (Types.is(state, Pager)) {
+            if (state.page > 0) {
+                params['page'] = state.page.toString();
+            }
 
-        if (pager.page > 0) {
-            params['page'] = pager.page.toString();
-        }
+            if (state.pageSize > 0) {
+                params['take'] = state.pageSize.toString();
 
-        if (pager.pageSize > 0) {
-            params['take'] = pager.pageSize.toString();
-
-            this.localStore.setInt(`${this.storeName}.pageSize`, pager.pageSize);
+                this.localStore.setInt(`${this.storeName}.pageSize`, state.pageSize);
+            }
         }
     }
 }
 
-class StringSynchronizer implements RouteSynchronizer {
+export class StringSynchronizer implements RouteSynchronizer {
     constructor(
         private readonly name: string
     ) {
@@ -87,7 +87,7 @@ class StringSynchronizer implements RouteSynchronizer {
     }
 }
 
-class StringArraySynchronizer implements RouteSynchronizer {
+export class StringKeysSynchronizer implements RouteSynchronizer {
     constructor(
         private readonly name: string
     ) {
@@ -133,7 +133,7 @@ export class Router2State implements OnDestroy {
         this.mapper?.ngOnDestroy();
     }
 
-    public map<T extends object>(state: State<T>): Router2StateMap<T> {
+    public mapTo<T extends object>(state: State<T>): Router2StateMap<T> {
         this.mapper?.ngOnDestroy();
         this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
@@ -146,7 +146,6 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     private readonly keysToKeep: string[] = [];
     private syncDone: ((state: any) => void)[] = [];
     private subscriptionChanges: Subscription;
-    private subscriptionRouter: Subscription;
     private subscriptionQueryParams: Subscription;
     private noNextSyncFromRoute = false;
 
@@ -173,7 +172,6 @@ export class Router2StateMap<T extends object> implements OnDestroy {
 
         this.subscriptionQueryParams?.unsubscribe();
         this.subscriptionChanges?.unsubscribe();
-        this.subscriptionRouter?.unsubscribe();
     }
 
     private syncToRoute(state: T) {
@@ -189,7 +187,6 @@ export class Router2StateMap<T extends object> implements OnDestroy {
                     target.value = value;
 
                     isChanged = true;
-                    break;
                 }
             }
         }
@@ -260,7 +257,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     public withStrings(key: keyof T & string, urlName: string) {
-        return this.withSynchronizer(key, new StringArraySynchronizer(urlName));
+        return this.withSynchronizer(key, new StringKeysSynchronizer(urlName));
     }
 
     public withPager(key: keyof T & string, storeName: string, defaultSize = 10) {
