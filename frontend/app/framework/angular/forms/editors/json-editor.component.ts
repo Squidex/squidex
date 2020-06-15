@@ -61,6 +61,8 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
         let url = 'dependencies/ace/ace.js';
         if (window.location.host.includes('localhost')) {
             url = 'https://localhost:3000/' + url;
+        } else {
+            url = 'build/' + url;
         }
         this.resourceLoader.loadScript(url).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

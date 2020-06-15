@@ -85,6 +85,8 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
         let url = 'dependencies/ace/ace.min.js';
         if (window.location.host.includes('localhost')) {
             url = 'https://localhost:3000/' + url;
+        } else {
+            url = 'build/' + url;
         }
         this.resourceLoader.loadScript(url).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

@@ -65,6 +65,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         let url = 'dependencies/tinymce/tinymce.min.js';
         if (window.location.host.includes('localhost')) {
             url = 'https://localhost:3000/' + url;
+        } else {
+            url = 'build/' + url;
         }
         this.resourceLoader.loadScript(url).then(() => {
             const timer = setInterval(() => {

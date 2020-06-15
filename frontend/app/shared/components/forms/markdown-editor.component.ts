@@ -87,6 +87,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         if (window.location.host.includes('localhost')) {
             urlJs = 'https://localhost:3000/' + urlJs;
             urlCss = 'https://localhost:3000/' + urlCss;
+        } else {
+            urlJs = 'build/' + urlJs;
+            urlCss = 'build/' + urlCss;
         }
         this.resourceLoader.loadStyle(urlCss);
         this.resourceLoader.loadScript(urlJs).then(() => {
