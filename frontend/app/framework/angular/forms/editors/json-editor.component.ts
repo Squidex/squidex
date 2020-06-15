@@ -58,8 +58,11 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
         if (this.height) {
             this.editor.nativeElement.style.height = `${this.height}px`;
         }
-
-        this.resourceLoader.loadScript('dependencies/ace.js').then(() => {
+        let url = 'dependencies/ace/ace.js';
+        if (window.location.host.includes('localhost')) {
+            url = 'https://localhost:3000/' + url;
+        }
+        this.resourceLoader.loadScript(url).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
             this.aceEditor.getSession().setMode('ace/mode/javascript');
