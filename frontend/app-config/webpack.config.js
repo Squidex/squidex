@@ -32,7 +32,9 @@ const plugins = {
     // https://www.npmjs.com/package/webpack-bundle-analyzer
     BundleAnalyzerPlugin: require('webpack-bundle-analyzer').BundleAnalyzerPlugin,
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
-    BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin
+    BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin,
+    // https://webpack.js.org/plugins/copy-webpack-plugin/
+    CopyPlugin : require('copy-webpack-plugin')
 };
 
 module.exports = function (env) {
@@ -204,6 +206,11 @@ module.exports = function (env) {
                 // Add errors to webpack instead of warnings
                 failOnError: true
             }),
+            new plugins.CopyPlugin({
+                patterns: [
+                  { from: './app/dependencies', to: 'dependencies' },
+                ],
+              }),
         ],
 
         devServer: {
