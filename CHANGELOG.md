@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.4.0 - 2020-06-15
+
+### Features
+
+* **Rules**: Liquid support.
+
+### Bugfixes
+
+* **Grains**: Fix restart of grains
+* **EventStore**: Fix a bug where very old events were not consumed properly.
+
 ## 4.4.0 RC - 2020-05-30
 
 ### General
