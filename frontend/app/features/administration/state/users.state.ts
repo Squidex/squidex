@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/shared';
+import { DialogService, Pager, shareSubscribed, State, StateSynchronizer } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
@@ -46,6 +46,9 @@ export class UsersState extends State<Snapshot> {
     public usersPager =
         this.project(x => x.usersPager);
 
+    public usersQuery =
+        this.project(x => x.usersQuery);
+
     public selectedUser =
         this.project(x => x.selectedUser);
 
@@ -60,16 +63,11 @@ export class UsersState extends State<Snapshot> {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService,
         private readonly usersService: UsersService
     ) {
         super({
             users: [],
-            usersPager: Pager.fromLocalStore('users', localStore)
-        });
-
-        this.usersPager.subscribe(pager => {
-            pager.saveTo('users', this.localStore);
+            usersPager: new Pager(0)
         });
     }
 
@@ -95,11 +93,18 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.getUser(id).pipe(catchError(() => of(null)));
     }
 
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
+            .keep('selectedUser')
+            .withPager('usersPager', 'users', 10)
+            .withString('usersQuery', 'q')
+            .whenSynced(() => this.loadInternal(false))
+            .build();
+    }
+
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            const usersPager = this.snapshot.usersPager.reset();
-
-            this.resetState({ usersPager, selectedUser: this.snapshot.selectedUser });
+            this.resetState({ selectedUser: this.snapshot.selectedUser });
         }
 
         return this.loadInternal(isReload);

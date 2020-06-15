@@ -114,7 +114,7 @@ export module Types {
         } else if (Types.isObject(lhs)) {
             const result = {};
 
-            for (let key in any) {
+            for (const key in any) {
                 if (any.hasOwnProperty(key)) {
                     result[key] = clone(lhs[key]);
                 }
@@ -162,7 +162,7 @@ export module Types {
                 return false;
             }
 
-            for (let key in lhs) {
+            for (const key in lhs) {
                 if (lhs.hasOwnProperty(key)) {
                     if (!equals(lhs[key], rhs[key], lazyString)) {
                         return false;

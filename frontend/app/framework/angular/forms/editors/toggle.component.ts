@@ -47,11 +47,13 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
     }
 
     public changeState(event: MouseEvent) {
-        let { isDisabled, isChecked } = this.snapshot;
+        const isDisabled = this.snapshot.isDisabled;
 
         if (isDisabled) {
             return;
         }
+
+        let isChecked = this.snapshot.isChecked;
 
         if (this.threeStates && (event.ctrlKey || event.shiftKey)) {
             if (isChecked) {

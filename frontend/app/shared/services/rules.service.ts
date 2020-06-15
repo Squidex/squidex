@@ -218,7 +218,7 @@ export class RulesService {
 
                 const actions: { [name: string]: RuleElementDto } = {};
 
-                for (let key of Object.keys(items).sort()) {
+                for (const key of Object.keys(items).sort()) {
                     const value = items[key];
 
                     const properties = value.properties.map((property: any) =>

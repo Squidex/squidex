@@ -51,7 +51,9 @@ export class AutoSaveService {
 }
 
 function getKey(key: AutoSaveKey) {
-    let { contentId, schemaId, schemaVersion } = key;
+    const { schemaId, schemaVersion } = key;
+
+    let contentId = key.contentId;
 
     if (!contentId) {
         contentId = '';

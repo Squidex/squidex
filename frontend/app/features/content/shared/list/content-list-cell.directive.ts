@@ -11,7 +11,7 @@ import { MetaFields, RootFieldDto, TableField, Types } from '@app/shared';
 export function getTableWidth(fields: ReadonlyArray<TableField>) {
     let result = 0;
 
-    for (let field of fields) {
+    for (const field of fields) {
         result += getCellWidth(field);
     }
 

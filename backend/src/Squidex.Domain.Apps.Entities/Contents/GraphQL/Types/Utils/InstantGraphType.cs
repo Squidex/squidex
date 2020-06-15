@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public override object ParseValue(object value)
         {
-            return InstantPattern.General.Parse(value.ToString()).Value;
+            return InstantPattern.General.Parse(value.ToString()!).Value;
         }
 
         public override object? ParseLiteral(IValue value)

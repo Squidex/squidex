@@ -36,7 +36,7 @@ describe('position', () => {
         { position: 'right-bottom', x: 310, y: 270 }
     ];
 
-    for (let test of tests) {
+    for (const test of tests) {
         const modalRect = buildRect(0, 0, 30, 30);
 
         it(`should calculate modal position for ${test.position}`, () => {

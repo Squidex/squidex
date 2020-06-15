@@ -6,7 +6,7 @@
  */
 
 import { ErrorDto } from '@app/framework';
-import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, LocalStoreService, Pager, versioned } from '@app/shared/internal';
+import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, Pager, versioned } from '@app/shared/internal';
 import { empty, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -17,11 +17,12 @@ describe('ContributorsState', () => {
     const {
         app,
         appsState,
+        buildDummyStateSynchronizer,
         newVersion,
         version
     } = TestValues;
 
-    let allIds: number[] = [];
+    const allIds: number[] = [];
 
     for (let i = 1; i <= 20; i++) {
         allIds.push(i);
@@ -32,18 +33,15 @@ describe('ContributorsState', () => {
     let dialogs: IMock<DialogService>;
     let contributorsService: IMock<ContributorsService>;
     let contributorsState: ContributorsState;
-    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        localStore = Mock.ofType<LocalStoreService>();
-
         contributorsService = Mock.ofType<ContributorsService>();
         contributorsService.setup(x => x.getContributors(app))
-            .returns(() => of(versioned(version, oldContributors))).verifiable();
+            .returns(() => of(versioned(version, oldContributors))).verifiable(Times.atLeastOnce());
 
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object, localStore.object);
+        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object);
     });
 
     afterEach(() => {
@@ -100,15 +98,6 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 1, 10));
         });
 
-        it('should update page size in local store', () => {
-            contributorsState.load().subscribe();
-            contributorsState.setPager(new Pager(0, 0, 50));
-
-            localStore.verify(x => x.setInt('contributors.pageSize', 50), Times.atLeastOnce());
-
-            expect().nothing();
-        });
-
         it('should show filtered contributors when searching', () => {
             contributorsState.load().subscribe();
             contributorsState.search('4');
@@ -121,6 +110,19 @@ describe('ContributorsState', () => {
 
             expect(contributors!).toEqual(createContributors(4, 14).items);
             expect(contributorsState.snapshot.contributorsPager.page).toEqual(0);
+        });
+
+        it('should load when synchronizer triggered', () => {
+            const { synchronizer, trigger } = buildDummyStateSynchronizer();
+
+            contributorsState.loadAndListen(synchronizer);
+
+            trigger();
+            trigger();
+
+            expect().nothing();
+
+            contributorsService.verify(x => x.getContributors(app), Times.exactly(2));
         });
 
         it('should show notification on load when reload is true', () => {
