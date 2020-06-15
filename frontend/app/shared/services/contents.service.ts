@@ -142,7 +142,7 @@ export class ContentsService {
             }
         }
 
-        let fullQuery = [...queryParts, ...queryOdataParts].join('&');
+        const fullQuery = [...queryParts, ...queryOdataParts].join('&');
 
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};

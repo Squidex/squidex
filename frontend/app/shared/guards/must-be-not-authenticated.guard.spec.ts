@@ -14,8 +14,8 @@ import { MustBeNotAuthenticatedGuard } from './must-be-not-authenticated.guard';
 describe('MustBeNotAuthenticatedGuard', () => {
     let router: IMock<Router>;
     let authService: IMock<AuthService>;
-    let uiOptions = new UIOptions({ map: { type: 'OSM' } });
-    let uiOptionsRedirect = new UIOptions({ map: { type: 'OSM' }, redirectToLogin: true });
+    const uiOptions = new UIOptions({ map: { type: 'OSM' } });
+    const uiOptionsRedirect = new UIOptions({ map: { type: 'OSM' }, redirectToLogin: true });
 
     beforeEach(() => {
         router = Mock.ofType<Router>();

@@ -5,16 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: max-line-length
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
-import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
+import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { combineLatest } from 'rxjs';
+import { distinctUntilChanged, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
+    providers: [
+        Router2State
+    ],
     animations: [
         fadeAnimation
     ]
@@ -45,6 +51,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
+        public readonly contentsRoute: Router2State,
         public readonly contentsState: ContentsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
@@ -58,23 +65,26 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.schemasState.selectedSchema
+            combineLatest(
+                this.schemasState.selectedSchema,
+                this.languagesState.languages,
+                this.contentsState.statuses
+            ).subscribe(([schema, languages, statuses]) => {
+                this.queryModel = queryModelFromSchema(schema, languages.map(x => x.language), statuses);
+            }));
+
+        this.own(
+            this.route.params.pipe(
+                    switchMap(x => this.schemasState.selectedSchema), distinctUntilChanged())
                 .subscribe(schema => {
                     this.resetSelection();
 
                     this.schema = schema;
 
-                    this.contentsState.load();
-
                     this.updateQueries();
-                    this.updateModel();
                     this.updateTable();
-                }));
 
-        this.own(
-            this.contentsState.statuses
-                .subscribe(() => {
-                    this.updateModel();
+                    this.contentsState.loadAndListen(this.contentsRoute);
                 }));
 
         this.own(
@@ -89,8 +99,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.find(x => x.isMaster)!;
                     this.languageMaster = this.language;
-
-                    this.updateModel();
                 }));
     }
 
@@ -138,14 +146,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.search(query);
     }
 
-    public isItemSelected(content: ContentDto): boolean {
-        return this.selectedItems[content.id] === true;
-    }
-
     private selectItems(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
 
+    public isItemSelected(content: ContentDto): boolean {
+        return this.selectedItems[content.id] === true;
+    }
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
     }
@@ -166,7 +173,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentsState.snapshot.contents) {
+            for (const content of this.contentsState.snapshot.contents) {
                 this.selectedItems[content.id] = true;
             }
         }
@@ -174,7 +181,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
@@ -184,13 +191,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.selectionCanDelete = true;
         this.nextStatuses = {};
 
-        for (let content of this.contentsState.snapshot.contents) {
+        for (const content of this.contentsState.snapshot.contents) {
             for (const info of content.statusUpdates) {
                 this.nextStatuses[info.status] = info.color;
             }
         }
 
-        for (let content of this.contentsState.snapshot.contents) {
+        for (const content of this.contentsState.snapshot.contents) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
@@ -218,12 +225,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     private updateTable() {
         if (this.schema) {
             this.tableView = new TableFields(this.uiState, this.schema);
-        }
-    }
-
-    private updateModel() {
-        if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
         }
     }
 }

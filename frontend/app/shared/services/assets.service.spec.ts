@@ -108,6 +108,9 @@ describe('AssetsService', () => {
             items: [
                 assetFolderResponse(22),
                 assetFolderResponse(23)
+            ],
+            path: [
+                assetFolderResponse(44)
             ]
         });
 
@@ -115,6 +118,8 @@ describe('AssetsService', () => {
             new AssetFoldersDto(10, [
                 createAssetFolder(22),
                 createAssetFolder(23)
+            ], [
+                createAssetFolder(44)
             ]));
     }));
 

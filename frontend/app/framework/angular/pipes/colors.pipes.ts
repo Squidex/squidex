@@ -97,7 +97,7 @@ function rgbToHsv({ r, g, b }: RGBColor): HSVColor {
 function hsvToRgb({ h, s, v }: HSVColor): RGBColor {
     let r = 0, g = 0, b = 0;
 
-    let i = Math.floor(h * 6);
+    const i = Math.floor(h * 6);
     const f = h * 6 - i;
     const p = v * (1 - s);
     const q = v * (1 - f * s);

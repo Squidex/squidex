@@ -1,4 +1,4 @@
-<tr [routerLink]="user.id" routerLinkActive="active">
+<tr [routerLink]="user.id" queryParamsHandling="merge" routerLinkActive="active">
     <td class="cell-user">
         <img class="user-picture" title="{{user.displayName}}" [src]="user | sqxUserDtoPicture" />
     </td>

@@ -105,7 +105,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
                 let width = 0;
 
-                for (let value of this.valuesSorted) {
+                for (const value of this.valuesSorted) {
                     width += 30;
                     width += ctx.measureText(value.name).width;
                 }
