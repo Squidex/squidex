@@ -280,17 +280,19 @@ describe('Router2State', () => {
             expect(invoked).toEqual(1);
         });
 
-        it('Should not sync again when nothing relevant', () => {
+        it('Should sync again when new query changed', () => {
             routerQueryParams.next({
                 key1: 'hello',
                 key2: 'squidex'
             });
 
             routerQueryParams.next({
-                key3: '!',
+                key1: 'hello',
+                key2: 'squidex',
+                key3: '!'
             });
 
-            expect(invoked).toEqual(1);
+            expect(invoked).toEqual(2);
         });
 
         it('Should reset other values when synced from route', () => {

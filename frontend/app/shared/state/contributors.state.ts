@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, Pager, Router2State, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
+import { DialogService, ErrorDto, Pager, shareMapSubscribed, shareSubscribed, State, StateSynchronizer, Types, Version } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
@@ -85,11 +85,11 @@ export class ContributorsState extends State<Snapshot> {
         });
     }
 
-    public sync(router: Router2State) {
-        router.mapTo(this)
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
             .withString('query', 'q')
             .withPager('contributorsPager', 'contributors', 10)
-            .whenSynced<ContributorsState>(s => s.loadInternal(false))
+            .whenSynced(() => this.loadInternal(false))
             .build();
     }
 

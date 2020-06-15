@@ -16,6 +16,7 @@ describe('AssetsState', () => {
     const {
         app,
         appsState,
+        buildDummyStateSynchronizer,
         newVersion
     } = TestValues;
 
@@ -103,6 +104,20 @@ describe('AssetsState', () => {
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.setPager(new Pager(200, 1, 30)).subscribe();
+
+            expect().nothing();
+        });
+
+        it('should load when synchronizer triggered', () => {
+            const { synchronizer, trigger } = buildDummyStateSynchronizer();
+
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+                .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable(Times.exactly(2));
+
+            assetsState.loadAndListen(synchronizer);
+
+            trigger();
+            trigger();
 
             expect().nothing();
         });

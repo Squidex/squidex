@@ -10,6 +10,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
@@ -64,6 +65,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
+            combineLatest(
+                this.schemasState.selectedSchema,
+                this.languagesState.languages,
+                this.contentsState.statuses
+            ).subscribe(([schema, languages, statuses]) => {
+                this.queryModel = queryModelFromSchema(schema, languages.map(x => x.language), statuses);
+            }));
+
+        this.own(
             this.route.params.pipe(
                     switchMap(x => this.schemasState.selectedSchema), distinctUntilChanged())
                 .subscribe(schema => {
@@ -72,16 +82,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.schema = schema;
 
                     this.updateQueries();
-                    this.updateModel();
                     this.updateTable();
 
-                    this.contentsState.sync(this.contentsRoute);
-                }));
-
-        this.own(
-            this.contentsState.statuses
-                .subscribe(() => {
-                    this.updateModel();
+                    this.contentsState.loadAndListen(this.contentsRoute);
                 }));
 
         this.own(
@@ -96,8 +99,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.find(x => x.isMaster)!;
                     this.languageMaster = this.language;
-
-                    this.updateModel();
                 }));
     }
 
@@ -224,12 +225,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     private updateTable() {
         if (this.schema) {
             this.tableView = new TableFields(this.uiState, this.schema);
-        }
-    }
-
-    private updateModel() {
-        if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
         }
     }
 }

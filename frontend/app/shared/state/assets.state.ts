@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, MathHelper, Pager, Router2State, shareSubscribed, State } from '@app/framework';
+import { compareStrings, DialogService, MathHelper, Pager, shareSubscribed, State, StateSynchronizer } from '@app/framework';
 import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
@@ -130,13 +130,13 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public sync(route: Router2State) {
-        route.mapTo(this)
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
             .withPager('assetsPager', 'assets', 20)
             .withString('parentId', 'parent')
             .withStrings('tagsSelected', 'tags')
             .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
-            .whenSynced<AssetsState>(x => x.loadInternal(false))
+            .whenSynced(() => this.loadInternal(false))
             .build();
     }
 

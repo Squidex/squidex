@@ -118,8 +118,28 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
     }
 }
 
+export interface StateSynchronizer {
+    mapTo<T extends object>(state: State<T>): StateSynchronizerMap<T>;
+}
+
+export interface StateSynchronizerMap<T> {
+    keep(key: keyof T & string): this;
+
+    withString(key: keyof T & string, urlName: string): this;
+
+    withStrings(key: keyof T & string, urlName: string): this;
+
+    withPager(key: keyof T & string, storeName: string, defaultSize: number): this;
+
+    whenSynced(action: () => void): this;
+
+    withSynchronizer(key: keyof T & string, synchronizer: RouteSynchronizer): this;
+
+    build(): void;
+}
+
 @Injectable()
-export class Router2State implements OnDestroy {
+export class Router2State implements OnDestroy, StateSynchronizer {
     private mapper: Router2StateMap<any>;
 
     constructor(
@@ -141,13 +161,13 @@ export class Router2State implements OnDestroy {
     }
 }
 
-export class Router2StateMap<T extends object> implements OnDestroy {
+export class Router2StateMap<T extends object> implements OnDestroy, StateSynchronizerMap<T> {
     private readonly syncs: { [field: string]: { synchronizer: RouteSynchronizer, value: any } } = {};
     private readonly keysToKeep: string[] = [];
-    private syncDone: ((state: any) => void)[] = [];
+    private syncDone: (() => void)[] = [];
+    private lastSyncedParams: Params | undefined;
     private subscriptionChanges: Subscription;
     private subscriptionQueryParams: Subscription;
-    private noNextSyncFromRoute = false;
 
     constructor(
         private readonly state: State<T>,
@@ -205,7 +225,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
             }
         }
 
-        this.noNextSyncFromRoute = true;
+        this.lastSyncedParams = queryParams;
 
         this.router.navigate([], {
             relativeTo: this.route,
@@ -216,8 +236,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
     }
 
     private syncFromRoute(query: Params) {
-        if (this.noNextSyncFromRoute) {
-            this.noNextSyncFromRoute = false;
+        if (Types.equals(this.lastSyncedParams, query)) {
             return;
         }
 
@@ -242,7 +261,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
         this.state.resetState(update);
 
         for (const action of this.syncDone) {
-            action(this.state);
+            action();
         }
     }
 
@@ -264,7 +283,7 @@ export class Router2StateMap<T extends object> implements OnDestroy {
         return this.withSynchronizer(key, new PagerSynchronizer(this.localStore, storeName, defaultSize));
     }
 
-    public whenSynced<TState>(action: (state: TState) => void) {
+    public whenSynced(action: () => void) {
         this.syncDone.push(action);
 
         return this;

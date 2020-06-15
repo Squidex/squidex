@@ -33,7 +33,7 @@ export class UsersPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.usersState.sync(this.usersRoute);
+        this.usersState.loadAndListen(this.usersRoute);
     }
 
     public reload() {

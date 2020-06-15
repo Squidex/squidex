@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, Pager, Router2State, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
 import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
@@ -114,12 +114,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
-    public sync(route: Router2State) {
-        route.mapTo(this)
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
             .keep('selectedContent')
             .withPager('contentsPager', 'contents', 10)
             .withSynchronizer('contentsQuery', new QuerySynchronizer())
-            .whenSynced<ContentsState>(x => x.loadInternal(false))
+            .whenSynced(() => this.loadInternal(false))
             .build();
     }
 

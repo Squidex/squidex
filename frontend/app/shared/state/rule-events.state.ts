@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, Pager, shareSubscribed, State } from '@app/framework';
+import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/framework';
 import { empty, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
@@ -52,6 +52,14 @@ export class RuleEventsState extends State<Snapshot> {
             ruleEvents: [],
             ruleEventsPager: new Pager(0)
         });
+    }
+
+    public loadAndListen(route: Router2State) {
+        route.mapTo(this)
+            .withPager('ruleEventsPager', 'ruleEvents', 30)
+            .withString('ruleId', 'ruleId')
+            .whenSynced(() => this.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {

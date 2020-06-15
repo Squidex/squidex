@@ -29,7 +29,7 @@ export class ContributorsPageComponent implements OnInit {
     public ngOnInit() {
         this.rolesState.load();
 
-        this.contributorsState.sync(this.contributorsRoute);
+        this.contributorsState.loadAndListen(this.contributorsRoute);
     }
 
     public reload() {

@@ -35,7 +35,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.assetsState.sync(this.assetsRoute);
+        this.assetsState.loadAndListen(this.assetsRoute);
     }
 
     public reload() {

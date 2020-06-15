@@ -10,10 +10,13 @@ import { DialogService, Pager } from '@app/shared';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { TestValues } from './../../../shared/state/_test-helpers';
 import { createUser } from './../services/users.service.spec';
 import { UsersState } from './users.state';
 
 describe('UsersState', () => {
+    const { buildDummyStateSynchronizer } = TestValues;
+
     const user1 = createUser(1);
     const user2 = createUser(2);
 
@@ -106,6 +109,20 @@ describe('UsersState', () => {
             usersState.search('my-query').subscribe();
 
             expect(usersState.snapshot.usersQuery).toEqual('my-query');
+        });
+
+        it('should load when synchronizer triggered', () => {
+            const { synchronizer, trigger } = buildDummyStateSynchronizer();
+
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
+
+            usersState.loadAndListen(synchronizer);
+
+            trigger();
+            trigger();
+
+            expect().nothing();
         });
     });
 
