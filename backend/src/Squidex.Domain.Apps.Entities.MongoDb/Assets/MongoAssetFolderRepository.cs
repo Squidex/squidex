@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<MongoAssetFolderEntity>, IAssetFolderRepository
     {
-        private readonly Lazy<string> idField = new Lazy<string>(GetIdField);
+        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
 
         public MongoAssetFolderRepository(IMongoDatabase database)
             : base(database)
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetFolderEntities.Select(x => Guid.Parse(x[idField.Value].AsString)).ToList();
+                return assetFolderEntities.Select(x => Guid.Parse(x[IdField.Value].AsString)).ToList();
             }
         }
 
