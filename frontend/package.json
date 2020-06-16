@@ -25,6 +25,7 @@
     "@angular/platform-browser-dynamic": "9.0.6",
     "@angular/platform-server": "9.0.6",
     "@angular/router": "9.0.6",
+    "ace-builds": "^1.4.11",
     "angular-mentions": "1.1.4",
     "angular2-chartjs": "0.5.1",
     "babel-polyfill": "6.26.0",
@@ -45,7 +46,9 @@
     "react": "16.10.2",
     "react-dom": "16.10.2",
     "rxjs": "6.5.4",
+    "simplemde": "^1.11.2",
     "slugify": "1.4.0",
+    "tinymce": "^5.2.0",
     "tslib": "1.11.1",
     "zone.js": "0.10.3"
   },

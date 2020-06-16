@@ -83,7 +83,7 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
             this.editor.nativeElement.style.height = `${this.height}px`;
         }
         let url = 'dependencies/ace/ace.min.js';
-        if (window.location.host.includes('localhost')) {
+        if (process.env.NODE_ENV !== 'production') {
             url = 'https://localhost:3000/' + url;
         } else {
             url = 'build/' + url;

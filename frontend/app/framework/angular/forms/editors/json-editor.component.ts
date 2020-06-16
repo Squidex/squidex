@@ -59,7 +59,7 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
             this.editor.nativeElement.style.height = `${this.height}px`;
         }
         let url = 'dependencies/ace/ace.js';
-        if (window.location.host.includes('localhost')) {
+        if (process.env.NODE_ENV !== 'production') {
             url = 'https://localhost:3000/' + url;
         } else {
             url = 'build/' + url;

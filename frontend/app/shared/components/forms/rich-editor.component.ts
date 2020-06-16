@@ -63,7 +63,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
     public ngAfterViewInit() {
         let url = 'dependencies/tinymce/tinymce.min.js';
-        if (window.location.host.includes('localhost')) {
+        if (process.env.NODE_ENV !== 'production') {
             url = 'https://localhost:3000/' + url;
         } else {
             url = 'build/' + url;

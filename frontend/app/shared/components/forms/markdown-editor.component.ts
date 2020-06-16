@@ -84,7 +84,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public ngAfterViewInit() {
         let urlJs = 'dependencies/simplemde/simplemde.min.js';
         let urlCss = 'dependencies/simplemde/simplemde.min.css';
-        if (window.location.host.includes('localhost')) {
+        if (process.env.NODE_ENV !== 'production') {
             urlJs = 'https://localhost:3000/' + urlJs;
             urlCss = 'https://localhost:3000/' + urlCss;
         } else {
