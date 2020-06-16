@@ -82,17 +82,8 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     public ngAfterViewInit() {
-        let urlJs = 'dependencies/simplemde/simplemde.min.js';
-        let urlCss = 'dependencies/simplemde/simplemde.min.css';
-        if (process.env.NODE_ENV !== 'production') {
-            urlJs = 'https://localhost:3000/' + urlJs;
-            urlCss = 'https://localhost:3000/' + urlCss;
-        } else {
-            urlJs = 'build/' + urlJs;
-            urlCss = 'build/' + urlCss;
-        }
-        this.resourceLoader.loadStyle(urlCss);
-        this.resourceLoader.loadScript(urlJs).then(() => {
+        this.resourceLoader.loadLocalStyle('dependencies/simplemde/simplemde.min.css');
+        this.resourceLoader.loadLocalScript('dependencies/simplemde/simplemde.min.js').then(() => {
             this.simplemde = new SimpleMDE({
                 previewRender: (text: string) => {
                     return marked(text, { pedantic: true });
