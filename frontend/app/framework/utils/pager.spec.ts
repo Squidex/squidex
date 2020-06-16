@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Mock, Times } from 'typemoq';
-import { LocalStoreService } from './../services/local-store.service';
 import { Pager } from './pager';
 
 describe('Pager', () => {
@@ -212,28 +210,5 @@ describe('Pager', () => {
             canGoNext: false,
             canGoPrev: false
         });
-    });
-
-    it('should create pager from local store', () => {
-        const localStore = Mock.ofType<LocalStoreService>();
-
-        localStore.setup(x => x.getInt('my.pageSize', 15))
-            .returns((() => 25));
-
-        const pager = Pager.fromLocalStore('my', localStore.object, 15);
-
-        expect(pager.pageSize).toBe(25);
-    });
-
-    it('should save pager to local store', () => {
-        const localStore = Mock.ofType<LocalStoreService>();
-
-        const pager = new Pager(0, 0, 25);
-
-        pager.saveTo('my', localStore.object);
-
-        localStore.verify(x => x.setInt('my.pageSize', 25), Times.once());
-
-        expect().nothing();
     });
 });

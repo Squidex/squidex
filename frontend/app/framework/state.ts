@@ -132,7 +132,7 @@ export class Model<T> {
 
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
-                let value = values[key];
+                const value = values[key];
 
                 if (value || !validOnly) {
                     clone[key] = value;

@@ -6,18 +6,17 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, UIState } from '@app/shared';
+import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, Router2State, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
-    templateUrl: './assets-page.component.html'
+    templateUrl: './assets-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
 export class AssetsPageComponent extends ResourceOwner implements OnInit {
-    public assetsFilter = new FormControl();
-
     public queries = new Queries(this.uiState, 'assets');
 
     public addAssetFolderDialog = new DialogModel();
@@ -25,9 +24,9 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public isListView: boolean;
 
     constructor(
+        public readonly assetsRoute: Router2State,
         public readonly assetsState: AssetsState,
         private readonly localStore: LocalStoreService,
-        private readonly route: ActivatedRoute,
         private readonly uiState: UIState
     ) {
         super();
@@ -36,11 +35,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.own(
-            this.route.queryParams
-                .subscribe(p => {
-                    this.assetsState.search({ fullText: p['query'] });
-                }));
+        this.assetsState.loadAndListen(this.assetsRoute);
     }
 
     public reload() {

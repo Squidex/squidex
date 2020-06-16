@@ -161,7 +161,7 @@ describe('AssetUploaderState', () => {
     it('should update status when uploading asset completes', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        let updated = createAsset(1, undefined, '_new');
+        const updated = createAsset(1, undefined, '_new');
 
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
             .returns(() => of(10, 20, updated)).verifiable();

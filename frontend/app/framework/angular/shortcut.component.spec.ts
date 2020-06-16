@@ -10,7 +10,7 @@ import { ShortcutService } from '@app/framework/internal';
 import { ShortcutComponent } from './shortcut.component';
 
 describe('ShortcutComponent', () => {
-    let changeDetector: any = {
+    const changeDetector: any = {
         detach: () => {
             return 0;
         }
