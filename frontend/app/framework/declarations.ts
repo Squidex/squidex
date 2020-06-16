@@ -62,6 +62,7 @@ export * from './angular/popup-link.directive';
 export * from './angular/resized.directive';
 export * from './angular/routers/can-deactivate.guard';
 export * from './angular/routers/parent-link.directive';
+export * from './angular/routers/router-2-state';
 export * from './angular/safe-html.pipe';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';

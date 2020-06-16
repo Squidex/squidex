@@ -6,14 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, LocalStoreService, Pager, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
 import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
-import { Query } from './query';
+import { Query, QuerySynchronizer } from './query';
 import { SchemasState } from './schemas.state';
 
 interface Snapshot {
@@ -46,8 +46,6 @@ interface Snapshot {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    private previousId: string;
-
     public selectedContent: Observable<ContentDto | null | undefined> =
         this.project(x => x.selectedContent, Types.equals);
 
@@ -84,16 +82,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService
+        private readonly dialogs: DialogService
     ) {
         super({
             contents: [],
-            contentsPager: Pager.fromLocalStore('contents', localStore)
-        });
-
-        this.contentsPager.subscribe(pager => {
-            pager.saveTo('contents', this.localStore);
+            contentsPager: new Pager(0)
         });
     }
 
@@ -121,11 +114,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
-    public load(isReload = false): Observable<any> {
-        if (!isReload && this.schemaId !== this.previousId) {
-            const contentsPager = this.snapshot.contentsPager.reset();
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
+            .keep('selectedContent')
+            .withPager('contentsPager', 'contents', 10)
+            .withSynchronizer('contentsQuery', new QuerySynchronizer())
+            .whenSynced(() => this.loadInternal(false))
+            .build();
+    }
 
-            this.resetState({ contentsPager, selectedContent: this.snapshot.selectedContent });
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState({ selectedContent: this.snapshot.selectedContent });
         }
 
         return this.loadInternal(isReload);
@@ -149,8 +149,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
 
         this.next({ isLoading: true });
-
-        this.previousId = this.schemaId;
 
         const query: any = {
              take: this.snapshot.contentsPager.pageSize,
@@ -331,10 +329,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
 @Injectable()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService,
+    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs, localStore);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaId() {
@@ -347,9 +345,9 @@ export class ManualContentsState extends ContentsStateBase {
     public schema: SchemaDto;
 
     constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService, localStore: LocalStoreService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
-        super(appsState, contentsService, dialogs, localStore);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaId() {

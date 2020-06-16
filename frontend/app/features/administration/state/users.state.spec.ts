@@ -6,14 +6,17 @@
  */
 
 import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
-import { DialogService, LocalStoreService, Pager } from '@app/shared';
+import { DialogService, Pager } from '@app/shared';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { TestValues } from './../../../shared/state/_test-helpers';
 import { createUser } from './../services/users.service.spec';
 import { UsersState } from './users.state';
 
 describe('UsersState', () => {
+    const { buildDummyStateSynchronizer } = TestValues;
+
     const user1 = createUser(1);
     const user2 = createUser(2);
 
@@ -22,17 +25,14 @@ describe('UsersState', () => {
     const newUser = createUser(3);
 
     let dialogs: IMock<DialogService>;
-    let localStore: IMock<LocalStoreService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        localStore = Mock.ofType<LocalStoreService>();
-
         usersService = Mock.ofType<UsersService>();
-        usersState = new UsersState(dialogs.object, localStore.object, usersService.object);
+        usersState = new UsersState(dialogs.object, usersService.object);
     });
 
     afterEach(() => {
@@ -61,15 +61,6 @@ describe('UsersState', () => {
             usersState.load().pipe(onErrorResumeNext()).subscribe();
 
             expect(usersState.snapshot.isLoading).toBeFalsy();
-        });
-
-        it('should load page size from local store', () => {
-            localStore.setup(x => x.getInt('users.pageSize', 10))
-                .returns(() => 25);
-
-            const state = new UsersState(dialogs.object, localStore.object, usersService.object);
-
-            expect(state.snapshot.usersPager.pageSize).toBe(25);
         });
 
         it('should show notification on load when reload is true', () => {
@@ -111,17 +102,6 @@ describe('UsersState', () => {
             expect().nothing();
         });
 
-        it('should update page size in local store', () => {
-            usersService.setup(x => x.getUsers(50, 0, undefined))
-                .returns(() => of(new UsersDto(200, []))).verifiable();
-
-            usersState.setPager(new Pager(0, 0, 50));
-
-            localStore.verify(x => x.setInt('users.pageSize', 50), Times.atLeastOnce());
-
-            expect().nothing();
-        });
-
         it('should load with query when searching', () => {
             usersService.setup(x => x.getUsers(10, 0, 'my-query'))
                 .returns(() => of(new UsersDto(0, []))).verifiable();
@@ -129,6 +109,20 @@ describe('UsersState', () => {
             usersState.search('my-query').subscribe();
 
             expect(usersState.snapshot.usersQuery).toEqual('my-query');
+        });
+
+        it('should load when synchronizer triggered', () => {
+            const { synchronizer, trigger } = buildDummyStateSynchronizer();
+
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
+
+            usersState.loadAndListen(synchronizer);
+
+            trigger();
+            trigger();
+
+            expect().nothing();
         });
     });
 

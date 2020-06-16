@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryContentsByQuery : OperationBase
     {
-        private static readonly PropertyPath DefaultOrderField = "mt";
         private readonly DataConverter converter;
         private readonly ITextIndex indexer;
 
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 foreach (var field in query.GetAllFields())
                 {
-                    projection = Projection.Include(field);
+                    projection = projection.Include(field);
                 }
 
                 var joined =
@@ -143,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         private static bool IsSatisfiedByIndex(ClrQuery query)
         {
-            return query.Sort?.Any(x => x.Path == DefaultOrderField && x.Order == SortOrder.Descending) == true;
+            return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
         }
 
         private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, ClrQuery? query)

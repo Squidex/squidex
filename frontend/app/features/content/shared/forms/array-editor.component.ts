@@ -70,7 +70,7 @@ export class ArrayEditorComponent {
     }
 
     public move(control: AbstractControl, index: number) {
-        let controls = [...this.arrayControl.controls];
+        const controls = [...this.arrayControl.controls];
 
         controls.splice(controls.indexOf(control), 1);
         controls.splice(index, 0, control);
