@@ -91,11 +91,13 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2));
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater) where T : IVersionedEntity<TKey> where TKey : notnull
+        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<TEntity>, UpdateDefinition<TEntity>> updater)
+            where TEntity : IVersionedEntity<TKey>
+            where TKey : notnull
         {
             try
             {
-                var update = updater(Builders<T>.Update.Set(x => x.Version, newVersion));
+                var update = updater(Builders<TEntity>.Update.Set(x => x.Version, newVersion));
 
                 if (oldVersion > EtagVersion.Any)
                 {
@@ -116,7 +118,7 @@ namespace Squidex.Infrastructure.MongoDb
 
                     if (existingVersion != null)
                     {
-                        var versionField = BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
+                        var versionField = GetVersionField<TEntity, TKey>();
 
                         throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                     }
@@ -128,7 +130,9 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, T doc) where T : IVersionedEntity<TKey> where TKey : notnull
+        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, TEntity doc)
+            where TEntity : IVersionedEntity<TKey>
+            where TKey : notnull
         {
             try
             {
@@ -151,7 +155,9 @@ namespace Squidex.Infrastructure.MongoDb
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion[nameof(IVersionedEntity<TKey>.Version)].AsInt64, oldVersion, ex);
+                        var versionField = GetVersionField<TEntity, TKey>();
+
+                        throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                     }
                 }
                 else
@@ -159,6 +165,13 @@ namespace Squidex.Infrastructure.MongoDb
                     throw;
                 }
             }
+        }
+
+        private static string GetVersionField<TEntity, TKey>()
+            where TEntity : IVersionedEntity<TKey>
+            where TKey : notnull
+        {
+            return BsonClassMap.LookupClassMap(typeof(TEntity)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
         }
 
         public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
