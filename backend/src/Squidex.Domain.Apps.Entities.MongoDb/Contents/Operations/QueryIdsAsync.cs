@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -19,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryIdsAsync : OperationBase
     {
+        private readonly Lazy<string> idField = new Lazy<string>(GetIdField);
+        private readonly Lazy<string> schemaIdField = new Lazy<string>(GetSchemaIdField);
         private static readonly List<(Guid SchemaId, Guid Id)> EmptyIds = new List<(Guid SchemaId, Guid Id)>();
         private readonly IAppProvider appProvider;
 
@@ -49,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (Guid.Parse(x[schemaIdField.Value].AsString), Guid.Parse(x[idField.Value].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> DoAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
@@ -67,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (Guid.Parse(x["_si"].AsString), Guid.Parse(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (Guid.Parse(x[schemaIdField.Value].AsString), Guid.Parse(x[idField.Value].AsString))).ToList();
         }
 
         public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, Guid schemaId)
@@ -84,6 +87,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
 
             return Filter.And(filters);
+        }
+
+        private static string GetIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.Id)).ElementName;
+        }
+
+        private static string GetSchemaIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.Id)).ElementName;
         }
     }
 }

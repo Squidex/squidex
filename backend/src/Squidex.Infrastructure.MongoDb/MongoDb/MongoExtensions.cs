@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
 
@@ -77,14 +78,6 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2));
         }
 
-        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> include1,
-            Expression<Func<TDocument, object>> include2,
-            Expression<Func<TDocument, object>> include3)
-        {
-            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2).Include(include3));
-        }
-
         public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
             Expression<Func<TDocument, object>> exclude)
         {
@@ -96,14 +89,6 @@ namespace Squidex.Infrastructure.MongoDb
             Expression<Func<TDocument, object>> exclude2)
         {
             return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2));
-        }
-
-        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> exclude1,
-            Expression<Func<TDocument, object>> exclude2,
-            Expression<Func<TDocument, object>> exclude3)
-        {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2).Exclude(exclude3));
         }
 
         public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater) where T : IVersionedEntity<TKey> where TKey : notnull
@@ -131,7 +116,9 @@ namespace Squidex.Infrastructure.MongoDb
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion[nameof(IVersionedEntity<TKey>.Version)].AsInt64, oldVersion, ex);
+                        var versionField = BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
+
+                        throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                     }
                 }
                 else
