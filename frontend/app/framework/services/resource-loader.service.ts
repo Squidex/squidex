@@ -61,18 +61,12 @@ export class ResourceLoaderService {
     }
 
     public loadLocalScript(url: string): Promise<any> {
-        if (process.env.NODE_ENV !== 'production') {
-            return this.loadScript(`https://localhost:3000/${url}`);
-        } else {
-            return this.loadScript(`build/${url}`);
-        }
+        return process.env.NODE_ENV !== 'production' ?
+        this.loadScript(`https://localhost:3000/${url}`) : this.loadScript(`build/${url}`);
     }
 
     public loadLocalStyle(url: string): Promise<any> {
-        if (process.env.NODE_ENV !== 'production') {
-            return this.loadStyle(`https://localhost:3000/${url}`);
-        } else {
-            return this.loadStyle(`build/${url}`);
-        }
+        return process.env.NODE_ENV !== 'production' ?
+        this.loadStyle(`https://localhost:3000/${url}`) : this.loadStyle(`build/${url}`);
     }
 }
