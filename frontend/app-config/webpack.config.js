@@ -224,6 +224,9 @@ module.exports = function (env) {
                   { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
                   { from: './node_modules/ace-builds/src-min/mode-javascript.js', to: 'dependencies/ace/mode-javascript.js' },
                   { from: './node_modules/ace-builds/src-min/worker-javascript.js', to: 'dependencies/ace/worker-javascript.js' },
+
+                  { from: './node_modules/font-awesome/css/font-awesome.min.css', to: 'dependencies/font-awesome/css/font-awesome.min.css' },
+                  { from: './node_modules/font-awesome/fonts', to: 'dependencies/font-awesome/fonts' },
                 ],
               }),
         ],

@@ -34,6 +34,7 @@
     "core-js": "3.6.4",
     "cropperjs": "2.0.0-alpha.1",
     "date-fns": "2.11.0",
+    "font-awesome": "^4.7.0",
     "graphiql": "0.17.5",
     "graphql": "14.6.0",
     "image-focus": "1.1.0",
