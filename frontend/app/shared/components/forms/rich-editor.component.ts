@@ -62,7 +62,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public ngAfterViewInit() {
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.2.0/tinymce.min.js').then(() => {
+        this.resourceLoader.loadLocalScript('dependencies/tinymce/tinymce.min.js').then(() => {
             const timer = setInterval(() => {
                 const target = this.editor.nativeElement;
 
