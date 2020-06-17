@@ -83,7 +83,7 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
             this.editor.nativeElement.style.height = `${this.height}px`;
         }
 
-        this.resourceLoader.loadLocalScript('dependencies/ace/ace.min.js').then(() => {
+        this.resourceLoader.loadLocalScript('dependencies/ace/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
             this.aceEditor.getSession().setMode(this.mode);
