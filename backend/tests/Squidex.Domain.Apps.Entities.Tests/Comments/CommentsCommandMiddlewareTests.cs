@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Should_invoke_commands_for_mentioned_users()
+        public async Task Should_not_invoke_commands_for_mentioned_users()
         {
             SetupUser("id1", "mail1@squidex.io");
             SetupUser("id2", "mail2@squidex.io");
@@ -101,11 +101,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.That.Matches(x => IsForUser(x, "id1"))))
-                .MustHaveHappened();
-
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.That.Matches(x => IsForUser(x, "id2"))))
-                .MustHaveHappened();
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
