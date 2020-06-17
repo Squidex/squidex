@@ -64,7 +64,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         this.contentEvents =
             this.contentsState.selectedContent.pipe(
                 filter(x => !!x),
-                map(content => `contents.${content?.id}`),
+                map(content => `schemas.${this.schemasState.schemaId}.contents.${content?.id}`),
                 switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
                 switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel)));
     }

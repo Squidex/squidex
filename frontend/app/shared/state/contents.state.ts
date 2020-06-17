@@ -79,6 +79,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public statusQueries =
         this.projectFrom(this.statuses, x => buildStatusQueries(x));
 
+    public get appName() {
+        return this.appsState.appName;
+    }
+
+    public get appId() {
+        return this.appsState.appId;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
@@ -300,9 +308,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         return this.loadInternal(false);
     }
-    private get appName() {
-        return this.appsState.appName;
-    }
 
     private replaceContent(content: ContentDto, oldVersion?: Version, updateText?: string) {
         if (!oldVersion || !oldVersion.eq(content.version)) {
@@ -324,7 +329,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    protected abstract get schemaId(): string;
+    public abstract get schemaId(): string;
 }
 
 @Injectable()
@@ -335,8 +340,8 @@ export class ContentsState extends ContentsStateBase {
         super(appsState, contentsService, dialogs);
     }
 
-    protected get schemaId() {
-        return this.schemasState.schemaName;
+    public get schemaId() {
+        return this.schemasState.schemaId;
     }
 }
 
@@ -350,8 +355,8 @@ export class ManualContentsState extends ContentsStateBase {
         super(appsState, contentsService, dialogs);
     }
 
-    protected get schemaId() {
-        return this.schema.name;
+    public get schemaId() {
+        return this.schema.id;
     }
 }
 

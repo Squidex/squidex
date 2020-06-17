@@ -6,7 +6,7 @@
  */
 
 import { NavigationExtras, Params, Router } from '@angular/router';
-import { LocalStoreService, MathHelper, Pager } from '@app/shared';
+import { LocalStoreService, MathHelper, Pager } from '@app/framework/internal';
 import { BehaviorSubject } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { State } from './../../state';

@@ -153,7 +153,7 @@ export class Router2State implements OnDestroy, StateSynchronizer {
         this.mapper?.ngOnDestroy();
     }
 
-    public mapTo<T extends object>(state: State<T>): Router2StateMap<T> {
+    public mapTo<T extends object>(state: State<T>) {
         this.mapper?.ngOnDestroy();
         this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 

@@ -33,6 +33,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserPictureStore userPictureStore;
+        private readonly IUserEvents userEvents;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly MyIdentityOptions identityOptions;
 
@@ -40,6 +41,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IUserPictureStore userPictureStore,
+            IUserEvents userEvents,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IOptions<MyIdentityOptions> identityOptions)
         {
@@ -47,6 +49,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             this.identityOptions = identityOptions.Value;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
+            this.userEvents = userEvents;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
@@ -84,7 +87,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
                 "Account updated successfully.", model);
         }
 
@@ -92,7 +95,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/properties/")]
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
                 "Account updated successfully.", model);
         }
 
@@ -141,6 +144,23 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(userManager.GetUserId(User));
 
             return await userManager.AddLoginAsync(user, externalLogin);
+        }
+
+        private async Task<IdentityResult> UpdateAsync(IdentityUser user, UserValues values)
+        {
+            var result = await userManager.UpdateSafeAsync(user, values);
+
+            if (result.Succeeded)
+            {
+                var resolved = await userManager.ResolveUserAsync(user);
+
+                if (resolved != null)
+                {
+                    userEvents.OnUserUpdated(resolved);
+                }
+            }
+
+            return result;
         }
 
         private async Task<IdentityResult> UpdatePictureAsync(List<IFormFile> file, IdentityUser user)

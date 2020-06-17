@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,13 +9,17 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users
 {
-    public sealed class NoopUserEvents : IUserEvents
+    public interface IUserEventHandler
     {
-        public void OnConsentGiven(IUser user)
+        void OnUserRegistered(IUser user)
         {
         }
 
-        public void OnUserRegistered(IUser user)
+        void OnUserUpdated(IUser user)
+        {
+        }
+
+        void OnConsentGiven(IUser user)
         {
         }
     }

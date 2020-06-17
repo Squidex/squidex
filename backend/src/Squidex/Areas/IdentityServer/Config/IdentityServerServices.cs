@@ -96,7 +96,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 new[]
                 {
                     SquidexClaimTypes.DisplayName,
-                    SquidexClaimTypes.PictureUrl
+                    SquidexClaimTypes.PictureUrl,
+                    SquidexClaimTypes.NotifoKey
                 });
         }
     }

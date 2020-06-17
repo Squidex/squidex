@@ -50,9 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.appProvider = appProvider;
 
             this.cache = cache;
-            this.localCache = localCache;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
+            this.localCache = localCache;
         }
 
         public bool Handles(StoredEvent @event)

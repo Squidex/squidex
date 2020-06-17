@@ -1,0 +1,26 @@
+:host ::ng-deep {
+    .notifo-notifications-button {
+        margin-left: .75rem;
+        margin-right: .75rem;
+        margin-top: .25rem;
+
+        svg {
+            fill: $color-white;
+        }
+    }
+
+    .notifo-topics-button {
+        margin-left: .75rem;
+        margin-right: .75rem;
+
+        svg {
+            fill: darken($color-border, 30%);
+        }
+    }
+
+    .notifo-container {
+        display: inline-block;
+        max-width: 5rem;
+        min-width: 3rem;
+    }
+}

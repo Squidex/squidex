@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +66,28 @@ namespace Squidex.Domain.Users
             }
         }
 
+        public async Task SetClaimAsync(string id, string type, string value)
+        {
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(type, nameof(type));
+            Guard.NotNullOrEmpty(value, nameof(value));
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                var values = new UserValues
+                {
+                    CustomClaims = new List<Claim>
+                    {
+                        new Claim(type, value)
+                    }
+                };
+
+                await userManager.UpdateAsync(id, values);
+            }
+        }
+
         public async Task<IUser?> FindByIdAsync(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -95,6 +118,18 @@ namespace Squidex.Domain.Users
                 {
                     return await userManager.FindByEmailWithClaimsAsync(idOrEmail);
                 }
+            }
+        }
+
+        public async Task<List<IUser>> QueryAllAsync()
+        {
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                var result = await userManager.QueryByEmailAsync(null);
+
+                return result.OfType<IUser>().ToList();
             }
         }
 
