@@ -115,7 +115,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             of(this.snapshot.contents.find(x => x.id === id)).pipe(
                 switchMap(content => {
                     if (!content) {
-                        return this.contentsService.getContent(this.appName, this.schemaId, id).pipe(catchError(() => of(null)));
+                        return this.contentsService.getContent(this.appName, this.schemaName, id).pipe(catchError(() => of(null)));
                     } else {
                         return of(content);
                     }
@@ -152,7 +152,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private loadInternalCore(isReload: boolean) {
-        if (!this.appName || !this.schemaId) {
+        if (!this.appName || !this.schemaName) {
             return empty();
         }
 
@@ -167,7 +167,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             query.query = this.snapshot.contentsQuery;
         }
 
-        return this.contentsService.getContents(this.appName, this.schemaId, query).pipe(
+        return this.contentsService.getContents(this.appName, this.schemaName, query).pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
@@ -202,12 +202,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaId, content.id, version).pipe(
+        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
             shareSubscribed(this.dialogs));
     }
 
     public create(request: any, publish: boolean): Observable<ContentDto> {
-        return this.contentsService.postContent(this.appName, this.schemaId, request, publish).pipe(
+        return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(payload => {
                 this.dialogs.notifyInfo('Content created successfully.');
 
@@ -330,6 +330,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public abstract get schemaId(): string;
+
+    public abstract get schemaName(): string;
 }
 
 @Injectable()
@@ -342,6 +344,10 @@ export class ContentsState extends ContentsStateBase {
 
     public get schemaId() {
         return this.schemasState.schemaId;
+    }
+
+    public get schemaName() {
+        return this.schemasState.schemaName;
     }
 }
 
@@ -357,6 +363,10 @@ export class ManualContentsState extends ContentsStateBase {
 
     public get schemaId() {
         return this.schema.id;
+    }
+
+    public get schemaName() {
+        return this.schema.name;
     }
 }
 

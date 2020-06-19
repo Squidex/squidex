@@ -7,6 +7,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Grpc.Core;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Notifo.SDK;
@@ -178,7 +179,14 @@ namespace Squidex.Domain.Apps.Entities.History
 
                         var request = BuildAllowedTopicRequest(contributorAssigned, contributorAssigned.ContributorId);
 
-                        await client.AddAllowedTopicAsync(request);
+                        try
+                        {
+                            await client.AddAllowedTopicAsync(request);
+                        }
+                        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                        {
+                            break;
+                        }
 
                         break;
                     }
@@ -187,7 +195,14 @@ namespace Squidex.Domain.Apps.Entities.History
                     {
                         var request = BuildAllowedTopicRequest(contributorRemoved, contributorRemoved.ContributorId);
 
-                        await client.RemoveAllowedTopicAsync(request);
+                        try
+                        {
+                            await client.RemoveAllowedTopicAsync(request);
+                        }
+                        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                        {
+                            break;
+                        }
 
                         break;
                     }

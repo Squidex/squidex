@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         private static string GetSchemaIdField()
         {
-            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.Id)).ElementName;
+            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.IndexedSchemaId)).ElementName;
         }
     }
 }
