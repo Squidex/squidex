@@ -99,7 +99,6 @@ namespace Squidex.Domain.Apps.Entities.History
             var userRequest = new UpsertUserRequest
             {
                 AppId = options.AppId,
-                EmailAddress = user.Email,
                 FullName = user.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
@@ -107,6 +106,11 @@ namespace Squidex.Domain.Apps.Entities.History
                 Settings = settings,
                 UserId = user.Id
             };
+
+            if (user.Email.IsEmail())
+            {
+                userRequest.EmailAddress = user.Email;
+            }
 
             var response = await client.UpsertUserAsync(userRequest);
 
