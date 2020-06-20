@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure.Queries;
@@ -20,37 +21,37 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly Guid appId = Guid.NewGuid();
 
         [Fact]
-        public void Should_normalize_tags()
+        public async Task Should_normalize_tags()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
             var source = ClrFilter.Eq("tags", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId, tagService);
+            var result = await FilterTagTransformer.TransformAsync(source, appId, tagService);
 
             Assert.Equal("tags == 'id1'", result!.ToString());
         }
 
         [Fact]
-        public void Should_not_fail_when_tags_not_found()
+        public async Task Should_not_fail_when_tags_not_found()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());
 
             var source = ClrFilter.Eq("tags", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId, tagService);
+            var result = await FilterTagTransformer.TransformAsync(source, appId, tagService);
 
             Assert.Equal("tags == 'name1'", result!.ToString());
         }
 
         [Fact]
-        public void Should_not_normalize_other_field()
+        public async Task Should_not_normalize_other_field()
         {
             var source = ClrFilter.Eq("other", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId, tagService);
+            var result = await FilterTagTransformer.TransformAsync(source, appId, tagService);
 
             Assert.Equal("other == 'value'", result!.ToString());
 

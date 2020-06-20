@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.tagService = tagService;
         }
 
-        public virtual ClrQuery ParseQuery(Context context, Q q)
+        public virtual async ValueTask<ClrQuery> ParseQueryAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (result.Filter != null)
                 {
-                    result.Filter = FilterTagTransformer.Transform(result.Filter, context.App.Id, tagService);
+                    result.Filter = await FilterTagTransformer.TransformAsync(result.Filter, context.App.Id, tagService);
                 }
 
                 if (result.Sort.Count == 0)

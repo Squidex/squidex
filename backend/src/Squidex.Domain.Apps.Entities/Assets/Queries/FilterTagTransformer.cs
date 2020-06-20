@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
-    public sealed class FilterTagTransformer : TransformVisitor<ClrValue>
+    public sealed class FilterTagTransformer : AsyncTransformVisitor<ClrValue>
     {
         private readonly ITagService tagService;
         private readonly Guid appId;
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.tagService = tagService;
         }
 
-        public static FilterNode<ClrValue>? Transform(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
+        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
         {
             Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));
@@ -33,11 +33,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return nodeIn.Accept(new FilterTagTransformer(appId, tagService));
         }
 
-        public override FilterNode<ClrValue>? Visit(CompareFilter<ClrValue> nodeIn)
+        public override async ValueTask<FilterNode<ClrValue>?> Visit(CompareFilter<ClrValue> nodeIn)
         {
             if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
             {
-                var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(stringValue))).Result;
+                var tagNames = await tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(stringValue));
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {

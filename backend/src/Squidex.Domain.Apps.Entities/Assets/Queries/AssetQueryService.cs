@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, Guid? parentId, Q query)
         {
-            var parsedQuery = queryParser.ParseQuery(context, query);
+            var parsedQuery = await queryParser.ParseQueryAsync(context, query);
 
             return await assetRepository.QueryAsync(context.App.Id, parentId, parsedQuery);
         }
