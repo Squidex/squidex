@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
@@ -87,14 +88,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
 
-                await Task.WhenAll(contentItems, contentCount);
+                var (items, total) = await AsyncHelper.WhenAll(contentItems, contentCount);
 
-                foreach (var entity in contentItems.Result)
+                foreach (var entity in items)
                 {
                     entity.ParseData(schema.SchemaDef, converter);
                 }
 
-                return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
+                return ResultList.Create<IContentEntity>(total, items);
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {

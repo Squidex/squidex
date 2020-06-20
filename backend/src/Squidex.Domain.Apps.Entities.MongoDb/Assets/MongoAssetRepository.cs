@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
@@ -84,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .QuerySort(query)
                             .ToListAsync();
 
-                    await Task.WhenAll(assetItems, assetCount);
+                    var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
 
-                    return ResultList.Create<IAssetEntity>(assetCount.Result, assetItems.Result);
+                    return ResultList.Create<IAssetEntity>(total, items);
                 }
                 catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {

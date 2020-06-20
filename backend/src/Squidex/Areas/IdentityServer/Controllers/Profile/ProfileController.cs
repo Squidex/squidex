@@ -21,6 +21,7 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -232,11 +233,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 throw new DomainException("Cannot find user.");
             }
 
-            var taskForProviders = signInManager.GetExternalProvidersAsync();
-            var taskForPassword = userManager.HasPasswordAsync(user.Identity);
-            var taskForLogins = userManager.GetLoginsAsync(user.Identity);
-
-            await Task.WhenAll(taskForProviders, taskForPassword, taskForLogins);
+            var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
+                signInManager.GetExternalProvidersAsync(),
+                userManager.HasPasswordAsync(user.Identity),
+                userManager.GetLoginsAsync(user.Identity));
 
             var result = new ProfileVM
             {
@@ -244,10 +244,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 ClientSecret = user.ClientSecret()!,
                 Email = user.Email,
                 ErrorMessage = errorMessage,
-                ExternalLogins = taskForLogins.Result,
-                ExternalProviders = taskForProviders.Result,
+                ExternalLogins = logins,
+                ExternalProviders = providers,
                 DisplayName = user.DisplayName()!,
-                HasPassword = taskForPassword.Result,
+                HasPassword = hasPassword,
                 HasPasswordAuth = identityOptions.AllowPasswordAuth,
                 IsHidden = user.IsHidden(),
                 SuccessMessage = successMessage

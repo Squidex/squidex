@@ -13,6 +13,7 @@ using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -51,17 +52,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] Guid parentId)
         {
-            var assetFolders = assetQuery.QueryAssetFoldersAsync(Context, parentId);
-            var assetPath = assetQuery.FindAssetFolderAsync(parentId);
-
-            await Task.WhenAll(assetFolders, assetPath);
+            var (folders, path) = await AsyncHelper.WhenAll(
+                assetQuery.QueryAssetFoldersAsync(Context, parentId),
+                assetQuery.FindAssetFolderAsync(parentId));
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(assetFolders.Result, assetPath.Result, Resources);
+                return AssetFoldersDto.FromAssets(folders, path, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = assetFolders.Result.ToEtag();
+            Response.Headers[HeaderNames.ETag] = folders.ToEtag();
 
             return Ok(response);
         }

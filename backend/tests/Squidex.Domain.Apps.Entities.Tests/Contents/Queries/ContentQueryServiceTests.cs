@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
                 .Returns(schema);
 
-            A.CallTo(() => queryParser.ParseQuery(A<Context>._, schema, A<Q>._))
+            A.CallTo(() => queryParser.ParseQueryAsync(A<Context>._, schema, A<Q>._))
                 .Returns(new ClrQuery());
 
             sut = new ContentQueryService(

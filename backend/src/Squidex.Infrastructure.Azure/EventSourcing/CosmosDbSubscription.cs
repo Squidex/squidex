@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             if (fromBeginning)
             {
-                hostName = $"squidex.{DateTime.UtcNow.Ticks.ToString()}";
+                hostName = $"squidex.{DateTime.UtcNow.Ticks}";
             }
             else
             {

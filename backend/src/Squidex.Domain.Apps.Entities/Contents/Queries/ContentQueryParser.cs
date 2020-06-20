@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.options = options.Value;
         }
 
-        public virtual ClrQuery ParseQuery(Context context, ISchemaEntity schema, Q q)
+        public virtual ValueTask<ClrQuery> ParseQueryAsync(Context context, ISchemaEntity schema, Q q)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(schema, nameof(schema));
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     result.Take = options.MaxResults;
                 }
 
-                return result;
+                return new ValueTask<ClrQuery>(result);
             }
         }
 
