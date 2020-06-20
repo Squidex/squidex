@@ -59,11 +59,11 @@ namespace Squidex.Infrastructure.EventSourcing
             var settings = CatchUpSubscriptionSettings.Default;
 
             return connection.SubscribeToStreamFrom(streamName, position, settings,
-                (s, e) =>
+                async (s, e) =>
                 {
                     var storedEvent = Formatter.Read(e, prefix, serializer);
 
-                    subscriber.OnEventAsync(this, storedEvent).Wait();
+                    await subscriber.OnEventAsync(this, storedEvent);
                 }, null,
                 (s, reason, ex) =>
                 {

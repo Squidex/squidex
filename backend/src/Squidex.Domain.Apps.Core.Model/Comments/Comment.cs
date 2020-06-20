@@ -30,9 +30,13 @@ namespace Squidex.Domain.Apps.Core.Comments
             Guard.NotNull(text, nameof(text));
 
             Id = id;
+
             Text = text;
+
             Time = time;
+
             User = user;
+
             Url = url;
         }
     }

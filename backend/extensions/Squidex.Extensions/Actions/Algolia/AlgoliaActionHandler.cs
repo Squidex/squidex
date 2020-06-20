@@ -96,7 +96,7 @@ namespace Squidex.Extensions.Actions.Algolia
                 return Result.Ignored();
             }
 
-            var index = clients.GetClient((job.AppId, job.ApiKey, job.IndexName));
+            var index = await clients.GetClientAsync((job.AppId, job.ApiKey, job.IndexName));
 
             try
             {

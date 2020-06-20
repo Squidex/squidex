@@ -49,7 +49,7 @@ namespace Squidex.Extensions.Actions.AzureQueue
 
         protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job, CancellationToken ct = default)
         {
-            var queue = clients.GetClient((job.QueueConnectionString, job.QueueName));
+            var queue = await clients.GetClientAsync((job.QueueConnectionString, job.QueueName));
 
             await queue.AddMessageAsync(new CloudQueueMessage(job.MessageBodyV2), null, null, null, null, ct);
 
