@@ -17,6 +17,7 @@ using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 
 namespace Squidex.Areas.IdentityServer.Config
@@ -46,7 +47,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 var adminEmail = options.AdminEmail;
                 var adminPass = options.AdminPassword;
 
-                Task.Run(async () =>
+                AsyncHelper.Sync(async () =>
                 {
                     if (userManager.SupportsQueryableUsers && !userManager.Users.Any())
                     {
@@ -69,7 +70,7 @@ namespace Squidex.Areas.IdentityServer.Config
                                 .WriteProperty("status", "failed"));
                         }
                     }
-                }).Wait();
+                });
             }
 
             return services;

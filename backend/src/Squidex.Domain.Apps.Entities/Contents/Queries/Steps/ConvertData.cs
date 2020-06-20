@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -72,12 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (ids.Count > 0)
                 {
-                    var taskForAssets = QueryAssetIdsAsync(context, ids);
-                    var taskForContents = QueryContentIdsAsync(context, ids);
+                    var (assets, refContents) = await AsyncHelper.WhenAll(
+                        QueryAssetIdsAsync(context, ids),
+                        QueryContentIdsAsync(context, ids));
 
-                    await Task.WhenAll(taskForAssets, taskForContents);
-
-                    var foundIds = new HashSet<Guid>(taskForAssets.Result.Union(taskForContents.Result));
+                    var foundIds = new HashSet<Guid>(assets.Union(refContents));
 
                     return ValueReferencesConverter.CleanReferences(foundIds);
                 }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
@@ -46,14 +47,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var grain = grainFactory.GetGrain<ICounterGrain>(appId);
 
-            return Task.Run(() => grain.IncrementAsync(name)).Result;
+            return AsyncHelper.Sync(() => grain.IncrementAsync(name));
         }
 
         private long Reset(Guid appId, string name, long value)
         {
             var grain = grainFactory.GetGrain<ICounterGrain>(appId);
 
-            return Task.Run(() => grain.ResetAsync(name, value)).Result;
+            return AsyncHelper.Sync(() => grain.ResetAsync(name, value));
         }
     }
 }
