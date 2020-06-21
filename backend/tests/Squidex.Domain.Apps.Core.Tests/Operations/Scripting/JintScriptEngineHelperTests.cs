@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(vars, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("helloWorld", result);
         }
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(vars, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("HelloWorld", result);
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(vars, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("4-haeuser", result);
         }
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(vars, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("4-hauser", result);
         }
@@ -119,7 +119,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject()
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+            var options = new ScriptOptions
+            {
+                CanReject = true
+            };
+
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Empty(ex.Errors);
         }
@@ -131,7 +136,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject('Not valid')
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+            var options = new ScriptOptions
+            {
+                CanReject = true
+            };
+
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Equal("Not valid", ex.Errors.Single().Message);
         }
@@ -143,7 +153,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow()
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+            var options = new ScriptOptions
+            {
+                CanDisallow = true
+            };
+
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Equal("Not allowed", ex.Message);
         }
@@ -155,7 +170,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow('Operation not allowed')
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+            var options = new ScriptOptions
+            {
+                CanDisallow = true
+            };
+
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Equal("Operation not allowed", ex.Message);
         }
@@ -173,7 +193,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
             ";
 
-            var result = await sut.GetAsync(new ScriptVars(), script);
+            var result = await sut.ExecuteAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -201,7 +221,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 }, headers);
             ";
 
-            var result = await sut.GetAsync(new ScriptVars(), script);
+            var result = await sut.ExecuteAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");

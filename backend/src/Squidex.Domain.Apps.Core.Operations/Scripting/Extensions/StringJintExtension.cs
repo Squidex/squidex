@@ -15,27 +15,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
     public sealed class StringJintExtension : IJintExtension
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
-        private readonly StringSlugifyDelegate slugify;
-        private readonly Func<string, JsValue> toCamelCase;
-        private readonly Func<string, JsValue> toPascalCase;
 
-        public StringJintExtension()
-        {
-            slugify = new StringSlugifyDelegate(Slugify);
-
-            toCamelCase = new Func<string, JsValue>(ToCamelCase);
-            toPascalCase = new Func<string, JsValue>(ToPascalCase);
-        }
-
-        public void Extend(Engine engine)
-        {
-            engine.SetValue("slugify", slugify);
-
-            engine.SetValue("toCamelCase", toCamelCase);
-            engine.SetValue("toPascalCase", toPascalCase);
-        }
-
-        private static JsValue Slugify(string text, bool single = false)
+        private readonly StringSlugifyDelegate slugify = (text, single) =>
         {
             try
             {
@@ -45,9 +26,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 return JsValue.Undefined;
             }
-        }
+        };
 
-        private static JsValue ToCamelCase(string text)
+        private readonly Func<string, JsValue> toCamelCase = text =>
         {
             try
             {
@@ -57,9 +38,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 return JsValue.Undefined;
             }
-        }
+        };
 
-        private static JsValue ToPascalCase(string text)
+        private readonly Func<string, JsValue> toPascalCase = text =>
         {
             try
             {
@@ -69,6 +50,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 return JsValue.Undefined;
             }
+        };
+
+        public void Extend(Engine engine)
+        {
+            engine.SetValue("slugify", slugify);
+
+            engine.SetValue("toCamelCase", toCamelCase);
+            engine.SetValue("toPascalCase", toPascalCase);
         }
     }
 }

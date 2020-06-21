@@ -122,7 +122,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return context.Data!;
             }
 
-            return await scriptEngine.ExecuteAndTransformAsync(context, actualScript);
+            var options = new ScriptOptions
+            {
+                AsContext = true,
+                CanDisallow = true,
+                CanReject = true
+            };
+
+            return await scriptEngine.TransformAsync(context, actualScript, options);
         }
 
         public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptVars context)
@@ -135,6 +142,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 return;
             }
+
+            var options = new ScriptOptions
+            {
+                AsContext = true,
+                CanDisallow = true,
+                CanReject = true
+            };
 
             await scriptEngine.ExecuteAsync(context, GetScript(script));
         }

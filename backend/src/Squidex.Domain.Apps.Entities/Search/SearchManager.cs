@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var tasks = searchSources.Select(x => SearchAsync(x, query, context));
 
-            var results = await Task.WhenAll<SearchResults>(tasks);
+            var results = await Task.WhenAll(tasks);
 
             return new SearchResults(results.SelectMany(x => x));
         }

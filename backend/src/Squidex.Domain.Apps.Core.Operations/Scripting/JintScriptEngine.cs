@@ -40,185 +40,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
 
-        public async Task ExecuteAsync(ScriptVars vars, string script)
-        {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
-
-            using (var cts = new CancellationTokenSource(ExecutionTimeout))
-            {
-                var tcs = new TaskCompletionSource<bool>();
-
-                using (cts.Token.Register(() => tcs.TrySetCanceled()))
-                {
-                    var engine =
-                        CreateEngine(vars, true, cts.Token, tcs.TrySetException, true)
-                            .AddDisallow()
-                            .AddReject();
-
-                    engine.SetValue("complete", new Action<JsValue?>(value =>
-                    {
-                        tcs.TrySetResult(true);
-                    }));
-
-                    Execute(engine, script);
-
-                    if (engine.GetValue("async") != true)
-                    {
-                        tcs.TrySetResult(true);
-                    }
-
-                    await tcs.Task;
-                }
-            }
-        }
-
-        public async Task<NamedContentData> ExecuteAndTransformAsync(ScriptVars vars, string script)
-        {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
-
-            using (var cts = new CancellationTokenSource(ExecutionTimeout))
-            {
-                var tcs = new TaskCompletionSource<NamedContentData>();
-
-                using (cts.Token.Register(() => tcs.TrySetCanceled()))
-                {
-                    var engine =
-                        CreateEngine(vars, true, cts.Token, tcs.TrySetException, true)
-                            .AddDisallow()
-                            .AddReject();
-
-                    engine.SetValue("complete", new Action<JsValue?>(value =>
-                    {
-                        tcs.TrySetResult(vars.Data!);
-                    }));
-
-                    engine.SetValue("replace", new Action(() =>
-                    {
-                        var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
-
-                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
-                        {
-                            if (!tcs.Task.IsCompleted)
-                            {
-                                if (data.TryUpdate(out var modified))
-                                {
-                                    tcs.TrySetResult(modified);
-                                }
-                                else
-                                {
-                                    tcs.TrySetResult(vars.Data!);
-                                }
-                            }
-                        }
-                    }));
-
-                    Execute(engine, script);
-
-                    if (engine.GetValue("async") != true)
-                    {
-                        tcs.TrySetResult(vars.Data!);
-                    }
-
-                    return await tcs.Task;
-                }
-            }
-        }
-
-        public async Task<NamedContentData> TransformAsync(ScriptVars vars, string script)
-        {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
-
-            using (var cts = new CancellationTokenSource(ExecutionTimeout))
-            {
-                var tcs = new TaskCompletionSource<NamedContentData>();
-
-                using (cts.Token.Register(() => tcs.TrySetCanceled()))
-                {
-                    var engine = CreateEngine(vars, true, cts.Token, tcs.TrySetException, true);
-
-                    engine.SetValue("complete", new Action<JsValue?>(value =>
-                    {
-                        tcs.TrySetResult(vars.Data!);
-                    }));
-
-                    engine.SetValue("replace", new Action(() =>
-                    {
-                        var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
-
-                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
-                        {
-                            if (!tcs.Task.IsCompleted)
-                            {
-                                if (data.TryUpdate(out var modified))
-                                {
-                                    tcs.TrySetResult(modified);
-                                }
-                                else
-                                {
-                                    tcs.TrySetResult(vars.Data!);
-                                }
-                            }
-                        }
-                    }));
-
-                    Execute(engine, script);
-
-                    if (engine.GetValue("async") != true)
-                    {
-                        tcs.TrySetResult(vars.Data!);
-                    }
-
-                    return await tcs.Task;
-                }
-            }
-        }
-
-        public bool Evaluate(ScriptVars vars, string script)
-        {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
-
-            try
-            {
-                var engine = CreateEngine(vars, false);
-
-                Execute(engine, script);
-
-                var converted = Equals(engine.GetCompletionValue().ToObject(), true);
-
-                return converted;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public string? Interpolate(ScriptVars vars, string script)
-        {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
-
-            try
-            {
-                var engine = CreateEngine(vars, false);
-
-                Execute(engine, script);
-
-                var converted = engine.GetCompletionValue().ToObject()?.ToString() ?? "null";
-
-                return converted == "undefined" ? "null" : converted;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
-        public Task<IJsonValue> GetAsync(ScriptVars vars, string script)
+        public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default)
         {
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
@@ -227,31 +49,90 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 var tcs = new TaskCompletionSource<IJsonValue>();
 
-                using (cts.Token.Register(() =>
+                using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    tcs.TrySetCanceled();
-                }))
-                {
-                    var engine = CreateEngine(vars, true, cts.Token, ex => tcs.TrySetException(ex), true);
+                    var context = CreateEngine(vars, options, cts.Token, tcs.TrySetException, true);
 
-                    engine.SetValue("complete", new Action<JsValue?>(value =>
+                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
                         tcs.TrySetResult(JsonMapper.Map(value));
                     }));
 
-                    engine.Execute(script);
+                    Execute(context.Engine, script);
 
-                    if (engine.GetValue("async") != true)
+                    if (!context.IsAsync)
                     {
-                        tcs.TrySetResult(JsonMapper.Map(engine.GetCompletionValue()));
+                        tcs.TrySetResult(JsonMapper.Map(context.Engine.GetCompletionValue()));
                     }
-                }
 
-                return tcs.Task;
+                    return await tcs.Task;
+                }
             }
         }
 
-        private Engine CreateEngine(ScriptVars vars, bool nested, CancellationToken cancellationToken = default, ExceptionHandler? exceptionHandler = null, bool async = false)
+        public async Task<NamedContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default)
+        {
+            Guard.NotNull(vars, nameof(vars));
+            Guard.NotNullOrEmpty(script, nameof(script));
+
+            using (var cts = new CancellationTokenSource(ExecutionTimeout))
+            {
+                var tcs = new TaskCompletionSource<NamedContentData>();
+
+                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                {
+                    var context = CreateEngine(vars, options, cts.Token, tcs.TrySetException, true);
+
+                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
+                    {
+                        tcs.TrySetResult(vars.Data!);
+                    }));
+
+                    context.Engine.SetValue("replace", new Action(() =>
+                    {
+                        var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
+
+                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                        {
+                            if (!tcs.Task.IsCompleted)
+                            {
+                                if (data.TryUpdate(out var modified))
+                                {
+                                    tcs.TrySetResult(modified);
+                                }
+                                else
+                                {
+                                    tcs.TrySetResult(vars.Data!);
+                                }
+                            }
+                        }
+                    }));
+
+                    Execute(context.Engine, script);
+
+                    if (!context.IsAsync)
+                    {
+                        tcs.TrySetResult(vars.Data!);
+                    }
+
+                    return await tcs.Task;
+                }
+            }
+        }
+
+        public IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
+        {
+            Guard.NotNull(vars, nameof(vars));
+            Guard.NotNullOrEmpty(script, nameof(script));
+
+            var context = CreateEngine(vars, options);
+
+            Execute(context.Engine, script);
+
+            return JsonMapper.Map(context.Engine.GetCompletionValue());
+        }
+
+        private ExecutionContext CreateEngine(ScriptVars vars, ScriptOptions options, CancellationToken cancellationToken = default, ExceptionHandler? exceptionHandler = null, bool async = false)
         {
             var engine = new Engine(options =>
             {
@@ -261,9 +142,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 options.TimeoutInterval(Timeout);
             });
 
-            if (async)
+            if (options.CanDisallow)
             {
-                engine.SetValue("async", false);
+                engine.AddDisallow();
+            }
+
+            if (options.CanReject)
+            {
+                engine.AddReject();
             }
 
             foreach (var extension in extensions)
@@ -271,16 +157,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var executionvars = new ExecutionContext(engine, cancellationToken, exceptionHandler);
+            var context = new ExecutionContext(engine, cancellationToken, exceptionHandler);
 
-            vars.Add(executionvars, nested);
+            context.AddVariables(vars, options);
 
             foreach (var extension in extensions)
             {
-                extension.Extend(executionvars, async);
+                extension.Extend(context, async);
             }
 
-            return executionvars.Engine;
+            return context;
         }
 
         private void Execute(Engine engine, string script)
