@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ISemanticLog log;
         private readonly IGrainState<BackupState> state;
         private readonly IUserResolver userResolver;
-        private CancellationTokenSource? currentTaskToken;
+        private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
         public BackupGrain(
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task BackupAsync(RefToken actor)
         {
-            if (currentTaskToken != null)
+            if (currentJobToken != null)
             {
                 throw new DomainException("Another backup process is already running.");
             }
@@ -107,14 +107,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Status = JobStatus.Started
             };
 
-            currentTaskToken = new CancellationTokenSource();
+            currentJobToken = new CancellationTokenSource();
             currentJob = job;
 
             state.Value.Jobs.Insert(0, job);
 
             await state.WriteAsync();
 
-            Process(job, actor, currentTaskToken.Token);
+            Process(job, actor, currentJobToken.Token);
         }
 
         private void Process(BackupJob job, RefToken actor, CancellationToken ct)
@@ -205,7 +205,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 await state.WriteAsync();
 
-                currentTaskToken = null;
+                currentJobToken?.Dispose();
+                currentJobToken = null;
                 currentJob = null;
             }
         }
@@ -235,7 +236,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (currentJob == job)
             {
-                currentTaskToken?.Cancel();
+                try
+                {
+                    currentJobToken?.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
             }
             else
             {

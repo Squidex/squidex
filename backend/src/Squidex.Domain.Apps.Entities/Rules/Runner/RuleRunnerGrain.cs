@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly ISemanticLog log;
-        private CancellationTokenSource? currentTaskToken;
+        private CancellationTokenSource? currentJobToken;
         private IGrainReminder? currentReminder;
         private bool isStopping;
 
@@ -80,14 +80,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             isStopping = true;
 
-            currentTaskToken?.Cancel();
+            currentJobToken?.Cancel();
 
             return base.OnDeactivateAsync();
         }
 
         public Task CancelAsync()
         {
-            currentTaskToken?.Cancel();
+            try
+            {
+                currentJobToken?.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                return Task.CompletedTask;
+            }
 
             return Task.CompletedTask;
         }
@@ -99,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         public async Task RunAsync(Guid ruleId)
         {
-            if (currentTaskToken != null)
+            if (currentJobToken != null)
             {
                 throw new DomainException("Another rule is already running.");
             }
@@ -116,11 +123,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         private void EnsureIsRunning()
         {
-            if (state.Value.RuleId.HasValue && currentTaskToken == null)
+            if (state.Value.RuleId.HasValue && currentJobToken == null)
             {
-                currentTaskToken = new CancellationTokenSource();
+                currentJobToken = new CancellationTokenSource();
 
-                Process(state.Value, currentTaskToken.Token);
+                Process(state.Value, currentJobToken.Token);
             }
         }
 
@@ -187,7 +194,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         currentReminder = null;
                     }
 
-                    currentTaskToken = null;
+                    currentJobToken?.Dispose();
+                    currentJobToken = null;
                 }
             }
         }
