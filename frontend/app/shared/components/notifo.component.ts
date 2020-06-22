@@ -44,18 +44,21 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public ngAfterViewInit() {
-        if (this.notifoApiKey) {
+        const userToken = this.notifoApiKey;
+
+        if (userToken) {
             let notifo = window['notifo'];
 
             if (!notifo) {
                 notifo = [];
 
+                const options: any = { apiUrl: this.notifoApiUrl, userToken };
+
                 if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
-                    notifo.push(['set', 'style', 'https://localhost:3002/notifo-sdk.css']);
+                    options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
                 }
 
-                notifo.push(['set', 'api-url', this.notifoApiUrl]);
-                notifo.push(['set', 'user-token', this.notifoApiKey]);
+                notifo.push(['init', options]);
                 notifo.push(['subscribe']);
 
                 window['notifo'] = notifo;
