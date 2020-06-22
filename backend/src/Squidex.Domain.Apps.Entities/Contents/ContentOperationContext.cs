@@ -60,12 +60,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (app == null)
             {
-                throw new InvalidOperationException("Cannot resolve app.");
+                throw new InvalidOperationException($"Cannot resolve app with id {appId}.");
             }
 
             if (schema == null)
             {
-                throw new InvalidOperationException("Cannot resolve schema.");
+                throw new InvalidOperationException($"Cannot resolve schema with id id {schemaId}.");
             }
 
             this.app = app;
