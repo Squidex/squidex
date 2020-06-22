@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(context, script).ToString();
 
             Assert.Equal("3", result);
         }
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(context, script).ToString();
 
             Assert.Equal("3", result);
         }

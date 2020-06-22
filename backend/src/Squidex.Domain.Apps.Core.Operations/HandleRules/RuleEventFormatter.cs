@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NodaTime.Text;
@@ -116,7 +117,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     ["event"] = @event
                 };
 
-                return scriptEngine.Interpolate(vars, script);
+                var result = scriptEngine.Execute(vars, script).ToString();
+
+                if (result == "undefined")
+                {
+                    return GlobalFallback;
+                }
+
+                return result;
             }
 
             var parts = BuildParts(text, @event);

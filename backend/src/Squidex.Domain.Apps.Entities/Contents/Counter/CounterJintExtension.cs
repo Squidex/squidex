@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
