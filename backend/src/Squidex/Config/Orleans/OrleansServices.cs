@@ -59,6 +59,7 @@ namespace Squidex.Config.Orleans
                 options.HostSelf = false;
             });
 
+            builder.AddIncomingGrainCallFilter<ExceptionWrapperFilter>();
             builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
             builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
             builder.AddIncomingGrainCallFilter<LoggingFilter>();

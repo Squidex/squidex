@@ -13,39 +13,30 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectVersionException : DomainObjectException
     {
-        private readonly long currentVersion;
-        private readonly long expectedVersion;
+        public long CurrentVersion { get; }
 
-        public long CurrentVersion
-        {
-            get { return currentVersion; }
-        }
-
-        public long ExpectedVersion
-        {
-            get { return expectedVersion; }
-        }
+        public long ExpectedVersion { get; }
 
         public DomainObjectVersionException(string id, Type type, long currentVersion, long expectedVersion)
             : base(FormatMessage(id, type, currentVersion, expectedVersion), id, type)
         {
-            this.currentVersion = currentVersion;
+            CurrentVersion = currentVersion;
 
-            this.expectedVersion = expectedVersion;
+            ExpectedVersion = expectedVersion;
         }
 
         protected DomainObjectVersionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            currentVersion = info.GetInt64(nameof(currentVersion));
+            CurrentVersion = info.GetInt64(nameof(CurrentVersion));
 
-            expectedVersion = info.GetInt64(nameof(expectedVersion));
+            ExpectedVersion = info.GetInt64(nameof(ExpectedVersion));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(currentVersion), currentVersion);
-            info.AddValue(nameof(expectedVersion), expectedVersion);
+            info.AddValue(nameof(CurrentVersion), CurrentVersion);
+            info.AddValue(nameof(ExpectedVersion), ExpectedVersion);
 
             base.GetObjectData(info, context);
         }
