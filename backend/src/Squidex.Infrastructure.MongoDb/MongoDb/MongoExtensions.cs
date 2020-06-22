@@ -40,14 +40,9 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 await collection.InsertOneAsync(document, null, ct);
             }
-            catch (MongoWriteException ex)
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    return false;
-                }
-
-                throw;
+                return false;
             }
 
             return true;
@@ -108,24 +103,21 @@ namespace Squidex.Infrastructure.MongoDb
                     await collection.UpdateOneAsync(x => x.Id.Equals(key), update, Upsert);
                 }
             }
-            catch (MongoWriteException ex)
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                var existingVersion =
+                    await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
+                        .FirstOrDefaultAsync();
+
+                if (existingVersion != null)
                 {
-                    var existingVersion =
-                        await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
+                    var versionField = GetVersionField<TEntity, TKey>();
 
-                    if (existingVersion != null)
-                    {
-                        var versionField = GetVersionField<TEntity, TKey>();
-
-                        throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
-                    }
+                    throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                 }
                 else
                 {
-                    throw;
+                    throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
                 }
             }
         }
@@ -145,24 +137,21 @@ namespace Squidex.Infrastructure.MongoDb
                     await collection.ReplaceOneAsync(x => x.Id.Equals(key), doc, UpsertReplace);
                 }
             }
-            catch (MongoWriteException ex)
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                var existingVersion =
+                    await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
+                        .FirstOrDefaultAsync();
+
+                if (existingVersion != null)
                 {
-                    var existingVersion =
-                        await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
+                    var versionField = GetVersionField<TEntity, TKey>();
 
-                    if (existingVersion != null)
-                    {
-                        var versionField = GetVersionField<TEntity, TKey>();
-
-                        throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
-                    }
+                    throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                 }
                 else
                 {
-                    throw;
+                    throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
                 }
             }
         }
