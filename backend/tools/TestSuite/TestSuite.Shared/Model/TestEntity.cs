@@ -24,7 +24,7 @@ namespace TestSuite.Model
                 {
                     new UpsertSchemaFieldDto
                     {
-                        Name = nameof(TestEntityData.Number).ToLowerInvariant(),
+                        Name = TestEntityData.NumberField,
                         Properties = new NumberFieldPropertiesDto
                         {
                             IsRequired = true
@@ -32,7 +32,7 @@ namespace TestSuite.Model
                     },
                     new UpsertSchemaFieldDto
                     {
-                        Name = nameof(TestEntityData.String).ToLowerInvariant(),
+                        Name = TestEntityData.StringField,
                         Properties = new StringFieldPropertiesDto
                         {
                             IsRequired = false
@@ -48,6 +48,10 @@ namespace TestSuite.Model
 
     public sealed class TestEntityData
     {
+        public static readonly string StringField = nameof(String).ToLowerInvariant();
+
+        public static readonly string NumberField = nameof(Number).ToLowerInvariant();
+
         [JsonConverter(typeof(InvariantConverter))]
         public int Number { get; set; }
 
