@@ -115,12 +115,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(condition?.Expression))
             {
-                var context = new ScriptVars
+                var vars = new ScriptVars
                 {
                     ["data"] = data
                 };
 
-                return scriptEngine.Evaluate(context, condition.Expression);
+                return scriptEngine.Evaluate(vars, condition.Expression);
             }
 
             return true;

@@ -51,12 +51,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 return resetCounter('my', 4);
             ";
 
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["appId"] = appId
             };
 
-            var result = sut.Execute(context, script).ToString();
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("3", result);
         }
@@ -76,12 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 return incrementCounter('my');
             ";
 
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["appId"] = appId
             };
 
-            var result = sut.Execute(context, script).ToString();
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("3", result);
         }

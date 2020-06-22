@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions()))
                 .Returns(new NamedContentData());
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
@@ -106,8 +106,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         ReferenceEquals(x.Data, oldData) &&
                         x.ContentId == content.Id),
                     "my-query",
-                    A<ScriptOptions>._))
+                    ScriptOptions()))
                 .MustHaveHappened();
+        }
+
+        private ScriptOptions ScriptOptions()
+        {
+            return A<ScriptOptions>.That.Matches(x => x.AsContext);
         }
     }
 }

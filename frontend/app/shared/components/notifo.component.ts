@@ -28,6 +28,10 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     @ViewChild('element', { static: false })
     public element: ElementRef<Element>;
 
+    public get showOnboarding() {
+        return !!this.notifoApiUrl && !!this.topic;
+    }
+
     constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions, authService: AuthService,
         private readonly renderer: Renderer2
     ) {
