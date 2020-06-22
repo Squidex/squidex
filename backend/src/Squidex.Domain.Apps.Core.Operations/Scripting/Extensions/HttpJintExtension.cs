@@ -45,6 +45,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         private async Task GetJsonAsync(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
         {
+            context.MarkAsync();
+
             try
             {
                 using (var httpClient = httpClientFactory.CreateClient())

@@ -26,6 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOperationContext
     {
+        private static readonly ScriptOptions ScriptOptions = new ScriptOptions
+        {
+            AsContext = true,
+            CanDisallow = true,
+            CanReject = true
+        };
+
         private readonly IScriptEngine scriptEngine;
         private readonly IAppProvider appProvider;
         private readonly IEnumerable<IValidatorsFactory> factories;
@@ -122,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return context.Data!;
             }
 
-            return await scriptEngine.ExecuteAndTransformAsync(context, actualScript);
+            return await scriptEngine.TransformAsync(context, actualScript, ScriptOptions);
         }
 
         public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptVars context)
@@ -136,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return;
             }
 
-            await scriptEngine.ExecuteAsync(context, GetScript(script));
+            await scriptEngine.ExecuteAsync(context, GetScript(script), ScriptOptions);
         }
 
         private void Enrich(ScriptVars context)

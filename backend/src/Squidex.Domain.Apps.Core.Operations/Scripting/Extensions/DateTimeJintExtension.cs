@@ -14,20 +14,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
     public sealed class DateTimeJintExtension : IJintExtension
     {
-        private readonly Func<DateTime, string, JsValue> formatDate;
-
-        public DateTimeJintExtension()
-        {
-            formatDate = new Func<DateTime, string, JsValue>(FormatDate);
-        }
-
-        public void Extend(Engine engine)
-        {
-            engine.SetValue("formatTime", formatDate);
-            engine.SetValue("formatDate", formatDate);
-        }
-
-        private static JsValue FormatDate(DateTime date, string format)
+        private readonly Func<DateTime, string, JsValue> formatDate = (date, format) =>
         {
             try
             {
@@ -37,6 +24,12 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 return JsValue.Undefined;
             }
+        };
+
+        public void Extend(Engine engine)
+        {
+            engine.SetValue("formatTime", formatDate);
+            engine.SetValue("formatDate", formatDate);
         }
     }
 }

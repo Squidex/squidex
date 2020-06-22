@@ -13,16 +13,22 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public interface IScriptEngine
     {
-        Task ExecuteAsync(ScriptVars vars, string script);
+        Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default);
 
-        Task<NamedContentData> ExecuteAndTransformAsync(ScriptVars vars, string script);
+        Task<NamedContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default);
 
-        Task<NamedContentData> TransformAsync(ScriptVars vars, string script);
+        IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default);
 
-        Task<IJsonValue> GetAsync(ScriptVars vars, string script);
-
-        bool Evaluate(ScriptVars vars, string script);
-
-        string? Interpolate(ScriptVars vars, string script);
+        bool Evaluate(ScriptVars vars, string script, ScriptOptions options = default)
+        {
+            try
+            {
+                return Execute(vars, script, options).Equals(JsonValue.True);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
