@@ -1,18 +1,31 @@
 .dashboard {
     & {
         @include absolute(0, 0, 0, 0);
-        overflow-y: auto;
+    }
+
+    &-summary {
+        @include absolute(2rem, null, null, 2rem);
+    }
+
+    &-settings {
+        @include absolute(1rem, 1rem, null, null);
     }
 
     &-title {
         font-size: 1.4rem;
     }
 
-    &-inner {
-        max-width: 75rem;
-        padding: 2rem;
-        padding-right: 1rem;
+    gridster {
+        background: none;
     }
+
+    gridster-item {
+        overflow: visible;
+    }
+}
+
+.btn {
+    z-index: 1000;
 }
 
 :host ::ng-deep {
@@ -29,14 +42,7 @@
     .card {
         & {
             @include force-height(16rem);
-            float: left;
-            margin-bottom: 1rem;
-            margin-right: 1rem;
-            width: 16rem;
-        }
-
-        &-lg {
-            width: 33rem;
+            height: 100%;
         }
 
         &-image {
@@ -44,6 +50,12 @@
 
             img {
                 height: 5rem;
+            }
+        }
+
+        h4 {
+            a {
+                color: $color-title;
             }
         }
 
@@ -65,22 +77,8 @@
         }
 
         &-href {
-            & {
-                cursor: pointer;
-            }
-
             &:hover {
                 @include box-shadow-outer(0, 3px, 16px, .2px);
-            }
-
-            &:focus {
-                outline: none;
-            }
-
-            &:hover,
-            &:focus,
-            &:active {
-                text-decoration: none;
             }
         }
     }
