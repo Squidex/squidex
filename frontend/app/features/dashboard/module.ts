@@ -25,9 +25,9 @@ const routes: Routes = [
     imports: [
         ChartModule,
         GridsterModule,
+        RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule,
-        RouterModule.forChild(routes)
+        SqxSharedModule
     ],
     declarations: [
         ApiCallsCardComponent,
