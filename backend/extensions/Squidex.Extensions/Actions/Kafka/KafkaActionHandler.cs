@@ -113,11 +113,11 @@ namespace Squidex.Extensions.Actions.Kafka
 
         public string MessageValue { get; set; }
 
-        public Dictionary<string, string> Headers { get; set; }
-
         public string Schema { get; set; }
 
         public string PartitionKey { get; set; }
+
+        public Dictionary<string, string> Headers { get; set; }
 
         public int PartitionCount { get; set; }
     }
