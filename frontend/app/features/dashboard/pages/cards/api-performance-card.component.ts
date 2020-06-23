@@ -37,7 +37,7 @@ export class ApiPerformanceCardComponent implements OnChanges {
     }
 
     public chartData: any;
-    public chartSummary: number;
+    public chartSummary = 0;
 
     public ngOnChanges() {
         if (this.usage) {

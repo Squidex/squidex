@@ -134,13 +134,13 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
         this.isStacked = value;
     }
 
-    public reset() {
+    public resetConfig() {
         this.gridConfig = [...this.allItems];
 
-        this.save();
+        this.saveConfig();
     }
 
-    public save() {
+    public saveConfig() {
         this.uiState.set('dashboard.grid', this.gridConfig, true);
 
         this.dialogs.notifyInfo('Configuration saved.');
@@ -158,5 +158,9 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
         } else {
             this.gridConfig.push({ ...item });
         }
+    }
+
+    public trackByItem(index: number, item: GridsterItem) {
+        return item.type;
     }
 }

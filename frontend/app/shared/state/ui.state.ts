@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { hasAnyLink, State, Types } from '@app/framework';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { UIService, UISettingsDto } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
@@ -17,10 +17,10 @@ interface Snapshot {
     settingsCommon: object & any;
 
     // All shared app settings.
-    settingsShared: object & any;
+    settingsShared?: object & any;
 
     // All user app settings.
-    settingsUser: object & any;
+    settingsUser?: object & any;
 
     // The merged settings of app and common settings.
     settings: object & any;
@@ -47,10 +47,10 @@ export class UIState extends State<Snapshot> {
         this.project(x => x.settings);
 
     public settingsShared =
-        this.project(x => x.settingsShared);
+        this.project(x => x.settingsShared).pipe(filter(x => !!x));
 
     public settingsUser =
-        this.project(x => x.settingsUser);
+        this.project(x => x.settingsUser).pipe(filter(x => !!x));
 
     public canReadEvents =
         this.project(x => x.canReadEvents === true);
@@ -89,9 +89,7 @@ export class UIState extends State<Snapshot> {
     ) {
         super({
             settings: {},
-            settingsCommon: {},
-            settingsShared: {},
-            settingsUser: {}
+            settingsCommon: {}
         });
 
         this.loadResources();
@@ -103,7 +101,12 @@ export class UIState extends State<Snapshot> {
     }
 
     private load(app: string) {
-        this.next(s => updateSettings(s, {}));
+        this.next(s => ({
+            ...s,
+            settings: s.settingsCommon,
+            settingsShared: undefined,
+            settingsUser: undefined
+        }));
 
         this.uiService.getSharedSettings(app)
             .subscribe(payload => {

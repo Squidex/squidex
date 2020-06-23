@@ -50,6 +50,9 @@ export class ConfirmClickDirective implements OnDestroy {
     @Input()
     public confirmRequired = true;
 
+    @Output()
+    public beforeClick = new EventEmitter();
+
     @Output('sqxConfirmClick')
     public clickConfirmed = new DelayEventEmitter();
 
@@ -76,12 +79,14 @@ export class ConfirmClickDirective implements OnDestroy {
 
             this.isOpen = true;
 
+            this.beforeClick.emit();
+
             const subscription =
                 this.dialogs.confirm(this.confirmTitle, this.confirmText)
-                    .subscribe(confiormed => {
+                    .subscribe(confirmed => {
                         this.isOpen = false;
 
-                        if (confiormed) {
+                        if (confirmed) {
                             this.clickConfirmed.delayEmit();
                         }
 

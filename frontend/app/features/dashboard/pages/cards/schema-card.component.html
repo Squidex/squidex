@@ -4,12 +4,24 @@
             <img src="./images/dashboard-schema.svg" />
         </div>
 
-        <h4 class="card-title">
-            <a [routerLink]="['schemas', { showDialog: true }]">New Schema</a>
-        </h4>
+        <ng-container *ngIf="app.canReadSchemas; else noPermission">
+            <h4 class="card-title">
+                <a [routerLink]="['schemas', { showDialog: true }]">New Schema</a>
+            </h4>
 
-        <div class="card-text">
-            A schema defines the structure of your content element.
-        </div>
+            <div class="card-text">
+                A schema defines the structure of your content element.
+            </div>
+        </ng-container>
+
+        <ng-template #noPermission>
+            <h4 class="card-title">
+                <a [routerLink]="['schemas']">Schemas</a>
+            </h4>
+
+            <div class="card-text">
+                Get an insight to the data model of this app.
+            </div>
+        </ng-template>
     </div>
 </div>

@@ -37,7 +37,7 @@ export class ApiTrafficCardComponent implements OnChanges {
     }
 
     public chartData: any;
-    public chartSummary: number;
+    public chartSummary = 0;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (this.usage && changes['usage']) {
