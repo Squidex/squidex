@@ -1,0 +1,13 @@
+<a class="card card-href" [routerLink]="['schemas', { showDialog: true }]" *ngIf="app.canCreateSchema">
+    <div class="card-body">
+        <div class="card-image">
+            <img src="./images/dashboard-schema.svg" />
+        </div>
+
+        <h4 class="card-title">New Schema</h4>
+
+        <div class="card-text">
+            A schema defines the structure of your content element.
+        </div>
+    </div>
+</a>

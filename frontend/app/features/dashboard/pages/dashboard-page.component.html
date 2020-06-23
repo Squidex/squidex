@@ -12,155 +12,57 @@
             </div>
 
             <div class="clearfix">
-                <a class="card card-href" [routerLink]="['schemas', { showDialog: true }]" *ngIf="app.canCreateSchema">
-                    <div class="card-body">
-                        <div class="card-image">
-                            <img src="./images/dashboard-schema.svg" />
-                        </div>
+                <sqx-schema-card
+                    [app]="app">
+                </sqx-schema-card>
 
-                        <h4 class="card-title">New Schema</h4>
+                <sqx-api-card
+                    [app]="app">
+                </sqx-api-card>
 
-                        <div class="card-text">
-                            A schema defines the structure of your content element.
-                        </div>
-                    </div>
-                </a>
+                <sqx-support-card
+                    [app]="app">
+                </sqx-support-card>
 
-                <a class="card card-href" href="/api/content/{{appsState.appName}}/docs" sqxExternalLink="noicon">
-                    <div class="card-body">
-                        <div class="card-image">
-                            <img src="./images/dashboard-api.svg" />
-                        </div>
+                <sqx-github-card
+                    [app]="app">
+                </sqx-github-card>
 
-                        <h4 class="card-title">Content API <i class="icon-external-link"></i></h4>
+                <sqx-api-calls-card
+                    [app]="app" [usage]="callsUsage">
+                </sqx-api-calls-card>
 
-                        <div class="card-text">
-                            OpenAPI 3.0 compatible documentation for your app content.
-                        </div>
-                    </div>
-                </a>
+                <sqx-api-performance-card
+                    [isStacked]="isStacked"
+                    (isStackedChange)="changeIsStacked($event)"
+                    [app]="app" [usage]="callsUsage">
+                </sqx-api-performance-card>
 
-                <a class="card card-href" href="https://support.squidex.io" sqxExternalLink="noicon">
-                    <div class="card-body">
-                        <div class="card-image">
-                            <img src="./images/dashboard-feedback.svg" />
-                        </div>
+                <sqx-api-calls-summary-card
+                    [app]="app" [usage]="callsUsage">
+                </sqx-api-calls-summary-card>
 
-                        <h4 class="card-title">Feedback & Support <i class="icon-external-link"></i></h4>
+                <sqx-asset-uploads-count-card
+                    [app]="app" [usage]="storageUsage">
+                </sqx-asset-uploads-count-card>
 
-                        <div class="card-text">
-                            Provide feedback and request features to help us to improve Squidex.
-                        </div>
-                    </div>
-                </a>
+                <sqx-asset-uploads-size-summary-card
+                    [app]="app" [usage]="storageCurrent">
+                </sqx-asset-uploads-size-summary-card>
 
-                <a class="card card-href" href="https://github.com/squidex/squidex" sqxExternalLink="noicon">
-                    <div class="card-body">
-                        <div class="card-image">
-                            <img src="./images/dashboard-github.svg" />
-                        </div>
+                <sqx-asset-uploads-size-card
+                    [app]="app" [usage]="storageUsage">
+                </sqx-asset-uploads-size-card>
+                
+                <sqx-api-traffic-card
+                    [isStacked]="isStacked"
+                    (isStackedChange)="changeIsStacked($event)"
+                    [app]="app">
+                </sqx-api-traffic-card>
 
-                        <h4 class="card-title">Github <i class="icon-external-link"></i></h4>
-
-                        <div class="card-text">
-                            Get the source code from Github and report bugs or ask for support.
-                        </div>
-                    </div>
-                </a>
-
-                <div class="card card-lg">
-                    <div class="card-header">
-                        API Calls
-
-                        <div class="float-right">
-                            <a class="force" (click)="downloadLog()">
-                                <small>Download Log</small>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <chart type="bar" [data]="chartCallsCount" [options]="stackedChartOptions"></chart>
-                    </div>
-                </div>
-
-                <div class="card card-lg">
-                    <div class="card-header">
-                        API Performance (ms): {{callsPerformance}}ms avg
-
-                        <div class="float-right">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isStacked" />
-                                <label class="form-check-label" for="stacked">
-                                    Stacked
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <chart type="bar" [data]="chartCallsPerformance" [options]="isStacked ? stackedChartOptions : chartOptions"></chart>
-                    </div>
-                </div>
-
-                <div class="card card">
-                    <div class="card-header">API Calls</div>
-                    <div class="card-body">
-                        <div class="aggregation" *ngIf="callsCurrent >= 0">
-                            <div class="aggregation-label">This month</div>
-                            <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
-                            <div class="aggregation-label" *ngIf="callsAllowed > 0">Monthly limit: {{callsAllowed | sqxKNumber}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card card-lg">
-                    <div class="card-header">Assets Uploads</div>
-                    <div class="card-body">
-                        <chart type="line" [data]="chartStorageCount" [options]="chartOptions"></chart>
-                    </div>
-                </div>
-
-                <div class="card card">
-                    <div class="card-header">Assets Size (MB)</div>
-                    <div class="card-body">
-                        <div class="aggregation" *ngIf="storageCurrent >= 0">
-                            <div class="aggregation-label">Total Size</div>
-                            <div class="aggregation-value">{{storageCurrent | sqxFileSize}}</div>
-                            <div class="aggregation-label" *ngIf="storageAllowed > 0">Total limit: {{storageAllowed | sqxFileSize}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card card-lg">
-                    <div class="card-header">Assets Uploads (MB)</div>
-                    <div class="card-body">
-                        <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
-                    </div>
-                </div>
-
-                <div class="card card-lg">
-                    <div class="card-header">
-                        Traffic (MB): {{callsBytes | sqxFileSize}} total
-
-                        <div class="float-right">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isStacked" />
-                                <label class="form-check-label" for="stacked">
-                                    Stacked
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <chart type="bar" [data]="chartCallsBytes" [options]="isStacked ? stackedChartOptions : chartOptions"></chart>
-                    </div>
-                </div>
-
-                <div class="card card-lg">
-                    <div class="card-header">History</div>
-                    <div class="card-body card-history card-body-scroll">
-                        <sqx-history-list [events]="history"></sqx-history-list>            
-                    </div>
-                </div>
+                <sqx-history-card
+                    [app]="app">
+                </sqx-history-card>>
             </div>
         </div>
     </div>

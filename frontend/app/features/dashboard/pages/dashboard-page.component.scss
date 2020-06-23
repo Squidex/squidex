@@ -15,91 +15,89 @@
     }
 }
 
-.subtext {
-    margin-bottom: 2rem;
-}
-
 :host ::ng-deep {
     canvas {
         height: 12rem !important;
         margin-bottom: 0;
         margin-top: -1rem;
     }
-}
 
-.card-image {
-    img {
-        height: 5rem;
-    }
-}
-
-.card {
-    & {
-        @include force-height(16rem);
-        float: left;
-        margin-bottom: 1rem;
-        margin-right: 1rem;
-        width: 16rem;
+    .subtext {
+        margin-bottom: 2rem;
     }
 
-    &-lg {
-        width: 33rem;
-    }
-
-    &-image {
-        text-align: center;
-    }
-
-    &-history {
-        overflow-y: auto;
-    }
-
-    &-text {
-        color: $color-text-decent;
-        font-size: .9rem;
-        font-weight: normal;
-    }
-
-    &-title {
-        color: $color-title;
-        font-size: 1.2rem;
-        font-weight: light;
-        margin-top: 1rem;
-    }
-
-    &-href {
+    .card {
         & {
-            cursor: pointer;
+            @include force-height(16rem);
+            float: left;
+            margin-bottom: 1rem;
+            margin-right: 1rem;
+            width: 16rem;
         }
 
-        &:hover {
-            @include box-shadow-outer(0, 3px, 16px, .2px);
+        &-lg {
+            width: 33rem;
         }
 
-        &:focus {
-            outline: none;
+        &-image {
+            text-align: center;
+
+            img {
+                height: 5rem;
+            }
         }
 
-        &:hover,
-        &:focus,
-        &:active {
-            text-decoration: none;
+        &-history {
+            overflow-y: auto;
+        }
+
+        &-text {
+            color: $color-text-decent;
+            font-size: .9rem;
+            font-weight: normal;
+        }
+
+        &-title {
+            color: $color-title;
+            font-size: 1.2rem;
+            font-weight: light;
+            margin-top: 1rem;
+        }
+
+        &-href {
+            & {
+                cursor: pointer;
+            }
+
+            &:hover {
+                @include box-shadow-outer(0, 3px, 16px, .2px);
+            }
+
+            &:focus {
+                outline: none;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                text-decoration: none;
+            }
         }
     }
-}
 
-.aggregation {
-    & {
-        text-align: center;
-    }
+    .aggregation {
+        & {
+            text-align: center;
+        }
 
-    &-label {
-        color: $color-text-decent;
-    }
+        &-label {
+            color: $color-text-decent;
+        }
 
-    &-value {
-        font-size: 3rem;
-        margin-bottom: .5rem;
-        margin-top: 1rem;
+        &-value {
+            font-size: 3rem;
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
     }
 }

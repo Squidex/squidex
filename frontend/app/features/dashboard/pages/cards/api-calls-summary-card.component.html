@@ -1,0 +1,10 @@
+<div class="card card">
+    <div class="card-header">API Calls</div>
+    <div class="card-body">
+        <div class="aggregation" *ngIf="callsTotal >= 0">
+            <div class="aggregation-label">This month</div>
+            <div class="aggregation-value">{{callsTotal | sqxKNumber}}</div>
+            <div class="aggregation-label" *ngIf="callsAllowed > 0">Monthly limit: {{callsAllowed | sqxKNumber}}</div>
+        </div>
+    </div>
+</div>
