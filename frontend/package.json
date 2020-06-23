@@ -27,6 +27,7 @@
     "@angular/platform-server": "9.0.6",
     "@angular/router": "9.0.6",
     "ace-builds": "^1.4.11",
+    "angular-gridster2": "^9.2.0",
     "angular-mentions": "1.1.4",
     "angular2-chartjs": "0.5.1",
     "babel-polyfill": "6.26.0",

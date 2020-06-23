@@ -1,22 +1,31 @@
 .dashboard {
     & {
         @include absolute(0, 0, 0, 0);
-        overflow-y: auto;
+    }
+
+    &-summary {
+        @include absolute(2rem, null, null, 2rem);
+    }
+
+    &-settings {
+        @include absolute(1rem, 1rem, null, null);
     }
 
     &-title {
         font-size: 1.4rem;
     }
 
-    &-inner {
-        max-width: 75rem;
-        padding: 2rem;
-        padding-right: 1rem;
+    gridster {
+        background: none;
+    }
+
+    gridster-item {
+        overflow: visible;
     }
 }
 
-.subtext {
-    margin-bottom: 2rem;
+.btn {
+    z-index: 1000;
 }
 
 :host ::ng-deep {
@@ -25,81 +34,68 @@
         margin-bottom: 0;
         margin-top: -1rem;
     }
-}
 
-.card-image {
-    img {
-        height: 5rem;
-    }
-}
-
-.card {
-    & {
-        @include force-height(16rem);
-        float: left;
-        margin-bottom: 1rem;
-        margin-right: 1rem;
-        width: 16rem;
+    .subtext {
+        margin-bottom: 2rem;
     }
 
-    &-lg {
-        width: 33rem;
-    }
-
-    &-image {
-        text-align: center;
-    }
-
-    &-history {
-        overflow-y: auto;
-    }
-
-    &-text {
-        color: $color-text-decent;
-        font-size: .9rem;
-        font-weight: normal;
-    }
-
-    &-title {
-        color: $color-title;
-        font-size: 1.2rem;
-        font-weight: light;
-        margin-top: 1rem;
-    }
-
-    &-href {
+    .card {
         & {
-            cursor: pointer;
+            @include force-height(16rem);
+            height: 100%;
         }
 
-        &:hover {
-            @include box-shadow-outer(0, 3px, 16px, .2px);
+        &-image {
+            text-align: center;
+
+            img {
+                height: 5rem;
+            }
         }
 
-        &:focus {
-            outline: none;
+        h4 {
+            a {
+                color: $color-title;
+            }
         }
 
-        &:hover,
-        &:focus,
-        &:active {
-            text-decoration: none;
+        &-history {
+            overflow-y: auto;
+        }
+
+        &-text {
+            color: $color-text-decent;
+            font-size: .9rem;
+            font-weight: normal;
+        }
+
+        &-title {
+            color: $color-title;
+            font-size: 1.2rem;
+            font-weight: light;
+            margin-top: 1rem;
+        }
+
+        &-href {
+            &:hover {
+                @include box-shadow-outer(0, 3px, 16px, .2px);
+            }
         }
     }
-}
 
-.aggregation {
-    & {
-        text-align: center;
-    }
+    .aggregation {
+        & {
+            text-align: center;
+        }
 
-    &-label {
-        color: $color-text-decent;
-    }
+        &-label {
+            color: $color-text-decent;
+        }
 
-    &-value {
-        font-size: 3rem;
-        margin-bottom: .5rem;
-        margin-top: 1rem;
+        &-value {
+            font-size: 3rem;
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
     }
 }
