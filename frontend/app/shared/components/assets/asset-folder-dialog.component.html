@@ -28,9 +28,9 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
             
-            <button type="submit" class="float-right btn btn-success">
+            <button type="submit" class="btn btn-success">
                 <ng-container *ngIf="assetFolder; else noAssetFolderButton">
                     Rename
                 </ng-container>

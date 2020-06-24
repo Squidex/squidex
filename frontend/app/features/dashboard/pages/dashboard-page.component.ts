@@ -7,9 +7,9 @@
 
 // tslint:disable: readonly-array
 
-import { AfterViewInit, Component, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, Renderer2, ViewChild, NgZone } from '@angular/core';
 import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, fadeAnimation, LocalStoreService, ResourceOwner, StorageUsagePerDateDto, UsagesService } from '@app/shared';
-import { GridsterComponent, GridsterItem, GridType } from 'angular-gridster2';
+import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
@@ -39,9 +39,10 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
+        private readonly localStore: LocalStoreService,
         private readonly renderer: Renderer2,
         private readonly usagesService: UsagesService,
-        private readonly localStore: LocalStoreService
+        private readonly zone: NgZone
     ) {
         super();
 
@@ -75,8 +76,18 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     }
 
     public ngAfterViewInit() {
-        this.renderer.listen(this.grid.el, 'scroll', () => {
-            this.isScrolled = this.grid.el.scrollTop > 0;
+        this.zone.runOutsideAngular(() => {
+            const gridElement = this.grid.el;
+
+            this.renderer.listen(gridElement, 'scroll', () => {
+                const isScrolled = gridElement.scrollTop > 0;
+
+                if (isScrolled !== this.isScrolled) {
+                    this.zone.run(() => {
+                        this.isScrolled = isScrolled;
+                    });
+                }
+            });
         });
     }
 
@@ -93,20 +104,22 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     }
 }
 
-const DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS: GridsterConfig = {
     displayGrid: 'onDrag&Resize',
+    draggable: {
+        enabled: true
+    },
     fixedColWidth: 254,
     fixedRowHeight: 254,
     gridType: GridType.Fixed,
+    maxItemCols: 2,
+    maxItemRows: 2,
     outerMargin: true,
     outerMarginBottom: 16,
     outerMarginLeft: 16,
     outerMarginRight: 16,
     outerMarginTop: 120,
-    draggable: {
-        enabled: true
-    },
     resizable: {
-        enabled: false
+        enabled: true
     }
 };

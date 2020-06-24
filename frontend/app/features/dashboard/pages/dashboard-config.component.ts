@@ -27,6 +27,9 @@ export class DashboardConfigComponent implements OnChanges {
     @Input()
     public config: GridsterItem[];
 
+    @Input()
+    public needsAttention = false;
+
     @Output()
     public configChange = new EventEmitter<GridsterItem[]>();
 
@@ -74,8 +77,6 @@ export class DashboardConfigComponent implements OnChanges {
 
         this.expertConfig = null!;
         this.expertDialog.hide();
-
-        this.saveConfig();
     }
 
     public resetConfig() {

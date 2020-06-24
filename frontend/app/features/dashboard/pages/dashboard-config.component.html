@@ -1,5 +1,5 @@
 <ng-container *ngIf="config">
-    <button type="button" class="btn settings-button" (click)="dropdownModal.toggle()" #buttonSettings>
+    <button type="button" class="btn settings-button" [class.focused]="needsAttention" [class.btn-primary]="needsAttention" (click)="dropdownModal.toggle()" #buttonSettings>
         <i class="icon-settings"></i>
     </button>
     
@@ -48,7 +48,7 @@
     
             <ng-container footer>
                 <button type="button" class="btn btn-secondary" (click)="expertDialog.hide()">Cancel</button>
-                <button type="button" class="btn btn-primary" (click)="completeExpertMode()">Save</button>
+                <button type="button" class="btn btn-primary" (click)="completeExpertMode()">Update</button>
             </ng-container>
         </sqx-modal-dialog>
     </ng-container>
