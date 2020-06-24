@@ -7,7 +7,7 @@
 
 // tslint:disable: readonly-array
 
-import { AfterViewInit, Component, OnInit, Renderer2, ViewChild, NgZone } from '@angular/core';
+import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, fadeAnimation, LocalStoreService, ResourceOwner, StorageUsagePerDateDto, UsagesService } from '@app/shared';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
 import { switchMap } from 'rxjs/operators';
