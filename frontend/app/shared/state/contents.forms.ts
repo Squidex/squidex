@@ -69,7 +69,15 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
             if (value) {
                 if (isAssets && Types.isArray(value)) {
                     if (value.length === 2) {
-                        formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" /> ${value[1]}`);
+                        const previewMode = field.properties['previewMode'];
+
+                        if (previewMode === 'ImageAndFileName') {
+                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" /> <span>${value[1]}</span>`);
+                        } else if (previewMode === 'Image') {
+                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" />`);
+                        } else {
+                            formatted = value[1];
+                        }
                     } else if (value.length === 1) {
                         formatted = value[0];
                     }

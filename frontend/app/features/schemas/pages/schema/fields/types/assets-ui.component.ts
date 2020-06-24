@@ -25,6 +25,9 @@ export class AssetsUIComponent implements OnInit {
     public properties: AssetsFieldPropertiesDto;
 
     public ngOnInit() {
+        this.editForm.setControl('previewMode',
+            new FormControl(this.properties.previewMode));
+
         this.editForm.setControl('resolveFirst',
             new FormControl(this.properties.resolveFirst));
     }

@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [Equals(DoNotAddEqualityOperators = true)]
     public sealed class AssetsFieldProperties : FieldProperties
     {
-        public bool MustBeImage { get; set; }
+        public AssetPreviewMode PreviewMode { get; set; }
 
         public int? MinItems { get; set; }
 
@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public int? AspectWidth { get; set; }
 
         public int? AspectHeight { get; set; }
+
+        public bool MustBeImage { get; set; }
 
         public bool AllowDuplicates { get; set; }
 

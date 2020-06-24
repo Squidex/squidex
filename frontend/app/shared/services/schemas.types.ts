@@ -172,6 +172,7 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
+    public readonly previewMode: 'ImageAndFileName' | 'Image' | 'FileName';
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly resolveFirst: boolean;
