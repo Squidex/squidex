@@ -11,7 +11,7 @@
         </div>
 
         <gridster [options]="gridOptions" #grid>
-            <gridster-item [item]="item" *ngFor="let item of gridConfig; trackBy: trackByItem">
+            <gridster-item [item]="item" *ngFor="let item of gridConfig">
                 <ng-container [ngSwitch]="item.type">
                     <ng-container *ngSwitchCase="'schemas'">
                         <sqx-schema-card
@@ -82,39 +82,7 @@
         </gridster>
 
         <div class="dashboard-settings">
-            <button type="button" class="btn settings-button" (click)="gridModal.toggle()" #buttonSettings>
-                <i class="icon-settings"></i>
-            </button>
-
-            <ng-container *sqxModal="gridModal">
-                <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
-                    <div class="dropdown-item" *ngFor="let item of allItems">
-                        
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="field_{{item.type}}"
-                                [ngModel]="isSelected(item)"
-                                (ngModelChange)="addOrRemove(item)" />
-        
-                            <label class="form-check-label" for="field_{{item.type}}">
-                                {{item.name}}
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-
-                    <a class="dropdown-item" (click)="saveConfig()">Save</a>
-
-                    <div class="dropdown-divider"></div>
-
-                    <a class="dropdown-item dropdown-item-delete" (beforeClick)="gridModal.hide()"
-                        (sqxConfirmClick)="resetConfig()"
-                        confirmTitle="Reset config"
-                        confirmText="Do you really want to reset the dashboard to the default?">
-                        Reset
-                    </a>
-                </div>
-            </ng-container>
+            <sqx-dashboard-config [app]="app" [config]="gridConfig" (configChange)="changeConfig($event)"></sqx-dashboard-config>
         </div>
     </div>
 </ng-container>

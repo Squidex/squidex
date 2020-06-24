@@ -12,7 +12,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { GridsterModule } from 'angular-gridster2';
 import { ChartModule } from 'angular2-chartjs';
-import { ApiCallsCardComponent,  ApiCallsSummaryCardComponent, ApiCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, DashboardPageComponent, GithubCardComponent, HistoryCardComponent, SchemaCardComponent, SupportCardComponent } from './declarations';
+import { ApiCallsCardComponent,  ApiCallsSummaryCardComponent, ApiCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, DashboardConfigComponent, DashboardPageComponent, GithubCardComponent, HistoryCardComponent, SchemaCardComponent, SupportCardComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -38,6 +38,7 @@ const routes: Routes = [
         AssetUploadsCountCardComponent,
         AssetUploadsSizeCardComponent,
         AssetUploadsSizeSummaryCardComponent,
+        DashboardConfigComponent,
         DashboardPageComponent,
         GithubCardComponent,
         HistoryCardComponent,

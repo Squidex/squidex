@@ -17,4 +17,5 @@ export * from './pages/cards/github-card.component';
 export * from './pages/cards/history-card.component';
 export * from './pages/cards/schema-card.component';
 export * from './pages/cards/support-card.component';
+export * from './pages/dashboard-config.component';
 export * from './pages/dashboard-page.component';

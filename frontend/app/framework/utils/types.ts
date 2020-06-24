@@ -56,6 +56,10 @@ export module Types {
         return isArrayOf(value, v => isNumber(v));
     }
 
+    export function isArrayOfObject(value: any): value is Array<Object> {
+        return isArrayOf(value, v => isObject(v));
+    }
+
     export function isArrayOfString(value: any): value is Array<string> {
         return isArrayOf(value, v => isString(v));
     }

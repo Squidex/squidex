@@ -21,10 +21,8 @@
                 <ng-content select="[content]"></ng-content>
             </div>
 
-            <div class="modal-footer" #footerElement *ngIf="showFooter">
-                <div class="clearfix">
-                    <ng-content select="[footer]"></ng-content>
-                </div>
+            <div class="modal-footer justify-content-between" #footerElement *ngIf="showFooter">
+                <ng-content select="[footer]"></ng-content>
             </div>
         </div>
     </div>
