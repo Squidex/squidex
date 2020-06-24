@@ -127,14 +127,14 @@
 
     <ng-container footer>
         <ng-container *ngIf="step === 2 || step === 4">
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
         </ng-container>
 
         <ng-container *ngIf="isEditable">
-            <button *ngIf="step === 2 &&  isWizard" type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Next</button>
-            <button *ngIf="step === 2 && !isWizard" type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
+            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Next</button>
+            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Save</button>
 
-            <button *ngIf="step === 4" type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
+            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">Save</button>
         </ng-container>
     </ng-container>
 </sqx-modal-dialog>

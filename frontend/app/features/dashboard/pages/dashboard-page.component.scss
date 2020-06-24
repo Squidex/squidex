@@ -5,10 +5,12 @@
 
     &-summary {
         @include absolute(2rem, null, null, 2rem);
+        z-index: 0;
     }
 
     &-settings {
         @include absolute(1rem, 1rem, null, null);
+        z-index: 1000;
     }
 
     &-title {
@@ -24,15 +26,17 @@
     }
 }
 
+gridster-item {
+    position: absolute;
+}
+
 .btn {
     z-index: 1000;
 }
 
 :host ::ng-deep {
-    canvas {
-        height: 12rem !important;
-        margin-bottom: 0;
-        margin-top: -1rem;
+    chart {
+        @include absolute(0, 1rem, 1rem, 1rem);
     }
 
     .subtext {
@@ -41,8 +45,7 @@
 
     .card {
         & {
-            @include force-height(16rem);
-            height: 100%;
+            @include absolute(0, 0, 0, 0);
         }
 
         &-image {
@@ -57,6 +60,14 @@
             a {
                 color: $color-title;
             }
+        }
+
+        &-header {
+            @include truncate;
+        }
+
+        &-body {
+            position: relative;
         }
 
         &-history {

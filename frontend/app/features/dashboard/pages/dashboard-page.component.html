@@ -77,12 +77,26 @@
                             [app]="app">
                         </sqx-history-card>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'content-summary'">
+                        <sqx-content-summary-card
+                            [app]="app" [options]="item">
+                        </sqx-content-summary-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'iframe'">
+                        <sqx-iframe-card
+                            [app]="app" [options]="item">
+                        </sqx-iframe-card>
+                    </ng-container>
                 </ng-container>
             </gridster-item>
         </gridster>
 
         <div class="dashboard-settings">
-            <sqx-dashboard-config [app]="app" [config]="gridConfig" (configChange)="changeConfig($event)"></sqx-dashboard-config>
+            <sqx-dashboard-config [app]="app"
+                [needsAttention]="isScrolled"
+                [config]="gridConfig" 
+                (configChange)="changeConfig($event)">
+            </sqx-dashboard-config>
         </div>
     </div>
 </ng-container>
