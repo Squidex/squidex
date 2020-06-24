@@ -64,6 +64,8 @@ gridster-item {
 
         &-header {
             @include truncate;
+            flex-shrink: 0;
+            flex-grow: 0;
         }
 
         &-body {
