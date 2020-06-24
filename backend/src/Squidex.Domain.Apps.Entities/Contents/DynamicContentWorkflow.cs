@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private bool IsTrue(WorkflowCondition condition, NamedContentData data, ClaimsPrincipal user)
         {
-            if (condition?.Roles != null)
+            if (condition?.Roles != null && user != null)
             {
                 if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && condition.Roles.Contains(x.Value)))
                 {
