@@ -1,0 +1,17 @@
+<ng-container *ngIf="section.separator">
+    <h3>{{section.separator.displayName}}</h3>
+</ng-container>
+
+<div *ngIf="!isCollapsed">
+    <sqx-content-field *ngFor="let field of section.fields; trackBy: trackByField"
+        [field]="field"
+        [fieldForm]="getFieldForm(field)"
+        [fieldFormCompare]="getFieldFormCompare(field)"
+        [form]="form"
+        [formContext]="formContext"
+        (languageChange)="languageChange.emit()"
+        [language]="language"
+        [languages]="languages"
+        [schema]="schema">
+    </sqx-content-field>
+</div>

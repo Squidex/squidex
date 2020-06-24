@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, DoCheck, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
-import { AppLanguageDto, AppsState, EditContentForm, fieldInvariant, invalid$, LocalStoreService, RootFieldDto, SchemaDto, TranslationsService, Types, value$ } from '@app/shared';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { AppLanguageDto, AppsState, EditContentForm, fieldInvariant, invalid$, LocalStoreService, RootFieldDto, SchemaDto, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { combineLatest } from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ import { combineLatest } from 'rxjs/operators';
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html'
 })
-export class ContentFieldComponent implements DoCheck, OnChanges {
+export class ContentFieldComponent implements OnChanges {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
@@ -44,14 +44,16 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public selectedFormControl: AbstractControl;
-    public selectedFormControlCompare?: AbstractControl;
-
     public showAllControls = false;
 
     public isDifferent: Observable<boolean>;
     public isInvalid: Observable<boolean>;
-    public isTranslatable: boolean;
+
+    public get canTranslate() {
+        const properties = this.field.properties;
+
+        return this.field.isLocalizable && Types.is(properties, StringFieldPropertiesDto) && (properties.editor === 'Input' || properties.editor === 'TextArea');
+    }
 
     constructor(
         private readonly appsState: AppsState,
@@ -61,16 +63,10 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['field']) {
-            this.showAllControls = this.localStore.getBoolean(this.configKey());
-        }
+        this.showAllControls = this.localStore.getBoolean(this.configKey());
 
         if (changes['fieldForm'] && this.fieldForm) {
             this.isInvalid = invalid$(this.fieldForm);
-        }
-
-        if (changes['fieldForm'] || changes['field'] || changes['languages']) {
-            this.isTranslatable = this.field.isTranslatable;
         }
 
         if ((changes['fieldForm'] || changes['fieldFormCompare']) && this.fieldFormCompare) {
@@ -81,32 +77,6 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
-    public ngDoCheck() {
-        if (this.fieldForm) {
-            const control = this.findControl(this.fieldForm);
-
-            if (this.selectedFormControl !== control) {
-                if (this.selectedFormControl && Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
-                    this.selectedFormControl['_clearChangeFns']();
-                }
-
-                this.selectedFormControl = control;
-            }
-
-            if (this.fieldFormCompare) {
-                const controlCompare = this.findControl(this.fieldFormCompare);
-
-                if (this.selectedFormControlCompare !== controlCompare) {
-                    if (this.selectedFormControlCompare && Types.isFunction(this.selectedFormControlCompare['_clearChangeFns'])) {
-                        this.selectedFormControlCompare['_clearChangeFns']();
-                    }
-
-                    this.selectedFormControlCompare = controlCompare;
-                }
-            }
-        }
-    }
-
     public changeShowAllControls(showAllControls: boolean) {
         this.showAllControls = showAllControls;
 
@@ -114,11 +84,11 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     }
 
     public copy() {
-        if (this.selectedFormControlCompare && this.fieldFormCompare) {
+        if (this.fieldFormCompare && this.fieldFormCompare) {
             if (this.showAllControls) {
                 this.fieldForm.setValue(this.fieldFormCompare.value);
             } else {
-                this.selectedFormControl.setValue(this.selectedFormControlCompare.value);
+                this.getControl()!.setValue(this.getControlCompare()!.value);
             }
         }
     }
@@ -163,11 +133,11 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
-    private findControl(form: FormGroup) {
+    private findControl(form?: FormGroup) {
         if (this.field.isLocalizable) {
-            return form.controls[this.language.iso2Code];
+            return form?.controls[this.language.iso2Code];
         } else {
-            return form.controls[fieldInvariant];
+            return form?.controls[fieldInvariant];
         }
     }
 
@@ -175,11 +145,19 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         return `(${language.iso2Code})`;
     }
 
+    public getControl() {
+        return this.findControl(this.fieldForm);
+    }
+
+    public getControlCompare() {
+        return this.findControl(this.fieldFormCompare);
+    }
+
     public trackByLanguage(index: number, language: AppLanguageDto) {
         return language.iso2Code;
     }
 
     private configKey() {
-        return `squidex.schemas.${this.schema.id}.fields.${this.field.fieldId}.show-all`;
+        return `squidex.schemas.${this.schema?.id}.fields.${this.field?.fieldId}.show-all`;
     }
 }

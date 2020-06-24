@@ -1,0 +1,14 @@
+<ng-container *ngIf="section.separator">
+    <h3>{{section.separator.displayName}}</h3>
+</ng-container>
+   
+<div class="form-group" *ngFor="let field of section.fields; trackBy: trackByField">
+    <sqx-field-editor
+        [control]="getControl(field)"
+        [field]="field"
+        [form]="form"
+        [formContext]="formContext"
+        [language]="language"
+        [languages]="languages">
+    </sqx-field-editor>
+</div>

@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, FieldDto, FieldFormatter, invalid$, RootFieldDto, value$ } from '@app/shared';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { AppLanguageDto, EditContentForm, FieldFormatter, invalid$, NestedFieldDto, RootFieldDto, value$ } from '@app/shared';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { FieldSection } from './../group-fields.pipe';
+import { ArraySectionComponent } from './array-section.component';
 import { FieldEditorComponent } from './field-editor.component';
-
-type FieldControl = { field: FieldDto, control: AbstractControl };
 
 @Component({
     selector: 'sqx-array-item',
@@ -19,9 +20,7 @@ type FieldControl = { field: FieldDto, control: AbstractControl };
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArrayItemComponent implements OnChanges, OnDestroy {
-    private subscription: Subscription;
-
+export class ArrayItemComponent implements OnChanges {
     @Output()
     public remove = new EventEmitter();
 
@@ -62,75 +61,44 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(FieldEditorComponent)
-    public editors: QueryList<FieldEditorComponent>;
+    public sections: QueryList<ArraySectionComponent>;
 
     public isHidden = false;
     public isInvalid: Observable<boolean>;
 
-    public title: string;
-
-    public fieldControls: ReadonlyArray<FieldControl> = [];
+    public title: Observable<string>;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
     ) {
     }
 
-    public ngOnDestroy() {
-        this.unsubscribeFromForm();
-    }
-
-    private unsubscribeFromForm() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-    }
-
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['itemForm']) {
             this.isInvalid = invalid$(this.itemForm);
-
-            this.unsubscribeFromForm();
-
-            this.subscription =
-                value$(this.itemForm)
-                    .subscribe(() => {
-                        this.updateTitle();
-                    });
         }
 
         if (changes['itemForm'] || changes['field']) {
-            this.updateFields();
-            this.updateTitle();
+            this.title = value$(this.itemForm).pipe(map(x => this.getTitle(x)));
         }
     }
 
-    private updateFields() {
-        const fields: FieldControl[] = [];
-
-        for (const field of this.field.nested) {
-            const control = this.itemForm.get(field.name)!;
-
-            if (control || this.field.properties.isContentField) {
-                fields.push({ field, control });
-            }
-        }
-
-        this.fieldControls = fields;
-    }
-
-    private updateTitle() {
+    private getTitle(value: any) {
         const values: string[] = [];
 
-        for (const { control, field } of this.fieldControls) {
-            const formatted = FieldFormatter.format(field, control.value);
+        for (const field of this.field.nested) {
+            const control = this.itemForm.get(field.name);
 
-            if (formatted) {
-                values.push(formatted);
+            if (control) {
+                const formatted = FieldFormatter.format(field, control.value);
+
+                if (formatted) {
+                    values.push(formatted);
+                }
             }
         }
 
-        this.title = values.join(', ');
+        return values.join(', ');
     }
 
     public collapse() {
@@ -162,12 +130,12 @@ export class ArrayItemComponent implements OnChanges, OnDestroy {
     }
 
     public reset() {
-        this.editors.forEach(editor => {
-            editor.reset();
+        this.sections.forEach(section => {
+            section.reset();
         });
     }
 
-    public trackByField(index: number, control: FieldControl) {
-        return control.field.name;
+    public trackBySection(index: number, section: FieldSection<NestedFieldDto>) {
+        return section.separator?.fieldId;
     }
 }

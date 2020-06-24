@@ -285,10 +285,6 @@ export class RootFieldDto extends FieldDto {
         return this.properties.fieldType === 'Array';
     }
 
-    public get isTranslatable() {
-        return this.isLocalizable && this.properties.isTranslateable;
-    }
-
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
         isLocked: boolean = false,

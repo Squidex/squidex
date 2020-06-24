@@ -1,13 +1,11 @@
-<div [class.ui]="!field.properties.isContentField" *ngIf="field">
-    <ng-container *ngIf="field.properties.isContentField">
-        <label>
-            {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-        </label> 
-    
-        <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
-    
-        <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
-    </ng-container>
+<div *ngIf="field">
+    <label>
+        {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+    </label> 
+
+    <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
+
+    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
