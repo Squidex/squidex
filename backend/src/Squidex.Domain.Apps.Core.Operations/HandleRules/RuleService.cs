@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<JobList> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
+        public virtual async Task<JobList> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = true)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                if (!ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
+                if (ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
                     return result;
                 }
