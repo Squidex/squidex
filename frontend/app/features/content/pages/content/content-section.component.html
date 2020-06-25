@@ -9,7 +9,7 @@
         [fieldFormCompare]="getFieldFormCompare(field)"
         [form]="form"
         [formContext]="formContext"
-        (languageChange)="languageChange.emit()"
+        (languageChange)="languageChange.emit($event)"
         [language]="language"
         [languages]="languages"
         [schema]="schema">
