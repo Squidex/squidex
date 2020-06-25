@@ -153,18 +153,29 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                 await eventStore.QueryAsync(async storedEvent =>
                 {
-                    var @event = eventDataFormatter.Parse(storedEvent.Data);
-
-                    var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event);
-
-                    foreach (var (job, _) in jobs)
+                    try
                     {
-                        await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
+                        var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                        var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false);
+
+                        foreach (var (job, _) in jobs)
+                        {
+                            await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        log.LogWarning(ex, w => w
+                            .WriteProperty("action", "runRule")
+                            .WriteProperty("status", "failedPartially3"));
+                    }
+                    finally
+                    {
+                        job.Position = storedEvent.EventPosition;
 
-                    job.Position = storedEvent.EventPosition;
-
-                    await state.WriteAsync();
+                        await state.WriteAsync();
+                    }
                 }, SquidexHeaders.AppId, Key.ToString(), job.Position, ct);
             }
             catch (OperationCanceledException)
@@ -174,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
-                    .WriteProperty("action", "runeRule")
+                    .WriteProperty("action", "runRule")
                     .WriteProperty("status", "failed")
                     .WriteProperty("ruleId", job.RuleId?.ToString()));
             }
