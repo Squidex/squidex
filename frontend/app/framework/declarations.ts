@@ -70,6 +70,7 @@ export * from './angular/status-icon.component';
 export * from './angular/stop-click.directive';
 export * from './angular/sync-scrolling.directive';
 export * from './angular/sync-width.directive';
+export * from './angular/tab-router-link.directive';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
 export * from './internal';
