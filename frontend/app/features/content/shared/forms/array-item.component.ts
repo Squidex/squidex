@@ -63,7 +63,7 @@ export class ArrayItemComponent implements OnChanges {
     @ViewChildren(FieldEditorComponent)
     public sections: QueryList<ArraySectionComponent>;
 
-    public isHidden = false;
+    public isCollapsed = false;
     public isInvalid: Observable<boolean>;
 
     public title: Observable<string>;
@@ -102,13 +102,13 @@ export class ArrayItemComponent implements OnChanges {
     }
 
     public collapse() {
-        this.isHidden = true;
+        this.isCollapsed = true;
 
         this.changeDetector.markForCheck();
     }
 
     public expand() {
-        this.isHidden = false;
+        this.isCollapsed = false;
 
         this.changeDetector.markForCheck();
     }
