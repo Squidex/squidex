@@ -139,10 +139,6 @@ export abstract class FieldPropertiesDto {
     public readonly placeholder?: string;
     public readonly tags?: ReadonlyArray<string>;
 
-    public get isTranslateable() {
-        return false;
-    }
-
     public get isComplexUI() {
         return true;
     }
@@ -327,10 +323,6 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 
     public get isComplexUI() {
         return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';
-    }
-
-    public get isTranslateable() {
-        return this.editor === 'Input' || this.editor === 'TextArea';
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
