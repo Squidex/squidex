@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     {
                         log.LogWarning(ex, w => w
                             .WriteProperty("action", "runRule")
-                            .WriteProperty("status", "failedPartially"));
+                            .WriteProperty("status", "failedPartially3"));
                     }
                     finally
                     {

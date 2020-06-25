@@ -160,6 +160,19 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public async Task Should_create_job_if_too_old_but_stale_events_are_not_ignored()
+        {
+            var @event = Envelope.Create(new ContentCreated()).SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
+
+            var jobs = await sut.CreateJobsAsync(ValidRule(), ruleId, @event, false);
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<AppEvent>._, A<RuleTrigger>._, ruleId))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_create_job_if_not_triggered_with_precheck()
         {
             var rule = ValidRule();
