@@ -51,10 +51,10 @@ export class ContentSectionComponent implements OnChanges {
         this.isCollapsed = this.localStore.getBoolean(this.configKey());
     }
 
-    public changeCollapsed(value: boolean) {
-        this.isCollapsed = value;
+    public toggle() {
+        this.isCollapsed = !this.isCollapsed;
 
-        this.localStore.setBoolean(this.configKey(), value);
+        this.localStore.setBoolean(this.configKey(), this.isCollapsed);
     }
 
     public getFieldForm(field: RootFieldDto) {

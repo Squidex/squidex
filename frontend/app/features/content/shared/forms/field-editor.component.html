@@ -170,11 +170,9 @@
                 </ng-container>
 			</ng-container>
 		</ng-template>
-	</div>
+    </div>
 
-	<ng-container *ngIf="field.properties.hints; let hints">
-		<sqx-form-hint *ngIf="hints.length > 0">
-			{{hints}}
-		</sqx-form-hint>
-	</ng-container>
+    <sqx-form-hint *ngIf="field.properties.hints?.length > 0">
+        {{field.properties.hints}}
+    </sqx-form-hint>
 </div>

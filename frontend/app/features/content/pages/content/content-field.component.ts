@@ -50,9 +50,17 @@ export class ContentFieldComponent implements OnChanges {
     public isInvalid: Observable<boolean>;
 
     public get canTranslate() {
+        if (this.languages.length <= 1) {
+            return false;
+        }
+
+        if (!this.field.isLocalizable) {
+            return false;
+        }
+
         const properties = this.field.properties;
 
-        return this.field.isLocalizable && Types.is(properties, StringFieldPropertiesDto) && (properties.editor === 'Input' || properties.editor === 'TextArea');
+        return Types.is(properties, StringFieldPropertiesDto) && (properties.editor === 'Input' || properties.editor === 'TextArea');
     }
 
     constructor(

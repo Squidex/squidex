@@ -26,9 +26,9 @@ export class GroupFieldsPipe<T extends FieldDto> implements PipeTransform {
         let currentFields: T[] = [];
 
         for (const field of fields) {
-            currentFields.push(field);
-
-            if (!field.properties.isContentField) {
+            if (field.properties.isContentField) {
+                currentFields.push(field);
+            } else {
                 sections.push({ separator: currentSeparator, fields: currentFields });
 
                 currentFields = [];
