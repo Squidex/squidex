@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -186,11 +187,11 @@ namespace Squidex.Extensions.Actions.Kafka
             {
                 case JsonString s:
                     return s.Value;
-                case JsonNumber n when schema.Tag == Schema.Type.Long:
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Long):
                     return (long)n.Value;
-                case JsonNumber n when schema.Tag == Schema.Type.Float:
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Float):
                     return (float)n.Value;
-                case JsonNumber n when schema.Tag == Schema.Type.Int:
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Int):
                     return (int)n.Value;
                 case JsonNumber n:
                     return n.Value;
@@ -229,6 +230,11 @@ namespace Squidex.Extensions.Actions.Kafka
             }
 
             return null;
+        }
+
+        private static bool IsTypeOrUnionWith(Schema schema, Schema.Type expected)
+        {
+            return schema.Tag == expected || (schema is UnionSchema union && union.Schemas.Any(x => x.Tag == expected));
         }
     }
 }
