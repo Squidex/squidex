@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     return result;
                 }
 
-                var expires = eventTime.Plus(Constants.ExpirationTime);
+                var expires = now.Plus(Constants.ExpirationTime);
 
                 if (!triggerHandler.Trigger(typed.Payload, rule.Trigger, ruleId))
                 {
