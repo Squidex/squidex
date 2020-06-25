@@ -280,20 +280,20 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        private Envelope<IEvent>? ParseKnownEvent(StoredEvent message)
+        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
         {
             try
             {
-                var @event = eventDataFormatter.Parse(message.Data);
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                @event.SetEventPosition(message.EventPosition);
-                @event.SetEventStreamNumber(message.EventStreamNumber);
+                @event.SetEventPosition(storedEvent.EventPosition);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
             }
             catch (TypeNameNotFoundException)
             {
-                log.LogDebug(w => w.WriteProperty("oldEventFound", message.Data.Type));
+                log.LogDebug(w => w.WriteProperty("oldEventFound", storedEvent.Data.Type));
 
                 return null;
             }

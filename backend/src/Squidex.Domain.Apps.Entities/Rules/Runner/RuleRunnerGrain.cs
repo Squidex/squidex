@@ -17,6 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
@@ -155,13 +156,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 {
                     try
                     {
-                        var @event = eventDataFormatter.Parse(storedEvent.Data);
+                        var @event = ParseKnownEvent(storedEvent);
 
-                        var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false);
-
-                        foreach (var (job, _) in jobs)
+                        if (@event != null)
                         {
-                            await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
+                            var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false);
+
+                            foreach (var (job, _) in jobs)
+                            {
+                                await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -208,6 +212,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     currentJobToken?.Dispose();
                     currentJobToken = null;
                 }
+            }
+        }
+
+        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
+        {
+            try
+            {
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                @event.SetEventPosition(storedEvent.EventPosition);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
+
+                return @event;
+            }
+            catch (TypeNameNotFoundException)
+            {
+                return null;
             }
         }
 
