@@ -23,10 +23,10 @@
                 <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="Move this item to bottom">
                     <i class="icon-caret-bottom"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="expand()" title="Expand this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="Expand this item">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="isHidden" (click)="collapse()" title="Collapse this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="Collapse this item">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
@@ -42,7 +42,7 @@
         </div>
     </div>
     
-    <div class="card-body" [class.hidden]="isHidden">
+    <div class="card-body" [class.hidden]="isCollapsed">
         <div class="form-group" *ngFor="let section of field.nested | sqxGroupFields; trackBy: trackBySection">
             <sqx-array-section
                 [form]="form"
