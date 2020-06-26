@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.Primitives;
 using ISResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
 using ISResizeOptions = SixLabors.ImageSharp.Processing.ResizeOptions;
 
@@ -39,7 +38,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 {
                     var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
 
-                    if (options.Quality.HasValue)
+                    if (options.Quality.HasValue && (encoder is JpegEncoder || !options.KeepFormat))
                     {
                         encoder = new JpegEncoder { Quality = options.Quality.Value };
                     }
@@ -72,11 +71,10 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                         if (options.FocusX.HasValue && options.FocusY.HasValue)
                         {
-                            resizeOptions.CenterCoordinates = new float[]
-                            {
+                            resizeOptions.CenterCoordinates = new PointF(
                                 +(options.FocusX.Value / 2f) + 0.5f,
-                                -(options.FocusX.Value / 2f) + 0.5f
-                            };
+                                -(options.FocusY.Value / 2f) + 0.5f
+                            );
                         }
 
                         sourceImage.Mutate(x => x.Resize(resizeOptions));
