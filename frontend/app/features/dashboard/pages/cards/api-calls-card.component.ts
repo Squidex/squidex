@@ -45,7 +45,7 @@ export class ApiCallsCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => x.averageElapsedMs)
+                        data: this.usage.details[k].map(x => x.totalCalls)
                     }))
             };
         }

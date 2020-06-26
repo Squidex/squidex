@@ -51,7 +51,7 @@ export class ApiPerformanceCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => x.totalCalls)
+                        data: this.usage.details[k].map(x => x.averageElapsedMs)
                     }))
             };
 
