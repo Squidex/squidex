@@ -7,8 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Esprima.Ast;
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;

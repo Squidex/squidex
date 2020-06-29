@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Esprima.Ast;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
