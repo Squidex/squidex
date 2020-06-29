@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             if (@event.Payload is SchemaEvent schemaEvent)
             {
-                var channel = $"schemas.{schemaEvent.SchemaId.Name}";
+                var channel = $"schemas.{schemaEvent.SchemaId.Id}";
 
                 result = ForEvent(@event.Payload, channel).Param("Name", schemaEvent.SchemaId.Name);
 

@@ -52,6 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     using (var client = new HttpClient())
                     {
+                        client.Timeout = TimeSpan.FromHours(1);
+
                         response = await client.GetAsync(url);
                         response.EnsureSuccessStatusCode();
 

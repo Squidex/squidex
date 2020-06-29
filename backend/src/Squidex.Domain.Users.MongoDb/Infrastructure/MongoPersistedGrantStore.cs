@@ -47,14 +47,14 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             }, ct);
         }
 
+        public async Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
+        {
+            return await Collection.Find(x => x.SubjectId == subjectId).ToListAsync();
+        }
+
         public Task StoreAsync(PersistedGrant grant)
         {
             return Collection.ReplaceOneAsync(x => x.Key == grant.Key, grant, UpsertReplace);
-        }
-
-        public Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
-        {
-            return Collection.Find(x => x.SubjectId == subjectId).ToListAsync().ContinueWith(x => (IEnumerable<PersistedGrant>)x.Result);
         }
 
         public Task<PersistedGrant> GetAsync(string key)

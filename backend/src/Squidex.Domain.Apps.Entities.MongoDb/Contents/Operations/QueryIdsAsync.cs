@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -20,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryIdsAsync : OperationBase
     {
         private static readonly List<(DomainId SchemaId, DomainId Id)> EmptyIds = new List<(DomainId SchemaId, DomainId Id)>();
+        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
+        private static readonly Lazy<string> SchemaIdField = new Lazy<string>(GetSchemaIdField);
         private readonly IAppProvider appProvider;
 
         public QueryIdsAsync(IAppProvider appProvider)
@@ -51,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (DomainId.Create(x["_si"].AsString), DomainId.Create(x["id"].AsString))).ToList();
+            return contentEntities.Select(x => (DomainId.Create(x[SchemaIdField.Value].AsString), DomainId.Create(x[IdField.Value].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
@@ -69,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
                     .ToListAsync();
 
-            return contentEntities.Select(x => (DomainId.Create(x["_si"].AsString), DomainId.Create(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => (DomainId.Create(x[SchemaIdField.Value].AsString), DomainId.Create(x[IdField.Value].AsString))).ToList();
         }
 
         public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId appId, DomainId schemaId)
@@ -87,6 +91,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
 
             return Filter.And(filters);
+        }
+
+        private static string GetIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.Id)).ElementName;
+        }
+
+        private static string GetSchemaIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).GetMemberMap(nameof(MongoContentEntity.IndexedSchemaId)).ElementName;
         }
     }
 }

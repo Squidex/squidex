@@ -124,7 +124,7 @@ export function getTagValues(values: ReadonlyArray<string | TagValue>) {
     }
     const result: TagValue[] = [];
 
-    for (let value of values) {
+    for (const value of values) {
         if (Types.isString(value)) {
             result.push(new TagValue(value, value, value));
         } else {

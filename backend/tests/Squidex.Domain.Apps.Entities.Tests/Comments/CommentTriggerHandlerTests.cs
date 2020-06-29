@@ -34,10 +34,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
             sut = new CommentTriggerHandler(scriptEngine, userResolver);
@@ -291,12 +291,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
         }

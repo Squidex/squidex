@@ -33,6 +33,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 dumpBuilder.AppendLine("Action timed out.");
             }
 
+            if (Exception != null)
+            {
+                dumpBuilder.AppendLine();
+                dumpBuilder.Append("Error: ");
+                dumpBuilder.AppendLine(Exception.Message);
+            }
+
             dumpBuilder.AppendLine();
             dumpBuilder.AppendFormat("Elapsed {0}.", elapsed);
             dumpBuilder.AppendLine();

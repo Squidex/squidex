@@ -624,5 +624,27 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
                 new SchemaFieldsReordered { FieldIds = new List<long> { 10, 50, 11 } }
             );
         }
+
+        [Fact]
+        public void Should_create_events_if_field_renamed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .AddString(10, "f1", Partitioning.Invariant)
+                    .AddString(11, "f2", Partitioning.Invariant);
+
+            var targetSchema =
+                new Schema("target")
+                    .AddString(1, "f3", Partitioning.Invariant)
+                    .AddString(2, "f2", Partitioning.Invariant);
+
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new FieldDeleted { FieldId = NamedId.Of(10L, "f1") },
+                new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
+                new SchemaFieldsReordered { FieldIds = new List<long> { 50, 11 } }
+            );
+        }
     }
 }

@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -18,11 +20,14 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
+        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
+
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
@@ -80,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .QuerySort(query)
                             .ToListAsync();
 
-                    await Task.WhenAll(assetItems, assetCount);
+                    var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
 
-                    return ResultList.Create<IAssetEntity>(assetCount.Result, assetItems.Result);
+                    return ResultList.Create<IAssetEntity>(total, items);
                 }
                 catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {
@@ -99,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x["_id"].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
@@ -111,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x["_id"].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
@@ -184,6 +189,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Filter.And(
                 Filter.In(x => x.Id, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        private static string GetIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoAssetEntity)).GetMemberMap(nameof(MongoAssetEntity.Id)).ElementName;
         }
     }
 }

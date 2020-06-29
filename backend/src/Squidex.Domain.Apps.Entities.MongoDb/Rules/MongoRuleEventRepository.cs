@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
@@ -75,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             var taskForItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
             var taskForCount = Collection.Find(filter).CountDocumentsAsync();
 
-            await Task.WhenAll(taskForItems, taskForCount);
+            var (items, total) = await AsyncHelper.WhenAll(taskForItems, taskForCount);
 
-            return ResultList.Create(taskForCount.Result, taskForItems.Result);
+            return ResultList.Create(total, items);
         }
 
         public async Task<IRuleEventEntity> FindAsync(DomainId id)
@@ -94,9 +95,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.UpdateOneAsync(x => x.DocumentId == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
 
-        public async Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default)
+        public async Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = job.Created, NextAttempt = nextAttempt });
 
             await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }

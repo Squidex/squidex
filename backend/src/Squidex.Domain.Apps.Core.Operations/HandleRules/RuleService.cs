@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
+using JobList = System.Collections.Generic.List<(Squidex.Domain.Apps.Core.Rules.RuleJob Job, System.Exception? Exception)>;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -67,12 +68,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<List<RuleJob>> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
+        public virtual async Task<JobList> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = false)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
-            var result = new List<RuleJob>();
+            var result = new JobList();
 
             try
             {
@@ -107,12 +108,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                if (!ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
+                if (ignoreStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
                     return result;
                 }
 
-                var expires = eventTime.Plus(Constants.ExpirationTime);
+                var expires = now.Plus(Constants.ExpirationTime);
 
                 if (!triggerHandler.Trigger(typed.Payload, rule.Trigger, ruleId))
                 {
@@ -135,25 +136,38 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         }
 
                         var actionName = typeNameRegistry.GetName(actionType);
-                        var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
-
-                        var json = jsonSerializer.Serialize(actionData.Data);
 
                         var job = new RuleJob
                         {
                             Id = DomainId.NewGuid(),
-                            ActionData = json,
+                            ActionData = string.Empty,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,
                             Created = now,
-                            Description = actionData.Description,
                             EventName = enrichedEvent.Name,
                             ExecutionPartition = enrichedEvent.Partition,
                             Expires = expires,
                             RuleId = ruleId
                         };
 
-                        result.Add(job);
+                        try
+                        {
+                            var (description, data) = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
+
+                            var json = jsonSerializer.Serialize(data);
+
+                            job.ActionData = json;
+                            job.ActionName = actionName;
+                            job.Description = description;
+
+                            result.Add((job, null));
+                        }
+                        catch (Exception ex)
+                        {
+                            job.Description = "Failed to create job";
+
+                            result.Add((job, ex));
+                        }
                     }
                     catch (Exception ex)
                     {

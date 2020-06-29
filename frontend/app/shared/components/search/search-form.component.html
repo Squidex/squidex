@@ -62,7 +62,9 @@
         </ng-container>
         
         <ng-container footer>
-            <button type="button" class="float-right btn btn-primary" (click)="search(true)">
+            <span></span>
+
+            <button type="button" class="btn btn-primary" (click)="search(true)">
                 Submit
             </button>
         </ng-container>
@@ -92,8 +94,9 @@
             </ng-container>
         
             <ng-container footer>
-                <button type="reset" class="float-left btn btn-secondary" (click)="saveQueryDialog.hide()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
-                <button type="submit" class="float-right btn btn-success">Create</button>
+                <button type="button" class="btn btn-secondary" (click)="saveQueryDialog.hide()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
+               
+                <button type="submit" class="btn-success">Create</button>
             </ng-container>
         </sqx-modal-dialog>
     </form>

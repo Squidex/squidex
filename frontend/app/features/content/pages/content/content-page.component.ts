@@ -9,9 +9,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldDto, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
+import { FieldSection } from '../../shared/group-fields.pipe';
 
 @Component({
     selector: 'sqx-content-page',
@@ -249,8 +250,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public trackByField(field: FieldDto) {
-        return field.fieldId;
+    public trackBySection(index: number, section: FieldSection<RootFieldDto>) {
+        return section.separator?.fieldId;
     }
 }
 

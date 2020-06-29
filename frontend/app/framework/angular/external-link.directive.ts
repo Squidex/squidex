@@ -25,6 +25,7 @@ export class ExternalLinkDirective implements AfterViewInit {
 
         this.renderer.setProperty(element, 'target', '_blank');
         this.renderer.setProperty(element, 'rel', 'noopener');
+        this.renderer.addClass(element, 'external');
 
         if (this.type !== 'noicon') {
             const icon = this.renderer.createElement('i');

@@ -9,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Jint;
+using Jint.Native;
+using Jint.Native.Object;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -22,6 +25,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public CancellationToken CancellationToken { get; }
 
+        public bool IsAsync { get; private set; }
+
         internal ExecutionContext(Engine engine, CancellationToken cancellationToken, ExceptionHandler? exceptionHandler = null)
             : base(StringComparer.OrdinalIgnoreCase)
         {
@@ -32,16 +37,55 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.exceptionHandler = exceptionHandler;
         }
 
+        public void MarkAsync()
+        {
+            IsAsync = true;
+        }
+
         public void Fail(Exception exception)
         {
             exceptionHandler?.Invoke(exception);
         }
 
-        public ExecutionContext SetValue(string key, object value)
+        public void AddVariables(ScriptVars vars, ScriptOptions options)
         {
-            this[key] = value;
+            var engine = Engine;
 
-            return this;
+            if (options.AsContext)
+            {
+                var contextInstance = new ObjectInstance(engine);
+
+                foreach (var (key, value) in vars)
+                {
+                    var property = key.ToCamelCase();
+
+                    if (value != null)
+                    {
+                        contextInstance.FastAddProperty(property, JsValue.FromObject(engine, value), true, true, true);
+
+                        this[property] = value;
+                    }
+                }
+
+                engine.SetValue("ctx", contextInstance);
+                engine.SetValue("context", contextInstance);
+            }
+            else
+            {
+                foreach (var (key, value) in vars)
+                {
+                    var property = key.ToCamelCase();
+
+                    if (value != null)
+                    {
+                        engine.SetValue(property, value);
+
+                        this[property] = value;
+                    }
+                }
+            }
+
+            engine.SetValue("async", true);
         }
     }
 }

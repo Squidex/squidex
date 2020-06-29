@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -13,6 +12,7 @@ using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -51,14 +51,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] string parentId)
         {
-            var assetFolders = await assetQuery.QueryAssetFoldersAsync(Context, parentId);
+            var (folders, path) = await AsyncHelper.WhenAll(
+                assetQuery.QueryAssetFoldersAsync(Context, parentId),
+                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId));
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(assetFolders, Resources);
+                return AssetFoldersDto.FromAssets(folders, path, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = assetFolders.ToEtag();
+            Response.Headers[HeaderNames.ETag] = folders.ToEtag();
 
             return Ok(response);
         }

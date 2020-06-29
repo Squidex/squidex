@@ -29,6 +29,7 @@ namespace Squidex.Infrastructure.Log.Store
             Guard.NotNull(log, nameof(log));
 
             this.logRepository = logRepository;
+
             this.log = log;
 
             timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);

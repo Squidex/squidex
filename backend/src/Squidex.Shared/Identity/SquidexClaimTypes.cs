@@ -13,6 +13,8 @@ namespace Squidex.Shared.Identity
 
         public static readonly string PictureUrl = "urn:squidex:picture";
 
+        public static readonly string NotifoKey = "urn:squidex:notifo";
+
         public static readonly string Consent = "urn:squidex:consent";
 
         public static readonly string ConsentForEmails = "urn:squidex:consent:emails";

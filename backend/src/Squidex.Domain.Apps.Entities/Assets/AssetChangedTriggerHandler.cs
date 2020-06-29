@@ -78,12 +78,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return true;
             }
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["event"] = @event
             };
 
-            return scriptEngine.Evaluate(context, trigger.Condition);
+            return scriptEngine.Evaluate(vars, trigger.Condition);
         }
     }
 }

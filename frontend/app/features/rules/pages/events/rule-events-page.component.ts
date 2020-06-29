@@ -6,32 +6,27 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ResourceOwner, RuleEventDto, RuleEventsState } from '@app/shared';
+import { Router2State, RuleEventDto, RuleEventsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
-    templateUrl: './rule-events-page.component.html'
+    templateUrl: './rule-events-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
-export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
+export class RuleEventsPageComponent implements OnInit {
     public selectedEventId: string | null = null;
 
     constructor(
-        public readonly ruleEventsState: RuleEventsState,
-        private readonly route: ActivatedRoute
+        public readonly ruleEventsRoute: Router2State,
+        public readonly ruleEventsState: RuleEventsState
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
-            this.route.queryParams
-                .subscribe(x => {
-                    this.ruleEventsState.filterByRule(x.ruleId);
-                }));
-
-        this.ruleEventsState.load();
+        this.ruleEventsState.loadAndListen(this.ruleEventsRoute);
     }
 
     public reload() {

@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            A.CallTo(() => queryParser.ParseQuery(requestContext, A<Q>._))
+            A.CallTo(() => queryParser.ParseQueryAsync(requestContext, A<Q>._))
                 .Returns(new ClrQuery());
 
             sut = new AssetQueryService(assetEnricher, assetRepository, assetFolderRepository, queryParser);

@@ -21,6 +21,7 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -33,6 +34,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserPictureStore userPictureStore;
+        private readonly IUserEvents userEvents;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly MyIdentityOptions identityOptions;
 
@@ -40,6 +42,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IUserPictureStore userPictureStore,
+            IUserEvents userEvents,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IOptions<MyIdentityOptions> identityOptions)
         {
@@ -47,6 +50,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             this.identityOptions = identityOptions.Value;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
+            this.userEvents = userEvents;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
@@ -84,7 +88,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
                 "Account updated successfully.", model);
         }
 
@@ -92,7 +96,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/properties/")]
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
                 "Account updated successfully.", model);
         }
 
@@ -141,6 +145,23 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(userManager.GetUserId(User));
 
             return await userManager.AddLoginAsync(user, externalLogin);
+        }
+
+        private async Task<IdentityResult> UpdateAsync(IdentityUser user, UserValues values)
+        {
+            var result = await userManager.UpdateSafeAsync(user, values);
+
+            if (result.Succeeded)
+            {
+                var resolved = await userManager.ResolveUserAsync(user);
+
+                if (resolved != null)
+                {
+                    userEvents.OnUserUpdated(resolved);
+                }
+            }
+
+            return result;
         }
 
         private async Task<IdentityResult> UpdatePictureAsync(List<IFormFile> file, IdentityUser user)
@@ -212,11 +233,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 throw new DomainException("Cannot find user.");
             }
 
-            var taskForProviders = signInManager.GetExternalProvidersAsync();
-            var taskForPassword = userManager.HasPasswordAsync(user.Identity);
-            var taskForLogins = userManager.GetLoginsAsync(user.Identity);
-
-            await Task.WhenAll(taskForProviders, taskForPassword, taskForLogins);
+            var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
+                signInManager.GetExternalProvidersAsync(),
+                userManager.HasPasswordAsync(user.Identity),
+                userManager.GetLoginsAsync(user.Identity));
 
             var result = new ProfileVM
             {
@@ -224,10 +244,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 ClientSecret = user.ClientSecret()!,
                 Email = user.Email,
                 ErrorMessage = errorMessage,
-                ExternalLogins = taskForLogins.Result,
-                ExternalProviders = taskForProviders.Result,
+                ExternalLogins = logins,
+                ExternalProviders = providers,
                 DisplayName = user.DisplayName()!,
-                HasPassword = taskForPassword.Result,
+                HasPassword = hasPassword,
                 HasPasswordAuth = identityOptions.AllowPasswordAuth,
                 IsHidden = user.IsHidden(),
                 SuccessMessage = successMessage

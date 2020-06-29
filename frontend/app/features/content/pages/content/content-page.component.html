@@ -22,6 +22,8 @@
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
                 <ng-container>
+                    <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents/{{content.id}}"></sqx-notifo>
+
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
                     <div class="dropdown dropdown-options ml-1" *ngIf="content?.canDelete">
@@ -79,16 +81,15 @@
                 </ng-container>
 
                 <div content>
-                    <sqx-content-field *ngFor="let field of schema.fields; trackBy: trackByField"
+                    <sqx-content-section *ngFor="let section of schema.fields | sqxGroupFields; trackBy: trackBySection"
                         [(language)]="language"
-                        [field]="field"
-                        [fieldForm]="contentForm.form.get(field.name)"
-                        [fieldFormCompare]="contentFormCompare?.form.get(field.name)"
                         [form]="contentForm"
+                        [formCompare]="contentFormCompare"
                         [formContext]="formContext"
                         [languages]="languages"
-                        [schema]="schema">
-                    </sqx-content-field>
+                        [schema]="schema"
+                        [section]="section">
+                    </sqx-content-section>
                 </div>
             </sqx-list-view>
 

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AssetFoldersDto, AssetPathItem, AssetsDto, AssetsService, AssetsState, DialogService, LocalStoreService, MathHelper, Pager, versioned } from '@app/shared/internal';
+import { AssetFoldersDto, AssetsDto, AssetsService, AssetsState, DialogService, MathHelper, Pager, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -16,6 +16,7 @@ describe('AssetsState', () => {
     const {
         app,
         appsState,
+        buildDummyStateSynchronizer,
         newVersion
     } = TestValues;
 
@@ -30,20 +31,15 @@ describe('AssetsState', () => {
     let dialogs: IMock<DialogService>;
     let assetsService: IMock<AssetsService>;
     let assetsState: AssetsState;
-    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        localStore = Mock.ofType<LocalStoreService>();
-        localStore.setup(x => x.getInt('assets.pageSize', 30))
-            .returns(() => 30);
 
         assetsService = Mock.ofType<AssetsService>();
         assetsService.setup(x => x.getTags(app))
             .returns(() => of({ tag1: 1, shared: 2, tag2: 1 }));
 
-        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object, localStore.object);
+        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
     });
 
     afterEach(() => {
@@ -53,7 +49,7 @@ describe('AssetsState', () => {
     describe('Loading', () => {
         beforeEach(() => {
             assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID))
-                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2]))).verifiable(Times.atLeastOnce());
+                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable(Times.atLeastOnce());
         });
 
         it('should load assets', () => {
@@ -112,58 +108,32 @@ describe('AssetsState', () => {
             expect().nothing();
         });
 
-        it('should update page size in local store', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 50, skip: 0, parentId: MathHelper.EMPTY_GUID }))
-                .returns(() => of(new AssetsDto(200, []))).verifiable();
+        it('should load when synchronizer triggered', () => {
+            const { synchronizer, trigger } = buildDummyStateSynchronizer();
 
-            assetsState.setPager(new Pager(0, 0, 50));
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+                .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable(Times.exactly(2));
 
-            localStore.verify(x => x.setInt('assets.pageSize', 50), Times.atLeastOnce());
+            assetsState.loadAndListen(synchronizer);
+
+            trigger();
+            trigger();
 
             expect().nothing();
         });
     });
 
     describe('Navigating', () => {
-        beforeEach(() => {
-            assetsService.setup(x => x.getAssets(app, It.isAny()))
-                .returns(() => of(new AssetsDto(0, [])));
+        it('should load with parent id', () => {
+            assetsService.setup(x => x.getAssetFolders(app, '123'))
+                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable();
 
-            assetsService.setup(x => x.getAssetFolders(app, It.isAny()))
-                .returns(() => of(new AssetFoldersDto(0, [])));
-        });
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123' }))
+                .returns(() => of(new AssetsDto(200, []))).verifiable();
 
-        it('should move to child', () => {
-            assetsState.navigate({ id: '1', folderName: 'Folder1' }).subscribe();
-            assetsState.navigate({ id: '2', folderName: 'Folder2' }).subscribe();
+            assetsState.navigate('123').subscribe();
 
-            let path: ReadonlyArray<AssetPathItem>;
-
-            assetsState.path.subscribe(result => {
-                path = result;
-            });
-
-            expect(path!).toEqual([
-                { id: MathHelper.EMPTY_GUID, folderName: 'Assets' },
-                { id: '1', folderName: 'Folder1' },
-                { id: '2', folderName: 'Folder2' }
-            ]);
-        });
-
-        it('should navigate back to parent', () => {
-            assetsState.navigate({ id: '1', folderName: 'Folder1' }).subscribe();
-            assetsState.navigate({ id: '2', folderName: 'Folder2' }).subscribe();
-            assetsState.navigate({ id: MathHelper.EMPTY_GUID, folderName: 'Assets' }).subscribe();
-
-            let path: ReadonlyArray<AssetPathItem>;
-
-            assetsState.path.subscribe(result => {
-                path = result;
-            });
-
-            expect(path!).toEqual([
-                { id: MathHelper.EMPTY_GUID, folderName: 'Assets' }
-            ]);
+            expect().nothing();
         });
     });
 
@@ -201,7 +171,7 @@ describe('AssetsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID))
-                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2])));
+                .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], [])));
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();

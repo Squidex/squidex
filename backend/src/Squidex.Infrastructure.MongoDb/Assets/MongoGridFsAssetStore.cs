@@ -114,7 +114,7 @@ namespace Squidex.Infrastructure.Assets
 
                 await bucket.UploadFromStreamAsync(name, name, stream, cancellationToken: ct);
             }
-            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 throw new AssetAlreadyExistsException(fileName);
             }

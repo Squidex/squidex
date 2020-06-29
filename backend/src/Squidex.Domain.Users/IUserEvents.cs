@@ -13,6 +13,8 @@ namespace Squidex.Domain.Users
     {
         void OnUserRegistered(IUser user);
 
+        void OnUserUpdated(IUser user);
+
         void OnConsentGiven(IUser user);
     }
 }

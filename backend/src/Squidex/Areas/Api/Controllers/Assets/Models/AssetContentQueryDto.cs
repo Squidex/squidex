@@ -76,6 +76,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public bool IgnoreFocus { get; set; }
 
         /// <summary>
+        /// True to not use JPEG encoding when quality is set and the image is not a JPEG. Default: false.
+        /// </summary>
+        [FromQuery(Name = "keepformat")]
+        public bool KeepFormat { get; set; }
+
+        /// <summary>
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "force")]

@@ -42,18 +42,21 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders();
+
             services.AddSingleton<IPasswordValidator<IdentityUser>,
                 PwnedPasswordValidator>();
+
             services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
+
             services.AddSingleton<IClaimsTransformation,
                 ApiPermissionUnifier>();
+
             services.AddSingleton<IClientStore,
                 LazyClientStore>();
+
             services.AddSingleton<IResourceStore,
                 InMemoryResourcesStore>();
-            services.AddSingleton<IXmlRepository,
-                DefaultXmlRepository>();
 
             services.AddIdentityServer(options =>
                 {
@@ -96,7 +99,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 new[]
                 {
                     SquidexClaimTypes.DisplayName,
-                    SquidexClaimTypes.PictureUrl
+                    SquidexClaimTypes.PictureUrl,
+                    SquidexClaimTypes.NotifoKey
                 });
         }
     }

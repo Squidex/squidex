@@ -50,9 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.appProvider = appProvider;
 
             this.cache = cache;
-            this.localCache = localCache;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
+            this.localCache = localCache;
         }
 
         public bool Handles(StoredEvent @event)
@@ -74,9 +74,24 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
 
-                foreach (var job in jobs)
+                foreach (var (job, ex) in jobs)
                 {
-                    await ruleEventRepository.EnqueueAsync(job, job.Created);
+                    if (ex != null)
+                    {
+                        await ruleEventRepository.EnqueueAsync(job, null);
+
+                        await ruleEventRepository.UpdateAsync(job, new RuleJobUpdate
+                        {
+                            JobResult = RuleJobResult.Failed,
+                            ExecutionResult = RuleResult.Failed,
+                            ExecutionDump = ex.ToString(),
+                            Finished = job.Created
+                        });
+                    }
+                    else
+                    {
+                        await ruleEventRepository.EnqueueAsync(job, job.Created);
+                    }
                 }
             }
         }

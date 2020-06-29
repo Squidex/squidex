@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -428,14 +428,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Publish a content item.
+        /// Change status of a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to publish.</param>
+        /// <param name="id">The id of the content item to change.</param>
         /// <param name="request">The status request.</param>
         /// <returns>
-        /// 200 => Content published.
+        /// 200 => Content status changed.
         /// 404 => Content, schema or app not found.
         /// 400 => Request is not valid.
         /// </returns>
@@ -457,13 +457,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Create a new version.
+        /// Create a new draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to discard changes.</param>
+        /// <param name="id">The id of the content item to create the draft for.</param>
         /// <returns>
-        /// 200 => Content restored.
+        /// 200 => Content draft created.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -484,13 +484,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Discard changes.
+        /// Delete the draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to discard changes.</param>
+        /// <param name="id">The id of the content item to delete the draft from.</param>
         /// <returns>
-        /// 200 => Content restored.
+        /// 200 => Content draft deleted.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>

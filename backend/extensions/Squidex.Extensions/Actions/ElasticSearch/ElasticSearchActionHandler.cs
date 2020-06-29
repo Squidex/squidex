@@ -80,7 +80,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 return Result.Ignored();
             }
 
-            var client = clients.GetClient((new Uri(job.ServerHost, UriKind.Absolute), job.ServerUser, job.ServerPassword));
+            var client = await clients.GetClientAsync((new Uri(job.ServerHost, UriKind.Absolute), job.ServerUser, job.ServerPassword));
 
             try
             {

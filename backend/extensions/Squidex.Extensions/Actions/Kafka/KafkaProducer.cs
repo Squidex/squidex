@@ -5,7 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Avro;
 using Avro.Generic;
@@ -13,9 +17,11 @@ using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
+using Schema = Avro.Schema;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
@@ -107,29 +113,66 @@ namespace Squidex.Extensions.Actions.Kafka
                 .WriteProperty("reason", error.Reason));
         }
 
-        public async Task<DeliveryResult<string, string>> Send(string topicName, Message<string, string> message, string schema)
+        public async Task SendAsync(KafkaJob job, CancellationToken ct)
         {
-            if (!string.IsNullOrWhiteSpace(schema))
+            if (!string.IsNullOrWhiteSpace(job.Schema))
             {
-                var value = CreateAvroRecord(message.Value, schema);
+                var value = CreateAvroRecord(job.MessageValue, job.Schema);
 
-                var avroMessage = new Message<string, GenericRecord> { Key = message.Key, Headers = message.Headers, Value = value };
+                var message = new Message<string, GenericRecord> { Value = value };
 
-                await avroProducer.ProduceAsync(topicName, avroMessage);
+                await ProduceAsync(avroProducer, message, job, ct);
+            }
+            else
+            {
+                var message = new Message<string, string> { Value = job.MessageValue };
+
+                await ProduceAsync(textProducer, message, job, ct);
+            }
+        }
+
+        private async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job, CancellationToken ct)
+        {
+            message.Key = job.MessageKey;
+
+            if (job.Headers?.Count > 0)
+            {
+                message.Headers = new Headers();
+
+                foreach (var header in job.Headers)
+                {
+                    message.Headers.Add(header.Key, Encoding.UTF8.GetBytes(header.Value));
+                }
             }
 
-            return await textProducer.ProduceAsync(topicName, message);
+            if (!string.IsNullOrWhiteSpace(job.PartitionKey) && job.PartitionCount > 0)
+            {
+                var partition = Math.Abs(job.PartitionKey.GetHashCode()) % job.PartitionCount;
+
+                await producer.ProduceAsync(new TopicPartition(job.TopicName, partition), message, ct);
+            }
+            else
+            {
+                await producer.ProduceAsync(job.TopicName, message, ct);
+            }
         }
 
         private GenericRecord CreateAvroRecord(string json, string avroSchema)
         {
-            var schema = (RecordSchema)Avro.Schema.Parse(avroSchema);
+            try
+            {
+                var schema = (RecordSchema)Avro.Schema.Parse(avroSchema);
 
-            var jsonObject = jsonSerializer.Deserialize<JsonObject>(json);
+                var jsonObject = jsonSerializer.Deserialize<JsonObject>(json);
 
-            var result = (GenericRecord)GetValue(jsonObject, schema);
+                var result = (GenericRecord)GetValue(jsonObject, schema);
 
-            return result;
+                return result;
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Failed to parse json: {json}, got {ex.Message}", ex);
+            }
         }
 
         public void Dispose()
@@ -138,12 +181,18 @@ namespace Squidex.Extensions.Actions.Kafka
             avroProducer?.Dispose();
         }
 
-        private object GetValue(IJsonValue value, Avro.Schema schema)
+        private object GetValue(IJsonValue value, Schema schema)
         {
             switch (value)
             {
                 case JsonString s:
                     return s.Value;
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Long):
+                    return (long)n.Value;
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Float):
+                    return (float)n.Value;
+                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Int):
+                    return (int)n.Value;
                 case JsonNumber n:
                     return n.Value;
                 case JsonBoolean b:
@@ -181,6 +230,11 @@ namespace Squidex.Extensions.Actions.Kafka
             }
 
             return null;
+        }
+
+        private static bool IsTypeOrUnionWith(Schema schema, Schema.Type expected)
+        {
+            return schema.Tag == expected || (schema is UnionSchema union && union.Schemas.Any(x => x.Tag == expected));
         }
     }
 }

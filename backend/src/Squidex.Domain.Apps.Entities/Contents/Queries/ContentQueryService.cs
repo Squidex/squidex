@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
         {
-            var parsedQuery = queryParser.ParseQuery(context, schema, query);
+            var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
 
             return await QueryCoreAsync(context, schema, parsedQuery);
         }

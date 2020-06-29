@@ -9,6 +9,9 @@ using Microsoft.OData.Edm;
 using Squidex.Infrastructure.Queries.OData;
 using Xunit;
 
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable IDE1006 // Naming Styles
+
 namespace Squidex.Infrastructure.Queries
 {
     public class QueryODataConversionTests
@@ -65,8 +68,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/dateime")]
         public void Should_parse_filter_when_type_is_datetime(string field)
         {
-            var i = Q($"$filter={field} eq 1988-01-19T12:00:00Z");
-            var o = C($"Filter: {field} == 1988-01-19T12:00:00Z");
+            var i = _Q($"$filter={field} eq 1988-01-19T12:00:00Z");
+            var o = _C($"Filter: {field} == 1988-01-19T12:00:00Z");
 
             Assert.Equal(o, i);
         }
@@ -74,8 +77,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_datetime_list()
         {
-            var i = Q("$filter=created in ('1988-01-19T12:00:00Z')");
-            var o = C("Filter: created in [1988-01-19T12:00:00Z]");
+            var i = _Q("$filter=created in ('1988-01-19T12:00:00Z')");
+            var o = _C("Filter: created in [1988-01-19T12:00:00Z]");
 
             Assert.Equal(o, i);
         }
@@ -83,8 +86,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_datetime_and_and_value_is_date()
         {
-            var i = Q("$filter=created eq 1988-01-19");
-            var o = C("Filter: created == 1988-01-19T00:00:00Z");
+            var i = _Q("$filter=created eq 1988-01-19");
+            var o = _C("Filter: created == 1988-01-19T00:00:00Z");
 
             Assert.Equal(o, i);
         }
@@ -96,8 +99,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/date")]
         public void Should_parse_filter_when_type_is_date(string field)
         {
-            var i = Q($"$filter={field} eq 1988-01-19");
-            var o = C($"Filter: {field} == 1988-01-19T00:00:00Z");
+            var i = _Q($"$filter={field} eq 1988-01-19");
+            var o = _C($"Filter: {field} == 1988-01-19T00:00:00Z");
 
             Assert.Equal(o, i);
         }
@@ -105,8 +108,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_date_list()
         {
-            var i = Q("$filter=birthday in ('1988-01-19')");
-            var o = C("Filter: birthday in [1988-01-19T00:00:00Z]");
+            var i = _Q("$filter=birthday in ('1988-01-19')");
+            var o = _C("Filter: birthday in [1988-01-19T00:00:00Z]");
 
             Assert.Equal(o, i);
         }
@@ -118,8 +121,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/guid")]
         public void Should_parse_filter_when_type_is_guid(string field)
         {
-            var i = Q($"$filter={field} eq B5FE25E3-B262-4B17-91EF-B3772A6B62BB");
-            var o = C($"Filter: {field} == b5fe25e3-b262-4b17-91ef-b3772a6b62bb");
+            var i = _Q($"$filter={field} eq B5FE25E3-B262-4B17-91EF-B3772A6B62BB");
+            var o = _C($"Filter: {field} == b5fe25e3-b262-4b17-91ef-b3772a6b62bb");
 
             Assert.Equal(o, i);
         }
@@ -127,8 +130,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_guid_list()
         {
-            var i = Q("$filter=id in ('B5FE25E3-B262-4B17-91EF-B3772A6B62BB')");
-            var o = C("Filter: id in [b5fe25e3-b262-4b17-91ef-b3772a6b62bb]");
+            var i = _Q("$filter=id in ('B5FE25E3-B262-4B17-91EF-B3772A6B62BB')");
+            var o = _C("Filter: id in [b5fe25e3-b262-4b17-91ef-b3772a6b62bb]");
 
             Assert.Equal(o, i);
         }
@@ -136,8 +139,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_null()
         {
-            var i = Q("$filter=firstName eq null");
-            var o = C("Filter: firstName == null");
+            var i = _Q("$filter=firstName eq null");
+            var o = _C("Filter: firstName == null");
 
             Assert.Equal(o, i);
         }
@@ -149,8 +152,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/string")]
         public void Should_parse_filter_when_type_is_string(string field)
         {
-            var i = Q($"$filter={field} eq 'Dagobert'");
-            var o = C($"Filter: {field} == 'Dagobert'");
+            var i = _Q($"$filter={field} eq 'Dagobert'");
+            var o = _C($"Filter: {field} == 'Dagobert'");
 
             Assert.Equal(o, i);
         }
@@ -158,8 +161,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_string_list()
         {
-            var i = Q("$filter=firstName in ('Dagobert')");
-            var o = C("Filter: firstName in ['Dagobert']");
+            var i = _Q("$filter=firstName in ('Dagobert')");
+            var o = _C("Filter: firstName in ['Dagobert']");
 
             Assert.Equal(o, i);
         }
@@ -171,8 +174,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/boolean")]
         public void Should_parse_filter_when_type_is_boolean(string field)
         {
-            var i = Q($"$filter={field} eq true");
-            var o = C($"Filter: {field} == True");
+            var i = _Q($"$filter={field} eq true");
+            var o = _C($"Filter: {field} == True");
 
             Assert.Equal(o, i);
         }
@@ -180,8 +183,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_boolean_list()
         {
-            var i = Q("$filter=isComicFigure in (true)");
-            var o = C("Filter: isComicFigure in [True]");
+            var i = _Q("$filter=isComicFigure in (true)");
+            var o = _C("Filter: isComicFigure in [True]");
 
             Assert.Equal(o, i);
         }
@@ -193,8 +196,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/int")]
         public void Should_parse_filter_when_type_is_int32(string field)
         {
-            var i = Q($"$filter={field} eq 60");
-            var o = C($"Filter: {field} == 60");
+            var i = _Q($"$filter={field} eq 60");
+            var o = _C($"Filter: {field} == 60");
 
             Assert.Equal(o, i);
         }
@@ -202,8 +205,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_int32_list()
         {
-            var i = Q("$filter=age in (60)");
-            var o = C("Filter: age in [60]");
+            var i = _Q("$filter=age in (60)");
+            var o = _C("Filter: age in [60]");
 
             Assert.Equal(o, i);
         }
@@ -215,8 +218,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/long")]
         public void Should_parse_filter_when_type_is_int64(string field)
         {
-            var i = Q($"$filter={field} eq 31543143513456789");
-            var o = C($"Filter: {field} == 31543143513456789");
+            var i = _Q($"$filter={field} eq 31543143513456789");
+            var o = _C($"Filter: {field} == 31543143513456789");
 
             Assert.Equal(o, i);
         }
@@ -224,8 +227,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_int64_list()
         {
-            var i = Q("$filter=incomeCents in (31543143513456789)");
-            var o = C("Filter: incomeCents in [31543143513456789]");
+            var i = _Q("$filter=incomeCents in (31543143513456789)");
+            var o = _C("Filter: incomeCents in [31543143513456789]");
 
             Assert.Equal(o, i);
         }
@@ -237,8 +240,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/double")]
         public void Should_parse_filter_when_type_is_double(string field)
         {
-            var i = Q($"$filter={field} eq 5634474356.1233");
-            var o = C($"Filter: {field} == 5634474356.1233");
+            var i = _Q($"$filter={field} eq 5634474356.1233");
+            var o = _C($"Filter: {field} == 5634474356.1233");
 
             Assert.Equal(o, i);
         }
@@ -246,8 +249,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_when_type_is_double_list()
         {
-            var i = Q("$filter=incomeMio in (5634474356.1233)");
-            var o = C("Filter: incomeMio in [5634474356.1233]");
+            var i = _Q("$filter=incomeMio in (5634474356.1233)");
+            var o = _C("Filter: incomeMio in [5634474356.1233]");
 
             Assert.Equal(o, i);
         }
@@ -255,8 +258,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_negation()
         {
-            var i = Q("$filter=not endswith(lastName, 'Duck')");
-            var o = C("Filter: !(endsWith(lastName, 'Duck'))");
+            var i = _Q("$filter=not endswith(lastName, 'Duck')");
+            var o = _C("Filter: !(endsWith(lastName, 'Duck'))");
 
             Assert.Equal(o, i);
         }
@@ -264,8 +267,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_startswith()
         {
-            var i = Q("$filter=startswith(lastName, 'Duck')");
-            var o = C("Filter: startsWith(lastName, 'Duck')");
+            var i = _Q("$filter=startswith(lastName, 'Duck')");
+            var o = _C("Filter: startsWith(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -273,8 +276,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_endswith()
         {
-            var i = Q("$filter=endswith(lastName, 'Duck')");
-            var o = C("Filter: endsWith(lastName, 'Duck')");
+            var i = _Q("$filter=endswith(lastName, 'Duck')");
+            var o = _C("Filter: endsWith(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -282,8 +285,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_empty()
         {
-            var i = Q("$filter=empty(lastName)");
-            var o = C("Filter: empty(lastName)");
+            var i = _Q("$filter=empty(lastName)");
+            var o = _C("Filter: empty(lastName)");
 
             Assert.Equal(o, i);
         }
@@ -291,8 +294,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_empty_to_true()
         {
-            var i = Q("$filter=empty(lastName) eq true");
-            var o = C("Filter: empty(lastName)");
+            var i = _Q("$filter=empty(lastName) eq true");
+            var o = _C("Filter: empty(lastName)");
 
             Assert.Equal(o, i);
         }
@@ -300,8 +303,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_contains()
         {
-            var i = Q("$filter=contains(lastName, 'Duck')");
-            var o = C("Filter: contains(lastName, 'Duck')");
+            var i = _Q("$filter=contains(lastName, 'Duck')");
+            var o = _C("Filter: contains(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -309,8 +312,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_contains_to_true()
         {
-            var i = Q("$filter=contains(lastName, 'Duck') eq true");
-            var o = C("Filter: contains(lastName, 'Duck')");
+            var i = _Q("$filter=contains(lastName, 'Duck') eq true");
+            var o = _C("Filter: contains(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -318,8 +321,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_contains_to_false()
         {
-            var i = Q("$filter=contains(lastName, 'Duck') eq false");
-            var o = C("Filter: !(contains(lastName, 'Duck'))");
+            var i = _Q("$filter=contains(lastName, 'Duck') eq false");
+            var o = _C("Filter: !(contains(lastName, 'Duck'))");
 
             Assert.Equal(o, i);
         }
@@ -327,8 +330,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_equals()
         {
-            var i = Q("$filter=age eq 1");
-            var o = C("Filter: age == 1");
+            var i = _Q("$filter=age eq 1");
+            var o = _C("Filter: age == 1");
 
             Assert.Equal(o, i);
         }
@@ -336,8 +339,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_notequals()
         {
-            var i = Q("$filter=age ne 1");
-            var o = C("Filter: age != 1");
+            var i = _Q("$filter=age ne 1");
+            var o = _C("Filter: age != 1");
 
             Assert.Equal(o, i);
         }
@@ -345,8 +348,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_lessthan()
         {
-            var i = Q("$filter=age lt 1");
-            var o = C("Filter: age < 1");
+            var i = _Q("$filter=age lt 1");
+            var o = _C("Filter: age < 1");
 
             Assert.Equal(o, i);
         }
@@ -354,8 +357,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_lessthanorequal()
         {
-            var i = Q("$filter=age le 1");
-            var o = C("Filter: age <= 1");
+            var i = _Q("$filter=age le 1");
+            var o = _C("Filter: age <= 1");
 
             Assert.Equal(o, i);
         }
@@ -363,8 +366,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_greaterthan()
         {
-            var i = Q("$filter=age gt 1");
-            var o = C("Filter: age > 1");
+            var i = _Q("$filter=age gt 1");
+            var o = _C("Filter: age > 1");
 
             Assert.Equal(o, i);
         }
@@ -372,8 +375,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_greaterthanorequal()
         {
-            var i = Q("$filter=age ge 1");
-            var o = C("Filter: age >= 1");
+            var i = _Q("$filter=age ge 1");
+            var o = _C("Filter: age >= 1");
 
             Assert.Equal(o, i);
         }
@@ -381,8 +384,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_conjunction_and_contains()
         {
-            var i = Q("$filter=contains(firstName, 'Sebastian') eq false and isComicFigure eq true");
-            var o = C("Filter: (!(contains(firstName, 'Sebastian')) && isComicFigure == True)");
+            var i = _Q("$filter=contains(firstName, 'Sebastian') eq false and isComicFigure eq true");
+            var o = _C("Filter: (!(contains(firstName, 'Sebastian')) && isComicFigure == True)");
 
             Assert.Equal(o, i);
         }
@@ -390,8 +393,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_conjunction()
         {
-            var i = Q("$filter=age eq 1 and age eq 2");
-            var o = C("Filter: (age == 1 && age == 2)");
+            var i = _Q("$filter=age eq 1 and age eq 2");
+            var o = _C("Filter: (age == 1 && age == 2)");
 
             Assert.Equal(o, i);
         }
@@ -399,8 +402,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_disjunction()
         {
-            var i = Q("$filter=age eq 1 or age eq 2");
-            var o = C("Filter: (age == 1 || age == 2)");
+            var i = _Q("$filter=age eq 1 or age eq 2");
+            var o = _C("Filter: (age == 1 || age == 2)");
 
             Assert.Equal(o, i);
         }
@@ -408,8 +411,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_full_text_numbers()
         {
-            var i = Q("$search=\"33k\"");
-            var o = C("FullText: '33k'");
+            var i = _Q("$search=\"33k\"");
+            var o = _C("FullText: '33k'");
 
             Assert.Equal(o, i);
         }
@@ -417,8 +420,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_full_text()
         {
-            var i = Q("$search=Duck");
-            var o = C("FullText: 'Duck'");
+            var i = _Q("$search=Duck");
+            var o = _C("FullText: 'Duck'");
 
             Assert.Equal(o, i);
         }
@@ -426,8 +429,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_with_full_text_and_multiple_terms()
         {
-            var i = Q("$search=Dagobert or Donald");
-            var o = C("FullText: 'Dagobert or Donald'");
+            var i = _Q("$search=Dagobert or Donald");
+            var o = _C("FullText: 'Dagobert or Donald'");
 
             Assert.Equal(o, i);
         }
@@ -435,8 +438,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_make_orderby_with_single_field()
         {
-            var i = Q("$orderby=age desc");
-            var o = C("Sort: age Descending");
+            var i = _Q("$orderby=age desc");
+            var o = _C("Sort: age Descending");
 
             Assert.Equal(o, i);
         }
@@ -444,8 +447,8 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_make_orderby_with_multiple_field()
         {
-            var i = Q("$orderby=age, incomeMio desc");
-            var o = C("Sort: age Ascending, incomeMio Descending");
+            var i = _Q("$orderby=age, incomeMio desc");
+            var o = _C("Sort: age Ascending, incomeMio Descending");
 
             Assert.Equal(o, i);
         }
@@ -453,18 +456,18 @@ namespace Squidex.Infrastructure.Queries
         [Fact]
         public void Should_parse_filter_and_take()
         {
-            var i = Q("$top=3&$skip=4");
-            var o = C("Skip: 4; Take: 3");
+            var i = _Q("$top=3&$skip=4");
+            var o = _C("Skip: 4; Take: 3");
 
             Assert.Equal(o, i);
         }
 
-        private static string C(string value)
+        private static string _C(string value)
         {
             return value.Replace('/', '.');
         }
 
-        private static string? Q(string value)
+        private static string? _Q(string value)
         {
             var parser = EdmModel.ParseQuery(value);
 

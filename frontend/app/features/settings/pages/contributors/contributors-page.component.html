@@ -6,6 +6,8 @@
     </ng-container>
 
     <ng-container menu>
+        <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
+
         <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="Refresh contributors (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
@@ -49,7 +51,7 @@
                             <table class="table table-items table-fixed">
                                 <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor"
                                     [sqxContributor]="contributor"
-                                    [search]="contributorsState.snapshot.queryRegex"
+                                    [search]="contributorsState.queryRegex | async"
                                     [roles]="roles">
                                 </tbody>
                             </table>

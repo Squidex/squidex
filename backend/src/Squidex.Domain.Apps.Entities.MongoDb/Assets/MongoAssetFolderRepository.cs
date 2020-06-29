@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -20,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<MongoAssetFolderEntity>, IAssetFolderRepository
     {
+        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
+
         public MongoAssetFolderRepository(IMongoDatabase database)
             : base(database)
         {
@@ -63,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetFolderEntities.Select(x => DomainId.Create(x["_id"].AsString)).ToList();
+                return assetFolderEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
@@ -79,6 +83,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 return assetFolderEntity;
             }
+        }
+
+        private static string GetIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoAssetFolderEntity)).GetMemberMap(nameof(MongoAssetFolderEntity.Id)).ElementName;
         }
     }
 }

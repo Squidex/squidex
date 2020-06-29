@@ -16,6 +16,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly ISemanticLog log;
-        private CancellationTokenSource? currentTaskToken;
+        private CancellationTokenSource? currentJobToken;
         private IGrainReminder? currentReminder;
         private bool isStopping;
 
@@ -79,14 +80,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             isStopping = true;
 
-            currentTaskToken?.Cancel();
+            currentJobToken?.Cancel();
 
             return base.OnDeactivateAsync();
         }
 
         public Task CancelAsync()
         {
-            currentTaskToken?.Cancel();
+            try
+            {
+                currentJobToken?.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                return Task.CompletedTask;
+            }
 
             return Task.CompletedTask;
         }
@@ -98,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         public async Task RunAsync(DomainId ruleId)
         {
-            if (currentTaskToken != null)
+            if (currentJobToken != null)
             {
                 throw new DomainException("Another rule is already running.");
             }
@@ -115,11 +123,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         private void EnsureIsRunning()
         {
-            if (state.Value.RuleId.HasValue && currentTaskToken == null)
+            if (state.Value.RuleId.HasValue && currentJobToken == null)
             {
-                currentTaskToken = new CancellationTokenSource();
+                currentJobToken = new CancellationTokenSource();
 
-                Process(state.Value, currentTaskToken.Token);
+                Process(state.Value, currentJobToken.Token);
             }
         }
 
@@ -145,16 +153,30 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                 await eventStore.QueryAsync(async storedEvent =>
                 {
-                    var @event = eventDataFormatter.Parse(storedEvent.Data);
-
-                    var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event);
-
-                    foreach (var job in jobs)
+                    try
                     {
-                        await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
-                    }
+                        var @event = ParseKnownEvent(storedEvent);
 
-                    job.Position = storedEvent.EventPosition;
+                        if (@event != null)
+                        {
+                            var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false);
+
+                            foreach (var (job, _) in jobs)
+                            {
+                                await ruleEventRepository.EnqueueAsync(job, job.Created, ct);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogWarning(ex, w => w
+                            .WriteProperty("action", "runRule")
+                            .WriteProperty("status", "failedPartially3"));
+                    }
+                    finally
+                    {
+                        job.Position = storedEvent.EventPosition;
+                    }
 
                     await state.WriteAsync();
                 }, $"\\-{Key}", job.Position, ct);
@@ -166,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
-                    .WriteProperty("action", "runeRule")
+                    .WriteProperty("action", "runRule")
                     .WriteProperty("status", "failed")
                     .WriteProperty("ruleId", job.RuleId?.ToString()));
             }
@@ -186,8 +208,26 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         currentReminder = null;
                     }
 
-                    currentTaskToken = null;
+                    currentJobToken?.Dispose();
+                    currentJobToken = null;
                 }
+            }
+        }
+
+        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
+        {
+            try
+            {
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                @event.SetEventPosition(storedEvent.EventPosition);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
+
+                return @event;
+            }
+            catch (TypeNameNotFoundException)
+            {
+                return null;
             }
         }
 

@@ -1,0 +1,18 @@
+<div class="header" *ngIf="section.separator; let separator">
+    <h3>{{separator!.displayName}}</h3>
+
+    <sqx-form-hint *ngIf="separator!.properties.hints?.length > 0">
+        {{separator!.properties.hints}}
+    </sqx-form-hint>
+</div>
+   
+<div class="form-group" *ngFor="let field of section.fields; trackBy: trackByField">
+    <sqx-field-editor
+        [control]="getControl(field)"
+        [field]="field"
+        [form]="form"
+        [formContext]="formContext"
+        [language]="language"
+        [languages]="languages">
+    </sqx-field-editor>
+</div>

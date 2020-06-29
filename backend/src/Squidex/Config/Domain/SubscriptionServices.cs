@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UsageGate>()
                 .AsSelf();
 
-            services.AddSingletonAs<NoopUserEvents>()
+            services.AddSingletonAs<UserEvents>()
                 .AsOptional<IUserEvents>();
         }
     }

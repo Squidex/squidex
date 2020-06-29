@@ -20,7 +20,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             foreach (var (key, value) in content)
             {
-                result[key] = GetFirst(value);
+                var first = GetFirst(value);
+
+                if (first != null)
+                {
+                    result[key] = first;
+                }
             }
 
             return result;
@@ -32,7 +37,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             foreach (var (key, value) in content)
             {
-                result[key] = GetFirst(value, fallback);
+                var first = GetFirst(value, fallback);
+
+                if (first != null)
+                {
+                    result[key] = first;
+                }
             }
 
             return result;
@@ -40,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static object? GetFirst(ContentFieldData? fieldData)
         {
-            if (fieldData == null)
+            if (fieldData == null || fieldData.Count == 0)
             {
                 return null;
             }

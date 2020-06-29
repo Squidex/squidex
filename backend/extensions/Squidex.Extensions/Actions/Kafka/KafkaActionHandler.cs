@@ -7,10 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Confluent.Kafka;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
@@ -55,7 +53,9 @@ namespace Squidex.Extensions.Actions.Kafka
                 MessageKey = key,
                 MessageValue = value,
                 Headers = await ParseHeadersAsync(action.Headers, @event),
-                Schema = action.Schema
+                Schema = action.Schema,
+                PartitionKey = await FormatAsync(action.PartitionKey, @event),
+                PartitionCount = action.PartitionCount
             };
 
             return (Description, ruleJob);
@@ -94,19 +94,7 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             try
             {
-                var message = new Message<string, string> { Key = job.MessageKey, Value = job.MessageValue };
-
-                if (job.Headers?.Count > 0)
-                {
-                    message.Headers = new Headers();
-
-                    foreach (var header in job.Headers)
-                    {
-                        message.Headers.Add(header.Key, Encoding.UTF8.GetBytes(header.Value));
-                    }
-                }
-
-                await kafkaProducer.Send(job.TopicName, message, job.Schema);
+                await kafkaProducer.SendAsync(job, ct);
 
                 return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
             }
@@ -125,8 +113,12 @@ namespace Squidex.Extensions.Actions.Kafka
 
         public string MessageValue { get; set; }
 
+        public string Schema { get; set; }
+
+        public string PartitionKey { get; set; }
+
         public Dictionary<string, string> Headers { get; set; }
 
-        public string Schema { get; set; }
+        public int PartitionCount { get; set; }
     }
 }

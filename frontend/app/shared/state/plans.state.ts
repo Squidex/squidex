@@ -66,6 +66,10 @@ export class PlansState extends State<Snapshot> {
 
     public window = window;
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly authState: AuthService,

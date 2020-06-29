@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
-        private readonly CancellationTokenSource timerCts = new CancellationTokenSource();
+        private readonly CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task RetryAsync()
         {
-            await Task.Delay(ReconnectWaitMs, timerCts.Token);
+            await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
 
             await dispatcher.DispatchAsync(Subscribe);
         }
@@ -108,7 +108,11 @@ namespace Squidex.Infrastructure.EventSourcing
             await dispatcher.DispatchAsync(Unsubscribe);
             await dispatcher.StopAndWaitAsync();
 
-            timerCts.Cancel();
+            if (!timerCancellation.IsCancellationRequested)
+            {
+                timerCancellation.Cancel();
+                timerCancellation.Dispose();
+            }
         }
     }
 }

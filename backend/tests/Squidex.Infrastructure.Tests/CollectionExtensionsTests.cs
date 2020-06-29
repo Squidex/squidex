@@ -16,6 +16,26 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();
 
         [Fact]
+        public void SetEquals_should_return_false_when_subset()
+        {
+            var set1 = new[] { 1, 2 };
+            var set2 = new[] { 1, 2, 3 };
+
+            Assert.False(set1.SetEquals(set2));
+            Assert.False(set2.SetEquals(set1));
+        }
+
+        [Fact]
+        public void SetEquals_should_return_true_for_same_items_in_different_order()
+        {
+            var set1 = new[] { 1, 2, 3 };
+            var set2 = new[] { 3, 2, 1 };
+
+            Assert.True(set1.SetEquals(set2));
+            Assert.True(set2.SetEquals(set1));
+        }
+
+        [Fact]
         public void IndexOf_should_return_index_when_found()
         {
             var source = new List<(int Value, int Other)>

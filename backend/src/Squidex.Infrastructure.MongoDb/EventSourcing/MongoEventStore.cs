@@ -41,13 +41,16 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected override MongoCollectionSettings CollectionSettings()
         {
-            return new MongoCollectionSettings { ReadPreference = ReadPreference.Primary, WriteConcern = WriteConcern.WMajority };
+            return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
+                new CreateIndexModel<MongoEventCommit>(
+                    Index
+                        .Ascending(x => x.Timestamp)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
                         .Ascending(x => x.EventStream)

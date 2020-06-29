@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task TransformAsync(Context context, string script, ContentEntity content)
         {
-            var scriptContext = new ScriptContext
+            var vars = new ScriptVars
             {
                 ContentId = content.Id,
                 Data = content.Data,
@@ -53,7 +53,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 User = context.User
             };
 
-            content.Data = await scriptEngine.TransformAsync(scriptContext, script);
+            var options = new ScriptOptions
+            {
+                AsContext = true
+            };
+
+            content.Data = await scriptEngine.TransformAsync(vars, script, options);
         }
 
         private static bool ShouldEnrich(Context context)

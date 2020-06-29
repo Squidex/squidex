@@ -56,9 +56,9 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        SqxSharedModule,
+        RouterModule.forChild(routes),
         SqxFrameworkModule,
-        RouterModule.forChild(routes)
+        SqxSharedModule
     ],
     declarations: [
         AdministrationAreaComponent,
