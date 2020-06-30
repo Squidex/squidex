@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ '_id' : '{id}' }}");
+            var o = _C($"{{ 'id' : '{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ '_id' : '{id}' }}");
+            var o = _C($"{{ 'id' : '{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.In("id", new List<Guid> { id }));
-            var o = _C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
 
             Assert.Equal(o, i);
         }
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.In("id", new List<string> { id }));
-            var o = _C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
 
             Assert.Equal(o, i);
         }

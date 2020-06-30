@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated()).SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
 
-            var jobs = await sut.CreateJobsAsync(ValidRule(), ruleId, @event);
+            var jobs = await sut.CreateJobsAsync(ValidRule(), ruleId, @event, true);
 
             Assert.Empty(jobs);
 

@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_resolve_references_in_loop()
         {
-            var referenceId1 = Guid.NewGuid();
+            var referenceId1 = DomainId.NewGuid();
             var reference1 = CreateReference(referenceId1, 1);
-            var referenceId2 = Guid.NewGuid();
+            var referenceId2 = DomainId.NewGuid();
             var reference2 = CreateReference(referenceId1, 2);
 
             var @event = new EnrichedContentEvent
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(expected, result);
         }
 
-        private IEnrichedContentEntity CreateReference(Guid referenceId, int index)
+        private IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
         {
             return new ContentEntity
             {
