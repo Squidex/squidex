@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                         .QuerySort(query)
                         .QuerySkip(query)
                         .QueryLimit(query)
-                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.Id, x => x.Joined)
+                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.DocumentId, x => x.Joined)
                         .ToListAsync();
 
                 return joined.Select(x => x.Joined[0]).ToList();
