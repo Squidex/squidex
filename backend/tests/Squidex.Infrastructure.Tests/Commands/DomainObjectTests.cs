@@ -164,7 +164,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_rebuild_state_async()
+        public async Task Should_rebuild_state()
         {
             SetupCreated(4);
 
@@ -174,6 +174,14 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_on_rebuild_when_no_event_found()
+        {
+            SetupEmpty();
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.RebuildStateAsync());
         }
 
         [Fact]

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -135,7 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (assetUrls.Count > 0)
                 {
-                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(assetUrls, urlGenerator);
+                    var appId = context.App.NamedId();
+
+                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(appId, assetUrls, urlGenerator);
 
                     yield return FieldConverters.ForValues(resolveAssetUrls);
                     yield return FieldConverters.ForValues(ValueConverters.ForNested(resolveAssetUrls));

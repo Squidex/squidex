@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 callback = async (bodyStream, range, ct) =>
                 {
-                    var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
+                    var resizedAsset = $"{asset.AppId.Id}_{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
                     if (query.ForceResize)
                     {
@@ -171,7 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                 callback = async (bodyStream, range, ct) =>
                 {
-                    await assetFileStore.DownloadAsync(asset.Id, asset.FileVersion, bodyStream, range, ct);
+                    await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, bodyStream, range, ct);
                 };
             }
 
@@ -196,7 +196,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     {
                         using (Profiler.Trace("ResizeDownload"))
                         {
-                            await assetFileStore.DownloadAsync(asset.Id, asset.FileVersion, sourceStream);
+                            await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, sourceStream);
                             sourceStream.Position = 0;
                         }
 

@@ -23,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class BackupContentsTests
     {
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
         private readonly BackupContents sut;
 
@@ -40,8 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_restore_states_for_all_contents()
         {
-            var appId = DomainId.NewGuid();
-
             var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
             var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
 
@@ -49,27 +48,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var contentId2 = DomainId.NewGuid();
             var contentId3 = DomainId.NewGuid();
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
+            var context = new RestoreContext(appId.Id, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId1,
                 SchemaId = schemaId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId3,
                 SchemaId = schemaId2
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentDeleted
+            await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
@@ -96,9 +95,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Equal(new HashSet<DomainId>
             {
-                contentId1,
-                contentId2
+                DomainId.Combine(appId.Id, contentId1),
+                DomainId.Combine(appId.Id, contentId2)
             }, rebuildContents);
+        }
+
+        private Envelope<ContentEvent> ContentEvent(ContentEvent @event)
+        {
+            @event.AppId = appId;
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetAggregateId(DomainId.Combine(appId.Id, @event.ContentId));
+
+            return envelope;
         }
     }
 }

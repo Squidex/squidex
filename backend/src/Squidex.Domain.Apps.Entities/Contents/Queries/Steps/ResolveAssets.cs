@@ -90,7 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                 if (referencedAsset.Type == AssetType.Image)
                                 {
-                                    var url = urlGenerator.AssetContent(referencedAsset.Id.ToString());
+                                    var url = urlGenerator.AssetContent(
+                                        referencedAsset.AppId,
+                                        referencedAsset.Id);
 
                                     array = JsonValue.Array(url, referencedAsset.FileName);
                                 }

@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetContent(c.Source.Id);
+                return context.UrlGenerator.AssetContent(c.Source.AppId, c.Source.Id);
             });
 
             return resolver;
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetSource(c.Source.Id, c.Source.FileVersion);
+                return context.UrlGenerator.AssetSource(c.Source.AppId, c.Source.Id, c.Source.FileVersion);
             });
 
             return resolver;
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetThumbnail(c.Source.Id, c.Source.Type);
+                return context.UrlGenerator.AssetThumbnail(c.Source.AppId, c.Source.Id, c.Source.Type);
             });
 
             return resolver;

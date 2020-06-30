@@ -32,14 +32,14 @@ namespace Squidex.Web.Services
             CanGenerateAssetSourceUrl = allowAssetSourceUrl;
         }
 
-        public string? AssetThumbnail(DomainId assetId, AssetType assetType)
+        public string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType)
         {
             if (assetType != AssetType.Image)
             {
                 return null;
             }
 
-            return urlsOptions.BuildUrl($"api/assets/{assetId}?width=100&mode=Max");
+            return urlsOptions.BuildUrl($"api/assets/{appId.Name}/{assetId}?width=100&mode=Max");
         }
 
         public string AppSettingsUI(NamedId<DomainId> appId)
@@ -47,14 +47,14 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"app/{appId.Name}/settings", false);
         }
 
-        public string AssetContent(DomainId assetId)
+        public string AssetContent(NamedId<DomainId> appId, DomainId assetId)
         {
-            return urlsOptions.BuildUrl($"api/assets/{assetId}");
+            return urlsOptions.BuildUrl($"api/assets/{appId.Name}/{assetId}");
         }
 
-        public string? AssetSource(DomainId assetId, long fileVersion)
+        public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
-            return assetFileStore.GeneratePublicUrl(assetId, fileVersion);
+            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion);
         }
 
         public string AssetsUI(NamedId<DomainId> appId)

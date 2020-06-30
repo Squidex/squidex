@@ -50,11 +50,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 case AssetCreated assetCreated:
                     return WriteAssetAsync(
+                        assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
                         context.Writer);
                 case AssetUpdated assetUpdated:
                     return WriteAssetAsync(
+                        assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
                         context.Writer);
@@ -72,12 +74,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     break;
                 case AssetCreated assetCreated:
                     await ReadAssetAsync(
+                        assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
                         context.Reader);
                     break;
                 case AssetUpdated assetUpdated:
                     await ReadAssetAsync(
+                        assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
                         context.Reader);
@@ -97,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     foreach (var id in assetIds)
                     {
-                        await target(id);
+                        await target(DomainId.Combine(context.AppId, id));
                     }
                 });
             }
@@ -108,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     foreach (var id in assetFolderIds)
                     {
-                        await target(id);
+                        await target(DomainId.Combine(context.AppId, id));
                     }
                 });
             }
@@ -128,21 +132,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await context.Writer.WriteJsonAsync(TagsFile, tags);
         }
 
-        private Task WriteAssetAsync(DomainId assetId, long fileVersion, IBackupWriter writer)
+        private Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer)
         {
             return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {
-                return assetFileStore.DownloadAsync(assetId, fileVersion, stream);
+                return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
             });
         }
 
-        private Task ReadAssetAsync(DomainId assetId, long fileVersion, IBackupReader reader)
+        private Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
         {
             assetIds.Add(assetId);
 
             return reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
             {
-                return assetFileStore.UploadAsync(assetId, fileVersion, stream);
+                return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
             });
         }
 

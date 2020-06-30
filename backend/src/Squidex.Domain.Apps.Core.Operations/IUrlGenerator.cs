@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Core
     {
         bool CanGenerateAssetSourceUrl { get; }
 
-        string? AssetSource(DomainId assetId, long fileVersion);
+        string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion);
 
-        string? AssetThumbnail(DomainId assetId, AssetType assetType);
+        string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType);
 
         string AppSettingsUI(NamedId<DomainId> appId);
 
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core
 
         string AssetsUI(NamedId<DomainId> appId, string? query = null);
 
-        string AssetContent(DomainId assetId);
+        string AssetContent(NamedId<DomainId> appId, DomainId assetId);
 
         string BackupsUI(NamedId<DomainId> appId);
 

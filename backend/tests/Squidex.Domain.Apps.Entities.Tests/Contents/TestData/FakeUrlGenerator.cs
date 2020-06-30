@@ -16,17 +16,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
     {
         public bool CanGenerateAssetSourceUrl { get; } = true;
 
-        public string? AssetThumbnail(DomainId assetId, AssetType assetType)
+        public string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType)
         {
             return $"assets/{assetId}?width=100";
         }
 
-        public string? AssetSource(DomainId assetId, long fileVersion)
+        public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
             return $"assets/source/{assetId}";
         }
 
-        public string AssetContent(DomainId assetId)
+        public string AssetContent(NamedId<DomainId> appId, DomainId assetId)
         {
             return $"assets/{assetId}";
         }

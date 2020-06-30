@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            A.CallTo(() => urlGenerator.AssetContent(assetId))
+            A.CallTo(() => urlGenerator.AssetContent(appId, assetId))
                 .Returns("asset-content-url");
 
             A.CallTo(() => user.Id)

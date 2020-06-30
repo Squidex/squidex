@@ -53,9 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(async target =>
                 {
-                    foreach (var contentId in contentIdsBySchemaId.Values.SelectMany(x => x))
+                    foreach (var id in contentIdsBySchemaId.Values.SelectMany(x => x))
                     {
-                        await target(contentId);
+                        await target(DomainId.Combine(context.AppId, id));
                     }
                 });
             }

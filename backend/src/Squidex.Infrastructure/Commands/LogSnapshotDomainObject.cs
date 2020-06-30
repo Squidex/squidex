@@ -98,6 +98,11 @@ namespace Squidex.Infrastructure.Commands
         {
             await EnsureLoadedAsync(true);
 
+            if (Snapshot.Version <= EtagVersion.Empty)
+            {
+                throw new DomainObjectNotFoundException(UniqueId.ToString(), GetType());
+            }
+
             if (persistence != null)
             {
                 var persistedSnapshots = store.GetSnapshotStore<T>();

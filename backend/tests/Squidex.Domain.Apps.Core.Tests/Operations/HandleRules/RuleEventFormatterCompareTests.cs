@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            A.CallTo(() => urlGenerator.AssetContent(assetId))
+            A.CallTo(() => urlGenerator.AssetContent(appId, assetId))
                 .Returns("asset-content-url");
 
             A.CallTo(() => user.Id)
@@ -302,7 +302,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_asset_content_url_from_event(string script)
         {
-            var @event = new EnrichedAssetEvent { Id = assetId };
+            var @event = new EnrichedAssetEvent { Id = assetId, AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 

@@ -53,11 +53,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
         {
             if (input is ObjectValue objectValue)
             {
-                if (objectValue.ToObjectValue() is DomainId id && id != DomainId.Empty)
+                if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent @event)
                 {
-                    var result = urlGenerator.AssetContent(id);
+                    if (objectValue.ToObjectValue() is DomainId id && id != DomainId.Empty)
+                    {
+                        var result = urlGenerator.AssetContent(@event.AppId, id);
 
-                    return new StringValue(result);
+                        return new StringValue(result);
+                    }
                 }
             }
 
