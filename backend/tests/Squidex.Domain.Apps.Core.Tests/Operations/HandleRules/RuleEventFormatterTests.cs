@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 return default;
             }
 
-            private async ValueTask<string?> GetValueAsync()
+            private static async ValueTask<string?> GetValueAsync()
             {
                 await Task.Delay(5);
 
@@ -73,8 +73,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
-
-            JintScriptEngine scriptEngine = BuildScriptEngine();
 
             var formatters = new IRuleEventFormatter[]
             {

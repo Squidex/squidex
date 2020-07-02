@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
         }
 
-        private bool IsAboutToBeLocked(DateTime today, long limit, long usage)
+        private static bool IsAboutToBeLocked(DateTime today, long limit, long usage)
         {
             var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
 

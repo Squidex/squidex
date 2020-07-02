@@ -69,10 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             switch (@event.Payload)
             {
-                case AssetFolderCreated assetFolderCreated:
-                    assetFolderIds.Add(assetFolderCreated.AssetFolderId);
+                case AssetFolderCreated _:
+                    assetFolderIds.Add(@event.Headers.AggregateId());
                     break;
                 case AssetCreated assetCreated:
+                    assetIds.Add(@event.Headers.AggregateId());
+
                     await ReadAssetAsync(
                         assetCreated.AppId.Id,
                         assetCreated.AssetId,
@@ -101,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     foreach (var id in assetIds)
                     {
-                        await target(DomainId.Combine(context.AppId, id));
+                        await target(id);
                     }
                 });
             }
@@ -112,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     foreach (var id in assetFolderIds)
                     {
-                        await target(DomainId.Combine(context.AppId, id));
+                        await target(id);
                     }
                 });
             }
@@ -142,8 +144,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
         {
-            assetIds.Add(assetId);
-
             return reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
             {
                 return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);

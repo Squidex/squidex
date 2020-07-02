@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
-        private ContentState CreateDraftContent(Status status)
+        private static ContentState CreateDraftContent(Status status)
         {
             return new ContentState
             {
@@ -313,7 +313,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             };
         }
 
-        private ContentState CreateContent(Status status)
+        private static ContentState CreateContent(Status status)
         {
             return new ContentState
             {

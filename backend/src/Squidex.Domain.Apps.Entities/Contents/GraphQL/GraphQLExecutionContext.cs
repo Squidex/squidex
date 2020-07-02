@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
     {
-        private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
-        private static readonly List<IContentEntity> EmptyContents = new List<IContentEntity>();
+        private static readonly IReadOnlyList<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
+        private static readonly IReadOnlyList<IContentEntity> EmptyContents = new List<IContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
         private readonly IDependencyResolver resolver;
 

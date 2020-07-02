@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
@@ -27,36 +29,90 @@ namespace Migrations.Migrations.MongoDb
         {
             var collection = database.GetCollection<BsonDocument>("Events");
 
-            await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
+            const int SizeOfBatch = 200;
+            const int SizeOfQueue = 20;
+
+            var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
-                string? appId = null;
+                BoundedCapacity = SizeOfQueue * SizeOfBatch
+            });
 
-                foreach (var @event in commit["Events"].AsBsonArray)
-                {
-                    var metadata = @event["Metadata"].AsBsonDocument;
+            var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
+            {
+                var updates = new List<WriteModel<BsonDocument>>();
 
-                    if (metadata.TryGetValue("AppId", out var value))
-                    {
-                        appId = value.AsString;
-                    }
-                }
-
-                if (appId != null)
+                foreach (var commit in batch)
                 {
                     var eventStream = commit["EventStream"].AsString;
 
-                    if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+                    string? appId = null;
+
+                    foreach (var @event in commit["Events"].AsBsonArray)
+                    {
+                        var metadata = @event["Metadata"].AsBsonDocument;
+
+                        if (metadata.TryGetValue("AppId", out var value))
+                        {
+                            appId = value.AsString;
+                        }
+                    }
+
+                    if (appId != null)
                     {
                         var parts = eventStream.Split("-");
 
-                        var newStreamName = $"{parts[0]}-{appId}-{string.Join("-", parts.Skip(1))}";
+                        var domainType = parts[0];
+                        var domainId = string.Join("-", parts.Skip(1));
 
-                        await collection.UpdateOneAsync(
-                            Builders<BsonDocument>.Filter.Eq("_id", commit["_id"].AsString),
-                            Builders<BsonDocument>.Update.Set("EventStream", newStreamName));
+                        var newStreamName = $"{domainType}-{appId}--{domainId}";
+
+                        var update = Builders<BsonDocument>.Update.Set("EventStream", newStreamName);
+
+                        var i = 0;
+
+                        foreach (var @event in commit["Events"].AsBsonArray)
+                        {
+                            update = update.Set($"Events.{i}.Metadata.AggregateId", $"{appId}--{domainId}");
+                            update = update.Unset($"Events.{i}.Metdata.AppId");
+
+                            i++;
+                        }
+
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", commit["_id"].AsString);
+
+                        updates.Add(new UpdateOneModel<BsonDocument>(filter, update));
                     }
                 }
+
+                if (updates.Count > 0)
+                {
+                    await collection.BulkWriteAsync(updates);
+                }
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 4,
+                MaxMessagesPerTask = 1,
+                BoundedCapacity = SizeOfQueue
             });
+
+            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
+            {
+                var eventStream = commit["EventStream"].AsString;
+
+                if (!eventStream.Contains("--") && !eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+                {
+                    await batchBlock.SendAsync(commit);
+                }
+            });
+
+            batchBlock.Complete();
+
+            await actionBlock.Completion;
         }
     }
 }

@@ -176,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                             }
                             catch
                             {
-                                await body.WriteAsync(AvatarBytes);
+                                await body.WriteAsync(AvatarBytes, ct);
                             }
                         });
 

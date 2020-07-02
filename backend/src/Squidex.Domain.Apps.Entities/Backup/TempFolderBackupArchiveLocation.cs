@@ -75,13 +75,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (IOException)
             {
-                stream.Dispose();
+                await stream.DisposeAsync();
 
                 throw new BackupRestoreException("The backup archive is corrupt and cannot be opened.");
             }
             catch (Exception)
             {
-                stream.Dispose();
+                await stream.DisposeAsync();
 
                 throw;
             }

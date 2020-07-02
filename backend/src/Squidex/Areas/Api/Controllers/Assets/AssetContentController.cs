@@ -156,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     {
                         try
                         {
-                            await assetStore.DownloadAsync(resizedAsset, bodyStream);
+                            await assetStore.DownloadAsync(resizedAsset, bodyStream, ct: ct);
                         }
                         catch (AssetNotFoundException)
                         {

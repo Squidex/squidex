@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return assets.ToLookup(x => x.Id);
         }
 
-        private void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {

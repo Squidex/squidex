@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(expected, result);
         }
 
-        private IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
+        private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
         {
             return new ContentEntity
             {

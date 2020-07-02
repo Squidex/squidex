@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Assets
         {
             try
             {
-                storageClient = StorageClient.Create();
+                storageClient = await StorageClient.CreateAsync();
 
                 await storageClient.GetBucketAsync(bucketName, cancellationToken: ct);
             }

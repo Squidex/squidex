@@ -81,8 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             using (var reader = new StreamReader(stream))
             {
-                string? line = null;
-                while ((line = reader.ReadLine()) != null)
+                while (await reader.ReadLineAsync() != null)
                 {
                     lines++;
                 }

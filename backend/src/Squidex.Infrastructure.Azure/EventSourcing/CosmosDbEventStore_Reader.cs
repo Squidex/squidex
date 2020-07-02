@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class CosmosDbEventStore : IEventStore, IInitializable
     {
-        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+        private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {

@@ -586,7 +586,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
         }
 
-        private ScriptOptions ScriptOptions()
+        private static ScriptOptions ScriptOptions()
         {
             return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
         }

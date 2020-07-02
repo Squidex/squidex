@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Equal(new HashSet<DomainId>
             {
                 DomainId.Combine(appId.Id, assetId1),
-                DomainId.Combine(appId.Id, assetId2),
+                DomainId.Combine(appId.Id, assetId2)
             }, rebuildAssets);
         }
 

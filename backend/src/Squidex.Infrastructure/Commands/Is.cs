@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,11 +12,6 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class Is
     {
-        public static bool Change(Guid oldValue, Guid newValue)
-        {
-            return !Equals(oldValue, newValue);
-        }
-
         public static bool Change(DomainId oldValue, DomainId newValue)
         {
             return !Equals(oldValue, newValue);

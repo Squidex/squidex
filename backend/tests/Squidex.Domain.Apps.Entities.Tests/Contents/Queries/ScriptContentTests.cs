@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustHaveHappened();
         }
 
-        private ScriptOptions ScriptOptions()
+        private static ScriptOptions ScriptOptions()
         {
             return A<ScriptOptions>.That.Matches(x => x.AsContext);
         }

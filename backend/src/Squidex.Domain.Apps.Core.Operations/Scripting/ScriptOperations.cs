@@ -15,19 +15,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         private delegate void MessageDelegate(string? message);
 
-        private static readonly MessageDelegate Disallow = new MessageDelegate(message =>
+        private static readonly MessageDelegate Disallow = message =>
         {
             message = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
 
             throw new DomainForbiddenException(message);
-        });
+        };
 
-        private static readonly MessageDelegate Reject = new MessageDelegate(message =>
+        private static readonly MessageDelegate Reject = message =>
         {
             var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
 
             throw new ValidationException("Script rejected the operation.", errors);
-        });
+        };
 
         public static Engine AddDisallow(this Engine engine)
         {

@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
-        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+        private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
         private readonly IEventStoreConnection connection;
         private readonly IJsonSerializer serializer;
         private readonly string prefix;

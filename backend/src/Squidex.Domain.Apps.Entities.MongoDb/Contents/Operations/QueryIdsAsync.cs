@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryIdsAsync : OperationBase
     {
-        private static readonly List<(DomainId SchemaId, DomainId Id)> EmptyIds = new List<(DomainId SchemaId, DomainId Id)>();
+        private static readonly IReadOnlyList<(DomainId SchemaId, DomainId Id)> EmptyIds = new List<(DomainId SchemaId, DomainId Id)>();
         private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
         private static readonly Lazy<string> SchemaIdField = new Lazy<string>(GetSchemaIdField);
         private readonly IAppProvider appProvider;

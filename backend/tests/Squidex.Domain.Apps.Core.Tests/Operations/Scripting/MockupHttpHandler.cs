@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
 
             madeRequest = request;
 

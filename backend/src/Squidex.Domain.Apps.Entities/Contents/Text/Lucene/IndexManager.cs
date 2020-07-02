@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
                 indexHolder.Dispose();
                 indices.Remove(indexHolder.Id);
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
                 indices.Clear();
             }

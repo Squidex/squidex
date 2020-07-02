@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             switch (@event.Payload)
             {
                 case ContentCreated contentCreated:
-                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(contentCreated.ContentId);
+                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(@event.Headers.AggregateId());
                     break;
                 case SchemaDeleted schemaDeleted:
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     foreach (var id in contentIdsBySchemaId.Values.SelectMany(x => x))
                     {
-                        await target(DomainId.Combine(context.AppId, id));
+                        await target(id);
                     }
                 });
             }
