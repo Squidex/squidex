@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            if (asset.IsProtected && !Resources.CanReadEvents)
+            if (asset.IsProtected && !Resources.CanReadAssets)
             {
                 return StatusCode(403);
             }
