@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.0.0 BETA 1 - 2020-07-06
+
+This version introduces a new way to deal with ids. So far each contnet element has an id that is unique across all apps. This causes problems, because you cannot define your own ids and the ids have to change when you clone an app via backup and restore.
+
+With this version ids for content items and assets are only unique within an app.
+
+To make this possible, this version rebuilds all content items, assets and asset folders which can take a few minutes.
+
 ## 4.5.0 - 2020-07-06
 
 ### Features
