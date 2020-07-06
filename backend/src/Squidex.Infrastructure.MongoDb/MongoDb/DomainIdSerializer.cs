@@ -41,7 +41,23 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override DomainId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            return DomainId.Create(context.Reader.ReadString());
+            switch (context.Reader.CurrentBsonType)
+            {
+                case BsonType.String:
+                    return DomainId.Create(context.Reader.ReadString());
+                case BsonType.Binary:
+                    var binary = context.Reader.ReadBinaryData();
+
+                    if (binary.SubType == BsonBinarySubType.UuidLegacy ||
+                        binary.SubType == BsonBinarySubType.UuidStandard)
+                    {
+                        return DomainId.Create(binary.ToGuid());
+                    }
+
+                    return DomainId.Create(binary.ToString());
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, DomainId value)

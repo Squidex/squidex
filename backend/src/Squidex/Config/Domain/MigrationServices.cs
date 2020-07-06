@@ -35,6 +35,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<ConvertEventStoreAppId>()
                 .As<IMigration>();
 
+            services.AddTransientAs<ClearRules>()
+                .As<IMigration>();
+
             services.AddTransientAs<ClearSchemas>()
                 .As<IMigration>();
 
@@ -54,6 +57,9 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssets>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildAssetFolders>()
                 .As<IMigration>();
 
             services.AddTransientAs<StartEventConsumers>()

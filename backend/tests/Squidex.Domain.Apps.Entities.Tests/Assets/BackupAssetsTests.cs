@@ -165,15 +165,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var rebuildAssets = new HashSet<DomainId>();
 
-            var add = new Func<DomainId, Task>(id =>
-            {
-                rebuildAssets.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildAssets.AddRange(source));
 
             await sut.RestoreAsync(context);
 
@@ -207,17 +200,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 AssetFolderId = assetFolderId2
             }), context);
 
-            var rebuildAssets = new HashSet<DomainId>();
+            var rebuildAssetFolders = new HashSet<DomainId>();
 
-            var add = new Func<DomainId, Task>(id =>
-            {
-                rebuildAssets.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildAssetFolders.AddRange(source));
 
             await sut.RestoreAsync(context);
 
@@ -225,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 DomainId.Combine(appId.Id, assetFolderId1),
                 DomainId.Combine(appId.Id, assetFolderId2)
-            }, rebuildAssets);
+            }, rebuildAssetFolders);
         }
 
         private BackupContext CreateBackupContext()

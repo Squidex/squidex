@@ -80,15 +80,18 @@ namespace Migrations
                 }
 
                 // Version 14: Schema refactoring
-                if (version < 14)
+                // Version 22: Also add app id to aggregate id.
+                if (version < 22)
                 {
                     yield return serviceProvider.GetRequiredService<ClearSchemas>();
+                    yield return serviceProvider.GetRequiredService<ClearRules>();
                 }
 
                 // Version 18: Rebuild assets.
                 // Version 22: Introduce domain id.
                 if (version < 22)
                 {
+                    yield return serviceProvider.GetService<RebuildAssetFolders>();
                     yield return serviceProvider.GetService<RebuildAssets>();
                 }
                 else

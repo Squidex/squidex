@@ -99,24 +99,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(async target =>
-                {
-                    foreach (var id in assetIds)
-                    {
-                        await target(id);
-                    }
-                });
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(assetIds);
             }
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(async target =>
-                {
-                    foreach (var id in assetFolderIds)
-                    {
-                        await target(id);
-                    }
-                });
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(assetFolderIds);
             }
         }
 

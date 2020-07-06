@@ -49,15 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task RestoreAsync(RestoreContext context)
         {
-            if (contentIdsBySchemaId.Count > 0)
+            var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
+
+            if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(async target =>
-                {
-                    foreach (var id in contentIdsBySchemaId.Values.SelectMany(x => x))
-                    {
-                        await target(id);
-                    }
-                });
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(ids);
             }
         }
     }

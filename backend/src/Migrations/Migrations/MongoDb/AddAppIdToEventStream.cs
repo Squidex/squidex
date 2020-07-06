@@ -73,7 +73,7 @@ namespace Migrations.Migrations.MongoDb
                         foreach (var @event in commit["Events"].AsBsonArray)
                         {
                             update = update.Set($"Events.{i}.Metadata.AggregateId", $"{appId}--{domainId}");
-                            update = update.Unset($"Events.{i}.Metdata.AppId");
+                            update = update.Unset($"Events.{i}.Metadata.AppId");
 
                             i++;
                         }

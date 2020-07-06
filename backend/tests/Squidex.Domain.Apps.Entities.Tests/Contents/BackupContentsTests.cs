@@ -81,15 +81,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var rebuildContents = new HashSet<DomainId>();
 
-            var add = new Func<DomainId, Task>(id =>
-            {
-                rebuildContents.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildContents.AddRange(source));
 
             await sut.RestoreAsync(context);
 
