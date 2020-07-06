@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Assets
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 var blobReference = blobClient.GetContainerReference(containerName);
 
-                await blobReference.CreateIfNotExistsAsync();
+                await blobReference.CreateIfNotExistsAsync(ct);
 
                 blobContainer = blobReference;
             }
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 var blob = blobContainer.GetBlockBlobReference(fileName);
 
-                await blob.FetchAttributesAsync();
+                await blob.FetchAttributesAsync(ct);
 
                 return blob.Properties.Length;
             }

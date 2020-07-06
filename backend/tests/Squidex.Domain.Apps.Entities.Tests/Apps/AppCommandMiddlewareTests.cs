@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly AppCommandMiddleware sut;
 
@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
         }
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return appId; }
+            get { return appId.Id; }
         }
 
         public AppCommandMiddlewareTests()
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => appImageStore.UploadAsync(appId, stream, A<CancellationToken>._))
+            A.CallTo(() => appImageStore.UploadAsync(appId.Id, stream, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

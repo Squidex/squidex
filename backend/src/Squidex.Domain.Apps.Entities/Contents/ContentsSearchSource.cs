@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<SearchFilter?> CreateSearchFilterAsync(Context context)
         {
-            var allowedSchemas = new List<Guid>();
+            var allowedSchemas = new List<DomainId>();
 
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Permissions.Allows(permission);
         }
 
-        private string FormatName(IEnrichedContentEntity content, string masterLanguage)
+        private static string FormatName(IEnrichedContentEntity content, string masterLanguage)
         {
             var sb = new StringBuilder();
 

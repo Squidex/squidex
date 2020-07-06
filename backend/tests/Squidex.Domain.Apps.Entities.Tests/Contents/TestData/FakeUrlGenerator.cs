@@ -16,107 +16,107 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
     {
         public bool CanGenerateAssetSourceUrl { get; } = true;
 
-        public string? AssetThumbnail(Guid assetId, AssetType assetType)
+        public string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType)
         {
             return $"assets/{assetId}?width=100";
         }
 
-        public string? AssetSource(Guid assetId, long fileVersion)
+        public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
             return $"assets/source/{assetId}";
         }
 
-        public string AssetContent(Guid assetId)
+        public string AssetContent(NamedId<DomainId> appId, DomainId assetId)
         {
             return $"assets/{assetId}";
         }
 
-        public string ContentUI(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId)
+        public string ContentUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId contentId)
         {
             return $"contents/{schemaId.Name}/{contentId}";
         }
 
-        public string AppSettingsUI(NamedId<Guid> appId)
+        public string AppSettingsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string AssetsUI(NamedId<Guid> appId)
+        public string AssetsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string AssetsUI(NamedId<Guid> appId, string? query = null)
+        public string AssetsUI(NamedId<DomainId> appId, string? query = null)
         {
             throw new NotSupportedException();
         }
 
-        public string BackupsUI(NamedId<Guid> appId)
+        public string BackupsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string ClientsUI(NamedId<Guid> appId)
+        public string ClientsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string ContentsUI(NamedId<Guid> appId)
+        public string ContentsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string ContentsUI(NamedId<Guid> appId, NamedId<Guid> schemaId)
+        public string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
         {
             throw new NotSupportedException();
         }
 
-        public string ContributorsUI(NamedId<Guid> appId)
+        public string ContributorsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string DashboardUI(NamedId<Guid> appId)
+        public string DashboardUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string LanguagesUI(NamedId<Guid> appId)
+        public string LanguagesUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string PatternsUI(NamedId<Guid> appId)
+        public string PatternsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string PlansUI(NamedId<Guid> appId)
+        public string PlansUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string RolesUI(NamedId<Guid> appId)
+        public string RolesUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string RulesUI(NamedId<Guid> appId)
+        public string RulesUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string SchemasUI(NamedId<Guid> appId)
+        public string SchemasUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }
 
-        public string SchemaUI(NamedId<Guid> appId, NamedId<Guid> schemaId)
+        public string SchemaUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
         {
             throw new NotSupportedException();
         }
 
-        public string WorkflowsUI(NamedId<Guid> appId)
+        public string WorkflowsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }

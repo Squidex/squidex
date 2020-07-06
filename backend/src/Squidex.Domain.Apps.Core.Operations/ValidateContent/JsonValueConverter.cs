@@ -35,12 +35,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field)
         {
-            return ConvertToGuidList();
+            return ConvertToStringList();
         }
 
         public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field)
         {
-            return ConvertToGuidList();
+            return ConvertToStringList();
         }
 
         public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field)
@@ -150,30 +150,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field)
         {
             return (value, null);
-        }
-
-        private (object? Result, JsonError? Error) ConvertToGuidList()
-        {
-            if (value is JsonArray array)
-            {
-                var result = new List<Guid>(array.Count);
-
-                foreach (var item in array)
-                {
-                    if (item is JsonString s && Guid.TryParse(s.Value, out var guid))
-                    {
-                        result.Add(guid);
-                    }
-                    else
-                    {
-                        return (null, new JsonError("Invalid json type, expected array of guid strings."));
-                    }
-                }
-
-                return (result, null);
-            }
-
-            return (null, new JsonError("Invalid json type, expected array of guid strings."));
         }
 
         private (object? Result, JsonError? Error) ConvertToStringList()

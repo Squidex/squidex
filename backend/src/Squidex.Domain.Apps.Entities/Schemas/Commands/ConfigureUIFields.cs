@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ConfigureUIFields : SchemaCommand
+    public sealed class ConfigureUIFields : SchemaUpdateCommand
     {
         public FieldNames? FieldsInLists { get; set; }
 

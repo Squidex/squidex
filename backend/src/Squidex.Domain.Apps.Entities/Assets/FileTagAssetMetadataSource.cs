@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return Task.CompletedTask;
         }
 
-        private void Enhance(UploadAssetCommand command)
+        private static void Enhance(UploadAssetCommand command)
         {
             try
             {

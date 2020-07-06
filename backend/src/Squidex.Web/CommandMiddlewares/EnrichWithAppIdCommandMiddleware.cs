@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -35,17 +34,10 @@ namespace Squidex.Web.CommandMiddlewares
                 appCommand.AppId = appId;
             }
 
-            if (context.Command is AppCommand appSelfCommand && appSelfCommand.AppId == Guid.Empty)
-            {
-                var appId = GetAppId();
-
-                appSelfCommand.AppId = appId.Id;
-            }
-
             return next(context);
         }
 
-        private NamedId<Guid> GetAppId()
+        private NamedId<DomainId> GetAppId()
         {
             var context = contextProvider.Context;
 

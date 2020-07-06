@@ -39,8 +39,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly string actionDump = "MyDump";
         private readonly string actionName = "ValidAction";
         private readonly string actionDescription = "MyDescription";
-        private readonly Guid ruleId = Guid.NewGuid();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly DomainId ruleId = DomainId.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
 
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated()).SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
 
-            var jobs = await sut.CreateJobsAsync(ValidRule(), ruleId, @event);
+            var jobs = await sut.CreateJobsAsync(ValidRule(), ruleId, @event, true);
 
             Assert.Empty(jobs);
 
@@ -429,7 +429,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(now, job.Created);
             Assert.Equal(now.Plus(Duration.FromDays(30)), job.Expires);
 
-            Assert.NotEqual(Guid.Empty, job.Id);
+            Assert.NotEqual(DomainId.Empty, job.Id);
         }
     }
 }

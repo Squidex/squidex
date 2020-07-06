@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
@@ -36,14 +35,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return indexManager.ClearAsync();
         }
 
-        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
+        public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
         {
             if (string.IsNullOrWhiteSpace(queryText))
             {
                 return null;
             }
 
-            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id);
+            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(app.Id.ToString());
 
             using (Profiler.TraceMethod<LuceneTextIndex>())
             {
@@ -60,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return new SearchContext { Languages = languages, Scope = scope };
         }
 
-        public Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
+        public Task ExecuteAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, params IndexCommand[] commands)
         {
-            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(appId.Id);
+            var index = grainFactory.GetGrain<ILuceneTextIndexGrain>(appId.Id.ToString());
 
             return index.IndexAsync(schemaId, commands.AsImmutable());
         }

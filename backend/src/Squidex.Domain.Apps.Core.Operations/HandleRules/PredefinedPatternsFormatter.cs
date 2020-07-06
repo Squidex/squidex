@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedAssetEvent assetEvent)
             {
-                return urlGenerator.AssetContent(assetEvent.Id);
+                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id);
             }
 
             return null;

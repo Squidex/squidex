@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
@@ -24,9 +23,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly Guid commentsId = Guid.NewGuid();
-        private readonly Guid commentId = Guid.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly DomainId commentsId = DomainId.NewGuid();
+        private readonly DomainId commentId = DomainId.NewGuid();
         private readonly CommentsCommandMiddleware sut;
 
         public CommentsCommandMiddlewareTests()

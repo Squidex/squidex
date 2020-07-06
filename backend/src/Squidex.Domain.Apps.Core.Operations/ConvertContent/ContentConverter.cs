@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             if (field is IArrayField arrayField)
             {
-                foreach (var (key, value) in data)
+                foreach (var (_, value) in data)
                 {
                     if (value is JsonArray array)
                     {

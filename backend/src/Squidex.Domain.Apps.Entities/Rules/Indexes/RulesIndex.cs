@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,12 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             this.grainFactory = grainFactory;
         }
 
-        public Task RebuildAsync(Guid appId, HashSet<Guid> rues)
+        public Task RebuildAsync(DomainId appId, HashSet<DomainId> rules)
         {
-            return Index(appId).RebuildAsync(rues);
+            return Index(appId).RebuildAsync(rules);
         }
 
-        public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
+        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
@@ -41,28 +40,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
                 var rules =
                     await Task.WhenAll(
-                        ids.Select(GetRuleAsync));
+                        ids.Select(x => GetRuleAsync(appId, x)));
 
                 return rules.NotNull().ToList();
             }
         }
 
-        private async Task<IRuleEntity?> GetRuleAsync(Guid id)
+        private async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id)
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
-                var ruleEntity = await grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync();
+                var rule = await GetRuleInternalAsync(appId, id);
 
-                if (IsFound(ruleEntity.Value))
+                if (IsFound(rule))
                 {
-                    return ruleEntity.Value;
+                    return rule;
                 }
 
                 return null;
             }
         }
 
-        private async Task<List<Guid>> GetRuleIdsAsync(Guid appId)
+        private async Task<List<DomainId>> GetRuleIdsAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
@@ -95,19 +94,26 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task DeleteRuleAsync(DeleteRule command)
         {
-            var id = command.RuleId;
+            var rule = await GetRuleInternalAsync(command.AppId.Id, command.RuleId);
 
-            var rule = await grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync();
-
-            if (IsFound(rule.Value))
+            if (IsFound(rule))
             {
-                await Index(rule.Value.AppId.Id).RemoveAsync(id);
+                await Index(rule.AppId.Id).RemoveAsync(rule.Id);
             }
         }
 
-        private IRulesByAppIndexGrain Index(Guid appId)
+        private async Task<IRuleEntity> GetRuleInternalAsync(DomainId appId, DomainId id)
         {
-            return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId);
+            var key = DomainId.Combine(appId, id).ToString();
+
+            var rule = await grainFactory.GetGrain<IRuleGrain>(key).GetStateAsync();
+
+            return rule.Value;
+        }
+
+        private IRulesByAppIndexGrain Index(DomainId appId)
+        {
+            return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.ToString());
         }
 
         private static bool IsFound(IRuleEntity rule)

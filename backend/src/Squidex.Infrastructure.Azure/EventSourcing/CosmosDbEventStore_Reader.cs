@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -19,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class CosmosDbEventStore : IEventStore, IInitializable
     {
-        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+        private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
@@ -28,15 +27,6 @@ namespace Squidex.Infrastructure.EventSourcing
             ThrowIfDisposed();
 
             return new CosmosDbSubscription(this, subscriber, streamFilter, position);
-        }
-
-        public Task CreateIndexAsync(string property)
-        {
-            Guard.NotNullOrEmpty(property, nameof(property));
-
-            ThrowIfDisposed();
-
-            return Task.CompletedTask;
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
@@ -126,23 +116,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
-        {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
-
-            ThrowIfDisposed();
-
-            StreamPosition lastPosition = position;
-
-            var filterDefinition = FilterBuilder.CreateByProperty(property, value, lastPosition);
-            var filterExpression = FilterBuilder.CreateExpression(property, value);
-
-            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
-        }
-
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -153,14 +127,9 @@ namespace Squidex.Infrastructure.EventSourcing
             var filterDefinition = FilterBuilder.CreateByFilter(streamFilter, lastPosition);
             var filterExpression = FilterBuilder.CreateExpression(null, null);
 
-            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
-        }
-
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, SqlQuerySpec query, EventPredicate filterExpression, CancellationToken ct = default)
-        {
             using (Profiler.TraceMethod<CosmosDbEventStore>())
             {
-                await documentClient.QueryAsync(collectionUri, query, async commit =>
+                await documentClient.QueryAsync(collectionUri, filterDefinition, async commit =>
                 {
                     var eventStreamOffset = (int)commit.EventStreamOffset;
 

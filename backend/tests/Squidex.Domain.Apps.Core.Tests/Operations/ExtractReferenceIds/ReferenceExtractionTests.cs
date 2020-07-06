@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
@@ -37,8 +36,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Fact]
         public void Should_get_ids_from_name_data()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var input =
                 new NamedContentData()
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
 
-            var ids = new HashSet<Guid>();
+            var ids = new HashSet<DomainId>();
 
             input.AddReferencedIds(schema, ids);
 
@@ -56,8 +55,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Fact]
         public void Should_get_limited_ids_from_name_data()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var input =
                 new NamedContentData()
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
 
-            var ids = new HashSet<Guid>();
+            var ids = new HashSet<DomainId>();
 
             input.AddReferencedIds(schema, ids, 1);
 
@@ -75,8 +74,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Fact]
         public void Should_cleanup_deleted_ids()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var source =
                 new NamedContentData()
@@ -108,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));
 
-            var cleaner = ValueReferencesConverter.CleanReferences(new HashSet<Guid> { id2 });
+            var cleaner = ValueReferencesConverter.CleanReferences(new HashSet<DomainId> { id2 });
             var cleanNested = ValueConverters.ForNested(cleaner);
 
             var converter = FieldConverters.ForValues(cleaner, cleanNested);
@@ -132,8 +131,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingNestedFields))]
         public void Should_return_ids_from_nested_field(NestedField field)
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var arrayField = Fields.Array(1, "my-array", Partitioning.Invariant, field);
 
@@ -151,16 +150,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_when_value_item_is_invalid(IField field)
         {
-            var result = field.GetReferencedIds(JsonValue.Array("invalid")).ToArray();
-
-            Assert.Empty(result);
-        }
-
-        [Theory]
-        [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_is_invalid(IField field)
-        {
-            var result = field.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
+            var result = field.GetReferencedIds(JsonValue.Array(1)).ToArray();
 
             Assert.Empty(result);
         }
@@ -196,14 +186,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_ids_from_field(IField field)
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var value = CreateValue(id1, id2);
 
             var result = field.GetReferencedIds(value);
 
-            Assert.Equal(new HashSet<Guid> { id1, id2 }, result);
+            Assert.Equal(new HashSet<DomainId> { id1, id2 }, result);
         }
 
         [Theory]
@@ -219,8 +209,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [MemberData(nameof(ReferencingFields))]
         public void Should_remove_deleted_ids_from_field(IField field)
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var value = CreateValue(id1, id2);
 
@@ -241,9 +231,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             yield return new object[] { Fields.Assets(1, "my-assets", Partitioning.Invariant) };
         }
 
-        private static HashSet<Guid> RandomIds()
+        private static HashSet<DomainId> RandomIds()
         {
-            return HashSet.Of(Guid.NewGuid());
+            return HashSet.Of(DomainId.NewGuid());
         }
 
         private static IJsonValue CreateValue(params object[] ids)

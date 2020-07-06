@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class UpdateClient : AppCommand
+    public sealed class UpdateClient : AppUpdateCommand
     {
         public string Id { get; set; }
 

@@ -34,10 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly ILocalCache localCache = new AsyncLocalCache();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaMatch = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+        private readonly NamedId<DomainId> schemaNonMatch = NamedId.Of(DomainId.NewGuid(), "my-schema2");
+        private readonly DomainId ruleId = DomainId.NewGuid();
         private readonly IRuleTriggerHandler sut;
-        private readonly Guid ruleId = Guid.NewGuid();
-        private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
-        private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
 
         public ContentChangedTriggerHandlerTests()
         {
@@ -64,10 +65,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(ContentEvent @event, EnrichedContentEventType type)
         {
+            @event.AppId = appId;
+
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch });
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
+                .Returns(new ContentEntity { AppId = appId, SchemaId = schemaMatch });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 
@@ -79,18 +82,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_enrich_with_old_data_when_updated()
         {
-            var @event = new ContentUpdated();
+            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid() };
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
             var dataNow = new NamedContentData();
             var dataOld = new NamedContentData();
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 12))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 12, Data = dataNow });
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
+                .Returns(new ContentEntity { AppId = appId, SchemaId = schemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });
 
-            A.CallTo(() => contentLoader.GetAsync(@event.ContentId, 11))
-                .Returns(new ContentEntity { SchemaId = SchemaMatch, Version = 11, Data = dataOld });
+            A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 11))
+                .Returns(new ContentEntity { AppId = appId, SchemaId = schemaMatch, Version = 11, Data = dataOld });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 
@@ -116,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
+                var result = sut.Trigger(new ContentCreated { SchemaId = schemaMatch }, trigger, ruleId);
 
                 Assert.False(result);
             });
@@ -125,9 +128,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_trigger_precheck_when_handling_all_events()
         {
-            TestForTrigger(handleAll: true, schemaId: SchemaMatch, condition: null, action: trigger =>
+            TestForTrigger(handleAll: true, schemaId: schemaMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
+                var result = sut.Trigger(new ContentCreated { SchemaId = schemaMatch }, trigger, ruleId);
 
                 Assert.True(result);
             });
@@ -136,9 +139,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_trigger_precheck_when_condition_is_empty()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: string.Empty, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
+                var result = sut.Trigger(new ContentCreated { SchemaId = schemaMatch }, trigger, ruleId);
 
                 Assert.True(result);
             });
@@ -147,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_not_trigger_precheck_when_schema_id_does_not_match()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaNonMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
+                var result = sut.Trigger(new ContentCreated { SchemaId = schemaMatch }, trigger, ruleId);
 
                 Assert.False(result);
             });
@@ -171,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.False(result);
             });
@@ -180,9 +183,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_trigger_check_when_handling_all_events()
         {
-            TestForTrigger(handleAll: true, schemaId: SchemaMatch, condition: null, action: trigger =>
+            TestForTrigger(handleAll: true, schemaId: schemaMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.True(result);
             });
@@ -191,9 +194,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_trigger_check_when_condition_is_empty()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: string.Empty, action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.True(result);
             });
@@ -202,9 +205,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_trigger_check_when_condition_matchs()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: "true", action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: "true", action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.True(result);
             });
@@ -213,9 +216,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_not_trigger_check_when_schema_id_does_not_match()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaNonMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.False(result);
             });
@@ -224,15 +227,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public void Should_not_trigger_check_when_condition_does_not_matchs()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: "false", action: trigger =>
+            TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: "false", action: trigger =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new EnrichedContentEvent { SchemaId = schemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
-        private void TestForTrigger(bool handleAll, NamedId<Guid>? schemaId, string? condition, Action<ContentChangedTriggerV2> action)
+        private void TestForTrigger(bool handleAll, NamedId<DomainId>? schemaId, string? condition, Action<ContentChangedTriggerV2> action)
         {
             var trigger = new ContentChangedTriggerV2 { HandleAll = handleAll };
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public sealed partial class IndexManager : DisposableObjectBase
     {
-        private readonly Dictionary<Guid, IndexHolder> indices = new Dictionary<Guid, IndexHolder>();
+        private readonly Dictionary<DomainId, IndexHolder> indices = new Dictionary<DomainId, IndexHolder>();
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
         private readonly IIndexStorage indexStorage;
         private readonly ISemanticLog log;
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return indexStorage.ClearAsync();
         }
 
-        public async Task<IIndex> AcquireAsync(Guid ownerId)
+        public async Task<IIndex> AcquireAsync(DomainId ownerId)
         {
             IndexHolder? indexHolder;
 
@@ -83,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
                 indexHolder.Dispose();
                 indices.Remove(indexHolder.Id);
@@ -126,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
                 indices.Clear();
             }

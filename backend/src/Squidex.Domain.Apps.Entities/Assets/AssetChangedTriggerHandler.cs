@@ -41,7 +41,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = new EnrichedAssetEvent();
 
-            var asset = await assetLoader.GetAsync(@event.Payload.AssetId, @event.Headers.EventStreamNumber());
+            var asset = await assetLoader.GetAsync(
+                @event.Payload.AppId.Id,
+                @event.Payload.AssetId,
+                @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(asset, result);
 

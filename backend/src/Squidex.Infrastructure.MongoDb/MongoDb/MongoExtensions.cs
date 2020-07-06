@@ -31,7 +31,9 @@ namespace Squidex.Infrastructure.MongoDb
                 Filter = new BsonDocument("name", collectionName)
             };
 
-            return (await database.ListCollectionNamesAsync(options)).Any();
+            var collections = await database.ListCollectionNamesAsync(options);
+
+            return await collections.AnyAsync();
         }
 
         public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document, CancellationToken ct = default)
@@ -96,17 +98,17 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (oldVersion > EtagVersion.Any)
                 {
-                    await collection.UpdateOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, update, Upsert);
+                    await collection.UpdateOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, update, Upsert);
                 }
                 else
                 {
-                    await collection.UpdateOneAsync(x => x.Id.Equals(key), update, Upsert);
+                    await collection.UpdateOneAsync(x => x.DocumentId.Equals(key), update, Upsert);
                 }
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 var existingVersion =
-                    await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
+                    await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
                         .FirstOrDefaultAsync();
 
                 if (existingVersion != null)
@@ -122,25 +124,28 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, TEntity doc)
+        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, long newVersion, TEntity doc)
             where TEntity : IVersionedEntity<TKey>
             where TKey : notnull
         {
             try
             {
+                doc.DocumentId = key;
+                doc.Version = newVersion;
+
                 if (oldVersion > EtagVersion.Any)
                 {
-                    await collection.ReplaceOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, doc, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, doc, UpsertReplace);
                 }
                 else
                 {
-                    await collection.ReplaceOneAsync(x => x.Id.Equals(key), doc, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), doc, UpsertReplace);
                 }
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 var existingVersion =
-                    await collection.Find(x => x.Id.Equals(key)).Only(x => x.Id, x => x.Version)
+                    await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
                         .FirstOrDefaultAsync();
 
                 if (existingVersion != null)

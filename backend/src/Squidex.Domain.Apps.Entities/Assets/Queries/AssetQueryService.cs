@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, Guid id)
+        public async Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, DomainId id)
         {
-            var asset = await assetRepository.FindAssetAsync(id);
+            var asset = await assetRepository.FindAssetAsync(context.App.Id, id);
 
             if (asset != null)
             {
@@ -50,13 +49,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return null;
         }
 
-        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(Guid id)
+        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id)
         {
             var result = new List<IAssetFolderEntity>();
 
-            while (id != default)
+            while (id != DomainId.Empty)
             {
-                var folder = await assetFolderRepository.FindAssetFolderAsync(id);
+                var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id);
 
                 if (folder == null || result.Any(x => x.Id == folder.Id))
                 {
@@ -72,14 +71,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return result;
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, Guid parentId)
+        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId)
         {
             var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId);
 
             return assetFolders;
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, Guid appId, string hash)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, DomainId appId, string hash)
         {
             Guard.NotNull(hash, nameof(hash));
 
@@ -88,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return await assetEnricher.EnrichAsync(assets, context);
         }
 
-        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Guid? parentId, Q query)
+        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return ResultList.Create(assets.Total, enriched);
         }
 
-        private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, Guid? parentId, Q query)
+        private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, DomainId? parentId, Q query)
         {
             var parsedQuery = await queryParser.ParseQueryAsync(context, query);
 
@@ -118,12 +117,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private async Task<IResultList<IAssetEntity>> QueryByIdsAsync(Context context, Q query)
         {
-            var assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<Guid>(query.Ids));
+            var assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<DomainId>(query.Ids));
 
             return Sort(assets, query.Ids);
         }
 
-        private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
+        private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<DomainId> ids)
         {
             return assets.SortSet(x => x.Id, ids);
         }

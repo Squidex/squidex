@@ -49,7 +49,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var name = GetFileName(fileName, nameof(fileName));
 
-            var file = await bucket.Find(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name)).FirstOrDefaultAsync();
+            var find = await bucket.FindAsync(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name), cancellationToken: ct);
+
+            var file = await find.FirstOrDefaultAsync(ct);
 
             if (file == null)
             {
@@ -67,7 +69,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 var sourceName = GetFileName(sourceFileName, nameof(sourceFileName));
 
-                using (var readStream = await bucket.OpenDownloadStreamAsync(sourceName, cancellationToken: ct))
+                await using (var readStream = await bucket.OpenDownloadStreamAsync(sourceName, cancellationToken: ct))
                 {
                     await UploadAsync(targetFileName, readStream, false, ct);
                 }

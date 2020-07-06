@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -38,8 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            var resolveDataDraft = context.ShouldProvideUnpublished() || context.IsFrontendClient;
-
             var referenceCleaner = await CleanReferencesAsync(context, contents, schemas);
 
             var converters = GenerateConverters(context, referenceCleaner).ToArray();
@@ -59,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             if (context.ShouldCleanup())
             {
-                var ids = new HashSet<Guid>();
+                var ids = new HashSet<DomainId>();
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                         QueryAssetIdsAsync(context, ids),
                         QueryContentIdsAsync(context, ids));
 
-                    var foundIds = new HashSet<Guid>(assets.Union(refContents));
+                    var foundIds = assets.Union(refContents).ToHashSet();
 
                     return ValueReferencesConverter.CleanReferences(foundIds);
                 }
@@ -86,14 +84,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return null;
         }
 
-        private async Task<IEnumerable<Guid>> QueryContentIdsAsync(Context context, HashSet<Guid> ids)
+        private async Task<IEnumerable<DomainId>> QueryContentIdsAsync(Context context, HashSet<DomainId> ids)
         {
             var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope());
 
             return result.Select(x => x.Id);
         }
 
-        private async Task<IEnumerable<Guid>> QueryAssetIdsAsync(Context context, HashSet<Guid> ids)
+        private async Task<IEnumerable<DomainId>> QueryAssetIdsAsync(Context context, HashSet<DomainId> ids)
         {
             var result = await assetRepository.QueryIdsAsync(context.App.Id, ids);
 
@@ -138,7 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (assetUrls.Count > 0)
                 {
-                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(assetUrls, urlGenerator);
+                    var appId = context.App.NamedId();
+
+                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(appId, assetUrls, urlGenerator);
 
                     yield return FieldConverters.ForValues(resolveAssetUrls);
                     yield return FieldConverters.ForValues(ValueConverters.ForNested(resolveAssetUrls));

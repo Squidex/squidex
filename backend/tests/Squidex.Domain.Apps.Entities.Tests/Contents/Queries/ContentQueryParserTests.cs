@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -24,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ContentQueryParserTests
     {
         private readonly ISchemaEntity schema;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext;
         private readonly ContentQueryParser sut;
 

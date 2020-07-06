@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,17 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     var id = (await arguments[1].Expression.EvaluateAsync(context)).ToStringValue();
 
-                    if (Guid.TryParse(id, out var guid))
+                    var references = await contentQueryService.QueryAsync(appContext, new List<DomainId> { id });
+                    var reference = references.FirstOrDefault();
+
+                    if (reference != null)
                     {
-                        var references = await contentQueryService.QueryAsync(appContext, new List<Guid> { guid });
-                        var reference = references.FirstOrDefault();
+                        var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
 
-                        if (reference != null)
-                        {
-                            var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
-
-                            context.SetValue(name, reference);
-                        }
+                        context.SetValue(name, reference);
                     }
                 }
 

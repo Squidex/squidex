@@ -22,18 +22,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
-
-        public Task CreateIndexAsync(string property)
-        {
-            Guard.NotNullOrEmpty(property, nameof(property));
-
-            return Collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoEventCommit>(
-                    Index
-                        .Ascending(CreateIndexPath(property))
-                        .Ascending(TimestampField)));
-        }
+        private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
@@ -129,21 +118,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
-        {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
-
-            StreamPosition lastPosition = position;
-
-            var filterDefinition = CreateFilter(property, value, lastPosition);
-            var filterExpression = CreateFilterExpression(property, value);
-
-            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
-        }
-
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -152,11 +127,6 @@ namespace Squidex.Infrastructure.EventSourcing
             var filterDefinition = CreateFilter(streamFilter, lastPosition);
             var filterExpression = CreateFilterExpression(null, null);
 
-            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
-        }
-
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, EventFilter filterDefinition, EventPredicate filterExpression, CancellationToken ct = default)
-        {
             using (Profiler.TraceMethod<MongoEventStore>())
             {
                 await Collection.Find(filterDefinition, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
@@ -188,16 +158,6 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static EventFilter CreateFilter(string property, object value, StreamPosition streamPosition)
-        {
-            var filters = new List<EventFilter>();
-
-            AppendByPosition(streamPosition, filters);
-            AppendByProperty(property, value, filters);
-
-            return Filter.And(filters);
-        }
-
         private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition)
         {
             var filters = new List<EventFilter>();
@@ -206,11 +166,6 @@ namespace Squidex.Infrastructure.EventSourcing
             AppendByStream(streamFilter, filters);
 
             return Filter.And(filters);
-        }
-
-        private static void AppendByProperty(string property, object value, List<EventFilter> filters)
-        {
-            filters.Add(Filter.Eq(CreateIndexPath(property), value));
         }
 
         private static void AppendByStream(string? streamFilter, List<EventFilter> filters)
@@ -252,11 +207,6 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 return x => true;
             }
-        }
-
-        private static string CreateIndexPath(string property)
-        {
-            return $"Events.Metadata.{property}";
         }
     }
 }

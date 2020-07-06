@@ -36,8 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     if (!string.IsNullOrWhiteSpace(script))
                     {
-                        var results = new List<IEnrichedContentEntity>();
-
                         await Task.WhenAll(group.Select(x => TransformAsync(context, script, x)));
                     }
                 }

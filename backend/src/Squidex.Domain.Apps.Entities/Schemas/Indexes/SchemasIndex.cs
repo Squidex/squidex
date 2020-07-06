@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             this.grainFactory = grainFactory;
         }
 
-        public Task RebuildAsync(Guid appId, Dictionary<string, Guid> schemas)
+        public Task RebuildAsync(DomainId appId, Dictionary<string, DomainId> schemas)
         {
             return Index(appId).RebuildAsync(schemas);
         }
 
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId, bool allowDeleted = false)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -48,13 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
                 var id = await GetSchemaIdAsync(appId, name);
 
-                if (id == default)
+                if (id == DomainId.Empty)
                 {
                     return null;
                 }
@@ -63,22 +62,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                var schema = await GetSchemaInternalAsync(appId, id);
 
-                if (IsFound(schema.Value, allowDeleted))
+                if (IsFound(schema, allowDeleted))
                 {
-                    return schema.Value;
+                    return schema;
                 }
 
                 return null;
             }
         }
 
-        private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
+        private async Task<DomainId> GetSchemaIdAsync(DomainId appId, string name)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -86,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetSchemaIdsAsync(Guid appId)
+        private async Task<List<DomainId>> GetSchemaIdsAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -158,19 +157,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task DeleteSchemaAsync(DeleteSchema commmand)
         {
-            var schemaId = commmand.SchemaId;
+            var schema = await GetSchemaInternalAsync(commmand.AppId.Id, commmand.SchemaId.Id);
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync();
-
-            if (IsFound(schema.Value, true))
+            if (IsFound(schema, true))
             {
-                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId);
+                await Index(schema.AppId.Id).RemoveAsync(schema.Id);
             }
         }
 
-        private ISchemasByAppIndexGrain Index(Guid appId)
+        private async Task<ISchemaEntity> GetSchemaInternalAsync(DomainId appId, DomainId id)
         {
-            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId);
+            var key = DomainId.Combine(appId, id).ToString();
+
+            var rule = await grainFactory.GetGrain<ISchemaGrain>(key).GetStateAsync();
+
+            return rule.Value;
+        }
+
+        private ISchemasByAppIndexGrain Index(DomainId appId)
+        {
+            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.ToString());
         }
 
         private static bool IsFound(ISchemaEntity entity, bool allowDeleted)

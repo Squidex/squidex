@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
@@ -20,21 +19,21 @@ namespace Squidex.Domain.Apps.Core.Contents
         private const string DefaultName = "Unnamed";
 
         public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
-        public static readonly IReadOnlyList<Guid> EmptySchemaIds = new List<Guid>();
+        public static readonly IReadOnlyList<DomainId> EmptySchemaIds = new List<DomainId>();
         public static readonly Workflow Default = CreateDefault();
         public static readonly Workflow Empty = new Workflow(default, EmptySteps);
 
         [IgnoreDuringEquals]
         public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; } = EmptySteps;
 
-        public IReadOnlyList<Guid> SchemaIds { get; } = EmptySchemaIds;
+        public IReadOnlyList<DomainId> SchemaIds { get; } = EmptySchemaIds;
 
         public Status Initial { get; }
 
         public Workflow(
             Status initial,
             IReadOnlyDictionary<Status, WorkflowStep>? steps,
-            IReadOnlyList<Guid>? schemaIds = null,
+            IReadOnlyList<DomainId>? schemaIds = null,
             string? name = null)
             : base(name ?? DefaultName)
         {

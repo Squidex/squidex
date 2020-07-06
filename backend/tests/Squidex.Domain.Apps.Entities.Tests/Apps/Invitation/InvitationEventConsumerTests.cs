@@ -26,8 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
         private readonly IUser assigner = A.Fake<IUser>();
         private readonly IUser assignee = A.Fake<IUser>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly string assignerId = Guid.NewGuid().ToString();
-        private readonly string assigneeId = Guid.NewGuid().ToString();
+        private readonly string assignerId = DomainId.NewGuid().ToString();
+        private readonly string assigneeId = DomainId.NewGuid().ToString();
         private readonly string appName = "my-app";
         private readonly InvitationEventConsumer sut;
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
             var @event = new AppContributorAssigned
             {
                 Actor = new RefToken(assignerType, assignerId),
-                AppId = NamedId.Of(Guid.NewGuid(), appName),
+                AppId = NamedId.Of(DomainId.NewGuid(), appName),
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
                 IsAdded = isNewContributor

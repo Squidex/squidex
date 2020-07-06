@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             }
         }
 
-        private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, Guid commentId)
+        private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, DomainId commentId)
         {
             Envelope<CommentCreated>? result = null;
 

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ using Squidex.Shared.Users;
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class BackupGrain : GrainOfGuid, IBackupGrain
+    public sealed class BackupGrain : GrainOfString, IBackupGrain
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
@@ -74,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.log = log;
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(string key)
         {
             RecoverAfterRestartAsync().Forget();
 
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var job = new BackupJob
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started
             };
@@ -138,6 +139,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         var context = new BackupContext(Key, userMapping, writer);
 
+                        var filter = $"^[^\\-]*-{Regex.Escape(Key)}";
+
                         await eventStore.QueryAsync(async storedEvent =>
                         {
                             var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -158,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, SquidexHeaders.AppId, Key.ToString(), null, ct);
+                        }, filter, null, ct);
 
                         foreach (var handler in handlers)
                         {
@@ -225,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return lastTimestamp;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(DomainId id)
         {
             var job = state.Value.Jobs.FirstOrDefault(x => x.Id == id);
 

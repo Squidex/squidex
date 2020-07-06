@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class UpdateRole : AppCommand
+    public sealed class UpdateRole : AppUpdateCommand
     {
         public string Name { get; set; }
 

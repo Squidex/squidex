@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,14 +12,14 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public delegate Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> CheckContentsByIds(HashSet<Guid> ids);
+    public delegate Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> CheckContentsByIds(HashSet<DomainId> ids);
 
     public sealed class ReferencesValidator : IValidator
     {
-        private readonly IEnumerable<Guid>? schemaIds;
+        private readonly IEnumerable<DomainId>? schemaIds;
         private readonly CheckContentsByIds checkReferences;
 
-        public ReferencesValidator(IEnumerable<Guid>? schemaIds, CheckContentsByIds checkReferences)
+        public ReferencesValidator(IEnumerable<DomainId>? schemaIds, CheckContentsByIds checkReferences)
         {
             Guard.NotNull(checkReferences, nameof(checkReferences));
 
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return;
             }
 
-            if (value is ICollection<Guid> contentIds)
+            if (value is ICollection<DomainId> contentIds)
             {
                 var foundIds = await checkReferences(contentIds.ToHashSet());
 
@@ -44,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var (schemaId, _) = foundIds.FirstOrDefault(x => x.Id == id);
 
-                    if (schemaId == Guid.Empty)
+                    if (schemaId == DomainId.Empty)
                     {
                         addError(context.Path, $"Contains invalid reference '{id}'.");
                     }

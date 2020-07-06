@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             });
         }
 
-        public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider)
+        public static Task CanUpdate(UpdateRule command, DomainId appId, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 

@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.log = log;
         }
 
-        public virtual async Task<JobList> CreateJobsAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event, bool ignoreStale = true)
+        public virtual async Task<JobList> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = true)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         var job = new RuleJob
                         {
-                            Id = Guid.NewGuid(),
+                            Id = DomainId.NewGuid(),
                             ActionData = string.Empty,
                             ActionName = actionName,
                             AppId = enrichedEvent.AppId.Id,

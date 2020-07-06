@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log.Store;
 using Xunit;
 
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var requestPath = "/my-path";
             var userId = "user1";
 
-            await sut.LogAsync(Guid.NewGuid(), default, requestMethod, requestPath, userId, clientId, elapsedMs, costs);
+            await sut.LogAsync(DomainId.NewGuid(), default, requestMethod, requestPath, userId, clientId, elapsedMs, costs);
 
             Assert.NotNull(recordedRequest);
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
             var dateTo = DateTime.UtcNow.Date;
 
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
             A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>._, appId.ToString(), dateFrom, dateTo, default))
                 .Invokes(x =>
@@ -80,8 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             using (var reader = new StreamReader(stream))
             {
-                string? line = null;
-                while ((line = reader.ReadLine()) != null)
+                while (await reader.ReadLineAsync() != null)
                 {
                     lines++;
                 }

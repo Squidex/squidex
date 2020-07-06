@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
             {
                 if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
                 {
-                    return urlGenerator.AssetContent(assetEvent.Id);
+                    return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id);
                 }
 
                 return JsValue.Null;

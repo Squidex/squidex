@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -13,6 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
     public class TagNormalizerTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly Guid appId = Guid.NewGuid();
-        private readonly Guid schemaId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly DomainId schemaId = DomainId.NewGuid();
         private readonly Schema schema;
 
         public TagNormalizerTests()

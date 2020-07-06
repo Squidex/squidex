@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public class FilterTagTransformerTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
 
         [Fact]
         public async Task Should_normalize_tags()

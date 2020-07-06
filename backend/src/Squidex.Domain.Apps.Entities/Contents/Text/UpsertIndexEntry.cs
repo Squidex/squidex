@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public bool ServePublished { get; set; }
 
-        public Guid ContentId { get; set; }
+        public DomainId ContentId { get; set; }
     }
 }

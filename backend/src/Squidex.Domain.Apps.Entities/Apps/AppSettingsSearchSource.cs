@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = context.App.NamedId();
 
-            void Search(string term, string permissionId, Func<NamedId<Guid>, string> generate, SearchResultType type)
+            void Search(string term, string permissionId, Func<NamedId<DomainId>, string> generate, SearchResultType type)
             {
                 if (result.Count < MaxItems && term.Contains(query, StringComparison.OrdinalIgnoreCase))
                 {

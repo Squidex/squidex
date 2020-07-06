@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
             this.assetStore = assetStore;
         }
 
-        public async Task<LuceneDirectory> CreateDirectoryAsync(Guid schemaId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(DomainId schemaId)
         {
             var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "LocalIndices", schemaId.ToString()));
 

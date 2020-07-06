@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -74,7 +73,7 @@ namespace Squidex.Extensions.Actions.Comment
 
     public sealed class CommentJob
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public RefToken Actor { get; set; }
 

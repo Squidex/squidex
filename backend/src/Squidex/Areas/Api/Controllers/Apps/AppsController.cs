@@ -105,7 +105,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = Deferred.Response(() =>
             {
                 var userOrClientId = HttpContext.User.UserOrClientId()!;
-                var userPermissions = Resources.Permissions;
 
                 return AppDto.FromApp(App, userOrClientId, appPlansProvider, Resources);
             });

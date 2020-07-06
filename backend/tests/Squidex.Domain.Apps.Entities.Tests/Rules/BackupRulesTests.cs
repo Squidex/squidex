@@ -37,13 +37,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Should_restore_indices_for_all_non_deleted_rules()
         {
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
-            var ruleId1 = Guid.NewGuid();
-            var ruleId2 = Guid.NewGuid();
-            var ruleId3 = Guid.NewGuid();
+            var ruleId1 = DomainId.NewGuid();
+            var ruleId2 = DomainId.NewGuid();
+            var ruleId3 = DomainId.NewGuid();
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
+            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
             await sut.RestoreEventAsync(Envelope.Create(new RuleCreated
             {
@@ -65,14 +65,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 RuleId = ruleId3
             }), context);
 
-            HashSet<Guid>? newIndex = null;
+            HashSet<DomainId>? newIndex = null;
 
-            A.CallTo(() => index.RebuildAsync(appId, A<HashSet<Guid>>._))
-                .Invokes(new Action<Guid, HashSet<Guid>>((_, i) => newIndex = i));
+            A.CallTo(() => index.RebuildAsync(appId, A<HashSet<DomainId>>._))
+                .Invokes(new Action<DomainId, HashSet<DomainId>>((_, i) => newIndex = i));
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new HashSet<Guid>
+            Assert.Equal(new HashSet<DomainId>
             {
                 ruleId1,
                 ruleId2

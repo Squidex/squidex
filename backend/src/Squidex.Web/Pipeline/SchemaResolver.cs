@@ -51,11 +51,11 @@ namespace Squidex.Web.Pipeline
             await next();
         }
 
-        private Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string schemaIdOrName)
+        private Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string schemaIdOrName)
         {
-            if (Guid.TryParse(schemaIdOrName, out var id))
+            if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                return appProvider.GetSchemaAsync(appId, id);
+                return appProvider.GetSchemaAsync(appId, guid);
             }
             else
             {

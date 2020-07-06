@@ -11,6 +11,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
@@ -78,9 +79,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 }
             }
 
-            public Guid Id { get; }
+            public DomainId Id { get; }
 
-            public IndexHolder(Guid id, Directory directory)
+            public IndexHolder(DomainId id, Directory directory)
             {
                 Id = id;
 

@@ -76,17 +76,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return isLocked;
         }
 
-        private bool HasNotifiedBefore(Guid appId)
+        private bool HasNotifiedBefore(DomainId appId)
         {
             return memoryCache.Get<bool>(appId);
         }
 
-        private bool TrackNotified(Guid appId)
+        private bool TrackNotified(DomainId appId)
         {
             return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
         }
 
-        private bool IsAboutToBeLocked(DateTime today, long limit, long usage)
+        private static bool IsAboutToBeLocked(DateTime today, long limit, long usage)
         {
             var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
 

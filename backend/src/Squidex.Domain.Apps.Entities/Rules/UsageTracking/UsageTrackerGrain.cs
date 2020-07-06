@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public sealed class Target
         {
-            public NamedId<Guid> AppId { get; set; }
+            public NamedId<DomainId> AppId { get; set; }
 
             public int Limits { get; set; }
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         [CollectionName("UsageTracker")]
         public sealed class State
         {
-            public Dictionary<Guid, Target> Targets { get; set; } = new Dictionary<Guid, Target>();
+            public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
         }
 
         public UsageTrackerGrain(IGrainState<State> state, IApiUsageTracker usageTracker)
@@ -119,35 +119,35 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             }
         }
 
-        public Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits, int? numDays)
+        public Task AddTargetAsync(DomainId ruleId, NamedId<DomainId> appId, int limits, int? numDays)
         {
             UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; t.NumDays = numDays; });
 
             return state.WriteAsync();
         }
 
-        public Task UpdateTargetAsync(Guid ruleId, int limits, int? numDays)
+        public Task UpdateTargetAsync(DomainId ruleId, int limits, int? numDays)
         {
             UpdateTarget(ruleId, t => { t.Limits = limits; t.NumDays = numDays; });
 
             return state.WriteAsync();
         }
 
-        public Task AddTargetAsync(Guid ruleId, int limits)
+        public Task AddTargetAsync(DomainId ruleId, int limits)
         {
             UpdateTarget(ruleId, t => t.Limits = limits);
 
             return state.WriteAsync();
         }
 
-        public Task RemoveTargetAsync(Guid ruleId)
+        public Task RemoveTargetAsync(DomainId ruleId)
         {
             state.Value.Targets.Remove(ruleId);
 
             return state.WriteAsync();
         }
 
-        private void UpdateTarget(Guid ruleId, Action<Target> updater)
+        private void UpdateTarget(DomainId ruleId, Action<Target> updater)
         {
             updater(state.Value.Targets.GetOrAddNew(ruleId));
         }

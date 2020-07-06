@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         }
                         else
                         {
-                            tagId = Guid.NewGuid().ToString();
+                            tagId = DomainId.NewGuid().ToString();
 
                             state.Value.Tags.Add(tagId, new Tag { Name = tagName });
                         }

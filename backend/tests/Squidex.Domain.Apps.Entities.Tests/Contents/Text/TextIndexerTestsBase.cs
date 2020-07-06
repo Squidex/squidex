@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,10 +26,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public abstract class TextIndexerTestsBase
     {
-        private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
-        private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly List<DomainId> ids1 = new List<DomainId> { DomainId.NewGuid() };
+        private readonly List<DomainId> ids2 = new List<DomainId> { DomainId.NewGuid() };
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppEntity app;
 
         private delegate Task IndexOperation(TextIndexingProcess process);
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         protected TextIndexerTestsBase()
         {
             app =
-                Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"),
+                Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"),
                     Language.DE,
                     Language.EN);
         }
@@ -312,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             );
         }
 
-        private IndexOperation Create(Guid id, string language, string text)
+        private IndexOperation Create(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -323,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentCreated { Data = data });
         }
 
-        private IndexOperation Update(Guid id, string language, string text)
+        private IndexOperation Update(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -334,7 +333,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentUpdated { Data = data });
         }
 
-        private IndexOperation CreateDraftWithData(Guid id, string language, string text)
+        private IndexOperation CreateDraftWithData(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -345,32 +344,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentDraftCreated { MigratedData = data });
         }
 
-        private IndexOperation CreateDraft(Guid id)
+        private IndexOperation CreateDraft(DomainId id)
         {
             return Op(id, new ContentDraftCreated());
         }
 
-        private IndexOperation Publish(Guid id)
+        private IndexOperation Publish(DomainId id)
         {
             return Op(id, new ContentStatusChanged { Status = Status.Published });
         }
 
-        private IndexOperation Unpublish( Guid id)
+        private IndexOperation Unpublish( DomainId id)
         {
             return Op(id, new ContentStatusChanged { Status = Status.Draft });
         }
 
-        private IndexOperation DeleteDraft(Guid id)
+        private IndexOperation DeleteDraft(DomainId id)
         {
             return Op(id, new ContentDraftDeleted());
         }
 
-        private IndexOperation Delete(Guid id)
+        private IndexOperation Delete(DomainId id)
         {
             return Op(id, new ContentDeleted());
         }
 
-        private IndexOperation Op(Guid id, ContentEvent contentEvent)
+        private IndexOperation Op(DomainId id, ContentEvent contentEvent)
         {
             contentEvent.ContentId = id;
             contentEvent.AppId = appId;
@@ -379,7 +378,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return p => p.On(Envelope.Create(contentEvent));
         }
 
-        private IndexOperation Search(List<Guid>? expected, string text, SearchScope target = SearchScope.All)
+        private IndexOperation Search(List<DomainId>? expected, string text, SearchScope target = SearchScope.All)
         {
             return async p =>
             {

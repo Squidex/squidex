@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
             return SimpleMapper.Map(this, new CreateComment { CommentsId = commentsId });
         }
 
-        public UpdateComment ToUpdateComment(string commentsId, Guid commentId)
+        public UpdateComment ToUpdateComment(string commentsId, string commentId)
         {
             return SimpleMapper.Map(this, new UpdateComment { CommentsId = commentsId, CommentId = commentId });
         }

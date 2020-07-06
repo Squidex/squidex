@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +23,7 @@ namespace Squidex.Web.Pipeline
         private readonly IClock clock = A.Fake<IClock>();
         private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
         private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RequestDelegate next;
         private readonly UsageMiddleware sut;
         private bool isNextCalled;

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                     e(Not.Defined("Folder name"), nameof(command.FolderName));
                 }
 
-                await CheckPathAsync(command.ParentId, assetQuery, Guid.Empty, e);
+                await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, DomainId.Empty, e);
             });
         }
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             });
         }
 
-        public static Task CanMove(MoveAssetFolder command, IAssetQueryService assetQuery, Guid id, Guid oldParentId)
+        public static Task CanMove(MoveAssetFolder command, IAssetQueryService assetQuery, DomainId id, DomainId oldParentId)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (command.ParentId != oldParentId)
                 {
-                    await CheckPathAsync(command.ParentId, assetQuery, id, e);
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, id, e);
                 }
             });
         }
@@ -61,22 +61,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        private static async Task CheckPathAsync(Guid parentId, IAssetQueryService assetQuery, Guid id, AddValidation e)
+        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
         {
-            if (parentId != default)
+            if (parentId != DomainId.Empty)
             {
-                var path = await assetQuery.FindAssetFolderAsync(parentId);
+                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
 
                 if (path.Count == 0)
                 {
                     e("Asset folder does not exist.", nameof(MoveAssetFolder.ParentId));
                 }
-                else if (id != default)
+                else if (id != DomainId.Empty)
                 {
-                    var indexOfThis = path.IndexOf(x => x.Id == id);
+                    var indexOfSelf = path.IndexOf(x => x.Id == id);
                     var indexOfParent = path.IndexOf(x => x.Id == parentId);
 
-                    if (indexOfThis >= 0 && indexOfParent > indexOfThis)
+                    if (indexOfSelf >= 0 && indexOfParent > indexOfSelf)
                     {
                         e("Cannot add folder to its own child.", nameof(MoveAssetFolder.ParentId));
                     }

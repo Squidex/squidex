@@ -258,10 +258,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 SimpleMapper.Map(model, result);
             }
 
-            if (result.Properties == null)
-            {
-                result.Properties = user.GetCustomProperties().Select(UserProperty.FromTuple).ToList();
-            }
+            result.Properties ??= user.GetCustomProperties().Select(UserProperty.FromTuple).ToList();
 
             return result;
         }

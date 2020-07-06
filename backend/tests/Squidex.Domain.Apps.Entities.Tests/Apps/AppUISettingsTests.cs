@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => grain.GetAsync())
                 .Returns(settings.AsJ());
 
-            var result = await sut.GetAsync(Guid.NewGuid(), "user");
+            var result = await sut.GetAsync(DomainId.NewGuid(), "user");
 
             Assert.Same(settings, result);
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var value = JsonValue.Object();
 
-            await sut.SetAsync(Guid.NewGuid(), "user", "the.path", value);
+            await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
 
             A.CallTo(() => grain.SetAsync("the.path", A<J<IJsonValue>>.That.Matches(x => x.Value == value)))
                 .MustHaveHappened();
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var value = JsonValue.Object();
 
-            await sut.SetAsync(Guid.NewGuid(), "user", value);
+            await sut.SetAsync(DomainId.NewGuid(), "user", value);
 
             A.CallTo(() => grain.SetAsync(A<J<JsonObject>>.That.Matches(x => x.Value == value)))
                 .MustHaveHappened();
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_call_grain_when_removing_value()
         {
-            await sut.RemoveAsync(Guid.NewGuid(), "user", "the.path");
+            await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
 
             A.CallTo(() => grain.RemoveAsync("the.path"))
                 .MustHaveHappened();

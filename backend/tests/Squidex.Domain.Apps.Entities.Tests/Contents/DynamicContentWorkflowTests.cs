@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -25,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly NamedId<Guid> simpleSchemaId = NamedId.Of(Guid.NewGuid(), "my-simple-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> simpleSchemaId = NamedId.Of(DomainId.NewGuid(), "my-simple-schema");
         private readonly DynamicContentWorkflow sut;
 
         private readonly Workflow workflow = new Workflow(
@@ -82,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             },
                             StatusColors.Published)
                 },
-                new List<Guid> { simpleSchemaId.Id });
+                new List<DomainId> { simpleSchemaId.Id });
 
-            var workflows = Workflows.Empty.Set(workflow).Set(Guid.NewGuid(), simpleWorkflow);
+            var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id))
                 .Returns(app);

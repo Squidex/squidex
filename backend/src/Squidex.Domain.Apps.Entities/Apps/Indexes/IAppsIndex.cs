@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public interface IAppsIndex
     {
-        Task<List<Guid>> GetIdsAsync();
+        Task<List<DomainId>> GetIdsAsync();
 
         Task<List<IAppEntity>> GetAppsAsync();
 
@@ -22,18 +22,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task<IAppEntity?> GetAppByNameAsync(string name);
 
-        Task<IAppEntity?> GetAppAsync(Guid appId);
+        Task<IAppEntity?> GetAppAsync(DomainId appId);
 
-        Task<string?> ReserveAsync(Guid id, string name);
+        Task<string?> ReserveAsync(DomainId id, string name);
 
         Task<bool> AddAsync(string? token);
 
         Task RemoveReservationAsync(string? token);
 
-        Task RebuildByContributorsAsync(string contributorId, HashSet<Guid> apps);
+        Task RebuildByContributorsAsync(string contributorId, HashSet<DomainId> apps);
 
-        Task RebuildAsync(Dictionary<string, Guid> apps);
+        Task RebuildAsync(Dictionary<string, DomainId> apps);
 
-        Task RebuildByContributorsAsync(Guid appId, HashSet<string> contributors);
+        Task RebuildByContributorsAsync(DomainId appId, HashSet<string> contributors);
     }
 }

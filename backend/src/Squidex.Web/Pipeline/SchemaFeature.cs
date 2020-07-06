@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class SchemaFeature : ISchemaFeature
     {
-        public NamedId<Guid> SchemaId { get; }
+        public NamedId<DomainId> SchemaId { get; }
 
-        public SchemaFeature(NamedId<Guid> schemaId)
+        public SchemaFeature(NamedId<DomainId> schemaId)
         {
             SchemaId = schemaId;
         }

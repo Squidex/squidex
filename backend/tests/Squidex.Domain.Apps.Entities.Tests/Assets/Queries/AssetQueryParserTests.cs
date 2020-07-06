@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public class AssetQueryParserTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext;
         private readonly AssetQueryParser sut;
 

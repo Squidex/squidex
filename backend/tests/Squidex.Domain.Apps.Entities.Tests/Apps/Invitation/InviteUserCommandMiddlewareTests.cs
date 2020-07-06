@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
     public class InviteUserCommandMiddlewareTests
     {
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IAppEntity app = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly InviteUserCommandMiddleware sut;
 

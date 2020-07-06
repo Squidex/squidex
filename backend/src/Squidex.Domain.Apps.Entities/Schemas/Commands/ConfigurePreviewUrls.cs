@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ConfigurePreviewUrls : SchemaCommand
+    public sealed class ConfigurePreviewUrls : SchemaUpdateCommand
     {
         public Dictionary<string, string> PreviewUrls { get; set; }
     }

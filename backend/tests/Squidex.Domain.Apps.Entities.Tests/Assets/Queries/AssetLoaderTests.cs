@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
@@ -19,12 +18,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IAssetGrain grain = A.Fake<IAssetGrain>();
-        private readonly Guid id = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly DomainId id = DomainId.NewGuid();
         private readonly AssetLoader sut;
 
         public AssetLoaderTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(id, null))
+            var key = DomainId.Combine(appId, id).ToString();
+
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(key, null))
                 .Returns(grain);
 
             sut = new AssetLoader(grainFactory);
@@ -36,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => grain.GetStateAsync(10))
                 .Returns(J.Of<IAssetEntity>(null!));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(appId, id, 10));
         }
 
         [Fact]
@@ -47,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => grain.GetStateAsync(10))
                 .Returns(J.Of<IAssetEntity>(content));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(appId, id, 10));
         }
 
         [Fact]
@@ -58,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => grain.GetStateAsync(10))
                 .Returns(J.Of<IAssetEntity>(content));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(appId, id, 10));
         }
 
         [Fact]
@@ -69,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => grain.GetStateAsync(10))
                 .Returns(J.Of<IAssetEntity>(content));
 
-            var result = await sut.GetAsync(id, 10);
+            var result = await sut.GetAsync(appId, id, 10);
 
             Assert.Same(content, result);
         }

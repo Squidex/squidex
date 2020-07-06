@@ -21,7 +21,7 @@ namespace Squidex.Extensions.Actions.Notification
     public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, NotificationJob>
     {
         private const string Description = "Send a Notification";
-        private static readonly NamedId<Guid> NoApp = NamedId.Of(Guid.Empty, "none");
+        private static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
         private readonly ICommandBus commandBus;
         private readonly IUserResolver userResolver;
 

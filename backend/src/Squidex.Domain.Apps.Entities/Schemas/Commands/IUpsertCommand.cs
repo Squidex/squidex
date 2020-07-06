@@ -12,25 +12,25 @@ using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entitie
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class UpsertCommand : SchemaCommand
+    public interface IUpsertCommand
     {
-        public bool IsPublished { get; set; }
+        bool IsPublished { get; set; }
 
-        public string Category { get; set; }
+        string Category { get; set; }
 
-        public SchemaFields Fields { get; set; }
+        SchemaFields Fields { get; set; }
 
-        public FieldNames? FieldsInReferences { get; set; }
+        FieldNames? FieldsInReferences { get; set; }
 
-        public FieldNames? FieldsInLists { get; set; }
+        FieldNames? FieldsInLists { get; set; }
 
-        public SchemaScripts? Scripts { get; set; }
+        SchemaScripts? Scripts { get; set; }
 
-        public SchemaProperties Properties { get; set; }
+        SchemaProperties Properties { get; set; }
 
-        public Dictionary<string, string>? PreviewUrls { get; set; }
+        Dictionary<string, string>? PreviewUrls { get; set; }
 
-        public Schema ToSchema(string name, bool isSingleton)
+        Schema ToSchema(string name, bool isSingleton)
         {
             var schema = new Schema(name, Properties, isSingleton);
 

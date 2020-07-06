@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
@@ -23,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ISchemaEntity schema;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
         public FilterTagTransformerTests()
         {

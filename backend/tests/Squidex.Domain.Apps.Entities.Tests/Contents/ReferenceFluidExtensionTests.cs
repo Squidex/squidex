@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly FluidTemplateEngine sut;
 
         public ReferenceFluidExtensionTests()
@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_resolve_references_in_loop()
         {
-            var referenceId1 = Guid.NewGuid();
+            var referenceId1 = DomainId.NewGuid();
             var reference1 = CreateReference(referenceId1, 1);
-            var referenceId2 = Guid.NewGuid();
+            var referenceId2 = DomainId.NewGuid();
             var reference2 = CreateReference(referenceId1, 2);
 
             var @event = new EnrichedContentEvent
@@ -57,10 +57,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 AppId = appId
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<Guid>>.That.Contains(referenceId1)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<DomainId>>.That.Contains(referenceId1)))
                 .Returns(ResultList.CreateFrom(1, reference1));
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<Guid>>.That.Contains(referenceId2)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<DomainId>>.That.Contains(referenceId2)))
                 .Returns(ResultList.CreateFrom(1, reference2));
 
             var vars = new TemplateVars
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(expected, result);
         }
 
-        private IEnrichedContentEntity CreateReference(Guid referenceId, int index)
+        private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
         {
             return new ContentEntity
             {

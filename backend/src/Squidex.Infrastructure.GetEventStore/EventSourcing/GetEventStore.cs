@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
-        private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+        private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
         private readonly IEventStoreConnection connection;
         private readonly IJsonSerializer serializer;
         private readonly string prefix;
@@ -59,29 +59,6 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotNull(streamFilter, nameof(streamFilter));
 
             return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
-        }
-
-        public Task CreateIndexAsync(string property)
-        {
-            Guard.NotNullOrEmpty(property, nameof(property));
-
-            return projectionClient.CreateProjectionAsync(property, string.Empty);
-        }
-
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
-        {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.NotNullOrEmpty(property, nameof(property));
-            Guard.NotNull(value, nameof(value));
-
-            using (Profiler.TraceMethod<GetEventStore>())
-            {
-                var streamName = await projectionClient.CreateProjectionAsync(property, value);
-
-                var sliceStart = projectionClient.ParsePosition(position);
-
-                await QueryAsync(callback, streamName, sliceStart, ct);
-            }
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)

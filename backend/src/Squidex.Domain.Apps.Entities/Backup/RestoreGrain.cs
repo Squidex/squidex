@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -117,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             state.Value.Job = new RestoreJob
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 NewAppName = newAppName,
                 Actor = actor,
                 Started = clock.GetCurrentInstant(),
@@ -250,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await commandBus.PublishAsync(new AssignContributor
                     {
                         Actor = actor,
-                        AppId = CurrentJob.AppId.Id,
+                        AppId = CurrentJob.AppId,
                         ContributorId = actor.Identifier,
                         Restoring = true,
                         Role = Role.Owner
@@ -320,19 +321,25 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (@event.Payload is AppCreated appCreated)
             {
+                var previousAppId = appCreated.AppId.Id.ToString();
+
                 if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
                 {
                     appCreated.Name = CurrentJob.NewAppName;
 
-                    CurrentJob.AppId = NamedId.Of(appCreated.AppId.Id, CurrentJob.NewAppName);
+                    CurrentJob.AppId = NamedId.Of(DomainId.NewGuid(), CurrentJob.NewAppName);
                 }
                 else
                 {
-                    CurrentJob.AppId = appCreated.AppId;
+                    CurrentJob.AppId = NamedId.Of(DomainId.NewGuid(), appCreated.Name);
                 }
 
-                await CreateContextAsync(reader);
+                await CreateContextAsync(reader, previousAppId);
             }
+
+            stream = stream.Replace(
+                restoreContext.PreviousAppId.ToString(),
+                restoreContext.AppId.ToString());
 
             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
             {
@@ -347,6 +354,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 appEvent.AppId = CurrentJob.AppId;
             }
 
+            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var aggregateId) && aggregateId is JsonString s)
+            {
+                var id = s.Value.Replace(
+                    restoreContext.PreviousAppId.ToString(),
+                    restoreContext.AppId.ToString());
+
+                @event.SetAggregateId(id);
+            }
+
             foreach (var handler in handlers)
             {
                 if (!await handler.RestoreEventAsync(@event, restoreContext))
@@ -356,14 +372,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
 
             var eventData = eventDataFormatter.ToEventData(@event, @event.Headers.CommitId());
-            var eventCommit = new List<EventData> { eventData };
+
+            var eventCommit = new List<EventData>
+            {
+                eventData
+            };
 
             await eventStore.AppendAsync(Guid.NewGuid(), stream, eventCommit);
 
             Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
         }
 
-        private async Task CreateContextAsync(IBackupReader reader)
+        private async Task CreateContextAsync(IBackupReader reader, DomainId previousAppId)
         {
             var userMapping = new UserMapping(CurrentJob.Actor);
 
@@ -376,7 +396,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Log("Created Users");
             }
 
-            restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader);
+            restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
         }
 
         private void Log(string message, bool replace = false)

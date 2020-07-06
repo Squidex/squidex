@@ -5,30 +5,35 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetFolderEntity : IAssetFolderEntity
+    public sealed class MongoAssetFolderEntity : IAssetFolderEntity, IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement("_id")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid IndexedAppId { get; set; }
+        public DomainId IndexedAppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("id")]
+        public DomainId Id { get; set; }
 
         [BsonRequired]
         [BsonElement("pi")]
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai")]
+        public NamedId<DomainId> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -37,10 +42,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement("mt")]
         public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("ai")]
-        public NamedId<Guid> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("fn")]
@@ -61,5 +62,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }
+
+        public DomainId UniqueId
+        {
+            get { return DocumentId; }
+        }
     }
 }

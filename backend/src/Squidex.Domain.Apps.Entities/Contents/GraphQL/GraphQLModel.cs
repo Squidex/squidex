@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
-        private readonly Dictionary<Guid, ContentGraphType> contentTypes = new Dictionary<Guid, ContentGraphType>();
+        private readonly Dictionary<DomainId, ContentGraphType> contentTypes = new Dictionary<DomainId, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
         private readonly IAppEntity app;
         private readonly IObjectGraphType assetType;
@@ -99,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetContent(c.Source.Id);
+                return context.UrlGenerator.AssetContent(c.Source.AppId, c.Source.Id);
             });
 
             return resolver;
@@ -111,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetSource(c.Source.Id, c.Source.FileVersion);
+                return context.UrlGenerator.AssetSource(c.Source.AppId, c.Source.Id, c.Source.FileVersion);
             });
 
             return resolver;
@@ -123,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
 
-                return context.UrlGenerator.AssetThumbnail(c.Source.Id, c.Source.Type);
+                return context.UrlGenerator.AssetThumbnail(c.Source.AppId, c.Source.Id, c.Source.Type);
             });
 
             return resolver;
@@ -156,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return assetType as IObjectGraphType;
         }
 
-        public IObjectGraphType GetContentType(Guid schemaId)
+        public IObjectGraphType GetContentType(DomainId schemaId)
         {
             return contentTypes.GetOrDefault(schemaId);
         }

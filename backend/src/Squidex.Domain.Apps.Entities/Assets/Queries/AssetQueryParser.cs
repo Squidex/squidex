@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 schema.Properties[name.ToCamelCase()] = property;
             }
 
-            AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String, JsonFormatStrings.Guid);
+            AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Created), JsonObjectType.String, JsonFormatStrings.DateTime);
             AddProperty(nameof(IAssetEntity.CreatedBy), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.FileHash), JsonObjectType.String);

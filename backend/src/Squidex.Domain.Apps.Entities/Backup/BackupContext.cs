@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -14,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         public IBackupWriter Writer { get; }
 
-        public BackupContext(Guid appId, IUserMapping userMapping, IBackupWriter writer)
+        public BackupContext(DomainId appId, IUserMapping userMapping, IBackupWriter writer)
             : base(appId, userMapping)
         {
             Guard.NotNull(writer, nameof(writer));

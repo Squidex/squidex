@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
 
-            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data, null))
+            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data))
                 .Throws(new TypeNameNotFoundException());
 
             var persistedEvents = new List<IEvent>();
@@ -274,7 +274,7 @@ namespace Squidex.Infrastructure.States
 
                 eventsStored.Add(eventStored);
 
-                A.CallTo(() => eventDataFormatter.Parse(eventData, null))
+                A.CallTo(() => eventDataFormatter.Parse(eventData))
                     .Returns(new Envelope<IEvent>(@event));
 
                 i++;

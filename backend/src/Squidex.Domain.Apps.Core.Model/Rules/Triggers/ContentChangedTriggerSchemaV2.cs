@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
     public sealed class ContentChangedTriggerSchemaV2 : Freezable
     {
-        public Guid SchemaId { get; set; }
+        public DomainId SchemaId { get; set; }
 
         public string? Condition { get; set; }
     }

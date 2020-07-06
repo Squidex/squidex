@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         public void Extend(ExecutionContext context, bool async)
         {
-            if (context.TryGetValue("appId", out var temp) && temp is Guid appId)
+            if (context.TryGetValue("appId", out var temp) && temp is DomainId appId)
             {
                 var engine = context.Engine;
 
@@ -42,16 +42,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             }
         }
 
-        private long Increment(Guid appId, string name)
+        private long Increment(DomainId appId, string name)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId);
+            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
 
             return AsyncHelper.Sync(() => grain.IncrementAsync(name));
         }
 
-        private long Reset(Guid appId, string name, long value)
+        private long Reset(DomainId appId, string name, long value)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId);
+            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
 
             return AsyncHelper.Sync(() => grain.ResetAsync(name, value));
         }

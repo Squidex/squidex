@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
@@ -17,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         IEntityWithLastModifiedBy,
         IEntityWithVersion
     {
-        NamedId<Guid> AppId { get; set; }
+        NamedId<DomainId> AppId { get; set; }
 
         Rule RuleDef { get; }
 

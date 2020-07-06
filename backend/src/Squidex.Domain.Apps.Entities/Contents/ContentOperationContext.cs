@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             get { return schema; }
         }
 
-        public async Task LoadAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized)
+        public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, Func<string> message, bool optimized)
         {
             var (app, schema) = await appProvider.GetAppWithSchemaAsync(appId.Id, schemaId.Id);
 

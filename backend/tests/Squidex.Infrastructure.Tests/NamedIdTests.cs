@@ -95,6 +95,26 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void Should_serialize_and_deserialize_null_id_token()
+        {
+            NamedId<DomainId>? value = null;
+
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_valid_id_token()
+        {
+            var value = NamedId.Of(DomainId.NewGuid().ToString(), "my-name");
+
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
+        }
+
+        [Fact]
         public void Should_throw_exception_if_string_id_is_not_valid()
         {
             Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<string>>("123"));

@@ -9,13 +9,13 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Infrastructure
 {
-    public sealed class StatusConverter : TypeConverter
+    public sealed class DomainIdTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(string);
+            return sourceType == typeof(string) && sourceType == typeof(Guid);
         }
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
@@ -25,7 +25,17 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            return new Status(value?.ToString());
+            if (value is string text)
+            {
+                return DomainId.Create(text);
+            }
+
+            if (value is Guid guid)
+            {
+                return DomainId.Create(guid);
+            }
+
+            return DomainId.Empty;
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)

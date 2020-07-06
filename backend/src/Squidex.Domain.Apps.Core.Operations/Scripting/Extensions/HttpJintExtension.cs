@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             return request;
         }
 
-        private async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
+        private static async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
         {
             var responseString = await response.Content.ReadAsStringAsync();
 

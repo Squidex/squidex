@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 case BulkUpdateType.ChangeStatus:
                                     {
-                                        if (id == null || id == default)
+                                        if (id == null || id == DomainId.Empty)
                                         {
                                             throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
                                         }
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 case BulkUpdateType.Delete:
                                     {
-                                        if (id == null || id == default)
+                                        if (id == null || id == DomainId.Empty)
                                         {
                                             throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
                                         }
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<Guid?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
+        private async Task<DomainId?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
         {
             var id = job.Id;
 

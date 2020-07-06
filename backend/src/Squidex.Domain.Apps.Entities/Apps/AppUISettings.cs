@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
@@ -25,34 +24,34 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.grainFactory = grainFactory;
         }
 
-        public async Task<JsonObject> GetAsync(Guid appId, string? userId)
+        public async Task<JsonObject> GetAsync(DomainId appId, string? userId)
         {
             var result = await GetGrain(appId, userId).GetAsync();
 
             return result.Value;
         }
 
-        public Task RemoveAsync(Guid appId, string? userId, string path)
+        public Task RemoveAsync(DomainId appId, string? userId, string path)
         {
             return GetGrain(appId, userId).RemoveAsync(path);
         }
 
-        public Task SetAsync(Guid appId, string? userId, string path, IJsonValue value)
+        public Task SetAsync(DomainId appId, string? userId, string path, IJsonValue value)
         {
             return GetGrain(appId, userId).SetAsync(path, value.AsJ());
         }
 
-        public Task SetAsync(Guid appId, string? userId, JsonObject settings)
+        public Task SetAsync(DomainId appId, string? userId, JsonObject settings)
         {
             return GetGrain(appId, userId).SetAsync(settings.AsJ());
         }
 
-        private IAppUISettingsGrain GetGrain(Guid appId, string? userId)
+        private IAppUISettingsGrain GetGrain(DomainId appId, string? userId)
         {
             return grainFactory.GetGrain<IAppUISettingsGrain>(GetKey(appId, userId));
         }
 
-        private static string GetKey(Guid appId, string? userId)
+        private static string GetKey(DomainId appId, string? userId)
         {
             if (!string.IsNullOrWhiteSpace(userId))
             {

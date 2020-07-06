@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentWorkflow contentWorkflow;
         private readonly ContentOperationContext context;
 
-        public ContentDomainObject(IStore<Guid> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
+        public ContentDomainObject(IStore<DomainId> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(context, nameof(context));
@@ -37,6 +37,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             this.contentWorkflow = contentWorkflow;
             this.context = context;
+        }
+
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is ContentCommand;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is ContentCommand contentCommand &&
+                Equals(contentCommand.AppId, Snapshot.AppId) &&
+                Equals(contentCommand.SchemaId, Snapshot.SchemaId) &&
+                Equals(contentCommand.ContentId, Snapshot.Id);
         }
 
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
@@ -304,15 +322,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void RaiseEvent(SchemaEvent @event)
         {
-            if (@event.AppId == null)
-            {
-                @event.AppId = Snapshot.AppId;
-            }
-
-            if (@event.SchemaId == null)
-            {
-                @event.SchemaId = Snapshot.SchemaId;
-            }
+            @event.AppId ??= Snapshot.AppId;
+            @event.SchemaId ??= Snapshot.SchemaId;
 
             RaiseEvent(Envelope.Create(@event));
         }
@@ -341,7 +352,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private Task LoadContext(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized = false)
+        private Task LoadContext(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, Func<string> message, bool optimized = false)
         {
             return context.LoadAsync(appId, schemaId, command, message, optimized);
         }

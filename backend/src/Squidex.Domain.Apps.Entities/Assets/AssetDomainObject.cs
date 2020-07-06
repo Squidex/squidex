@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetDomainObject(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
+        public AssetDomainObject(IStore<DomainId> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(tagService, nameof(tagService));
@@ -39,10 +39,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetQuery = assetQuery;
         }
 
+        protected override bool IsDeleted()
+        {
+            return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanAcceptCreation(ICommand command)
+        {
+            return command is AssetCommand;
+        }
+
+        protected override bool CanAccept(ICommand command)
+        {
+            return command is AssetCommand assetCommand &&
+                Equals(assetCommand.AppId, Snapshot.AppId) &&
+                Equals(assetCommand.AssetId, Snapshot.Id);
+        }
+
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotDeleted();
-
             switch (command)
             {
                 case CreateAsset createAsset:
@@ -99,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task<HashSet<string>?> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
+        private async Task<HashSet<string>?> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
         {
             if (tags == null)
             {
@@ -160,20 +175,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void RaiseEvent(AppEvent @event)
         {
-            if (@event.AppId == null)
-            {
-                @event.AppId = Snapshot.AppId;
-            }
+            @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private void VerifyNotDeleted()
-        {
-            if (Snapshot.IsDeleted)
-            {
-                throw new DomainException("Asset has already been deleted");
-            }
         }
     }
 }

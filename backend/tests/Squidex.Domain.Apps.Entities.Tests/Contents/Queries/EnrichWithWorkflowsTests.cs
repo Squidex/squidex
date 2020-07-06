@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -21,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly Context requestContext;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly RefToken user = new RefToken(RefTokenType.Subject, "me");
         private readonly EnrichWithWorkflows sut;
 

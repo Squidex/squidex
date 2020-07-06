@@ -93,7 +93,7 @@ namespace Squidex.Domain.Users.MongoDb
                     }
                     else
                     {
-                        throw ex;
+                        throw;
                     }
                 }
             }

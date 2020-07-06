@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 foreach (var asset in results)
                 {
-                    requestCache.AddDependency(asset.Id, asset.Version);
+                    requestCache.AddDependency(asset.UniqueId, asset.Version);
                 }
 
                 if (ShouldEnrich(context))
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task<Dictionary<string, string>> CalculateTags(IGrouping<System.Guid, IAssetEntity> group)
+        private async Task<Dictionary<string, string>> CalculateTags(IGrouping<DomainId, IAssetEntity> group)
         {
             var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
 

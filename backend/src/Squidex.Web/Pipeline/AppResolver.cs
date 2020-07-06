@@ -90,7 +90,7 @@ namespace Squidex.Web.Pipeline
             await next();
         }
 
-        private Context SetContext(HttpContext httpContext, IAppEntity app)
+        private static Context SetContext(HttpContext httpContext, IAppEntity app)
         {
             var requestContext = new Context(httpContext.User, app);
 

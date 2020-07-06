@@ -128,6 +128,8 @@ namespace Squidex.Infrastructure.UsageTracking
                     (dateFrom.AddDays(4), new Counters())
                 }
             };
+
+            Assert.Equal(expected, result);
         }
 
         [Fact]

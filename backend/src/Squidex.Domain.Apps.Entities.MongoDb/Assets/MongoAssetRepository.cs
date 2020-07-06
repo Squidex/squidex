@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }, ct);
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? parentId, ClrQuery query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
@@ -96,31 +96,31 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
                 var assetEntities =
-                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
+                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x[IdField.Value].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryChildIdsAsync(Guid appId, Guid parentId)
+        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x[IdField.Value].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetBySlugAsync(Guid appId, string slug)
+        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -156,7 +156,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(Guid id)
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var documentId = DomainId.Combine(appId, id).ToString();
+
+                var assetEntity =
+                    await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                return assetEntity;
+            }
+        }
+
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId id)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -168,11 +182,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        private static FilterDefinition<MongoAssetEntity> BuildFilter(Guid appId, HashSet<Guid> ids)
+        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
         {
+            var documentIds = ids.Select(x => DomainId.Combine(appId, x));
+
             return Filter.And(
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.Id, ids),
+                Filter.In(x => x.Id, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
         }
 

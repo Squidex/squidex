@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Xunit;
 
@@ -18,46 +18,65 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class DefaultAssetFileStoreTests
     {
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly long assetFileVersion = 21;
-        private readonly string fileName;
+        private readonly string fileNameOld;
+        private readonly string fileNameNew;
         private readonly DefaultAssetFileStore sut;
 
         public DefaultAssetFileStoreTests()
         {
-            fileName = $"{assetId}_{assetFileVersion}";
+            fileNameOld = $"{assetId}_{assetFileVersion}";
+            fileNameNew = $"{appId}_{assetId}_{assetFileVersion}";
 
             sut = new DefaultAssetFileStore(assetStore);
         }
 
         [Fact]
-        public void Should_invoke_asset_store_to_generate_public_url()
+        public void Should_get_public_url_from_store()
         {
             var url = "http_//squidex.io/assets";
 
-            A.CallTo(() => assetStore.GeneratePublicUrl(fileName))
+            A.CallTo(() => assetStore.GeneratePublicUrl(fileNameNew))
                 .Returns(url);
 
-            var result = sut.GeneratePublicUrl(assetId, assetFileVersion);
+            var result = sut.GeneratePublicUrl(appId, assetId, assetFileVersion);
 
             Assert.Equal(url, result);
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_get_file_size()
+        public async Task Should_get_file_size_from_store()
         {
             var size = 1024L;
 
-            A.CallTo(() => assetStore.GetSizeAsync(fileName, default))
+            A.CallTo(() => assetStore.GetSizeAsync(fileNameNew, default))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(assetId, assetFileVersion);
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion);
 
             Assert.Equal(size, result);
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_temporary_upload_file()
+        public async Task Should_get_file_size_from_store_with_old_file_name_if_new_name_not_found()
+        {
+            var size = 1024L;
+
+            A.CallTo(() => assetStore.GetSizeAsync(fileNameOld, default))
+                .Throws(new AssetNotFoundException(fileNameOld));
+
+            A.CallTo(() => assetStore.GetSizeAsync(fileNameNew, default))
+                .Returns(size);
+
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion);
+
+            Assert.Equal(size, result);
+        }
+
+        [Fact]
+        public async Task Should_upload_temporary_filet_to_store()
         {
             var stream = new MemoryStream();
 
@@ -68,38 +87,55 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_upload_file()
+        public async Task Should_upload_file_to_store()
         {
             var stream = new MemoryStream();
 
-            await sut.UploadAsync(assetId, assetFileVersion, stream);
+            await sut.UploadAsync(appId, assetId, assetFileVersion, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(fileNameNew, stream, true, CancellationToken.None))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_download_file()
+        public async Task Should_download_file_from_store()
         {
             var stream = new MemoryStream();
 
-            await sut.DownloadAsync(assetId, assetFileVersion, stream);
+            await sut.DownloadAsync(appId, assetId, assetFileVersion, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_copy_from_temporary_file()
+        public async Task Should_download_file_from_store_with_old_file_name_if_new_name_not_found()
         {
-            await sut.CopyAsync("Temp", assetId, assetFileVersion);
+            var stream = new MemoryStream();
 
-            A.CallTo(() => assetStore.CopyAsync("Temp", fileName, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
+                .Throws(new AssetNotFoundException(fileNameNew));
+
+            await sut.DownloadAsync(appId, assetId, assetFileVersion, stream);
+
+            A.CallTo(() => assetStore.DownloadAsync(fileNameOld, stream, default, CancellationToken.None))
+                .MustHaveHappened();
+
+            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_delete_temporary_file()
+        public async Task Should_copy_file_to_store()
+        {
+            await sut.CopyAsync("Temp", appId, assetId, assetFileVersion);
+
+            A.CallTo(() => assetStore.CopyAsync("Temp", fileNameNew, CancellationToken.None))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_delete_temporary_file_from_store()
         {
             await sut.DeleteAsync("Temp");
 
@@ -108,11 +144,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_invoke_asset_store_to_delete_file()
+        public async Task Should_delete_file_from_store()
         {
-            await sut.DeleteAsync(assetId, assetFileVersion);
+            await sut.DeleteAsync(appId, assetId, assetFileVersion);
 
-            A.CallTo(() => assetStore.DeleteAsync(fileName))
+            A.CallTo(() => assetStore.DeleteAsync(fileNameNew))
+                .MustHaveHappened();
+
+            A.CallTo(() => assetStore.DeleteAsync(fileNameOld))
                 .MustHaveHappened();
         }
     }

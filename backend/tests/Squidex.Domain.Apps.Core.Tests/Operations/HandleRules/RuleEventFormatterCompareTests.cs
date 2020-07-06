@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IUser user = A.Fake<IUser>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly Guid contentId = Guid.NewGuid();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId contentId = Guid.NewGuid();
+        private readonly DomainId assetId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
         private class FakeContentResolver : IRuleEventFormatter
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 return default;
             }
 
-            private async ValueTask<string?> GetValueAsync()
+            private static async ValueTask<string?> GetValueAsync()
             {
                 await Task.Delay(5);
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            A.CallTo(() => urlGenerator.AssetContent(assetId))
+            A.CallTo(() => urlGenerator.AssetContent(appId, assetId))
                 .Returns("asset-content-url");
 
             A.CallTo(() => user.Id)
@@ -77,8 +77,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
-
-            JintScriptEngine scriptEngine = BuildScriptEngine();
 
             var formatters = new IRuleEventFormatter[]
             {
@@ -302,7 +300,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_asset_content_url_from_event(string script)
         {
-            var @event = new EnrichedAssetEvent { Id = assetId };
+            var @event = new EnrichedAssetEvent { Id = assetId, AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 

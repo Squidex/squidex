@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
     public class GuardRuleTests
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
         public sealed class TestAction : RuleAction

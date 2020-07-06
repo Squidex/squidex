@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -15,11 +14,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetEntity : IEnrichedAssetEntity
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         public Instant Created { get; set; }
 
@@ -57,9 +56,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetType Type { get; set; }
 
-        public Guid AssetId
+        public DomainId AssetId
         {
             get { return Id; }
+        }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IUsageNotifierGrain usageNotifierGrain = A.Fake<IUsageNotifierGrain>();
         private readonly DateTime today = new DateTime(2020, 04, 10);
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly UsageGate sut;
         private long apiCallsBlocking;
         private long apiCallsMax;

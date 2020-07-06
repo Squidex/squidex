@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         [Fact]
         public async Task Should_create_client()
         {
-            var command = new CreateApp { AppId = Guid.NewGuid() };
+            var command = new CreateApp { AppId = DomainId.NewGuid(), Name = "my-app" };
 
             var context =
                 new CommandContext(command, commandBus)

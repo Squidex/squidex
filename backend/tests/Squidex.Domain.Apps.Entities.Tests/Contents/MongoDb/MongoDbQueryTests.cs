@@ -69,12 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     .Update(new SchemaProperties());
 
             var schema = A.Dummy<ISchemaEntity>();
-            A.CallTo(() => schema.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => schema.Id).Returns(DomainId.NewGuid());
             A.CallTo(() => schema.Version).Returns(3);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
 
             var app = A.Dummy<IAppEntity>();
-            A.CallTo(() => app.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => app.Id).Returns(DomainId.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
         }
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ '_id' : '{id}' }}");
+            var o = _C($"{{ 'id' : '{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -99,10 +99,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_id_string()
         {
-            var id = Guid.NewGuid().ToString();
+            var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ '_id' : '{id}' }}");
+            var o = _C($"{{ 'id' : '{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.In("id", new List<Guid> { id }));
-            var o = _C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
 
             Assert.Equal(o, i);
         }
@@ -121,10 +121,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_id_string_list()
         {
-            var id = Guid.NewGuid().ToString();
+            var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.In("id", new List<string> { id }));
-            var o = _C($"{{ '_id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
 
             Assert.Equal(o, i);
         }

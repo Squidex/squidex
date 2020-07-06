@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -14,14 +13,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         public IUserMapping UserMapping { get; }
 
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
         public RefToken Initiator
         {
             get { return UserMapping.Initiator; }
         }
 
-        protected BackupContextBase(Guid appId, IUserMapping userMapping)
+        protected BackupContextBase(DomainId appId, IUserMapping userMapping)
         {
             Guard.NotNull(userMapping, nameof(userMapping));
 

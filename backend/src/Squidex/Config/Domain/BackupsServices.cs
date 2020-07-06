@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -43,9 +42,6 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<BackupSchemas>()
                 .As<IBackupHandler>();
-
-            services.AddSingletonAs<EventStoreInitializer>()
-                .AsSelf();
         }
     }
 }

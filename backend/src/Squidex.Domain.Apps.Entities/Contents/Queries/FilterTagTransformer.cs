@@ -20,16 +20,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly ITagService tagService;
         private readonly ISchemaEntity schema;
-        private readonly Guid appId;
+        private readonly DomainId appId;
 
-        private FilterTagTransformer(Guid appId, ISchemaEntity schema, ITagService tagService)
+        private FilterTagTransformer(DomainId appId, ISchemaEntity schema, ITagService tagService)
         {
             this.appId = appId;
             this.schema = schema;
             this.tagService = tagService;
         }
 
-        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, Guid appId, ISchemaEntity schema, ITagService tagService)
+        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, DomainId appId, ISchemaEntity schema, ITagService tagService)
         {
             Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));

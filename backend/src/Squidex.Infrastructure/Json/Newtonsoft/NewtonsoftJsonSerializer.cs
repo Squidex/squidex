@@ -16,32 +16,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         private readonly JsonSerializerSettings settings;
         private readonly JsonSerializer serializer;
 
-        private sealed class CustomReader : JsonTextReader
-        {
-            private readonly Func<string, string> stringConverter;
-
-            public override object? Value
-            {
-                get
-                {
-                    var value = base.Value;
-
-                    if (value is string s)
-                    {
-                        return stringConverter(s);
-                    }
-
-                    return value;
-                }
-            }
-
-            public CustomReader(TextReader reader, Func<string, string> stringConverter)
-                : base(reader)
-            {
-                this.stringConverter = stringConverter;
-            }
-        }
-
         public NewtonsoftJsonSerializer(JsonSerializerSettings settings)
         {
             Guard.NotNull(settings, nameof(settings));
@@ -66,35 +40,35 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public T Deserialize<T>(string value, Type? actualType = null, Func<string, string>? stringConverter = null)
+        public T Deserialize<T>(string value, Type? actualType = null)
         {
             using (var textReader = new StringReader(value))
             {
                 actualType ??= typeof(T);
 
-                using (var reader = GetReader(stringConverter, textReader))
+                using (var reader = GetReader(textReader))
                 {
                     return (T)serializer.Deserialize(reader, actualType)!;
                 }
             }
         }
 
-        public T Deserialize<T>(Stream stream, Type? actualType = null, Func<string, string>? stringConverter = null)
+        public T Deserialize<T>(Stream stream, Type? actualType = null)
         {
             using (var textReader = new StreamReader(stream))
             {
                 actualType ??= typeof(T);
 
-                using (var reader = GetReader(stringConverter, textReader))
+                using (var reader = GetReader(textReader))
                 {
                     return (T)serializer.Deserialize(reader, actualType)!;
                 }
             }
         }
 
-        private static JsonTextReader GetReader(Func<string, string>? stringConverter, TextReader textReader)
+        private static JsonTextReader GetReader(TextReader textReader)
         {
-            return stringConverter != null ? new CustomReader(textReader, stringConverter) : new JsonTextReader(textReader);
+            return new JsonTextReader(textReader);
         }
     }
 }

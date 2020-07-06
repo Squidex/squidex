@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Comments
 {
     public sealed class Comment
     {
-        public Guid Id { get; }
+        public DomainId Id { get; }
 
         public Instant Time { get; }
 
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Comments
 
         public Uri? Url { get; }
 
-        public Comment(Guid id, Instant time, RefToken user, string text, Uri? url = null)
+        public Comment(DomainId id, Instant time, RefToken user, string text, Uri? url = null)
         {
             Guard.NotEmpty(id, nameof(id));
             Guard.NotNull(user, nameof(user));

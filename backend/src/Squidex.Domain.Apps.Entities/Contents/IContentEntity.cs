@@ -6,7 +6,6 @@
 // ==========================================================================
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
@@ -18,9 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         IEntityWithLastModifiedBy,
         IEntityWithVersion
     {
-        NamedId<Guid> AppId { get; }
+        NamedId<DomainId> AppId { get; }
 
-        NamedId<Guid> SchemaId { get; }
+        NamedId<DomainId> SchemaId { get; }
 
         Status? NewStatus { get; }
 

@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
     public class AppPatternsTests
     {
         private readonly AppPatterns patterns_0;
-        private readonly Guid firstId = Guid.NewGuid();
-        private readonly Guid id = Guid.NewGuid();
+        private readonly DomainId firstId = DomainId.NewGuid();
+        private readonly DomainId id = DomainId.NewGuid();
 
         public AppPatternsTests()
         {

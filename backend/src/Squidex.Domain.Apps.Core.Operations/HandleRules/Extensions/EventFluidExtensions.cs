@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
             {
                 if (context.GetValue("event")?.ToObjectValue() is EnrichedContentEvent contentEvent)
                 {
-                    if (objectValue.ToObjectValue() is Guid guid && guid != Guid.Empty)
+                    if (objectValue.ToObjectValue() is DomainId id && id != DomainId.Empty)
                     {
-                        var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, guid);
+                        var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, id);
 
                         return new StringValue(result);
                     }
@@ -53,11 +53,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
         {
             if (input is ObjectValue objectValue)
             {
-                if (objectValue.ToObjectValue() is Guid guid && guid != Guid.Empty)
+                if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent @event)
                 {
-                    var result = urlGenerator.AssetContent(guid);
+                    if (objectValue.ToObjectValue() is DomainId id && id != DomainId.Empty)
+                    {
+                        var result = urlGenerator.AssetContent(@event.AppId, id);
 
-                    return new StringValue(result);
+                        return new StringValue(result);
+                    }
                 }
             }
 

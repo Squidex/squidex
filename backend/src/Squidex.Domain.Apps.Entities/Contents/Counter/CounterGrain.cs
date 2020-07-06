@@ -13,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public sealed class CounterGrain : GrainOfGuid, ICounterGrain
+    public sealed class CounterGrain : GrainOfString, ICounterGrain
     {
         private readonly IGrainState<State> state;
 

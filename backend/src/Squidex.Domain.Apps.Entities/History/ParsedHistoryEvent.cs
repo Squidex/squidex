@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly HistoryEvent item;
         private readonly Lazy<string?> message;
 
-        public Guid Id
+        public DomainId Id
         {
             get { return item.Id; }
         }

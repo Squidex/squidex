@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -23,11 +22,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.converter = converter;
         }
 
-        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, Guid id)
+        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, DomainId id)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var find = Collection.Find(x => x.Id == id);
+            var documentId = DomainId.Combine(schema.AppId, id).ToString();
+
+            var find = Collection.Find(x => x.DocumentId == documentId);
 
             var contentEntity = await find.FirstOrDefaultAsync();
 

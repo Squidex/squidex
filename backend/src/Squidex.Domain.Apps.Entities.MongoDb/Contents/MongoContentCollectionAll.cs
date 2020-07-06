@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<DomainId> ids)
         {
             Guard.NotNull(app, nameof(app));
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<DomainId> ids)
         {
             Guard.NotNull(app, nameof(app));
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, Guid id)
+        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -125,19 +125,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<MongoContentEntity> FindAsync(Guid id)
+        public Task<MongoContentEntity> FindAsync(DomainId documentId)
         {
-            return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync();
         }
 
-        public Task UpsertVersionedAsync(Guid id, long oldVersion, MongoContentEntity entity)
+        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity)
         {
-            return Collection.UpsertVersionedAsync(id, oldVersion, entity);
+            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
         }
 
-        public Task RemoveAsync(Guid id)
+        public Task RemoveAsync(DomainId documentId)
         {
-            return Collection.DeleteOneAsync(x => x.Id == id);
+            return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
         }
     }
 }

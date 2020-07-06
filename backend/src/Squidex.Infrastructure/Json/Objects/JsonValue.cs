@@ -70,6 +70,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(l);
                 case Guid g:
                     return Create(g);
+                case DomainId i:
+                    return Create(i);
                 case Instant i:
                     return Create(i);
             }
@@ -78,6 +80,11 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         public static IJsonValue Create(Guid value)
+        {
+            return Create(value.ToString());
+        }
+
+        public static IJsonValue Create(DomainId value)
         {
             return Create(value.ToString());
         }

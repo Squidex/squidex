@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static ValueConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
+        public static ValueConverter ResolveAssetUrls(NamedId<DomainId> appId, IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
         {
             if (fields?.Any() != true)
             {
@@ -132,10 +133,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         var id = array[i].ToString();
 
-                        if (Guid.TryParse(id, out var assetId))
-                        {
-                            array[i] = JsonValue.Create(urlGenerator.AssetContent(assetId));
-                        }
+                        array[i] = JsonValue.Create(urlGenerator.AssetContent(appId, id));
                     }
                 }
 

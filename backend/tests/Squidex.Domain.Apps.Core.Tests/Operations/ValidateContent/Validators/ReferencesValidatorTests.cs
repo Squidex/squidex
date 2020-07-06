@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
     public class ReferencesValidatorTests
     {
         private readonly List<string> errors = new List<string>();
-        private readonly Guid schemaId = Guid.NewGuid();
-        private readonly Guid ref1 = Guid.NewGuid();
-        private readonly Guid ref2 = Guid.NewGuid();
+        private readonly DomainId schemaId = DomainId.NewGuid();
+        private readonly DomainId ref1 = DomainId.NewGuid();
+        private readonly DomainId ref2 = DomainId.NewGuid();
 
         [Fact]
         public async Task Should_add_error_if_references_are_not_valid()
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_schemas_not_defined()
         {
-            var sut = new ReferencesValidator(null, FoundReferences((Guid.NewGuid(), ref2)));
+            var sut = new ReferencesValidator(null, FoundReferences((DomainId.NewGuid(), ref2)));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_reference_schema_is_not_valid()
         {
-            var sut = new ReferencesValidator(Enumerable.Repeat(schemaId, 1), FoundReferences((Guid.NewGuid(), ref2)));
+            var sut = new ReferencesValidator(Enumerable.Repeat(schemaId, 1), FoundReferences((DomainId.NewGuid(), ref2)));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -64,14 +64,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { $"Contains reference '{ref2}' to invalid schema." });
         }
 
-        private static List<Guid> CreateValue(params Guid[] ids)
+        private static List<DomainId> CreateValue(params DomainId[] ids)
         {
             return ids.ToList();
         }
 
-        private static CheckContentsByIds FoundReferences(params (Guid SchemaId, Guid Id)[] references)
+        private static CheckContentsByIds FoundReferences(params (DomainId SchemaId, DomainId Id)[] references)
         {
-            return new CheckContentsByIds(x => Task.FromResult<IReadOnlyList<(Guid SchemaId, Guid Id)>>(references.ToList()));
+            return x => Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id)>>(references.ToList());
         }
     }
 }

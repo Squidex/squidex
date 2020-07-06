@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,9 +21,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ScriptContentTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly NamedId<Guid> schemaWithScriptId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> schemaWithScriptId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
         private readonly ScriptContent sut;
 
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustHaveHappened();
         }
 
-        private ScriptOptions ScriptOptions()
+        private static ScriptOptions ScriptOptions()
         {
             return A<ScriptOptions>.That.Matches(x => x.AsContext);
         }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -97,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             CheckWorkflowExists(workflows, command.WorkflowId);
         }
 
-        private static void CheckWorkflowExists(Workflows workflows, Guid id)
+        private static void CheckWorkflowExists(Workflows workflows, DomainId id)
         {
             if (!workflows.ContainsKey(id))
             {

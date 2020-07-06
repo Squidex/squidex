@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         },
                         "#00ff00",
                         NoUpdate.When("Expression", "Role1", "Role2"))
-                }, new List<Guid> { Guid.NewGuid() }, "MyName");
+                }, new List<DomainId> { DomainId.NewGuid() }, "MyName");
 
             var serialized = workflow.SerializeAndDeserialize();
 

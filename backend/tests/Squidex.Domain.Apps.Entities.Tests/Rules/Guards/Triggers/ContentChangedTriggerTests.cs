@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
     public class ContentChangedTriggerTests
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
         [Fact]
         public async Task Should_add_error_if_schema_id_is_not_defined()
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
                     new ValidationError("Schema id is required.", "Schemas")
                 });
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
                 .MustNotHaveHappened();
         }
 
@@ -92,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_ids_are_valid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
                 .Returns(Mocks.Schema(appId, schemaId));
 
             var trigger = new ContentChangedTriggerV2

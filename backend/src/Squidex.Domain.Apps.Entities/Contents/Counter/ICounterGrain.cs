@@ -10,7 +10,7 @@ using Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public interface ICounterGrain : IGrainWithGuidKey
+    public interface ICounterGrain : IGrainWithStringKey
     {
         Task<long> IncrementAsync(string name);
 

@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Events.Comments
 {
     public abstract class CommentsEvent : AppEvent
     {
-        public string CommentsId { get; set; }
+        public DomainId CommentsId { get; set; }
 
-        public Guid CommentId { get; set; }
+        public DomainId CommentId { get; set; }
     }
 }

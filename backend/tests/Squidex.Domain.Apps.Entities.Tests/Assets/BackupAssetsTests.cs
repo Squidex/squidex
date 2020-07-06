@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
         private readonly BackupAssets sut;
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => tagService.GetExportableTagsAsync(appId, TagGroups.Assets))
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets))
                 .Returns(tags);
 
             await sut.BackupAsync(context);
@@ -72,14 +72,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, tags))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_backup_created_asset()
         {
-            var @event = new AssetCreated { AssetId = Guid.NewGuid() };
+            var @event = new AssetCreated { AssetId = DomainId.NewGuid() };
 
             await TestBackupEventAsync(@event, 0);
         }
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_backup_updated_asset()
         {
-            var @event = new AssetUpdated { AssetId = Guid.NewGuid(), FileVersion = 3 };
+            var @event = new AssetUpdated { AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
             await TestBackupEventAsync(@event, @event.FileVersion);
         }
@@ -102,16 +102,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
 
-            await sut.BackupEventAsync(Envelope.Create(@event), context);
+            await sut.BackupEventAsync(AppEvent(@event), context);
 
-            A.CallTo(() => assetFileStore.DownloadAsync(assetId, version, assetStream, default, default))
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, assetStream, default, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_restore_created_asset()
         {
-            var @event = new AssetCreated { AssetId = Guid.NewGuid() };
+            var @event = new AssetCreated { AssetId = DomainId.NewGuid() };
 
             await TestRestoreAsync(@event, 0);
         }
@@ -119,128 +119,131 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_restore_updated_asset()
         {
-            var @event = new AssetUpdated { AssetId = Guid.NewGuid(), FileVersion = 3 };
+            var @event = new AssetUpdated { AppId = appId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
             await TestRestoreAsync(@event, @event.FileVersion);
         }
 
         private async Task TestRestoreAsync(AssetEvent @event, long version)
         {
-            var oldId = Guid.NewGuid();
-
             var assetStream = new MemoryStream();
             var assetId = @event.AssetId;
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.OldGuid(assetId))
-                .Returns(oldId);
-
-            A.CallTo(() => context.Reader.ReadBlobAsync($"{oldId}_{version}.asset", A<Func<Stream, Task>>._))
+            A.CallTo(() => context.Reader.ReadBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
 
-            await sut.RestoreEventAsync(Envelope.Create(@event), context);
+            await sut.RestoreEventAsync(AppEvent(@event), context);
 
-            A.CallTo(() => assetFileStore.UploadAsync(assetId, version, assetStream, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, assetStream, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_restore_states_for_all_assets()
         {
-            var assetId1 = Guid.NewGuid();
-            var assetId2 = Guid.NewGuid();
+            var assetId1 = DomainId.NewGuid();
+            var assetId2 = DomainId.NewGuid();
 
             var context = CreateRestoreContext();
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetCreated
+            await sut.RestoreEventAsync(AppEvent(new AssetCreated
             {
                 AssetId = assetId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetCreated
+            await sut.RestoreEventAsync(AppEvent(new AssetCreated
             {
                 AssetId = assetId2
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetDeleted
+            await sut.RestoreEventAsync(AppEvent(new AssetDeleted
             {
                 AssetId = assetId2
             }), context);
 
-            var rebuildAssets = new HashSet<Guid>();
+            var rebuildAssets = new HashSet<DomainId>();
 
-            var add = new Func<Guid, Task>(id =>
-            {
-                rebuildAssets.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildAssets.AddRange(source));
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new HashSet<Guid>
+            Assert.Equal(new HashSet<DomainId>
             {
-                assetId1,
-                assetId2
+                DomainId.Combine(appId.Id, assetId1),
+                DomainId.Combine(appId.Id, assetId2)
             }, rebuildAssets);
         }
 
         [Fact]
         public async Task Should_restore_states_for_all_asset_folders()
         {
-            var assetFolderId1 = Guid.NewGuid();
-            var assetFolderId2 = Guid.NewGuid();
+            var assetFolderId1 = DomainId.NewGuid();
+            var assetFolderId2 = DomainId.NewGuid();
 
             var context = CreateRestoreContext();
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetFolderCreated
+            await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
             {
                 AssetFolderId = assetFolderId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetFolderCreated
+            await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
             {
                 AssetFolderId = assetFolderId2
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new AssetFolderDeleted
+            await sut.RestoreEventAsync(AppEvent(new AssetFolderDeleted
             {
                 AssetFolderId = assetFolderId2
             }), context);
 
-            var rebuildAssets = new HashSet<Guid>();
+            var rebuildAssetFolders = new HashSet<DomainId>();
 
-            var add = new Func<Guid, Task>(id =>
-            {
-                rebuildAssets.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildAssetFolders.AddRange(source));
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new HashSet<Guid>
+            Assert.Equal(new HashSet<DomainId>
             {
-                assetFolderId1,
-                assetFolderId2
-            }, rebuildAssets);
+                DomainId.Combine(appId.Id, assetFolderId1),
+                DomainId.Combine(appId.Id, assetFolderId2)
+            }, rebuildAssetFolders);
         }
 
         private BackupContext CreateBackupContext()
         {
-            return new BackupContext(appId, CreateUserMapping(), A.Fake<IBackupWriter>());
+            return new BackupContext(appId.Id, CreateUserMapping(), A.Fake<IBackupWriter>());
         }
 
         private RestoreContext CreateRestoreContext()
         {
-            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>());
+            return new RestoreContext(appId.Id, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
+        }
+
+        private Envelope<AssetEvent> AppEvent(AssetEvent @event)
+        {
+            @event.AppId = appId;
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetAggregateId(DomainId.Combine(appId.Id, @event.AssetId));
+
+            return envelope;
+        }
+
+        private Envelope<AssetFolderEvent> AppEvent(AssetFolderEvent @event)
+        {
+            @event.AppId = appId;
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetAggregateId(DomainId.Combine(appId.Id, @event.AssetFolderId));
+
+            return envelope;
         }
 
         private IUserMapping CreateUserMapping()

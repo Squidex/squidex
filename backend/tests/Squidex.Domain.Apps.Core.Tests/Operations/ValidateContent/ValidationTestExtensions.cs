@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
     public static class ValidationTestExtensions
     {
-        private static readonly NamedId<Guid> AppId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private static readonly NamedId<Guid> SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private static readonly NamedId<DomainId> AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private static readonly NamedId<DomainId> SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private static readonly IValidatorsFactory Factory = new DefaultValidatorsFactory();
 
         public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors,
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 AppId,
                 SchemaId,
                 schema ?? new Schema(SchemaId.Name),
-                Guid.NewGuid(),
+                DomainId.NewGuid(),
                 mode);
 
             if (updater != null)

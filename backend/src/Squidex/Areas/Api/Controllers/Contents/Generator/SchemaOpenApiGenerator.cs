@@ -215,7 +215,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             if (path.StartsWith("/{id}", StringComparison.OrdinalIgnoreCase))
             {
-                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {schemaName} content.", JsonFormatStrings.Guid);
+                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {schemaName} content.");
 
                 operation.AddResponse("404", $"App, schema or {schemaName} content not found.");
             }

@@ -78,15 +78,15 @@ namespace Squidex.Extensions.Validation
             {
                 case BooleanFieldProperties _ when value is JsonBoolean boolean:
                     return boolean.Value;
-                case BooleanFieldProperties _ when value is JsonNull _:
+                case BooleanFieldProperties _ when value is JsonNull:
                     return ClrValue.Null;
                 case NumberFieldProperties _ when value is JsonNumber number:
                     return number.Value;
-                case NumberFieldProperties _ when value is JsonNull _:
+                case NumberFieldProperties _ when value is JsonNull:
                     return ClrValue.Null;
                 case StringFieldProperties _ when value is JsonString @string:
                     return @string.Value;
-                case StringFieldProperties _ when value is JsonNull _:
+                case StringFieldProperties _ when value is JsonNull:
                     return ClrValue.Null;
                 case ReferencesFieldProperties _ when value is JsonArray array && array.FirstOrDefault() is JsonString @string:
                     return @string.Value;

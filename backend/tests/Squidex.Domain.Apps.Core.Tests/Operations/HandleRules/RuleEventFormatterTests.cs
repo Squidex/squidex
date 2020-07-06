@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -32,10 +31,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IUser user = A.Fake<IUser>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly Guid contentId = Guid.NewGuid();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly DomainId contentId = DomainId.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
         private class FakeContentResolver : IRuleEventFormatter
@@ -50,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 return default;
             }
 
-            private async ValueTask<string?> GetValueAsync()
+            private static async ValueTask<string?> GetValueAsync()
             {
                 await Task.Delay(5);
 
@@ -63,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            A.CallTo(() => urlGenerator.AssetContent(assetId))
+            A.CallTo(() => urlGenerator.AssetContent(appId, assetId))
                 .Returns("asset-content-url");
 
             A.CallTo(() => user.Id)
@@ -74,8 +73,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
-
-            JintScriptEngine scriptEngine = BuildScriptEngine();
 
             var formatters = new IRuleEventFormatter[]
             {

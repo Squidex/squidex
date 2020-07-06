@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppUISettings
     {
-        Task<JsonObject> GetAsync(Guid appId, string? userId);
+        Task<JsonObject> GetAsync(DomainId appId, string? userId);
 
-        Task SetAsync(Guid appId, string? userId, string path, IJsonValue value);
+        Task SetAsync(DomainId appId, string? userId, string path, IJsonValue value);
 
-        Task SetAsync(Guid appId, string? userId, JsonObject settings);
+        Task SetAsync(DomainId appId, string? userId, JsonObject settings);
 
-        Task RemoveAsync(Guid appId, string? userId, string path);
+        Task RemoveAsync(DomainId appId, string? userId, string path);
     }
 }

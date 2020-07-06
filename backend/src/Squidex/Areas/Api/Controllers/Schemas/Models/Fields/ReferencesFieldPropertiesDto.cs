@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The id of the referenced schemas.
         /// </summary>
-        public ReadOnlyCollection<Guid>? SchemaIds { get; set; }
+        public ReadOnlyCollection<DomainId>? SchemaIds { get; set; }
 
         public override FieldProperties ToProperties()
         {

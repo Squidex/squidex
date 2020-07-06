@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public abstract class LogSnapshotDomainObject<T> : DomainObjectBase<T> where T : class, IDomainState<T>, new()
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<DomainId> store;
         private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
         private IPersistence? persistence;
 
@@ -26,7 +25,7 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshots.Last(); }
         }
 
-        protected LogSnapshotDomainObject(IStore<Guid> store, ISemanticLog log)
+        protected LogSnapshotDomainObject(IStore<DomainId> store, ISemanticLog log)
             : base(log)
         {
             Guard.NotNull(log, nameof(log));
@@ -36,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected override void OnSetup()
         {
-            persistence = store.WithEventSourcing(GetType(), Id, x => ApplyEvent(x, true));
+            persistence = store.WithEventSourcing(GetType(), UniqueId.ToString(), x => ApplyEvent(x, true));
         }
 
         public T GetSnapshot(long version)
@@ -83,7 +82,7 @@ namespace Squidex.Infrastructure.Commands
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
                 await persistence.WriteEventsAsync(newEvents);
-                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, Snapshot.Version);
+                await persistedSnapshots.WriteAsync(UniqueId.ToString(), Snapshot, previousVersion, Snapshot.Version);
             }
         }
 
@@ -99,11 +98,16 @@ namespace Squidex.Infrastructure.Commands
         {
             await EnsureLoadedAsync(true);
 
+            if (Snapshot.Version <= EtagVersion.Empty)
+            {
+                throw new DomainObjectNotFoundException(UniqueId.ToString(), GetType());
+            }
+
             if (persistence != null)
             {
                 var persistedSnapshots = store.GetSnapshotStore<T>();
 
-                await persistedSnapshots.WriteAsync(Id, Snapshot, EtagVersion.Any, Snapshot.Version);
+                await persistedSnapshots.WriteAsync(UniqueId.ToString(), Snapshot, EtagVersion.Any, Snapshot.Version);
             }
         }
 

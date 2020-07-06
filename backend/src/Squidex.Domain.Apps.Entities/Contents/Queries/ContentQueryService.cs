@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
+        public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, DomainId id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (version > EtagVersion.Empty)
                 {
-                    content = await FindByVersionAsync(id, version);
+                    content = await FindByVersionAsync(context, id, version);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<DomainId> ids)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -156,9 +156,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             ISchemaEntity? schema = null;
 
-            if (Guid.TryParse(schemaIdOrName, out var id))
+            if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, id);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, guid);
             }
 
             if (schema == null)
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private static IEnumerable<IContentEntity> FilterContents(IGrouping<Guid, (IContentEntity Content, ISchemaEntity Schema)> group, Context context)
+        private static IEnumerable<IContentEntity> FilterContents(IGrouping<DomainId, (IContentEntity Content, ISchemaEntity Schema)> group, Context context)
         {
             var schema = group.First().Schema;
 
@@ -220,9 +220,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contents.SortSet(x => x.Id, query.Ids);
         }
 
-        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<Guid> ids)
+        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<DomainId> ids)
         {
-            return contentRepository.QueryAsync(context.App, new HashSet<Guid>(ids), context.Scope());
+            return contentRepository.QueryAsync(context.App, new HashSet<DomainId>(ids), context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
@@ -230,19 +230,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.QueryAsync(context.App, schema, query, context.Scope());
         }
 
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<DomainId> ids)
         {
             return contentRepository.QueryAsync(context.App, schema, ids, context.Scope());
         }
 
-        private Task<IContentEntity?> FindCoreAsync(Context context, Guid id, ISchemaEntity schema)
+        private Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema)
         {
             return contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
         }
 
-        private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
+        private Task<IContentEntity> FindByVersionAsync(Context context, DomainId id, long version)
         {
-            return contentVersionLoader.GetAsync(id, version);
+            return contentVersionLoader.GetAsync(context.App.Id, id, version);
         }
     }
 }

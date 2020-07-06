@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         [CollectionName("UsageNotifications")]
         public sealed class State
         {
-            public Dictionary<Guid, DateTime> NotificationsSent { get; } = new Dictionary<Guid, DateTime>();
+            public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
         }
 
         public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver)
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             }
         }
 
-        private bool HasBeenSentBefore(Guid appId, DateTime now)
+        private bool HasBeenSentBefore(DomainId appId, DateTime now)
         {
             if (state.Value.NotificationsSent.TryGetValue(appId, out var lastSent))
             {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return false;
         }
 
-        private Task TrackNotifiedAsync(Guid appId, DateTime now)
+        private Task TrackNotifiedAsync(DomainId appId, DateTime now)
         {
             state.Value.NotificationsSent[appId] = now;
 

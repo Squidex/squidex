@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
@@ -20,13 +20,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         [BsonRequired]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -58,5 +56,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         [BsonRequired]
         [BsonElement]
         public Instant? NextAttempt { get; set; }
+
+        DomainId IEntity.Id
+        {
+            get { return DocumentId; }
+        }
+
+        DomainId IEntity.UniqueId
+        {
+            get { return DocumentId; }
+        }
     }
 }

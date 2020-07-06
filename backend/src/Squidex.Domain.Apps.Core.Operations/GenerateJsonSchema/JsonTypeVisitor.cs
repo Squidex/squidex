@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field)
         {
-            var itemSchema = schemaResolver("AssetItem", SchemaBuilder.Guid());
+            var itemSchema = schemaResolver("AssetItem", SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field)
         {
-            var itemSchema = schemaResolver("ReferenceItem", SchemaBuilder.Guid());
+            var itemSchema = schemaResolver("ReferenceItem", SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }

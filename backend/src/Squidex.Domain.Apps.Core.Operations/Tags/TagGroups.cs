@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Tags
     {
         public const string Assets = "Assets";
 
-        public static string Schemas(Guid schemaId)
+        public static string Schemas(DomainId schemaId)
         {
             return $"Schemas_{schemaId}";
         }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 
@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
     {
-        private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
-        private static readonly List<IContentEntity> EmptyContents = new List<IContentEntity>();
+        private static readonly IReadOnlyList<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
+        private static readonly IReadOnlyList<IContentEntity> EmptyContents = new List<IContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
         private readonly IDependencyResolver resolver;
 
@@ -56,14 +56,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             execution.UserContext = this;
         }
 
-        public override async Task<IEnrichedAssetEntity?> FindAssetAsync(Guid id)
+        public override async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
         {
             var dataLoader = GetAssetsLoader();
 
             return await dataLoader.LoadAsync(id);
         }
 
-        public async Task<IContentEntity?> FindContentAsync(Guid id)
+        public async Task<IContentEntity?> FindContentAsync(DomainId id)
         {
             var dataLoader = GetContentsLoader();
 
@@ -98,39 +98,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await dataLoader.LoadManyAsync(ids);
         }
 
-        private IDataLoader<Guid, IEnrichedAssetEntity> GetAssetsLoader()
+        private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IEnrichedAssetEntity>("Assets",
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>("Assets",
                 async batch =>
                 {
-                    var result = await GetReferencedAssetsAsync(new List<Guid>(batch));
+                    var result = await GetReferencedAssetsAsync(new List<DomainId>(batch));
 
                     return result.ToDictionary(x => x.Id);
                 });
         }
 
-        private IDataLoader<Guid, IContentEntity> GetContentsLoader()
+        private IDataLoader<DomainId, IContentEntity> GetContentsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>("References",
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<DomainId, IContentEntity>("References",
                 async batch =>
                 {
-                    var result = await GetReferencedContentsAsync(new List<Guid>(batch));
+                    var result = await GetReferencedContentsAsync(new List<DomainId>(batch));
 
                     return result.ToDictionary(x => x.Id);
                 });
         }
 
-        private static ICollection<Guid>? ParseIds(IJsonValue value)
+        private static ICollection<DomainId>? ParseIds(IJsonValue value)
         {
             try
             {
-                var result = new List<Guid>();
+                var result = new List<DomainId>();
 
                 if (value is JsonArray array)
                 {
                     foreach (var id in array)
                     {
-                        result.Add(Guid.Parse(id.ToString()));
+                        result.Add(id.ToString());
                     }
                 }
 

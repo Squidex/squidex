@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Apps;
@@ -133,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return ForEvent(e, "settings.roles").Param("Name", name);
         }
 
-        private HistoryEvent CreatePatternsEvent(IEvent e, Guid id, string? name = null)
+        private HistoryEvent CreatePatternsEvent(IEvent e, DomainId id, string? name = null)
         {
             return ForEvent(e, "settings.patterns").Param("PatternId", id).Param("Name", name);
         }

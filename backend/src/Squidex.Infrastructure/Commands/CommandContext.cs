@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private Tuple<object?>? result;
 
-        public Guid ContextId { get; } = Guid.NewGuid();
+        public DomainId ContextId { get; } = DomainId.NewGuid();
 
         public ICommand Command { get; }
 

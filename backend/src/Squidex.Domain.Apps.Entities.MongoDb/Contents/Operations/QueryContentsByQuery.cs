@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -34,8 +33,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             [BsonId]
             [BsonElement("_id")]
-            [BsonRepresentation(BsonType.String)]
-            public Guid Id { get; set; }
+            public DomainId Id { get; set; }
 
             public MongoContentEntity[] Joined { get; set; }
         }
@@ -51,6 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.ReferencedIds)
@@ -69,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 query = query.AdjustToModel(schema.SchemaDef);
 
-                List<Guid>? fullTextIds = null;
+                List<DomainId>? fullTextIds = null;
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
@@ -83,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.Id, fullTextIds, query);
+                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
@@ -125,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                         .QuerySort(query)
                         .QuerySkip(query)
                         .QueryLimit(query)
-                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.Id, x => x.Joined)
+                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.DocumentId, x => x.Joined)
                         .ToListAsync();
 
                 return joined.Select(x => x.Joined[0]).ToList();
@@ -146,20 +145,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, ClrQuery? query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
             if (ids != null && ids.Count > 0)
             {
+                var documentIds = ids.Select(x => DomainId.Combine(appId, x)).ToList();
+
                 filters.Add(
                     Filter.Or(
-                        Filter.AnyIn(x => x.ReferencedIds, ids),
-                        Filter.In(x => x.Id, ids)));
+                        Filter.AnyIn(x => x.ReferencedIds, documentIds),
+                        Filter.In(x => x.DocumentId, documentIds)));
             }
 
             if (query?.Filter != null)

@@ -46,36 +46,41 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            var channel = $"contents.{@event.Headers.AggregateId()}";
+            HistoryEvent? result = null;
 
-            if (@event.Payload is SchemaEvent schemaEvent)
+            if (@event.Payload is ContentEvent contentEvent)
             {
-                if (schemaEvent.SchemaId == null)
+                var channel = $"contents.{contentEvent.ContentId}";
+
+                if (@event.Payload is SchemaEvent schemaEvent)
                 {
-                    return Task.FromResult<HistoryEvent?>(null);
+                    if (schemaEvent.SchemaId == null)
+                    {
+                        return Task.FromResult<HistoryEvent?>(null);
+                    }
+
+                    channel = $"schemas.{schemaEvent.SchemaId.Id}.{channel}";
                 }
 
-                channel = $"schemas.{schemaEvent.SchemaId.Id}.{channel}";
+                result = ForEvent(@event.Payload, channel);
+
+                if (@event.Payload is SchemaEvent schemaEvent2)
+                {
+                    result = result.Param("Schema", schemaEvent2.SchemaId.Name);
+                }
+
+                if (@event.Payload is ContentStatusChanged contentStatusChanged)
+                {
+                    result = result.Param("Status", contentStatusChanged.Status);
+                }
+
+                if (@event.Payload is ContentStatusScheduled contentStatusScheduled)
+                {
+                    result = result.Param("Status", contentStatusScheduled.Status);
+                }
             }
 
-            var result = ForEvent(@event.Payload, channel);
-
-            if (@event.Payload is SchemaEvent schemaEvent2)
-            {
-                result = result.Param("Schema", schemaEvent2.SchemaId.Name);
-            }
-
-            if (@event.Payload is ContentStatusChanged contentStatusChanged)
-            {
-                result = result.Param("Status", contentStatusChanged.Status);
-            }
-
-            if (@event.Payload is ContentStatusScheduled contentStatusScheduled)
-            {
-                result = result.Param("Status", contentStatusScheduled.Status);
-            }
-
-            return Task.FromResult<HistoryEvent?>(result);
+            return Task.FromResult(result);
         }
     }
 }

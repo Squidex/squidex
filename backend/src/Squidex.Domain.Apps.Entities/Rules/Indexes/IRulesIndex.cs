@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
     public interface IRulesIndex
     {
-        Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
+        Task<List<IRuleEntity>> GetRulesAsync(DomainId appId);
 
-        Task RebuildAsync(Guid appId, HashSet<Guid> rules);
+        Task RebuildAsync(DomainId appId, HashSet<DomainId> rules);
     }
 }

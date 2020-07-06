@@ -70,11 +70,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                                 .AddValue("Doe"))
                         .AddField("profession",
                             new ContentFieldData()
-                                .AddValue("Software Developer"))
+                                .AddValue("Software Developer")),
+                SchemaId = postsId
             });
         }
 
-        private static async Task<NamedId<Guid>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command =
                 SchemaBuilder.Create("Basics")
@@ -117,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(command.SchemaId, command.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Projects")
@@ -147,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Experience")
@@ -174,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Education")
@@ -201,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreatePublicationsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePublicationsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command =
                 SchemaBuilder.Create("Publications")
@@ -223,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(command.SchemaId, command.Name);
         }
 
-        private static async Task<NamedId<Guid>> CreateSkillsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateSkillsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command =
                 SchemaBuilder.Create("Skills")

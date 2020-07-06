@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -18,15 +17,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 {
     public sealed class ContentState : DomainObjectState<ContentState>, IContentEntity
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
-        public NamedId<Guid> SchemaId { get; set; }
+        public NamedId<DomainId> SchemaId { get; set; }
 
         public ContentVersion? NewVersion { get; set; }
 
         public ContentVersion CurrentVersion { get; set; }
 
         public ScheduleJob? ScheduleJob { get; set; }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
 
         public NamedContentData Data
         {
@@ -54,6 +58,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             {
                 case ContentCreated e:
                     {
+                        Id = e.ContentId;
+
                         SimpleMapper.Map(e, this);
 
                         CurrentVersion = new ContentVersion(e.Status, e.Data);

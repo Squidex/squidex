@@ -19,14 +19,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 {
     public sealed class RuleTriggerValidator : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
     {
-        public Func<Guid, Task<ISchemaEntity?>> SchemaProvider { get; }
+        public Func<DomainId, Task<ISchemaEntity?>> SchemaProvider { get; }
 
-        public RuleTriggerValidator(Func<Guid, Task<ISchemaEntity?>> schemaProvider)
+        public RuleTriggerValidator(Func<DomainId, Task<ISchemaEntity?>> schemaProvider)
         {
             SchemaProvider = schemaProvider;
         }
 
-        public static Task<IEnumerable<ValidationError>> ValidateAsync(Guid appId, RuleTrigger action, IAppProvider appProvider)
+        public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger action, IAppProvider appProvider)
         {
             Guard.NotNull(action, nameof(action));
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 foreach (var schema in trigger.Schemas)
                 {
-                    if (schema.SchemaId == Guid.Empty)
+                    if (schema.SchemaId == DomainId.Empty)
                     {
                         errors.Add(new ValidationError(Not.Defined("Schema id"), nameof(trigger.Schemas)));
                     }

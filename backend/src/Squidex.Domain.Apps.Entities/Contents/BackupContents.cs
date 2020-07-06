@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BackupContents : IBackupHandler
     {
-        private readonly Dictionary<Guid, HashSet<Guid>> contentIdsBySchemaId = new Dictionary<Guid, HashSet<Guid>>();
+        private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
         private readonly Rebuilder rebuilder;
 
         public string Name { get; } = "Contents";
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             switch (@event.Payload)
             {
                 case ContentCreated contentCreated:
-                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(contentCreated.ContentId);
+                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(@event.Headers.AggregateId());
                     break;
                 case SchemaDeleted schemaDeleted:
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
@@ -50,15 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task RestoreAsync(RestoreContext context)
         {
-            if (contentIdsBySchemaId.Count > 0)
+            var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
+
+            if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(async target =>
-                {
-                    foreach (var contentId in contentIdsBySchemaId.Values.SelectMany(x => x))
-                    {
-                        await target(contentId);
-                    }
-                });
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(ids);
             }
         }
     }

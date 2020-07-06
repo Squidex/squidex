@@ -7,11 +7,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -19,88 +16,42 @@ namespace Squidex.Web.CommandMiddlewares
 {
     public sealed class EnrichWithSchemaIdCommandMiddleware : ICommandMiddleware
     {
-        private readonly IAppProvider appProvider;
-        private readonly IActionContextAccessor actionContextAccessor;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithSchemaIdCommandMiddleware(IAppProvider appProvider, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(actionContextAccessor, nameof(actionContextAccessor));
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
-            this.appProvider = appProvider;
-
-            this.actionContextAccessor = actionContextAccessor;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            if (actionContextAccessor.ActionContext == null)
+            if (httpContextAccessor.HttpContext == null)
             {
-                await next(context);
-
-                return;
+                return next(context);
             }
 
             if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
-                var schemaId = await GetSchemaIdAsync(context);
+                var schemaId = GetSchemaId();
 
-                schemaCommand.SchemaId = schemaId!;
+                schemaCommand.SchemaId = schemaId;
             }
 
-            if (context.Command is SchemaCommand schemaSelfCommand && schemaSelfCommand.SchemaId == Guid.Empty)
-            {
-                var schemaId = await GetSchemaIdAsync(context);
-
-                schemaSelfCommand.SchemaId = schemaId?.Id ?? Guid.Empty;
-            }
-
-            await next(context);
+            return next(context);
         }
 
-        private async Task<NamedId<Guid>?> GetSchemaIdAsync(CommandContext context)
+        private NamedId<DomainId> GetSchemaId()
         {
-            NamedId<Guid>? appId = null;
+            var schemaFeature = httpContextAccessor.HttpContext.Features.Get<ISchemaFeature>();
 
-            if (context.Command is IAppCommand appCommand)
+            if (schemaFeature == null)
             {
-                appId = appCommand.AppId;
+                throw new InvalidOperationException("Cannot resolve schema.");
             }
 
-            if (appId == null)
-            {
-                appId = actionContextAccessor.ActionContext.HttpContext.Context().App?.NamedId();
-            }
-
-            if (appId != null)
-            {
-                var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
-
-                if (routeValues.ContainsKey("name"))
-                {
-                    var schemaName = routeValues["name"].ToString()!;
-
-                    ISchemaEntity? schema;
-
-                    if (Guid.TryParse(schemaName, out var id))
-                    {
-                        schema = await appProvider.GetSchemaAsync(appId.Id, id);
-                    }
-                    else
-                    {
-                        schema = await appProvider.GetSchemaAsync(appId.Id, schemaName);
-                    }
-
-                    if (schema == null)
-                    {
-                        throw new DomainObjectNotFoundException(schemaName, typeof(ISchemaEntity));
-                    }
-
-                    return schema.NamedId();
-                }
-            }
-
-            return null;
+            return schemaFeature.SchemaId;
         }
     }
 }

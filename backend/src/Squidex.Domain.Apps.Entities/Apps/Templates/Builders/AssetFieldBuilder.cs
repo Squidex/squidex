@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class AssetFieldBuilder : FieldBuilder
     {
-        public AssetFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+        public AssetFieldBuilder(UpsertSchemaField field, CreateSchema schema)
             : base(field, schema)
         {
         }

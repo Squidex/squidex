@@ -23,12 +23,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The id of the asset.
         /// </summary>
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         /// <summary>
         /// The id of the parent folder. Empty for files without parent.
         /// </summary>
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
         /// <summary>
         /// The file name.
@@ -200,8 +200,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             {
                 response.AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
-
-            var version = response.FileVersion;
 
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {

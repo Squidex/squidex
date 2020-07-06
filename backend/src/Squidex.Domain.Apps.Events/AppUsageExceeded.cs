@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events
@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Events
 
         public long CallsLimit { get; set; }
 
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
     }
 }

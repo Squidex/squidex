@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<DomainId> ids, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids, SearchScope scope)
+        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<DomainId> ids, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, SearchScope scope)
+        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids, SearchScope scope)
+        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionAll.QueryScheduledWithoutDataAsync(now, callback);
         }
 
-        public Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode<ClrValue> filterNode)
+        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
         }

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Apps
     [EventType(nameof(AppPatternDeleted))]
     public sealed class AppPatternDeleted : AppEvent
     {
-        public Guid PatternId { get; set; }
+        public DomainId PatternId { get; set; }
     }
 }

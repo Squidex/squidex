@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly ILocalCache localCache = A.Fake<ILocalCache>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly RuleEnqueuer sut;
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public void Should_return_type_name_for_name()
         {
-            Assert.Equal(typeof(RuleEnqueuer).Name, sut.Name);
+            Assert.Equal(nameof(RuleEnqueuer), sut.Name);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var rule = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
 
-            return new RuleEntity { RuleDef = rule, Id = Guid.NewGuid() };
+            return new RuleEntity { RuleDef = rule, Id = DomainId.NewGuid() };
         }
     }
 }

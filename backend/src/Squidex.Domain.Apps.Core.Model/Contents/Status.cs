@@ -11,8 +11,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    [TypeConverter(typeof(StatusConverter))]
-    public struct Status : IEquatable<Status>, IComparable<Status>
+    [TypeConverter(typeof(StatusTypeConverter))]
+    public readonly struct Status : IEquatable<Status>, IComparable<Status>
     {
         public static readonly Status Archived = new Status("Archived");
         public static readonly Status Draft = new Status("Draft");
@@ -37,12 +37,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool Equals(Status other)
         {
-            return string.Equals(name, other.name);
+            return string.Equals(Name, other.Name);
         }
 
         public override int GetHashCode()
         {
-            return name?.GetHashCode() ?? 0;
+            return Name.GetHashCode();
         }
 
         public override string ToString()

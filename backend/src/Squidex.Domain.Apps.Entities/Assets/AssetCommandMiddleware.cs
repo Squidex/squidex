@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (asset != null)
             {
-                await assetFileStore.CopyAsync(tempFile, command.AssetId, asset.FileVersion);
+                await assetFileStore.CopyAsync(tempFile, command.AppId.Id, command.AssetId, asset.FileVersion);
             }
         }
 

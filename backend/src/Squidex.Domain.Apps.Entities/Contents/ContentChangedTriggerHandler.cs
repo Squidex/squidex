@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -39,7 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var content =
                 await contentLoader.GetAsync(
-                    @event.Headers.AggregateId(),
+                    @event.Payload.AppId.Id,
+                    @event.Payload.ContentId,
                     @event.Headers.EventStreamNumber());
 
             SimpleMapper.Map(content, result);
@@ -77,6 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var previousContent =
                             await contentLoader.GetAsync(
+                                content.AppId.Id,
                                 content.Id,
                                 content.Version - 1);
 
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger, Guid ruleId)
+        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger, DomainId ruleId)
         {
             if (trigger.HandleAll)
             {
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<Guid> eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<DomainId> eventId)
         {
             return eventId.Id == schema.SchemaId;
         }

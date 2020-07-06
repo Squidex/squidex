@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentDomainObjectTests : HandlerTestBase<ContentState>
     {
-        private readonly Guid contentId = Guid.NewGuid();
+        private readonly DomainId contentId = DomainId.NewGuid();
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
@@ -67,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly NamedContentData patched;
         private readonly ContentDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return contentId; }
+            get { return DomainId.Combine(AppId, contentId); }
         }
 
         public ContentDomainObjectTests()
@@ -587,7 +586,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
         }
 
-        private ScriptOptions ScriptOptions()
+        private static ScriptOptions ScriptOptions()
         {
             return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
         }

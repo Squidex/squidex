@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             Validate.It(() => "Cannot add pattern.", e =>
             {
-                if (command.PatternId == Guid.Empty)
+                if (command.PatternId == DomainId.Empty)
                 {
                    e(Not.Defined("Id"), nameof(command.PatternId));
                 }

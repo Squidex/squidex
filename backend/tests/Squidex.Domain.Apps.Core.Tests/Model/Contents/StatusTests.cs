@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
@@ -107,6 +108,19 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var serialized = status.SerializeAndDeserialize();
 
             Assert.Equal(status, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_as_dictionary_key()
+        {
+            var dictionary = new Dictionary<Status, int>
+            {
+                [Status.Draft] = 123
+            };
+
+            var serialized = dictionary.SerializeAndDeserialize();
+
+            Assert.Equal(123, serialized[Status.Draft]);
         }
     }
 }

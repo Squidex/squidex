@@ -5,17 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetFolderEntity : IEntity, IEntityWithVersion
     {
-        NamedId<Guid> AppId { get; set; }
+        NamedId<DomainId> AppId { get; set; }
 
         string FolderName { get; set; }
 
-        Guid ParentId { get; set; }
+        DomainId ParentId { get; set; }
     }
 }

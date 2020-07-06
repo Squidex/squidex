@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     public sealed class CachingTextIndexerState : ITextIndexerState
     {
         private readonly ITextIndexerState inner;
-        private LRUCache<Guid, Tuple<TextContentState?>> cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
+        private LRUCache<(DomainId, DomainId), Tuple<TextContentState?>> cache = new LRUCache<(DomainId, DomainId), Tuple<TextContentState?>>(1000);
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
@@ -28,37 +28,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             await inner.ClearAsync();
 
-            cache = new LRUCache<Guid, Tuple<TextContentState?>>(1000);
+            cache = new LRUCache<(DomainId, DomainId), Tuple<TextContentState?>>(1000);
         }
 
-        public async Task<TextContentState?> GetAsync(Guid contentId)
+        public async Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
         {
-            if (cache.TryGetValue(contentId, out var value))
+            if (cache.TryGetValue((appId, contentId), out var value))
             {
                 return value.Item1;
             }
 
-            var result = await inner.GetAsync(contentId);
+            var result = await inner.GetAsync(appId, contentId);
 
-            cache.Set(contentId, Tuple.Create(result));
+            cache.Set((appId, contentId), Tuple.Create(result));
 
             return result;
         }
 
-        public Task SetAsync(TextContentState state)
+        public Task SetAsync(DomainId appId, TextContentState state)
         {
             Guard.NotNull(state, nameof(state));
 
-            cache.Set(state.ContentId, Tuple.Create<TextContentState?>(state));
+            cache.Set((appId, state.ContentId), Tuple.Create<TextContentState?>(state));
 
-            return inner.SetAsync(state);
+            return inner.SetAsync(appId, state);
         }
 
-        public Task RemoveAsync(Guid contentId)
+        public Task RemoveAsync(DomainId appId, DomainId contentId)
         {
-            cache.Set(contentId, Tuple.Create<TextContentState?>(null));
+            cache.Set((appId, contentId), Tuple.Create<TextContentState?>(null));
 
-            return inner.RemoveAsync(contentId);
+            return inner.RemoveAsync(appId, contentId);
         }
     }
 }

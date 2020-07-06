@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers
 {
@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers
         /// <summary>
         /// The optional list of ids to query.
         /// </summary>
-        public List<Guid>? Ids { get; set; }
+        public List<DomainId>? Ids { get; set; }
 
         /// <summary>
         /// The optional odata query.
@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers
         /// <summary>
         /// The parent id (for assets).
         /// </summary>
-        public Guid? ParentId { get; set; }
+        public DomainId? ParentId { get; set; }
 
         public Q ToQuery()
         {

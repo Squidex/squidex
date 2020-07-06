@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -31,13 +31,13 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var workflows_1 = workflows_0.Set(Workflow.Default);
 
             Assert.Single(workflows_1);
-            Assert.Same(Workflow.Default, workflows_1[Guid.Empty]);
+            Assert.Same(Workflow.Default, workflows_1[DomainId.Empty]);
         }
 
         [Fact]
         public void Should_add_new_workflow_with_default_states()
         {
-            var id = Guid.NewGuid();
+            var id = DomainId.NewGuid();
 
             var workflows_1 = workflows_0.Add(id, "1");
 
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_update_workflow()
         {
-            var id = Guid.NewGuid();
+            var id = DomainId.NewGuid();
 
             var workflows_1 = workflows_0.Add(id, "1");
             var workflows_2 = workflows_1.Update(id, Workflow.Empty);
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_update_workflow_with_default_guid()
         {
-            var workflows_1 = workflows_0.Update(Guid.Empty, Workflow.Empty);
+            var workflows_1 = workflows_0.Update(default, Workflow.Empty);
 
             Assert.NotEmpty(workflows_1);
         }
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_do_nothing_if_workflow_to_update_not_found()
         {
-            var workflows_1 = workflows_0.Update(Guid.NewGuid(), Workflow.Empty);
+            var workflows_1 = workflows_0.Update(DomainId.NewGuid(), Workflow.Empty);
 
             Assert.Same(workflows_0, workflows_1);
         }
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_remove_workflow()
         {
-            var id = Guid.NewGuid();
+            var id = DomainId.NewGuid();
 
             var workflows_1 = workflows_0.Add(id, "1");
             var workflows_2 = workflows_1.Remove(id);
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_do_nothing_if_workflow_to_remove_not_found()
         {
-            var workflows_1 = workflows_0.Remove(Guid.NewGuid());
+            var workflows_1 = workflows_0.Remove(DomainId.NewGuid());
 
             Assert.Empty(workflows_1);
         }

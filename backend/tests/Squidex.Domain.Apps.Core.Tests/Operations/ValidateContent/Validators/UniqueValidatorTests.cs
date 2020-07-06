@@ -10,13 +10,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
     public class UniqueValidatorTests
     {
-        private readonly Guid schemaId = Guid.NewGuid();
+        private readonly DomainId schemaId = DomainId.NewGuid();
         private readonly List<string> errors = new List<string>();
 
         [Fact]
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var filter = string.Empty;
 
-            var sut = new UniqueValidator(Check(Guid.NewGuid(), f => filter = f));
+            var sut = new UniqueValidator(Check(DomainId.NewGuid(), f => filter = f));
 
             await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
 
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var filter = string.Empty;
 
-            var sut = new UniqueValidator(Check(Guid.NewGuid(), f => filter = f));
+            var sut = new UniqueValidator(Check(DomainId.NewGuid(), f => filter = f));
 
             await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
 
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_not_add_error_if_string_value_not_found_but_in_optimized_mode()
         {
-            var sut = new UniqueValidator(Check(Guid.NewGuid()));
+            var sut = new UniqueValidator(Check(DomainId.NewGuid()));
 
             await sut.ValidateAsync(null, errors);
 
@@ -83,14 +84,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             Assert.Empty(errors);
         }
 
-        private CheckUniqueness Check(Guid id, Action<string>? filter = null)
+        private CheckUniqueness Check(DomainId id, Action<string>? filter = null)
         {
-            return new CheckUniqueness(filterNode =>
+            return filterNode =>
             {
                 filter?.Invoke(filterNode.ToString());
 
-                return Task.FromResult<IReadOnlyList<(Guid, Guid)>>(new List<(Guid, Guid)> { (schemaId, id) });
-            });
+                return Task.FromResult<IReadOnlyList<(DomainId, DomainId)>>(new List<(DomainId, DomainId)> { (schemaId, id) });
+            };
         }
     }
 }

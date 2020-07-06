@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
@@ -35,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly Stream stream = new MemoryStream();
         private readonly AssetDomainObjectGrain asset;
         private readonly AssetFile file;
@@ -46,9 +47,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
         }
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return assetId; }
+            get { return DomainId.Combine(AppId, assetId); }
         }
 
         public AssetCommandMiddlewareTests()
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(assetDomainObject);
 
             asset = new AssetDomainObjectGrain(serviceProvider, null!);
-            asset.ActivateAsync(Id).Wait();
+            asset.ActivateAsync(Id.ToString()).Wait();
 
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
@@ -72,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), AppId, A<string>._))
                 .Returns(new List<IEnrichedAssetEntity>());
 
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id.ToString(), null))
                 .Returns(asset);
 
             sut = new AssetCommandMiddleware(grainFactory,
@@ -280,14 +281,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
+            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = assetId, File = file }));
         }
 
         private void AssertAssetHasBeenUploaded(long version)
         {
             A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, Id, version, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, version, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
                 .MustHaveHappened();
@@ -301,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<Guid>._, A<string>._))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<DomainId>._, A<string>._))
                 .Returns(new List<IEnrichedAssetEntity> { duplicate });
         }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,19 +28,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly Guid parentId = Guid.NewGuid();
-        private readonly Guid assetId = Guid.NewGuid();
+        private readonly DomainId parentId = DomainId.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
         private readonly AssetDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
             get { return assetId; }
         }
 
         public AssetDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))

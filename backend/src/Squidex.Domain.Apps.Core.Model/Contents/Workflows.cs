@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -14,7 +13,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflows : ImmutableDictionary<Guid, Workflow>
+    public sealed class Workflows : ImmutableDictionary<DomainId, Workflow>
     {
         public static readonly Workflows Empty = new Workflows();
 
@@ -22,19 +21,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public Workflows(Dictionary<Guid, Workflow> inner)
+        public Workflows(Dictionary<DomainId, Workflow> inner)
             : base(inner)
         {
         }
 
         [Pure]
-        public Workflows Remove(Guid id)
+        public Workflows Remove(DomainId id)
         {
             return Without<Workflows>(id);
         }
 
         [Pure]
-        public Workflows Add(Guid workflowId, string name)
+        public Workflows Add(DomainId workflowId, string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -46,11 +45,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow, nameof(workflow));
 
-            return With<Workflows>(Guid.Empty, workflow);
+            return With<Workflows>(default, workflow);
         }
 
         [Pure]
-        public Workflows Set(Guid id, Workflow workflow)
+        public Workflows Set(DomainId id, Workflow workflow)
         {
             Guard.NotNull(workflow, nameof(workflow));
 
@@ -58,11 +57,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         }
 
         [Pure]
-        public Workflows Update(Guid id, Workflow workflow)
+        public Workflows Update(DomainId id, Workflow workflow)
         {
             Guard.NotNull(workflow, nameof(workflow));
 
-            if (id == Guid.Empty)
+            if (id == DomainId.Empty)
             {
                 return Set(workflow);
             }

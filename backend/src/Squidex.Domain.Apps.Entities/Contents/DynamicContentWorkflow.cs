@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -126,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        private async Task<Workflow> GetWorkflowAsync(Guid appId, Guid schemaId)
+        private async Task<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
         {
             Workflow? result = null;
 

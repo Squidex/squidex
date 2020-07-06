@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class DeleteRole : AppCommand
+    public sealed class DeleteRole : AppUpdateCommand
     {
         public string Name { get; set; }
     }

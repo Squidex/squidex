@@ -16,16 +16,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     public sealed class FilterTagTransformer : AsyncTransformVisitor<ClrValue>
     {
         private readonly ITagService tagService;
-        private readonly Guid appId;
+        private readonly DomainId appId;
 
-        private FilterTagTransformer(Guid appId, ITagService tagService)
+        private FilterTagTransformer(DomainId appId, ITagService tagService)
         {
             this.appId = appId;
 
             this.tagService = tagService;
         }
 
-        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, Guid appId, ITagService tagService)
+        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, DomainId appId, ITagService tagService)
         {
             Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));

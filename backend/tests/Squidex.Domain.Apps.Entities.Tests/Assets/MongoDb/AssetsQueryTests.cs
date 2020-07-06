@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public async Task Should_verify_ids()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var assets = await _.AssetRepository.QueryIdsAsync(_.RandomAppId(), ids);
 
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_default(Guid? parentId)
+        public async Task Should_query_assets_by_default(DomainId? parentId)
         {
             var query = new ClrQuery();
 
@@ -67,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_tags(Guid? parentId)
+        public async Task Should_query_assets_by_tags(DomainId? parentId)
         {
             var query = new ClrQuery
             {
@@ -81,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_tags_and_name(Guid? parentId)
+        public async Task Should_query_assets_by_tags_and_name(DomainId? parentId)
         {
             var query = new ClrQuery
             {
@@ -95,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_fileName(Guid? parentId)
+        public async Task Should_query_assets_by_fileName(DomainId? parentId)
         {
             var query = new ClrQuery
             {
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_fileName_and_tags(Guid? parentId)
+        public async Task Should_query_assets_by_fileName_and_tags(DomainId? parentId)
         {
             var query = new ClrQuery
             {
@@ -124,10 +123,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public static IEnumerable<object?[]> ParentIds()
         {
             yield return new object?[] { null };
-            yield return new object?[] { Guid.Empty };
+            yield return new object?[] { DomainId.Empty };
         }
 
-        private async Task<IResultList<IAssetEntity>> QueryAsync(Guid? parentId, ClrQuery query)
+        private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery query)
         {
             query.Top = 1000;
 
