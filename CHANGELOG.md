@@ -1,5 +1,30 @@
 # Changelog
 
+## 4.5.0 - 2020-07-06
+
+### Features
+
+* **Backups**: Increase download timeout for backups to 60 minutes.
+* **Rules**: Change expiration for rule events to be relative from now instead of relative to the original event to make replaying easier.
+* **Rules**: Also create rule events when the creation failed to simplify debugging.
+* **UI**: CTRL+Click for content items to open them in new tabs. Mimic default browser behavior for links.
+* **UI**: Make sections defined by schema separators collapsible.
+* **UI**: Customizable dashboard.
+* **UI**: Include external dependencies into the build to run Squidex in protected company networks.
+* **UI**: Define the preview modes for assets.
+* **Notifo**: Notifo integration finalized.
+
+### Bugfixes
+
+* **Assets**: Fixed a bug where the wrong permission was checked for protected assets.
+* **Assets**: Fixed the wrong calculation of focus points when resizing assets.
+* **Assets**: Upraded the image library to a newer version to fix a bug with resizing.
+* **Contents**: Minor fixes for flat content.
+* **Rules**: Fixed several bugs in the rule runner.
+* **Rules**: Fixed avro serialize for union schemas.
+* **Rules**: Proper cancellation for kafka.
+* **Schemas**: Fixed several minor bugs in the schema synchronizer.
+
 ## 4.4.0 - 2020-06-15
 
 ### Features
