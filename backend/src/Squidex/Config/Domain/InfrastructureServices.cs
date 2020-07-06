@@ -71,6 +71,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<StringJintExtension>()
                 .As<IJintExtension>();
 
+            services.AddSingletonAs<StringWordsJintExtension>()
+                .As<IJintExtension>();
+
             services.AddSingletonAs<HttpJintExtension>()
                 .As<IJintExtension>();
 

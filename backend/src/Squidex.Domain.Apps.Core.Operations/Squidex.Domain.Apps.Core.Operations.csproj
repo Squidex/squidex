@@ -17,7 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
     <PackageReference Include="Jint" Version="3.0.0-beta-1580" />
+    <PackageReference Include="Markdig" Version="0.20.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.4" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.4" />
     <PackageReference Include="NJsonSchema" Version="10.1.18" />

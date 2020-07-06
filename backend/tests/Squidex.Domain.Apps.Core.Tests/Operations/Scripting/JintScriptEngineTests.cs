@@ -40,7 +40,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             {
                 new DateTimeJintExtension(),
                 new HttpJintExtension(httpClientFactory),
-                new StringJintExtension()
+                new StringJintExtension(),
+                new StringWordsJintExtension()
             };
 
             var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
