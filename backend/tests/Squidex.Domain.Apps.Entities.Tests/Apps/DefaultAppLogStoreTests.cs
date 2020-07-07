@@ -33,22 +33,27 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
                 .Invokes((Request request) => recordedRequest = request);
 
-            var clientId = "frontend";
-            var costs = 2;
-            var elapsedMs = 120;
-            var requestMethod = "GET";
-            var requestPath = "/my-path";
-            var userId = "user1";
+            var request = default(RequestLog);
+            request.Bytes = 1024;
+            request.Costs = 1.5;
+            request.ElapsedMs = 120;
+            request.RequestMethod = "GET";
+            request.RequestPath = "/my-path";
+            request.Timestamp = default;
+            request.UserClientId = "frontend";
+            request.UserId = "user1";
 
-            await sut.LogAsync(Guid.NewGuid(), default, requestMethod, requestPath, userId, clientId, elapsedMs, costs);
+            await sut.LogAsync(Guid.NewGuid(), request);
 
             Assert.NotNull(recordedRequest);
 
-            Assert.Contains(clientId, recordedRequest!.Properties.Values);
-            Assert.Contains(costs.ToString(), recordedRequest!.Properties.Values);
-            Assert.Contains(elapsedMs.ToString(), recordedRequest!.Properties.Values);
-            Assert.Contains(requestMethod, recordedRequest!.Properties.Values);
-            Assert.Contains(requestPath, recordedRequest!.Properties.Values);
+            Assert.Contains(request.Bytes.ToString(), recordedRequest!.Properties.Values);
+            Assert.Contains(request.Costs.ToString(), recordedRequest!.Properties.Values);
+            Assert.Contains(request.ElapsedMs.ToString(), recordedRequest!.Properties.Values);
+            Assert.Contains(request.RequestMethod, recordedRequest!.Properties.Values);
+            Assert.Contains(request.RequestPath, recordedRequest!.Properties.Values);
+            Assert.Contains(request.UserClientId, recordedRequest!.Properties.Values);
+            Assert.Contains(request.UserId, recordedRequest!.Properties.Values);
         }
 
         [Fact]

@@ -18,17 +18,17 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class UsageMiddleware : IMiddleware
     {
-        private readonly IAppLogStore log;
+        private readonly IAppLogStore logStore;
         private readonly IApiUsageTracker usageTracker;
         private readonly IClock clock;
 
-        public UsageMiddleware(IAppLogStore log, IApiUsageTracker usageTracker, IClock clock)
+        public UsageMiddleware(IAppLogStore logStore, IApiUsageTracker usageTracker, IClock clock)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(logStore, nameof(logStore));
             Guard.NotNull(usageTracker, nameof(usageTracker));
             Guard.NotNull(clock, nameof(clock));
 
-            this.log = log;
+            this.logStore = logStore;
 
             this.usageTracker = usageTracker;
 
@@ -51,37 +51,37 @@ namespace Squidex.Web.Pipeline
                 {
                     var appId = context.Features.Get<IAppFeature>()?.AppId;
 
-                    var costs = context.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
-
                     if (appId != null)
                     {
-                        var elapsedMs = watch.Stop();
+                        var bytes = usageBody.BytesWritten;
 
-                        var now = clock.GetCurrentInstant();
-
-                        var userId = context.User.OpenIdSubject();
-                        var userClient = context.User.OpenIdClientId();
-
-                        await log.LogAsync(appId.Id, now,
-                            context.Request.Method,
-                            context.Request.Path,
-                            userId,
-                            userClient,
-                            elapsedMs,
-                            costs);
-
-                        if (costs > 0)
+                        if (context.Request.ContentLength != null)
                         {
-                            var bytes = usageBody.BytesWritten;
+                            bytes += context.Request.ContentLength.Value;
+                        }
 
-                            if (context.Request.ContentLength != null)
-                            {
-                                bytes += context.Request.ContentLength.Value;
-                            }
+                        var request = default(RequestLog);
 
-                            var date = now.ToDateTimeUtc().Date;
+                        request.Bytes = bytes;
+                        request.Costs = context.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
+                        request.ElapsedMs = watch.Stop();
+                        request.RequestMethod = context.Request.Method;
+                        request.RequestPath = context.Request.Path;
+                        request.Timestamp = clock.GetCurrentInstant();
+                        request.UserClientId = context.User.OpenIdClientId();
+                        request.UserId = context.User.OpenIdSubject();
 
-                            await usageTracker.TrackAsync(date, appId.Id.ToString(), userClient, costs, elapsedMs, bytes);
+                        await logStore.LogAsync(appId.Id, request);
+
+                        if (request.Costs > 0)
+                        {
+                            var date = request.Timestamp.ToDateTimeUtc().Date;
+
+                            await usageTracker.TrackAsync(date, appId.Id.ToString(),
+                                request.UserClientId,
+                                request.Costs,
+                                request.ElapsedMs,
+                                request.Bytes);
                         }
                     }
                 }

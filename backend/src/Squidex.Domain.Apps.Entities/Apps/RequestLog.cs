@@ -5,17 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppLogStore
+    public struct RequestLog
     {
-        Task LogAsync(Guid appId, RequestLog request);
+        public Instant Timestamp;
 
-        Task ReadLogAsync(Guid appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default);
+        public string? RequestMethod;
+
+        public string? RequestPath;
+
+        public string? UserId;
+
+        public string? UserClientId;
+
+        public long ElapsedMs;
+
+        public long Bytes;
+
+        public double Costs;
     }
 }
