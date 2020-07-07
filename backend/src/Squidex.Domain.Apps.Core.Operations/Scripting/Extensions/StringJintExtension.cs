@@ -6,12 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.IO;
-using System.Text;
-using HtmlAgilityPack;
 using Jint;
 using Jint.Native;
-using Markdig;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
@@ -60,13 +56,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                var document = LoadHtml(text);
-
-                var sb = new StringBuilder();
-
-                WriteTextTo(document.DocumentNode, sb);
-
-                return sb.ToString().Trim(' ', '\n', '\r');
+                return TextHelpers.Html2Text(text);
             }
             catch
             {
@@ -74,76 +64,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
-        private static HtmlDocument LoadHtml(string text)
-        {
-            var document = new HtmlDocument();
-
-            document.LoadHtml(text);
-
-            return document;
-        }
-
-        private static void WriteTextTo(HtmlNode node, StringBuilder sb)
-        {
-            switch (node.NodeType)
-            {
-                case HtmlNodeType.Comment:
-                    break;
-                case HtmlNodeType.Document:
-                    WriteChildrenTextTo(node, sb);
-                    break;
-                case HtmlNodeType.Text:
-                    var html = ((HtmlTextNode)node).Text;
-
-                    if (HtmlNode.IsOverlappedClosingElement(html))
-                    {
-                        break;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(html))
-                    {
-                        sb.Append(HtmlEntity.DeEntitize(html));
-                    }
-
-                    break;
-
-                case HtmlNodeType.Element:
-                    switch (node.Name)
-                    {
-                        case "p":
-                            sb.AppendLine();
-                            break;
-                        case "br":
-                            sb.AppendLine();
-                            break;
-                        case "style":
-                            return;
-                        case "script":
-                            return;
-                    }
-
-                    if (node.HasChildNodes)
-                    {
-                        WriteChildrenTextTo(node, sb);
-                    }
-
-                    break;
-            }
-        }
-
-        private static void WriteChildrenTextTo(HtmlNode node, StringBuilder sb)
-        {
-            foreach (var child in node.ChildNodes)
-            {
-                WriteTextTo(child, sb);
-            }
-        }
-
         private readonly Func<string, JsValue> markdown2Text = text =>
         {
             try
             {
-                return Markdown.ToPlainText(text).Trim(' ', '\n', '\r');
+                return TextHelpers.Markdown2Text(text);
             }
             catch
             {

@@ -97,6 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 new DateTimeFluidExtension(),
                 new EventFluidExtensions(urlGenerator),
                 new StringFluidExtension(),
+                new StringWordsFluidExtension(),
                 new UserFluidExtension()
             };
 

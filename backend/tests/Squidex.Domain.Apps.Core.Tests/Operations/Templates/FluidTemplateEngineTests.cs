@@ -24,7 +24,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         {
             var extensions = new IFluidExtension[]
             {
-                new DateTimeFluidExtension()
+                new DateTimeFluidExtension(),
+                new StringFluidExtension(),
+                new StringWordsFluidExtension()
             };
 
             sut = new FluidTemplateEngine(extensions);
@@ -111,6 +113,66 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
             var result = await RenderAync(template, value);
 
             Assert.Equal("Hello", result);
+        }
+
+        [Fact]
+        public async Task Should_format_html_to_text()
+        {
+            var template = "{{ e.text | html2text }}";
+
+            var value = new
+            {
+                Text = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("Hello World", result);
+        }
+
+        [Fact]
+        public async Task Should_convert_markdown_to_text()
+        {
+            var template = "{{ e.text | markdown2text }}";
+
+            var value = new
+            {
+                Text = "## Hello World"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("Hello World", result);
+        }
+
+        [Fact]
+        public async Task Should_format_word_count()
+        {
+            var template = "{{ e.text | word_count }}";
+
+            var value = new
+            {
+                Text = "Hello World"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("2", result);
+        }
+
+        [Fact]
+        public async Task Should_format_character_count()
+        {
+            var template = "{{ e.text | character_count }}";
+
+            var value = new
+            {
+                text = "Hello World"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("10", result);
         }
 
         [Fact]

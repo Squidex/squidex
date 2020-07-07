@@ -86,8 +86,15 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DateTimeFluidExtension>()
                 .As<IFluidExtension>();
 
+            services.AddSingletonAs<StringFluidExtension>()
+                .As<IFluidExtension>();
+
+            services.AddSingletonAs<StringWordsFluidExtension>()
+                .As<IFluidExtension>();
+
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
+
 
             services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }

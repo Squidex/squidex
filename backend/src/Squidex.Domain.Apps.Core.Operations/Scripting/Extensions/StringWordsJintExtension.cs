@@ -17,27 +17,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                var numWords = 0;
-
-                for (int i = 1; i < text.Length; i++)
-                {
-                    if (char.IsWhiteSpace(text[i - 1]))
-                    {
-                        var character = text[i];
-
-                        if (char.IsLetterOrDigit(character) || char.IsPunctuation(character))
-                        {
-                            numWords++;
-                        }
-                    }
-                }
-
-                if (text.Length > 2)
-                {
-                    numWords++;
-                }
-
-                return numWords;
+                return TextHelpers.WordCount(text);
             }
             catch
             {
@@ -49,17 +29,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                var characterCount = 0;
-
-                for (int i = 0; i < text.Length; i++)
-                {
-                    if (char.IsLetter(text[i]))
-                    {
-                        characterCount++;
-                    }
-                }
-
-                return characterCount;
+                return TextHelpers.CharacterCount(text);
             }
             catch
             {
