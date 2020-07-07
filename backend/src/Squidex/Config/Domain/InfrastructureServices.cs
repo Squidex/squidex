@@ -95,7 +95,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
 
-
             services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
         }
 
