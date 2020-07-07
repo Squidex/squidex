@@ -64,7 +64,7 @@ namespace TestSuite.LoadTests
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.GetAsync(new ContentQuery { OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ContentQuery { OrderBy = "data/number/iv asc" });
             });
         }
 
@@ -74,7 +74,7 @@ namespace TestSuite.LoadTests
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.GetAsync(new ContentQuery { Skip = 5, OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ContentQuery { Skip = 5, OrderBy = "data/number/iv asc" });
             });
         }
 
@@ -84,7 +84,7 @@ namespace TestSuite.LoadTests
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.GetAsync(new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/number/iv asc" });
             });
         }
 
@@ -94,7 +94,7 @@ namespace TestSuite.LoadTests
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.GetAsync(new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/value/iv desc" });
+                await _.Contents.GetAsync(new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/number/iv desc" });
             });
         }
 
@@ -104,7 +104,7 @@ namespace TestSuite.LoadTests
         {
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.GetAsync(new ContentQuery { Filter = "data/value/iv gt 3 and data/value/iv lt 7", OrderBy = "data/value/iv asc" });
+                await _.Contents.GetAsync(new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" });
             });
         }
     }

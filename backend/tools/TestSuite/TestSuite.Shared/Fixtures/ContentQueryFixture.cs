@@ -13,7 +13,7 @@ namespace TestSuite.Fixtures
     public class ContentQueryFixture : ContentFixture
     {
         public ContentQueryFixture()
-               : this("my-reads")
+            : this("my-reads")
         {
         }
 

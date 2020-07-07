@@ -6,22 +6,23 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 
 namespace Squidex.Infrastructure.Security
 {
     public sealed partial class Permission
     {
-        internal struct Part
+        internal readonly struct Part
         {
-            private static readonly char[] AlternativeSeparators = { '|' };
-            private static readonly char[] MainSeparators = { '.' };
+            private const char SeparatorAlternative = '|';
+            private const char SeparatorMain = '.';
+            private const char CharAny = '*';
+            private const char CharExclude = '^';
 
-            public readonly string[]? Alternatives;
+            public readonly ReadOnlyMemory<char>[]? Alternatives;
 
             public readonly bool Exclusion;
 
-            public Part(string[]? alternatives, bool exclusion)
+            public Part(ReadOnlyMemory<char>[]? alternatives, bool exclusion)
             {
                 Alternatives = alternatives;
 
@@ -30,37 +31,118 @@ namespace Squidex.Infrastructure.Security
 
             public static Part[] ParsePath(string path)
             {
-                var parts = path.Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-                var result = new Part[parts.Length];
-
-                for (var i = 0; i < result.Length; i++)
+                if (string.IsNullOrWhiteSpace(path))
                 {
-                    result[i] = Parse(parts[i]);
+                    return Array.Empty<Part>();
+                }
+
+                var current = path.AsMemory();
+                var currentSpan = current.Span;
+
+                var result = new Part[CountOf(currentSpan, SeparatorMain) + 1];
+
+                if (result.Length == 1)
+                {
+                    result[0] = Parse(current);
+                }
+                else
+                {
+                    for (int i = 0, j = 0; i < currentSpan.Length; i++)
+                    {
+                        if (currentSpan[i] == SeparatorMain)
+                        {
+                            result[j] = Parse(current.Slice(0, i));
+
+                            current = current.Slice(i + 1);
+                            currentSpan = current.Span;
+
+                            i = 0;
+                            j++;
+                        }
+                        else if (i == currentSpan.Length - 1 || currentSpan[i] == SeparatorMain)
+                        {
+                            result[j] = Parse(current);
+                        }
+                    }
                 }
 
                 return result;
             }
 
-            public static Part Parse(string part)
+            public static Part Parse(ReadOnlyMemory<char> current)
             {
+                var currentSpan = current.Span;
+
+                if (currentSpan.Length == 0)
+                {
+                    return new Part(Array.Empty<ReadOnlyMemory<char>>(), false);
+                }
+
                 var isExclusion = false;
 
-                if (part.StartsWith(Exclude, StringComparison.OrdinalIgnoreCase))
+                if (currentSpan[0] == CharExclude)
                 {
                     isExclusion = true;
 
-                    part = part.Substring(1);
+                    current = current.Slice(1);
+                    currentSpan = current.Span;
                 }
 
-                string[]? alternatives = null;
-
-                if (part != Any)
+                if (currentSpan.Length == 0)
                 {
-                    alternatives = part.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries);
+                    return new Part(Array.Empty<ReadOnlyMemory<char>>(), isExclusion);
                 }
 
-                return new Part(alternatives, isExclusion);
+                if (current.Length > 1 || currentSpan[0] != CharAny)
+                {
+                    var alternatives = new ReadOnlyMemory<char>[CountOf(currentSpan, SeparatorAlternative) + 1];
+
+                    if (alternatives.Length == 1)
+                    {
+                        alternatives[0] = current;
+                    }
+                    else
+                    {
+                        for (int i = 0, j = 0; i < current.Length; i++)
+                        {
+                            if (currentSpan[i] == SeparatorAlternative)
+                            {
+                                alternatives[j] = current.Slice(0, i);
+
+                                current = current.Slice(i + 1);
+                                currentSpan = current.Span;
+
+                                i = 0;
+                                j++;
+                            }
+                            else if (i == current.Length - 1)
+                            {
+                                alternatives[j] = current;
+                            }
+                        }
+                    }
+
+                    return new Part(alternatives, isExclusion);
+                }
+                else
+                {
+                    return new Part(null, isExclusion);
+                }
+            }
+
+            private static int CountOf(ReadOnlySpan<char> text, char character)
+            {
+                var count = 0;
+
+                for (var i = 0; i < text.Length; i++)
+                {
+                    if (text[i] == character)
+                    {
+                        count++;
+                    }
+                }
+
+                return count;
             }
 
             public static bool Intersects(ref Part lhs, ref Part rhs, bool allowNull)
@@ -70,14 +152,28 @@ namespace Squidex.Infrastructure.Security
                     return true;
                 }
 
-                if (allowNull && rhs.Alternatives == null)
+                if (rhs.Alternatives == null)
                 {
-                    return true;
+                    return allowNull;
                 }
 
                 var shouldIntersect = !(lhs.Exclusion ^ rhs.Exclusion);
 
-                return rhs.Alternatives != null && lhs.Alternatives.Intersect(rhs.Alternatives).Any() == shouldIntersect;
+                var isIntersected = false;
+
+                for (var i = 0; i < lhs.Alternatives.Length; i++)
+                {
+                    for (var j = 0; j < rhs.Alternatives.Length; j++)
+                    {
+                        if (lhs.Alternatives[i].Span.Equals(rhs.Alternatives[j].Span, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isIntersected = true;
+                            break;
+                        }
+                    }
+                }
+
+                return isIntersected == shouldIntersect;
             }
         }
     }
