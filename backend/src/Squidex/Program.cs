@@ -67,13 +67,7 @@ namespace Squidex
                     {
                         if (context.HostingEnvironment.IsDevelopment() || context.Configuration.GetValue<bool>("devMode:enable"))
                         {
-                            serverOptions.Listen(
-                                IPAddress.Any,
-                                5001,
-                                listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
-
-                            serverOptions.Listen(
-                                IPAddress.IPv6Any,
+                            serverOptions.ListenAnyIP(
                                 5001,
                                 listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
                         }
