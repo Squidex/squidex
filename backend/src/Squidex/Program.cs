@@ -71,6 +71,11 @@ namespace Squidex
                                 IPAddress.Any,
                                 5001,
                                 listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
+
+                            serverOptions.Listen(
+                                IPAddress.IPv6Any,
+                                5001,
+                                listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
                         }
                     });
 
