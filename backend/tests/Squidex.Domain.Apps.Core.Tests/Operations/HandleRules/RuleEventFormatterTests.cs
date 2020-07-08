@@ -100,7 +100,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 new DateTimeJintExtension(),
                 new EventJintExtension(urlGenerator),
-                new StringJintExtension()
+                new StringJintExtension(),
+                new StringWordsJintExtension()
             };
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));

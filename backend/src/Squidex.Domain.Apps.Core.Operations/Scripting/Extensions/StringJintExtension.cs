@@ -52,12 +52,42 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
+        private readonly Func<string, JsValue> html2Text = text =>
+        {
+            try
+            {
+                return TextHelpers.Html2Text(text);
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
+
+        private readonly Func<string, JsValue> markdown2Text = text =>
+        {
+            try
+            {
+                return TextHelpers.Markdown2Text(text);
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
+
+        public Func<string, JsValue> Html2Text => html2Text;
+
         public void Extend(Engine engine)
         {
             engine.SetValue("slugify", slugify);
 
             engine.SetValue("toCamelCase", toCamelCase);
             engine.SetValue("toPascalCase", toPascalCase);
+
+            engine.SetValue("html2Text", Html2Text);
+
+            engine.SetValue("markdown2Text", markdown2Text);
         }
     }
 }

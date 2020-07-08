@@ -5,15 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using TestSuite.Fixtures;
+using NodaTime;
 
-namespace TestSuite.LoadTests
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class ReadingFixture : ContentQueryFixture
+    public struct RequestLog
     {
-        public ReadingFixture()
-            : base("benchmark-reading")
-        {
-        }
+        public Instant Timestamp;
+
+        public string? RequestMethod;
+
+        public string? RequestPath;
+
+        public string? UserId;
+
+        public string? UserClientId;
+
+        public long ElapsedMs;
+
+        public long Bytes;
+
+        public double Costs;
     }
 }

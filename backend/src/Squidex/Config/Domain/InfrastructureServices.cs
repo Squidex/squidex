@@ -71,6 +71,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<StringJintExtension>()
                 .As<IJintExtension>();
 
+            services.AddSingletonAs<StringWordsJintExtension>()
+                .As<IJintExtension>();
+
             services.AddSingletonAs<HttpJintExtension>()
                 .As<IJintExtension>();
 
@@ -81,6 +84,12 @@ namespace Squidex.Config.Domain
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<DateTimeFluidExtension>()
+                .As<IFluidExtension>();
+
+            services.AddSingletonAs<StringFluidExtension>()
+                .As<IFluidExtension>();
+
+            services.AddSingletonAs<StringWordsFluidExtension>()
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<UserFluidExtension>()

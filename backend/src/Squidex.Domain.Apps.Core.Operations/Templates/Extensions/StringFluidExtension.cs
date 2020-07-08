@@ -14,14 +14,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 {
     public sealed class StringFluidExtension : IFluidExtension
     {
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
-        {
-            TemplateContext.GlobalFilters.AddFilter("escape", Escape);
-            TemplateContext.GlobalFilters.AddFilter("slugify", Slugify);
-            TemplateContext.GlobalFilters.AddFilter("trim", Trim);
-        }
-
-        public static FluidValue Slugify(FluidValue input, FilterArguments arguments, TemplateContext context)
+        private static readonly FilterDelegate Slugify = (input, arguments, context) =>
         {
             if (input is StringValue value)
             {
@@ -31,9 +24,9 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
             }
 
             return input;
-        }
+        };
 
-        public static FluidValue Escape(FluidValue input, FilterArguments arguments, TemplateContext context)
+        private static readonly FilterDelegate Escape = (input, arguments, context) =>
         {
             var result = input.ToStringValue();
 
@@ -41,11 +34,30 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
             result = result[1..^1];
 
             return FluidValue.Create(result);
-        }
+        };
 
-        public static FluidValue Trim(FluidValue input, FilterArguments arguments, TemplateContext context)
+        private static readonly FilterDelegate Markdown2Text = (input, arguments, context) =>
+        {
+            return FluidValue.Create(TextHelpers.Markdown2Text(input.ToStringValue()));
+        };
+
+        private static readonly FilterDelegate Html2Text = (input, arguments, context) =>
+        {
+            return FluidValue.Create(TextHelpers.Html2Text(input.ToStringValue()));
+        };
+
+        private static readonly FilterDelegate Trim = (input, arguments, context) =>
         {
             return FluidValue.Create(input.ToStringValue().Trim());
+        };
+
+        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+        {
+            TemplateContext.GlobalFilters.AddFilter("html2text", Html2Text);
+            TemplateContext.GlobalFilters.AddFilter("markdown2text", Markdown2Text);
+            TemplateContext.GlobalFilters.AddFilter("escape", Escape);
+            TemplateContext.GlobalFilters.AddFilter("slugify", Slugify);
+            TemplateContext.GlobalFilters.AddFilter("trim", Trim);
         }
     }
 }

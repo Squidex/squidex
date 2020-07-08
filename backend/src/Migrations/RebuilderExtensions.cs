@@ -45,7 +45,7 @@ namespace Migrations
 
         public static Task RebuildAssetFoldersAsync(this Rebuilder rebuilder, CancellationToken ct = default)
         {
-            return rebuilder.RebuildAsync<AssetFolderDomainObject, AssetFolderState>("^assetfolder\\-", ct);
+            return rebuilder.RebuildAsync<AssetFolderDomainObject, AssetFolderState>("^assetFolder\\-", ct);
         }
 
         public static Task RebuildContentAsync(this Rebuilder rebuilder, CancellationToken ct = default)
