@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Workflow? result = null;
 
-            var app = await appProvider.GetAppAsync(appId);
+            var app = await appProvider.GetAppAsync(appId, false);
 
             if (app != null)
             {

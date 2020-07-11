@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -80,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             if (Guid.TryParse(name, out var id))
             {
-                schema = await appProvider.GetSchemaAsync(AppId, id);
+                schema = await appProvider.GetSchemaAsync(AppId, id, false);
             }
             else
             {

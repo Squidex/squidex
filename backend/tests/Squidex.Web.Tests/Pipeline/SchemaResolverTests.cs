@@ -65,7 +65,7 @@ namespace Squidex.Web.Pipeline
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(appId));
             actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -82,7 +82,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -99,7 +99,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -117,7 +117,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
                 .MustNotHaveHappened();
         }
 
@@ -131,7 +131,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
                 .MustNotHaveHappened();
         }
 

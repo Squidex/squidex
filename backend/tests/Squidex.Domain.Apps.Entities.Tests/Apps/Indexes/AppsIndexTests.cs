@@ -9,10 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
@@ -41,7 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => grainFactory.GetGrain<IAppsByUserIndexGrain>(userId, null))
                 .Returns(indexByUser);
 
-            sut = new AppsIndex(grainFactory);
+            var cache = new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub());
+
+            sut = new AppsIndex(grainFactory, cache);
         }
 
         [Fact]
@@ -108,9 +113,40 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
 
-            var actual = await sut.GetAppByNameAsync(appId.Name);
+            var actual1 = await sut.GetAppByNameAsync(appId.Name, false);
+            var actual2 = await sut.GetAppByNameAsync(appId.Name, false);
 
-            Assert.Same(expected, actual);
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+
+            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id, null))
+                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(() => indexByName.GetIdAsync(A<string>._))
+                .MustHaveHappenedTwiceExactly();
+        }
+
+        [Fact]
+        public async Task Should_resolve_app_by_name_and_id_if_cached_before()
+        {
+            var expected = SetupApp(0, false);
+
+            A.CallTo(() => indexByName.GetIdAsync(appId.Name))
+                .Returns(appId.Id);
+
+            var actual1 = await sut.GetAppByNameAsync(appId.Name, true);
+            var actual2 = await sut.GetAppByNameAsync(appId.Name, true);
+            var actual3 = await sut.GetAppAsync(appId.Id, true);
+
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+            Assert.Same(expected, actual3);
+
+            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id, null))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => indexByName.GetIdAsync(A<string>._))
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -118,9 +154,37 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            var actual = await sut.GetAppAsync(appId.Id);
+            var actual1 = await sut.GetAppAsync(appId.Id, false);
+            var actual2 = await sut.GetAppAsync(appId.Id, false);
 
-            Assert.Same(expected, actual);
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+
+            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id, null))
+                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(() => indexByName.GetIdAsync(A<string>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_resolve_app_by_id_and_name_if_cached_before()
+        {
+            var expected = SetupApp(0, false);
+
+            var actual1 = await sut.GetAppAsync(appId.Id, true);
+            var actual2 = await sut.GetAppAsync(appId.Id, true);
+            var actual3 = await sut.GetAppByNameAsync(appId.Name, true);
+
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+            Assert.Same(expected, actual3);
+
+            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id, null))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => indexByName.GetIdAsync(A<string>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -128,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             SetupApp(0, true);
 
-            var actual = await sut.GetAppAsync(appId.Id);
+            var actual = await sut.GetAppAsync(appId.Id, false);
 
             Assert.Null(actual);
         }
@@ -138,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             SetupApp(-1, false);
 
-            var actual = await sut.GetAppAsync(appId.Id);
+            var actual = await sut.GetAppAsync(appId.Id, false);
 
             Assert.Null(actual);
         }
@@ -369,6 +433,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var appEntity = A.Fake<IAppEntity>();
 
+            A.CallTo(() => appEntity.Id)
+                .Returns(appId.Id);
             A.CallTo(() => appEntity.Name)
                 .Returns(appId.Name);
             A.CallTo(() => appEntity.Version)

@@ -9,10 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Orleans;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
@@ -36,7 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.Id, null))
                 .Returns(index);
 
-            sut = new SchemasIndex(grainFactory);
+            var cache = new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub());
+
+            sut = new SchemasIndex(grainFactory, cache);
         }
 
         [Fact]
@@ -44,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, false);
 
-            var actual = await sut.GetSchemaAsync(appId.Id, schema.Id);
+            var actual = await sut.GetSchemaAsync(appId.Id, schema.Id, false, false);
 
             Assert.Same(actual, schema);
         }
@@ -57,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
 
-            var actual = await sut.GetSchemaByNameAsync(appId.Id, schema.SchemaDef.Name);
+            var actual = await sut.GetSchemaByNameAsync(appId.Id, schema.SchemaDef.Name, false);
 
             Assert.Same(actual, schema);
         }
@@ -97,19 +102,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .Returns(schema.Id);
 
             var actual = await sut.GetSchemasAsync(appId.Id);
-
-            Assert.Empty(actual);
-        }
-
-        [Fact]
-        public async Task Should_also_return_schema_if_deleted_allowed()
-        {
-            var schema = SetupSchema(-1, true);
-
-            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
-                .Returns(schema.Id);
-
-            var actual = await sut.GetSchemasAsync(appId.Id, true);
 
             Assert.Empty(actual);
         }

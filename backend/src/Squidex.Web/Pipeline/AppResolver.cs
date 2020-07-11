@@ -41,7 +41,9 @@ namespace Squidex.Web.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var app = await appProvider.GetAppAsync(appName);
+                var canCache = !user.IsInClient(DefaultClients.Frontend);
+
+                var app = await appProvider.GetAppAsync(appName, canCache);
 
                 if (app == null)
                 {

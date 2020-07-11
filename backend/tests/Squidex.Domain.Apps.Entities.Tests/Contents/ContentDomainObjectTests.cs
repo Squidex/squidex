@@ -94,10 +94,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             schema = Mocks.Schema(AppNamedId, SchemaNamedId, schemaDef);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppName))
+            A.CallTo(() => appProvider.GetAppAsync(AppName, false))
                 .Returns(app);
 
-            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId))
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId, false))
                 .Returns((app, schema));
 
             A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))

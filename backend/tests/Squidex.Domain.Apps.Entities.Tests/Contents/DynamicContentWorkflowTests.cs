@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var workflows = Workflows.Empty.Set(workflow).Set(Guid.NewGuid(), simpleWorkflow);
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
                 .Returns(app);
 
             A.CallTo(() => app.Workflows)

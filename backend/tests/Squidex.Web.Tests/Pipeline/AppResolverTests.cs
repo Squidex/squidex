@@ -34,13 +34,16 @@ namespace Squidex.Web.Pipeline
         private readonly ActionContext actionContext;
         private readonly ActionExecutingContext actionExecutingContext;
         private readonly ActionExecutionDelegate next;
-        private readonly ClaimsIdentity user = new ClaimsIdentity();
+        private readonly ClaimsIdentity userIdentiy = new ClaimsIdentity();
+        private readonly ClaimsPrincipal user;
         private readonly string appName = "my-app";
         private readonly AppResolver sut;
         private bool isNextCalled;
 
         public AppResolverTests()
         {
+            user = new ClaimsPrincipal(userIdentiy);
+
             actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
             {
                 EndpointMetadata = new List<object>()
@@ -48,7 +51,7 @@ namespace Squidex.Web.Pipeline
 
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
             actionExecutingContext.HttpContext = httpContext;
-            actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
+            actionExecutingContext.HttpContext.User = user;
             actionExecutingContext.RouteData.Values["app"] = appName;
 
             next = () =>
@@ -64,7 +67,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_return_not_found_if_app_not_found()
         {
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(Task.FromResult<IAppEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -78,10 +81,10 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName, appUser: "user1");
 
-            user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
+            userIdentiy.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -96,9 +99,9 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName, appClient: "client1");
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -113,12 +116,12 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName);
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
             actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -133,10 +136,10 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName);
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -150,9 +153,9 @@ namespace Squidex.Web.Pipeline
         {
             var app = CreateApp(appName, appClient: "client1");
 
-            user.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
+            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -170,7 +173,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
                 .MustNotHaveHappened();
         }
 
