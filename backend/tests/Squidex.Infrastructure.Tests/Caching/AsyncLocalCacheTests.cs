@@ -55,11 +55,11 @@ namespace Squidex.Infrastructure.Caching
         {
             using (sut.StartContext())
             {
-                var value1 = sut.GetOrCreate("Key", () => ++called);
+                var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 await Task.Delay(5);
 
-                var value2 = sut.GetOrCreate("Key", () => ++called);
+                var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 Assert.Equal(1, called);
                 Assert.Equal(1, value1);
@@ -70,11 +70,11 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public async Task Should_call_creator_twice_when_context_not_exists()
         {
-            var value1 = sut.GetOrCreate("Key", () => ++called);
+            var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             await Task.Delay(5);
 
-            var value2 = sut.GetOrCreate("Key", () => ++called);
+            var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             Assert.Equal(2, called);
             Assert.Equal(1, value1);
@@ -86,11 +86,11 @@ namespace Squidex.Infrastructure.Caching
         {
             using (sut.StartContext())
             {
-                var value1 = sut.GetOrCreate("Key", () => ++called);
+                var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 await Task.Delay(5);
 
-                var value2 = sut.GetOrCreate("Key", () => ++called);
+                var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 Assert.Equal(1, called);
                 Assert.Equal(1, value1);
@@ -101,11 +101,11 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public async Task Should_call_async_creator_twice_when_context_not_exists()
         {
-            var value1 = sut.GetOrCreate("Key", () => ++called);
+            var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             await Task.Delay(5);
 
-            var value2 = sut.GetOrCreate("Key", () => ++called);
+            var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             Assert.Equal(2, called);
             Assert.Equal(1, value1);

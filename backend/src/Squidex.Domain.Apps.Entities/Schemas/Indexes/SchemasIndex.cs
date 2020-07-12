@@ -48,13 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 var schemas =
                     await Task.WhenAll(
-                        ids.Select(id => GetSchemaAsync(appId, id, false, false)));
+                        ids.Select(id => GetSchemaAsync(appId, id, false)));
 
                 return schemas.NotNull().ToList();
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name,  bool canCache)
+        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool canCache)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -75,11 +75,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     return null;
                 }
 
-                return await GetSchemaAsync(appId, id, false, canCache);
+                return await GetSchemaAsync(appId, id, canCache);
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted, bool canCache)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool canCache)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -93,29 +93,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     }
                 }
 
-                var schema = await GetSchemaAsync(id);
+                var schema = await GetSchemaCoreAsync(id);
 
-                if (IsFound(schema, allowDeleted))
+                if (schema != null)
                 {
-                    return schema;
+                    CacheIt(schema, false);
                 }
 
-                return null;
+                return schema;
             }
-        }
-
-        private async Task<ISchemaEntity> GetSchemaAsync(Guid id)
-        {
-            var result = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
-
-            var schema = result.Value;
-
-            if (IsFound(schema, false))
-            {
-                CacheIt(schema, false);
-            }
-
-            return schema;
         }
 
         private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
@@ -165,16 +151,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 await next(context);
 
-                if (context.IsCompleted)
+                if (context.IsCompleted && context.Command is SchemaCommand schemaCommand)
                 {
-                    if (context.Command is DeleteSchema deleteSchema)
-                    {
-                        await DeleteSchemaAsync(deleteSchema);
-                    }
+                    var schema = await GetSchemaCoreAsync(schemaCommand.SchemaId);
 
-                    if (context.PlainResult is ISchemaEntity schema)
+                    if (schema != null)
                     {
-                        CacheIt(schema, true);
+                        if (context.Command is DeleteSchema)
+                        {
+                            await DeleteSchemaAsync(schema);
+                        }
                     }
                 }
             }
@@ -201,21 +187,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return null;
         }
 
-        private async Task DeleteSchemaAsync(DeleteSchema commmand)
+        private Task DeleteSchemaAsync(ISchemaEntity schema)
         {
-            var schemaId = commmand.SchemaId;
-
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync();
-
-            if (IsFound(schema.Value, true))
-            {
-                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId);
-            }
+            return Index(schema.AppId.Id).RemoveAsync(schema.Id);
         }
 
         private ISchemasByAppIndexGrain Index(Guid appId)
         {
             return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId);
+        }
+
+        private async Task<ISchemaEntity?> GetSchemaCoreAsync(Guid schemaId)
+        {
+            var schema = (await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync()).Value;
+
+            if (schema.Version <= EtagVersion.Empty)
+            {
+                return null;
+            }
+
+            return schema;
         }
 
         private string GetCacheKey(Guid appId, string name)
@@ -226,11 +217,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private string GetCacheKey(Guid appId, Guid id)
         {
             return $"SCHEMAS_ID_{appId}_{id}";
-        }
-
-        private static bool IsFound(ISchemaEntity entity, bool allowDeleted)
-        {
-            return entity.Version > EtagVersion.Empty && (!entity.IsDeleted || allowDeleted);
         }
 
         private void CacheIt(ISchemaEntity schema, bool publish)

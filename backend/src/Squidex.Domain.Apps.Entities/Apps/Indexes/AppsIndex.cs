@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 var apps =
                     await Task.WhenAll(ids
-                        .Select(GetAppAsync));
+                        .Select(id => GetAppAsync(id, false)));
 
                 return apps.NotNull().ToList();
             }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var apps =
                     await Task.WhenAll(ids
                         .SelectMany(x => x).Distinct()
-                        .Select(GetAppAsync));
+                        .Select(id => GetAppAsync(id, false)));
 
                 return apps.NotNull().ToList();
             }
@@ -143,29 +143,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     }
                 }
 
-                var app = await GetAppAsync(appId);
+                var app = await GetAppCoreAsync(appId);
 
-                if (IsFound(app, false))
+                if (app != null)
                 {
-                    return app;
+                    CacheIt(app, false);
                 }
 
-                return null;
+                return app;
             }
-        }
-
-        private async Task<IAppEntity> GetAppAsync(Guid appId)
-        {
-            var result = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
-
-            var app = result.Value;
-
-            if (IsFound(app, true))
-            {
-                CacheIt(app, false);
-            }
-
-            return app;
         }
 
         private async Task<List<Guid>> GetAppIdsByUserAsync(string userId)
@@ -233,26 +219,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 await next(context);
 
-                if (context.IsCompleted)
+                if (context.IsCompleted && context.Command is AppCommand appCommand)
                 {
-                    switch (context.Command)
-                    {
-                        case AssignContributor assignContributor:
-                            await AssignContributorAsync(assignContributor);
-                            break;
+                    var app = await GetAppCoreAsync(appCommand.AppId);
 
-                        case RemoveContributor removeContributor:
-                            await RemoveContributorAsync(removeContributor);
-                            break;
-
-                        case ArchiveApp archiveApp:
-                            await ArchiveAppAsync(archiveApp);
-                            break;
-                    }
-
-                    if (context.PlainResult is IAppEntity app)
+                    if (app != null)
                     {
                         CacheIt(app, true);
+
+                        switch (context.Command)
+                        {
+                            case AssignContributor assignContributor:
+                                await AssignContributorAsync(assignContributor);
+                                break;
+
+                            case RemoveContributor removeContributor:
+                                await RemoveContributorAsync(removeContributor);
+                                break;
+
+                            case ArchiveApp archiveApp:
+                                await ArchiveAppAsync(app);
+                                break;
+                        }
                     }
                 }
             }
@@ -279,30 +267,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return null;
         }
 
-        private Task AssignContributorAsync(AssignContributor command)
+        private async Task AssignContributorAsync(AssignContributor command)
         {
-            return Index(command.ContributorId).AddAsync(command.AppId);
+            await Index(command.ContributorId).AddAsync(command.AppId);
         }
 
-        private Task RemoveContributorAsync(RemoveContributor command)
+        private async Task RemoveContributorAsync(RemoveContributor command)
         {
-            return Index(command.ContributorId).RemoveAsync(command.AppId);
+            await Index(command.ContributorId).RemoveAsync(command.AppId);
         }
 
-        private async Task ArchiveAppAsync(ArchiveApp command)
+        private async Task ArchiveAppAsync(IAppEntity app)
         {
-            var appId = command.AppId;
+            await Index().RemoveAsync(app.Id);
 
-            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
-
-            if (IsFound(app.Value, true))
+            foreach (var contributorId in app.Contributors.Keys)
             {
-                await Index().RemoveAsync(appId);
-            }
-
-            foreach (var contributorId in app.Value.Contributors.Keys)
-            {
-                await Index(contributorId).RemoveAsync(appId);
+                await Index(contributorId).RemoveAsync(app.Id);
             }
         }
 
@@ -316,6 +297,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return grainFactory.GetGrain<IAppsByUserIndexGrain>(id);
         }
 
+        private async Task<IAppEntity?> GetAppCoreAsync(Guid appId)
+        {
+            var app = (await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync()).Value;
+
+            if (app.Version <= EtagVersion.Empty)
+            {
+                return null;
+            }
+
+            return app;
+        }
+
         private static string GetCacheKey(Guid id)
         {
             return $"APPS_ID_{id}";
@@ -324,11 +317,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private static string GetCacheKey(string name)
         {
             return $"APPS_NAME_{name}";
-        }
-
-        private static bool IsFound(IAppEntity entity, bool allowArchived)
-        {
-            return entity.Version > EtagVersion.Empty && (!entity.IsArchived || allowArchived);
         }
 
         private void CacheIt(IAppEntity app, bool publish)

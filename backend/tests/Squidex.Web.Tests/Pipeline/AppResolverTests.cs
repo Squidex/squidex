@@ -84,7 +84,7 @@ namespace Squidex.Web.Pipeline
             userIdentiy.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
             userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -101,7 +101,7 @@ namespace Squidex.Web.Pipeline
 
             userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -121,7 +121,7 @@ namespace Squidex.Web.Pipeline
 
             actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);

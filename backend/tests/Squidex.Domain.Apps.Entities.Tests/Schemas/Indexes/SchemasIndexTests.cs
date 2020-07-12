@@ -45,32 +45,91 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_resolve_schema_by_id()
+        public async Task Should_resolve_schema_by_name()
         {
-            var schema = SetupSchema(0, false);
+            var expected = SetupSchema();
 
-            var actual = await sut.GetSchemaAsync(appId.Id, schema.Id, false, false);
+            A.CallTo(() => index.GetIdAsync(schemaId.Name))
+                .Returns(schemaId.Id);
 
-            Assert.Same(actual, schema);
+            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
+            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
+
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id, null))
+                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(() => index.GetIdAsync(A<string>._))
+                .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
-        public async Task Should_resolve_schema_by_name()
+        public async Task Should_resolve_schema_by_name_and_id_if_cached_before()
         {
-            var schema = SetupSchema(0, false);
+            var expected = SetupSchema();
 
-            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
-                .Returns(schema.Id);
+            A.CallTo(() => index.GetIdAsync(schemaId.Name))
+                .Returns(schemaId.Id);
 
-            var actual = await sut.GetSchemaByNameAsync(appId.Id, schema.SchemaDef.Name, false);
+            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
 
-            Assert.Same(actual, schema);
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+            Assert.Same(expected, actual3);
+
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id, null))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => index.GetIdAsync(A<string>._))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_resolve_schema_by_id()
+        {
+            var expected = SetupSchema();
+
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false);
+
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id, null))
+                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(() => index.GetIdAsync(A<string>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_resolve_schema_by_id_and_name_if_cached_before()
+        {
+            var expected = SetupSchema();
+
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
+            var actual3 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+
+            Assert.Same(expected, actual1);
+            Assert.Same(expected, actual2);
+            Assert.Same(expected, actual3);
+
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id, null))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => index.GetIdAsync(A<string>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_resolve_schemas_by_id()
         {
-            var schema = SetupSchema(0, false);
+            var schema = SetupSchema();
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { schema.Id });
@@ -83,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_return_empty_schema_if_schema_not_created()
         {
-            var schema = SetupSchema(-1, false);
+            var schema = SetupSchema(EtagVersion.NotFound);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { schema.Id });
@@ -96,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_return_empty_schema_if_schema_deleted()
         {
-            var schema = SetupSchema(0, true);
+            var schema = SetupSchema();
 
             A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
@@ -182,10 +241,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .MustNotHaveHappened();
         }
 
-        [Theory, InlineData(true), InlineData(false)]
-        public async Task Should_remove_schema_from_index_on_delete_when_existed_before(bool isDeleted)
+        [Fact]
+        public async Task Should_remove_schema_from_index_on_delete_when_existed_before()
         {
-            var schema = SetupSchema(0, isDeleted);
+            var schema = SetupSchema();
 
             var command = new DeleteSchema { SchemaId = schema.Id };
 
@@ -215,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return new CreateSchema { SchemaId = schemaId.Id, Name = name, AppId = appId };
         }
 
-        private ISchemaEntity SetupSchema(long version, bool deleted)
+        private ISchemaEntity SetupSchema(long version = 0)
         {
             var schemaEntity = A.Fake<ISchemaEntity>();
 
@@ -227,8 +286,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .Returns(appId);
             A.CallTo(() => schemaEntity.Version)
                 .Returns(version);
-            A.CallTo(() => schemaEntity.IsDeleted)
-                .Returns(deleted);
 
             var schemaGrain = A.Fake<ISchemaGrain>();
 

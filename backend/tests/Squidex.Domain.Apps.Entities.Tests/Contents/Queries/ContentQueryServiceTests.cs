@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             SetupEnricher();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, A<bool>._))
                 .Returns(schema);
 
             A.CallTo(() => queryParser.ParseQueryAsync(A<Context>._, schema, A<Q>._))

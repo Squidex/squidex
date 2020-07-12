@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Caching
 {
     public static class LocalCacheExtensions
     {
-        public static T GetOrCreate<T>(this ILocalCache cache, object key, Func<T> task)
+        public static async Task<T> GetOrCreateAsync<T>(this ILocalCache cache, object key, Func<Task<T>> task)
         {
             if (cache.TryGetValue(key, out var value))
             {
@@ -25,7 +26,7 @@ namespace Squidex.Infrastructure.Caching
                 }
             }
 
-            var result = task();
+            var result = await task();
 
             cache.Add(key, result);
 
