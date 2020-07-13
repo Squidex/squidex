@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     }
                 }
 
-                var schema = await GetSchemaCoreAsync(id);
+                var schema = await GetSchemaCoreAsync(DomainId.Combine(appId, id));
 
                 if (schema != null)
                 {

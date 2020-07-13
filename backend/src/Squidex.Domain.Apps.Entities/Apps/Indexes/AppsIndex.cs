@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                                 await RemoveContributorAsync(removeContributor);
                                 break;
 
-                            case ArchiveApp archiveApp:
+                            case ArchiveApp _:
                                 await ArchiveAppAsync(app);
                                 break;
                         }

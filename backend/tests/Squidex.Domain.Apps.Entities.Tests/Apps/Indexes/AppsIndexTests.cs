@@ -311,6 +311,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_add_app_to_index_on_contributor_assignment()
         {
+            SetupApp();
+
             var command = new AssignContributor { AppId = appId, ContributorId = userId };
 
             var context =
@@ -326,6 +328,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_remove_from_user_index_on_remove_of_contributor()
         {
+            SetupApp();
+
             var command = new RemoveContributor { AppId = appId, ContributorId = userId };
 
             var context =

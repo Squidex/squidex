@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
 
-            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id.ToString(), null))
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedTwiceExactly();
 
             A.CallTo(() => index.GetIdAsync(A<string>._))
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Assert.Same(expected, actual2);
             Assert.Same(expected, actual3);
 
-            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id.ToString(), null))
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => index.GetIdAsync(A<string>._))
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
 
-            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id.ToString(), null))
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedTwiceExactly();
 
             A.CallTo(() => index.GetIdAsync(A<string>._))
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Assert.Same(expected, actual2);
             Assert.Same(expected, actual3);
 
-            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(schemaId.Id.ToString(), null))
+            A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => index.GetIdAsync(A<string>._))

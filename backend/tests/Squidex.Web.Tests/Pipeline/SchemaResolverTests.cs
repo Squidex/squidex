@@ -66,7 +66,7 @@ namespace Squidex.Web.Pipeline
         {
             actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, true))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
