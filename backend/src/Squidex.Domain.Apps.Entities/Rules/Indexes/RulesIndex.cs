@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
                 var rules =
                     await Task.WhenAll(
-                        ids.Select(x => GetRuleAsync(appId, x)));
+                        ids.Select(id => GetRuleCoreAsync(DomainId.Combine(appId, id))));
 
                 return rules.NotNull().ToList();
             }
@@ -50,14 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
-                var rule = await GetRuleInternalAsync(appId, id);
-
-                if (IsFound(rule))
-                {
-                    return rule;
-                }
-
-                return null;
+                return await GetRuleCoreAsync(DomainId.Combine(appId, id));
             }
         }
 
@@ -94,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task DeleteRuleAsync(DeleteRule command)
         {
-            var rule = await GetRuleInternalAsync(command.AppId.Id, command.RuleId);
+            var rule = await GetRuleCoreAsync(command.AggregateId);
 
-            if (IsFound(rule))
+            if (rule != null)
             {
                 await Index(rule.AppId.Id).RemoveAsync(rule.Id);
             }
@@ -116,9 +109,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.ToString());
         }
 
-        private static bool IsFound(IRuleEntity rule)
+        private async Task<IRuleEntity?> GetRuleCoreAsync(DomainId id)
         {
-            return rule.Version > EtagVersion.Empty && !rule.IsDeleted;
+            var rule = (await grainFactory.GetGrain<IRuleGrain>(id.ToString()).GetStateAsync()).Value;
+
+            if (rule.Version <= EtagVersion.Empty)
+            {
+                return null;
+            }
+
+            return rule;
         }
     }
 }

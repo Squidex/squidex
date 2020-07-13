@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
-            var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+            var schema = await appProvider.GetSchemaAsync(appId, schemaId, false);
 
             if (schema == null)
             {

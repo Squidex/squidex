@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.appProvider = appProvider;
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(DomainId appId, ISchemaEntity? schema, HashSet<DomainId> ids)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> DoAsync(DomainId appId, ISchemaEntity? schema, HashSet<DomainId> ids, bool canCache)
         {
             Guard.NotNull(ids, nameof(ids));
 
             var find = Collection.Find(CreateFilter(appId, ids));
 
             var contentItems = await find.ToListAsync();
-            var contentSchemas = await GetSchemasAsync(appId, schema, contentItems);
+            var contentSchemas = await GetSchemasAsync(appId, schema, contentItems, canCache);
 
             var result = new List<(IContentEntity Content, ISchemaEntity Schema)>();
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return result;
         }
 
-        private async Task<IDictionary<DomainId, ISchemaEntity>> GetSchemasAsync(DomainId appId, ISchemaEntity? schema, List<MongoContentEntity> contentItems)
+        private async Task<IDictionary<DomainId, ISchemaEntity>> GetSchemasAsync(DomainId appId, ISchemaEntity? schema, List<MongoContentEntity> contentItems, bool canCache)
         {
             var schemas = new Dictionary<DomainId, ISchemaEntity>();
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 if (!schemas.ContainsKey(schemaId))
                 {
-                    var found = await appProvider.GetSchemaAsync(appId, schemaId);
+                    var found = await appProvider.GetSchemaAsync(appId, schemaId, false, canCache);
 
                     if (found != null)
                     {

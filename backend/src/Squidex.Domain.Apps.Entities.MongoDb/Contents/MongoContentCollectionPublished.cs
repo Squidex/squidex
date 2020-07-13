@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, schema, ids);
+                var result = await queryContentsById.DoAsync(app.Id, schema, ids, true);
 
                 return ResultList.Create(result.Count, result.Select(x => x.Content));
             }
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, null, ids);
+                var result = await queryContentsById.DoAsync(app.Id, null, ids, true);
 
                 return result;
             }

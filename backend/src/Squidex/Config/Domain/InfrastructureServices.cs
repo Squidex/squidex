@@ -59,6 +59,12 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AsyncLocalCache>()
                 .As<ILocalCache>();
 
+            services.AddSingletonAs<ReplicatedCache>()
+                .As<IReplicatedCache>();
+
+            services.AddSingletonAs<OrleansPubSub>()
+                .As<IPubSub>();
+
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
 

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool DoNotScript { get; set; }
 
-        DomainId IAggregateCommand.AggregateId
+        public DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, ContentId); }
         }

@@ -128,36 +128,46 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                 });
 
                 editor.on('change', () => {
-                    const value = editor.getContent();
-
-                    if (this.value !== value) {
-                        this.value = value;
-
-                        self.callChange(value);
-                    }
+                    self.onValueChanged();
                 });
 
                 editor.on('paste', (event: ClipboardEvent) => {
+                    let hasFileDropped = false;
+
                     if (event.clipboardData) {
                         for (let i = 0; i < event.clipboardData.items.length; i++) {
                             const file = event.clipboardData.items[i].getAsFile();
 
                             if (file && ImageTypes.indexOf(file.type) >= 0) {
                                 self.uploadFile(file);
+
+                                hasFileDropped = true;
                             }
                         }
+                    }
+
+                    if (!hasFileDropped) {
+                        self.onValueChanged();
                     }
                 });
 
                 editor.on('drop', (event: DragEvent) => {
+                    let hasFileDropped = false;
+
                     if (event.dataTransfer) {
                         for (let i = 0; i < event.dataTransfer.files.length; i++) {
                             const file = event.dataTransfer.files.item(i);
 
                             if (file && ImageTypes.indexOf(file.type) >= 0) {
                                 self.uploadFile(file);
+
+                                hasFileDropped = true;
                             }
                         }
+                    }
+
+                    if (!hasFileDropped) {
+                        self.onValueChanged();
                     }
 
                     return false;
@@ -170,6 +180,16 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
             target
         };
+    }
+
+    private onValueChanged() {
+        const value = this.tinyEditor.getContent();
+
+        if (this.value !== value) {
+            this.value = value;
+
+            this.callChange(value);
+        }
     }
 
     public writeValue(obj: any) {

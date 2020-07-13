@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             if (Guid.TryParse(name, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(AppId, guid);
+                schema = await appProvider.GetSchemaAsync(AppId, guid, false);
             }
             else
             {

@@ -41,14 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
                     new ValidationError("Schema id is required.", "Schemas")
                 });
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, false))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_add_error_if_schemas_ids_are_not_valid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             var trigger = new ContentChangedTriggerV2
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_ids_are_valid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, false))
                 .Returns(Mocks.Schema(appId, schemaId));
 
             var trigger = new ContentChangedTriggerV2

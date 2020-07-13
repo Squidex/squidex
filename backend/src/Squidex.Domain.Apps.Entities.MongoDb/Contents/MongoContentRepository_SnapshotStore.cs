@@ -53,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 {
                     var schema = await GetSchemaAsync(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
+                    if (schema == null)
+                    {
+                        return (null!, EtagVersion.NotFound);
+                    }
+
                     contentEntity.ParseData(schema.SchemaDef, converter);
 
                     return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
@@ -73,9 +78,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                await Task.WhenAll(
-                    UpsertDraftContentAsync(value, oldVersion, newVersion, schema),
-                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema));
+                if (schema == null)
+                {
+                    return;
+                }
+
+                var saveDraft = UpsertDraftContentAsync(value, oldVersion, newVersion, schema);
+                var savePublic = UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema);
+
+                await Task.WhenAll(saveDraft, savePublic);
             }
         }
 
@@ -137,14 +148,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private async Task<ISchemaEntity> GetSchemaAsync(DomainId appId, DomainId schemaId)
+        private async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId schemaId)
         {
             var schema = await appProvider.GetSchemaAsync(appId, schemaId, true);
-
-            if (schema == null)
-            {
-                throw new DomainObjectNotFoundException(schemaId.ToString(), typeof(ISchemaEntity));
-            }
 
             return schema;
         }

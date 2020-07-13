@@ -44,14 +44,14 @@ namespace Squidex.Web.CommandMiddlewares
 
         private NamedId<DomainId> GetSchemaId()
         {
-            var schemaFeature = httpContextAccessor.HttpContext.Features.Get<ISchemaFeature>();
+            var feature = httpContextAccessor.HttpContext.Features.Get<ISchemaFeature>();
 
-            if (schemaFeature == null)
+            if (feature == null)
             {
                 throw new InvalidOperationException("Cannot resolve schema.");
             }
 
-            return schemaFeature.SchemaId;
+            return feature.SchemaId;
         }
     }
 }

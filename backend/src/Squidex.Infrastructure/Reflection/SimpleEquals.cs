@@ -18,8 +18,15 @@ namespace Squidex.Infrastructure.Reflection
     public static class SimpleEquals
     {
         private static readonly ConcurrentDictionary<Type, IDeepComparer> Comparers = new ConcurrentDictionary<Type, IDeepComparer>();
+        private static readonly HashSet<Type> SimpleTypes = new HashSet<Type>();
         private static readonly DefaultComparer DefaultComparer = new DefaultComparer();
         private static readonly NoopComparer NoopComparer = new NoopComparer();
+
+        static SimpleEquals()
+        {
+            SimpleTypes.Add(typeof(string));
+            SimpleTypes.Add(typeof(Uri));
+        }
 
         internal static IDeepComparer Build(Type type)
         {
@@ -91,7 +98,7 @@ namespace Squidex.Infrastructure.Reflection
 
         private static bool IsSimpleType(Type type)
         {
-            return type.IsValueType || type == typeof(string);
+            return type.IsValueType || SimpleTypes.Contains(type);
         }
 
         private static bool IsEquatable(Type type)

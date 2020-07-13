@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public GuardRuleTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
                 .Returns(Mocks.Schema(appId, schemaId));
         }
 

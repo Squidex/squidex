@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Fluid;
 using Fluid.Values;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
