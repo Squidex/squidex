@@ -542,6 +542,11 @@ namespace Squidex.Infrastructure
             return value != null && PropertyNameRegex.IsMatch(value);
         }
 
+        public static string Or(this string? value, string fallback)
+        {
+            return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
+        }
+
         public static string WithFallback(this string? value, string fallback)
         {
             return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;

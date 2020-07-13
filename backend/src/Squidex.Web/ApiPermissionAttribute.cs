@@ -15,7 +15,7 @@ using Squidex.Shared;
 
 namespace Squidex.Web
 {
-    public sealed class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
+    public sealed class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter, IAllowAnonymous
     {
         private readonly string[] permissionIds;
 

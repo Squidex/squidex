@@ -64,6 +64,25 @@
                 </div>
                 <div class="col-auto cell-actions"></div>
             </div>
+            <div class="form-group row">
+                <div class="col cell-input offset-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="{{client.id}}_allowAnonymous" 
+                            [disabled]="!client.canUpdate"
+                            [ngModel]="client.allowAnonymous"
+                            (ngModelChange)="updateAccess($event)" />
+            
+                        <label class="form-check-label" for="{{client.id}}_allowAnonymous">
+                            Allow anonymous access.
+                        </label>
+                    </div>
+        
+                    <sqx-form-hint>
+                        Allow access to the API without an access token to all resources that are configured via the role of this client. Do not give more than one client anonymous access.
+                    </sqx-form-hint>
+                </div>
+                <div class="col-auto cell-actions"></div>
+            </div>
         </div>
     </div>
 </div>

@@ -71,12 +71,6 @@ namespace Squidex.Infrastructure.Validation
             return $"{Upper(property)} is not a valid value.";
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string DefinedOr(string property1, string property2)
-        {
-            return $"Either {Lower(property1)} or {Lower(property2)} must be defined.";
-        }
-
         private static string Lower(string property)
         {
             if (char.IsUpper(property[0]))

@@ -34,16 +34,12 @@ namespace Squidex.Web.Pipeline
         private readonly ActionContext actionContext;
         private readonly ActionExecutingContext actionExecutingContext;
         private readonly ActionExecutionDelegate next;
-        private readonly ClaimsIdentity userIdentiy = new ClaimsIdentity();
-        private readonly ClaimsPrincipal user;
         private readonly string appName = "my-app";
         private readonly AppResolver sut;
         private bool isNextCalled;
 
         public AppResolverTests()
         {
-            user = new ClaimsPrincipal(userIdentiy);
-
             actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
             {
                 EndpointMetadata = new List<object>()
@@ -51,7 +47,6 @@ namespace Squidex.Web.Pipeline
 
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
             actionExecutingContext.HttpContext = httpContext;
-            actionExecutingContext.HttpContext.User = user;
             actionExecutingContext.RouteData.Values["app"] = appName;
 
             next = () =>
@@ -67,6 +62,8 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_return_not_found_if_app_not_found()
         {
+            SetupUser();
+
             A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(Task.FromResult<IAppEntity?>(null));
 
@@ -77,12 +74,30 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_return_401_if_user_is_anonymous()
+        {
+            var user = SetupUser(null);
+
+            var app = CreateApp(appName);
+
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+                .Returns(app);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.IsType<UnauthorizedResult>(actionExecutingContext.Result);
+            Assert.False(isNextCalled);
+        }
+
+        [Fact]
         public async Task Should_resolve_app_from_user()
         {
+            var user = SetupUser();
+
             var app = CreateApp(appName, appUser: "user1");
 
-            userIdentiy.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
+            user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
             A.CallTo(() => appProvider.GetAppAsync(appName, true))
                 .Returns(app);
@@ -97,9 +112,11 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_resolve_app_from_client()
         {
-            var app = CreateApp(appName, appClient: "client1");
+            var user = SetupUser();
 
-            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+
+            var app = CreateApp(appName, appClient: "client1");
 
             A.CallTo(() => appProvider.GetAppAsync(appName, true))
                 .Returns(app);
@@ -112,12 +129,31 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_resolve_app_if_anonymous_but_not_permissions()
+        public async Task Should_resolve_app_from_anonymous_client()
         {
-            var app = CreateApp(appName);
+            var user = SetupUser();
 
-            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
-            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+            var app = CreateApp(appName, appClient: "client1", allowAnonymous: true);
+
+            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+                .Returns(app);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.Same(app, httpContext.Context().App);
+            Assert.True(user.Claims.Count() > 2);
+            Assert.True(isNextCalled);
+        }
+
+        [Fact]
+        public async Task Should_resolve_app_if_action_allows_anonymous_but_user_has_no_permissions()
+        {
+            var user = SetupUser();
+
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+
+            var app = CreateApp(appName);
 
             actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
@@ -134,10 +170,12 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_return_not_found_if_user_has_no_permissions()
         {
-            var app = CreateApp(appName);
+            var user = SetupUser();
 
-            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
-            userIdentiy.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+
+            var app = CreateApp(appName);
 
             A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
@@ -151,9 +189,11 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_return_not_found_if_client_is_from_another_app()
         {
-            var app = CreateApp(appName, appClient: "client1");
+            var user = SetupUser();
 
-            userIdentiy.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
+
+            var app = CreateApp(appName, appClient: "client1");
 
             A.CallTo(() => appProvider.GetAppAsync(appName, false))
                 .Returns(app);
@@ -177,7 +217,17 @@ namespace Squidex.Web.Pipeline
                 .MustNotHaveHappened();
         }
 
-        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null)
+        private ClaimsIdentity SetupUser(string? type = "OIDC")
+        {
+            var userIdentity = new ClaimsIdentity(type);
+            var userPrincipal = new ClaimsPrincipal(userIdentity);
+
+            actionExecutingContext.HttpContext.User = userPrincipal;
+
+            return userIdentity;
+        }
+
+        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null, bool? allowAnonymous = null)
         {
             var appEntity = A.Fake<IAppEntity>();
 
@@ -195,7 +245,7 @@ namespace Squidex.Web.Pipeline
             if (appClient != null)
             {
                 A.CallTo(() => appEntity.Clients)
-                    .Returns(AppClients.Empty.Add(appClient, "secret"));
+                    .Returns(AppClients.Empty.Add(appClient, "secret").Update(appClient, allowAnonymous: allowAnonymous));
             }
             else
             {

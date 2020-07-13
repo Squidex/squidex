@@ -29,7 +29,8 @@ export class ClientDto {
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly role: string
+        public readonly role: string,
+        public readonly allowAnonymous: boolean
     ) {
         this._links = links;
 
@@ -53,6 +54,7 @@ export interface CreateClientDto {
 export interface UpdateClientDto {
     readonly name?: string;
     readonly role?: string;
+    readonly allowAnonymous?: boolean;
 }
 
 @Injectable()
@@ -144,7 +146,8 @@ function parseClients(response: any): ClientsPayload {
             item.id,
             item.name || item.id,
             item.secret,
-            item.role));
+            item.role,
+            item.allowAnonymous));
 
     const _links = response._links;
 

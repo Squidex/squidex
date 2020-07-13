@@ -58,6 +58,11 @@ namespace Squidex.Web.Pipeline
                     (role, permissions) = FindByOpenIdClient(app, user);
                 }
 
+                if (permissions == null)
+                {
+                    (role, permissions) = FindAnonymousClient(app);
+                }
+
                 if (permissions != null)
                 {
                     var identity = user.Identities.First();
@@ -77,7 +82,15 @@ namespace Squidex.Web.Pipeline
 
                 if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
-                    context.Result = new NotFoundResult();
+                    if (string.IsNullOrWhiteSpace(user.Identity.AuthenticationType))
+                    {
+                        context.Result = new UnauthorizedResult();
+                    }
+                    else
+                    {
+                        context.Result = new NotFoundResult();
+                    }
+
                     return;
                 }
 
@@ -129,6 +142,18 @@ namespace Squidex.Web.Pipeline
             }
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
+            {
+                return (client.Role, role.Permissions);
+            }
+
+            return (null, null);
+        }
+
+        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app)
+        {
+            var client = app.Clients.Values.FirstOrDefault(x => x.AllowAnonymous);
+
+            if (client != null && app.Roles.TryGet(app.Name, client.Role, out var role))
             {
                 return (client.Role, role.Permissions);
             }
