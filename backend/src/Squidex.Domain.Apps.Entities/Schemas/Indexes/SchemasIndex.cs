@@ -157,6 +157,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                     if (schema != null)
                     {
+                        CacheIt(schema, true);
+
                         if (context.Command is DeleteSchema)
                         {
                             await DeleteSchemaAsync(schema);
