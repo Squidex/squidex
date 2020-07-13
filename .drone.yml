@@ -18,6 +18,7 @@ steps:
         - pull_request
       branch:
         - master
+        - release/*
         
   - name: build_dev
     image: docker
