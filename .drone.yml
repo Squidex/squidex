@@ -49,6 +49,7 @@ steps:
         - pull_request
       branch:
         - master
+        - release/*
 
   - name: test_run
     image: mcr.microsoft.com/dotnet/core/sdk:3.1-buster
@@ -64,6 +65,7 @@ steps:
         - pull_request
       branch:
         - master
+        - release/*
 
   - name: test_cleanup
     image: docker/compose
@@ -84,6 +86,7 @@ steps:
         - pull_request
       branch:
         - master
+        - release/*
 
   - name: push_dev
     image: docker
