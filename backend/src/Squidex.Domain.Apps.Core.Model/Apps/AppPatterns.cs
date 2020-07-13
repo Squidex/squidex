@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -41,11 +40,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Update(Guid id, string name, string pattern, string? message = null)
+        public AppPatterns Update(Guid id, string? name = null, string? pattern = null, string? message = null)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNullOrEmpty(pattern, nameof(pattern));
-
             if (!TryGetValue(id, out var appPattern))
             {
                 return this;

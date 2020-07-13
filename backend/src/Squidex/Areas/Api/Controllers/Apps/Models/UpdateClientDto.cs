@@ -17,12 +17,17 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The new display name of the client.
         /// </summary>
         [StringLength(20)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The role of the client.
         /// </summary>
         public string? Role { get; set; }
+
+        /// <summary>
+        /// True to allow anonymous access without an access token for this client.
+        /// </summary>
+        public bool? AllowAnonymous { get; set; }
 
         public UpdateClient ToCommand(string clientId)
         {

@@ -23,15 +23,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", Role.Editor));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", Role.Editor, false));
         }
 
         [Fact]
         public void Should_assign_clients_with_permission()
         {
-            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", Role.Reader));
+            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", Role.Reader, false));
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", Role.Reader));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", Role.Reader, false));
         }
 
         [Fact]
@@ -47,45 +47,37 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1.Add("2", new AppClient("my-name", "my-secret", "my-role"));
+            clients_1.Add("2", new AppClient("my-name", "my-secret", "my-role", false));
         }
 
         [Fact]
-        public void Should_rename_client()
+        public void Should_update_client_with_role()
         {
-            var clients_1 = clients_0.Rename("1", "new-name");
+            var client_1 = clients_0.Update("1", role: Role.Reader);
 
-            clients_1["1"].Should().BeEquivalentTo(new AppClient("new-name", "my-secret", Role.Editor));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Reader, false));
         }
 
         [Fact]
-        public void Should_return_same_clients_if_client_is_updated_with_the_same_values()
+        public void Should_update_client_with_name()
         {
-            var clients_1 = clients_0.Rename("2", "2");
+            var client_1 = clients_0.Update("1", name: "New-Name");
 
-            Assert.Same(clients_0, clients_1);
+            client_1["1"].Should().BeEquivalentTo(new AppClient("New-Name", "my-secret", Role.Editor, false));
         }
 
         [Fact]
-        public void Should_return_same_clients_if_client_to_rename_not_found()
+        public void Should_update_client_with_allow_anonymous()
         {
-            var clients_1 = clients_0.Rename("2", "new-name");
+            var client_1 = clients_0.Update("1", allowAnonymous: true);
 
-            Assert.Same(clients_0, clients_1);
-        }
-
-        [Fact]
-        public void Should_update_client()
-        {
-            var client_1 = clients_0.Update("1", Role.Reader);
-
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Reader));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, true));
         }
 
         [Fact]
         public void Should_return_same_clients_if_client_to_update_not_found()
         {
-            var clients_1 = clients_0.Update("2", Role.Reader);
+            var clients_1 = clients_0.Update("2", role: Role.Reader);
 
             Assert.Same(clients_0, clients_1);
         }

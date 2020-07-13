@@ -17,7 +17,9 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Secret { get; }
 
-        public AppClient(string name, string secret, string role)
+        public bool AllowAnonymous { get; set; }
+
+        public AppClient(string name, string secret, string role, bool allowAnonymous)
             : base(name)
         {
             Guard.NotNullOrEmpty(secret, nameof(secret));
@@ -26,22 +28,14 @@ namespace Squidex.Domain.Apps.Core.Apps
             Role = role;
 
             Secret = secret;
+
+            AllowAnonymous = allowAnonymous;
         }
 
         [Pure]
-        public AppClient Update(string newRole)
+        public AppClient Update(string? name, string? role, bool? allowAnonymous)
         {
-            Guard.NotNullOrEmpty(newRole, nameof(newRole));
-
-            return new AppClient(Name, Secret, newRole);
-        }
-
-        [Pure]
-        public AppClient Rename(string newName)
-        {
-            Guard.NotNullOrEmpty(newName, nameof(newName));
-
-            return new AppClient(newName, Secret, Role);
+            return new AppClient(name.Or(Name), Secret, role.Or(Role), allowAnonymous ?? AllowAnonymous);
         }
     }
 }

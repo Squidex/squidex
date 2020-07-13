@@ -37,6 +37,10 @@ export class ClientComponent {
         this.clientsState.update(this.client, { role });
     }
 
+    public updateAccess(allowAnonymous: boolean) {
+        this.clientsState.update(this.client, { allowAnonymous });
+    }
+
     public rename(name: string) {
         this.clientsState.update(this.client, { name });
     }

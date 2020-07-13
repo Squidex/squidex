@@ -341,19 +341,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public void UpdateClient(UpdateClient command)
-        {
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
-            }
-
-            if (command.Role != null)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Role = command.Role }));
-            }
-        }
-
         public void ChangePlan(ChangePlan command)
         {
             if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
@@ -369,6 +356,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void Update(UpdateApp command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppUpdated()));
+        }
+
+        public void UpdateClient(UpdateClient command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated()));
         }
 
         public void UploadImage(UploadAppImage command)

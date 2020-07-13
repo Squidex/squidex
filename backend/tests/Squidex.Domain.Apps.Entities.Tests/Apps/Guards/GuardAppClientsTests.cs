@@ -96,17 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_no_name_and_role()
-        {
-            var command = new UpdateClient { Id = "ios" };
-
-            var clients_1 = clients_0.Add("ios", "secret");
-
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
-                new ValidationError("Either name or role must be defined.", "Name", "Role"));
-        }
-
-        [Fact]
         public void UpdateClient_should_throw_exception_if_client_has_invalid_role()
         {
             var command = new UpdateClient { Id = "ios", Role = "Invalid" };

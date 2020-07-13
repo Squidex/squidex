@@ -406,8 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
-                    CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
+                    CreateEvent(new AppClientUpdated { Id = clientId, Name = clientNewName, Role = Role.Developer })
                 );
         }
 
