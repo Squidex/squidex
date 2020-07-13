@@ -156,14 +156,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             ISchemaEntity? schema = null;
 
+            var canCache = !context.IsFrontendClient;
+
             if (Guid.TryParse(schemaIdOrName, out var id))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, id);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, id, false, canCache);
             }
 
             if (schema == null)
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
             }
 
             if (schema == null)

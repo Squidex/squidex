@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<Guid>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<Guid>._, false, false))
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<Guid>(0)!, x.GetArgument<Guid>(1)!)));
 
             return appProvider;

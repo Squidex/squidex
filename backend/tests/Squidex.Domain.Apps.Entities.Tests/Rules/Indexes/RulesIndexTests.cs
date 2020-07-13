@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_resolve_rules_by_id()
         {
-            var rule = SetupRule(0, false);
+            var rule = SetupRule(0);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_return_empty_rule_if_rule_not_created()
         {
-            var rule = SetupRule(-1, false);
+            var rule = SetupRule(-1);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_return_empty_rule_if_rule_deleted()
         {
-            var rule = SetupRule(-1, false);
+            var rule = SetupRule(-1);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_remove_rule_from_index_on_delete()
         {
-            var rule = SetupRule(0, false);
+            var rule = SetupRule(0);
 
             var command = new DeleteRule { RuleId = rule.Id };
 
@@ -118,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                 .MustHaveHappened();
         }
 
-        private IRuleEntity SetupRule(long version, bool deleted)
+        private IRuleEntity SetupRule(long version)
         {
             var ruleId = Guid.NewGuid();
 
-            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version, IsDeleted = deleted };
+            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version };
             var ruleGrain = A.Fake<IRuleGrain>();
 
             A.CallTo(() => ruleGrain.GetStateAsync())

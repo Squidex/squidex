@@ -24,19 +24,13 @@ namespace Squidex.Infrastructure.Caching
 
                 await Task.Delay(5);
 
-                var found = sut.TryGetValue("Key", out var value);
-
-                Assert.True(found);
-                Assert.Equal(1, value);
+                AssertCache(sut, "Key", 1, true);
 
                 await Task.Delay(5);
 
                 sut.Remove("Key");
 
-                var foundAfterRemove = sut.TryGetValue("Key", out value);
-
-                Assert.False(foundAfterRemove);
-                Assert.Null(value);
+                AssertCache(sut, "Key", null, false);
             }
         }
 
@@ -47,19 +41,13 @@ namespace Squidex.Infrastructure.Caching
 
             await Task.Delay(5);
 
-            var found = sut.TryGetValue("Key", out var value);
-
-            Assert.False(found);
-            Assert.Null(value);
+            AssertCache(sut, "Key", null, false);
 
             sut.Remove("Key");
 
             await Task.Delay(5);
 
-            var foundAfterRemove = sut.TryGetValue("Key", out value);
-
-            Assert.False(foundAfterRemove);
-            Assert.Null(value);
+            AssertCache(sut, "Key", null, false);
         }
 
         [Fact]
@@ -67,11 +55,11 @@ namespace Squidex.Infrastructure.Caching
         {
             using (sut.StartContext())
             {
-                var value1 = sut.GetOrCreate("Key", () => ++called);
+                var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 await Task.Delay(5);
 
-                var value2 = sut.GetOrCreate("Key", () => ++called);
+                var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
                 Assert.Equal(1, called);
                 Assert.Equal(1, value1);
@@ -82,11 +70,11 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public async Task Should_call_creator_twice_when_context_not_exists()
         {
-            var value1 = sut.GetOrCreate("Key", () => ++called);
+            var value1 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             await Task.Delay(5);
 
-            var value2 = sut.GetOrCreate("Key", () => ++called);
+            var value2 = await sut.GetOrCreateAsync("Key", () => Task.FromResult(++called));
 
             Assert.Equal(2, called);
             Assert.Equal(1, value1);
@@ -122,6 +110,14 @@ namespace Squidex.Infrastructure.Caching
             Assert.Equal(2, called);
             Assert.Equal(1, value1);
             Assert.Equal(2, value2);
+        }
+
+        private static void AssertCache(ILocalCache cache, string key, object? expectedValue, bool expectedFound)
+        {
+            var found = cache.TryGetValue(key, out var value);
+
+            Assert.Equal(expectedFound, found);
+            Assert.Equal(expectedValue, value);
         }
     }
 }

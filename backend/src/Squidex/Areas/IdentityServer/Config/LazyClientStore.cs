@@ -65,7 +65,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
             if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
             {
-                var app = await appProvider.GetAppAsync(appName);
+                var app = await appProvider.GetAppAsync(appName, true);
 
                 var appClient = app?.Clients.GetOrDefault(appClientId);
 

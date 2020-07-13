@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             Guard.NotNull(action, nameof(action));
             Guard.NotNull(appProvider, nameof(appProvider));
 
-            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x));
+            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x, false));
 
             return action.Accept(visitor);
         }

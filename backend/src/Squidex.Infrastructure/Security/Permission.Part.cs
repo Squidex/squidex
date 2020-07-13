@@ -132,9 +132,11 @@ namespace Squidex.Infrastructure.Security
 
             private static int CountOf(ReadOnlySpan<char> text, char character)
             {
+                var length = text.Length;
+
                 var count = 0;
 
-                for (var i = 0; i < text.Length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     if (text[i] == character)
                     {

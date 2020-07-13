@@ -12,6 +12,7 @@ services:
       - "8086:8086"
     environment:
       - INFLUXDB_DB=k6
+      - INFLUXDB_HTTP_MAX_BODY_SIZE=0
 
   grafana:
     image: grafana/grafana:latest

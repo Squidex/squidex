@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
@@ -40,24 +41,16 @@ namespace Squidex.Domain.Apps.Entities
             this.indexSchemas = indexSchemas;
         }
 
-        public Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(Guid appId, Guid id)
+        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(Guid appId, Guid id, bool canCache = false)
         {
-            return localCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
-            {
-                return await GetAppWithSchemaUncachedAsync(appId, id);
-            });
-        }
-
-        private async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaUncachedAsync(Guid appId, Guid id)
-        {
-            var app = await GetAppAsync(appId);
+            var app = await GetAppAsync(appId, canCache);
 
             if (app == null)
             {
                 return (null, null);
             }
 
-            var schema = await GetSchemaAsync(appId, id, false);
+            var schema = await GetSchemaAsync(appId, id, false, canCache);
 
             if (schema == null)
             {
@@ -67,60 +60,114 @@ namespace Squidex.Domain.Apps.Entities
             return (app, schema);
         }
 
-        public Task<IAppEntity?> GetAppAsync(Guid appId)
+        public async Task<IAppEntity?> GetAppAsync(Guid appId, bool canCache = false)
         {
-            return localCache.GetOrCreateAsync($"GetAppAsync({appId})", async () =>
+            var app = await localCache.GetOrCreateAsync(AppCacheKey(appId), () =>
             {
-                return await indexForApps.GetAppAsync(appId);
+                return indexForApps.GetAppAsync(appId, canCache);
             });
+
+            if (app != null)
+            {
+                localCache.Add(AppCacheKey(app.Id), app);
+            }
+
+            return app?.IsArchived == true ? null : app;
         }
 
-        public Task<IAppEntity?> GetAppAsync(string appName)
+        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false)
         {
-            return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
+            var app = await localCache.GetOrCreateAsync(AppCacheKey(appName), () =>
             {
-                return await indexForApps.GetAppByNameAsync(appName);
+                return indexForApps.GetAppByNameAsync(appName, canCache);
             });
+
+            if (app != null)
+            {
+                localCache.Add(AppCacheKey(app.Id), app);
+            }
+
+            return app?.IsArchived == true ? null : app;
         }
 
-        public Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name, bool canCache = false)
         {
-            return localCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
+            var schema = await localCache.GetOrCreateAsync(SchemaCacheKey(appId, name), () =>
             {
-                return await indexForApps.GetAppsForUserAsync(userId, permissions);
+                return indexSchemas.GetSchemaByNameAsync(appId, name, canCache);
             });
+
+            if (schema != null)
+            {
+                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+            }
+
+            return schema?.IsDeleted == true ? null : schema;
         }
 
-        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string name)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false, bool canCache = false)
         {
-            return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
+            var schema = await localCache.GetOrCreateAsync(SchemaCacheKey(appId, id), () =>
             {
-                return await indexSchemas.GetSchemaByNameAsync(appId, name);
+                return indexSchemas.GetSchemaAsync(appId, id, canCache);
             });
+
+            if (schema != null)
+            {
+                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+            }
+
+            return schema?.IsDeleted == true && !allowDeleted ? null : schema;
         }
 
-        public Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions)
         {
-            return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
+            var apps = await localCache.GetOrCreateAsync($"GetUserApps({userId})", () =>
             {
-                return await indexSchemas.GetSchemaAsync(appId, id, allowDeleted);
+                return indexForApps.GetAppsForUserAsync(userId, permissions);
             });
+
+            return apps.Where(x => !x.IsArchived).ToList();
         }
 
-        public Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
         {
-            return localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
+            var schemas = await localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", () =>
             {
-                return await indexSchemas.GetSchemasAsync(appId);
+                return indexSchemas.GetSchemasAsync(appId);
             });
+
+            return schemas.Where(x => !x.IsDeleted).ToList();
         }
 
-        public Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
+        public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
         {
-            return localCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
+            var rules = await localCache.GetOrCreateAsync($"GetRulesAsync({appId})", () =>
             {
-                return await indexRules.GetRulesAsync(appId);
+                return indexRules.GetRulesAsync(appId);
             });
+
+            return rules.Where(x => !x.IsDeleted).ToList();
+        }
+
+        private static string AppCacheKey(Guid appId)
+        {
+            return $"APPS_ID_{appId}";
+        }
+
+        private static string AppCacheKey(string appName)
+        {
+            return $"APPS_NAME_{appName}";
+        }
+
+        private static string SchemaCacheKey(Guid appId, Guid id)
+        {
+            return $"SCHEMAS_ID_{appId}_{id}";
+        }
+
+        private static string SchemaCacheKey(Guid appId, string name)
+        {
+            return $"SCHEMAS_NAME_{appId}_{name}";
         }
     }
 }

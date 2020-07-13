@@ -1,5 +1,5 @@
-import { check } from 'k6';
 import http from 'k6/http';
+import { check } from 'k6';
 import { variables, getBearerToken } from './shared.js';
 
 export const options = {
@@ -9,18 +9,17 @@ export const options = {
     ],
     thresholds: {
         'http_req_duration': ['p(99)<300'], // 99% of requests must complete below 300ms
-    },
-    discardResponseBodies: true
+    }
 };
 
 export function setup() {
-    const token = getBearerToken(variables.appName);
+    const token = getBearerToken('ci-semantic-search');
 
     return { token };
 }
 
 export default function (data) {
-    const url = `${variables.serverUrl}/api/apps/${variables.appName}/clients`;
+    const url = `${variables.serverUrl}/api/content/ci-semantic-search/test/5d648f76-7ae9-4141-a325-0c31ed155e5c`;
 
     const response = http.get(url, {
         headers: {
@@ -31,4 +30,4 @@ export default function (data) {
     check(response, {
         'is status 200': (r) => r.status === 200,
     });
-}
+} 

@@ -34,7 +34,7 @@ namespace Migrations.Migrations
 
             foreach (var id in ids)
             {
-                var app = await indexForApps.GetAppAsync(id);
+                var app = await indexForApps.GetAppAsync(id, false);
 
                 if (app != null && app.Patterns.Count == 0)
                 {

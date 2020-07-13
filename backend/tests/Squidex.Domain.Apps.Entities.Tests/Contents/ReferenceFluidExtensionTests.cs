@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ReferencesFluidExtension(contentQuery, appProvider)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
                 .Returns(Mocks.App(appId));
 
             sut = new FluidTemplateEngine(extensions);

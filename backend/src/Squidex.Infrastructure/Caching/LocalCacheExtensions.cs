@@ -10,34 +10,27 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public static class RequestCacheExtensions
+    public static class LocalCacheExtensions
     {
         public static async Task<T> GetOrCreateAsync<T>(this ILocalCache cache, object key, Func<Task<T>> task)
         {
-            if (cache.TryGetValue(key, out var value) && value is T typedValue)
+            if (cache.TryGetValue(key, out var value))
             {
-                return typedValue;
+                if (value is T typed)
+                {
+                    return typed;
+                }
+                else
+                {
+                    return default!;
+                }
             }
 
-            typedValue = await task();
+            var result = await task();
 
-            cache.Add(key, typedValue);
+            cache.Add(key, result);
 
-            return typedValue;
-        }
-
-        public static T GetOrCreate<T>(this ILocalCache cache, object key, Func<T> task)
-        {
-            if (cache.TryGetValue(key, out var value) && value is T typedValue)
-            {
-                return typedValue;
-            }
-
-            typedValue = task();
-
-            cache.Add(key, typedValue);
-
-            return typedValue;
+            return result;
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             SetupEnricher();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, A<bool>._))
                 .Returns(schema);
 
             A.CallTo(() => queryParser.ParseQueryAsync(A<Context>._, schema, A<Q>._))
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, true))
                 .Returns(schema);
 
             var result = await sut.GetSchemaOrThrowAsync(ctx, input);
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true))
                 .Returns(schema);
 
             var result = await sut.GetSchemaOrThrowAsync(ctx, input);
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<string>._))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>._, A<string>._, true))
                 .Returns((ISchemaEntity?)null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));

@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
-                    var app = await appProvider.GetAppAsync(enrichedEvent.AppId.Id);
+                    var app = await appProvider.GetAppAsync(enrichedEvent.AppId.Id, false);
 
                     if (app == null)
                     {
