@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
 {
+    [Trait("Category", "Dependencies")]
     public class PubSubTests
     {
         [Fact]
