@@ -9,10 +9,13 @@ using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FakeItEasy;
+using GraphQL;
+using Grpc.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
@@ -94,6 +97,22 @@ namespace Squidex.Web.Pipeline
 
             A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 500 && x.Value is ErrorDto)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_log_exception()
+        {
+            var ex = new InvalidOperationException();
+
+            var failingNext = new RequestDelegate(context =>
+            {
+                throw ex;
+            });
+
+            await sut.InvokeAsync(httpContext, failingNext);
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Error, ex, A<LogFormatter>._))
                 .MustHaveHappened();
         }
 
