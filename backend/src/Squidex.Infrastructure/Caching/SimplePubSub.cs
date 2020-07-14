@@ -10,11 +10,11 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public sealed class SimplePubSub : IPubSub
+    public class SimplePubSub : IPubSub
     {
         private readonly List<Action<object>> handlers = new List<Action<object>>();
 
-        public void Publish(object message)
+        public virtual void Publish(object message)
         {
             foreach (var handler in handlers)
             {
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Caching
             }
         }
 
-        public void Subscribe(Action<object> handler)
+        public virtual void Subscribe(Action<object> handler)
         {
             Guard.NotNull(handler, nameof(handler));
 

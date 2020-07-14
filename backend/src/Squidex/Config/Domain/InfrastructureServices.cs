@@ -46,6 +46,8 @@ namespace Squidex.Config.Domain
                 config.GetSection("urls"));
             services.Configure<ExposedConfiguration>(
                 config.GetSection("exposedConfiguration"));
+            services.Configure<ReplicatedCacheOptions>(
+                config.GetSection("caching:replicated"));
 
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();

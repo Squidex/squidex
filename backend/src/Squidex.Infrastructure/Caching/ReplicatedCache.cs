@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Caching
 {
@@ -15,6 +16,7 @@ namespace Squidex.Infrastructure.Caching
         private readonly Guid instanceId = Guid.NewGuid();
         private readonly IMemoryCache memoryCache;
         private readonly IPubSub pubSub;
+        private readonly ReplicatedCacheOptions options;
 
         public class InvalidateMessage
         {
@@ -23,15 +25,22 @@ namespace Squidex.Infrastructure.Caching
             public string Key { get; set; }
         }
 
-        public ReplicatedCache(IMemoryCache memoryCache, IPubSub pubSub)
+        public ReplicatedCache(IMemoryCache memoryCache, IPubSub pubSub, IOptions<ReplicatedCacheOptions> options)
         {
             Guard.NotNull(memoryCache, nameof(memoryCache));
             Guard.NotNull(pubSub, nameof(pubSub));
+            Guard.NotNull(options, nameof(options));
 
             this.memoryCache = memoryCache;
 
             this.pubSub = pubSub;
-            this.pubSub.Subscribe(OnMessage);
+
+            if (options.Value.Enable)
+            {
+                this.pubSub.Subscribe(OnMessage);
+            }
+
+            this.options = options.Value;
         }
 
         private void OnMessage(object message)
@@ -44,6 +53,11 @@ namespace Squidex.Infrastructure.Caching
 
         public void Add(string key, object? value, TimeSpan expiration, bool invalidate)
         {
+            if (!options.Enable)
+            {
+                return;
+            }
+
             memoryCache.Set(key, value, expiration);
 
             if (invalidate)
@@ -54,6 +68,11 @@ namespace Squidex.Infrastructure.Caching
 
         public void Remove(string key)
         {
+            if (!options.Enable)
+            {
+                return;
+            }
+
             memoryCache.Remove(key);
 
             Invalidate(key);
@@ -61,11 +80,23 @@ namespace Squidex.Infrastructure.Caching
 
         public bool TryGetValue(string key, out object? value)
         {
+            if (!options.Enable)
+            {
+                value = null;
+
+                return false;
+            }
+
             return memoryCache.TryGetValue(key, out value);
         }
 
         private void Invalidate(string key)
         {
+            if (!options.Enable)
+            {
+                return;
+            }
+
             pubSub.Publish(new InvalidateMessage { Key = key, Source = instanceId });
         }
     }
