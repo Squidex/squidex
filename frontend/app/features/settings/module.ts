@@ -11,6 +11,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PatternComponent, PatternsPageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
+import { WorkflowDiagramComponent } from './pages/workflows/workflow-diagram.component';
 
 const routes: Routes = [
     {
@@ -195,6 +196,7 @@ const routes: Routes = [
         SettingsAreaComponent,
         WorkflowAddFormComponent,
         WorkflowComponent,
+        WorkflowDiagramComponent,
         WorkflowsPageComponent,
         WorkflowStepComponent,
         WorkflowTransitionComponent
