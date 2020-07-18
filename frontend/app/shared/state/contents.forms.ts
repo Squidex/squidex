@@ -7,22 +7,15 @@
 
 // tslint:disable: max-line-length
 // tslint:disable: prefer-for-of
+// tslint:disable: readonly-array
 
-import { FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { DateTime, Form, formControls, StringFormControl, Types, ValidatorsEx, value$ } from '@app/framework';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, StringFormControl as FormControlForString, Types, value$, getRawValue } from '@app/framework';
 import { BehaviorSubject } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { ContentDto, ContentReferencesValue } from './../services/contents.service';
-import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
-
-export class HtmlValue {
-    constructor(
-        public readonly html: string
-    ) {
-    }
-}
+import { fieldInvariant } from './../services/schemas.types';
+import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string, user: boolean };
 
@@ -36,389 +29,6 @@ export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
             ],
             user: false
         }));
-    }
-}
-
-export type FieldValue = string | HtmlValue;
-
-export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any, formatted: FieldValue } {
-    if (content.referenceData) {
-        const reference = content.referenceData[field.name];
-
-        const isAssets = field.properties.fieldType === 'Assets';
-
-        if (reference && (!isAssets || allowHtml)) {
-            let fieldValue: ContentReferencesValue;
-
-            if (field.isLocalizable) {
-                fieldValue = reference[language.iso2Code];
-            } else {
-                fieldValue = reference[fieldInvariant];
-            }
-
-            let value: string | undefined = undefined;
-
-            if (Types.isObject(fieldValue)) {
-                value = fieldValue[language.iso2Code];
-            } else {
-                value = fieldValue;
-            }
-
-            let formatted: FieldValue = value!;
-
-            if (value) {
-                if (isAssets && Types.isArray(value)) {
-                    if (value.length === 2) {
-                        const previewMode = field.properties['previewMode'];
-
-                        if (previewMode === 'ImageAndFileName') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" /> <span>${value[1]}</span>`);
-                        } else if (previewMode === 'Image') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" />`);
-                        } else {
-                            formatted = value[1];
-                        }
-                    } else if (value.length === 1) {
-                        formatted = value[0];
-                    }
-                }
-            } else {
-                value = formatted = '- No Value -';
-            }
-
-            return { value, formatted };
-        }
-    }
-
-    const contentField = content.data[field.name];
-
-    if (contentField) {
-        let value: any;
-
-        if (field.isLocalizable) {
-            value = contentField[language.iso2Code];
-        } else {
-            value = contentField[fieldInvariant];
-        }
-
-        let formatted: any;
-
-        if (Types.isUndefined(value)) {
-            formatted = value || '';
-        } else {
-            formatted = FieldFormatter.format(field, value, allowHtml);
-        }
-
-        return { value, formatted };
-    }
-
-    return { value: undefined, formatted: '' };
-}
-
-export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
-    private constructor(
-        private readonly value: any,
-        private readonly allowHtml: boolean
-    ) {
-    }
-
-    public static format(field: FieldDto, value: any, allowHtml = true) {
-        if (value === null || value === undefined) {
-            return '';
-        }
-
-        return field.properties.accept(new FieldFormatter(value, allowHtml));
-    }
-
-    public visitArray(_: ArrayFieldPropertiesDto): string {
-        return this.formatArray('Item', 'Items');
-    }
-
-    public visitAssets(_: AssetsFieldPropertiesDto): string {
-        return this.formatArray('Asset', 'Assets');
-    }
-
-    public visitBoolean(_: BooleanFieldPropertiesDto): string {
-        return this.value ? 'Yes' : 'No';
-    }
-
-    public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
-        try {
-            const parsed = DateTime.parseISO(this.value);
-
-            if (properties.editor === 'Date') {
-                return parsed.toStringFormatUTC('yyyy-MM-dd');
-            } else {
-                return parsed.toStringFormatUTC('yyyy-MM-dd HH:mm:ss');
-            }
-        } catch (ex) {
-            return this.value;
-        }
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): string {
-        return `${this.value.longitude}, ${this.value.latitude}`;
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): string {
-        return '<Json />';
-    }
-
-    public visitNumber(properties: NumberFieldPropertiesDto): FieldValue {
-        if (Types.isNumber(this.value) && properties.editor === 'Stars' && this.allowHtml) {
-            if (this.value <= 0 || this.value > 6) {
-                return new HtmlValue(`&#9733; ${this.value}`);
-            } else {
-                let html = '';
-
-                for (let i = 0; i < this.value; i++) {
-                    html += '&#9733; ';
-                }
-
-                return new HtmlValue(html);
-            }
-        }
-        return `${this.value}`;
-    }
-
-    public visitReferences(_: ReferencesFieldPropertiesDto): string {
-        return this.formatArray('Reference', 'References');
-    }
-
-    public visitTags(_: TagsFieldPropertiesDto): string {
-        if (this.value.length) {
-            return this.value.join(', ');
-        } else {
-            return '';
-        }
-    }
-
-    public visitString(properties: StringFieldPropertiesDto): any {
-        if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            const src = thumbnail(this.value, undefined, 50);
-
-            if (src) {
-                return new HtmlValue(`<img src="${src}" />`);
-            }
-        }
-
-        return this.value;
-    }
-
-    public visitUI(_: UIFieldPropertiesDto): any {
-        return '';
-    }
-
-    private formatArray(singularName: string, pluralName: string) {
-        if (Types.isArray(this.value)) {
-            if (this.value.length > 1) {
-                return `${this.value.length} ${pluralName}`;
-            } else if (this.value.length === 1) {
-                return `1 ${singularName}`;
-            }
-        }
-
-        return `0 ${pluralName}`;
-    }
-}
-
-export function thumbnail(url: string, width?: number, height?: number) {
-    if (url && url.startsWith('https://images.unsplash.com')) {
-        if (width) {
-            return `${url}&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=${width}&fit=max`;
-        }
-
-        if (height) {
-            return `${url}&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=${height}&fit=max`;
-        }
-    }
-
-    return undefined;
-}
-
-export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValidatorFn>> {
-    private constructor(
-        private readonly isOptional: boolean
-    ) {
-    }
-
-    public static create(field: FieldDto, isOptional: boolean) {
-        const validators = [...field.properties.accept(new FieldsValidators(isOptional))];
-
-        if (field.properties.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        return validators;
-    }
-
-    public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        return validators;
-    }
-
-    public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        if (!properties.allowDuplicates) {
-            validators.push(ValidatorsEx.uniqueStrings());
-        }
-
-        return validators;
-    }
-
-    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.between(properties.minValue, properties.maxValue)
-        ];
-
-        if (properties.allowedValues && properties.allowedValues.length > 0) {
-            const values: ReadonlyArray<(number | null)> = properties.allowedValues;
-
-            if (properties.isRequired && !this.isOptional) {
-                validators.push(ValidatorsEx.validValues(values));
-            } else {
-                validators.push(ValidatorsEx.validValues(values.concat([null])));
-            }
-        }
-
-        return validators;
-    }
-
-    public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        if (!properties.allowDuplicates) {
-            validators.push(ValidatorsEx.uniqueStrings());
-        }
-
-        return validators;
-    }
-
-    public visitString(properties: StringFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minLength, properties.maxLength)
-        ];
-
-        if (properties.pattern && properties.pattern.length > 0) {
-            validators.push(ValidatorsEx.pattern(properties.pattern, properties.patternMessage));
-        }
-
-        if (properties.allowedValues && properties.allowedValues.length > 0) {
-            const values: ReadonlyArray<string | null> = properties.allowedValues;
-
-            if (properties.isRequired && !this.isOptional) {
-                validators.push(ValidatorsEx.validValues(values));
-            } else {
-                validators.push(ValidatorsEx.validValues(values.concat([null])));
-            }
-        }
-
-        return validators;
-    }
-
-    public visitTags(properties: TagsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
-        ];
-
-        if (properties.allowedValues && properties.allowedValues.length > 0) {
-            const values: ReadonlyArray<string | null> = properties.allowedValues;
-
-            validators.push(ValidatorsEx.validArrayValues(values));
-        }
-
-        return validators;
-    }
-
-    public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-}
-
-export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
-    private constructor(
-        private readonly now?: DateTime
-    ) {
-    }
-
-    public static get(field: FieldDto, now?: DateTime) {
-        return field.properties.accept(new FieldDefaultValue(now));
-    }
-
-    public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
-        const now = this.now || DateTime.now();
-
-        if (properties.calculatedDefaultValue === 'Now') {
-            return `${now.toStringFormatUTC('yyyy-MM-dd\'T\'HH:mm:ss')}Z`;
-        } else if (properties.calculatedDefaultValue === 'Today') {
-            return `${now.toISODate()}T00:00:00Z`;
-        } else {
-            return properties.defaultValue;
-        }
-    }
-
-    public visitArray(_: ArrayFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitAssets(_: AssetsFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitBoolean(properties: BooleanFieldPropertiesDto): any {
-        return properties.defaultValue;
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitNumber(properties: NumberFieldPropertiesDto): any {
-        return properties.defaultValue;
-    }
-
-    public visitReferences(_: ReferencesFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitString(properties: StringFieldPropertiesDto): any {
-        return properties.defaultValue;
-    }
-
-    public visitTags(_: TagsFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitUI(_: UIFieldPropertiesDto): any {
-        return null;
     }
 }
 
@@ -448,26 +58,61 @@ export class PartitionConfig {
     }
 }
 
+type ConditionType = 'Disable' | 'Hide';
+type Condition = { field: string, type: ConditionType, expression: string };
+
+class CompiledCondition {
+    private function: Function;
+
+    public get field() {
+        return this.condition.field;
+    }
+
+    public get type() {
+        return this.condition.type;
+    }
+
+    constructor(
+        private readonly condition: Condition
+    ) {
+        this.function = new Function(`return function(data, itemData, user) { return ${condition.expression} }`)();
+    }
+
+    public eval(data: any, itemData: any, user: any) {
+        try {
+            return this.function(data, itemData, user);
+        } catch {
+            return false;
+        }
+    }
+}
+
 export class EditContentForm extends Form<FormGroup, any> {
     private readonly partitions: PartitionConfig;
+    private readonly conditions: ReadonlyArray<CompiledCondition>;
+    private readonly fields: FieldControl<RootFieldDto>[];
     private initialData: any;
 
     public value = new BehaviorSubject<any>(this.form.value);
 
-    constructor(languages: ReadonlyArray<AppLanguageDto>,
-        private readonly schema: SchemaDetailsDto
-    ) {
-        super(new FormGroup({}));
+    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto, conditions: Condition[] = []) {
+        super(new FormGroup({}, {
+            updateOn: 'blur'
+        }));
+
+        this.conditions = conditions.map(x => new CompiledCondition(x));
 
         value$(this.form).subscribe(value => {
             this.value.next(value);
+
+            this.updateVisibility();
         });
 
         this.partitions = new PartitionConfig(languages);
 
         for (const field of schema.fields) {
             if (field.properties.isContentField) {
-                const fieldForm = new FormGroup({});
+                const fieldForm = new FieldControl(field, new FormGroup({}), this.conditions.filter(x => x.field === field.name));
                 const fieldDefault = FieldDefaultValue.get(field);
 
                 for (const { key, isOptional } of this.partitions.getAll(field)) {
@@ -476,16 +121,17 @@ export class EditContentForm extends Form<FormGroup, any> {
                     const control =
                         field.isArray ?
                             new FormArray([], fieldValidators) :
-                            new StringFormControl(fieldDefault, fieldValidators);
+                            new FormControlForString(fieldDefault, fieldValidators);
 
-                    fieldForm.setControl(key, control);
+                    fieldForm.add(new FieldControl(field, control), key);
                 }
 
-                this.form.setControl(field.name, fieldForm);
+                this.form.setControl(field.name, fieldForm.form);
             }
         }
 
-        this.extractPrevData();
+        this.updateInitialData();
+        this.updateVisibility();
         this.enable();
     }
 
@@ -513,18 +159,18 @@ export class EditContentForm extends Form<FormGroup, any> {
         const partitionForm = this.findArrayItemForm(field, language);
 
         if (partitionForm && field.nested.length > 0) {
-            this.addArrayItem(partitionForm, field, this.partitions.get(language), source);
+            this.addArrayItem(partitionForm, this.partitions.get(language), source);
         }
     }
 
-    private removeItem(partitionForm: FormArray, index: number) {
+    private removeItem(partitionForm: FieldControl, index: number) {
         partitionForm.removeAt(index);
     }
 
-    private addArrayItem(partitionForm: FormArray, field: RootFieldDto, partition: Partition, source?: FormGroup) {
-        const itemForm = new FormGroup({});
+    private addArrayItem(partitionForm: FieldControl<RootFieldDto>, partition: Partition, source?: FormGroup) {
+        const itemForm = new FieldControl(partitionForm.field, new FormGroup({}));
 
-        for (const nestedField of field.nested) {
+        for (const nestedField of partitionForm.field.nested) {
             if (nestedField.properties.isContentField) {
                 let value = FieldDefaultValue.get(nestedField);
 
@@ -537,54 +183,49 @@ export class EditContentForm extends Form<FormGroup, any> {
                 }
 
                 const nestedValidators = FieldsValidators.create(nestedField, partition.isOptional);
-                const nestedForm = new StringFormControl(value, nestedValidators);
+                const nestedForm = new FormControlForString(value, nestedValidators);
+                const nestedFieldControl = new FieldControl(nestedField, nestedForm,  this.conditions.filter(x => x.field === nestedField.name));
 
-                if (nestedField.isDisabled) {
-                    nestedForm.disable(NO_EMIT);
-                }
-
-                itemForm.setControl(nestedField.name, nestedForm);
+                itemForm.add(nestedFieldControl, nestedField.name);
             }
         }
 
-        partitionForm.push(itemForm);
+        itemForm.enable();
+
+        partitionForm.add(itemForm, '_');
     }
 
-    private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FormArray | null {
-        const fieldForm = this.form.get(field.name);
+    private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FieldControl<RootFieldDto> | undefined {
+        const fieldForm = this.fields.find(x => x.field.name === field.name);
 
         if (!fieldForm) {
-            return null;
+            return undefined;
         } else if (field.isLocalizable) {
-            return fieldForm.get(language.iso2Code) as FormArray;
+            return fieldForm.get(language.iso2Code) as any;
         } else {
-            return fieldForm.get(fieldInvariant) as FormArray;
+            return fieldForm.get(fieldInvariant) as any;
         }
     }
 
     public load(value: any, isInitial?: boolean) {
-        for (const field of this.schema.fields) {
-            if (field.isArray && field.nested.length > 0) {
-                const fieldForm = this.form.get(field.name) as FormGroup;
+        for (const control of this.fields) {
+            const { field } = control;
 
-                if (fieldForm) {
-                    const fieldValue = value?.[field.name] || {};
+            if (control.isArray && field.nested.length > 0) {
+                const fieldValue = value?.[field.name] || {};
 
-                    for (const partition of this.partitions.getAll(field)) {
-                        const { key, isOptional } = partition;
+                for (const partition of this.partitions.getAll(field)) {
+                    const { key, isOptional } = partition;
 
-                        const partitionValidators = FieldsValidators.create(field, isOptional);
-                        const partitionForm = new FormArray([], partitionValidators);
+                    const partitionValidators = FieldsValidators.create(field, isOptional);
+                    const partitionForm = new FieldControl(field, new FormArray([], partitionValidators));
 
-                        const partitionValue = fieldValue[key];
+                    const partitionValue = fieldValue[key];
 
-                        if (Types.isArray(partitionValue)) {
-                            for (let i = 0; i < partitionValue.length; i++) {
-                                this.addArrayItem(partitionForm, field, partition);
-                            }
+                    if (Types.isArray(partitionValue)) {
+                        for (let i = 0; i < partitionValue.length; i++) {
+                            this.addArrayItem(partitionForm, partition);
                         }
-
-                        fieldForm.setControl(key, partitionForm);
                     }
                 }
             }
@@ -593,14 +234,14 @@ export class EditContentForm extends Form<FormGroup, any> {
         super.load(value);
 
         if (isInitial) {
-            this.extractPrevData();
+            this.updateInitialData();
         }
     }
 
     public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {
         super.submitCompleted(options);
 
-        this.extractPrevData();
+        this.updateInitialData();
     }
 
     protected disable() {
@@ -610,43 +251,138 @@ export class EditContentForm extends Form<FormGroup, any> {
     protected enable() {
         this.form.enable(NO_EMIT_SELF);
 
-        for (const field of this.schema.fields) {
-            const fieldForm = this.form.get(field.name);
+        const data = this.form.getRawValue();
 
-            if (fieldForm) {
-                if (field.isArray) {
-                    fieldForm.enable(NO_EMIT_SELF);
+        for (const field of this.fields) {
+            field.enable(data);
+        }
+    }
 
-                    for (const partitionForm of formControls(fieldForm)) {
-                        partitionForm.enable(NO_EMIT_SELF);
+    protected updateVisibility() {
+        for (const field of this.fields) {
+            field.updateVisibility();
+        }
+    }
 
-                        for (const itemForm of formControls(partitionForm)) {
-                            itemForm.enable(NO_EMIT_SELF);
+    private updateInitialData() {
+        this.initialData = this.form.getRawValue();
+    }
+}
 
-                            for (const nestedField of field.nested) {
-                                const nestedForm = itemForm.get(nestedField.name);
+export type FormSection<T> = {
+    separator?: T;
 
-                                if (nestedForm) {
-                                    if (nestedField.isDisabled) {
-                                        nestedForm.disable(NO_EMIT);
-                                    } else {
-                                        nestedForm.enable(NO_EMIT);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else if (field.isDisabled) {
-                    fieldForm.disable(NO_EMIT);
-                } else {
-                    fieldForm.enable(NO_EMIT);
+    fields: ReadonlyArray<T>;
+};
+
+export class FieldControl<T extends FieldDto = FieldDto> {
+    private readonly hidden$ = new BehaviorSubject<boolean>(false);
+    private readonly childrenControls: { name: string, control: FieldControl }[] = [];
+
+    public get hidden() {
+        return this.hidden$.value;
+    }
+
+    public get children(): ReadonlyArray<FieldControl> {
+        return this.children;
+    }
+
+    public get isArray() {
+        return Types.is(this.field, RootFieldDto) && this.field.isArray;
+    }
+
+    public get(name: string) {
+        return this.childrenControls.find(x => x.name === name)?.control;
+    }
+
+    constructor(
+        public readonly field: T,
+        public readonly form: AbstractControl,
+        private readonly conditions?: CompiledCondition[]
+    ) {
+    }
+
+    public add(control: FieldControl, name: string) {
+        if (Types.is(this.form, FormArray)) {
+            this.form.push(control.form);
+        } else if (Types.is(this.form, FormGroup)) {
+            this.form.setControl(name, control.form);
+        }
+
+        this.childrenControls.push({ name, control });
+    }
+
+    public removeAt(index: number) {
+        if (Types.is(this.form, FormArray)) {
+            this.form.removeAt(index);
+        }
+    }
+
+    public updateVisibility(fromParent = false) {
+        if (this.conditions && this.conditions.length > 0) {
+            let evaluated = undefined;
+
+            for (const condition of this.conditions) {
+                if (condition.type === 'Hide' && (evaluated = condition.eval(this, this))) {
+                    break;
+                }
+            }
+
+            let hidden = fromParent;
+
+            if (Types.isBoolean(evaluated)) {
+                hidden = evaluated;
+            }
+
+            if (this.hidden !== hidden) {
+                this.hidden$.next(true);
+            }
+
+            if (!hidden) {
+                for (const { control } of this.childrenControls) {
+                    control.updateVisibility(fromParent);
                 }
             }
         }
     }
 
-    private extractPrevData() {
-        this.initialData = this.form.getRawValue();
+    public enable(data: any, user?: any, itemData?: any) {
+        if (this.conditions && this.conditions.length > 0) {
+            let evaluated = false;
+
+            for (const condition of this.conditions) {
+                if (condition.type === 'Disable' && (evaluated = condition.eval(data, itemData, user))) {
+                    break;
+                }
+            }
+
+            if (evaluated) {
+                this.form.disable(NO_EMIT);
+                return;
+            }
+        }
+
+        if (this.isArray) {
+            for (const partitionForm of this.childrenControls) {
+                partitionForm.control.form.enable(NO_EMIT_SELF);
+
+                for (const itemForm of partitionForm.control.childrenControls) {
+                    itemForm.control.form.enable(NO_EMIT_SELF);
+
+                    const currentItemData = getRawValue(itemForm.control.form);
+
+                    for (const nestedField of itemForm.control.childrenControls) {
+                        nestedField.control.enable(user, itemData);
+                    }
+                }
+            }
+        } else {
+            if (!this.field.isDisabled) {
+                this.form.enable(NO_EMIT);
+            } else {
+                this.form.disable(NO_EMIT);
+            }
+        }
     }
 }
 
@@ -664,7 +400,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new StringFormControl(undefined, validators));
+            this.form.setControl(field.name, new FormControlForString(undefined, validators));
         }
     }
 
