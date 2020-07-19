@@ -76,6 +76,8 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     }
 
     public submit(): TOut | null {
+        this.form.markAllAsTouched();
+
         this.state.next({ submitted: true, error: null });
 
         if (this.form.valid) {

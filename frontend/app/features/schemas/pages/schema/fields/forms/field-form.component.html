@@ -13,18 +13,19 @@
 
     <div class="float-right" *ngIf="showButtons">
         <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary2" (click)="cancel.emit()">Cancel</button>
+
         <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">Save</button>
     </div>
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-    <sqx-field-form-common [editForm]="editForm" [editFormSubmitted]="editFormSubmitted " [field]="field"></sqx-field-form-common>
+    <sqx-field-form-common [fieldForm]="fieldForm" [field]="field"></sqx-field-form-common>
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-    <sqx-field-form-validation [patterns]="patterns" [editForm]="editForm" [field]="field"></sqx-field-form-validation>
+    <sqx-field-form-validation [fieldForm]="fieldForm" [field]="field" [patterns]="patterns"></sqx-field-form-validation>
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-    <sqx-field-form-ui [editForm]="editForm" [field]="field"></sqx-field-form-ui>
+    <sqx-field-form-ui [fieldForm]="fieldForm" [field]="field"></sqx-field-form-ui>
 </div>

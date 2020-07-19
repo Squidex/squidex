@@ -24,9 +24,6 @@ export class GenericActionComponent implements OnInit {
     @Input()
     public actionForm: FormGroup;
 
-    @Input()
-    public actionFormSubmitted = false;
-
     public ngOnInit() {
         for (const property of this.definition.properties) {
             const validators = [];

@@ -57,7 +57,7 @@
                         <div class="form-group">
                             <label for="fileName">Name</label>
                             
-                            <sqx-control-errors for="fileName" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                            <sqx-control-errors for="fileName"></sqx-control-errors>
                     
                             <input type="text" class="form-control" id="fileName" formControlName="fileName" spellcheck="false" />
                         </div>
@@ -65,7 +65,7 @@
                         <div class="form-group">
                             <label for="slug">Slug</label>
                             
-                            <sqx-control-errors for="slug" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                            <sqx-control-errors for="slug"></sqx-control-errors>
                     
                             <input type="text" class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" spellcheck="false" />
             
@@ -77,7 +77,7 @@
                         <div class="form-group">
                             <label>Tags</label>
                             
-                            <sqx-control-errors for="tags" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                            <sqx-control-errors for="tags"></sqx-control-errors>
             
                             <sqx-tag-editor [suggestions]="allTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
                         </div>
@@ -87,13 +87,13 @@
             
                             <div class="form-group row no-gutters" *ngFor="let form of annotateForm.metadata.controls; let i = index">
                                 <div class="col col-name pr-1">
-                                    <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                                    <sqx-control-errors [for]="form.get('name')" fieldName="Name"></sqx-control-errors>
                 
                                     <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Name" spellcheck="false" />
                                 </div>
                 
                                 <div class="col pr-1">
-                                    <sqx-control-errors [for]="form.get('value')" fieldName="Value" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+                                    <sqx-control-errors [for]="form.get('value')" fieldName="Value"></sqx-control-errors>
                 
                                     <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('value')" placeholder="Value" />
                                 </div>

@@ -22,16 +22,13 @@ export class FieldFormComponent implements AfterViewInit {
     public isEditable: boolean;
 
     @Input()
-    public editForm: FormGroup;
-
-    @Input()
-    public editFormSubmitted: boolean;
-
-    @Input()
-    public patterns: ReadonlyArray<PatternDto>;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public patterns: ReadonlyArray<PatternDto>;
 
     @Output()
     public cancel = new EventEmitter();
@@ -40,9 +37,9 @@ export class FieldFormComponent implements AfterViewInit {
 
     public ngAfterViewInit() {
         if (!this.isEditable) {
-            this.editForm.disable();
+            this.fieldForm.disable();
         } else {
-            this.editForm.enable();
+            this.fieldForm.enable();
         }
     }
 

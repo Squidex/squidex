@@ -16,7 +16,7 @@ import { FieldDto, TagsFieldPropertiesDto } from '@app/shared';
 })
 export class TagsValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,10 +25,10 @@ export class TagsValidationComponent implements OnInit {
     public properties: TagsFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('maxItems',
+        this.fieldForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
 
-        this.editForm.setControl('minItems',
+        this.fieldForm.setControl('minItems',
             new FormControl(this.properties.minItems));
     }
 }

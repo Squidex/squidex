@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
 })
 export class StringValidationComponent extends ResourceOwner implements OnChanges, OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -44,42 +44,42 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
         this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
 
         if (this.showUnique) {
-            this.editForm.setControl('isUnique',
+            this.fieldForm.setControl('isUnique',
                 new FormControl(this.properties.isUnique));
         }
 
-        this.editForm.setControl('maxLength',
+        this.fieldForm.setControl('maxLength',
             new FormControl(this.properties.maxLength));
 
-        this.editForm.setControl('minLength',
+        this.fieldForm.setControl('minLength',
             new FormControl(this.properties.minLength));
 
-        this.editForm.setControl('pattern',
+        this.fieldForm.setControl('pattern',
             new FormControl(this.properties.pattern));
 
-        this.editForm.setControl('patternMessage',
+        this.fieldForm.setControl('patternMessage',
             new FormControl(this.properties.patternMessage));
 
-        this.editForm.setControl('defaultValue',
+        this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            hasNoValue$(this.editForm.controls['isRequired']);
+            hasNoValue$(this.fieldForm.controls['isRequired']);
 
         this.showPatternSuggestions =
-            hasNoValue$(this.editForm.controls['pattern']);
+            hasNoValue$(this.fieldForm.controls['pattern']);
 
         this.showPatternSuggestions =
-            hasNoValue$(this.editForm.controls['pattern']);
+            hasNoValue$(this.fieldForm.controls['pattern']);
 
         this.showPatternMessage =
-            hasValue$(this.editForm.controls['pattern']);
+            hasValue$(this.fieldForm.controls['pattern']);
 
         this.own(
-            value$(this.editForm.controls['pattern'])
+            value$(this.fieldForm.controls['pattern'])
                 .subscribe((value: string) => {
                     if (!value) {
-                        this.editForm.controls['patternMessage'].setValue(undefined);
+                        this.fieldForm.controls['patternMessage'].setValue(undefined);
                     }
 
                     this.setPatternName();
@@ -93,17 +93,17 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     }
 
     public setPattern(pattern: PatternDto) {
-        this.editForm.controls['pattern'].setValue(pattern.pattern);
-        this.editForm.controls['patternMessage'].setValue(pattern.message);
+        this.fieldForm.controls['pattern'].setValue(pattern.pattern);
+        this.fieldForm.controls['patternMessage'].setValue(pattern.message);
     }
 
     private setPatternName() {
-        const value = this.editForm.controls['pattern']?.value;
+        const value = this.fieldForm.controls['pattern']?.value;
 
         if (!value) {
             this.patternName = '';
         } else {
-            const matchingPattern = this.patterns.find(x => x.pattern === this.editForm.controls['pattern'].value);
+            const matchingPattern = this.patterns.find(x => x.pattern === this.fieldForm.controls['pattern'].value);
 
             if (matchingPattern) {
                 this.patternName = matchingPattern.name;

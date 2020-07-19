@@ -16,7 +16,7 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 })
 export class GeolocationUIComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,7 +25,7 @@ export class GeolocationUIComponent implements OnInit {
     public properties: GeolocationFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));

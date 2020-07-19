@@ -16,7 +16,7 @@ import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared'
 })
 export class ArrayValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -30,10 +30,10 @@ export class ArrayValidationComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.editForm.setControl('maxItems',
+        this.fieldForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
 
-        this.editForm.setControl('minItems',
+        this.fieldForm.setControl('minItems',
             new FormControl(this.properties.minItems));
     }
 }

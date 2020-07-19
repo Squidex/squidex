@@ -14,13 +14,13 @@
 
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">
                     <div class="col col-name pr-1">
-                        <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors [for]="form.get('name')" fieldName="Name"></sqx-control-errors>
     
                         <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Web or Mobile" />
                     </div>
     
                     <div class="col pr-1">
-                        <sqx-control-errors [for]="form.get('url')" fieldName="Url" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors [for]="form.get('url')" fieldName="Url"></sqx-control-errors>
     
                         <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('url')" placeholder="Url with variables" />
                     </div>
@@ -38,13 +38,13 @@
 
                 <div class="form-group row no-gutters" [formGroup]="addForm.form" *ngIf="isEditable">
                     <div class="col col-name pr-1">
-                        <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors for="name"></sqx-control-errors>
 
                         <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Web or Mobile" />
                     </div>
 
                     <div class="col pr-1">
-                        <sqx-control-errors for="url" [submitted]="addForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors for="url"></sqx-control-errors>
 
                         <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url with variables" />
                     </div>

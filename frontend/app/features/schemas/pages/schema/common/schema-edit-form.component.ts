@@ -20,7 +20,7 @@ export class SchemaEditFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public editForm = new EditSchemaForm(this.formBuilder);
+    public fieldForm = new EditSchemaForm(this.formBuilder);
 
     public isEditable = false;
 
@@ -33,8 +33,8 @@ export class SchemaEditFormComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdate;
 
-        this.editForm.load(this.schema.properties);
-        this.editForm.setEnabled(this.isEditable);
+        this.fieldForm.load(this.schema.properties);
+        this.fieldForm.setEnabled(this.isEditable);
     }
 
     public saveSchema() {
@@ -42,14 +42,14 @@ export class SchemaEditFormComponent implements OnChanges {
             return;
         }
 
-        const value = this.editForm.submit();
+        const value = this.fieldForm.submit();
 
         if (value) {
             this.schemasState.update(this.schema, value)
                 .subscribe(() => {
-                    this.editForm.submitCompleted({ noReset: true });
+                    this.fieldForm.submitCompleted({ noReset: true });
                 }, error => {
-                    this.editForm.submitFailed(error);
+                    this.fieldForm.submitFailed(error);
                 });
         }
     }

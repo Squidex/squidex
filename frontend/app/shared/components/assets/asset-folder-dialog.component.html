@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label for="folderName">Folder Name <small class="hint">(required)</small></label>
                 
-                <sqx-control-errors for="folderName" submitOnly="true" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="folderName"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="folderName" formControlName="folderName" autocomplete="off" sqxFocusOnInit />
             </div>

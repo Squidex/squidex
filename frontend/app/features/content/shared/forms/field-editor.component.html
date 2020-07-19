@@ -5,7 +5,7 @@
 
     <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
 
-    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName"></sqx-control-errors>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
