@@ -5,7 +5,7 @@
         </label>
 
         <div class="col-9">
-            <sqx-control-errors [for]="property.name" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors [for]="property.name"></sqx-control-errors>
 
             <ng-container [ngSwitch]="property.editor">
                 <ng-container *ngSwitchCase="'TextArea'">

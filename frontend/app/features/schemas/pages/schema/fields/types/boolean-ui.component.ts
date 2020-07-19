@@ -16,7 +16,7 @@ import { BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 })
 export class BooleanUIComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,12 +25,12 @@ export class BooleanUIComponent implements OnInit {
     public properties: BooleanFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
 
-        this.editForm.setControl('inlineEditable',
+        this.fieldForm.setControl('inlineEditable',
             new FormControl(this.properties.inlineEditable));
     }
 }

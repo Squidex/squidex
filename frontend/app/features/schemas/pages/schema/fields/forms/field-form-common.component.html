@@ -1,4 +1,4 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">Name</label>
 
@@ -15,7 +15,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldLabel">Label</label>
 
         <div class="col-7">
-            <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="label"></sqx-control-errors>
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label" />
 
@@ -29,7 +29,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldHints">Hints</label>
 
         <div class="col-7">
-            <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="hints"></sqx-control-errors>
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="100" formControlName="hints" />
 

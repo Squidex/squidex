@@ -1,5 +1,5 @@
 
-<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
+<form [formGroup]="fieldForm.form" (ngSubmit)="saveSchema()">
     <div class="card">
         <div class="card-header">Common</div>
 
@@ -13,7 +13,7 @@
             <div class="form-group">
                 <label for="schemaLabel">Label</label>
                 
-                <sqx-control-errors for="label" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="label"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
 
@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label for="schemaHints">Hints</label>
                 
-                <sqx-control-errors for="hints" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="hints"></sqx-control-errors>
         
                 <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
             </div>
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label for="schemaTags">Tags</label>
                 
-                <sqx-control-errors for="tags" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="tags"></sqx-control-errors>
         
                 <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
         

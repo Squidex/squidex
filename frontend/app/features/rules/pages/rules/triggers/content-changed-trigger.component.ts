@@ -30,9 +30,6 @@ export class ContentChangedTriggerComponent implements OnInit {
     @Input()
     public triggerForm: FormGroup;
 
-    @Input()
-    public triggerFormSubmitted = false;
-
     public triggerSchemas: ReadonlyArray<TriggerSchemaForm>;
 
     public schemaToAdd: SchemaDto;

@@ -1,4 +1,4 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
 
@@ -25,14 +25,14 @@
         <label class="col-3 col-form-label">Editor</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Date'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Date'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Date" />
 
                 <i class="icon-control-Date"></i>
 
                 <span class="radio-label">Date</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'DateTime'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'DateTime'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="DateTime" />
 
                 <i class="icon-control-DateTime"></i>

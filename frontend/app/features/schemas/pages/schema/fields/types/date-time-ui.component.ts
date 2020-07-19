@@ -19,7 +19,7 @@ export class DateTimeUIComponent implements OnInit {
     public readonly converter = FloatConverter.INSTANCE;
 
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -30,7 +30,7 @@ export class DateTimeUIComponent implements OnInit {
     public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));

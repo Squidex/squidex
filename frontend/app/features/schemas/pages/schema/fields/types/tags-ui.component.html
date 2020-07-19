@@ -1,4 +1,4 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
 
@@ -25,21 +25,21 @@
         <label class="col-3 col-form-label">Editor</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Tags'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Tags'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Tags" />
 
                 <i class="icon-control-Tags"></i>
 
                 <span class="radio-label">Tags</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Dropdown'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown" />
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Checkboxes'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Checkboxes'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkboxes" />
 
                 <i class="icon-control-Checkboxes"></i>
