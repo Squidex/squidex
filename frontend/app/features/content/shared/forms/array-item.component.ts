@@ -6,11 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, FieldFormatter, invalid$, NestedFieldDto, RootFieldDto, value$ } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldArrayItemValueForm, FieldFormatter, FieldSection, invalid$, NestedFieldDto, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { FieldSection } from './../group-fields.pipe';
 import { ArraySectionComponent } from './array-section.component';
 import { FieldEditorComponent } from './field-editor.component';
 
@@ -37,7 +35,7 @@ export class ArrayItemComponent implements OnChanges {
     public formContext: any;
 
     @Input()
-    public field: RootFieldDto;
+    public formModel: FieldArrayItemForm;
 
     @Input()
     public isFirst = false;
@@ -50,9 +48,6 @@ export class ArrayItemComponent implements OnChanges {
 
     @Input()
     public index: number;
-
-    @Input()
-    public itemForm: FormGroup;
 
     @Input()
     public language: AppLanguageDto;
@@ -74,23 +69,21 @@ export class ArrayItemComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['itemForm']) {
-            this.isInvalid = invalid$(this.itemForm);
-        }
+        if (changes['formModel']) {
+            this.isInvalid = invalid$(this.formModel.form);
 
-        if (changes['itemForm'] || changes['field']) {
-            this.title = value$(this.itemForm).pipe(map(x => this.getTitle(x)));
+            this.title = value$(this.formModel.form).pipe(map(x => this.getTitle(x)));
         }
     }
 
     private getTitle(value: any) {
         const values: string[] = [];
 
-        for (const field of this.field.nested) {
-            const control = this.itemForm.get(field.name);
+        for (const field of this.formModel.field.nested) {
+            const fieldValue = value[field.name];
 
-            if (control) {
-                const formatted = FieldFormatter.format(field, control.value);
+            if (fieldValue) {
+                const formatted = FieldFormatter.format(field, fieldValue);
 
                 if (formatted) {
                     values.push(formatted);
@@ -135,7 +128,7 @@ export class ArrayItemComponent implements OnChanges {
         });
     }
 
-    public trackBySection(index: number, section: FieldSection<NestedFieldDto>) {
+    public trackBySection(section: FieldSection<NestedFieldDto, FieldArrayItemValueForm>) {
         return section.separator?.fieldId;
     }
 }

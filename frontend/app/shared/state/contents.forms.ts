@@ -5,15 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
 // tslint:disable: prefer-for-of
 // tslint:disable: readonly-array
 
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, StringFormControl as FormControlForString, Types, value$, getRawValue } from '@app/framework';
-import { BehaviorSubject } from 'rxjs';
+import { Form, StringFormControl as FormControlForString, Types, valueAll$ } from '@app/framework';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
@@ -88,51 +87,71 @@ class CompiledCondition {
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
-    private readonly partitions: PartitionConfig;
-    private readonly conditions: ReadonlyArray<CompiledCondition>;
-    private readonly fields: FieldControl<RootFieldDto>[];
+    private readonly fields: { [name: string]: FieldForm } = {};
     private initialData: any;
 
-    public value = new BehaviorSubject<any>(this.form.value);
+    public readonly sections: ReadonlyArray<FieldSection<RootFieldDto, FieldForm>>;
+
+    public readonly value = new BehaviorSubject<any>(this.form.value);
 
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto, conditions: Condition[] = []) {
         super(new FormGroup({}, {
             updateOn: 'blur'
         }));
 
-        this.conditions = conditions.map(x => new CompiledCondition(x));
-
-        value$(this.form).subscribe(value => {
-            this.value.next(value);
-
-            this.updateVisibility();
+        conditions.push({
+            field: 'text1', type: 'Hide', expression: 'data.value.iv > 100'
+        });
+        conditions.push({
+            field: 'text2', type: 'Disable', expression: 'data.value.iv > 100'
+        });
+        conditions.push({
+            field: 'nested.text3', type: 'Hide', expression: 'data.value.iv > 100'
         });
 
-        this.partitions = new PartitionConfig(languages);
+        const compiledPartitions = new PartitionConfig(languages);
+        const compiledConditions = conditions.map(x => new CompiledCondition(x));
+
+        const sections: FieldSection<RootFieldDto, FieldForm>[] = [];
+
+        let currentSeparator: RootFieldDto | undefined = undefined;
+        let currentFields: FieldForm[] = [];
 
         for (const field of schema.fields) {
             if (field.properties.isContentField) {
-                const fieldForm = new FieldControl(field, new FormGroup({}), this.conditions.filter(x => x.field === field.name));
-                const fieldDefault = FieldDefaultValue.get(field);
+                const child = new FieldForm(field, compiledPartitions, compiledConditions);
 
-                for (const { key, isOptional } of this.partitions.getAll(field)) {
-                    const fieldValidators = FieldsValidators.create(field, isOptional);
+                currentFields.push(child);
 
-                    const control =
-                        field.isArray ?
-                            new FormArray([], fieldValidators) :
-                            new FormControlForString(fieldDefault, fieldValidators);
+                this.form.setControl(field.name, child.form);
 
-                    fieldForm.add(new FieldControl(field, control), key);
-                }
+                this.fields[field.name] = child;
+            } else {
+                sections.push(new FieldSection<RootFieldDto, FieldForm>(currentSeparator, currentFields));
 
-                this.form.setControl(field.name, fieldForm.form);
+                currentFields = [];
+                currentSeparator = field;
             }
         }
 
+        if (currentFields.length > 0) {
+            sections.push(new FieldSection<RootFieldDto, FieldForm>(currentSeparator, currentFields));
+        }
+
+        this.sections = sections;
+
+        valueAll$(this.form).subscribe(value => {
+            this.value.next(value);
+
+            this.updateHidden(value);
+            this.updateEnabled(value);
+        });
+
         this.updateInitialData();
-        this.updateVisibility();
-        this.enable();
+    }
+
+    public getFieldForm(name: string): FieldForm | undefined {
+        return this.fields[name];
     }
 
     public hasChanged() {
@@ -147,87 +166,10 @@ export class EditContentForm extends Form<FormGroup, any> {
         return !Types.equals(changes, currentValue, true);
     }
 
-    public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
-        const partitionForm = this.findArrayItemForm(field, language);
-
-        if (partitionForm) {
-            this.removeItem(partitionForm, index);
-        }
-    }
-
-    public arrayItemInsert(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
-        const partitionForm = this.findArrayItemForm(field, language);
-
-        if (partitionForm && field.nested.length > 0) {
-            this.addArrayItem(partitionForm, this.partitions.get(language), source);
-        }
-    }
-
-    private removeItem(partitionForm: FieldControl, index: number) {
-        partitionForm.removeAt(index);
-    }
-
-    private addArrayItem(partitionForm: FieldControl<RootFieldDto>, partition: Partition, source?: FormGroup) {
-        const itemForm = new FieldControl(partitionForm.field, new FormGroup({}));
-
-        for (const nestedField of partitionForm.field.nested) {
-            if (nestedField.properties.isContentField) {
-                let value = FieldDefaultValue.get(nestedField);
-
-                if (source) {
-                    const sourceField = source.get(nestedField.name);
-
-                    if (sourceField) {
-                        value = sourceField.value;
-                    }
-                }
-
-                const nestedValidators = FieldsValidators.create(nestedField, partition.isOptional);
-                const nestedForm = new FormControlForString(value, nestedValidators);
-                const nestedFieldControl = new FieldControl(nestedField, nestedForm,  this.conditions.filter(x => x.field === nestedField.name));
-
-                itemForm.add(nestedFieldControl, nestedField.name);
-            }
-        }
-
-        itemForm.enable();
-
-        partitionForm.add(itemForm, '_');
-    }
-
-    private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FieldControl<RootFieldDto> | undefined {
-        const fieldForm = this.fields.find(x => x.field.name === field.name);
-
-        if (!fieldForm) {
-            return undefined;
-        } else if (field.isLocalizable) {
-            return fieldForm.get(language.iso2Code) as any;
-        } else {
-            return fieldForm.get(fieldInvariant) as any;
-        }
-    }
-
     public load(value: any, isInitial?: boolean) {
-        for (const control of this.fields) {
-            const { field } = control;
-
-            if (control.isArray && field.nested.length > 0) {
-                const fieldValue = value?.[field.name] || {};
-
-                for (const partition of this.partitions.getAll(field)) {
-                    const { key, isOptional } = partition;
-
-                    const partitionValidators = FieldsValidators.create(field, isOptional);
-                    const partitionForm = new FieldControl(field, new FormArray([], partitionValidators));
-
-                    const partitionValue = fieldValue[key];
-
-                    if (Types.isArray(partitionValue)) {
-                        for (let i = 0; i < partitionValue.length; i++) {
-                            this.addArrayItem(partitionForm, partition);
-                        }
-                    }
-                }
+        for (const section of this.sections) {
+            for (const child of section.fields) {
+                child.prepareLoad(value[child.field.name]);
             }
         }
 
@@ -251,16 +193,20 @@ export class EditContentForm extends Form<FormGroup, any> {
     protected enable() {
         this.form.enable(NO_EMIT_SELF);
 
-        const data = this.form.getRawValue();
+        this.updateEnabled(this.form.getRawValue());
+    }
 
-        for (const field of this.fields) {
-            field.enable(data);
+    private updateEnabled(data: any) {
+        for (const section of this.sections) {
+            for (const child of section.fields) {
+                child.updateEnabled(data, data);
+            }
         }
     }
 
-    protected updateVisibility() {
-        for (const field of this.fields) {
-            field.updateVisibility();
+    private updateHidden(data: any) {
+        for (const section of this.sections) {
+            section.updateHidden(data, data);
         }
     }
 
@@ -269,120 +215,352 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 }
 
-export type FormSection<T> = {
-    separator?: T;
-
-    fields: ReadonlyArray<T>;
-};
-
-export class FieldControl<T extends FieldDto = FieldDto> {
+abstract class Hidden {
     private readonly hidden$ = new BehaviorSubject<boolean>(false);
-    private readonly childrenControls: { name: string, control: FieldControl }[] = [];
 
     public get hidden() {
         return this.hidden$.value;
     }
 
-    public get children(): ReadonlyArray<FieldControl> {
-        return this.children;
+    public get hiddenChanges(): Observable<boolean> {
+        return this.hidden$;
     }
 
-    public get isArray() {
-        return Types.is(this.field, RootFieldDto) && this.field.isArray;
+    protected setHidden(hidden: boolean) {
+        if (hidden !== this.hidden) {
+            this.hidden$.next(hidden);
+        }
     }
 
-    public get(name: string) {
-        return this.childrenControls.find(x => x.name === name)?.control;
-    }
+    public abstract updateHidden(user: any, data: any, itemData?: any): void;
+}
 
+export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
     constructor(
         public readonly field: T,
-        public readonly form: AbstractControl,
-        private readonly conditions?: CompiledCondition[]
+        public readonly form: TForm,
+        private readonly rules?: CompiledCondition[]
     ) {
+        super();
     }
 
-    public add(control: FieldControl, name: string) {
-        if (Types.is(this.form, FormArray)) {
-            this.form.push(control.form);
-        } else if (Types.is(this.form, FormGroup)) {
-            this.form.setControl(name, control.form);
+    public updateEnabled(user: any, data: any, itemData?: any) {
+        let disabled = this.field.isDisabled;
+
+        if (this.rules) {
+            for (const rule of this.rules) {
+                if (rule.type === 'Disable' && rule.eval(data, itemData, user)) {
+                    disabled = true;
+                    break;
+                }
+            }
         }
 
-        this.childrenControls.push({ name, control });
+        if (disabled !== this.form.disabled) {
+            if (disabled) {
+                this.form.disable(NO_EMIT);
+                return;
+            } else {
+                this.form.enable(NO_EMIT_SELF);
+            }
+        }
+
+        this.updateChildEnabled(user, data, itemData);
+    }
+
+    public updateHidden(user: any, data: any, itemData?: any) {
+        let hidden = this.field.isHidden;
+
+        if (this.rules) {
+            for (const rule of this.rules) {
+                if (rule.type === 'Hide' && rule.eval(data, itemData, user)) {
+                    hidden = true;
+                    break;
+                }
+            }
+        }
+
+        if (hidden !== this.hidden) {
+            if (hidden) {
+                this.setHidden(true);
+                return;
+            } else {
+                this.setHidden(false);
+            }
+        }
+
+        this.updateChildHidden(user, data, itemData);
+
+        return !hidden;
+    }
+
+    protected updateChildEnabled(user: any, data: any, itemData: any) {
+        return;
+    }
+
+    protected updateChildHidden(user: any, data: any, itemData: any) {
+        return;
+    }
+
+    public prepareLoad(value: any) {
+        return;
+    }
+}
+
+export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
+    private readonly childMap: { [partition: string]: (FieldValueForm | FieldArrayForm) } = {};
+
+    constructor(field: RootFieldDto, partitions: PartitionConfig, rules: CompiledCondition[]
+    ) {
+        super(field, new FormGroup({}), FieldForm.buildRules(field, rules));
+
+        for (const { key, isOptional } of partitions.getAll(field)) {
+            const child =
+                field.isArray ?
+                    new FieldArrayForm(field, isOptional, rules) :
+                    new FieldValueForm(field, isOptional);
+
+            this.childMap[key] = child;
+
+            this.form.setControl(key, child.form);
+        }
+    }
+
+    public copyFrom(source: FieldForm, key: string) {
+        this.getField(key)?.form.setValue(source.getField(key)?.form.value);
+    }
+
+    public copyAllFrom(source: FieldForm) {
+        this.form.setValue(source.form.getRawValue());
+    }
+
+    public getField(language: string) {
+        if (this.field.isLocalizable) {
+            return this.childMap[language];
+        } else {
+            return this.childMap[fieldInvariant];
+        }
+    }
+
+    protected updateChildEnabled(user: any, data: any) {
+        for (const child of Object.values(this.childMap)) {
+            child.updateEnabled(user, data);
+        }
+    }
+
+    public updateChildHidden(user: any, data: any) {
+        for (const child of Object.values(this.childMap)) {
+            child.updateHidden(user, data);
+        }
+    }
+
+    public prepareLoad(value: any) {
+        if (Types.isObject(value)) {
+            for (const key in this.childMap) {
+                if (this.childMap.hasOwnProperty(key)) {
+                    const child = this.childMap[key];
+
+                    child.prepareLoad(value[key]);
+                }
+            }
+        }
+    }
+
+    private static buildRules(field: RootFieldDto, rules: CompiledCondition[]) {
+        return rules.filter(x => x.field === field.name);
+    }
+}
+
+export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormControlForString> {
+    constructor(field: RootFieldDto, isOptional: boolean
+    ) {
+        super(field, FieldValueForm.buildControl(field, isOptional));
+    }
+
+    private static buildControl(field: RootFieldDto, isOptional: boolean) {
+        const value = FieldDefaultValue.get(field);
+
+        const validators = FieldsValidators.create(field, isOptional);
+
+        return new FormControlForString(value, validators);
+    }
+}
+
+export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray> {
+    public children: FieldArrayItemForm[] = [];
+
+    constructor(field: RootFieldDto,
+        private readonly isOptional: boolean,
+        private readonly allRules: CompiledCondition[]
+    ) {
+        super(field, FieldArrayForm.buildControl(field, isOptional));
+    }
+
+    public add(source?: FieldArrayItemForm) {
+        const child = new FieldArrayItemForm(this.field, this.isOptional, this.allRules, source);
+
+        this.children.push(child);
+
+        this.form.push(child.form);
     }
 
     public removeAt(index: number) {
-        if (Types.is(this.form, FormArray)) {
-            this.form.removeAt(index);
+        this.children.splice(index, 1);
+
+        this.form.removeAt(index);
+    }
+
+    public move(index: number, item: FieldArrayItemForm) {
+        const children = [...this.children];
+
+        children.splice(children.indexOf(item), 1);
+        children.splice(index, 0, item);
+
+        this.children = children;
+
+        this.sort(children);
+    }
+
+    public sort(children: ReadonlyArray<FieldArrayItemForm>) {
+        for (let i = 0; i < children.length; i++) {
+            this.form.setControl(i, children[i].form);
         }
     }
 
-    public updateVisibility(fromParent = false) {
-        if (this.conditions && this.conditions.length > 0) {
-            let evaluated = undefined;
+    protected updateChildEnabled(user: any, data: any) {
+        for (const child of this.children) {
+            child.updateEnabled(user, data);
+        }
+    }
 
-            for (const condition of this.conditions) {
-                if (condition.type === 'Hide' && (evaluated = condition.eval(this, this))) {
-                    break;
-                }
+    public updateChildHidden(user: any, data: any) {
+        for (const child of this.children) {
+            child.updateHidden(user, data);
+        }
+    }
+
+    public prepareLoad(value: any) {
+        if (Types.isArray(value)) {
+            while (this.children.length < value.length) {
+                this.add();
             }
 
-            let hidden = fromParent;
-
-            if (Types.isBoolean(evaluated)) {
-                hidden = evaluated;
-            }
-
-            if (this.hidden !== hidden) {
-                this.hidden$.next(true);
-            }
-
-            if (!hidden) {
-                for (const { control } of this.childrenControls) {
-                    control.updateVisibility(fromParent);
-                }
+            while (this.children.length > value.length) {
+                this.removeAt(this.children.length - 1);
             }
         }
     }
 
-    public enable(data: any, user?: any, itemData?: any) {
-        if (this.conditions && this.conditions.length > 0) {
-            let evaluated = false;
+    private static buildControl(field: RootFieldDto, isOptional: boolean) {
+        const validators = FieldsValidators.create(field, isOptional);
 
-            for (const condition of this.conditions) {
-                if (condition.type === 'Disable' && (evaluated = condition.eval(data, itemData, user))) {
-                    break;
-                }
-            }
+        return new FormArray([], validators);
+    }
+}
 
-            if (evaluated) {
-                this.form.disable(NO_EMIT);
-                return;
-            }
-        }
+export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGroup>  {
+    public readonly sections: ReadonlyArray<FieldSection<NestedFieldDto, FieldArrayItemValueForm>>;
 
-        if (this.isArray) {
-            for (const partitionForm of this.childrenControls) {
-                partitionForm.control.form.enable(NO_EMIT_SELF);
+    constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledCondition[], source?: FieldArrayItemForm
+    ) {
+        super(field, new FormGroup({}));
 
-                for (const itemForm of partitionForm.control.childrenControls) {
-                    itemForm.control.form.enable(NO_EMIT_SELF);
+        const sections: FieldSection<NestedFieldDto, FieldArrayItemValueForm>[] = [];
 
-                    const currentItemData = getRawValue(itemForm.control.form);
+        let currentSeparator: NestedFieldDto | undefined = undefined;
+        let currentFields: FieldArrayItemValueForm[] = [];
 
-                    for (const nestedField of itemForm.control.childrenControls) {
-                        nestedField.control.enable(user, itemData);
-                    }
-                }
-            }
-        } else {
-            if (!this.field.isDisabled) {
-                this.form.enable(NO_EMIT);
+        for (const nestedField of field.nested) {
+            if (nestedField.properties.isContentField) {
+                const child = new FieldArrayItemValueForm(nestedField, field, isOptional, allRules, source);
+
+                currentFields.push(child);
+
+                this.form.setControl(nestedField.name, child.form);
             } else {
-                this.form.disable(NO_EMIT);
+                sections.push(new FieldSection<NestedFieldDto, FieldArrayItemValueForm>(currentSeparator, currentFields));
+
+                currentFields = [];
+                currentSeparator = nestedField;
             }
         }
+
+        if (currentFields.length > 0) {
+            sections.push(new FieldSection<NestedFieldDto, FieldArrayItemValueForm>(currentSeparator, currentFields));
+        }
+
+        this.sections = sections;
+    }
+
+    public updateChildHidden(user: any, data: any) {
+        const itemData = this.form.getRawValue();
+
+        for (const section of this.sections) {
+            section.updateHidden(user, data, itemData);
+        }
+    }
+
+    protected updateChildEnabled(user: any, data: any) {
+        const itemData = this.form.getRawValue();
+
+        for (const section of this.sections) {
+            for (const child of section.fields) {
+                child.updateEnabled(user, data, itemData);
+            }
+        }
+    }
+}
+
+export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, FormControlForString> {
+    constructor(field: NestedFieldDto, parent: RootFieldDto, isOptional: boolean, rules: CompiledCondition[], source?: FieldArrayItemForm
+    ) {
+        super(field,
+            FieldArrayItemValueForm.buildControl(field, isOptional, source),
+            FieldArrayItemValueForm.buildRules(field, parent, rules)
+        );
+    }
+
+    private static buildRules(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledCondition[]) {
+        const fullName = `${parent.name}.${field.name}`;
+
+        return rules.filter(x => x.field === fullName);
+    }
+
+    private static buildControl(field: NestedFieldDto, isOptional: boolean, source?: FieldArrayItemForm) {
+        let value = FieldDefaultValue.get(field);
+
+        if (source) {
+            const sourceField = source.form.get(field.name);
+
+            if (sourceField) {
+                value = sourceField.value;
+            }
+        }
+
+        const validators = FieldsValidators.create(field, isOptional);
+
+        return new FormControlForString(value, validators);
+    }
+}
+
+export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
+    constructor(
+        public readonly separator: TSeparator | undefined,
+        public readonly fields: ReadonlyArray<TChild>
+    ) {
+        super();
+    }
+
+    public updateHidden(user: any, data: any, itemData?: any) {
+        let visible = false;
+
+        for (const child of this.fields) {
+            child.updateHidden(user, data, itemData);
+
+            visible = visible || !child.hidden;
+        }
+
+        this.setHidden(!visible);
     }
 }
 

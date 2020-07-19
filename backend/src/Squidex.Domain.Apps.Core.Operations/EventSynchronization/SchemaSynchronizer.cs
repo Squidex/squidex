@@ -80,6 +80,11 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 {
                     yield return E(new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences });
                 }
+
+                if (!source.FieldRules.SetEquals(target.FieldRules))
+                {
+                    yield return E(new SchemaFieldRulesConfigured { FieldRules = target.FieldRules });
+                }
             }
         }
 

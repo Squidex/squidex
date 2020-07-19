@@ -6,8 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, LocalStoreService, RootFieldDto, SchemaDto } from '@app/shared';
-import { FieldSection } from './../../shared/group-fields.pipe';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-section',
@@ -29,10 +28,10 @@ export class ContentSectionComponent implements OnChanges {
     public formContext: any;
 
     @Input()
-    public schema: SchemaDto;
+    public formSection: FieldSection<RootFieldDto, FieldForm>;
 
     @Input()
-    public section: FieldSection<RootFieldDto>;
+    public schema: SchemaDto;
 
     @Input()
     public language: AppLanguageDto;
@@ -57,19 +56,15 @@ export class ContentSectionComponent implements OnChanges {
         this.localStore.setBoolean(this.configKey(), this.isCollapsed);
     }
 
-    public getFieldForm(field: RootFieldDto) {
-        return this.form.form.get(field.name)!;
+    public getFieldFormCompare(formState: FieldForm) {
+        return this.formCompare?.getFieldForm(formState.field.name);
     }
 
-    public getFieldFormCompare(field: RootFieldDto) {
-        return this.formCompare?.form.get(field.name)!;
-    }
-
-    public trackByField(index: number, field: RootFieldDto) {
-        return field.fieldId;
+    public trackByField(index: number, formState: FieldForm) {
+        return formState.field.fieldId;
     }
 
     private configKey(): string {
-        return `squidex.schemas.${this.schema?.id}.fields.${this.section?.separator?.fieldId}.closed`;
+        return `squidex.schemas.${this.schema?.id}.fields.${this.formSection?.separator?.fieldId}.closed`;
     }
 }

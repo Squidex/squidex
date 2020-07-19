@@ -6,8 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { AppLanguageDto, AppsState, EditContentForm, fieldInvariant, invalid$, LocalStoreService, RootFieldDto, SchemaDto, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { combineLatest } from 'rxjs/operators';
 
@@ -24,16 +23,16 @@ export class ContentFieldComponent implements OnChanges {
     public form: EditContentForm;
 
     @Input()
+    public formCompare?: EditContentForm;
+
+    @Input()
     public formContext: any;
 
     @Input()
-    public field: RootFieldDto;
+    public formModel: FieldForm;
 
     @Input()
-    public fieldForm: FormGroup;
-
-    @Input()
-    public fieldFormCompare?: FormGroup;
+    public formModelCompare?: FieldForm;
 
     @Input()
     public schema: SchemaDto;
@@ -54,11 +53,11 @@ export class ContentFieldComponent implements OnChanges {
             return false;
         }
 
-        if (!this.field.isLocalizable) {
+        if (!this.formModel.field.isLocalizable) {
             return false;
         }
 
-        const properties = this.field.properties;
+        const properties = this.formModel.field.properties;
 
         return Types.is(properties, StringFieldPropertiesDto) && (properties.editor === 'Input' || properties.editor === 'TextArea');
     }
@@ -73,14 +72,14 @@ export class ContentFieldComponent implements OnChanges {
     public ngOnChanges(changes: SimpleChanges) {
         this.showAllControls = this.localStore.getBoolean(this.configKey());
 
-        if (changes['fieldForm'] && this.fieldForm) {
-            this.isInvalid = invalid$(this.fieldForm);
+        if (changes['formModel'] && this.formModel) {
+            this.isInvalid = invalid$(this.formModel.form);
         }
 
-        if ((changes['fieldForm'] || changes['fieldFormCompare']) && this.fieldFormCompare) {
+        if ((changes['formModel'] || changes['formModelCompare']) && this.formModelCompare) {
             this.isDifferent =
-                value$(this.fieldForm).pipe(
-                    combineLatest(value$(this.fieldFormCompare),
+                value$(this.formModel.form).pipe(
+                    combineLatest(value$(this.formModelCompare!.form),
                         (lhs, rhs) => !Types.equals(lhs, rhs, true)));
         }
     }
@@ -92,11 +91,11 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public copy() {
-        if (this.fieldFormCompare && this.fieldFormCompare) {
+        if (this.formModel && this.formModelCompare) {
             if (this.showAllControls) {
-                this.fieldForm.setValue(this.fieldFormCompare.value);
+                this.formModel.form.setValue(this.formModelCompare.form.value);
             } else {
-                this.getControl()!.setValue(this.getControlCompare()!.value);
+                this.getControl()!.form.setValue(this.getControlCompare()!.form.value);
             }
         }
     }
@@ -106,7 +105,7 @@ export class ContentFieldComponent implements OnChanges {
 
         if (master) {
             const masterCode = master.iso2Code;
-            const masterValue = this.fieldForm.get(masterCode)!.value;
+            const masterValue = this.formModel.getField(masterCode)!.form.value;
 
             if (masterValue) {
                 if (this.showAllControls) {
@@ -123,10 +122,10 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     private translateValue(text: string, sourceLanguage: string, targetLanguage: string) {
-        const control = this.fieldForm.get(targetLanguage);
+        const control = this.formModel.getField(targetLanguage);
 
         if (control) {
-            const value = control.value;
+            const value = control.form.value;
 
             if (!value) {
                 const request = { text, sourceLanguage, targetLanguage };
@@ -134,18 +133,10 @@ export class ContentFieldComponent implements OnChanges {
                 this.translations.translate(this.appsState.appName, request)
                     .subscribe(result => {
                         if (result.text) {
-                            control.setValue(result.text);
+                            control.form.setValue(result.text);
                         }
                     });
             }
-        }
-    }
-
-    private findControl(form?: FormGroup) {
-        if (this.field.isLocalizable) {
-            return form?.controls[this.language.iso2Code];
-        } else {
-            return form?.controls[fieldInvariant];
         }
     }
 
@@ -154,18 +145,18 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public getControl() {
-        return this.findControl(this.fieldForm);
+        return this.formModel.getField(this.language.iso2Code);
     }
 
     public getControlCompare() {
-        return this.findControl(this.fieldFormCompare);
+        return this.formModelCompare?.getField(this.language.iso2Code);
     }
 
-    public trackByLanguage(index: number, language: AppLanguageDto) {
+    public trackByLanguage(language: AppLanguageDto) {
         return language.iso2Code;
     }
 
     private configKey() {
-        return `squidex.schemas.${this.schema?.id}.fields.${this.field?.fieldId}.show-all`;
+        return `squidex.schemas.${this.schema?.id}.fields.${this.formModel.field.fieldId}.show-all`;
     }
 }

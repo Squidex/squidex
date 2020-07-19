@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public FieldNames? FieldsInLists { get; set; }
 
+        public FieldRules? FieldRules { get; set; }
+
         public SchemaScripts? Scripts { get; set; }
 
         public SchemaProperties Properties { get; set; }
@@ -57,6 +59,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
             if (FieldsInReferences != null)
             {
                 schema = schema.SetFieldsInReferences(FieldsInReferences);
+            }
+
+            if (FieldRules != null)
+            {
+                schema = schema.SetFieldRules(FieldRules);
             }
 
             if (!string.IsNullOrWhiteSpace(Category))

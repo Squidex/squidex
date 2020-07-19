@@ -43,14 +43,13 @@
     </div>
     
     <div class="card-body" [class.hidden]="isCollapsed">
-        <div class="form-group" *ngFor="let section of field.nested | sqxGroupFields; trackBy: trackBySection">
+        <div class="form-group" *ngFor="let section of formModel.sections">
             <sqx-array-section
                 [form]="form"
                 [formContext]="formContext"
-                [itemForm]="itemForm"
+                [formSection]="section"
                 [language]="language"
-                [languages]="languages"
-                [section]="section">
+                [languages]="languages">
             </sqx-array-section>
         </div>
     </div>

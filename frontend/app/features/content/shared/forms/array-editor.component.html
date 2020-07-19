@@ -1,26 +1,23 @@
-<div class="array-container" *ngIf="arrayControl.controls.length > 0" 
+<div class="array-container" *ngIf="formModel.children.length > 0" 
     cdkDropList
     [cdkDropListDisabled]="false"
-    [cdkDropListData]="arrayControl.controls"
+    [cdkDropListData]="formModel.children"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of arrayControl.controls; let i = index;"
+    <div *ngFor="let itemForm of formModel.children; let i = index;"
         class="table-drag item"
         cdkDrag
         cdkDragLockAxis="y">
         <sqx-array-item
             [form]="form"
             [formContext]="formContext"
-            [field]="field"
-            [isDisabled]="arrayControl.disabled"
+            [formModel]="itemForm"
+            [isDisabled]="formModel.form.disabled"
             [isFirst]="i === 0"
-            [isLast]="i === arrayControl.controls.length - 1"
+            [isLast]="i === formModel.children.length - 1"
             [index]="i"
-            [itemForm]="itemForm"
             [language]="language"
             [languages]="languages"
-            (clone)="itemAdd(itemForm)"
-            (move)="move(itemForm, $event)"
-            (remove)="itemRemove(i)">
+            (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
             <i cdkDragHandle class="icon-drag2"></i>
         </sqx-array-item>
     </div>
@@ -28,12 +25,12 @@
 
 <div class="row">
     <div class="col">
-        <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="itemAdd(undefined)">
+        <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || formModel.form.disabled" (click)="itemAdd(undefined)">
             Add Item
         </button>
     </div>
 
-    <div class="col-auto" *ngIf="arrayControl.controls.length > 0">
+    <div class="col-auto" *ngIf="formModel.children.length > 0">
         <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="Expand all items">
             <i class="icon-plus-square"></i>
         </button>

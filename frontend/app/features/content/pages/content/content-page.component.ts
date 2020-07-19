@@ -9,10 +9,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
-import { FieldSection } from '../../shared/group-fields.pipe';
 
 @Component({
     selector: 'sqx-content-page',
@@ -111,7 +110,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
 
         this.own(
-            this.contentForm.form.valueChanges.pipe(
+            valueAll$(this.contentForm.form).pipe(
                     filter(_ => !this.isLoadingContent),
                     filter(_ => this.contentForm.form.enabled),
                     debounceTime(2000)
@@ -250,7 +249,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public trackBySection(index: number, section: FieldSection<RootFieldDto>) {
+    public trackBySection(index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;
     }
 }

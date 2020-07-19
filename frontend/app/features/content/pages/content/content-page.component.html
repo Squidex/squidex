@@ -81,14 +81,14 @@
                 </ng-container>
 
                 <div content>
-                    <sqx-content-section *ngFor="let section of schema.fields | sqxGroupFields; trackBy: trackBySection"
+                    <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
                         [(language)]="language"
                         [form]="contentForm"
                         [formCompare]="contentFormCompare"
                         [formContext]="formContext"
+                        [formSection]="section"
                         [languages]="languages"
-                        [schema]="schema"
-                        [section]="section">
+                        [schema]="schema">
                     </sqx-content-section>
                 </div>
             </sqx-list-view>

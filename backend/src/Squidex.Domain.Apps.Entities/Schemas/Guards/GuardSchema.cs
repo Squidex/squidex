@@ -290,6 +290,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
+        private static void ValidateFieldRules(UpsertCommand command, AddValidation e)
+        {
+            if (command.FieldRules != null)
+            {
+                var rulePrefix = 0;
+
+                foreach (var fieldRule in command.FieldRules)
+                {
+
+                }
+            }
+        }
+
         private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
