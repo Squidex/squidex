@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/workflows/")]
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
-        [ApiPermission(Permissions.AppWorkflowsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppWorkflowsRead)]
         [ApiCosts(0)]
         public IActionResult GetWorkflows(string app)
         {
@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/workflows/")]
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
-        [ApiPermission(Permissions.AppWorkflowsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostWorkflow(string app, [FromBody] AddWorkflowDto request)
         {
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/workflows/{id}")]
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
-        [ApiPermission(Permissions.AppWorkflowsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutWorkflow(string app, Guid id, [FromBody] UpdateWorkflowDto request)
         {
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/workflows/{id}")]
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
-        [ApiPermission(Permissions.AppWorkflowsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteWorkflow(string app, Guid id)
         {

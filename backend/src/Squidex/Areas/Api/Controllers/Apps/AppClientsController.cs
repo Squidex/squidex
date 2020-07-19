@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
-        [ApiPermission(Permissions.AppClientsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppClientsRead)]
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientsDto), 201)]
-        [ApiPermission(Permissions.AppClientsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)
         {
@@ -101,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/clients/{id}/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
-        [ApiPermission(Permissions.AppClientsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string id, [FromBody] UpdateClientDto request)
         {
@@ -127,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/clients/{id}/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
-        [ApiPermission(Permissions.AppClientsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppClientsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteClient(string app, string id)
         {

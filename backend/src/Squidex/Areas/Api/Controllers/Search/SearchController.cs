@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Search
         [HttpGet]
         [Route("apps/{app}/search/")]
         [ProducesResponseType(typeof(SearchResultDto[]), 200)]
-        [ApiPermission(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app, [FromQuery] string? query = null)
         {
