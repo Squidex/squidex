@@ -99,6 +99,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             });
         }
 
+        public static void CanConfigureFieldRules(ConfigureFieldRules command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot configure field rules.", e =>
+            {
+                ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
+            });
+        }
+
         public static void CanPublish(PublishSchema command)
         {
             Guard.NotNull(command, nameof(command));
@@ -155,6 +165,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
             ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
+
+            ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
         }
 
         private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
@@ -290,15 +302,27 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldRules(UpsertCommand command, AddValidation e)
+        private static void ValidateFieldRules(List<FieldRuleCommand>? fieldRules, string path, AddValidation e)
         {
-            if (command.FieldRules != null)
+            if (fieldRules != null)
             {
-                var rulePrefix = 0;
+                var ruleIndex = 0;
+                var rulePrefix = string.Empty;
 
-                foreach (var fieldRule in command.FieldRules)
+                foreach (var fieldRule in fieldRules)
                 {
+                    ruleIndex++;
+                    rulePrefix = $"{path}[{ruleIndex}]";
 
+                    if (string.IsNullOrWhiteSpace(fieldRule.Field))
+                    {
+                        e(Not.Defined(nameof(fieldRule.Field)), $"{rulePrefix}.{nameof(fieldRule.Field)}");
+                    }
+
+                    if (!fieldRule.Action.IsEnumValue())
+                    {
+                        e(Not.Valid(nameof(fieldRule.Action)), $"{rulePrefix}.{nameof(fieldRule.Action)}");
+                    }
                 }
             }
         }

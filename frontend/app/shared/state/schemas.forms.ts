@@ -8,7 +8,7 @@
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
@@ -68,6 +68,59 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
             noFieldDeletion: !value.fieldsDelete,
             noFieldRecreation: !value.fieldsRecreate
         };
+    }
+}
+
+type AddFieldRuleFormType = FieldRule;
+
+export class AddFieldRuleForm extends Form<FormGroup, AddFieldRuleFormType> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            action: ['',
+                [
+                    Validators.required
+                ]
+            ],
+            field: ['',
+                [
+                    Validators.required
+                ]
+            ],
+            condition: ''
+        }));
+    }
+}
+
+export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
+    constructor(
+        private readonly formBuilder: FormBuilder
+    ) {
+        super(formBuilder.array([]));
+    }
+
+    public add(value: any) {
+        this.form.push(
+            this.formBuilder.group({
+                action: ['',
+                    [
+                        Validators.required
+                    ]
+                ],
+                field: ['',
+                    [
+                        Validators.required
+                    ]
+                ],
+                condition: ''
+            }));
+    }
+
+    public remove(index: number) {
+        this.form.removeAt(index);
+    }
+
+    public transformLoad(value: Partial<SchemaDetailsDto>) {
+        return value.fieldRules || [];
     }
 }
 

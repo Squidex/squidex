@@ -570,6 +570,51 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanConfigureFieldRules_should_throw_exception_if_field_rules_are_invalid()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = new List<FieldRuleCommand>
+                {
+                    new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
+                    new FieldRuleCommand(),
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureFieldRules(command),
+                new ValidationError("Action is not a valid value.",
+                    "FieldRules[1].Action"),
+                new ValidationError("Field is required.",
+                    "FieldRules[2].Field"));
+        }
+
+        [Fact]
+        public void CanConfigureFieldRules_should_not_throw_exception_if_field_rules_are_valid()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = new List<FieldRuleCommand>
+                {
+                    new FieldRuleCommand { Field = "field1", Action = FieldRuleAction.Disable, Condition = "a == b" },
+                    new FieldRuleCommand { Field = "field2" }
+                }
+            };
+
+            GuardSchema.CanConfigureFieldRules(command);
+        }
+
+        [Fact]
+        public void CanConfigureFieldRules_should_not_throw_exception_if_field_rules_are_null()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = null
+            };
+
+            GuardSchema.CanConfigureFieldRules(command);
+        }
+
+        [Fact]
         public void CanPublish_should_not_throw_exception()
         {
             var command = new PublishSchema();

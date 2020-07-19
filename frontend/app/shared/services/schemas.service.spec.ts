@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new Version('1');
@@ -156,6 +156,33 @@ describe('SchemasService', () => {
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/scripts');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12));
+
+        expect(schema!).toEqual(createSchemaDetails(12));
+    }));
+
+    it('should make put request to update field rules',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto: FieldRule[] = [{ field: 'field1', action: 'Disable', condition: 'a === b' }];
+
+        const resource: Resource = {
+            _links: {
+                ['update/rules']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/rules' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putFieldRules('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/rules');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -766,6 +793,10 @@ describe('SchemasService', () => {
             ],
             fieldsInLists: ['field1'],
             fieldsInReferences: ['field1'],
+            fieldRules:
+            [{
+                field: 'field1', action: 'Hide', condition: 'a === 2'
+            }],
             scripts: {
                 query: '<script-query>',
                 create: '<script-create>',
@@ -829,6 +860,9 @@ export function createSchemaDetails(id: number, suffix = '') {
         ],
         ['field1'],
         ['field1'],
+        [{
+            field: 'field1', action: 'Hide', condition: 'a === 2'
+        }],
         {
             query: '<script-query>',
             create: '<script-create>',

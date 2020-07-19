@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { compareStrings, defined, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { empty, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields, FieldRule } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
@@ -226,6 +226,14 @@ export class SchemasState extends State<Snapshot> {
 
     public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putPreviewUrls(this.appName, schema, request, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDetailsDto> {
+        return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
             }),

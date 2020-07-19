@@ -1,0 +1,90 @@
+<form [formGroup]="formEdit.form" (ngSubmit)="saveSchema()">
+    <div class="card mb-2">
+        <div class="card-header">Preview URLs</div>
+
+        <div class="card-body">
+            <sqx-form-alert>
+                Checkout the integrated help page to learn more about preview URL's.
+            </sqx-form-alert>
+
+            <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && formEdit.form.controls.length === 0">
+                    No preview urls configured.
+                </div>
+
+                <div class="form-group row no-gutters" *ngFor="let form of formEdit.form.controls; let i = index" [formGroup]="form">
+                    <div class="col col-action pr-1">
+                        <sqx-control-errors for="action" [submitted]="formEdit.submitted | async"></sqx-control-errors>
+
+                        <select class="form-control" formControlName="action">
+                            <option>Disable</option>
+                            <option>Hide</option>
+                        </select>
+                    </div>
+
+                    <div class="col pr-1">
+                        <sqx-control-errors for="field" [submitted]="formEdit.submitted | async"></sqx-control-errors>
+
+                        <select class="form-control" formControlName="field">
+                            <option *ngFor="let field of fieldNames"></option>
+                        </select>
+                    </div>
+
+                    <div class="col pr-1">
+                        <sqx-control-errors for="field" [submitted]="formEdit.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control" formControlName="condition" placeholder="Condition as javascript expression" />
+                    </div>
+
+                    <div class="col-auto col-options">
+                        <button type="button" class="btn btn-text-danger"
+                            [disabled]="!isEditable"
+                            (sqxConfirmClick)="formEdit.remove(i)"
+                            confirmTitle="Remove url" 
+                            confirmText="Do you really want to remove this rule?">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group row no-gutters" [formGroup]="formAdd.form" *ngIf="isEditable">
+                    <div class="col col-action pr-1">
+                        <sqx-control-errors for="action" [submitted]="formAdd.submitted | async"></sqx-control-errors>
+
+                        <select class="form-control" formControlName="action">
+                            <option>Disable</option>
+                            <option>Hide</option>
+                        </select>
+                    </div>
+
+                    <div class="col pr-1">
+                        <sqx-control-errors for="field" [submitted]="formAdd.submitted | async"></sqx-control-errors>
+
+                        <select class="form-control" formControlName="field">
+                            <option *ngFor="let field of fieldNames"></option>
+                        </select>
+                    </div>
+
+                    <div class="col pr-1">
+                        <sqx-control-errors for="field" [submitted]="formAdd.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control" formControlName="condition" placeholder="Condition as javascript expression" />
+                    </div>
+
+                    <div class="col-auto col-options">
+                        <button type="button" class="btn btn-success" (click)="add()">
+                            <i class="icon-add"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-text-secondary" (click)="cancelAdd()">
+                            <i class="icon-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" *ngIf="isEditable">
+            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+        </div>
+    </div>
+</form>

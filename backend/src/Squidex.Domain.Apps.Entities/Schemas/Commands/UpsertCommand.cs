@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using FieldRules = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.FieldRuleCommand>;
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
@@ -63,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
             if (FieldRules != null)
             {
-                schema = schema.SetFieldRules(FieldRules);
+                schema = schema.SetFieldRules(FieldRules.Select(x => x.ToFieldRule()).ToArray());
             }
 
             if (!string.IsNullOrWhiteSpace(Category))

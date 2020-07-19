@@ -43,6 +43,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public List<string> FieldsInReferences { get; set; }
 
         /// <summary>
+        /// The field rules.
+        /// </summary>
+        public List<FieldRuleDto> FieldRules { get; set; }
+
+        /// <summary>
         /// The list of fields.
         /// </summary>
         [Required]
@@ -58,8 +63,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
             result.FieldsInLists = schema.SchemaDef.FieldsInLists.ToList();
-
             result.FieldsInReferences = schema.SchemaDef.FieldsInReferences.ToList();
+
+            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromFieldRule).ToList();
 
             if (schema.SchemaDef.PreviewUrls.Count > 0)
             {

@@ -93,9 +93,9 @@ export class ContentFieldComponent implements OnChanges {
     public copy() {
         if (this.formModel && this.formModelCompare) {
             if (this.showAllControls) {
-                this.formModel.form.setValue(this.formModelCompare.form.value);
+                this.formModel.copyAllFrom(this.formModelCompare);
             } else {
-                this.getControl()!.form.setValue(this.getControlCompare()!.form.value);
+                this.formModel.copyFrom(this.formModelCompare, this.language.iso2Code);
             }
         }
     }
