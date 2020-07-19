@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("apps/{app}/assets/folders", Order = -1)]
         [ProducesResponseType(typeof(AssetsDto), 200)]
-        [ApiPermission(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] Guid parentId)
         {
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 201)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostAssetFolder(string app, [FromBody] CreateAssetFolderDto request)
         {
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetFolder(string app, Guid id, [FromBody] RenameAssetFolderDto request)
         {
@@ -130,7 +130,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetFolderParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
         {
@@ -152,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAssetFolder(string app, Guid id)
         {

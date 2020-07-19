@@ -26,6 +26,7 @@
     "@angular/platform-browser-dynamic": "9.0.6",
     "@angular/platform-server": "9.0.6",
     "@angular/router": "9.0.6",
+    "@egjs/hammerjs": "^2.0.17",
     "ace-builds": "^1.4.11",
     "angular-gridster2": "^9.2.0",
     "angular-mentions": "1.1.4",
@@ -39,6 +40,7 @@
     "graphiql": "0.17.5",
     "graphql": "14.6.0",
     "image-focus": "1.1.0",
+    "keycharm": "^0.3.1",
     "marked": "0.8.0",
     "mersenne-twister": "1.1.0",
     "mousetrap": "1.6.5",
@@ -53,6 +55,9 @@
     "slugify": "1.4.0",
     "tinymce": "^5.2.0",
     "tslib": "1.11.1",
+    "vis-data": "^6.6.1",
+    "vis-network": "^7.10.0",
+    "vis-util": "^4.3.2",
     "zone.js": "0.10.3"
   },
   "devDependencies": {

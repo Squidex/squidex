@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/roles/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
-        [ApiPermission(Permissions.AppRolesRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetRoles(string app)
         {
@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/roles/permissions")]
         [ProducesResponseType(typeof(string[]), 200)]
-        [ApiPermission(Permissions.AppRolesRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetPermissions(string app)
         {
@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/roles/")]
         [ProducesResponseType(typeof(RolesDto), 201)]
-        [ApiPermission(Permissions.AppRolesCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppRolesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
         {
@@ -120,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
-        [ApiPermission(Permissions.AppRolesUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
         {
@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
-        [ApiPermission(Permissions.AppRolesDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRole(string app, string roleName)
         {

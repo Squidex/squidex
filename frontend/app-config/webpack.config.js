@@ -227,6 +227,8 @@ module.exports = function (env) {
 
                   { from: './node_modules/font-awesome/css/font-awesome.min.css', to: 'dependencies/font-awesome/css/font-awesome.min.css' },
                   { from: './node_modules/font-awesome/fonts', to: 'dependencies/font-awesome/fonts' },
+
+                  { from: './node_modules/vis-network/standalone/umd/vis-network.min.js', to: 'dependencies/vis-network.min.js' },
                 ],
               }),
         ],

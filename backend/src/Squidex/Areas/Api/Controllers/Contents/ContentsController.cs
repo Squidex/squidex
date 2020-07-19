@@ -268,7 +268,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/{version}/")]
-        [ApiPermission(Permissions.AppContentsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
@@ -297,7 +297,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/")]
         [ProducesResponseType(typeof(ContentsDto), 201)]
-        [ApiPermission(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
@@ -325,7 +325,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/import")]
         [ProducesResponseType(typeof(BulkResultDto[]), 200)]
-        [ApiPermission(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
         public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
@@ -356,7 +356,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), 200)]
-        [ApiPermission(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous(Permissions.AppContents)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
         {
@@ -388,7 +388,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request)
         {
@@ -417,7 +417,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request)
         {
@@ -446,7 +446,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
         {
@@ -473,7 +473,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsVersionCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> CreateDraft(string app, string name, Guid id)
         {
@@ -500,7 +500,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string name, Guid id)
         {
@@ -526,7 +526,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/")]
-        [ApiPermission(Permissions.AppContentsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {

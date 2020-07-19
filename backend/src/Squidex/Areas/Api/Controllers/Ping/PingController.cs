@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
         /// </remarks>
         [HttpGet]
         [Route("ping/{app}/")]
-        [ApiPermission(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetAppPing(string app)
         {
