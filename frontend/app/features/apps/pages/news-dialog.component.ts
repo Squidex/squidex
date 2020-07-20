@@ -20,7 +20,7 @@ export class NewsDialogComponent {
     @Input()
     public features: ReadonlyArray<FeatureDto>;
 
-    public trackByFeature(index: number, feature: FeatureDto) {
+    public trackByFeature(_index: number, feature: FeatureDto) {
         return feature;
     }
 }

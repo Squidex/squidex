@@ -249,7 +249,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public trackBySection(index: number, section: FieldSection<RootFieldDto, FieldForm>) {
+    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;
     }
 }

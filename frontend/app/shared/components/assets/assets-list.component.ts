@@ -96,7 +96,7 @@ export class AssetsListComponent {
         return drag.data.id !== drop.data;
     }
 
-    public trackByAssetItem(index: number, asset: AssetDto | AssetFolderDto) {
+    public trackByAssetItem(_index: number, asset: AssetDto | AssetFolderDto) {
         return asset.id;
     }
 }

@@ -38,7 +38,7 @@ export class AssetsFiltersPageComponent {
         this.assetsState.resetTags();
     }
 
-    public trackByTag(index: number, tag: { name: string }) {
+    public trackByTag(_index: number, tag: { name: string }) {
         return tag.name;
     }
 }

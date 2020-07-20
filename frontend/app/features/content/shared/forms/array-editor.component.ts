@@ -40,11 +40,11 @@ export class ArrayEditorComponent {
     }
 
     public itemRemove(index: number) {
-        this.formModel.removeAt(index);
+        this.formModel.removeItemAt(index);
     }
 
     public itemAdd(value?: FieldArrayItemForm) {
-        this.formModel.add(value);
+        this.formModel.addItem(value);
     }
 
     public sort(event: CdkDragDrop<ReadonlyArray<FieldArrayItemForm>>) {

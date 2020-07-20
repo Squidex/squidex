@@ -96,7 +96,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         this.schemaToAdd = this.schemasToAdd[0];
     }
 
-    public trackBySchema(index: number, schema: SchemaDto) {
+    public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
     }
 }

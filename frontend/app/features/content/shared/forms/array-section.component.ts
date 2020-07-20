@@ -40,7 +40,7 @@ export class ArraySectionComponent {
         });
     }
 
-    public trackByField(index: number, field: FieldArrayItemForm) {
+    public trackByField(_index: number, field: FieldArrayItemForm) {
         return field.field.fieldId;
     }
 }

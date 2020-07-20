@@ -105,7 +105,7 @@ export class ContentFieldComponent implements OnChanges {
 
         if (master) {
             const masterCode = master.iso2Code;
-            const masterValue = this.formModel.getField(masterCode)!.form.value;
+            const masterValue = this.formModel.get(masterCode)!.form.value;
 
             if (masterValue) {
                 if (this.showAllControls) {
@@ -122,7 +122,7 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     private translateValue(text: string, sourceLanguage: string, targetLanguage: string) {
-        const control = this.formModel.getField(targetLanguage);
+        const control = this.formModel.get(targetLanguage);
 
         if (control) {
             const value = control.form.value;
@@ -145,11 +145,11 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public getControl() {
-        return this.formModel.getField(this.language.iso2Code);
+        return this.formModel.get(this.language.iso2Code);
     }
 
     public getControlCompare() {
-        return this.formModelCompare?.getField(this.language.iso2Code);
+        return this.formModelCompare?.get(this.language.iso2Code);
     }
 
     public trackByLanguage(language: AppLanguageDto) {

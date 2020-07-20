@@ -10,10 +10,12 @@
 
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, StringFormControl as FormControlForString, Types, valueAll$ } from '@app/framework';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { LanguageDto } from './../services/languages.service';
+import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
+import { CompiledRule, Hidden, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string, user: boolean };
@@ -31,55 +33,44 @@ export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
     }
 }
 
-const NO_EMIT = { emitEvent: false };
-const NO_EMIT_SELF = { emitEvent: false, onlySelf: true };
-
-type Partition = { key: string, isOptional: boolean };
-
-export class PartitionConfig {
-    private readonly invariant: ReadonlyArray<Partition> = [{ key: fieldInvariant, isOptional: false }];
-    private readonly languages: ReadonlyArray<Partition>;
-
-    constructor(languages: ReadonlyArray<AppLanguageDto>) {
-        this.languages = languages.map(l => this.get(l));
-    }
-
-    public get(language?: AppLanguageDto) {
-        if (!language) {
-            return this.invariant[0];
-        }
-
-        return { key: language.iso2Code, isOptional: language.isOptional };
-    }
-
-    public getAll(field: RootFieldDto) {
-        return field.isLocalizable ? this.languages : this.invariant;
-    }
-}
-
-class CompiledRule {
-    private function: Function;
-
-    public get field() {
-        return this.rule.field;
-    }
-
-    public get action() {
-        return this.rule.action;
-    }
+export class PatchContentForm extends Form<FormGroup, any> {
+    private readonly editableFields: ReadonlyArray<RootFieldDto>;
 
     constructor(
-        private readonly rule: FieldRule
+        private readonly listFields: ReadonlyArray<TableField>,
+        private readonly language: AppLanguageDto
     ) {
-        this.function = new Function(`return function(data, itemData, user) { return ${rule.condition} }`)();
+        super(new FormGroup({}));
+
+        this.editableFields = <any>this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable);
+
+        for (const field of this.editableFields) {
+            const validators = FieldsValidators.create(field, this.language.isOptional);
+
+            this.form.setControl(field.name, new FormControlForString(undefined, validators));
+        }
     }
 
-    public eval(data: any, itemData: any, user: any) {
-        try {
-            return this.function(data, itemData, user);
-        } catch {
-            return false;
+    public submit() {
+        const result = super.submit();
+
+        if (result) {
+            const request = {};
+
+            for (const field of this.editableFields) {
+                const value = result[field.name];
+
+                if (field.isLocalizable) {
+                    request[field.name] = { [this.language.iso2Code]: value };
+                } else {
+                    request[field.name] = { iv: value };
+                }
+            }
+
+            return request;
         }
+
+        return result;
     }
 }
 
@@ -137,8 +128,12 @@ export class EditContentForm extends Form<FormGroup, any> {
         this.updateInitialData();
     }
 
-    public getFieldForm(name: string): FieldForm | undefined {
-        return this.fields[name];
+    public get(field: string | RootFieldDto): FieldForm | undefined {
+        if (Types.is(field, RootFieldDto)) {
+            return this.fields[field.name];
+        } else {
+            return this.fields[field];
+        }
     }
 
     public hasChanged() {
@@ -202,26 +197,6 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 }
 
-abstract class Hidden {
-    private readonly hidden$ = new BehaviorSubject<boolean>(false);
-
-    public get hidden() {
-        return this.hidden$.value;
-    }
-
-    public get hiddenChanges(): Observable<boolean> {
-        return this.hidden$;
-    }
-
-    protected setHidden(hidden: boolean) {
-        if (hidden !== this.hidden) {
-            this.hidden$.next(hidden);
-        }
-    }
-
-    public abstract updateHidden(user: any, data: any, itemData?: any): void;
-}
-
 export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
     constructor(
         public readonly field: T,
@@ -281,15 +256,15 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         return !hidden;
     }
 
-    protected updateChildEnabled(user: any, data: any, itemData: any) {
+    protected updateChildEnabled(_user: any, _data: any, _itemData: any) {
         return;
     }
 
-    protected updateChildHidden(user: any, data: any, itemData: any) {
+    protected updateChildHidden(_user: any, _data: any, _itemData: any) {
         return;
     }
 
-    public prepareLoad(value: any) {
+    public prepareLoad(_data: any) {
         return;
     }
 }
@@ -314,16 +289,16 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 
     public copyFrom(source: FieldForm, key: string) {
-        this.getField(key)?.form.setValue(source.getField(key)?.form.value);
+        this.get(key)?.form.setValue(source.get(key)?.form.value);
     }
 
     public copyAllFrom(source: FieldForm) {
         this.form.setValue(source.form.getRawValue());
     }
 
-    public getField(language: string) {
+    public get(language: string | LanguageDto) {
         if (this.field.isLocalizable) {
-            return this.childMap[language];
+            return this.childMap[language['iso2Code'] || language];
         } else {
             return this.childMap[fieldInvariant];
         }
@@ -383,7 +358,11 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         super(field, FieldArrayForm.buildControl(field, isOptional));
     }
 
-    public add(source?: FieldArrayItemForm) {
+    public get(index: number) {
+        return this.children[index];
+    }
+
+    public addItem(source?: FieldArrayItemForm) {
         const child = new FieldArrayItemForm(this.field, this.isOptional, this.allRules, source);
 
         this.children.push(child);
@@ -391,7 +370,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         this.form.push(child.form);
     }
 
-    public removeAt(index: number) {
+    public removeItemAt(index: number) {
         this.children.splice(index, 1);
 
         this.form.removeAt(index);
@@ -429,11 +408,11 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     public prepareLoad(value: any) {
         if (Types.isArray(value)) {
             while (this.children.length < value.length) {
-                this.add();
+                this.addItem();
             }
 
             while (this.children.length > value.length) {
-                this.removeAt(this.children.length - 1);
+                this.removeItemAt(this.children.length - 1);
             }
         }
     }
@@ -446,6 +425,8 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
 }
 
 export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGroup>  {
+    private fields: { [key: string]: FieldArrayItemValueForm } = {};
+
     public readonly sections: ReadonlyArray<FieldSection<NestedFieldDto, FieldArrayItemValueForm>>;
 
     constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledRule[], source?: FieldArrayItemForm
@@ -463,6 +444,8 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 
                 currentFields.push(child);
 
+                this.fields[nestedField.name] = child;
+
                 this.form.setControl(nestedField.name, child.form);
             } else {
                 sections.push(new FieldSection<NestedFieldDto, FieldArrayItemValueForm>(currentSeparator, currentFields));
@@ -477,6 +460,10 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
         }
 
         this.sections = sections;
+    }
+
+    public get(field: string | NestedFieldDto): FieldArrayItemValueForm | undefined {
+        return this.fields[field['name'] || field];
     }
 
     public updateChildHidden(user: any, data: any) {
@@ -551,43 +538,5 @@ export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
     }
 }
 
-export class PatchContentForm extends Form<FormGroup, any> {
-    private readonly editableFields: ReadonlyArray<RootFieldDto>;
-
-    constructor(
-        private readonly listFields: ReadonlyArray<TableField>,
-        private readonly language: AppLanguageDto
-    ) {
-        super(new FormGroup({}));
-
-        this.editableFields = <any>this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable);
-
-        for (const field of this.editableFields) {
-            const validators = FieldsValidators.create(field, this.language.isOptional);
-
-            this.form.setControl(field.name, new FormControlForString(undefined, validators));
-        }
-    }
-
-    public submit() {
-        const result = super.submit();
-
-        if (result) {
-            const request = {};
-
-            for (const field of this.editableFields) {
-                const value = result[field.name];
-
-                if (field.isLocalizable) {
-                    request[field.name] = { [this.language.iso2Code]: value };
-                } else {
-                    request[field.name] = { iv: value };
-                }
-            }
-
-            return request;
-        }
-
-        return result;
-    }
-}
+const NO_EMIT = { emitEvent: false };
+const NO_EMIT_SELF = { emitEvent: false, onlySelf: true };

@@ -153,7 +153,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(_index: number, content: ContentDto): string {
         return content.id;
     }
 }

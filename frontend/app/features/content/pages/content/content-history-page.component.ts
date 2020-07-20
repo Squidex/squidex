@@ -98,7 +98,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         this.contentPage.loadVersion(event.version, true);
     }
 
-    public trackByEvent(index: number, event: HistoryEventDto) {
+    public trackByEvent(_index: number, event: HistoryEventDto) {
         return event.eventId;
     }
 }

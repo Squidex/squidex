@@ -117,7 +117,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly fields: ReadonlyArray<RootFieldDto> = [],
         public readonly fieldsInLists: FieldNames = [],
         public readonly fieldsInReferences: FieldNames = [],
-        public readonly fieldRules: FieldRule[] = [],
+        public readonly fieldRules: ReadonlyArray<FieldRule> = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {

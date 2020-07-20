@@ -1,0 +1,101 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AppLanguageDto } from './../services/app-languages.service';
+import { FieldRule, RootFieldDto } from './../services/schemas.service';
+import { fieldInvariant } from './../services/schemas.types';
+
+export abstract class Hidden {
+    private readonly hidden$ = new BehaviorSubject<boolean>(false);
+
+    public get hidden() {
+        return this.hidden$.value;
+    }
+
+    public get hiddenChanges(): Observable<boolean> {
+        return this.hidden$;
+    }
+
+    protected setHidden(hidden: boolean) {
+        if (hidden !== this.hidden) {
+            this.hidden$.next(hidden);
+        }
+    }
+
+    public abstract updateHidden(user: any, data: any, itemData?: any): void;
+}
+
+export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
+    constructor(
+        public readonly separator: TSeparator | undefined,
+        public readonly fields: ReadonlyArray<TChild>
+    ) {
+        super();
+    }
+
+    public updateHidden(user: any, data: any, itemData?: any) {
+        let visible = false;
+
+        for (const child of this.fields) {
+            child.updateHidden(user, data, itemData);
+
+            visible = visible || !child.hidden;
+        }
+
+        this.setHidden(!visible);
+    }
+}
+
+type Partition = { key: string, isOptional: boolean };
+
+export class PartitionConfig {
+    private readonly invariant: ReadonlyArray<Partition> = [{ key: fieldInvariant, isOptional: false }];
+    private readonly languages: ReadonlyArray<Partition>;
+
+    constructor(languages: ReadonlyArray<AppLanguageDto>) {
+        this.languages = languages.map(l => this.get(l));
+    }
+
+    public get(language?: AppLanguageDto) {
+        if (!language) {
+            return this.invariant[0];
+        }
+
+        return { key: language.iso2Code, isOptional: language.isOptional };
+    }
+
+    public getAll(field: RootFieldDto) {
+        return field.isLocalizable ? this.languages : this.invariant;
+    }
+}
+
+export class CompiledRule {
+    private function: Function;
+
+    public get field() {
+        return this.rule.field;
+    }
+
+    public get action() {
+        return this.rule.action;
+    }
+
+    constructor(
+        private readonly rule: FieldRule
+    ) {
+        this.function = new Function(`return function(data, itemData, user) { return ${rule.condition} }`)();
+    }
+
+    public eval(data: any, itemData: any, user: any) {
+        try {
+            return this.function(data, itemData, user);
+        } catch {
+            return false;
+        }
+    }
+}

@@ -18,7 +18,7 @@ export class HistoryListComponent {
     @Input()
     public events: ReadonlyArray<HistoryEventDto>;
 
-    public trackByEvent(index: number, event: HistoryEventDto) {
+    public trackByEvent(_index: number, event: HistoryEventDto) {
         return event.eventId;
     }
 }

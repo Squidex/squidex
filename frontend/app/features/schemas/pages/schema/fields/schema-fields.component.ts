@@ -22,7 +22,7 @@ export class SchemaFieldsComponent implements OnInit {
 
     public addFieldDialog = new DialogModel();
 
-    public trackByFieldFn: (index: number, field: FieldDto) => any;
+    public trackByFieldFn: (_index: number, field: FieldDto) => any;
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -39,7 +39,7 @@ export class SchemaFieldsComponent implements OnInit {
         this.schemasState.orderFields(this.schema, sorted(event)).subscribe();
     }
 
-    public trackByField(index: number, field: FieldDto) {
+    public trackByField(_index: number, field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

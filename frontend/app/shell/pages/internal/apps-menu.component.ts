@@ -28,7 +28,7 @@ export class AppsMenuComponent {
     ) {
     }
 
-    public trackByApp(index: number, app: AppDto) {
+    public trackByApp(_index: number, app: AppDto) {
         return app.id;
     }
 }

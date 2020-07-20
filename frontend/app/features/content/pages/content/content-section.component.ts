@@ -57,10 +57,10 @@ export class ContentSectionComponent implements OnChanges {
     }
 
     public getFieldFormCompare(formState: FieldForm) {
-        return this.formCompare?.getFieldForm(formState.field.name);
+        return this.formCompare?.get(formState.field.name);
     }
 
-    public trackByField(index: number, formState: FieldForm) {
+    public trackByField(_index: number, formState: FieldForm) {
         return formState.field.fieldId;
     }
 
