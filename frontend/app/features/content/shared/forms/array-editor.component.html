@@ -1,9 +1,9 @@
-<div class="array-container" *ngIf="formModel.children.length > 0" 
+<div class="array-container" *ngIf="formModel.items.length > 0" 
     cdkDropList
     [cdkDropListDisabled]="false"
-    [cdkDropListData]="formModel.children"
+    [cdkDropListData]="formModel.items"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of formModel.children; let i = index;"
+    <div *ngFor="let itemForm of formModel.items; let i = index;"
         class="table-drag item"
         cdkDrag
         cdkDragLockAxis="y">
@@ -13,7 +13,7 @@
             [formModel]="itemForm"
             [isDisabled]="formModel.form.disabled"
             [isFirst]="i === 0"
-            [isLast]="i === formModel.children.length - 1"
+            [isLast]="i === formModel.items.length - 1"
             [index]="i"
             [language]="language"
             [languages]="languages"
@@ -30,7 +30,7 @@
         </button>
     </div>
 
-    <div class="col-auto" *ngIf="formModel.children.length > 0">
+    <div class="col-auto" *ngIf="formModel.items.length > 0">
         <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="Expand all items">
             <i class="icon-plus-square"></i>
         </button>

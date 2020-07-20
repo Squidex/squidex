@@ -69,7 +69,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(schema => {
                     this.schema = schema;
 
-                    this.contentForm = new EditContentForm(this.languages, this.schema);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
                 }));
 
         this.own(
@@ -219,7 +219,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.contentFormCompare = new EditContentForm(this.languages, this.schema);
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext.user);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);

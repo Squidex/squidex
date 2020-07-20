@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: prefer-for-of
 // tslint:disable: readonly-array
 
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -17,6 +16,8 @@ import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } 
 import { fieldInvariant } from './../services/schemas.types';
 import { CompiledRule, FieldSection, Hidden, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators, FieldUpdateOn } from './contents.forms.visitors';
+
+export { FieldSection } from './contents.forms-helpers';
 
 type SaveQueryFormType = { name: string, user: boolean };
 
@@ -82,7 +83,9 @@ export class EditContentForm extends Form<FormGroup, any> {
 
     public readonly value = new BehaviorSubject<any>(this.form.value);
 
-    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto) {
+    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
+        private readonly user: any = {}
+    ) {
         super(new FormGroup({}, {
             updateOn: 'blur'
         }));
@@ -101,9 +104,9 @@ export class EditContentForm extends Form<FormGroup, any> {
 
                 currentFields.push(child);
 
-                this.form.setControl(field.name, child.form);
-
                 this.fields[field.name] = child;
+
+                this.form.setControl(field.name, child.form);
             } else {
                 sections.push(new FieldSection<RootFieldDto, FieldForm>(currentSeparator, currentFields));
 
@@ -179,7 +182,7 @@ export class EditContentForm extends Form<FormGroup, any> {
 
     private updateState(data: any) {
         for (const field of Object.values(this.fields)) {
-            field.updateState(data, data);
+            field.updateState(this.user, data);
         }
 
         for (const section of this.sections) {
