@@ -3,7 +3,7 @@
     [cdkDropListDisabled]="false"
     [cdkDropListData]="formModel.items"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of formModel.items; let i = index;"
+    <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst"
         class="table-drag item"
         cdkDrag
         cdkDragLockAxis="y">
@@ -11,10 +11,10 @@
             [form]="form"
             [formContext]="formContext"
             [formModel]="itemForm"
-            [isDisabled]="formModel.form.disabled"
-            [isFirst]="i === 0"
-            [isLast]="i === formModel.items.length - 1"
             [index]="i"
+            [isDisabled]="formModel.form.disabled"
+            [isFirst]="isFirst"
+            [isLast]="isLast"
             [language]="language"
             [languages]="languages"
             (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
