@@ -128,7 +128,7 @@ export class ArrayItemComponent implements OnChanges {
         });
     }
 
-    public trackBySection(section: FieldSection<NestedFieldDto, FieldArrayItemValueForm>) {
+    public trackBySection(_index: number, section: FieldSection<NestedFieldDto, FieldArrayItemValueForm>) {
         return section.separator?.fieldId;
     }
 }

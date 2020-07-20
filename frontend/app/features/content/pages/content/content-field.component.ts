@@ -152,7 +152,7 @@ export class ContentFieldComponent implements OnChanges {
         return this.formModelCompare?.get(this.language.iso2Code);
     }
 
-    public trackByLanguage(language: AppLanguageDto) {
+    public trackByLanguage(_index: number, language: AppLanguageDto) {
         return language.iso2Code;
     }
 

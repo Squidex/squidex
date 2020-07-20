@@ -77,7 +77,7 @@ export class SchemaCategoryComponent implements OnChanges {
         }
     }
 
-    public trackBySchema(schema: SchemaDto) {
+    public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
     }
 
