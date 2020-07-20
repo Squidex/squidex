@@ -84,12 +84,16 @@ export class CompiledRule {
     constructor(
         private readonly rule: FieldRule
     ) {
-        this.function = new Function(`return function(data, itemData, user) { return ${rule.condition} }`)();
+        try {
+            this.function = new Function(`return function(user, data, itemData) { return ${rule.condition} }`)();
+        } catch {
+            this.function = () => false;
+        }
     }
 
-    public eval(data: any, itemData: any, user: any) {
+    public eval(user: any, data: any, itemData?: any) {
         try {
-            return this.function(data, itemData, user);
+            return this.function(user, data, itemData);
         } catch {
             return false;
         }

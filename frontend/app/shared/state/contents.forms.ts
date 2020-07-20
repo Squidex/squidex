@@ -199,41 +199,47 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     constructor(
         public readonly field: T,
         public readonly form: TForm,
+        public readonly isOptional: boolean,
         private readonly rules?: CompiledRule[]
     ) {
         super();
     }
 
     public updateState(user: any, data: any, itemData?: any) {
-        let isDisabled = this.field.isDisabled;
-        let isHidden = this.field.isHidden;
+        const state = {
+            isDisabled: this.field.isDisabled,
+            isHidden: this.field.isHidden,
+            isRequired: this.field.properties.isRequired && !this.isOptional
+        };
 
         if (this.rules) {
             for (const rule of this.rules) {
-                if (rule.eval(data, itemData, user)) {
+                if (rule.eval(user, data, itemData)) {
                     if (rule.action === 'Disable') {
-                        isDisabled = true;
+                        state.isDisabled = true;
+                    } else if (rule.action === 'Hide') {
+                        state.isHidden = true;
                     } else {
-                        isHidden = true;
+                        state.isRequired = true;
                     }
                 }
             }
         }
 
-        this.setHidden(isHidden);
+        this.setHidden(state.isHidden);
 
-        if (isDisabled !== this.form.disabled) {
-            if (isDisabled) {
+        if (state.isDisabled !== this.form.disabled) {
+            if (state.isDisabled) {
                 this.form.disable(NO_EMIT);
             } else {
                 this.form.enable(NO_EMIT_SELF);
             }
         }
 
-        this.updateChildState(user, data, itemData);
+        this.updateCustomState(state, user, data, itemData);
     }
 
-    protected updateChildState(_user: any, _data: any, _itemData: any) {
+    protected updateCustomState(_state: State, _user: any, _data: any, _itemData: any) {
         return;
     }
 
@@ -244,10 +250,11 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 
 export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     private readonly partitions: { [partition: string]: (FieldValueForm | FieldArrayForm) } = {};
+    private isRequired: boolean;
 
     constructor(field: RootFieldDto, partitions: PartitionConfig, rules: CompiledRule[]
     ) {
-        super(field, new FormGroup({}), FieldForm.buildRules(field, rules));
+        super(field, new FormGroup({}), false, FieldForm.buildRules(field, rules));
 
         for (const { key, isOptional } of partitions.getAll(field)) {
             const child =
@@ -259,6 +266,8 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 
             this.form.setControl(key, child.form);
         }
+
+        this.isRequired = field.properties.isRequired;
     }
 
     public copyFrom(source: FieldForm, key: string) {
@@ -277,9 +286,28 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         }
     }
 
-    protected updateChildState(user: any, data: any) {
-        for (const child of Object.values(this.partitions)) {
-            child.updateState(user, data);
+    protected updateCustomState({ isRequired }: State, user: any, data: any) {
+        if (this.isRequired !== isRequired) {
+            this.isRequired = isRequired;
+
+            for (const partition of Object.values(this.partitions)) {
+                if (!partition.isOptional) {
+                    let validators = FieldsValidators.create(this.field, false);
+
+                    if (isRequired) {
+                        validators.push(Validators.required);
+                    } else {
+                        validators = validators.filter(x => x !== Validators.required);
+                    }
+
+                    partition.form.setValidators(validators);
+                    partition.form.updateValueAndValidity();
+                }
+            }
+        }
+
+        for (const partition of Object.values(this.partitions)) {
+            partition.updateState(user, data);
         }
     }
 
@@ -303,7 +331,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 export class FieldValueForm extends AbstractContentForm<RootFieldDto, StringFormControl> {
     constructor(field: RootFieldDto, isOptional: boolean
     ) {
-        super(field, FieldValueForm.buildControl(field, isOptional));
+        super(field, FieldValueForm.buildControl(field, isOptional), isOptional);
     }
 
     private static buildControl(field: RootFieldDto, isOptional: boolean) {
@@ -318,11 +346,10 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, StringForm
 export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray> {
     public items: FieldArrayItemForm[] = [];
 
-    constructor(field: RootFieldDto,
-        private readonly isOptional: boolean,
+    constructor(field: RootFieldDto, isOptional: boolean,
         private readonly allRules: CompiledRule[]
     ) {
-        super(field, FieldArrayForm.buildControl(field, isOptional));
+        super(field, FieldArrayForm.buildControl(field, isOptional), isOptional);
     }
 
     public get(index: number) {
@@ -360,7 +387,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         }
     }
 
-    protected updateChildState(user: any, data: any) {
+    protected updateCustomState(_: State, user: any, data: any) {
         for (const item of this.items) {
             item.updateState(user, data);
         }
@@ -392,7 +419,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 
     constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledRule[], source?: FieldArrayItemForm
     ) {
-        super(field, new FormGroup({}));
+        super(field, new FormGroup({}), isOptional);
 
         const sections: FieldSection<NestedFieldDto, FieldArrayItemValueForm>[] = [];
 
@@ -401,7 +428,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 
         for (const nestedField of field.nested) {
             if (nestedField.properties.isContentField) {
-                const child = new FieldArrayItemValueForm(nestedField, field, isOptional, allRules, source);
+                const child = new FieldArrayItemValueForm(nestedField, field, allRules, isOptional, source);
 
                 currentFields.push(child);
 
@@ -427,7 +454,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
         return this.fields[field['name'] || field];
     }
 
-    protected updateChildState(user: any, data: any) {
+    protected updateCustomState(_: State, user: any, data: any) {
         const itemData = this.form.getRawValue();
 
         for (const field of Object.values(this.fields)) {
@@ -441,12 +468,34 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 }
 
 export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, StringFormControl> {
-    constructor(field: NestedFieldDto, parent: RootFieldDto, isOptional: boolean, rules: CompiledRule[], source?: FieldArrayItemForm
+    private isRequired = false;
+
+    constructor(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[], isOptional: boolean, source?: FieldArrayItemForm
     ) {
         super(field,
             FieldArrayItemValueForm.buildControl(field, isOptional, source),
+            isOptional,
             FieldArrayItemValueForm.buildRules(field, parent, rules)
         );
+
+        this.isRequired = field.properties.isRequired && !isOptional;
+    }
+
+    protected updateCustomState({ isRequired }: State) {
+        if (!this.isOptional && this.isRequired !== isRequired) {
+            this.isRequired = isRequired;
+
+            let validators = FieldsValidators.create(this.field, true);
+
+            if (isRequired) {
+                validators.push(Validators.required);
+            } else {
+                validators = validators.filter(x => x !== Validators.required);
+            }
+
+            this.form.setValidators(validators);
+            this.form.updateValueAndValidity();
+        }
     }
 
     private static buildRules(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[]) {
@@ -471,6 +520,12 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
         return new StringFormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
     }
 }
+
+type State = {
+    isRequired: boolean,
+    isHidden: boolean,
+    isDisabled: boolean
+};
 
 const NO_EMIT = { emitEvent: false };
 const NO_EMIT_SELF = { emitEvent: false, onlySelf: true };

@@ -96,7 +96,7 @@ export class SchemaDto {
 
 export type TableField = RootFieldDto | string;
 
-export type FieldRuleAction = 'Disable' | 'Hide';
+export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
 export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
 
 export class SchemaDetailsDto extends SchemaDto {

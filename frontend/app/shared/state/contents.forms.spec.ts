@@ -700,6 +700,32 @@ describe('ContentForm', () => {
             expectForm(contentForm.form, 'field3.de', { invalid: false });
         });
 
+        it('should require field based on condition', () => {
+            const contentForm = createForm([
+                createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' })
+            ], [{
+                field: 'field1', action: 'Require', condition: 'data.field2.iv < 100'
+            }]);
+
+            const field1 = contentForm.get('field1');
+            const field2 = contentForm.get('field2');
+
+            expect(field1!.form.disabled).toBeFalsy();
+
+            contentForm.load({
+                field2: {
+                    iv: 120
+                }
+            });
+
+            expect(field1!.form.valid).toBeTruthy();
+
+            field2?.get('iv')!.form.setValue(99);
+
+            expect(field1!.form.valid).toBeFalsy();
+        });
+
         it('should disable field based on condition', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
