@@ -9,14 +9,14 @@
 // tslint:disable: readonly-array
 
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, StringFormControl as FormControlForString, Types, valueAll$ } from '@app/framework';
+import { Form, StringFormControl, Types, valueAll$ } from '@app/framework';
 import { BehaviorSubject } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
-import { CompiledRule, Hidden, PartitionConfig } from './contents.forms-helpers';
-import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
+import { CompiledRule, FieldSection, Hidden, PartitionConfig } from './contents.forms-helpers';
+import { FieldDefaultValue, FieldsValidators, FieldUpdateOn } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string, user: boolean };
 
@@ -47,7 +47,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new FormControlForString(undefined, validators));
+            this.form.setControl(field.name, new StringFormControl(undefined, { updateOn: FieldUpdateOn.get(field), validators }));
         }
     }
 
@@ -121,8 +121,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         valueAll$(this.form).subscribe(value => {
             this.value.next(value);
 
-            this.updateHidden(value);
-            this.updateEnabled(value);
+            this.updateState(value);
         });
 
         this.updateInitialData();
@@ -175,20 +174,16 @@ export class EditContentForm extends Form<FormGroup, any> {
     protected enable() {
         this.form.enable(NO_EMIT_SELF);
 
-        this.updateEnabled(this.form.getRawValue());
+        this.updateState(this.form.getRawValue());
     }
 
-    private updateEnabled(data: any) {
-        for (const section of this.sections) {
-            for (const child of section.fields) {
-                child.updateEnabled(data, data);
-            }
+    private updateState(data: any) {
+        for (const field of Object.values(this.fields)) {
+            field.updateState(data, data);
         }
-    }
 
-    private updateHidden(data: any) {
         for (const section of this.sections) {
-            section.updateHidden(data, data);
+            section.updateHidden();
         }
     }
 
@@ -206,61 +201,36 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         super();
     }
 
-    public updateEnabled(user: any, data: any, itemData?: any) {
-        let disabled = this.field.isDisabled;
+    public updateState(user: any, data: any, itemData?: any) {
+        let isDisabled = this.field.isDisabled;
+        let isHidden = this.field.isHidden;
 
         if (this.rules) {
             for (const rule of this.rules) {
-                if (rule.action === 'Disable' && rule.eval(data, itemData, user)) {
-                    disabled = true;
-                    break;
+                if (rule.eval(data, itemData, user)) {
+                    if (rule.action === 'Disable') {
+                        isDisabled = true;
+                    } else {
+                        isHidden = true;
+                    }
                 }
             }
         }
 
-        if (disabled !== this.form.disabled) {
-            if (disabled) {
+        this.setHidden(isHidden);
+
+        if (isDisabled !== this.form.disabled) {
+            if (isDisabled) {
                 this.form.disable(NO_EMIT);
-                return;
             } else {
                 this.form.enable(NO_EMIT_SELF);
             }
         }
 
-        this.updateChildEnabled(user, data, itemData);
+        this.updateChildState(user, data, itemData);
     }
 
-    public updateHidden(user: any, data: any, itemData?: any) {
-        let hidden = this.field.isHidden;
-
-        if (this.rules) {
-            for (const rule of this.rules) {
-                if (rule.action === 'Hide' && rule.eval(data, itemData, user)) {
-                    hidden = true;
-                    break;
-                }
-            }
-        }
-
-        if (hidden !== this.hidden) {
-            if (hidden) {
-                this.setHidden(true);
-                return;
-            } else {
-                this.setHidden(false);
-            }
-        }
-
-        this.updateChildHidden(user, data, itemData);
-
-        return !hidden;
-    }
-
-    protected updateChildEnabled(_user: any, _data: any, _itemData: any) {
-        return;
-    }
-
-    protected updateChildHidden(_user: any, _data: any, _itemData: any) {
+    protected updateChildState(_user: any, _data: any, _itemData: any) {
         return;
     }
 
@@ -270,7 +240,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 }
 
 export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
-    private readonly childMap: { [partition: string]: (FieldValueForm | FieldArrayForm) } = {};
+    private readonly partitions: { [partition: string]: (FieldValueForm | FieldArrayForm) } = {};
 
     constructor(field: RootFieldDto, partitions: PartitionConfig, rules: CompiledRule[]
     ) {
@@ -282,7 +252,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
                     new FieldArrayForm(field, isOptional, rules) :
                     new FieldValueForm(field, isOptional);
 
-            this.childMap[key] = child;
+            this.partitions[key] = child;
 
             this.form.setControl(key, child.form);
         }
@@ -298,29 +268,23 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 
     public get(language: string | LanguageDto) {
         if (this.field.isLocalizable) {
-            return this.childMap[language['iso2Code'] || language];
+            return this.partitions[language['iso2Code'] || language];
         } else {
-            return this.childMap[fieldInvariant];
+            return this.partitions[fieldInvariant];
         }
     }
 
-    protected updateChildEnabled(user: any, data: any) {
-        for (const child of Object.values(this.childMap)) {
-            child.updateEnabled(user, data);
-        }
-    }
-
-    public updateChildHidden(user: any, data: any) {
-        for (const child of Object.values(this.childMap)) {
-            child.updateHidden(user, data);
+    protected updateChildState(user: any, data: any) {
+        for (const child of Object.values(this.partitions)) {
+            child.updateState(user, data);
         }
     }
 
     public prepareLoad(value: any) {
         if (Types.isObject(value)) {
-            for (const key in this.childMap) {
-                if (this.childMap.hasOwnProperty(key)) {
-                    const child = this.childMap[key];
+            for (const key in this.partitions) {
+                if (this.partitions.hasOwnProperty(key)) {
+                    const child = this.partitions[key];
 
                     child.prepareLoad(value[key]);
                 }
@@ -333,7 +297,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormControlForString> {
+export class FieldValueForm extends AbstractContentForm<RootFieldDto, StringFormControl> {
     constructor(field: RootFieldDto, isOptional: boolean
     ) {
         super(field, FieldValueForm.buildControl(field, isOptional));
@@ -344,12 +308,12 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormContro
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormControlForString(value, validators);
+        return new StringFormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
     }
 }
 
 export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray> {
-    public children: FieldArrayItemForm[] = [];
+    public items: FieldArrayItemForm[] = [];
 
     constructor(field: RootFieldDto,
         private readonly isOptional: boolean,
@@ -359,30 +323,30 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     }
 
     public get(index: number) {
-        return this.children[index];
+        return this.items[index];
     }
 
     public addItem(source?: FieldArrayItemForm) {
         const child = new FieldArrayItemForm(this.field, this.isOptional, this.allRules, source);
 
-        this.children.push(child);
+        this.items.push(child);
 
         this.form.push(child.form);
     }
 
     public removeItemAt(index: number) {
-        this.children.splice(index, 1);
+        this.items.splice(index, 1);
 
         this.form.removeAt(index);
     }
 
     public move(index: number, item: FieldArrayItemForm) {
-        const children = [...this.children];
+        const children = [...this.items];
 
         children.splice(children.indexOf(item), 1);
         children.splice(index, 0, item);
 
-        this.children = children;
+        this.items = children;
 
         this.sort(children);
     }
@@ -393,26 +357,20 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         }
     }
 
-    protected updateChildEnabled(user: any, data: any) {
-        for (const child of this.children) {
-            child.updateEnabled(user, data);
-        }
-    }
-
-    public updateChildHidden(user: any, data: any) {
-        for (const child of this.children) {
-            child.updateHidden(user, data);
+    protected updateChildState(user: any, data: any) {
+        for (const item of this.items) {
+            item.updateState(user, data);
         }
     }
 
     public prepareLoad(value: any) {
         if (Types.isArray(value)) {
-            while (this.children.length < value.length) {
+            while (this.items.length < value.length) {
                 this.addItem();
             }
 
-            while (this.children.length > value.length) {
-                this.removeItemAt(this.children.length - 1);
+            while (this.items.length > value.length) {
+                this.removeItemAt(this.items.length - 1);
             }
         }
     }
@@ -466,26 +424,20 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
         return this.fields[field['name'] || field];
     }
 
-    public updateChildHidden(user: any, data: any) {
+    protected updateChildState(user: any, data: any) {
         const itemData = this.form.getRawValue();
 
-        for (const section of this.sections) {
-            section.updateHidden(user, data, itemData);
+        for (const field of Object.values(this.fields)) {
+            field.updateState(user, data, itemData);
         }
-    }
-
-    protected updateChildEnabled(user: any, data: any) {
-        const itemData = this.form.getRawValue();
 
         for (const section of this.sections) {
-            for (const child of section.fields) {
-                child.updateEnabled(user, data, itemData);
-            }
+            section.updateHidden();
         }
     }
 }
 
-export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, FormControlForString> {
+export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, StringFormControl> {
     constructor(field: NestedFieldDto, parent: RootFieldDto, isOptional: boolean, rules: CompiledRule[], source?: FieldArrayItemForm
     ) {
         super(field,
@@ -513,28 +465,7 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormControlForString(value, validators);
-    }
-}
-
-export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
-    constructor(
-        public readonly separator: TSeparator | undefined,
-        public readonly fields: ReadonlyArray<TChild>
-    ) {
-        super();
-    }
-
-    public updateHidden(user: any, data: any, itemData?: any) {
-        let visible = false;
-
-        for (const child of this.fields) {
-            child.updateHidden(user, data, itemData);
-
-            visible = visible || !child.hidden;
-        }
-
-        this.setHidden(!visible);
+        return new StringFormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
     }
 }
 

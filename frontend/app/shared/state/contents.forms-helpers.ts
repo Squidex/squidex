@@ -26,11 +26,9 @@ export abstract class Hidden {
             this.hidden$.next(hidden);
         }
     }
-
-    public abstract updateHidden(user: any, data: any, itemData?: any): void;
 }
 
-export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
+export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
     constructor(
         public readonly separator: TSeparator | undefined,
         public readonly fields: ReadonlyArray<TChild>
@@ -38,12 +36,10 @@ export class FieldSection<TSeparator, TChild extends Hidden> extends Hidden {
         super();
     }
 
-    public updateHidden(user: any, data: any, itemData?: any) {
+    public updateHidden() {
         let visible = false;
 
         for (const child of this.fields) {
-            child.updateHidden(user, data, itemData);
-
             visible = visible || !child.hidden;
         }
 
