@@ -7,10 +7,19 @@
     padding: 1.25rem;
 }
 
-.col-options {
-    @include force-width(6rem);
+.col-action {
+    @include force-width(7rem);
 }
 
-.col-name {
-    @include force-width(14rem);
+.preview {
+    background-color: $color-input;
+    border: 0;
+    border-radius: 4px;
+    opacity: .4;
+}
+
+.label {
+    font-size: .9rem;
+    font-weight: normal;
+    line-height: 2.4rem;
 }

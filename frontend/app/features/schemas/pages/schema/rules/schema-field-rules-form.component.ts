@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddFieldRuleForm, ConfigureFieldRulesForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { ConfigureFieldRulesForm, SchemaDetailsDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
@@ -18,8 +18,7 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public formAdd = new AddFieldRuleForm(this.formBuilder);
-    public formEdit = new ConfigureFieldRulesForm(this.formBuilder);
+    public editForm = new ConfigureFieldRulesForm(this.formBuilder);
 
     public fieldNames: ReadonlyArray<string>;
 
@@ -32,32 +31,30 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.isEditable = this.schema.canUpdateUrls;
-
-        this.formEdit.load(this.schema);
-        this.formEdit.setEnabled(this.isEditable);
-
         const fieldNames: string[] = [];
 
-        this.fieldNames = fieldNames;
-    }
+        for (const field of this.schema.fields) {
+            if (field.properties.isContentField) {
+                fieldNames.push(field.name);
 
-    public cancelAdd() {
-        this.formAdd.submitCompleted();
+                for (const nestedField of field.nested) {
+                    if (nestedField.properties.isContentField) {
+                        fieldNames.push(`${field.name}.${nestedField.name}`);
+                    }
+                }
+            }
+        }
+
+        this.fieldNames = fieldNames.sorted();
+
+        this.isEditable = this.schema.canUpdateUrls;
+
+        this.editForm.load(this.schema);
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public add() {
-        if (!this.isEditable) {
-            return;
-        }
-
-        const value = this.formAdd.submit();
-
-        if (value) {
-            this.formEdit.add(value);
-
-            this.cancelAdd();
-        }
+        this.editForm.add(this.fieldNames);
     }
 
     public saveSchema() {
@@ -65,14 +62,14 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
             return;
         }
 
-        const value = this.formEdit.submit();
+        const value = this.editForm.submit();
 
         if (value) {
             this.schemasState.configureFieldRules(this.schema, value)
                 .subscribe(() => {
-                    this.formEdit.submitCompleted({ noReset: true });
+                    this.editForm.submitCompleted({ noReset: true });
                 }, error => {
-                    this.formEdit.submitFailed(error);
+                    this.editForm.submitFailed(error);
                 });
         }
     }

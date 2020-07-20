@@ -71,26 +71,6 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 }
 
-type AddFieldRuleFormType = FieldRule;
-
-export class AddFieldRuleForm extends Form<FormGroup, AddFieldRuleFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            action: ['',
-                [
-                    Validators.required
-                ]
-            ],
-            field: ['',
-                [
-                    Validators.required
-                ]
-            ],
-            condition: ''
-        }));
-    }
-}
-
 export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
     constructor(
         private readonly formBuilder: FormBuilder
@@ -98,15 +78,15 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
         super(formBuilder.array([]));
     }
 
-    public add(value: any) {
+    public add(fieldNames: ReadonlyArray<string>) {
         this.form.push(
             this.formBuilder.group({
-                action: ['',
+                action: ['Disable',
                     [
                         Validators.required
                     ]
                 ],
-                field: ['',
+                field: [fieldNames[0],
                     [
                         Validators.required
                     ]
@@ -120,26 +100,17 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
     }
 
     public transformLoad(value: Partial<SchemaDetailsDto>) {
-        return value.fieldRules || [];
-    }
-}
+        const result = value.fieldRules || [];
 
-type AddPreviewUrlFormType = { name: string, url: string };
+        while (this.form.controls.length < result.length) {
+            this.add([]);
+        }
 
-export class AddPreviewUrlForm extends Form<FormGroup, AddPreviewUrlFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]
-            ],
-            url: ['',
-                [
-                    Validators.required
-                ]
-            ]
-        }));
+        while (this.form.controls.length > result.length) {
+            this.remove(this.form.controls.length - 1);
+        }
+
+        return result;
     }
 }
 
@@ -152,15 +123,15 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         super(formBuilder.array([]));
     }
 
-    public add(value: any) {
+    public add() {
         this.form.push(
             this.formBuilder.group({
-                name: [value.name,
+                name: ['',
                     [
                         Validators.required
                     ]
                 ],
-                url: [value.url,
+                url: ['',
                     [
                         Validators.required
                     ]
@@ -180,7 +151,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         const length = Object.keys(previewUrls).length;
 
         while (this.form.controls.length < length) {
-            this.add({});
+            this.add();
         }
 
         while (this.form.controls.length > length) {

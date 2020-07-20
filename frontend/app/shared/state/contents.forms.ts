@@ -12,7 +12,7 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '
 import { Form, StringFormControl as FormControlForString, Types, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
@@ -57,24 +57,21 @@ export class PartitionConfig {
     }
 }
 
-type ConditionType = 'Disable' | 'Hide';
-type Condition = { field: string, type: ConditionType, expression: string };
-
-class CompiledCondition {
+class CompiledRule {
     private function: Function;
 
     public get field() {
-        return this.condition.field;
+        return this.rule.field;
     }
 
-    public get type() {
-        return this.condition.type;
+    public get action() {
+        return this.rule.action;
     }
 
     constructor(
-        private readonly condition: Condition
+        private readonly rule: FieldRule
     ) {
-        this.function = new Function(`return function(data, itemData, user) { return ${condition.expression} }`)();
+        this.function = new Function(`return function(data, itemData, user) { return ${rule.condition} }`)();
     }
 
     public eval(data: any, itemData: any, user: any) {
@@ -94,23 +91,13 @@ export class EditContentForm extends Form<FormGroup, any> {
 
     public readonly value = new BehaviorSubject<any>(this.form.value);
 
-    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto, conditions: Condition[] = []) {
+    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto) {
         super(new FormGroup({}, {
             updateOn: 'blur'
         }));
 
-        conditions.push({
-            field: 'text1', type: 'Hide', expression: 'data.value.iv > 100'
-        });
-        conditions.push({
-            field: 'text2', type: 'Disable', expression: 'data.value.iv > 100'
-        });
-        conditions.push({
-            field: 'nested.text3', type: 'Hide', expression: 'data.value.iv > 100'
-        });
-
         const compiledPartitions = new PartitionConfig(languages);
-        const compiledConditions = conditions.map(x => new CompiledCondition(x));
+        const compiledConditions = schema.fieldRules.map(x => new CompiledRule(x));
 
         const sections: FieldSection<RootFieldDto, FieldForm>[] = [];
 
@@ -239,7 +226,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     constructor(
         public readonly field: T,
         public readonly form: TForm,
-        private readonly rules?: CompiledCondition[]
+        private readonly rules?: CompiledRule[]
     ) {
         super();
     }
@@ -249,7 +236,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 
         if (this.rules) {
             for (const rule of this.rules) {
-                if (rule.type === 'Disable' && rule.eval(data, itemData, user)) {
+                if (rule.action === 'Disable' && rule.eval(data, itemData, user)) {
                     disabled = true;
                     break;
                 }
@@ -273,7 +260,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 
         if (this.rules) {
             for (const rule of this.rules) {
-                if (rule.type === 'Hide' && rule.eval(data, itemData, user)) {
+                if (rule.action === 'Hide' && rule.eval(data, itemData, user)) {
                     hidden = true;
                     break;
                 }
@@ -310,7 +297,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     private readonly childMap: { [partition: string]: (FieldValueForm | FieldArrayForm) } = {};
 
-    constructor(field: RootFieldDto, partitions: PartitionConfig, rules: CompiledCondition[]
+    constructor(field: RootFieldDto, partitions: PartitionConfig, rules: CompiledRule[]
     ) {
         super(field, new FormGroup({}), FieldForm.buildRules(field, rules));
 
@@ -366,7 +353,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         }
     }
 
-    private static buildRules(field: RootFieldDto, rules: CompiledCondition[]) {
+    private static buildRules(field: RootFieldDto, rules: CompiledRule[]) {
         return rules.filter(x => x.field === field.name);
     }
 }
@@ -391,7 +378,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
 
     constructor(field: RootFieldDto,
         private readonly isOptional: boolean,
-        private readonly allRules: CompiledCondition[]
+        private readonly allRules: CompiledRule[]
     ) {
         super(field, FieldArrayForm.buildControl(field, isOptional));
     }
@@ -461,7 +448,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
 export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGroup>  {
     public readonly sections: ReadonlyArray<FieldSection<NestedFieldDto, FieldArrayItemValueForm>>;
 
-    constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledCondition[], source?: FieldArrayItemForm
+    constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledRule[], source?: FieldArrayItemForm
     ) {
         super(field, new FormGroup({}));
 
@@ -512,7 +499,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 }
 
 export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, FormControlForString> {
-    constructor(field: NestedFieldDto, parent: RootFieldDto, isOptional: boolean, rules: CompiledCondition[], source?: FieldArrayItemForm
+    constructor(field: NestedFieldDto, parent: RootFieldDto, isOptional: boolean, rules: CompiledRule[], source?: FieldArrayItemForm
     ) {
         super(field,
             FieldArrayItemValueForm.buildControl(field, isOptional, source),
@@ -520,7 +507,7 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
         );
     }
 
-    private static buildRules(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledCondition[]) {
+    private static buildRules(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[]) {
         const fullName = `${parent.name}.${field.name}`;
 
         return rules.filter(x => x.field === fullName);
