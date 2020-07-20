@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IAppProvider appProvider;
         private readonly IMemoryCache cache;
+        private readonly ILocalCache localCache;
         private readonly RuleService ruleService;
 
         public string Name
@@ -36,20 +38,21 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return ".*"; }
         }
 
-        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, IRuleEventRepository ruleEventRepository,
+        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(cache);
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(ruleService);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(cache, nameof(cache));
+            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(ruleService, nameof(ruleService));
 
             this.appProvider = appProvider;
 
             this.cache = cache;
-
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
+            this.localCache = localCache;
         }
 
         public bool Handles(StoredEvent @event)
@@ -62,16 +65,34 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return Task.CompletedTask;
         }
 
-        public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
+        public async Task Enqueue(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule);
-            Guard.NotNull(@event);
+            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(@event, nameof(@event));
 
-            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
-
-            foreach (var job in jobs)
+            using (localCache.StartContext())
             {
-                await ruleEventRepository.EnqueueAsync(job, job.Created);
+                var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
+
+                foreach (var (job, ex) in jobs)
+                {
+                    if (ex != null)
+                    {
+                        await ruleEventRepository.EnqueueAsync(job, null);
+
+                        await ruleEventRepository.UpdateAsync(job, new RuleJobUpdate
+                        {
+                            JobResult = RuleJobResult.Failed,
+                            ExecutionResult = RuleResult.Failed,
+                            ExecutionDump = ex.ToString(),
+                            Finished = job.Created
+                        });
+                    }
+                    else
+                    {
+                        await ruleEventRepository.EnqueueAsync(job, job.Created);
+                    }
+                }
             }
         }
 
@@ -88,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        private Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
+        private Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
             return cache.GetOrCreateAsync(appId, entry =>
             {

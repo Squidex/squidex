@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
@@ -14,6 +15,8 @@ namespace TestSuite.Fixtures
 {
     public class ContentFixture : CreatedAppFixture
     {
+        private static readonly HashSet<string> CreatedSchemas = new HashSet<string>();
+
         public IContentsClient<TestEntity, TestEntityData> Contents { get; }
 
         public string SchemaName { get; }
@@ -27,20 +30,25 @@ namespace TestSuite.Fixtures
         {
             SchemaName = schemaName;
 
-            Task.Run(async () =>
+            if (!CreatedSchemas.Contains(schemaName))
             {
-                try
+                Task.Run(async () =>
                 {
-                    await TestEntity.CreateSchemaAsync(Schemas, AppName, schemaName);
-                }
-                catch (SquidexManagementException ex)
-                {
-                    if (ex.StatusCode != 400)
+                    try
                     {
-                        throw;
+                        await TestEntity.CreateSchemaAsync(Schemas, AppName, schemaName);
                     }
-                }
-            }).Wait();
+                    catch (SquidexManagementException ex)
+                    {
+                        if (ex.StatusCode != 400)
+                        {
+                            throw;
+                        }
+                    }
+                }).Wait();
+
+                CreatedSchemas.Add(schemaName);
+            }
 
             Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
         }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
@@ -22,12 +23,14 @@ namespace Squidex.Areas.Api.Controllers.Users
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
+        private readonly IUserEvents userEvents;
 
-        public UserManagementController(ICommandBus commandBus, UserManager<IdentityUser> userManager, IUserFactory userFactory)
+        public UserManagementController(ICommandBus commandBus, UserManager<IdentityUser> userManager, IUserFactory userFactory, IUserEvents userEvents)
             : base(commandBus)
         {
             this.userManager = userManager;
             this.userFactory = userFactory;
+            this.userEvents = userEvents;
         }
 
         [HttpGet]
@@ -36,12 +39,11 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var taskForItems = userManager.QueryByEmailAsync(query, take, skip);
-            var taskForCount = userManager.CountByEmailAsync(query);
+            var (items, total) = await AsyncHelper.WhenAll(
+                userManager.QueryByEmailAsync(query, take, skip),
+                userManager.CountByEmailAsync(query));
 
-            await Task.WhenAll(taskForItems, taskForCount);
-
-            var response = UsersDto.FromResults(taskForItems.Result, taskForCount.Result, this);
+            var response = UsersDto.FromResults(items, total, Resources);
 
             return Ok(response);
         }
@@ -59,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -72,7 +74,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userManager.CreateAsync(userFactory, request.ToValues());
 
-            var response = UserDto.FromUser(user, this);
+            userEvents.OnUserRegistered(user);
+
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -85,7 +89,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userManager.UpdateAsync(id, request.ToValues());
 
-            var response = UserDto.FromUser(user, this);
+            userEvents.OnUserUpdated(user);
+
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -103,7 +109,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userManager.LockAsync(id);
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }
@@ -121,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userManager.UnlockAsync(id);
 
-            var response = UserDto.FromUser(user, this);
+            var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
         }

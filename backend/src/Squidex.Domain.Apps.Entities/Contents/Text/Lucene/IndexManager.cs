@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,15 +16,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
     public sealed partial class IndexManager : DisposableObjectBase
     {
-        private readonly Dictionary<Guid, IndexHolder> indices = new Dictionary<Guid, IndexHolder>();
+        private readonly Dictionary<DomainId, IndexHolder> indices = new Dictionary<DomainId, IndexHolder>();
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
         private readonly IIndexStorage indexStorage;
         private readonly ISemanticLog log;
 
         public IndexManager(IIndexStorage indexStorage, ISemanticLog log)
         {
-            Guard.NotNull(indexStorage);
-            Guard.NotNull(log);
+            Guard.NotNull(indexStorage, nameof(indexStorage));
+            Guard.NotNull(log, nameof(log));
 
             this.indexStorage = indexStorage;
 
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             return indexStorage.ClearAsync();
         }
 
-        public async Task<IIndex> AcquireAsync(Guid ownerId)
+        public async Task<IIndex> AcquireAsync(DomainId ownerId)
         {
             IndexHolder? indexHolder;
 
@@ -62,7 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     await CommitInternalAsync(indexHolder, true);
                 }
 
-                indexHolder = new IndexHolder(ownerId);
+                var directory = await indexStorage.CreateDirectoryAsync(ownerId);
+
+                indexHolder = new IndexHolder(ownerId, directory);
                 indices[ownerId] = indexHolder;
             }
             finally
@@ -70,24 +71,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 lockObject.Release();
             }
 
-            var directory = await indexStorage.CreateDirectoryAsync(ownerId);
-
-            indexHolder.Open(directory);
-
             return indexHolder;
         }
 
         public async Task ReleaseAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             var indexHolder = (IndexHolder)index;
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
-                indexHolder.Release();
+                indexHolder.Dispose();
                 indices.Remove(indexHolder.Id);
             }
             finally
@@ -100,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public Task CommitAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             return CommitInternalAsync(index, false);
         }
@@ -118,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     holder.Commit();
                 }
 
-                await indexStorage.WriteAsync(holder.GetUnsafeWriter().Directory, holder.Snapshotter);
+                await indexStorage.WriteAsync(holder.Directory, holder.Snapshotter);
             }
         }
 
@@ -128,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             try
             {
-                lockObject.Wait();
+                await lockObject.WaitAsync();
 
                 indices.Clear();
             }

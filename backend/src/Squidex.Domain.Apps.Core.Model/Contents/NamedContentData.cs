@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -14,6 +15,11 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public NamedContentData()
             : base(StringComparer.Ordinal)
+        {
+        }
+
+        public NamedContentData(NamedContentData source)
+            : base(source, StringComparer.Ordinal)
         {
         }
 
@@ -39,14 +45,26 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public NamedContentData AddField(string name, ContentFieldData? data)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             this[name] = data;
 
             return this;
         }
 
-        public bool Equals(NamedContentData other)
+        public NamedContentData Clone()
+        {
+            var clone = new NamedContentData(Count);
+
+            foreach (var (key, value) in this)
+            {
+                clone[key] = value?.Clone()!;
+            }
+
+            return clone;
+        }
+
+        public bool Equals([AllowNull] NamedContentData other)
         {
             return base.Equals(other);
         }

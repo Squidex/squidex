@@ -20,18 +20,18 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public DefaultEventDataFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
         {
-            Guard.NotNull(typeNameRegistry);
-            Guard.NotNull(serializer);
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.typeNameRegistry = typeNameRegistry;
 
             this.serializer = serializer;
         }
 
-        public Envelope<IEvent> Parse(EventData eventData, Func<string, string>? stringConverter = null)
+        public Envelope<IEvent> Parse(EventData eventData)
         {
             var payloadType = typeNameRegistry.GetType(eventData.Type);
-            var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);
+            var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType);
 
             if (payloadObj is IMigrated<IEvent> migratedEvent)
             {

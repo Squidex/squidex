@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
-        private readonly CancellationTokenSource timerCts = new CancellationTokenSource();
+        private readonly CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
@@ -29,9 +29,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscription(IEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
         {
-            Guard.NotNull(eventStore);
-            Guard.NotNull(eventSubscriber);
-            Guard.NotNull(streamFilter);
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
+            Guard.NotNull(streamFilter, nameof(streamFilter));
 
             this.position = position;
 
@@ -45,10 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private void Subscribe()
         {
-            if (currentSubscription == null)
-            {
-                currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
-            }
+            currentSubscription ??= eventStore.CreateSubscription(this, streamFilter, position);
         }
 
         private void Unsubscribe()
@@ -91,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task RetryAsync()
         {
-            await Task.Delay(ReconnectWaitMs, timerCts.Token);
+            await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
 
             await dispatcher.DispatchAsync(Subscribe);
         }
@@ -111,7 +108,11 @@ namespace Squidex.Infrastructure.EventSourcing
             await dispatcher.DispatchAsync(Unsubscribe);
             await dispatcher.StopAndWaitAsync();
 
-            timerCts.Cancel();
+            if (!timerCancellation.IsCancellationRequested)
+            {
+                timerCancellation.Cancel();
+                timerCancellation.Dispose();
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
     {
         public EnrichedSchemaEventType Type { get; set; }
 
-        public Guid Id
+        public DomainId Id
         {
             get { return SchemaId.Id; }
         }

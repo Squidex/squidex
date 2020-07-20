@@ -19,6 +19,16 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public ContentFieldData(ContentFieldData source)
+            : base(source, StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
+        public ContentFieldData(int capacity)
+            : base(capacity, StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
         public ContentFieldData AddValue(object? value)
         {
             return AddJsonValue(JsonValue.Create(value));
@@ -38,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddJsonValue(string key, IJsonValue value)
         {
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             if (Language.IsValidLanguage(key))
             {
@@ -50,6 +60,18 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
 
             return this;
+        }
+
+        public ContentFieldData Clone()
+        {
+            var clone = new ContentFieldData(Count);
+
+            foreach (var (key, value) in this)
+            {
+                clone[key] = value?.Clone()!;
+            }
+
+            return clone;
         }
 
         public override bool Equals(object? obj)

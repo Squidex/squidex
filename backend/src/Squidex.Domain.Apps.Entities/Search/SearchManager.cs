@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Search
 
         public SearchManager(IEnumerable<ISearchSource> searchSources, ISemanticLog log)
         {
-            Guard.NotNull(searchSources);
-            Guard.NotNull(log);
+            Guard.NotNull(searchSources, nameof(searchSources));
+            Guard.NotNull(log, nameof(log));
 
             this.searchSources = searchSources;
 
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var tasks = searchSources.Select(x => SearchAsync(x, query, context));
 
-            var results = await Task.WhenAll<SearchResults>(tasks);
+            var results = await Task.WhenAll(tasks);
 
             return new SearchResults(results.SelectMany(x => x));
         }

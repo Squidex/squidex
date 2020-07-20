@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -19,11 +20,14 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
+        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
+
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
@@ -63,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }, ct);
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? parentId, ClrQuery query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
@@ -81,49 +85,42 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .QuerySort(query)
                             .ToListAsync();
 
-                    await Task.WhenAll(assetItems, assetCount);
+                    var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
 
-                    return ResultList.Create<IAssetEntity>(assetCount.Result, assetItems.Result);
+                    return ResultList.Create<IAssetEntity>(total, items);
                 }
-                catch (MongoQueryException ex)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {
-                    if (ex.Message.Contains("17406"))
-                    {
-                        throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
                 }
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
                 var assetEntities =
-                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
+                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryChildIdsAsync(Guid appId, Guid parentId)
+        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.DocumentId)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
+                return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
             }
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
@@ -135,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetBySlugAsync(Guid appId, string slug)
+        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -147,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -159,7 +156,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(Guid id)
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var documentId = DomainId.Combine(appId, id).ToString();
+
+                var assetEntity =
+                    await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                return assetEntity;
+            }
+        }
+
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId id)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -171,12 +182,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        private static FilterDefinition<MongoAssetEntity> BuildFilter(Guid appId, HashSet<Guid> ids)
+        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
         {
+            var documentIds = ids.Select(x => DomainId.Combine(appId, x));
+
             return Filter.And(
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.Id, ids),
+                Filter.In(x => x.Id, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        private static string GetIdField()
+        {
+            return BsonClassMap.LookupClassMap(typeof(MongoAssetEntity)).GetMemberMap(nameof(MongoAssetEntity.Id)).ElementName;
         }
     }
 }

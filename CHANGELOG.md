@@ -1,5 +1,107 @@
 # Changelog
 
+## 5.0.0 BETA 1 - 2020-07-06
+
+This version introduces a new way to deal with ids. So far each content element has an id that is unique across all apps. This causes problems, because you cannot define your own ids and the ids have to change when you clone an app via backup and restore.
+
+With this version ids for content items and assets are only unique within an app.
+
+To make this possible, this version rebuilds all content items, assets and asset folders which can take a few minutes.
+
+## 4.5.0 - 2020-07-06
+
+### Features
+
+* **Backups**: Increase download timeout for backups to 60 minutes.
+* **Rules**: Change expiration for rule events to be relative from now instead of relative to the original event to make replaying easier.
+* **Rules**: Also create rule events when the creation failed to simplify debugging.
+* **UI**: CTRL+Click for content items to open them in new tabs. Mimic default browser behavior for links.
+* **UI**: Make sections defined by schema separators collapsible.
+* **UI**: Customizable dashboard.
+* **UI**: Include external dependencies into the build to run Squidex in protected company networks.
+* **UI**: Define the preview modes for assets.
+* **Notifo**: Notifo integration finalized.
+
+### Bugfixes
+
+* **Assets**: Fixed a bug where the wrong permission was checked for protected assets.
+* **Assets**: Fixed the wrong calculation of focus points when resizing assets.
+* **Assets**: Upraded the image library to a newer version to fix a bug with resizing.
+* **Contents**: Minor fixes for flat content.
+* **Rules**: Fixed several bugs in the rule runner.
+* **Rules**: Fixed avro serialize for union schemas.
+* **Rules**: Proper cancellation for kafka.
+* **Schemas**: Fixed several minor bugs in the schema synchronizer.
+
+## 4.4.0 - 2020-06-15
+
+### Features
+
+* **Rules**: Liquid support.
+
+### Bugfixes
+
+* **Grains**: Fix restart of grains
+* **EventStore**: Fix a bug where very old events were not consumed properly.
+
+## 4.4.0 RC - 2020-05-30
+
+### General
+
+* Many improvements to tests and integration of API tests into CI pipeline.
+
+### Features 
+
+* **Rules**: Defined payload, headers and key in kafka rule action.
+* **Rules**: Support for avro serialization in kafka rule action.
+* **Rules**: Define fallback values in formatting, e.g. `${CONTENT_DATA.name.iv ? Fallback}`
+* **Rules**: Define transformations, e.g. `${CONTENT_DATA.name.iv | upper}`: Upper, Lower, Slugify, EncodeJson, Timestamp_Ms, Timestamp_Seconds
+* **Rules**: Resolve reference in formatting, e.g. `${CONTENT_DATA.city.iv.data.name.iv}`
+* **Contents**: Use aggregation framework to order large data sets.
+* **Contents**: Improvements to the bulk endpoint to also allow deletion and updates.
+* **Contents**: Improvements to the enrichment flow of contents when they are queried from the database.
+* **Scripts**: Fallback for `oldStatus`.
+* **Clustering**: Auto restart background processes.
+* **Authentication**: Use local API authentication to bypass the extra call to identity server and to make deployment easier.
+* **Authentication**: Improve performance when checking permissions by simple caching.
+* **Amazon S3**: Allow to upload assets where the stream has no length.
+* **UI**: Additional editor to use checkboxes for references.
+
+### Bugfixes
+
+* **Assets**: Fixed a bug where deleting folders using the UI was not working properly.
+* **Contents**: Use aggregation framework to order large data sets.
+* **Contents**: Fixed a bug where references were cleared in some conditions.
+* **UI**: Do not show first value in dropdowns when no value is defined.
+* **UI**: Fixes for notifications and show newest notifications first.
+* **UI**: Fixed the layout of asset preview in content list.
+* **Authentication**: Fixed a bug where invited collaborators were not added to an app correctly.
+* **Schemas**: Fix for schema synchronizer were some changes were not discovered correctly.
+
+## 4.3.0 - 2020-04-27
+
+### Features
+
+* **API**: Dedicated health check for event consumers and background processes.
+* **Rules**: Integrated a background worker to start rules from beginning.
+* **Users**: Custom user properties.
+* **Scripting**: Incrementing counters.
+
+### Bugfixes
+
+* **API**: Fix in OpenAPI schema to get rid of FieldNames collection that causes problems in code generators.
+* **API**: Short header for surrogate keys and custom request header to turn off keys.
+* **API**: Better error handling for unsupported ODATA features.
+* **UI**: Fix in autocompletion component which was causing issues in role form.
+* **UI**: Fixed a layout bug in the role form.
+* **UI**: Fixed a layout bug in tag editor.
+* **UI**: Time formatting fixed.
+* **UI**: Fixed a bug that was showing all assets and not in their folders.
+* **API**: Fixed index usage for event store.
+* **FullText**: Fixed a small minor in full text index.
+* **Rules**: Fixed a bug in email rule which was using email body as sender and recipient address.
+* **Rules**: Use default timeout in webhook.
+
 ## 4.2.0 Beta 2 - 2020-02-24
 
 This release just contains a lot of bugfixes.

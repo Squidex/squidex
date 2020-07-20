@@ -6,12 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, LocalStoreService, MathHelper, Pager, shareSubscribed, State } from '@app/framework';
+import { compareStrings, DialogService, MathHelper, Pager, shareSubscribed, State, StateSynchronizer } from '@app/framework';
 import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
-import { Query } from './query';
+import { Query, QueryFullTextSynchronizer } from './query';
 
 export type AssetPathItem = { id: string, folderName: string };
 
@@ -19,9 +19,9 @@ export type TagsAvailable = { [name: string]: number };
 export type TagsSelected = { [name: string]: boolean };
 export type Tag = { name: string, count: number; };
 
-const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
+const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto>, path?: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
 
-const ROOT_PATH: ReadonlyArray<AssetPathItem> = [{ id: MathHelper.EMPTY_GUID, folderName: 'Assets' }];
+const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'Assets' };
 
 interface Snapshot {
     // All assets tags.
@@ -46,7 +46,10 @@ interface Snapshot {
     path: ReadonlyArray<AssetPathItem>;
 
     // The parent folder.
-    parentFolder?: AssetPathItem;
+    parentId: string;
+
+    // Indicates if the assets are loaded once.
+    isLoadedOnce?: boolean;
 
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
@@ -103,10 +106,7 @@ export class AssetsState extends State<Snapshot> {
         this.project(x => x.path.length > 0);
 
     public parentFolder =
-        this.project(x => x.parentFolder);
-
-    public pathRoot =
-        this.project(x => x.path[x.path.length - 1]);
+        this.project(x => getParent(x.path));
 
     public canCreate =
         this.project(x => x.canCreate === true);
@@ -117,21 +117,27 @@ export class AssetsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService
+        private readonly dialogs: DialogService
     ) {
         super({
             assetFolders: [],
             assets: [],
-            assetsPager: Pager.fromLocalStore('assets', localStore, 30),
-            path: ROOT_PATH,
+            assetsPager: new Pager(0, 0, 30),
+            parentId: ROOT_ITEM.id,
+            path: [ROOT_ITEM],
             tagsAvailable: {},
             tagsSelected: {}
         });
+    }
 
-        this.assetsPager.subscribe(pager => {
-            pager.saveTo('assets', this.localStore);
-        });
+    public loadAndListen(synchronizer: StateSynchronizer) {
+        synchronizer.mapTo(this)
+            .withPager('assetsPager', 'assets', 20)
+            .withString('parentId', 'parent')
+            .withStrings('tagsSelected', 'tags')
+            .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
+            .whenSynced(() => this.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {
@@ -150,30 +156,32 @@ export class AssetsState extends State<Snapshot> {
             skip: this.snapshot.assetsPager.skip
         };
 
-        if (this.parentId) {
-            query.parentId = this.parentId;
-        }
+        const withQuery = hasQuery(this.snapshot);
 
-        if (this.snapshot.assetsQuery) {
-            query.query = this.snapshot.assetsQuery;
-        }
+        if (withQuery) {
+            if (this.snapshot.assetsQuery) {
+                query.query = this.snapshot.assetsQuery;
+            }
 
-        const searchTags = Object.keys(this.snapshot.tagsSelected);
+            const searchTags = Object.keys(this.snapshot.tagsSelected);
 
-        if (searchTags.length > 0) {
-            query.tags = searchTags;
+            if (searchTags.length > 0) {
+                query.tags = searchTags;
+            }
+        } else {
+            query.parentId = this.snapshot.parentId;
         }
 
         const assets$ =
             this.assetsService.getAssets(this.appName, query);
 
         const assetFolders$ =
-            this.snapshot.path.length === 0 ?
-                of(EMPTY_FOLDERS) :
-                this.assetsService.getAssetFolders(this.appName, this.parentId);
+            !withQuery ?
+                this.assetsService.getAssetFolders(this.appName, this.snapshot.parentId) :
+                of(EMPTY_FOLDERS);
 
         const tags$ =
-            this.snapshot.path.length === 1 ?
+            !withQuery || !this.snapshot.isLoadedOnce ?
                 this.assetsService.getTags(this.appName) :
                 of(this.snapshot.tagsAvailable);
 
@@ -183,6 +191,10 @@ export class AssetsState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
+                const path = assetFolders.path ?
+                    [ROOT_ITEM, ...assetFolders.path] :
+                    [];
+
                 this.next(s => ({
                     ...s,
                     assetFolders: assetFolders.items,
@@ -191,8 +203,9 @@ export class AssetsState extends State<Snapshot> {
                     canCreate: assets.canCreate,
                     canCreateFolders: assetFolders.canCreate,
                     isLoaded: true,
+                    isLoadedOnce: true,
                     isLoading: false,
-                    parentFolder: getParent(s.path),
+                    path,
                     tagsAvailable
                 }));
             }),
@@ -203,7 +216,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public addAsset(asset: AssetDto) {
-        if (asset.parentId !== this.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
+        if (asset.parentId !== this.snapshot.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
             return;
         }
 
@@ -218,9 +231,9 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public createAssetFolder(folderName: string) {
-        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.parentId }).pipe(
+        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.snapshot.parentId }).pipe(
             tap(assetFolder => {
-                if (assetFolder.parentId !== this.parentId) {
+                if (assetFolder.parentId !== this.snapshot.parentId) {
                     return;
                 }
 
@@ -334,6 +347,12 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public navigate(parentId: string) {
+        this.next({ parentId });
+
+        return this.loadInternal(false);
+    }
+
     public setPager(assetsPager: Pager) {
         this.next({ assetsPager });
 
@@ -350,13 +369,6 @@ export class AssetsState extends State<Snapshot> {
 
             if (tags) {
                 newState.tagsSelected = tags;
-            }
-
-            if (Object.keys(newState.tagsSelected).length > 0 || (newState.assetsQuery && newState.assetsQuery.fullText)) {
-                newState.path = [];
-                newState.assetFolders = [];
-            } else if (newState.path.length === 0) {
-                newState.path = ROOT_PATH;
             }
 
             return newState;
@@ -387,24 +399,6 @@ export class AssetsState extends State<Snapshot> {
         return this.searchInternal(null, tagsSelected);
     }
 
-    public navigate(folder: AssetPathItem) {
-        this.next(s => {
-            let path = s.path;
-
-            const index = path.findIndex(x => x.id === folder.id);
-
-            if (index >= 0) {
-                path = path.slice(0, index + 1);
-            } else {
-                path = [...path, folder];
-            }
-
-            return { ...s, path };
-        });
-
-        return this.loadInternal(false);
-    }
-
     public resetTags(): Observable<any> {
         return this.searchInternal(null, {});
     }
@@ -414,7 +408,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public get parentId() {
-        return this.snapshot.path.length > 0 ? this.snapshot.path[this.snapshot.path.length - 1].id : undefined;
+        return this.snapshot.parentId;
     }
 
     private get appName() {
@@ -456,6 +450,10 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
 
 function sort(tags: { [name: string]: number }) {
     return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
+}
+
+function hasQuery(state: Snapshot) {
+    return (state.assetsQuery && !!state.assetsQuery.fullText) || Object.keys(state.tagsSelected).length > 0;
 }
 
 function getParent(path: ReadonlyArray<AssetPathItem>) {

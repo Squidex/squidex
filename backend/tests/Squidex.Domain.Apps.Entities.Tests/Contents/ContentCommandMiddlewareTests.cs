@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly Guid contentId = Guid.NewGuid();
+        private readonly DomainId contentId = DomainId.NewGuid();
         private readonly Context requestContext = Context.Anonymous();
         private readonly ContentCommandMiddleware sut;
 
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
         }
 
-        protected override Guid Id
+        protected override DomainId Id
         {
             get { return contentId; }
         }
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Same(result, context.Result<IEnrichedContentEntity>());
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var enriched = new ContentEntity();
 
-            A.CallTo(() => contentEnricher.EnrichAsync(result, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(result, true, requestContext))
                 .Returns(enriched);
 
             await sut.HandleAsync(context);

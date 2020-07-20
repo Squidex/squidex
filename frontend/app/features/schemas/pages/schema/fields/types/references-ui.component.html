@@ -24,6 +24,13 @@
 
                 <span class="radio-label">Tags</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Checkboxes'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkboxes" />
+
+                <i class="icon-control-Checkboxes"></i>
+
+                <span class="radio-label">Checkboxes</span>
+            </label>
         </div>
     </div>
 

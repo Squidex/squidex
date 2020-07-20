@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class TextContentState
     {
-        public Guid ContentId { get; set; }
+        public DomainId ContentId { get; set; }
 
         public string DocIdCurrent { get; set; }
 

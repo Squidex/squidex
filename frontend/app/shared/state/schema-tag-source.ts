@@ -6,12 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Converter, TagValue } from '@app/framework';
+import { TagConverter, TagValue } from '@app/framework';
 import { map, shareReplay } from 'rxjs/operators';
 import { SchemaDto } from './../services/schemas.service';
 import { SchemasState } from './schemas.state';
 
-class SchemaConverter implements Converter {
+class SchemaConverter implements TagConverter {
     public suggestions: ReadonlyArray<TagValue>;
 
     constructor(

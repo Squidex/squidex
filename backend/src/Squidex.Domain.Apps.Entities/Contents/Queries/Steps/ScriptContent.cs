@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ScriptContent(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.scriptEngine = scriptEngine;
         }
@@ -36,8 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     if (!string.IsNullOrWhiteSpace(script))
                     {
-                        var results = new List<IEnrichedContentEntity>();
-
                         await Task.WhenAll(group.Select(x => TransformAsync(context, script, x)));
                     }
                 }
@@ -46,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task TransformAsync(Context context, string script, ContentEntity content)
         {
-            var scriptContext = new ScriptContext
+            var vars = new ScriptVars
             {
                 ContentId = content.Id,
                 Data = content.Data,
@@ -55,7 +53,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 User = context.User
             };
 
-            content.Data = await scriptEngine.TransformAsync(scriptContext, script);
+            var options = new ScriptOptions
+            {
+                AsContext = true
+            };
+
+            content.Data = await scriptEngine.TransformAsync(vars, script, options);
         }
 
         private static bool ShouldEnrich(Context context)

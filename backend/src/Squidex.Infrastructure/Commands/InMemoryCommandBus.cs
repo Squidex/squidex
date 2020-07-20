@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Commands
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
-            Guard.NotNull(middlewares);
+            Guard.NotNull(middlewares, nameof(middlewares));
 
             var reverseMiddlewares = middlewares.Reverse().ToList();
 
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task<CommandContext> PublishAsync(ICommand command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             var context = new CommandContext(command, this);
 

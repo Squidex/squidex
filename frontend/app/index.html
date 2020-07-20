@@ -7,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Squidex Headless CMS</title>
-
+    <style>
+        #outdated {
+            display: none;
+        }
+    </style>
     <noscript>
         <style>
             .loading {
-                display: none;
-            }
-
-            #outdated {
                 display: none;
             }
         </style>
@@ -23,11 +23,11 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.js"></script>
-    <script>
+    <script> 
         function addLoadEvent(callback) {
             var oldOnload = window.onload;
             if (typeof window.onload != 'function') {
-                window.oldOnload = callback;
+                window.onload = callback;
             } else {
                 window.onload = function () {
                     if (oldOnload) {
@@ -37,6 +37,7 @@
                 }
             }
         }
+
         addLoadEvent(function () {
             outdatedBrowser({ lowerThan: 'borderImage', languagePath: '' });
         });

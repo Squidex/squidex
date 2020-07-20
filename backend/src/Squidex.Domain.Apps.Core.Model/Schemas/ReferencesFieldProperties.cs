@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -25,17 +25,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public ReferencesFieldEditor Editor { get; set; }
 
-        public Guid SchemaId
+        public DomainId SchemaId
         {
             get
             {
-                return SchemaIds?.FirstOrDefault() ?? Guid.Empty;
+                return SchemaIds?.FirstOrDefault() ?? default;
             }
             set
             {
                 if (value != default)
                 {
-                    SchemaIds = new ReadOnlyCollection<Guid>(new List<Guid> { value });
+                    SchemaIds = new ReadOnlyCollection<DomainId>(new List<DomainId> { value });
                 }
                 else
                 {
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        public ReadOnlyCollection<Guid>? SchemaIds { get; set; }
+        public ReadOnlyCollection<DomainId>? SchemaIds { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

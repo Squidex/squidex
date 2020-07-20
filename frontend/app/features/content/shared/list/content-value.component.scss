@@ -1,10 +1,18 @@
-:ng-deep {
+:host ::ng-deep {
     .html-value {
         img {
-            margin-top: -25px;
+            margin-top: -15px;
             max-height: 50px;
             min-height: 50px;
             position: absolute;
+        }
+
+        img + span {
+            padding-left: 60px;
+        }
+
+        span {
+            @include truncate;
         }
     }
 }

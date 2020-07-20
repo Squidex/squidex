@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Reflection.Equality
 {
@@ -19,7 +20,7 @@ namespace Squidex.Infrastructure.Reflection.Equality
             this.comparer = comparer ?? SimpleEquals.Build(typeof(T));
         }
 
-        public bool Equals(T x, T y)
+        public bool Equals([AllowNull] T x, [AllowNull] T y)
         {
             return comparer.IsEquals(x, y);
         }

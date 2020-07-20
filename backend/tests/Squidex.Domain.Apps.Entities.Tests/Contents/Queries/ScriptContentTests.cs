@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,9 +21,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ScriptContentTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-        private readonly NamedId<Guid> schemaWithScriptId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> schemaWithScriptId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
         private readonly ScriptContent sut;
 
@@ -67,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, A<string>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, A<string>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -93,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptContext>._, "my-query"))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions()))
                 .Returns(new NamedContentData());
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
@@ -101,12 +100,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.NotSame(oldData, content.Data);
 
             A.CallTo(() => scriptEngine.TransformAsync(
-                    A<ScriptContext>.That.Matches(x =>
+                    A<ScriptVars>.That.Matches(x =>
                         ReferenceEquals(x.User, ctx.User) &&
                         ReferenceEquals(x.Data, oldData) &&
                         x.ContentId == content.Id),
-                    "my-query"))
+                    "my-query",
+                    ScriptOptions()))
                 .MustHaveHappened();
+        }
+
+        private static ScriptOptions ScriptOptions()
+        {
+            return A<ScriptOptions>.That.Matches(x => x.AsContext);
         }
     }
 }

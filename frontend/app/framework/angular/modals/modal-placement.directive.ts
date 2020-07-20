@@ -67,7 +67,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         this.renderer.setStyle(modalRef, 'bottom', 'auto');
         this.renderer.setStyle(modalRef, 'right', 'auto');
 
-        let zIndex = window.document.defaultView!.getComputedStyle(modalRef).getPropertyValue('z-index');
+        const zIndex = window.document.defaultView!.getComputedStyle(modalRef).getPropertyValue('z-index');
 
         if (!zIndex || zIndex === 'auto') {
             this.renderer.setStyle(modalRef, 'z-index', 10000);

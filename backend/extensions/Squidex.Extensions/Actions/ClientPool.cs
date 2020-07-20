@@ -30,11 +30,6 @@ namespace Squidex.Extensions.Actions
             this.factory = factory;
         }
 
-        public TClient GetClient(TKey key)
-        {
-            return GetClientAsync(key).Result;
-        }
-
         public async Task<TClient> GetClientAsync(TKey key)
         {
             if (!memoryCache.TryGetValue<TClient>(key, out var client))

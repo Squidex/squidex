@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
@@ -18,28 +17,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         public GrainRuleRunnerService(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
 
-        public Task CancelAsync(Guid appId)
+        public Task CancelAsync(DomainId appId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.CancelAsync();
         }
 
-        public Task<Guid?> GetRunningRuleIdAsync(Guid appId)
+        public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.GetRunningRuleIdAsync();
         }
 
-        public Task RunAsync(Guid appId, Guid ruleId)
+        public Task RunAsync(DomainId appId, DomainId ruleId)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId);
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.RunAsync(ruleId);
         }

@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public sealed class UsageNotification
     {
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
         public string AppName { get; set; }
 

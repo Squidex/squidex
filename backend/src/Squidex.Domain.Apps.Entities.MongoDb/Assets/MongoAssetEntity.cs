@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -17,21 +15,27 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<Guid>
+    public sealed class MongoAssetEntity : IAssetEntity, IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement("_id")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.String)]
-        public Guid IndexedAppId { get; set; }
+        public DomainId IndexedAppId { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("id")]
+        public DomainId Id { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("pi")]
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai")]
+        public NamedId<DomainId> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -40,10 +44,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement("mt")]
         public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("ai")]
-        public NamedId<Guid> AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("mm")]
@@ -102,9 +102,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("md")]
         public AssetMetadata Metadata { get; set; }
 
-        public Guid AssetId
+        public DomainId AssetId
         {
             get { return Id; }
+        }
+
+        public DomainId UniqueId
+        {
+            get { return DocumentId; }
         }
     }
 }

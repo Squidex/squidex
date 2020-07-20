@@ -31,7 +31,7 @@ namespace Squidex.Extensions.Actions.Webhook
         [DataType(DataType.Text)]
         public string SharedSecret { get; set; }
 
-        [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as payload.")]
+        [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
         [DataType(DataType.MultilineText)]
         [Formattable]
         public string Payload { get; set; }

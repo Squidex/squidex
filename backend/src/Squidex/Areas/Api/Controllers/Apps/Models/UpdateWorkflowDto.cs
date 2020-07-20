@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public List<Guid>? SchemaIds { get; set; }
+        public List<DomainId>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public Status Initial { get; set; }
 
-        public UpdateWorkflow ToCommand(Guid id)
+        public UpdateWorkflow ToCommand(string id)
         {
             var workflow = new Workflow(
                 Initial,

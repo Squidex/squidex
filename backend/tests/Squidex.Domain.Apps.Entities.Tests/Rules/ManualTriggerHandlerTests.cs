@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -29,6 +30,18 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 
             Assert.Equal("Manual", result.Single().Name);
+        }
+
+        [Fact]
+        public async Task Should_create_event_with_actor()
+        {
+            var actor = new RefToken(RefTokenType.Subject, "me");
+
+            var envelope = Envelope.Create<AppEvent>(new RuleManuallyTriggered { Actor = actor });
+
+            var result = await sut.CreateEnrichedEventsAsync(envelope);
+
+            Assert.Equal(actor, ((EnrichedUserEventBase)result.Single()).Actor);
         }
 
         [Fact]

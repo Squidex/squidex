@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public EventConsumersHealthCheck(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
     public class TagGrainTests
     {
         private readonly IGrainState<TagGrain.State> grainState = A.Fake<IGrainState<TagGrain.State>>();
-        private readonly string id = Guid.NewGuid().ToString();
+        private readonly string id = DomainId.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()
@@ -108,9 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         public async Task Should_remove_tags_from_grain()
         {
             var result1 = await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
             var result2 = await sut.NormalizeTagsAsync(HashSet.Of("name2", "name3"), null);
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
             await sut.NormalizeTagsAsync(null, new HashSet<string>(result1.Values));
 

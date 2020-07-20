@@ -26,6 +26,11 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         public JsonArray(JsonArray source)
+            : base(source.ToList())
+        {
+        }
+
+        private JsonArray(List<IJsonValue> source)
             : base(source)
         {
         }
@@ -90,6 +95,11 @@ namespace Squidex.Infrastructure.Json.Objects
             return hashCode;
         }
 
+        public IJsonValue Clone()
+        {
+            return new JsonArray(this.Select(x => x.Clone()).ToList());
+        }
+
         public string ToJsonString()
         {
             return ToString();
@@ -102,7 +112,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
         {
-            Guard.NotNull(pathSegment);
+            Guard.NotNull(pathSegment, nameof(pathSegment));
 
             if (pathSegment != null && int.TryParse(pathSegment, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) && index >= 0 && index < Count)
             {

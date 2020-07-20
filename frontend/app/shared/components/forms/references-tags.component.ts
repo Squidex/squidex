@@ -7,54 +7,16 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, Converter, getContentValue, LanguageDto, StatefulControlComponent, TagValue, UIOptions } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, LanguageDto, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true
 };
 
-class TagsConverter implements Converter {
-    public suggestions: ReadonlyArray<TagValue> = [];
-
-    constructor(language: LanguageDto, contents: ReadonlyArray<ContentDto>) {
-        this.suggestions = this.createTags(language, contents);
-    }
-
-    public convertInput(input: string) {
-        const result = this.suggestions.find(x => x.name === input);
-
-        return result || null;
-    }
-
-    public convertValue(value: any) {
-        const result = this.suggestions.find(x => x.id === value);
-
-        return result || null;
-    }
-
-    private createTags(language: LanguageDto, contents: ReadonlyArray<ContentDto>): ReadonlyArray<TagValue> {
-        if (contents.length === 0) {
-            return [];
-        }
-
-        const values = contents.map(content => {
-            const name =
-                content.referenceFields
-                    .map(f => getContentValue(content, language, f, false))
-                    .map(v => v.formatted || 'No value')
-                    .filter(v => !!v)
-                    .join(', ');
-
-            return new TagValue(content.id, name, content.id);
-        });
-
-        return values;
-    }
-}
-
 interface State {
     // The tags converter.
-    converter: TagsConverter;
+    converter: ReferencesTagsConverter;
 }
 
 const NO_EMIT = { emitEvent: false };
@@ -88,7 +50,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService
     ) {
-        super(changeDetector, { converter: new TagsConverter(null!, []) });
+        super(changeDetector, { converter: new ReferencesTagsConverter(null!, []) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
@@ -125,6 +87,8 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
                 this.resetConverterState();
             }
+        } else {
+            this.resetConverterState();
         }
     }
 
@@ -143,14 +107,14 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     }
 
     private resetConverterState() {
-        let converter: TagsConverter;
+        let converter: ReferencesTagsConverter;
 
         if (this.isValid && this.contentItems && this.contentItems.length > 0) {
-            converter = new TagsConverter(this.language, this.contentItems);
+            converter = new ReferencesTagsConverter(this.language, this.contentItems);
 
             this.selectionControl.enable(NO_EMIT);
         } else {
-            converter = new TagsConverter(null!, []);
+            converter = new ReferencesTagsConverter(null!, []);
 
             this.selectionControl.disable(NO_EMIT);
         }

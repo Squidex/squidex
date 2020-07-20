@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Int = new IntGraphType();
 
-        public static readonly IGraphType Guid = new GuidGraphType2();
+        public static readonly IGraphType DomainId = new StringGraphType();
 
         public static readonly IGraphType Date = new InstantGraphType();
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
-        public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
+        public static readonly IGraphType NonNullDomainId = new NonNullGraphType(DomainId);
 
         public static readonly IGraphType NonNullDate = new NonNullGraphType(Date);
 

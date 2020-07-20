@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Commands
 
         public GrainCommandMiddleware(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<object?> ExecuteCommandAsync(TCommand typedCommand)
         {
-            var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId);
+            var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId.ToString());
 
             var result = await grain.ExecuteAsync(typedCommand);
 

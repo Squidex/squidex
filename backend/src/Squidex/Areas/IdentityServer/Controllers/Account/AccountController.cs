@@ -360,7 +360,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user.Identity, DateTimeOffset.UtcNow.AddYears(100)));
         }
 
-        private Task<bool> AddClaimsAsync(UserWithClaims user, ExternalLoginInfo externalLogin, string email, bool isFirst = false)
+        private async Task<bool> AddClaimsAsync(UserWithClaims user, ExternalLoginInfo externalLogin, string email, bool isFirst = false)
         {
             var update = new UserValues
             {
@@ -382,7 +382,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 update.Permissions = new PermissionSet(Permissions.Admin);
             }
 
-            return MakeIdentityOperation(() => userManager.SyncClaims(user.Identity, update));
+            return await MakeIdentityOperation(() => userManager.SyncClaims(user.Identity, update));
         }
 
         private IActionResult RedirectToLogoutUrl(LogoutRequest context)

@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
@@ -42,8 +43,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
             await collection.Indexes.CreateManyAsync(new[]
             {
-                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.NextAttempt)),
-                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.AppId).Descending(x => x.Created)),
+                new CreateIndexModel<MongoRuleEventEntity>(
+                    Index.Ascending(x => x.NextAttempt)),
+
+                new CreateIndexModel<MongoRuleEventEntity>(
+                    Index.Ascending(x => x.AppId).Descending(x => x.Created)),
+
                 new CreateIndexModel<MongoRuleEventEntity>(
                     Index
                         .Ascending(x => x.Expires),
@@ -59,47 +64,47 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
-        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20)
+        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20)
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
-            if (ruleId.HasValue)
+            if (ruleId.HasValue && ruleId.Value != DomainId.Empty)
             {
-                filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId));
+                filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }
 
             var taskForItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
             var taskForCount = Collection.Find(filter).CountDocumentsAsync();
 
-            await Task.WhenAll(taskForItems, taskForCount);
+            var (items, total) = await AsyncHelper.WhenAll(taskForItems, taskForCount);
 
-            return ResultList.Create(taskForCount.Result, taskForItems.Result);
+            return ResultList.Create(total, items);
         }
 
-        public async Task<IRuleEventEntity> FindAsync(Guid id)
+        public async Task<IRuleEventEntity> FindAsync(DomainId id)
         {
             var ruleEvent =
-                await Collection.Find(x => x.Id == id)
+                await Collection.Find(x => x.DocumentId == id)
                     .FirstOrDefaultAsync();
 
             return ruleEvent;
         }
 
-        public Task EnqueueAsync(Guid id, Instant nextAttempt)
+        public Task EnqueueAsync(DomainId id, Instant nextAttempt)
         {
-            return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
+            return Collection.UpdateOneAsync(x => x.DocumentId == id, Update.Set(x => x.NextAttempt, nextAttempt));
         }
 
-        public async Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default)
+        public async Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = job.Created, NextAttempt = nextAttempt });
 
             await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }
 
-        public Task CancelAsync(Guid id)
+        public Task CancelAsync(DomainId id)
         {
-            return Collection.UpdateOneAsync(x => x.Id == id,
+            return Collection.UpdateOneAsync(x => x.DocumentId == id,
                 Update
                     .Set(x => x.NextAttempt, null)
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
@@ -107,8 +112,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public async Task UpdateAsync(RuleJob job, RuleJobUpdate update)
         {
-            Guard.NotNull(job);
-            Guard.NotNull(update);
+            Guard.NotNull(job, nameof(job));
+            Guard.NotNull(update, nameof(update));
 
             if (update.ExecutionResult == RuleResult.Success)
             {
@@ -119,7 +124,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, update.Finished);
             }
 
-            await Collection.UpdateOneAsync(x => x.Id == job.Id,
+            var documentId = job.Id.ToString();
+
+            await Collection.UpdateOneAsync(x => x.DocumentId == documentId,
                 Update
                     .Set(x => x.Result, update.ExecutionResult)
                     .Set(x => x.LastDump, update.ExecutionDump)
@@ -128,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Inc(x => x.NumCalls, 1));
         }
 
-        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId)
+        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId)
         {
             return statisticsCollection.QueryByAppAsync(appId);
         }

@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var headers = new EnvelopeHeaders(JsonValue.Object().Add("Key1", 123));
 
-            var clone = headers.Clone();
+            var clone = headers.CloneHeaders();
 
             CompareHeaders(headers, clone);
         }

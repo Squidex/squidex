@@ -1,0 +1,57 @@
+<ng-container *ngIf="config">
+    <button type="button" class="btn settings-button" [class.focused]="needsAttention" [class.btn-primary]="needsAttention" (click)="dropdownModal.toggle()" #buttonSettings>
+        <i class="icon-settings"></i>
+    </button>
+    
+    <ng-container *sqxModal="dropdownModal">
+        <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
+            <div class="dropdown-item" *ngFor="let item of configDefaults">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="field_{{item.type}}"
+                        [ngModel]="isSelected(item)"
+                        (ngModelChange)="addOrRemove(item)" />
+    
+                    <label class="form-check-label" for="field_{{item.type}}">
+                        {{item.name}}
+                    </label>
+                </div>
+            </div>
+    
+            <div class="dropdown-divider"></div>
+    
+            <a class="dropdown-item" (click)="startExpertMode()">Expert Mode</a>
+
+            <a class="dropdown-item" (click)="saveConfig()">Save</a>
+    
+            <div class="dropdown-divider"></div>
+    
+            <a class="dropdown-item dropdown-item-delete" (beforeClick)="dropdownModal.hide()"
+                (sqxConfirmClick)="resetConfig()"
+                confirmTitle="Reset config"
+                confirmText="Do you really want to reset the dashboard to the default?">
+                Reset
+            </a>
+        </div>
+    </ng-container>
+    
+    
+    <ng-container *sqxModal="expertDialog">
+        <sqx-modal-dialog (close)="expertDialog.hide()" fullHeight="true" size="lg">
+            <ng-container title>
+                Edit Config
+            </ng-container>
+        
+            <ng-container content>
+                <div class="json-editor">
+                    <sqx-json-editor [noBorder]="true" [(ngModel)]="expertConfig"></sqx-json-editor>
+                </div>
+            </ng-container>
+    
+            <ng-container footer>
+                <button type="button" class="btn btn-secondary" (click)="expertDialog.hide()">Cancel</button>
+
+                <button type="button" class="btn btn-primary" (click)="completeExpertMode()">Update</button>
+            </ng-container>
+        </sqx-modal-dialog>
+    </ng-container>
+</ng-container>

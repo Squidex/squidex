@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static string Format(IJsonValue? value, IField field)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             if (value == null || value is JsonNull)
             {

@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Schema(string name, SchemaProperties? properties = null, bool isSingleton = false)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             this.name = name;
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished, bool isSingleton = false)
             : this(name, properties, isSingleton)
         {
-            Guard.NotNull(fields);
+            Guard.NotNull(fields, nameof(fields));
 
             this.fields = new FieldCollection<RootField>(fields);
 

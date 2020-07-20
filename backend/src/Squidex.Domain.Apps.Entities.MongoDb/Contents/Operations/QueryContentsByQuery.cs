@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -17,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
@@ -24,6 +27,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     {
         private readonly DataConverter converter;
         private readonly ITextIndex indexer;
+
+        [BsonIgnoreExtraElements]
+        internal sealed class IdOnly
+        {
+            [BsonId]
+            [BsonElement("_id")]
+            public DomainId Id { get; set; }
+
+            public MongoContentEntity[] Joined { get; set; }
+        }
 
         public QueryContentsByQuery(DataConverter converter, ITextIndex indexer)
         {
@@ -36,6 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.ReferencedIds)
@@ -46,15 +60,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
         {
-            Guard.NotNull(app);
-            Guard.NotNull(schema);
-            Guard.NotNull(query);
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(query, nameof(query));
 
             try
             {
                 query = query.AdjustToModel(schema.SchemaDef);
 
-                List<Guid>? fullTextIds = null;
+                List<DomainId>? fullTextIds = null;
 
                 if (!string.IsNullOrWhiteSpace(query.FullText))
                 {
@@ -68,52 +82,86 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.Id, fullTextIds, query);
+                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
-                var contentItems =
-                    Collection.Find(filter)
-                        .QueryLimit(query)
-                        .QuerySkip(query)
-                        .QuerySort(query)
-                        .ToListAsync();
+                var contentItems = FindContentsAsync(query, filter);
 
-                await Task.WhenAll(contentItems, contentCount);
+                var (items, total) = await AsyncHelper.WhenAll(contentItems, contentCount);
 
-                foreach (var entity in contentItems.Result)
+                foreach (var entity in items)
                 {
                     entity.ParseData(schema.SchemaDef, converter);
                 }
 
-                return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
+                return ResultList.Create<IContentEntity>(total, items);
             }
-            catch (MongoQueryException ex)
+            catch (MongoCommandException ex) when (ex.Code == 96)
             {
-                if (ex.Message.Contains("17406"))
-                {
-                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
-                }
-                else
-                {
-                    throw;
-                }
+                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
+            }
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            {
+                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
             }
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid>? ids, ClrQuery? query)
+        private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter)
+        {
+            if (query.Skip > 0 && !IsSatisfiedByIndex(query))
+            {
+                var projection = Projection.Include("_id");
+
+                foreach (var field in query.GetAllFields())
+                {
+                    projection = projection.Include(field);
+                }
+
+                var joined =
+                    await Collection.Aggregate()
+                        .Match(filter)
+                        .Project<IdOnly>(projection)
+                        .QuerySort(query)
+                        .QuerySkip(query)
+                        .QueryLimit(query)
+                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.DocumentId, x => x.Joined)
+                        .ToListAsync();
+
+                return joined.Select(x => x.Joined[0]).ToList();
+            }
+
+            var result =
+                Collection.Find(filter)
+                    .QuerySort(query)
+                    .QueryLimit(query)
+                    .QuerySkip(query)
+                    .ToListAsync();
+
+            return await result;
+        }
+
+        private static bool IsSatisfiedByIndex(ClrQuery query)
+        {
+            return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
+        }
+
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
             if (ids != null && ids.Count > 0)
             {
+                var documentIds = ids.Select(x => DomainId.Combine(appId, x)).ToList();
+
                 filters.Add(
                     Filter.Or(
-                        Filter.AnyIn(x => x.ReferencedIds, ids),
-                        Filter.In(x => x.Id, ids)));
+                        Filter.AnyIn(x => x.ReferencedIds, documentIds),
+                        Filter.In(x => x.DocumentId, documentIds)));
             }
 
             if (query?.Filter != null)

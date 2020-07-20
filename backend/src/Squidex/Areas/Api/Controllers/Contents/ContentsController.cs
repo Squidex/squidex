@@ -1,11 +1,10 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -124,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Context, Resources, null, contentWorkflow);
             });
 
             return Ok(response);
@@ -153,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Context, Resources, null, contentWorkflow);
             });
 
             return Ok(response);
@@ -186,7 +185,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(async () =>
             {
-                return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
+                return await ContentsDto.FromContentsAsync(contents, Context, Resources, schema, contentWorkflow);
             });
 
             return Ok(response);
@@ -218,7 +217,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(async () =>
             {
-                return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
+                return await ContentsDto.FromContentsAsync(contents, Context, Resources, schema, contentWorkflow);
             });
 
             return Ok(response);
@@ -242,11 +241,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContent(string app, string name, Guid id)
+        public async Task<IActionResult> GetContent(string app, string name, string id)
         {
             var content = await contentQuery.FindContentAsync(Context, name, id);
 
-            var response = ContentDto.FromContent(Context, content, this);
+            var response = ContentDto.FromContent(Context, content, Resources);
 
             return Ok(response);
         }
@@ -270,11 +269,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/{id}/{version}/")]
         [ApiPermission(Permissions.AppContentsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
+        public async Task<IActionResult> GetContentVersion(string app, string name, string id, int version)
         {
             var content = await contentQuery.FindContentAsync(Context, name, id, version);
 
-            var response = ContentDto.FromContent(Context, content, this);
+            var response = ContentDto.FromContent(Context, content, Resources);
 
             return Ok(response.Data);
         }
@@ -301,9 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
-            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
+            var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
 
             var response = await InvokeCommandAsync(command);
 
@@ -326,19 +323,48 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/import")]
-        [ProducesResponseType(typeof(ImportResultDto[]), 200)]
+        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] ImportContentsDto request)
+        public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = request.ToCommand();
 
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<ImportResult>();
-            var response = result.Select(x => ImportResultDto.FromImportResult(x, HttpContext)).ToArray();
+            var result = context.Result<BulkUpdateResult>();
+            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Bulk update content items.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The bulk update request.</param>
+        /// <returns>
+        /// 201 => Contents created.
+        /// 404 => Content references, schema or app not found.
+        /// 400 => Content data is not valid.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/{name}/bulk")]
+        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
+        [ApiPermission(Permissions.AppContents)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
+        {
+            var command = request.ToCommand();
+
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<BulkUpdateResult>();
+            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -363,10 +389,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string app, string name, string id, [FromBody] NamedContentData request)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
             var response = await InvokeCommandAsync(command);
@@ -394,10 +418,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string app, string name, string id, [FromBody] NamedContentData request)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
             var response = await InvokeCommandAsync(command);
@@ -406,14 +428,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Publish a content item.
+        /// Change status of a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to publish.</param>
+        /// <param name="id">The id of the content item to change.</param>
         /// <param name="request">The status request.</param>
         /// <returns>
-        /// 200 => Content published.
+        /// 200 => Content status changed.
         /// 404 => Content, schema or app not found.
         /// 400 => Request is not valid.
         /// </returns>
@@ -423,12 +445,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
+        public async Task<IActionResult> PutContentStatus(string app, string name, string id, ChangeStatusDto request)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(command);
@@ -437,13 +457,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Create a new version.
+        /// Create a new draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to discard changes.</param>
+        /// <param name="id">The id of the content item to create the draft for.</param>
         /// <returns>
-        /// 200 => Content restored.
+        /// 200 => Content draft created.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -454,10 +474,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> CreateDraft(string app, string name, Guid id)
+        public async Task<IActionResult> CreateDraft(string app, string name, string id)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = new CreateContentDraft { ContentId = id };
 
             var response = await InvokeCommandAsync(command);
@@ -466,13 +484,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Discard changes.
+        /// Delete the draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to discard changes.</param>
+        /// <param name="id">The id of the content item to delete the draft from.</param>
         /// <returns>
-        /// 200 => Content restored.
+        /// 200 => Content draft deleted.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -483,10 +501,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteVersion(string app, string name, Guid id)
+        public async Task<IActionResult> DeleteVersion(string app, string name, string id)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = new DeleteContentDraft { ContentId = id };
 
             var response = await InvokeCommandAsync(command);
@@ -511,10 +527,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/{id}/")]
         [ApiPermission(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
+        public async Task<IActionResult> DeleteContent(string app, string name, string id)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
             var command = new DeleteContent { ContentId = id };
 
             await CommandBus.PublishAsync(command);
@@ -527,7 +541,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IEnrichedContentEntity>();
-            var response = ContentDto.FromContent(Context, result, this);
+            var response = ContentDto.FromContent(Context, result, Resources);
 
             return response;
         }

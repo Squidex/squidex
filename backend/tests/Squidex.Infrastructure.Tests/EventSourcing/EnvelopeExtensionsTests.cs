@@ -55,12 +55,12 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_set_and_get_aggregate_id()
         {
-            var commitId = Guid.NewGuid();
+            var commitId = DomainId.NewGuid();
 
             sut.SetAggregateId(commitId);
 
             Assert.Equal(commitId, sut.Headers.AggregateId());
-            Assert.Equal(commitId, sut.Headers.GetGuid("AggregateId"));
+            Assert.Equal(commitId.ToString(), sut.Headers.GetString("AggregateId"));
         }
 
         [Fact]

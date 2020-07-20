@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -17,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(AddWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot add workflow.", e =>
             {
@@ -30,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             CheckWorkflowExists(workflows, command.WorkflowId);
 
@@ -92,12 +91,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanDelete(Workflows workflows, DeleteWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             CheckWorkflowExists(workflows, command.WorkflowId);
         }
 
-        private static void CheckWorkflowExists(Workflows workflows, Guid id)
+        private static void CheckWorkflowExists(Workflows workflows, DomainId id)
         {
             if (!workflows.ContainsKey(id))
             {

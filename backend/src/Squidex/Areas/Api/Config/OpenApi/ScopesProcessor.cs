@@ -20,10 +20,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
     {
         public bool Process(OperationProcessorContext context)
         {
-            if (context.OperationDescription.Operation.Security == null)
-            {
-                context.OperationDescription.Operation.Security = new List<OpenApiSecurityRequirement>();
-            }
+            context.OperationDescription.Operation.Security ??= new List<OpenApiSecurityRequirement>();
 
             var permissionAttribute = context.MethodInfo.GetCustomAttribute<ApiPermissionAttribute>();
 

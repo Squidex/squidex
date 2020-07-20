@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public sealed class BackupJob : IBackupJob
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         public Instant Started { get; set; }
 

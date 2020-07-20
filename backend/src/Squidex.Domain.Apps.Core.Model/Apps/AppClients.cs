@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Revoke(string id)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             return Without<AppClients>(id);
         }
@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Add(string id, AppClient client)
         {
-            Guard.NotNullOrEmpty(id);
-            Guard.NotNull(client);
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(client, nameof(client));
 
             return With<AppClients>(id, client);
         }
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Add(string id, string secret)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             if (ContainsKey(id))
             {
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Rename(string id, string newName)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             if (!TryGetValue(id, out var client))
             {
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Update(string id, string role)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             if (!TryGetValue(id, out var client))
             {

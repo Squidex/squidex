@@ -8,14 +8,12 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.Model;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -24,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class BackupReader : DisposableObjectBase, IBackupReader
     {
-        private readonly GuidMapper guidMapper = new GuidMapper();
         private readonly ZipArchive archive;
         private readonly IJsonSerializer serializer;
         private int readEvents;
@@ -42,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupReader(IJsonSerializer serializer, Stream stream)
         {
-            Guard.NotNull(serializer);
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.serializer = serializer;
 
@@ -57,14 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Guid OldGuid(Guid newId)
-        {
-            return guidMapper.OldGuid(newId);
-        }
-
         public Task<T> ReadJsonAttachmentAsync<T>(string name)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -77,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             using (var stream = attachmentEntry.Open())
             {
-                result = serializer.Deserialize<T>(stream, null, guidMapper.NewGuidOrValue);
+                result = serializer.Deserialize<T>(stream, null);
             }
 
             readAttachments++;
@@ -87,8 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
         {
-            Guard.NotNullOrEmpty(name);
-            Guard.NotNull(handler);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNull(handler, nameof(handler));
 
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -107,9 +99,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler)
         {
-            Guard.NotNull(handler);
-            Guard.NotNull(formatter);
-            Guard.NotNull(streamNameResolver);
+            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(formatter, nameof(formatter));
+            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
             while (true)
             {
@@ -124,31 +116,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     var (streamName, data) = serializer.Deserialize<CompatibleStoredEvent>(stream).ToEvent();
 
-                    MapHeaders(data);
-
-                    var eventStream = streamNameResolver.WithNewId(streamName, guidMapper.NewGuidOrNull);
-                    var eventEnvelope = formatter.Parse(data, guidMapper.NewGuidOrValue);
+                    var eventStream = streamName;
+                    var eventEnvelope = formatter.Parse(data);
 
                     await handler((eventStream, eventEnvelope));
                 }
 
                 readEvents++;
-            }
-        }
-
-        private void MapHeaders(EventData data)
-        {
-            foreach (var (key, value) in data.Headers.ToList())
-            {
-                if (value.Type == JsonValueType.String)
-                {
-                    var newGuid = guidMapper.NewGuidOrNull(value.ToString());
-
-                    if (newGuid != null)
-                    {
-                        data.Headers.Add(key, newGuid);
-                    }
-                }
             }
         }
     }

@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = Deferred.Response(() =>
             {
-                return SchemasDto.FromSchemas(schemas, this, app);
+                return SchemasDto.FromSchemas(schemas, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = schemas.ToEtag();
@@ -78,9 +78,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             ISchemaEntity? schema;
 
-            if (Guid.TryParse(name, out var id))
+            if (Guid.TryParse(name, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(AppId, id);
+                schema = await appProvider.GetSchemaAsync(AppId, guid, false);
             }
             else
             {
@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = Deferred.Response(() =>
             {
-                return SchemaDetailsDto.FromSchemaWithDetails(schema, this, app);
+                return SchemaDetailsDto.FromSchemaWithDetails(schema, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = schema.ToEtag();
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetSchema), new { app, name = request.Name }, response);
         }
@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -171,7 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -195,7 +195,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -219,7 +219,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -244,7 +244,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -267,7 +267,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new PublishSchema();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -290,7 +290,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new UnpublishSchema();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -315,12 +315,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             return NoContent();
         }
 
-        private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<SchemaDetailsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, Resources);
 
             return response;
         }

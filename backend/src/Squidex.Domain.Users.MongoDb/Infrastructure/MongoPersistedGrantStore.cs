@@ -10,9 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -26,7 +24,7 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             {
                 cm.AutoMap();
 
-                cm.MapIdProperty(x => x.Key).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.MapIdProperty(x => x.Key);
             });
         }
 
@@ -49,14 +47,14 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             }, ct);
         }
 
+        public async Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
+        {
+            return await Collection.Find(x => x.SubjectId == subjectId).ToListAsync();
+        }
+
         public Task StoreAsync(PersistedGrant grant)
         {
             return Collection.ReplaceOneAsync(x => x.Key == grant.Key, grant, UpsertReplace);
-        }
-
-        public Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
-        {
-            return Collection.Find(x => x.SubjectId == subjectId).ToListAsync().ContinueWith(x => (IEnumerable<PersistedGrant>)x.Result);
         }
 
         public Task<PersistedGrant> GetAsync(string key)

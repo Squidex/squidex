@@ -37,9 +37,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return this;
             }
 
-            protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? streamFilter, string? position)
+            protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? filter, string? position)
             {
-                return store.CreateSubscription(subscriber, streamFilter, position);
+                return store.CreateSubscription(subscriber, filter, position);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.Handles(A<StoredEvent>._))
                 .Returns(true);
 
-            A.CallTo(() => formatter.Parse(eventData, null))
+            A.CallTo(() => formatter.Parse(eventData))
                 .Returns(envelope);
 
             sut = new MyEventConsumerGrain(
@@ -98,6 +98,20 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_subscribe_to_event_store_when_not_found_in_db()
         {
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            grainState.Value.Should().BeEquivalentTo(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+                .MustHaveHappened(1, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_subscribe_to_event_store_when_failed()
+        {
+            grainState.Value = grainState.Value.Stopped(new InvalidOperationException());
+
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
 
@@ -206,7 +220,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            A.CallTo(() => formatter.Parse(eventData, null))
+            A.CallTo(() => formatter.Parse(eventData))
                 .Throws(new TypeNameNotFoundException());
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
@@ -340,7 +354,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => formatter.Parse(eventData, null))
+            A.CallTo(() => formatter.Parse(eventData))
                 .Throws(ex);
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);

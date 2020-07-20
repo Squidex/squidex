@@ -49,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
             IUrlGenerator urlGenerator,
             ISemanticLog log)
         {
-            Guard.NotNull(texts);
-            Guard.NotNull(emailSender);
-            Guard.NotNull(urlGenerator);
-            Guard.NotNull(log);
+            Guard.NotNull(texts, nameof(texts));
+            Guard.NotNull(emailSender, nameof(emailSender));
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(log, nameof(log));
 
             this.texts = texts.Value;
             this.emailSender = emailSender;
@@ -62,8 +62,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
 
         public Task SendUsageAsync(IUser user, string appName, long usage, long usageLimit)
         {
-            Guard.NotNull(user);
-            Guard.NotNull(appName);
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(appName, nameof(appName));
 
             var vars = new TemplatesVars
             {
@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Notifications
 
         public Task SendInviteAsync(IUser assigner, IUser user, string appName)
         {
-            Guard.NotNull(assigner);
-            Guard.NotNull(user);
-            Guard.NotNull(appName);
+            Guard.NotNull(assigner, nameof(assigner));
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(appName, nameof(appName));
 
             var vars = new TemplatesVars { Assigner = assigner, AppName = appName };
 

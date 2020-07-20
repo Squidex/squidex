@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
     {
         public string AppName { get; set; }
 
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public RefToken Actor { get; set; }
 

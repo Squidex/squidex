@@ -166,5 +166,16 @@ namespace Squidex.Infrastructure.Security
 
             Assert.Equal(new List<Permission> { source[2], source[1], source[0] }, sorted);
         }
+
+        [Theory]
+        [InlineData("permission")]
+        [InlineData("permission...")]
+        [InlineData("permission.||..")]
+        public void Should_parse_invalid_permissions(string source)
+        {
+            var permission = new Permission(source);
+
+            permission.Allows(new Permission(Permission.Any));
+        }
     }
 }

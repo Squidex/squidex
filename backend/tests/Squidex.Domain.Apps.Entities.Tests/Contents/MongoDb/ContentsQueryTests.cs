@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_verify_ids()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
 
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_ids()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), ids, SearchScope.All);
 
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_ids_and_schema()
         {
-            var ids = Enumerable.Repeat(0, 50).Select(_ => Guid.NewGuid()).ToHashSet();
+            var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), ids, SearchScope.All);
 
@@ -62,11 +61,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public async Task Should_query_contents_by_filter()
         {
-            var filter = F.Eq("data.value.iv", _.RandomValue());
+            var filter = F.Eq("data.value.iv", 12);
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
         [Fact]
@@ -84,7 +83,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(query);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
+        }
+
+        [Fact]
+        public async Task Should_query_contents_with_large_skip()
+        {
+            var query = new ClrQuery
+            {
+                Sort = new List<SortNode>
+                {
+                    new SortNode("data.value.iv", SortOrder.Ascending)
+                }
+            };
+
+            var contents = await QueryAsync(query, 1000, 9000);
+
+            Assert.NotEmpty(contents);
         }
 
         [Fact]
@@ -105,19 +120,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var query = new ClrQuery
             {
-                Filter = F.Eq("data.value.iv", _.RandomValue())
+                Filter = F.Eq("data.value.iv", 200)
             };
 
-            var contents = await QueryAsync(query);
+            var contents = await QueryAsync(query, 1000, 0);
 
-            Assert.NotNull(contents);
+            Assert.NotEmpty(contents);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery)
+        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100)
         {
-            clrQuery.Top = 1000;
-            clrQuery.Skip = 100;
-            clrQuery.Sort = new List<SortNode> { new SortNode("LastModified", SortOrder.Descending) };
+            if (clrQuery.Take == long.MaxValue)
+            {
+                clrQuery.Take = take;
+            }
+
+            if (clrQuery.Skip == 0)
+            {
+                clrQuery.Skip = skip;
+            }
+
+            if (clrQuery.Sort.Count == 0)
+            {
+                clrQuery.Sort = new List<SortNode>
+                {
+                    new SortNode("LastModified", SortOrder.Descending)
+                };
+            }
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), clrQuery, SearchScope.All);
 

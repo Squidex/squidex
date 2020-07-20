@@ -35,46 +35,46 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumers = await GetGrain().GetConsumersAsync();
 
-            var response = EventConsumersDto.FromResults(eventConsumers.Value, this);
+            var response = EventConsumersDto.FromResults(eventConsumers.Value, Resources);
 
             return Ok(response);
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/start/")]
+        [Route("event-consumers/{consumerName}/start/")]
         [ProducesResponseType(typeof(EventConsumerDto), 200)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task<IActionResult> StartEventConsumer(string name)
+        public async Task<IActionResult> StartEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().StartAsync(name);
+            var eventConsumer = await GetGrain().StartAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/stop/")]
+        [Route("event-consumers/{consumerName}/stop/")]
         [ProducesResponseType(typeof(EventConsumerDto), 200)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task<IActionResult> StopEventConsumer(string name)
+        public async Task<IActionResult> StopEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().StopAsync(name);
+            var eventConsumer = await GetGrain().StopAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/reset/")]
+        [Route("event-consumers/{consumerName}/reset/")]
         [ProducesResponseType(typeof(EventConsumerDto), 200)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task<IActionResult> ResetEventConsumer(string name)
+        public async Task<IActionResult> ResetEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().ResetAsync(name);
+            var eventConsumer = await GetGrain().ResetAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, Resources);
 
             return Ok(response);
         }

@@ -83,13 +83,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
         {
-            requestCache.AddDependency(app.Id, app.Version);
+            requestCache.AddDependency(app.UniqueId, app.Version);
 
             var appBasePath = $"/content/{app.Name}";
 
             foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
             {
-                requestCache.AddDependency(schema.Id, schema.Version);
+                requestCache.AddDependency(schema.UniqueId, schema.Version);
 
                 var partition = app.PartitionResolver();
 

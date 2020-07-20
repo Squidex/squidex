@@ -87,7 +87,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-        <button type="submit" class="float-right btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
+        <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
+        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
     </ng-container>
 </sqx-modal-dialog>

@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -24,17 +24,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             this.storage = storage;
 
-            A.CallTo(() => grainFactory.GetGrain<ILuceneTextIndexGrain>(A<Guid>._, null))
+            A.CallTo(() => grainFactory.GetGrain<ILuceneTextIndexGrain>(A<string>._, null))
                 .ReturnsLazily(() => grain);
         }
 
-        public async Task<ITextIndex> CreateAsync(Guid schemaId)
+        public async Task<ITextIndex> CreateAsync(DomainId schemaId)
         {
             var indexManager = new IndexManager(storage, A.Fake<ISemanticLog>());
 
             grain = new LuceneTextIndexGrain(indexManager);
 
-            await grain.ActivateAsync(schemaId);
+            await grain.ActivateAsync(schemaId.ToString());
 
             return new LuceneTextIndex(grainFactory, indexManager);
         }

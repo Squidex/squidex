@@ -8,10 +8,11 @@
 using System;
 using System.Linq;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01.Migrations.MongoDb;
+using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -81,6 +82,9 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<RenameAssetMetadata>()
                         .As<IMigration>();
 
+                    services.AddTransientAs<AddAppIdToEventStream>()
+                        .As<IMigration>();
+
                     services.AddHealthChecks()
                         .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 
@@ -102,17 +106,20 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
+                    services.AddSingletonAs<MongoXmlRepository>()
+                        .As<IXmlRepository>();
+
                     services.AddSingletonAs<MongoKeyStore>()
                         .As<ISigningCredentialStore>().As<IValidationKeysStore>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, Guid>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, DomainId>>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, Guid>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, DomainId>>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentState, Guid>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentState, DomainId>>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .AsSelf();

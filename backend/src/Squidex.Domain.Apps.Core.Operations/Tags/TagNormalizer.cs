@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
@@ -17,11 +16,11 @@ namespace Squidex.Domain.Apps.Core.Tags
 {
     public static class TagNormalizer
     {
-        public static async Task NormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, NamedContentData newData, NamedContentData? oldData)
+        public static async Task NormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, NamedContentData newData, NamedContentData? oldData)
         {
-            Guard.NotNull(tagService);
-            Guard.NotNull(schema);
-            Guard.NotNull(newData);
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(newData, nameof(newData));
 
             var newValues = new HashSet<string>();
             var newArrays = new List<JsonArray>();
@@ -53,10 +52,10 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        public static async Task DenormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, params NamedContentData[] datas)
+        public static async Task DenormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, params NamedContentData[] datas)
         {
-            Guard.NotNull(tagService);
-            Guard.NotNull(schema);
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(schema, nameof(schema));
 
             var tagsValues = new HashSet<string>();
             var tagsArrays = new List<JsonArray>();

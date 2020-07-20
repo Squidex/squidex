@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class ArchiveApp : AppCommand
+    public sealed class ArchiveApp : AppUpdateCommand
     {
     }
 }

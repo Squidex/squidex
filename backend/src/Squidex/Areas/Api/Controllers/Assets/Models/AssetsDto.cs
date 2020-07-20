@@ -9,7 +9,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -27,29 +26,29 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public AssetDto[] Items { get; set; }
 
-        public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, ApiController controller, string app)
+        public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, Resources resources)
         {
             var response = new AssetsDto
             {
                 Total = assets.Total,
-                Items = assets.Select(x => AssetDto.FromAsset(x, controller, app)).ToArray()
+                Items = assets.Select(x => AssetDto.FromAsset(x, resources)).ToArray()
             };
 
-            return CreateLinks(response, controller, app);
+            return CreateLinks(response, resources);
         }
 
-        private static AssetsDto CreateLinks(AssetsDto response, ApiController controller, string app)
+        private static AssetsDto CreateLinks(AssetsDto response, Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            response.AddSelfLink(controller.Url<AssetsController>(x => nameof(x.GetAssets), values));
+            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
 
-            if (controller.HasPermission(Permissions.AppAssetsCreate))
+            if (resources.CanCreateAsset)
             {
-                response.AddPostLink("create", controller.Url<AssetsController>(x => nameof(x.PostAsset), values));
+                response.AddPostLink("create", resources.Url<AssetsController>(x => nameof(x.PostAsset), values));
             }
 
-            response.AddGetLink("tags", controller.Url<AssetsController>(x => nameof(x.GetTags), values));
+            response.AddGetLink("tags", resources.Url<AssetsController>(x => nameof(x.GetTags), values));
 
             return response;
         }

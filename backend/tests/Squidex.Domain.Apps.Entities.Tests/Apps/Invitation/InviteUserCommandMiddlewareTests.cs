@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
     public class InviteUserCommandMiddlewareTests
     {
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IAppEntity app = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly InviteUserCommandMiddleware sut;
 
@@ -30,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         }
 
         [Fact]
-        public async Task Should_invite_user_and_change_result()
+        public async Task Should_invite_user_and_change_result_and_update_command()
         {
             var command = new AssignContributor { ContributorId = "me@email.com", Invite = true };
 
@@ -38,12 +37,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 new CommandContext(command, commandBus)
                     .Complete(app);
 
+            var user = CreateUser("123");
+
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
-                .Returns(true);
+                .Returns((user, true));
 
             await sut.HandleAsync(context);
 
             Assert.Same(context.Result<InvitedResult>().App, app);
+            Assert.Equal(user.Id, command.ContributorId);
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
                 .MustHaveHappened();
@@ -58,12 +60,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 new CommandContext(command, commandBus)
                     .Complete(app);
 
+            var user = CreateUser("123");
+
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
-                .Returns(false);
+                .Returns((user, false));
 
             await sut.HandleAsync(context);
 
             Assert.Same(context.Result<IAppEntity>(), app);
+            Assert.Equal(user.Id, command.ContributorId);
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
                 .MustHaveHappened();
@@ -97,6 +102,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._))
                 .MustNotHaveHappened();
+        }
+
+        private static IUser CreateUser(string id)
+        {
+            var user = A.Fake<IUser>();
+
+            A.CallTo(() => user.Id).Returns(id);
+
+            return user;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAttach(AppClients clients, AttachClient command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot attach client.", e =>
             {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanRevoke(AppClients clients, RevokeClient command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             GetClientOrThrow(clients, command.Id);
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(AppClients clients, UpdateClient command, Roles roles)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             GetClientOrThrow(clients, command.Id);
 

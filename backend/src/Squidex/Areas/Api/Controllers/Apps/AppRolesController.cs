@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Update an app role.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the role to be updated.</param>
+        /// <param name="roleName">The name of the role to be updated.</param>
         /// <param name="request">Role to be updated for the app.</param>
         /// <returns>
         /// 200 => Role updated.
@@ -118,13 +118,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 404 => Role or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/roles/{name}/")]
+        [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
         [ApiPermission(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRole(string app, string name, [FromBody] UpdateRoleDto request)
+        public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
         {
-            var command = request.ToCommand(name);
+            var command = request.ToCommand(roleName);
 
             var response = await InvokeCommandAsync(command);
 
@@ -135,20 +135,20 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Remove role from app.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the role.</param>
+        /// <param name="roleName">The name of the role.</param>
         /// <returns>
         /// 200 => Role deleted.
         /// 400 => Role is in use by contributor or client or default role.
         /// 404 => Role or app not found.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/roles/{name}/")]
+        [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
         [ApiPermission(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteRole(string app, string name)
+        public async Task<IActionResult> DeleteRole(string app, string roleName)
         {
-            var command = new DeleteRole { Name = name };
+            var command = new DeleteRole { Name = roleName };
 
             var response = await InvokeCommandAsync(command);
 
@@ -167,7 +167,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private RolesDto GetResponse(IAppEntity result)
         {
-            return RolesDto.FromApp(result, this);
+            return RolesDto.FromApp(result, Resources);
         }
     }
 }

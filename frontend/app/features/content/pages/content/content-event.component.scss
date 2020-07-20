@@ -20,6 +20,14 @@
         font-weight: normal;
         margin: .25rem 0;
     }
+
+    &-right {
+        overflow: hidden;
+    }
+
+    &-message {
+        overflow-wrap: break-word;
+    }
 }
 
 .user-picture {

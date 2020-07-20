@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return @event.Headers.Timestamp().ToDateTimeUtc().Date;
         }
 
-        private Task UpdateSizeAsync(Guid appId, DateTime date, long size, long count)
+        private Task UpdateSizeAsync(DomainId appId, DateTime date, long size, long count)
         {
             var counters = new Counters
             {
@@ -72,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 usageTracker.TrackAsync(SummaryDate, appKey, null, counters));
         }
 
-        private static string GetKey(Guid appId)
+        private static string GetKey(DomainId appId)
         {
             return $"{appId}_Assets";
         }

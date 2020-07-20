@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -36,20 +35,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [Required]
         public StatusInfoDto[] Statuses { get; set; }
 
-        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, ApiController controller,
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, Resources resources,
             ISchemaEntity? schema, IContentWorkflow workflow)
         {
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(context, x, controller)).ToArray()
+                Items = contents.Select(x => ContentDto.FromContent(context, x, resources)).ToArray()
             };
 
             if (schema != null)
             {
                 await result.AssignStatusesAsync(workflow, schema);
 
-                result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+                result.CreateLinks(resources, schema.SchemaDef.Name);
             }
 
             return result;
@@ -62,17 +61,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
         }
 
-        private void CreateLinks(ApiController controller, string app, string schema)
+        private void CreateLinks(Resources resources, string schema)
         {
-            var values = new { app, name = schema };
+            var values = new { app = resources.App, name = schema };
 
-            AddSelfLink(controller.Url<ContentsController>(x => nameof(x.GetContents), values));
+            AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContents), values));
 
-            if (controller.HasPermission(Permissions.AppContentsCreate, app, schema))
+            if (resources.CanCreateContent(schema))
             {
-                AddPostLink("create", controller.Url<ContentsController>(x => nameof(x.PostContent), values));
+                AddPostLink("create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
+                AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
             }
         }
     }

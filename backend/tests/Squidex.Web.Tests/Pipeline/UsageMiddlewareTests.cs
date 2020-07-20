@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,8 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 using Xunit;
+
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 
 namespace Squidex.Web.Pipeline
 {
@@ -24,7 +27,7 @@ namespace Squidex.Web.Pipeline
         private readonly IClock clock = A.Fake<IClock>();
         private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
         private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RequestDelegate next;
         private readonly UsageMiddleware sut;
         private bool isNextCalled;
@@ -109,17 +112,69 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_track_response_bytes()
+        public async Task Should_track_response_bytes_with_writer()
         {
             httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, async x =>
             {
-                await x.Response.WriteAsync("Hello World");
+                await x.Response.BodyWriter.WriteAsync(Encoding.Default.GetBytes("Hello World"));
 
                 await next(x);
             });
+
+            Assert.True(isNextCalled);
+
+            var date = instant.ToDateTimeUtc().Date;
+
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_track_response_bytes_with_stream()
+        {
+            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+            await sut.InvokeAsync(httpContext, async x =>
+            {
+                await x.Response.Body.WriteAsync(Encoding.Default.GetBytes("Hello World"));
+
+                await next(x);
+            });
+
+            Assert.True(isNextCalled);
+
+            var date = instant.ToDateTimeUtc().Date;
+
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_track_response_bytes_with_file()
+        {
+            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+            var tempFileName = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(tempFileName, "Hello World");
+
+                await sut.InvokeAsync(httpContext, async x =>
+                {
+                    await x.Response.SendFileAsync(tempFileName, 0, new FileInfo(tempFileName).Length);
+
+                    await next(x);
+                });
+            }
+            finally
+            {
+                File.Delete(tempFileName);
+            }
 
             Assert.True(isNextCalled);
 
@@ -156,7 +211,12 @@ namespace Squidex.Web.Pipeline
 
             await sut.InvokeAsync(httpContext, next);
 
-            A.CallTo(() => appLogStore.LogAsync(appId.Id, instant, "GET", "/my-path", null, null, A<long>._, 0))
+            A.CallTo(() => appLogStore.LogAsync(appId.Id,
+                A<RequestLog>.That.Matches(x =>
+                    x.Timestamp == instant &&
+                    x.RequestMethod == "GET" &&
+                    x.RequestPath == "/my-path" &&
+                    x.Costs == 0)))
                 .MustHaveHappened();
         }
     }

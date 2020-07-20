@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public static IEnumerable<IValidator> CreateValidators(IField field, FieldValidatorFactory createFieldValidator)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             var visitor = new DefaultFieldValueValidatorsFactory(createFieldValidator);
 
@@ -59,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (!field.Properties.AllowDuplicates)
             {
-                yield return new UniqueValuesValidator<Guid>();
+                yield return new UniqueValuesValidator<string>();
             }
         }
 
@@ -127,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (!field.Properties.AllowDuplicates)
             {
-                yield return new UniqueValuesValidator<Guid>();
+                yield return new UniqueValuesValidator<string>();
             }
         }
 

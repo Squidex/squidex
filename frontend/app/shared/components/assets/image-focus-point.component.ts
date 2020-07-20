@@ -70,7 +70,7 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnCha
                 this.x = newFocus.x;
                 this.y = newFocus.y;
 
-                for (let preview of this.previewImages) {
+                for (const preview of this.previewImages) {
                     preview.setFocus(newFocus);
                 }
             }

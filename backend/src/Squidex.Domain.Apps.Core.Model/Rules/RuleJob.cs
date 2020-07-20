@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
     public sealed class RuleJob
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
         public string EventName { get; set; }
 

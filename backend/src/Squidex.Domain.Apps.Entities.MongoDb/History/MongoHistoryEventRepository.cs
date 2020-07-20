@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.History
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                 cancellationToken: ct);
         }
 
-        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
+        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)
         {
             if (!string.IsNullOrWhiteSpace(channelPrefix))
             {
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             return Collection.ReplaceOneAsync(x => x.Id == item.Id, item, UpsertReplace);
         }
 
-        public Task RemoveAsync(Guid appId)
+        public Task RemoveAsync(DomainId appId)
         {
             return Collection.DeleteManyAsync(x => x.AppId == appId);
         }

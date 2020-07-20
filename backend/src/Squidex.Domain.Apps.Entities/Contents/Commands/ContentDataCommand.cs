@@ -11,6 +11,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public abstract class ContentDataCommand : ContentCommand
     {
+        public bool DoNotValidate { get; set; }
+
+        public bool OptimizeValidation { get; set; }
+
         public NamedContentData Data { get; set; }
     }
 }

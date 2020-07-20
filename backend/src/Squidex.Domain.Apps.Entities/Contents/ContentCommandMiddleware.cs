@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(contentEnricher);
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(contentEnricher, nameof(contentEnricher));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (context.PlainResult is IContentEntity content && NotEnriched(context))
             {
-                var enriched = await contentEnricher.EnrichAsync(content, contextProvider.Context);
+                var enriched = await contentEnricher.EnrichAsync(content, true, contextProvider.Context);
 
                 context.Complete(enriched);
             }

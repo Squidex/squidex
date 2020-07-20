@@ -36,9 +36,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public bool OptimizeValidation { get; set; } = true;
 
-        public CreateContents ToCommand()
+        public BulkUpdateContents ToCommand()
         {
-            return SimpleMapper.Map(this, new CreateContents());
+            return SimpleMapper.Map(this, new BulkUpdateContents());
         }
     }
 }

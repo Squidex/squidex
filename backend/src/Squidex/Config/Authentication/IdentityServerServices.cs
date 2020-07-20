@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using IdentityModel.AspNetCore.OAuth2Introspection;
+using IdentityServer4;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Config.Authentication
@@ -21,23 +20,21 @@ namespace Squidex.Config.Authentication
     {
         public static AuthenticationBuilder AddSquidexIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
+            var apiAuthorityUrl = identityOptions.AuthorityUrl;
+
+            var useCustomAuthorityUrl = !string.IsNullOrWhiteSpace(apiAuthorityUrl);
+
+            if (!useCustomAuthorityUrl)
+            {
+                var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
+
+                apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
+            }
+
             var apiScope = Constants.ApiScope;
 
-            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-
-            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
+            if (useCustomAuthorityUrl)
             {
-                string apiAuthorityUrl;
-
-                if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
-                {
-                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityServerPrefix);
-                }
-                else
-                {
-                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
-                }
-
                 authBuilder.AddIdentityServerAuthentication(options =>
                 {
                     options.Authority = apiAuthorityUrl;
@@ -45,32 +42,42 @@ namespace Squidex.Config.Authentication
                     options.ApiSecret = null;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SupportedTokens = SupportedTokens.Jwt;
-
-                    var fromHeader = TokenRetrieval.FromAuthorizationHeader();
-                    var fromQuery = TokenRetrieval.FromQueryString();
-
-                    options.TokenRetriever = request =>
-                    {
-                        var result = fromHeader(request) ?? fromQuery(request);
-
-                        return result;
-                    };
-                });
-
-                authBuilder.AddOpenIdConnect(options =>
-                {
-                    options.Authority = apiAuthorityUrl;
-                    options.ClientId = Constants.InternalClientId;
-                    options.ClientSecret = Constants.InternalClientSecret;
-                    options.CallbackPath = "/signin-internal";
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.SaveTokens = true;
-                    options.Scope.Add(Constants.PermissionsScope);
-                    options.Scope.Add(Constants.ProfileScope);
-                    options.Scope.Add(Constants.RoleScope);
-                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });
             }
+            else
+            {
+                authBuilder.AddLocalApi(options =>
+                {
+                    options.ExpectedScope = apiScope;
+                });
+            }
+
+            authBuilder.AddOpenIdConnect(options =>
+            {
+                options.Authority = apiAuthorityUrl;
+                options.ClientId = Constants.InternalClientId;
+                options.ClientSecret = Constants.InternalClientSecret;
+                options.CallbackPath = "/signin-internal";
+                options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                options.SaveTokens = true;
+                options.Scope.Add(Constants.PermissionsScope);
+                options.Scope.Add(Constants.ProfileScope);
+                options.Scope.Add(Constants.RoleScope);
+                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
+
+            authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    if (useCustomAuthorityUrl)
+                    {
+                        return IdentityServerAuthenticationDefaults.AuthenticationScheme;
+                    }
+
+                    return IdentityServerConstants.LocalApi.PolicyName;
+                };
+            });
 
             return authBuilder;
         }

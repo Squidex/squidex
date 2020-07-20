@@ -72,7 +72,7 @@ export class CommentComponent implements OnChanges {
     }
 
     public delete() {
-        if (!this.isDeletable) {
+        if (!this.isDeletable && !this.canDelete) {
             return;
         }
 

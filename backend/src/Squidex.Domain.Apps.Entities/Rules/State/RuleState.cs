@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
@@ -19,9 +18,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
     [CollectionName("Rules")]
     public sealed class RuleState : DomainObjectState<RuleState>, IRuleEntity
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public Rule RuleDef { get; set; }
+
+        public DomainId UniqueId
+        {
+            get { return DomainId.Combine(AppId, Id); }
+        }
 
         public override bool ApplyEvent(IEvent @event)
         {
@@ -31,6 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
             {
                 case RuleCreated e:
                     {
+                        Id = e.RuleId;
+
                         RuleDef = new Rule(e.Trigger, e.Action);
                         RuleDef = RuleDef.Rename(e.Name);
 

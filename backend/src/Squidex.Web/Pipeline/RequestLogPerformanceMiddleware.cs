@@ -21,8 +21,8 @@ namespace Squidex.Web.Pipeline
 
         public RequestLogPerformanceMiddleware(IOptions<RequestLogOptions> requestLogOptions, ISemanticLog log)
         {
-            Guard.NotNull(requestLogOptions);
-            Guard.NotNull(log);
+            Guard.NotNull(requestLogOptions, nameof(requestLogOptions));
+            Guard.NotNull(log, nameof(log));
 
             this.requestLogOptions = requestLogOptions.Value;
 

@@ -19,16 +19,32 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public InviteUserCommandMiddleware(IUserResolver userResolver)
         {
-            Guard.NotNull(userResolver);
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             this.userResolver = userResolver;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            if (context.Command is AssignContributor assignContributor && ShouldInvite(assignContributor))
+            if (context.Command is AssignContributor assignContributor && ShouldResolve(assignContributor))
             {
-                var created = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true);
+                IUser? user;
+
+                var created = false;
+
+                if (assignContributor.Invite)
+                {
+                    (user, created) = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true);
+                }
+                else
+                {
+                    user = await userResolver.FindByIdOrEmailAsync(assignContributor.ContributorId);
+                }
+
+                if (user != null)
+                {
+                    assignContributor.ContributorId = user.Id;
+                }
 
                 await next(context);
 
@@ -43,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             }
         }
 
-        private static bool ShouldInvite(AssignContributor assignContributor)
+        private static bool ShouldResolve(AssignContributor assignContributor)
         {
-            return assignContributor.Invite && assignContributor.ContributorId.IsEmail();
+            return assignContributor.ContributorId.IsEmail();
         }
     }
 }

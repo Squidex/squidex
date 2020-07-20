@@ -52,14 +52,14 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, ((JsonScalar<double>)data["my-number"]!["iv"]).Value);
+            Assert.Equal(456, ((JsonNumber)data["my-number"]!["iv"]).Value);
 
             Assert.Equal("de-string", data["my-string"]!["de"].ToString());
             Assert.Equal("en-string", data["my-string"]!["en"].ToString());
 
             Assert.Equal(now.ToString(), data["my-datetime"]!["iv"].ToString());
 
-            Assert.True(((JsonScalar<bool>)data["my-boolean"]!["iv"]).Value);
+            Assert.True(((JsonBoolean)data["my-boolean"]!["iv"]).Value);
         }
 
         [Fact]

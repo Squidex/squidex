@@ -20,6 +20,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [Trait("Category", "NotAutomated")]
     public sealed class GraphQLTests : IClassFixture<CreatedAppFixture>
     {
         public CreatedAppFixture _ { get; }

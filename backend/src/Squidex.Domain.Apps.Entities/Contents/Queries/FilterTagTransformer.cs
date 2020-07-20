@@ -16,33 +16,33 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public sealed class FilterTagTransformer : TransformVisitor<ClrValue>
+    public sealed class FilterTagTransformer : AsyncTransformVisitor<ClrValue>
     {
         private readonly ITagService tagService;
         private readonly ISchemaEntity schema;
-        private readonly Guid appId;
+        private readonly DomainId appId;
 
-        private FilterTagTransformer(Guid appId, ISchemaEntity schema, ITagService tagService)
+        private FilterTagTransformer(DomainId appId, ISchemaEntity schema, ITagService tagService)
         {
             this.appId = appId;
             this.schema = schema;
             this.tagService = tagService;
         }
 
-        public static FilterNode<ClrValue>? Transform(FilterNode<ClrValue> nodeIn, Guid appId, ISchemaEntity schema, ITagService tagService)
+        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, DomainId appId, ISchemaEntity schema, ITagService tagService)
         {
-            Guard.NotNull(nodeIn);
-            Guard.NotNull(tagService);
-            Guard.NotNull(schema);
+            Guard.NotNull(nodeIn, nameof(nodeIn));
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(schema, nameof(schema));
 
             return nodeIn.Accept(new FilterTagTransformer(appId, schema, tagService));
         }
 
-        public override FilterNode<ClrValue>? Visit(CompareFilter<ClrValue> nodeIn)
+        public override async ValueTask<FilterNode<ClrValue>?> Visit(CompareFilter<ClrValue> nodeIn)
         {
             if (nodeIn.Value.Value is string stringValue && IsDataPath(nodeIn.Path) && IsTagField(nodeIn.Path))
             {
-                var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schema.Id), HashSet.Of(stringValue))).Result;
+                var tagNames = await tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schema.Id), HashSet.Of(stringValue));
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {

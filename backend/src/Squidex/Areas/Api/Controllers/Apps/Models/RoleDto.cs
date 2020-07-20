@@ -11,7 +11,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Web;
-using AllPermissions = Squidex.Shared.Permissions;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -70,20 +69,20 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return app.Clients.Count(x => role.Equals(x.Value.Role));
         }
 
-        public RoleDto WithLinks(ApiController controller, string app)
+        public RoleDto WithLinks(Resources resources)
         {
-            var values = new { app, name = Name };
+            var values = new { app = resources.App, roleName = Name };
 
             if (!IsDefaultRole)
             {
-                if (controller.HasPermission(AllPermissions.AppRolesUpdate, app))
+                if (resources.CanUpdateRole)
                 {
-                    AddPutLink("update", controller.Url<AppRolesController>(x => nameof(x.PutRole), values));
+                    AddPutLink("update", resources.Url<AppRolesController>(x => nameof(x.PutRole), values));
                 }
 
-                if (controller.HasPermission(AllPermissions.AppRolesDelete, app) && NumClients == 0 && NumContributors == 0)
+                if (resources.CanDeleteRole && NumClients == 0 && NumContributors == 0)
                 {
-                    AddDeleteLink("delete", controller.Url<AppRolesController>(x => nameof(x.DeleteRole), values));
+                    AddDeleteLink("delete", resources.Url<AppRolesController>(x => nameof(x.DeleteRole), values));
                 }
             }
 

@@ -25,10 +25,11 @@ namespace Squidex.Infrastructure.Log.Store
 
         public BackgroundRequestLogStore(IRequestLogRepository logRepository, ISemanticLog log)
         {
-            Guard.NotNull(logRepository);
-            Guard.NotNull(log);
+            Guard.NotNull(logRepository, nameof(logRepository));
+            Guard.NotNull(log, nameof(log));
 
             this.logRepository = logRepository;
+
             this.log = log;
 
             timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
@@ -80,7 +81,7 @@ namespace Squidex.Infrastructure.Log.Store
 
         public Task LogAsync(Request request)
         {
-            Guard.NotNull(request);
+            Guard.NotNull(request, nameof(request));
 
             jobs.Enqueue(request);
 

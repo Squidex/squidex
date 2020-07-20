@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -30,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
-        public UpdateRule ToCommand(Guid id)
+        public UpdateRule ToCommand(string id)
         {
             var command = new UpdateRule { RuleId = id, Action = Action, Name = Name };
 

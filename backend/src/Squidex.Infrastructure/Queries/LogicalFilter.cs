@@ -17,12 +17,20 @@ namespace Squidex.Infrastructure.Queries
 
         public LogicalFilter(LogicalFilterType type, IReadOnlyList<FilterNode<TValue>> filters)
         {
-            Guard.NotNull(filters);
-            Guard.Enum(type);
+            Guard.NotNull(filters, nameof(filters));
+            Guard.Enum(type, nameof(type));
 
             Filters = filters;
 
             Type = type;
+        }
+
+        public override void AddFields(HashSet<string> fields)
+        {
+            foreach (var filter in Filters)
+            {
+                filter.AddFields(fields);
+            }
         }
 
         public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)

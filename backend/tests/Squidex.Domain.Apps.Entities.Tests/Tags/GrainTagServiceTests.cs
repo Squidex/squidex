@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Tags
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ITagGrain grain = A.Fake<ITagGrain>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
         private readonly GrainTagService sut;
 
         public GrainTagServiceTests()

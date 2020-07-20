@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -32,18 +33,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
         {
-            Guard.NotNull(jsonSerializer);
-            Guard.NotNull(options);
-            Guard.NotNull(tagService);
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(tagService, nameof(tagService));
 
             this.jsonSerializer = jsonSerializer;
             this.options = options.Value;
             this.tagService = tagService;
         }
 
-        public virtual ClrQuery ParseQuery(Context context, Q q)
+        public virtual async ValueTask<ClrQuery> ParseQueryAsync(Context context, Q q)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (result.Filter != null)
                 {
-                    result.Filter = FilterTagTransformer.Transform(result.Filter, context.App.Id, tagService);
+                    result.Filter = await FilterTagTransformer.TransformAsync(result.Filter, context.App.Id, tagService);
                 }
 
                 if (result.Sort.Count == 0)
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 schema.Properties[name.ToCamelCase()] = property;
             }
 
-            AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String, JsonFormatStrings.Guid);
+            AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.Created), JsonObjectType.String, JsonFormatStrings.DateTime);
             AddProperty(nameof(IAssetEntity.CreatedBy), JsonObjectType.String);
             AddProperty(nameof(IAssetEntity.FileHash), JsonObjectType.String);

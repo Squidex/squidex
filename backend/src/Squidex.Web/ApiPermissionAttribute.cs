@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 
 namespace Squidex.Web
 {
@@ -25,7 +26,7 @@ namespace Squidex.Web
 
         public ApiPermissionAttribute(params string[] ids)
         {
-            AuthenticationSchemes = "Bearer";
+            AuthenticationSchemes = Constants.ApiSecurityScheme;
 
             permissionIds = ids;
         }
@@ -40,16 +41,25 @@ namespace Squidex.Web
 
                 if (permissions != null)
                 {
-                    foreach (var permissionId in permissionIds)
+                    foreach (var id in permissionIds)
                     {
-                        var id = permissionId;
+                        var app = context.HttpContext.Features.Get<IAppFeature>()?.AppId.Name;
 
-                        foreach (var (key, value) in context.RouteData.Values)
+                        if (string.IsNullOrWhiteSpace(app))
                         {
-                            id = id.Replace($"{{{key}}}", value?.ToString());
+                            app = Permission.Any;
                         }
 
-                        if (permissions.Allows(new Permission(id)))
+                        var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.SchemaId.Name;
+
+                        if (string.IsNullOrWhiteSpace(schema))
+                        {
+                            schema = Permission.Any;
+                        }
+
+                        var permission = Permissions.ForApp(id, app, schema);
+
+                        if (permissions.Allows(permission))
                         {
                             hasPermission = true;
                             break;

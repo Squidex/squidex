@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Orleans;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public interface IRulesByAppIndexGrain : IIdsIndexGrain<Guid>, IGrainWithGuidKey
+    public interface IRulesByAppIndexGrain : IIdsIndexGrain<DomainId>, IGrainWithStringKey
     {
     }
 }

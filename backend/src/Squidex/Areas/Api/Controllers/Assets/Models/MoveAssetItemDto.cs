@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
@@ -15,14 +15,14 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The parent folder id.
         /// </summary>
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
 
-        public MoveAsset ToCommand(Guid id)
+        public MoveAsset ToCommand(DomainId id)
         {
             return new MoveAsset { AssetId = id, ParentId = ParentId };
         }
 
-        public MoveAssetFolder ToFolderCommand(Guid id)
+        public MoveAssetFolder ToFolderCommand(string id)
         {
             return new MoveAssetFolder { AssetFolderId = id, ParentId = ParentId };
         }

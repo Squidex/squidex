@@ -38,30 +38,6 @@ namespace Squidex.Infrastructure.EventSourcing
             return $"by-{prefix.Slugify()}-{filter.Slugify()}";
         }
 
-        private string CreatePropertyProjectionName(string property)
-        {
-            return $"by-{prefix.Slugify()}-{property.Slugify()}-property";
-        }
-
-        public async Task<string> CreateProjectionAsync(string property, object value)
-        {
-            var name = CreatePropertyProjectionName(property);
-
-            var query =
-                $@"fromAll()
-                    .when({{
-                        $any: function (s, e) {{
-                            if (e.streamId.indexOf('{prefix}') === 0 && e.metadata.{property}) {{
-                                linkTo('{name}-' + e.metadata.{property}, e);
-                            }}
-                        }}
-                    }});";
-
-            await CreateProjectionAsync(name, query);
-
-            return $"{name}-{value}";
-        }
-
         public async Task<string> CreateProjectionAsync(string? streamFilter = null)
         {
             streamFilter ??= ".*";

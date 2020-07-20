@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Infrastructure
 {
-    public struct BytesRange
+    public readonly struct BytesRange
     {
         public readonly long? From;
 

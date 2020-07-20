@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
@@ -15,18 +14,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
-        Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
+        Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? parentId, ClrQuery query);
+        Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
+        Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids);
 
-        Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, HashSet<Guid> ids);
+        Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids);
 
-        Task<IReadOnlyList<Guid>> QueryChildIdsAsync(Guid appId, Guid parentId);
+        Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId);
 
-        Task<IAssetEntity?> FindAssetAsync(Guid id);
+        Task<IAssetEntity?> FindAssetAsync(DomainId appId);
 
-        Task<IAssetEntity?> FindAssetBySlugAsync(Guid appId, string slug);
+        Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id);
+
+        Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug);
     }
 }

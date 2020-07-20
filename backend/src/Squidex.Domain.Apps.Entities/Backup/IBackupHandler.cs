@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return Task.CompletedTask;
         }
 
-        public Task CleanupRestoreErrorAsync(Guid appId)
+        public Task CleanupRestoreErrorAsync(DomainId appId)
         {
             return Task.CompletedTask;
         }

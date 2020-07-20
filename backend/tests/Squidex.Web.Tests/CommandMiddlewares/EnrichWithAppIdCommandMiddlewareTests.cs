@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -22,7 +21,7 @@ namespace Squidex.Web.CommandMiddlewares
     {
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
@@ -64,31 +63,9 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_assign_app_id_to_app_self_command()
-        {
-            var command = new ChangePlan();
-            var context = Ctx(command);
-
-            await sut.HandleAsync(context);
-
-            Assert.Equal(appId.Id, command.AppId);
-        }
-
-        [Fact]
-        public async Task Should_not_override_app_id()
-        {
-            var command = new ChangePlan { AppId = Guid.NewGuid() };
-            var context = Ctx(command);
-
-            await sut.HandleAsync(context);
-
-            Assert.NotEqual(appId.Id, command.AppId);
-        }
-
-        [Fact]
         public async Task Should_not_override_app_id_and_name()
         {
-            var command = new CreateContent { AppId = NamedId.Of(Guid.NewGuid(), "other-app") };
+            var command = new CreateContent { AppId = NamedId.Of(DomainId.NewGuid(), "other-app") };
             var context = Ctx(command);
 
             await sut.HandleAsync(context);

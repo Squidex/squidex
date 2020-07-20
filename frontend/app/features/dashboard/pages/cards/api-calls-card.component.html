@@ -1,0 +1,14 @@
+<div class="card card-lg">
+    <div class="card-header">
+        API Calls
+
+        <div class="float-right">
+            <a class="force" (click)="downloadLog()">
+                <small>Download Log</small>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <chart type="bar" [data]="chartData" [options]="chartOptions"></chart>
+    </div>
+</div>

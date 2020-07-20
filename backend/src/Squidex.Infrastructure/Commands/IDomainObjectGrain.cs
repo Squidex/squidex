@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public interface IDomainObjectGrain : IGrainWithGuidKey
+    public interface IDomainObjectGrain : IGrainWithStringKey
     {
         Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command);
     }

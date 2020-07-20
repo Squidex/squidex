@@ -26,14 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public UserMapping(RefToken initiator)
         {
-            Guard.NotNull(initiator);
+            Guard.NotNull(initiator, nameof(initiator));
 
             this.initiator = initiator;
         }
 
         public void Backup(RefToken token)
         {
-            Guard.NotNull(token);
+            Guard.NotNull(token, nameof(token));
 
             if (!token.IsSubject)
             {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void Backup(string userId)
         {
-            Guard.NotNullOrEmpty(userId);
+            Guard.NotNullOrEmpty(userId, nameof(userId));
 
             if (!userMap.ContainsKey(userId))
             {
@@ -55,8 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task StoreAsync(IBackupWriter writer, IUserResolver userResolver)
         {
-            Guard.NotNull(writer);
-            Guard.NotNull(userResolver);
+            Guard.NotNull(writer, nameof(writer));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             var users = await userResolver.QueryManyAsync(userMap.Keys.ToArray());
 
@@ -67,19 +67,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task RestoreAsync(IBackupReader reader, IUserResolver userResolver)
         {
-            Guard.NotNull(reader);
-            Guard.NotNull(userResolver);
+            Guard.NotNull(reader, nameof(reader));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
 
             foreach (var (userId, email) in json)
             {
-                var user = await userResolver.FindByIdOrEmailAsync(email);
-
-                if (user == null && await userResolver.CreateUserIfNotExistsAsync(email, false))
-                {
-                    user = await userResolver.FindByIdOrEmailAsync(email);
-                }
+                var (user, _) = await userResolver.CreateUserIfNotExistsAsync(email, false);
 
                 if (user != null)
                 {
@@ -90,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public bool TryMap(string userId, out RefToken result)
         {
-            Guard.NotNullOrEmpty(userId);
+            Guard.NotNullOrEmpty(userId, nameof(userId));
 
             if (userMap.TryGetValue(userId, out var mapped))
             {
@@ -104,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public bool TryMap(RefToken token, out RefToken result)
         {
-            Guard.NotNull(token);
+            Guard.NotNull(token, nameof(token));
 
             if (token.IsClient)
             {

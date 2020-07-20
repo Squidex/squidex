@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class MoveAssetFolder : AssetFolderCommand
     {
-        public Guid ParentId { get; set; }
+        public DomainId ParentId { get; set; }
     }
 }

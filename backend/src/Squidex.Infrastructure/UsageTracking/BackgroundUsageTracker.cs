@@ -29,8 +29,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
-            Guard.NotNull(usageRepository);
-            Guard.NotNull(log);
+            Guard.NotNull(usageRepository, nameof(usageRepository));
+            Guard.NotNull(log, nameof(log));
 
             this.usageRepository = usageRepository;
 
@@ -88,8 +88,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public Task TrackAsync(DateTime date, string key, string? category, Counters counters)
         {
-            Guard.NotNullOrEmpty(key);
-            Guard.NotNull(counters);
+            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNull(counters, nameof(counters));
 
             ThrowIfDisposed();
 
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             ThrowIfDisposed();
 
@@ -151,7 +151,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate)
         {
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             ThrowIfDisposed();
 

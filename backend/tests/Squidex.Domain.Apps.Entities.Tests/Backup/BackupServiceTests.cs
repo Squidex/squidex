@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public class BackupServiceTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly Guid appId = Guid.NewGuid();
-        private readonly Guid backupId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly DomainId backupId = DomainId.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
         private readonly BackupService sut;
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var grain = A.Fake<IBackupGrain>();
 
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
                 .Returns(grain);
 
             await sut.StartBackupAsync(appId, actor);
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var grain = A.Fake<IBackupGrain>();
 
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
                 .Returns(grain);
 
             A.CallTo(() => grain.GetStateAsync())
@@ -112,14 +112,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var grain = A.Fake<IBackupGrain>();
 
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
                 .Returns(grain);
 
             A.CallTo(() => grain.GetStateAsync())
                 .Returns(state.AsJ());
 
             var result1 = await sut.GetBackupAsync(appId, backupId);
-            var result2 = await sut.GetBackupAsync(appId, Guid.NewGuid());
+            var result2 = await sut.GetBackupAsync(appId, DomainId.NewGuid());
 
             Assert.Same(state[0], result1);
             Assert.Null(result2);
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var grain = A.Fake<IBackupGrain>();
 
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
                 .Returns(grain);
 
             await sut.DeleteBackupAsync(appId, backupId);

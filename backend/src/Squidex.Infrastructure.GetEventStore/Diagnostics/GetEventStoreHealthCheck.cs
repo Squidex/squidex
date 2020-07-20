@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public GetEventStoreHealthCheck(IEventStoreConnection connection)
         {
-            Guard.NotNull(connection);
+            Guard.NotNull(connection, nameof(connection));
 
             this.connection = connection;
         }

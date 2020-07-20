@@ -1,4 +1,4 @@
-<div *ngIf="!forContent || snapshot.filtered.length > 0" class="droppable category"
+<div *ngIf="!forContent || filteredSchemas.length > 0" class="droppable category"
     cdkDropList
     cdkDropListSortingDisabled
     [cdkDropListData]="schemaCategory.name"
@@ -8,7 +8,7 @@
         <div class="row no-gutters">
             <div class="col-auto">
                 <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
-                    <i [class.icon-caret-right]="!snapshot.isOpen" [class.icon-caret-down]="snapshot.isOpen"></i> 
+                    <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
                 </button>
             </div>
             <div class="col">
@@ -16,7 +16,7 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    ({{snapshot.filtered.length}})
+                    ({{filteredSchemas.length}})
                 </ng-container>
                 <ng-template #noSchemas>
                     <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()">
@@ -24,12 +24,12 @@
                     </button>
                 </ng-template>
             </div>
-        </div>        
+        </div>
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
+    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="!isCollapsed" @fade>
         <ng-container *ngIf="!forContent; else simpleMode">
-            <div *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item"
+            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item"
                 routerLinkActive="active"
                 cdkDropList
                 cdkDrag
@@ -41,7 +41,7 @@
                 <a class="nav-link" [routerLink]="schemaRoute(schema)">
                     <div class="row">
                         <div class="col-4">
-                            <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
+                            <span class="schema-name schema-name-accent" title="{{schema.displayName}}" titlePosition="top-left">{{schema.displayName}}</span> 
                         </div>
                         <div class="col-4">
                             <span class="schema-user">
@@ -59,7 +59,7 @@
         </ng-container>
     
         <ng-template #simpleMode>
-            <li *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item">
+            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item">
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
                     <span class="schema-name" *ngIf="forContent">{{schema.displayName}}</span>
                 </a>

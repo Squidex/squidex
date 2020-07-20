@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -44,7 +45,7 @@ namespace Squidex.Web
 
                 foreach (var item in entities)
                 {
-                    hasher.AppendData(item.Id.ToByteArray());
+                    hasher.AppendData(Encoding.Default.GetBytes(item.UniqueId.ToString()));
                     hasher.AppendData(BitConverter.GetBytes(item.Version));
                 }
 

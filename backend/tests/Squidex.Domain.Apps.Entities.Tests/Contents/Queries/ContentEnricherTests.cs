@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -22,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly ISchemaEntity schema;
         private readonly Context requestContext;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
         private sealed class ResolveSchema : IContentEnricherStep
         {
@@ -83,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
-            await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, false, requestContext);
 
             A.CallTo(() => step1.EnrichAsync(requestContext))
                 .MustHaveHappened();
@@ -108,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
-            await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, false, requestContext);
 
             Assert.Same(schema, step1.Schema);
             Assert.Same(schema, step1.Schema);
@@ -117,9 +118,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .MustHaveHappenedOnceExactly();
         }
 
-        private ContentEntity CreateContent()
+        [Fact]
+        public async Task Should_clone_data_when_requested()
         {
-            return new ContentEntity { SchemaId = schemaId };
+            var source = CreateContent(new NamedContentData());
+
+            var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
+
+            var result = await sut.EnrichAsync(source, true, requestContext);
+
+            Assert.NotSame(source.Data, result.Data);
+        }
+
+        [Fact]
+        public async Task Should_not_clone_data_when_not_requested()
+        {
+            var source = CreateContent(new NamedContentData());
+
+            var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
+
+            var result = await sut.EnrichAsync(source, false, requestContext);
+
+            Assert.Same(source.Data, result.Data);
+        }
+
+        private ContentEntity CreateContent(NamedContentData? data = null)
+        {
+            return new ContentEntity { SchemaId = schemaId, Data = data! };
         }
     }
 }

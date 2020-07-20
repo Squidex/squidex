@@ -150,7 +150,12 @@ export class SchemaDetailsDto extends SchemaDto {
     }
 
     public export(): any {
-        const fieldKeys = ['fieldId', '_links', 'parentFieldId'];
+        const fieldKeys = [
+            'fieldId',
+            'parentId',
+            'parentFieldId',
+            '_links'
+        ];
 
         const cleanup = (source: any, ...exclude: string[]): any => {
             const clone = {};
@@ -203,9 +208,9 @@ export class SchemaDetailsDto extends SchemaDto {
 }
 
 function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
-    let result: TableField[] = [];
+    const result: TableField[] = [];
 
-    for (let name of names) {
+    for (const name of names) {
         if (name.startsWith('meta.')) {
             result.push(name);
         } else {
@@ -278,10 +283,6 @@ export class RootFieldDto extends FieldDto {
 
     public get isArray() {
         return this.properties.fieldType === 'Array';
-    }
-
-    public get isTranslatable() {
-        return this.isLocalizable && this.properties.isTranslateable;
     }
 
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,

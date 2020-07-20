@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainRuntime? runtime)
             : base(identity, runtime)
         {
-            Guard.NotNull(eventConsumers);
+            Guard.NotNull(eventConsumers, nameof(eventConsumers));
 
             this.eventConsumers = eventConsumers;
         }
@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(5));
             RegisterTimer(x => ActivateAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);

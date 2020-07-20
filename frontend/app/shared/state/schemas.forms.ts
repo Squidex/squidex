@@ -66,7 +66,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
         return {
             ...value.json,
             noFieldDeletion: !value.fieldsDelete,
-            noFieldRecreation: !value.fieldsDelete
+            noFieldRecreation: !value.fieldsRecreate
         };
     }
 }

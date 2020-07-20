@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -33,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public BackupApps(IAppImageStore appImageStore, IAppsIndex appsIndex, IAppUISettings appUISettings)
         {
-            Guard.NotNull(appImageStore);
-            Guard.NotNull(appsIndex);
-            Guard.NotNull(appUISettings);
+            Guard.NotNull(appImageStore, nameof(appImageStore));
+            Guard.NotNull(appsIndex, nameof(appsIndex));
+            Guard.NotNull(appUISettings, nameof(appUISettings));
 
             this.appsIndex = appsIndex;
             this.appImageStore = appImageStore;
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await appUISettings.SetAsync(context.AppId, null, json);
         }
 
-        private async Task ReserveAppAsync(Guid appId, string appName)
+        private async Task ReserveAppAsync(DomainId appId, string appName)
         {
             appReservation = await appsIndex.ReserveAsync(appId, appName);
 
@@ -125,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public async Task CleanupRestoreErrorAsync(Guid appId)
+        public async Task CleanupRestoreErrorAsync(DomainId appId)
         {
             if (appReservation != null)
             {
@@ -140,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
         }
 
-        private Task WriteAssetAsync(Guid appId, IBackupWriter writer)
+        private Task WriteAssetAsync(DomainId appId, IBackupWriter writer)
         {
             return writer.WriteBlobAsync(AvatarFile, async stream =>
             {
@@ -154,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             });
         }
 
-        private async Task ReadAssetAsync(Guid appId, IBackupReader reader)
+        private async Task ReadAssetAsync(DomainId appId, IBackupReader reader)
         {
             try
             {

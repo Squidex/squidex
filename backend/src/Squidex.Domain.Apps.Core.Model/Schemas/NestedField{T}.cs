@@ -55,9 +55,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             properties.Freeze();
         }
 
-        private T ValidateProperties(FieldProperties newProperties)
+        private static T ValidateProperties(FieldProperties newProperties)
         {
-            Guard.NotNull(newProperties);
+            Guard.NotNull(newProperties, nameof(newProperties));
 
             if (!(newProperties is T typedProperties))
             {

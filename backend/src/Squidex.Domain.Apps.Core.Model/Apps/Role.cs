@@ -11,7 +11,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using AllPermissions = Squidex.Shared.Permissions;
+using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         public Role(string name, PermissionSet permissions)
             : base(name)
         {
-            Guard.NotNull(permissions);
+            Guard.NotNull(permissions, nameof(permissions));
 
             Permissions = permissions;
         }
@@ -59,12 +59,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             var result = new HashSet<Permission>
             {
-                AllPermissions.ForApp(AllPermissions.AppCommon, app)
+                P.ForApp(P.AppCommon, app)
             };
 
             if (Permissions.Any())
             {
-                var prefix = AllPermissions.ForApp(AllPermissions.App, app).Id;
+                var prefix = P.ForApp(P.App, app).Id;
 
                 foreach (var permission in Permissions)
                 {

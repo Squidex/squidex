@@ -62,7 +62,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     public transformSubmit(value: any) {
         const result = { ...value, metadata: {} };
 
-        for (let item of value.metadata) {
+        for (const item of value.metadata) {
             const raw = item.value;
 
             let parsed = raw;

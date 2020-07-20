@@ -114,8 +114,8 @@ namespace Squidex.Shared
         public const string AppRulesDisable = "squidex.apps.{app}.rules.disable";
         public const string AppRulesDelete = "squidex.apps.{app}.rules.delete";
 
-        public const string AppSchemas = "squidex.apps.{app}.schemas.{name}";
-        public const string AppSchemasCreate = "squidex.apps.{app}.schemas.{name}.create";
+        public const string AppSchemas = "squidex.apps.{app}.schemas";
+        public const string AppSchemasCreate = "squidex.apps.{app}.schemas.create";
         public const string AppSchemasUpdate = "squidex.apps.{app}.schemas.{name}.update";
         public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{name}.scripts";
         public const string AppSchemasPublish = "squidex.apps.{app}.schemas.{name}.publish";
@@ -157,7 +157,7 @@ namespace Squidex.Shared
 
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
-            Guard.NotNull(id);
+            Guard.NotNull(id, nameof(id));
 
             return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{name}", schema ?? Permission.Any));
         }

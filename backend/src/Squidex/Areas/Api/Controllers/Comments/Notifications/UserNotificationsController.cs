@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -25,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
     [ApiExplorerSettings(GroupName = nameof(Notifications))]
     public sealed class UserNotificationsController : ApiController
     {
-        private static readonly NamedId<Guid> NoApp = NamedId.Of(Guid.Empty, "none");
+        private static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
         private readonly ICommentsLoader commentsLoader;
 
         public UserNotificationsController(ICommandBus commandBus, ICommentsLoader commentsLoader)
@@ -77,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         [HttpDelete]
         [Route("users/{userId}/notifications/{commentId}")]
         [ApiPermission]
-        public async Task<IActionResult> DeleteComment(string userId, Guid commentId)
+        public async Task<IActionResult> DeleteComment(string userId, string commentId)
         {
             CheckPermissions(userId);
 

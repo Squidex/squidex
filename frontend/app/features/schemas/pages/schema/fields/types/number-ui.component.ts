@@ -17,6 +17,8 @@ import { map } from 'rxjs/operators';
     templateUrl: 'number-ui.component.html'
 })
 export class NumberUIComponent extends ResourceOwner implements OnInit {
+    public readonly converter = FloatConverter.INSTANCE;
+
     @Input()
     public editForm: FormGroup;
 
@@ -25,8 +27,6 @@ export class NumberUIComponent extends ResourceOwner implements OnInit {
 
     @Input()
     public properties: NumberFieldPropertiesDto;
-
-    public converter = new FloatConverter();
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;

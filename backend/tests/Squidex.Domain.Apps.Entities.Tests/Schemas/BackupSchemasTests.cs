@@ -37,13 +37,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Should_restore_indices_for_all_non_deleted_schemas()
         {
-            var appId = Guid.NewGuid();
+            var appId = DomainId.NewGuid();
 
-            var schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
-            var schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
-            var schemaId3 = NamedId.Of(Guid.NewGuid(), "my-schema3");
+            var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+            var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
+            var schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
+            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
             await sut.RestoreEventAsync(Envelope.Create(new SchemaCreated
             {
@@ -65,14 +65,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 SchemaId = schemaId3
             }), context);
 
-            Dictionary<string, Guid>? newIndex = null;
+            Dictionary<string, DomainId>? newIndex = null;
 
-            A.CallTo(() => index.RebuildAsync(appId, A<Dictionary<string, Guid>>._))
-                .Invokes(new Action<Guid, Dictionary<string, Guid>>((_, i) => newIndex = i));
+            A.CallTo(() => index.RebuildAsync(appId, A<Dictionary<string, DomainId>>._))
+                .Invokes(new Action<DomainId, Dictionary<string, DomainId>>((_, i) => newIndex = i));
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new Dictionary<string, Guid>
+            Assert.Equal(new Dictionary<string, DomainId>
             {
                 [schemaId1.Name] = schemaId1.Id,
                 [schemaId2.Name] = schemaId2.Id

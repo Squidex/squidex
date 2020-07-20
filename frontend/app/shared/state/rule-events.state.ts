@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/framework';
+import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/framework';
 import { empty, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
@@ -46,17 +46,20 @@ export class RuleEventsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService,
         private readonly rulesService: RulesService
     ) {
         super({
             ruleEvents: [],
-            ruleEventsPager: Pager.fromLocalStore('rule-events', localStore)
+            ruleEventsPager: new Pager(0)
         });
+    }
 
-        this.ruleEventsPager.subscribe(pager => {
-            pager.saveTo('rule-events', this.localStore);
-        });
+    public loadAndListen(route: Router2State) {
+        route.mapTo(this)
+            .withPager('ruleEventsPager', 'ruleEvents', 30)
+            .withString('ruleId', 'ruleId')
+            .whenSynced(() => this.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {

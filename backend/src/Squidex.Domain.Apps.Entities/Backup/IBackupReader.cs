@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int ReadEvents { get; }
 
-        Guid OldGuid(Guid newId);
-
         Task ReadBlobAsync(string name, Func<Stream, Task> handler);
 
         Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler);

@@ -183,6 +183,22 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
+        public void Should_create_array_from_source()
+        {
+            var json = JsonValue.Array(1, "2");
+
+            var copy = new JsonArray(json);
+
+            Assert.Equal("[1, \"2\"]", copy.ToJsonString());
+            Assert.Equal("[1, \"2\"]", copy.ToString());
+
+            copy.Clear();
+
+            Assert.Empty(copy);
+            Assert.NotEmpty(json);
+        }
+
+        [Fact]
         public void Should_create_object()
         {
             var json = JsonValue.Object().Add("key1", 1).Add("key2", "2");
@@ -234,6 +250,76 @@ namespace Squidex.Infrastructure.Json.Objects
 
             Assert.Equal("null", json.ToJsonString());
             Assert.Equal("null", json.ToString());
+        }
+
+        [Fact]
+        public void Should_clone_number_and_return_same()
+        {
+            var source = JsonValue.Create(1);
+
+            var clone = source.Clone();
+
+            Assert.Same(source, clone);
+        }
+
+        [Fact]
+        public void Should_clone_string_and_return_same()
+        {
+            var source = JsonValue.Create("test");
+
+            var clone = source.Clone();
+
+            Assert.Same(source, clone);
+        }
+
+        [Fact]
+        public void Should_clone_boolean_and_return_same()
+        {
+            var source = JsonValue.Create(true);
+
+            var clone = source.Clone();
+
+            Assert.Same(source, clone);
+        }
+
+        [Fact]
+        public void Should_clone_null_and_return_same()
+        {
+            var source = JsonValue.Null;
+
+            var clone = source.Clone();
+
+            Assert.Same(source, clone);
+        }
+
+        [Fact]
+        public void Should_clone_array_and_also_children()
+        {
+            var source = JsonValue.Array(JsonValue.Array(), JsonValue.Array());
+
+            var clone = (JsonArray)source.Clone();
+
+            Assert.NotSame(source, clone);
+
+            for (var i = 0; i < source.Count; i++)
+            {
+                Assert.NotSame(clone[i], source[i]);
+            }
+        }
+
+        [Fact]
+        public void Should_clone_object_and_also_children()
+        {
+            var source = JsonValue.Object().Add("1", JsonValue.Array()).Add("2", JsonValue.Array());
+
+            var clone = (JsonObject)source.Clone();
+
+            Assert.NotSame(source, clone);
+
+            foreach (var (key, value) in clone)
+            {
+                Assert.NotSame(value, source[key]);
+            }
         }
 
         [Fact]

@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
         {
-            Guard.NotNull(apiUsageTracker);
-            Guard.NotNull(appPlansProvider);
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(apiUsageTracker, nameof(apiUsageTracker));
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, DateTime today)
         {
-            Guard.NotNull(app);
+            Guard.NotNull(app, nameof(app));
 
             var isLocked = false;
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             {
                 var appId = app.Id;
 
-                var usage = await apiUsageTracker.GetMonthCostsAsync(appId.ToString(), today);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today);
 
                 if (IsAboutToBeLocked(today, plan.MaxApiCalls, usage) && !HasNotifiedBefore(app.Id))
                 {
@@ -76,17 +76,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return isLocked;
         }
 
-        private bool HasNotifiedBefore(Guid appId)
+        private bool HasNotifiedBefore(DomainId appId)
         {
             return memoryCache.Get<bool>(appId);
         }
 
-        private bool TrackNotified(Guid appId)
+        private bool TrackNotified(DomainId appId)
         {
             return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
         }
 
-        private bool IsAboutToBeLocked(DateTime today, long limit, long usage)
+        private static bool IsAboutToBeLocked(DateTime today, long limit, long usage)
         {
             var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
 

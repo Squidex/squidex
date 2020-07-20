@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AttachClient : AppCommand
+    public sealed class AttachClient : AppUpdateCommand
     {
         public string Id { get; set; }
 

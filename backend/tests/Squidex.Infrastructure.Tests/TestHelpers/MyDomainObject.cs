@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
@@ -16,7 +15,7 @@ namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed class MyDomainObject : DomainObject<MyDomainState>
     {
-        public MyDomainObject(IStore<Guid> store)
+        public MyDomainObject(IStore<DomainId> store)
            : base(store, A.Dummy<ISemanticLog>())
         {
         }

@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Shared;
+using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -26,38 +25,38 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The id of the rule that is currently rerunning.
         /// </summary>
-        public Guid? RunningRuleId { get; set; }
+        public DomainId? RunningRuleId { get; set; }
 
-        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, Guid? runningRuleId, ApiController controller, string app)
+        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, DomainId? runningRuleId, Resources resources)
         {
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, controller, app)).ToArray()
+                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;
 
-            return result.CreateLinks(controller, runningRuleId, app);
+            return result.CreateLinks(resources, runningRuleId);
         }
 
-        private RulesDto CreateLinks(ApiController controller, Guid? runningRuleId, string app)
+        private RulesDto CreateLinks(Resources resources, DomainId? runningRuleId)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetRules), values));
+            AddSelfLink(resources.Url<RulesController>(x => nameof(x.GetRules), values));
 
-            if (controller.HasPermission(Permissions.AppRulesCreate, app))
+            if (resources.CanCreateRule)
             {
-                AddPostLink("create", controller.Url<RulesController>(x => nameof(x.PostRule), values));
+                AddPostLink("create", resources.Url<RulesController>(x => nameof(x.PostRule), values));
             }
 
-            if (controller.HasPermission(Permissions.AppRulesEvents, app))
+            if (resources.CanReadRuleEvents)
             {
-                AddGetLink("events", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
+                AddGetLink("events", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
 
                 if (runningRuleId != null)
                 {
-                    AddDeleteLink("run/cancel", controller.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
+                    AddDeleteLink("run/cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
                 }
             }
 

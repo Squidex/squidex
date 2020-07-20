@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
         }
 
-        public EnvelopeHeaders Clone()
+        public EnvelopeHeaders CloneHeaders()
         {
             return new EnvelopeHeaders(this);
         }

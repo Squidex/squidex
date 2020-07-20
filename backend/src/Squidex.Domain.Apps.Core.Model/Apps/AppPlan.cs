@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public AppPlan(RefToken owner, string planId)
         {
-            Guard.NotNull(owner);
-            Guard.NotNullOrEmpty(planId);
+            Guard.NotNull(owner, nameof(owner));
+            Guard.NotNullOrEmpty(planId, nameof(planId));
 
             Owner = owner;
 

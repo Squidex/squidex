@@ -15,12 +15,12 @@ namespace Squidex.Infrastructure
     {
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
         {
-            return source.Intersect(other).Count() == other.Count;
+            return source.Count == other.Count && source.Intersect(other).Count() == other.Count;
         }
 
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other, IEqualityComparer<T> comparer)
         {
-            return source.Intersect(other, comparer).Count() == other.Count;
+            return source.Count == other.Count && source.Intersect(other, comparer).Count() == other.Count;
         }
 
         public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure
 
         public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer) where T : notnull
         {
-            Guard.NotNull(comparer);
+            Guard.NotNull(comparer, nameof(comparer));
 
             var hashCodes = collection.Where(x => !Equals(x, null)).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
 

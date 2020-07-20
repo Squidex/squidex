@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -23,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
 
         public DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(contentRepository);
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkAssets = new CheckAssets(async ids =>
                 {
-                    return await assetRepository.QueryAsync(context.AppId.Id, new HashSet<Guid>(ids));
+                    return await assetRepository.QueryAsync(context.AppId.Id, new HashSet<DomainId>(ids));
                 });
 
                 yield return new AssetsValidator(assetsField.Properties, checkAssets);

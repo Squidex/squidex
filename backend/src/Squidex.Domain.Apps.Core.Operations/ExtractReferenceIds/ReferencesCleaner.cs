@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -15,12 +14,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public sealed class ReferencesCleaner : IFieldVisitor<IJsonValue>
     {
-        private readonly HashSet<Guid> validIds;
+        private readonly HashSet<DomainId> validIds;
         private IJsonValue value;
 
-        public ReferencesCleaner(HashSet<Guid> validIds)
+        public ReferencesCleaner(HashSet<DomainId> validIds)
         {
-            Guard.NotNull(validIds);
+            Guard.NotNull(validIds, nameof(validIds));
 
             this.validIds = validIds;
         }
@@ -89,12 +88,17 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (value is JsonArray array)
             {
-                var result = new JsonArray(array);
+                var result = array;
 
                 for (var i = 0; i < result.Count; i++)
                 {
                     if (!IsValidReference(result[i]))
                     {
+                        if (ReferenceEquals(result, array))
+                        {
+                            result = new JsonArray(array);
+                        }
+
                         result.RemoveAt(i);
                         i--;
                     }
@@ -108,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private bool IsValidReference(IJsonValue item)
         {
-            return item is JsonString s && Guid.TryParse(s.Value, out var guid) && validIds.Contains(guid);
+            return item is JsonString s && validIds.Contains(s.Value);
         }
     }
 }

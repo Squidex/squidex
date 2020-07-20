@@ -30,7 +30,7 @@ namespace Squidex.Web
         public FileCallbackResult(string contentType, FileCallback callback)
             : base(contentType)
         {
-            Guard.NotNull(callback);
+            Guard.NotNull(callback, nameof(callback));
 
             Callback = callback;
         }

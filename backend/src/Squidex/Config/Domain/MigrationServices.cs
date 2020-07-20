@@ -7,8 +7,8 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01;
-using Migrate_01.Migrations;
+using Migrations;
+using Migrations.Migrations;
 using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Config.Domain
@@ -29,13 +29,13 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 
-            services.AddTransientAs<AddPatterns>()
-                .As<IMigration>();
-
             services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStoreAppId>()
+                .As<IMigration>();
+
+            services.AddTransientAs<ClearRules>()
                 .As<IMigration>();
 
             services.AddTransientAs<ClearSchemas>()
@@ -57,6 +57,9 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssets>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildAssetFolders>()
                 .As<IMigration>();
 
             services.AddTransientAs<StartEventConsumers>()

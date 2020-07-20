@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T, TState> : GrainOfGuid where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
+    public abstract class DomainObjectGrain<T, TState> : GrainOfString where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
     {
         private readonly T domainObject;
 
@@ -28,12 +28,12 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObjectGrain(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider);
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             domainObject = serviceProvider.GetRequiredService<T>();
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(string key)
         {
             domainObject.Setup(key);
 

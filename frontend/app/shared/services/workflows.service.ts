@@ -142,7 +142,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
 
         const transitions = this.transitions.map(transition => {
             if (transition.from === name || transition.to === name) {
-                let newTransition = { ...transition };
+                const newTransition = { ...transition };
 
                 if (newTransition.from === name) {
                     newTransition.from = newName;
@@ -178,12 +178,12 @@ export class WorkflowDto extends Model<WorkflowDto> {
     public serialize(): any {
         const result = { steps: {}, schemaIds: this.schemaIds, initial: this.initial, name: this.name };
 
-        for (let step of this.steps) {
+        for (const step of this.steps) {
             const { name, ...values } = step;
 
             const s = { ...values, transitions: {} };
 
-            for (let transition of this.getTransitions(step)) {
+            for (const transition of this.getTransitions(step)) {
                 const { from, to, step: _, ...t } = transition;
 
                 s.transitions[to] = t;
@@ -288,13 +288,13 @@ function parseWorkflow(workflow: any) {
     const steps: WorkflowStep[] = [];
     const transitions: WorkflowTransition[] = [];
 
-    for (let stepName in workflow.steps) {
+    for (const stepName in workflow.steps) {
         if (workflow.steps.hasOwnProperty(stepName)) {
             const { transitions: srcTransitions, ...step } = workflow.steps[stepName];
 
             steps.push({ name: stepName, isLocked: stepName === 'Published', ...step });
 
-            for (let to in srcTransitions) {
+            for (const to in srcTransitions) {
                 if (srcTransitions.hasOwnProperty(to)) {
                     const transition = srcTransitions[to];
 

@@ -21,8 +21,8 @@ namespace Squidex.Web.Pipeline
 
         public ActionContextLogAppender(IActionContextAccessor actionContextAccessor, IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(actionContextAccessor);
-            Guard.NotNull(httpContextAccessor);
+            Guard.NotNull(actionContextAccessor, nameof(actionContextAccessor));
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             this.actionContextAccessor = actionContextAccessor;
 

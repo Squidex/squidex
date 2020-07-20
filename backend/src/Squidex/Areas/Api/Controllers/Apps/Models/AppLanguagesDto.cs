@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -21,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public AppLanguageDto[] Items { get; set; }
 
-        public static AppLanguagesDto FromApp(IAppEntity app, ApiController controller)
+        public static AppLanguagesDto FromApp(IAppEntity app, Resources resources)
         {
             var config = app.LanguagesConfig;
 
@@ -29,23 +28,23 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Items = config.Languages
                     .Select(x => AppLanguageDto.FromLanguage(x.Key, x.Value, config))
-                    .Select(x => x.WithLinks(controller, app))
+                    .Select(x => x.WithLinks(resources, app))
                     .OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code)
                     .ToArray()
             };
 
-            return result.CreateLinks(controller, app.Name);
+            return result.CreateLinks(resources);
         }
 
-        private AppLanguagesDto CreateLinks(ApiController controller, string app)
+        private AppLanguagesDto CreateLinks(Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            AddSelfLink(controller.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
+            AddSelfLink(resources.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
 
-            if (controller.HasPermission(Permissions.AppLanguagesCreate, app))
+            if (resources.CanCreateLanguage)
             {
-                AddPostLink("create", controller.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
+                AddPostLink("create", resources.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
             }
 
             return this;

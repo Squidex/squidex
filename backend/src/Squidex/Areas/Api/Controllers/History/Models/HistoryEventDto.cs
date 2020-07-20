@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.History.Models
@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// <summary>
         /// Gets a unique id for the event.
         /// </summary>
-        public Guid EventId { get; set; }
+        public DomainId EventId { get; set; }
 
         /// <summary>
         /// The time when the event happened.

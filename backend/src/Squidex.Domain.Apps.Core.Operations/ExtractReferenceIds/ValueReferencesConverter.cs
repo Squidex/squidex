@@ -5,29 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ValueReferencesConverter
     {
-        public static ValueConverter CleanReferences(HashSet<Guid>? validIds = null)
+        public static ValueConverter CleanReferences(HashSet<DomainId>? validIds = null)
         {
             if (validIds == null)
             {
-                return (value, field) => value;
+                return ValueConverters.Noop;
             }
 
             var cleaner = new ReferencesCleaner(validIds);
 
-            return (value, field) =>
+            return (value, field, parent) =>
             {
                 if (value.Type == JsonValueType.Null)
                 {
-                    return value!;
+                    return value;
                 }
 
                 cleaner.SetValue(value);
