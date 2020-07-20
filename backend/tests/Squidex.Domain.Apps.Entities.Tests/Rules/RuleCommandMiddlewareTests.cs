@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly Guid ruleId = Guid.NewGuid();
+        private readonly DomainId ruleId = DomainId.NewGuid();
         private readonly Context requestContext = Context.Anonymous();
         private readonly RuleCommandMiddleware sut;
 
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
         }
 
-        protected override Guid Id
+        protected override DomainId Id
         {
             get { return ruleId; }
         }

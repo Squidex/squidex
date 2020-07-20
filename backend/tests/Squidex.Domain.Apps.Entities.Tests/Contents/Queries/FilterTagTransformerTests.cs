@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
@@ -23,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ISchemaEntity schema;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
         public FilterTagTransformerTests()
         {
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = ClrFilter.Eq("data.tags2.iv", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'id1'", result!.ToString());
         }
@@ -58,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = ClrFilter.Eq("data.tags2.iv", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'name1'", result!.ToString());
         }
@@ -68,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("data.tags1.iv", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags1.iv == 'value'", result!.ToString());
 
@@ -81,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("data.string.iv", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.string.iv == 'value'", result!.ToString());
 
@@ -94,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("no.data", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("no.data == 'value'", result!.ToString());
 

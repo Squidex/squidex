@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AddPattern : AppCommand
+    public sealed class AddPattern : AppUpdateCommand
     {
-        public Guid PatternId { get; set; }
+        public DomainId PatternId { get; set; }
 
         public string Name { get; set; }
 
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public AddPattern()
         {
-            PatternId = Guid.NewGuid();
+            PatternId = DomainId.NewGuid();
         }
     }
 }

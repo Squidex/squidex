@@ -6,12 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 
 namespace Squidex.Web.Pipeline
 {
@@ -21,7 +24,7 @@ namespace Squidex.Web.Pipeline
 
         public SchemaResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider);
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
         }
@@ -36,7 +39,7 @@ namespace Squidex.Web.Pipeline
 
                 if (!string.IsNullOrWhiteSpace(schemaIdOrName))
                 {
-                    var schema = await GetSchemaAsync(appId, schemaIdOrName);
+                    var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
 
                     if (schema == null)
                     {
@@ -51,15 +54,17 @@ namespace Squidex.Web.Pipeline
             await next();
         }
 
-        private Task<ISchemaEntity?> GetSchemaAsync(Guid appId, string schemaIdOrName)
+        private Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string schemaIdOrName, ClaimsPrincipal user)
         {
-            if (Guid.TryParse(schemaIdOrName, out var id))
+            var canCache = !user.IsInClient(DefaultClients.Frontend);
+
+            if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                return appProvider.GetSchemaAsync(appId, id);
+                return appProvider.GetSchemaAsync(appId, guid, false, canCache);
             }
             else
             {
-                return appProvider.GetSchemaAsync(appId, schemaIdOrName);
+                return appProvider.GetSchemaAsync(appId, schemaIdOrName, canCache);
             }
         }
     }

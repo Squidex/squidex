@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static Task CanAssign(AppContributors contributors, Roles roles, AssignContributor command, IUserResolver users, IAppLimitsPlan? plan)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot assign contributor.", async e =>
             {
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             throw new DomainForbiddenException("You cannot change your own role.");
                         }
 
-                        if (!contributors.TryGetValue(command.ContributorId, out var role))
+                        if (!contributors.TryGetValue(command.ContributorId, out _))
                         {
                             if (plan != null && plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                             {
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanRemove(AppContributors contributors, RemoveContributor command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot remove contributor.", e =>
             {

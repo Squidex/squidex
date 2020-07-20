@@ -9,14 +9,14 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppLogStore
     {
-        Task LogAsync(Guid appId, Instant timestamp, string? requestMethod, string? requestPath, string? userId, string? clientId, long elapsedMs, double costs);
+        Task LogAsync(DomainId appId, RequestLog request);
 
-        Task ReadLogAsync(Guid appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default);
+        Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default);
     }
 }

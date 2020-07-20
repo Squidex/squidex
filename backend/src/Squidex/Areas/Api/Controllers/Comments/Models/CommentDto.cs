@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// <summary>
         /// The id of the comment.
         /// </summary>
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         /// <summary>
         /// The time when the comment was created or updated last.

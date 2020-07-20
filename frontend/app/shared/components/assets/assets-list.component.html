@@ -30,7 +30,7 @@
                         <div class="folder-container-over"></div>
             
                         <sqx-asset-folder [assetFolder]="parent"
-                            (navigate)="state.navigate($event)">
+                            (navigate)="state.navigate($event.id)">
                         </sqx-asset-folder>
                     </div>
                     
@@ -46,7 +46,7 @@
                             cdkDrag
                             [cdkDragData]="assetFolder"
                             [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
-                            (navigate)="state.navigate($event)"
+                            (navigate)="state.navigate($event.id)"
                             (delete)="deleteAssetFolder($event)">
                         </sqx-asset-folder>
                     </div>

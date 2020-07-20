@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Squidex.Domain.Apps.Core.Contents;
@@ -17,38 +16,38 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
-        public static HashSet<Guid> GetReferencedIds(this NamedContentData source, Schema schema, int referencesPerField = int.MaxValue)
+        public static HashSet<DomainId> GetReferencedIds(this NamedContentData source, Schema schema, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
-            var extractor = new ReferencesExtractor(new HashSet<Guid>(), referencesPerField);
+            var extractor = new ReferencesExtractor(new HashSet<DomainId>(), referencesPerField);
 
             AddReferencedIds(source, schema.Fields, extractor);
 
             return extractor.Result;
         }
 
-        public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<Guid> result, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
             AddReferencedIds(source, schema.Fields, extractor);
         }
 
-        public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<Guid> result, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(fields);
+            Guard.NotNull(fields, nameof(fields));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
             AddReferencedIds(source, fields, extractor);
         }
 
-        public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<Guid> result, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             var extractor = new ReferencesExtractor(result, referencesPerField);
 
@@ -76,9 +75,9 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        public static HashSet<Guid> GetReferencedIds(this IField field, IJsonValue? value, int referencesPerField = int.MaxValue)
+        public static HashSet<DomainId> GetReferencedIds(this IField field, IJsonValue? value, int referencesPerField = int.MaxValue)
         {
-            var result = new HashSet<Guid>();
+            var result = new HashSet<DomainId>();
 
             if (value != null)
             {
@@ -94,8 +93,8 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static JsonObject FormatReferences(this NamedContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
         {
-            Guard.NotNull(schema);
-            Guard.NotNull(partitioning);
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(partitioning, nameof(partitioning));
 
             var result = JsonValue.Object();
 
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partitionKey, string separator)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var sb = new StringBuilder();
 

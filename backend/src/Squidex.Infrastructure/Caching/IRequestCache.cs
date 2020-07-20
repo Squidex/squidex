@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Infrastructure.Caching
 {
     public interface IRequestCache
     {
-        void AddDependency(Guid key, long version);
+        void AddDependency(DomainId key, long version);
 
         void AddDependency(object? value);
 

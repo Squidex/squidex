@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -14,15 +13,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class DomainObjectState<T> :
-        IDomainState<T>,
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-        where T : class
+    public abstract class DomainObjectState<T> : IDomainState<T> where T : class
     {
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         public RefToken CreatedBy { get; set; }
 
@@ -64,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var headers = @event.Headers;
 
-            if (clone.Id == default)
+            if (clone.Id == DomainId.Empty)
             {
                 clone.Id = headers.AggregateId();
             }

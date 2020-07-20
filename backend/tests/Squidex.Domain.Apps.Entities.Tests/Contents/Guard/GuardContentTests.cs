@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
     public class GuardContentTests
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
 
@@ -232,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CreateDraft_should_throw_exception_if_not_published()
         {
-            var schema = CreateSchema(false);
+            CreateSchema(false);
 
             var content = CreateContent(Status.Draft);
             var command = new CreateContentDraft();
@@ -243,8 +242,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CreateDraft_should_not_throw_exception()
         {
-            var schema = CreateSchema(false);
-
             var content = CreateContent(Status.Published);
             var command = new CreateContentDraft();
 
@@ -254,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
         {
-            var schema = CreateSchema(false);
+            CreateSchema(false);
 
             var content = new ContentState();
             var command = new DeleteContentDraft();
@@ -265,8 +262,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDeleteDraft_should_not_throw_exception()
         {
-            var schema = CreateSchema(false);
-
             var content = CreateDraftContent(Status.Draft);
             var command = new DeleteContentDraft();
 
@@ -307,10 +302,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private ISchemaEntity CreateSchema(bool isSingleton)
         {
-            return Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
+            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
-        private ContentState CreateDraftContent(Status status)
+        private static ContentState CreateDraftContent(Status status)
         {
             return new ContentState
             {
@@ -318,7 +313,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             };
         }
 
-        private ContentState CreateContent(Status status)
+        private static ContentState CreateContent(Status status)
         {
             return new ContentState
             {

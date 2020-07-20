@@ -15,12 +15,7 @@ namespace TestSuite.Fixtures
 {
     public class AssetFixture : CreatedAppFixture
     {
-        public IAssetsClient Assets { get; }
-
-        public AssetFixture()
-        {
-            Assets = ClientManager.CreateAssetsClient();
-        }
+        public IAssetsClient Assets => Squidex.Assets;
 
         public async Task<MemoryStream> DownloadAsync(AssetDto asset)
         {

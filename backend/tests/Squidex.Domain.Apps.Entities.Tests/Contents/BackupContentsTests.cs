@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class BackupContentsTests
     {
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
         private readonly BackupContents sut;
 
@@ -40,36 +40,34 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_restore_states_for_all_contents()
         {
-            var appId = Guid.NewGuid();
+            var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+            var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
 
-            var schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
-            var schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
+            var contentId1 = DomainId.NewGuid();
+            var contentId2 = DomainId.NewGuid();
+            var contentId3 = DomainId.NewGuid();
 
-            var contentId1 = Guid.NewGuid();
-            var contentId2 = Guid.NewGuid();
-            var contentId3 = Guid.NewGuid();
+            var context = new RestoreContext(appId.Id, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
-            var context = new RestoreContext(appId, new UserMapping(new RefToken(RefTokenType.Subject, "123")), A.Fake<IBackupReader>());
-
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId1,
                 SchemaId = schemaId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentCreated
+            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId3,
                 SchemaId = schemaId2
             }), context);
 
-            await sut.RestoreEventAsync(Envelope.Create(new ContentDeleted
+            await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
@@ -80,25 +78,29 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId2
             }), context);
 
-            var rebuildContents = new HashSet<Guid>();
+            var rebuildContents = new HashSet<DomainId>();
 
-            var add = new Func<Guid, Task>(id =>
-            {
-                rebuildContents.Add(id);
-
-                return Task.CompletedTask;
-            });
-
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IdSource>._, A<CancellationToken>._))
-                .Invokes((IdSource source, CancellationToken _) => source(add));
+            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+                .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildContents.AddRange(source));
 
             await sut.RestoreAsync(context);
 
-            Assert.Equal(new HashSet<Guid>
+            Assert.Equal(new HashSet<DomainId>
             {
-                contentId1,
-                contentId2
+                DomainId.Combine(appId.Id, contentId1),
+                DomainId.Combine(appId.Id, contentId2)
             }, rebuildContents);
+        }
+
+        private Envelope<ContentEvent> ContentEvent(ContentEvent @event)
+        {
+            @event.AppId = appId;
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetAggregateId(DomainId.Combine(appId.Id, @event.ContentId));
+
+            return envelope;
         }
     }
 }

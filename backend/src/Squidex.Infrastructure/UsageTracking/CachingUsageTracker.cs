@@ -21,28 +21,28 @@ namespace Squidex.Infrastructure.UsageTracking
         public CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
             : base(cache)
         {
-            Guard.NotNull(inner);
+            Guard.NotNull(inner, nameof(inner));
 
             this.inner = inner;
         }
 
         public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
-            Guard.NotNull(key);
+            Guard.NotNull(key, nameof(key));
 
             return inner.QueryAsync(key, fromDate, toDate);
         }
 
         public Task TrackAsync(DateTime date, string key, string? category, Counters counters)
         {
-            Guard.NotNull(key);
+            Guard.NotNull(key, nameof(key));
 
             return inner.TrackAsync(date, key, category, counters);
         }
 
         public Task<Counters> GetForMonthAsync(string key, DateTime date)
         {
-            Guard.NotNull(key);
+            Guard.NotNull(key, nameof(key));
 
             var cacheKey = string.Join("$", "Usage", nameof(GetForMonthAsync), key, date);
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate)
         {
-            Guard.NotNull(key);
+            Guard.NotNull(key, nameof(key));
 
             var cacheKey = string.Join("$", "Usage", nameof(GetAsync), key, fromDate, toDate);
 

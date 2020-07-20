@@ -17,11 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(AppPatterns patterns, AddPattern command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot add pattern.", e =>
             {
-                if (command.PatternId == Guid.Empty)
+                if (command.PatternId == DomainId.Empty)
                 {
                    e(Not.Defined("Id"), nameof(command.PatternId));
                 }
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanDelete(AppPatterns patterns, DeletePattern command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             if (!patterns.ContainsKey(command.PatternId))
             {
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanUpdate(AppPatterns patterns, UpdatePattern command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             if (!patterns.ContainsKey(command.PatternId))
             {

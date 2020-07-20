@@ -19,14 +19,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, Guid>
+    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, DomainId>
     {
-        async Task<(AssetState Value, long Version)> ISnapshotStore<AssetState, Guid>.ReadAsync(Guid key)
+        async Task<(AssetState Value, long Version)> ISnapshotStore<AssetState, DomainId>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var existing =
-                    await Collection.Find(x => x.Id == key)
+                    await Collection.Find(x => x.DocumentId == key)
                         .FirstOrDefaultAsync();
 
                 if (existing != null)
@@ -38,20 +38,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetState, Guid>.WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetState, DomainId>.WriteAsync(DomainId key, AssetState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var entity = SimpleMapper.Map(value, new MongoAssetEntity());
 
-                entity.Version = newVersion;
                 entity.IndexedAppId = value.AppId.Id;
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, entity);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
             }
         }
 
-        async Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetState, DomainId>.ReadAllAsync(Func<AssetState, long, Task> callback, CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -59,11 +58,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetState, Guid>.RemoveAsync(Guid key)
+        async Task ISnapshotStore<AssetState, DomainId>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                await Collection.DeleteOneAsync(x => x.Id == key);
+                await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }
         }
 

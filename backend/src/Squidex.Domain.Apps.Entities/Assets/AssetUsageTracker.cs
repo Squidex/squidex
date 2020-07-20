@@ -25,12 +25,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetUsageTracker(IUsageTracker usageTracker)
         {
-            Guard.NotNull(usageTracker);
+            Guard.NotNull(usageTracker, nameof(usageTracker));
 
             this.usageTracker = usageTracker;
         }
 
-        public async Task<long> GetTotalSizeAsync(Guid appId)
+        public async Task<long> GetTotalSizeAsync(DomainId appId)
         {
             var key = GetKey(appId);
 
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return counters.GetInt64(CounterTotalSize);
         }
 
-        public async Task<IReadOnlyList<AssetStats>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyList<AssetStats>> QueryAsync(DomainId appId, DateTime fromDate, DateTime toDate)
         {
             var enriched = new List<AssetStats>();
 

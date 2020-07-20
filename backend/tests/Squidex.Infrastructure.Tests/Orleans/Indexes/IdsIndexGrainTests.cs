@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -15,17 +14,17 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 {
     public class IdsIndexGrainTests
     {
-        private readonly IGrainState<IdsIndexState<Guid>> grainState = A.Fake<IGrainState<IdsIndexState<Guid>>>();
-        private readonly Guid id1 = Guid.NewGuid();
-        private readonly Guid id2 = Guid.NewGuid();
-        private readonly IdsIndexGrain<IdsIndexState<Guid>, Guid> sut;
+        private readonly IGrainState<IdsIndexState<DomainId>> grainState = A.Fake<IGrainState<IdsIndexState<DomainId>>>();
+        private readonly DomainId id1 = DomainId.NewGuid();
+        private readonly DomainId id2 = DomainId.NewGuid();
+        private readonly IdsIndexGrain<IdsIndexState<DomainId>, DomainId> sut;
 
         public IdsIndexGrainTests()
         {
             A.CallTo(() => grainState.ClearAsync())
-                .Invokes(() => grainState.Value = new IdsIndexState<Guid>());
+                .Invokes(() => grainState.Value = new IdsIndexState<DomainId>());
 
-            sut = new IdsIndexGrain<IdsIndexState<Guid>, Guid>(grainState);
+            sut = new IdsIndexGrain<IdsIndexState<DomainId>, DomainId>(grainState);
         }
 
         [Fact]
@@ -36,7 +35,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
             var result = await sut.GetIdsAsync();
 
-            Assert.Equal(new List<Guid> { id1, id2 }, result);
+            Assert.Equal(new List<DomainId> { id1, id2 }, result);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedTwiceExactly();
@@ -75,7 +74,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
             var result = await sut.GetIdsAsync();
 
-            Assert.Equal(new List<Guid> { id2 }, result);
+            Assert.Equal(new List<DomainId> { id2 }, result);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedTwiceOrMore();
@@ -84,7 +83,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
         [Fact]
         public async Task Should_replace__ids_on_rebuild()
         {
-            var state = new HashSet<Guid>
+            var state = new HashSet<DomainId>
             {
                 id1,
                 id2
@@ -94,7 +93,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
             var result = await sut.GetIdsAsync();
 
-            Assert.Equal(new List<Guid> { id1, id2 }, result);
+            Assert.Equal(new List<DomainId> { id1, id2 }, result);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened();

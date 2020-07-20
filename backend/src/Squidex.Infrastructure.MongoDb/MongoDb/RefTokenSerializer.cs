@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
@@ -13,13 +14,20 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class RefTokenSerializer : ClassSerializerBase<RefToken>
     {
-        private static volatile int isRegistered;
+        private static int isRegistered;
 
         public static void Register()
         {
             if (Interlocked.Increment(ref isRegistered) == 1)
             {
-                BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+                try
+                {
+                    BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+                }
+                catch (BsonSerializationException)
+                {
+                    return;
+                }
             }
         }
 

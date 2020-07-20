@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -19,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public class GuardAppPatternsTests
     {
-        private readonly Guid patternId = Guid.NewGuid();
+        private readonly DomainId patternId = DomainId.NewGuid();
         private readonly AppPatterns patterns_0 = AppPatterns.Empty;
 
         [Fact]
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_name_exists()
         {
-            var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
+            var patterns_1 = patterns_0.Add(DomainId.NewGuid(), "any", "[a-z]", "Message");
 
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
@@ -63,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_pattern_exists()
         {
-            var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
+            var patterns_1 = patterns_0.Add(DomainId.NewGuid(), "any", "[a-z]", "Message");
 
             var command = new AddPattern { PatternId = patternId, Name = "other", Pattern = "[a-z]" };
 
@@ -133,8 +132,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_name_exists()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
             var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");
@@ -148,8 +147,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_pattern_exists()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
 
             var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
             var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");

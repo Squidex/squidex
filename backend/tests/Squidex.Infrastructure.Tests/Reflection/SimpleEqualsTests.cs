@@ -84,6 +84,12 @@ namespace Squidex.Infrastructure.Reflection
                 TimeSpan.FromMilliseconds(123),
                 TimeSpan.FromMilliseconds(55)
             };
+
+            yield return new object[]
+            {
+                new Uri("/url1", UriKind.Relative),
+                new Uri("/url2", UriKind.Relative),
+            };
         }
 
         [Theory]

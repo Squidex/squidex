@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Assets
 
         public MongoGridFsAssetStore(IGridFSBucket<string> bucket)
         {
-            Guard.NotNull(bucket);
+            Guard.NotNull(bucket, nameof(bucket));
 
             this.bucket = bucket;
         }
@@ -49,7 +49,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var name = GetFileName(fileName, nameof(fileName));
 
-            var file = await bucket.Find(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name)).FirstOrDefaultAsync();
+            var find = await bucket.FindAsync(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name), cancellationToken: ct);
+
+            var file = await find.FirstOrDefaultAsync(ct);
 
             if (file == null)
             {
@@ -61,13 +63,13 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(targetFileName);
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
             try
             {
                 var sourceName = GetFileName(sourceFileName, nameof(sourceFileName));
 
-                using (var readStream = await bucket.OpenDownloadStreamAsync(sourceName, cancellationToken: ct))
+                await using (var readStream = await bucket.OpenDownloadStreamAsync(sourceName, cancellationToken: ct))
                 {
                     await UploadAsync(targetFileName, readStream, false, ct);
                 }
@@ -80,7 +82,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             try
             {
@@ -101,7 +103,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             try
             {
@@ -114,7 +116,7 @@ namespace Squidex.Infrastructure.Assets
 
                 await bucket.UploadFromStreamAsync(name, name, stream, cancellationToken: ct);
             }
-            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 throw new AssetAlreadyExistsException(fileName);
             }

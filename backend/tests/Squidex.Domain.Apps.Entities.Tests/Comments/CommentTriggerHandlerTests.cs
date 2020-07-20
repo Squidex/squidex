@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 using Xunit;
@@ -33,10 +34,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
             sut = new CommentTriggerHandler(scriptEngine, userResolver);
@@ -142,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new ContentCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new ContentCreated(), trigger, DomainId.NewGuid());
 
                 Assert.False(result);
             });
@@ -153,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new CommentCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new CommentCreated(), trigger, DomainId.NewGuid());
 
                 Assert.True(result);
             });
@@ -255,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             });
         }
 
-        private IUser CreateUser(string id, string email = "sebastian@squidex.io")
+        private static IUser CreateUser(string id, string email = "sebastian@squidex.io")
         {
             var user = A.Fake<IUser>();
 
@@ -290,12 +291,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
         }

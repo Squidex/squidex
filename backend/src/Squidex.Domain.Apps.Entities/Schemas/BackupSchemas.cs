@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -18,14 +17,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public sealed class BackupSchemas : IBackupHandler
     {
-        private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
+        private readonly Dictionary<string, DomainId> schemasByName = new Dictionary<string, DomainId>();
         private readonly ISchemasIndex indexSchemas;
 
         public string Name { get; } = "Schemas";
 
         public BackupSchemas(ISchemasIndex indexSchemas)
         {
-            Guard.NotNull(indexSchemas);
+            Guard.NotNull(indexSchemas, nameof(indexSchemas));
 
             this.indexSchemas = indexSchemas;
         }

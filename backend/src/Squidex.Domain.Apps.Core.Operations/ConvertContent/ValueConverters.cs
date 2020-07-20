@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field, parent) =>
             {
-                if (field is IField<JsonFieldProperties> && value is JsonScalar<string> s)
+                if (field is IField<JsonFieldProperties> && value is JsonString s)
                 {
                     var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(s.Value));
 
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static ValueConverter ResolveAssetUrls(IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
+        public static ValueConverter ResolveAssetUrls(NamedId<DomainId> appId, IReadOnlyCollection<string>? fields, IUrlGenerator urlGenerator)
         {
             if (fields?.Any() != true)
             {
@@ -126,13 +127,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (value, field, parent) =>
             {
-                if (value is JsonArray array && shouldHandle(field, parent))
+                if (field is IField<AssetsFieldProperties> && value is JsonArray array && shouldHandle(field, parent))
                 {
                     for (var i = 0; i < array.Count; i++)
                     {
                         var id = array[i].ToString();
 
-                        array[i] = JsonValue.Create(urlGenerator.AssetContent(Guid.Parse(id)));
+                        array[i] = JsonValue.Create(urlGenerator.AssetContent(appId, id));
                     }
                 }
 

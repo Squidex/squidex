@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public AllowedValuesValidator(IEnumerable<T> allowedValues)
         {
-            Guard.NotNull(allowedValues);
+            Guard.NotNull(allowedValues, nameof(allowedValues));
 
             this.allowedValues = allowedValues;
         }

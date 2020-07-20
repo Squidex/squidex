@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -16,33 +15,33 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         public ImmutableQueue<string> Path { get; }
 
-        public NamedId<Guid> AppId { get; }
+        public NamedId<DomainId> AppId { get; }
 
-        public NamedId<Guid> SchemaId { get; }
+        public NamedId<DomainId> SchemaId { get; }
 
         public Schema Schema { get; }
 
-        public Guid ContentId { get; }
+        public DomainId ContentId { get; }
 
         public bool IsOptional { get; }
 
         public ValidationMode Mode { get; }
 
         public ValidationContext(
-            NamedId<Guid> appId,
-            NamedId<Guid> schemaId,
+            NamedId<DomainId> appId,
+            NamedId<DomainId> schemaId,
             Schema schema,
-            Guid contentId,
+            DomainId contentId,
             ValidationMode mode = ValidationMode.Default)
             : this(appId, schemaId, schema, contentId, ImmutableQueue<string>.Empty, false, mode)
         {
         }
 
         private ValidationContext(
-            NamedId<Guid> appId,
-            NamedId<Guid> schemaId,
+            NamedId<DomainId> appId,
+            NamedId<DomainId> schemaId,
             Schema schema,
-            Guid contentId,
+            DomainId contentId,
             ImmutableQueue<string> path,
             bool isOptional,
             ValidationMode mode = ValidationMode.Default)

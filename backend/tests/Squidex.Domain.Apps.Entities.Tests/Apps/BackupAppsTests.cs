@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppsIndex index = A.Fake<IAppsIndex>();
         private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly DomainId appId = DomainId.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
         private readonly BackupApps sut;
 
@@ -323,7 +323,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             HashSet<string>? newIndex = null;
 
             A.CallTo(() => index.RebuildByContributorsAsync(appId, A<HashSet<string>>._))
-                .Invokes(new Action<Guid, HashSet<string>>((_, i) => newIndex = i));
+                .Invokes(new Action<DomainId, HashSet<string>>((_, i) => newIndex = i));
 
             await sut.CompleteRestoreAsync(context);
 
@@ -341,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private RestoreContext CreateRestoreContext()
         {
-            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>());
+            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
         }
 
         private IUserMapping CreateUserMapping()

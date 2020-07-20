@@ -16,7 +16,8 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public sealed class CDNTests : IClassFixture<CloudFixture>
+    [Trait("Category", "NotAutomated")]
+    public class CDNTests : IClassFixture<CloudFixture>
     {
         public CloudFixture _ { get; }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public Instant? DueTime { get; set; }
 
-        public ChangeContentStatus ToCommand(Guid id)
+        public ChangeContentStatus ToCommand(string id)
         {
             return new ChangeContentStatus { ContentId = id, Status = Status, DueTime = DueTime };
         }

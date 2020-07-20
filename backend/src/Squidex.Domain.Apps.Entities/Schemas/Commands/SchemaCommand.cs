@@ -1,22 +1,19 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class SchemaCommand : SquidexCommand, IAggregateCommand
+    public abstract class SchemaCommand : SquidexCommand, IAppCommand, IAggregateCommand
     {
-        public Guid SchemaId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return SchemaId; }
-        }
+        public abstract DomainId AggregateId { get; }
     }
 }

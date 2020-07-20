@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
         private readonly Context requestContext = Context.Anonymous();
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly BulkUpdateCommandMiddleware sut;
 
         public BulkUpdateCommandMiddlewareTests()
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>.That.Matches(x => x.Data == data)))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => domainObject.Setup(A<Guid>._))
+            A.CallTo(() => domainObject.Setup(A<DomainId>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>.That.Matches(x => x.Data == data)))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => domainObject.Setup(A<Guid>._))
+            A.CallTo(() => domainObject.Setup(A<DomainId>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -373,7 +373,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .MustNotHaveHappened();
         }
 
-        private static (Guid Id, NamedContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)
+        private static (DomainId Id, NamedContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)
         {
             Query<IJsonValue>? query = withQuery ? new Query<IJsonValue>() : null;
 
@@ -383,10 +383,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new ContentFieldData()
                             .AddJsonValue("iv", JsonValue.Create(1)));
 
-            return (Guid.NewGuid(), data, query);
+            return (DomainId.NewGuid(), data, query);
         }
 
-        private static IEnrichedContentEntity CreateContent(Guid id)
+        private static IEnrichedContentEntity CreateContent(DomainId id)
         {
             return new ContentEntity { Id = id };
         }

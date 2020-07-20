@@ -25,9 +25,9 @@ namespace Squidex.Infrastructure.Assets
 
         public AmazonS3AssetStore(AmazonS3Options options)
         {
-            Guard.NotNullOrEmpty(options.Bucket);
-            Guard.NotNullOrEmpty(options.AccessKey);
-            Guard.NotNullOrEmpty(options.SecretKey);
+            Guard.NotNullOrEmpty(options.Bucket, nameof(options.Bucket));
+            Guard.NotNullOrEmpty(options.AccessKey, nameof(options.AccessKey));
+            Guard.NotNullOrEmpty(options.SecretKey, nameof(options.SecretKey));
 
             this.options = options;
         }
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             var key = GetKey(fileName, nameof(fileName));
 
@@ -162,7 +162,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             var key = GetKey(fileName, nameof(fileName));
 
@@ -193,7 +193,7 @@ namespace Squidex.Infrastructure.Assets
 
                     using (tempStream)
                     {
-                        await stream.CopyToAsync(tempStream);
+                        await stream.CopyToAsync(tempStream, ct);
 
                         request.InputStream = tempStream;
 

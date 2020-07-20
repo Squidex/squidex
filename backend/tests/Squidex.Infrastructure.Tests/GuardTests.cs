@@ -80,9 +80,21 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void NotEmpty_should_throw_for_empty_domainId()
+        {
+            Assert.Throws<ArgumentException>(() => Guard.NotEmpty((DomainId)default, "parameter"));
+        }
+
+        [Fact]
         public void NotEmpty_should_do_nothing_for_valid_guid()
         {
             Guard.NotEmpty(Guid.NewGuid(), "parameter");
+        }
+
+        [Fact]
+        public void NotEmpty_should_do_nothing_for_valid_id()
+        {
+            Guard.NotEmpty(DomainId.NewGuid(), "parameter");
         }
 
         [Fact]

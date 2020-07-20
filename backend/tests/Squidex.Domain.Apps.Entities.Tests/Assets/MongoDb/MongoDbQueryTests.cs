@@ -30,6 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         static MongoDbQueryTests()
         {
             InstantSerializer.Register();
+
+            DomainIdSerializer.Register();
         }
 
         [Fact]

@@ -157,7 +157,7 @@ namespace Squidex.Shared
 
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
-            Guard.NotNull(id);
+            Guard.NotNull(id, nameof(id));
 
             return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{name}", schema ?? Permission.Any));
         }

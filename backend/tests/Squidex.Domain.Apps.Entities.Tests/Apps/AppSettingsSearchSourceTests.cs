@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppSettingsSearchSourceTests
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly AppSettingsSearchSource sut;
 
         public AppSettingsSearchSourceTests()

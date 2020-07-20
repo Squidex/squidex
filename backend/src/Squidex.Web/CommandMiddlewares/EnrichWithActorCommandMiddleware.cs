@@ -20,7 +20,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithActorCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor);
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             this.httpContextAccessor = httpContextAccessor;
         }
@@ -43,10 +43,7 @@ namespace Squidex.Web.CommandMiddlewares
                     squidexCommand.Actor = actorToken ?? throw new DomainForbiddenException("No actor with subject or client id available.");
                 }
 
-                if (squidexCommand.User == null)
-                {
-                    squidexCommand.User = httpContextAccessor.HttpContext.User;
-                }
+                squidexCommand.User ??= httpContextAccessor.HttpContext.User;
             }
 
             return next(context);

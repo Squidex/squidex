@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Users;
 
 namespace Squidex.Config.Authentication
 {
@@ -18,9 +16,6 @@ namespace Squidex.Config.Authentication
         public static void AddSquidexAuthentication(this IServiceCollection services, IConfiguration config)
         {
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
-
-            services.AddSingletonAs<DefaultXmlRepository>()
-                .As<IXmlRepository>();
 
             services.AddAuthentication()
                 .AddSquidexCookies()

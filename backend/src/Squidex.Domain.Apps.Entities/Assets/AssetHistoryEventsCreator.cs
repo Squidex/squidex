@@ -30,11 +30,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            var channel = $"assets.{@event.Headers.AggregateId()}";
+            HistoryEvent? result = null;
 
-            var result = ForEvent(@event.Payload, channel);
+            if (@event.Payload is AssetEvent assetEvent)
+            {
+                var channel = $"assets.{assetEvent.AssetId}";
 
-            return Task.FromResult<HistoryEvent?>(result);
+                result = ForEvent(@event.Payload, channel);
+            }
+
+            return Task.FromResult(result);
         }
     }
 }

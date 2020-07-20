@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Security
 {
@@ -31,7 +32,7 @@ namespace Squidex.Infrastructure.Security
 
         public Permission(string id)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             this.id = id;
         }
@@ -112,7 +113,7 @@ namespace Squidex.Infrastructure.Security
             return id;
         }
 
-        public int CompareTo(Permission other)
+        public int CompareTo([AllowNull] Permission other)
         {
             return other == null ? -1 : string.Compare(id, other.id, StringComparison.Ordinal);
         }

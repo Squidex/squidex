@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var result = new NamedContentData(content.Count);
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var result = new NamedContentData(content.Count);
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static IdContentData ConvertName2IdCloned(this NamedContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema);
+            Guard.NotNull(schema, nameof(schema));
 
             var result = new IdContentData(content.Count);
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             if (field is IArrayField arrayField)
             {
-                foreach (var (key, value) in data)
+                foreach (var (_, value) in data)
                 {
                     if (value is JsonArray array)
                     {

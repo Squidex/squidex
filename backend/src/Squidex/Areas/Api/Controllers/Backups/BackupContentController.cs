@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetBackupContent(string app, Guid id)
+        public async Task<IActionResult> GetBackupContent(string app, string id)
         {
             var backup = await backupservice.GetBackupAsync(AppId, id);
 

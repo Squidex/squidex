@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -21,14 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType?, ValueResolver?, QueryArguments?)>
     {
         private static readonly ValueResolver NoopResolver = (value, c) => value;
-        private readonly Dictionary<Guid, ContentGraphType> schemaTypes;
+        private readonly Dictionary<DomainId, ContentGraphType> schemaTypes;
         private readonly ISchemaEntity schema;
         private readonly IGraphModel model;
         private readonly IGraphType assetListType;
         private readonly string fieldName;
 
         public QueryGraphTypeVisitor(ISchemaEntity schema,
-            Dictionary<Guid, ContentGraphType> schemaTypes,
+            Dictionary<DomainId, ContentGraphType> schemaTypes,
             IGraphModel model,
             IGraphType assetListType,
             string fieldName)

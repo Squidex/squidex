@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,12 +22,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly IRulesByAppIndexGrain index = A.Fake<IRulesByAppIndexGrain>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RulesIndex sut;
 
         public RulesIndexTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.Id, null))
+            A.CallTo(() => grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.Id.ToString(), null))
                 .Returns(index);
 
             sut = new RulesIndex(grainFactory);
@@ -37,10 +36,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_resolve_rules_by_id()
         {
-            var rule = SetupRule(0, false);
+            var rule = SetupRule(0);
 
             A.CallTo(() => index.GetIdsAsync())
-                .Returns(new List<Guid> { rule.Id });
+                .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
@@ -50,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_return_empty_rule_if_rule_not_created()
         {
-            var rule = SetupRule(-1, false);
+            var rule = SetupRule(-1);
 
             A.CallTo(() => index.GetIdsAsync())
-                .Returns(new List<Guid> { rule.Id });
+                .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
@@ -63,10 +62,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_return_empty_rule_if_rule_deleted()
         {
-            var rule = SetupRule(-1, false);
+            var rule = SetupRule(-1);
 
             A.CallTo(() => index.GetIdsAsync())
-                .Returns(new List<Guid> { rule.Id });
+                .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
@@ -76,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_add_rule_to_index_on_create()
         {
-            var ruleId = Guid.NewGuid();
+            var ruleId = DomainId.NewGuid();
 
             var command = new CreateRule { RuleId = ruleId, AppId = appId };
 
@@ -93,9 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_remove_rule_from_index_on_delete()
         {
-            var rule = SetupRule(0, false);
+            var rule = SetupRule(0);
 
-            var command = new DeleteRule { RuleId = rule.Id };
+            var command = new DeleteRule { RuleId = rule.Id, AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         [Fact]
         public async Task Should_forward_call_when_rebuilding()
         {
-            var rules = new HashSet<Guid>();
+            var rules = new HashSet<DomainId>();
 
             await sut.RebuildAsync(appId.Id, rules);
 
@@ -118,17 +117,19 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                 .MustHaveHappened();
         }
 
-        private IRuleEntity SetupRule(long version, bool deleted)
+        private IRuleEntity SetupRule(long version)
         {
-            var ruleId = Guid.NewGuid();
+            var ruleId = DomainId.NewGuid();
 
-            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version, IsDeleted = deleted };
+            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version };
             var ruleGrain = A.Fake<IRuleGrain>();
 
             A.CallTo(() => ruleGrain.GetStateAsync())
                 .Returns(J.Of<IRuleEntity>(ruleEntity));
 
-            A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(ruleId, null))
+            var key = DomainId.Combine(appId, ruleId).ToString();
+
+            A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(key, null))
                 .Returns(ruleGrain);
 
             return ruleEntity;

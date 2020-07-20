@@ -16,11 +16,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return new JsonSchema { Type = JsonObjectType.Object };
         }
 
-        public static JsonSchema Guid()
-        {
-            return new JsonSchema { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid };
-        }
-
         public static JsonSchema String()
         {
             return new JsonSchema { Type = JsonObjectType.String };
@@ -39,11 +34,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         public static JsonSchemaProperty DateTimeProperty(string? description = null, bool isRequired = false)
         {
             return Enrich(new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime }, description, isRequired);
-        }
-
-        public static JsonSchemaProperty GuidProperty(string? description = null, bool isRequired = false)
-        {
-            return Enrich(new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid }, description, isRequired);
         }
 
         public static JsonSchemaProperty NumberProperty(string? description = null, bool isRequired = false)

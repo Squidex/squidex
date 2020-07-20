@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The id of the content when the import succeeds.
         /// </summary>
-        public Guid? ContentId { get; set; }
+        public DomainId? ContentId { get; set; }
 
         public static BulkResultDto FromImportResult(BulkUpdateResultItem result, HttpContext httpContext)
         {

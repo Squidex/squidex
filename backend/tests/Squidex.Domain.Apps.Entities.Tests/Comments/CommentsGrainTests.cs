@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
-        private readonly Guid commentsId = Guid.NewGuid();
-        private readonly Guid commentId = Guid.NewGuid();
+        private readonly DomainId commentsId = DomainId.NewGuid();
+        private readonly DomainId commentId = DomainId.NewGuid();
         private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
         private readonly CommentsGrain sut;
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult { Version = 2 });
             sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult
             {
-                DeletedComments = new List<Guid>
+                DeletedComments = new List<DomainId>
                 {
                     commentId
                 },
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             });
             sut.GetCommentsAsync(1).Result.Should().BeEquivalentTo(new CommentsResult
             {
-                DeletedComments = new List<Guid>
+                DeletedComments = new List<DomainId>
                 {
                     commentId
                 },
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         protected T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
         {
             @event.Actor = actor;
-            @event.CommentsId = commentsId.ToString();
+            @event.CommentsId = commentsId;
             @event.CommentId = commentId;
 
             return @event;
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         protected T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
             command.Actor = actor;
-            command.CommentsId = commentsId.ToString();
+            command.CommentsId = commentsId;
             command.CommentId = commentId;
 
             return command;

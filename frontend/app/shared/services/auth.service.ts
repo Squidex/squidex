@@ -28,6 +28,10 @@ export class Profile {
         return this.user.profile['urn:squidex:picture'];
     }
 
+    public get notifoToken(): string | undefined {
+        return this.user.profile['urn:squidex:notifo'];
+    }
+
     public get isExpired(): boolean {
         return this.user.expired || false;
     }

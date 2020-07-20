@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -18,16 +17,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class ValueConvertersTests
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly Guid id1 = Guid.NewGuid();
-        private readonly Guid id2 = Guid.NewGuid();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly DomainId id1 = DomainId.NewGuid();
+        private readonly DomainId id2 = DomainId.NewGuid();
         private readonly RootField<StringFieldProperties> stringField = Fields.String(1, "1", Partitioning.Invariant);
         private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
 
         public ValueConvertersTests()
         {
-            A.CallTo(() => urlGenerator.AssetContent(A<Guid>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<Guid>(0)}");
+            A.CallTo(() => urlGenerator.AssetContent(appId, A<DomainId>._))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<DomainId>(1)}");
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var result = ValueConverters.ResolveAssetUrls(HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = source;
 
-            var result = ValueConverters.ResolveAssetUrls(HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
 
             Assert.Equal(expected, result);
         }
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var result = ValueConverters.ResolveAssetUrls(HashSet.Of(path), urlGenerator)(source, field.Fields[0], field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field.Fields[0], field);
 
             Assert.Equal(expected, result);
         }
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = source;
 
-            var result = ValueConverters.ResolveAssetUrls(HashSet.Of(path), urlGenerator)(source, field.Fields[0], field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field.Fields[0], field);
 
             Assert.Equal(expected, result);
         }

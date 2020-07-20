@@ -31,13 +31,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [TypeName(nameof(MyEvent))]
         public sealed class MyEvent : IEvent
         {
-            public Guid GuidRaw { get; set; }
+            public DomainId DomainIdRaw { get; set; }
 
-            public Guid GuidEmpty { get; set; }
+            public DomainId DomainIdEmpty { get; set; }
 
-            public NamedId<Guid> GuidNamed { get; set; }
+            public NamedId<DomainId> DomainIdNamed { get; set; }
 
-            public Dictionary<Guid, string> Values { get; set; }
+            public Dictionary<DomainId, string> Values { get; set; }
         }
 
         public BackupReaderWriterTests()
@@ -45,9 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             typeNameRegistry.Map(typeof(MyEvent));
 
             formatter = new DefaultEventDataFormatter(typeNameRegistry, serializer);
-
-            A.CallTo(() => streamNameResolver.WithNewId(A<string>._, A<Func<string, string>>._))
-                .ReturnsLazily(new Func<string, Func<string, string>, string>((stream, idGenerator) => stream + "^2"));
         }
 
         [Theory]
@@ -58,16 +55,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             var stream = new MemoryStream();
 
             var random = new Random();
-            var randomGuids = new List<Guid>();
+            var randomDomainIds = new List<DomainId>();
 
             for (var i = 0; i < 100; i++)
             {
-                randomGuids.Add(Guid.NewGuid());
+                randomDomainIds.Add(DomainId.NewGuid());
             }
 
-            Guid RandomGuid()
+            DomainId RandomDomainId()
             {
-                return randomGuids[random.Next(randomGuids.Count)];
+                return randomDomainIds[random.Next(randomDomainIds.Count)];
             }
 
             var sourceEvents = new List<(string Stream, Envelope<IEvent> Event)>();
@@ -76,21 +73,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var @event = new MyEvent
                 {
-                    GuidNamed = NamedId.Of(RandomGuid(), $"name{i}"),
-                    GuidRaw = RandomGuid(),
-                    Values = new Dictionary<Guid, string>
+                    DomainIdNamed = NamedId.Of(RandomDomainId(), $"name{i}"),
+                    DomainIdRaw = RandomDomainId(),
+                    Values = new Dictionary<DomainId, string>
                     {
-                        [RandomGuid()] = "Key"
+                        [RandomDomainId()] = "Key"
                     }
                 };
 
                 var envelope = Envelope.Create<IEvent>(@event);
 
-                envelope.Headers.Add(RandomGuid().ToString(), i);
-                envelope.Headers.Add("Id", RandomGuid().ToString());
+                envelope.Headers.Add(RandomDomainId().ToString(), i);
+                envelope.Headers.Add("Id", RandomDomainId().ToString());
                 envelope.Headers.Add("Index", i);
 
-                sourceEvents.Add(($"My-{RandomGuid()}", envelope));
+                sourceEvents.Add(($"My-{RandomDomainId()}", envelope));
             }
 
             using (var writer = new BackupWriter(serializer, stream, true, version))
@@ -151,24 +148,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     targetEvents.Add(@event);
                 });
 
-                void CompareGuid(Guid source, Guid target)
-                {
-                    Assert.Equal(source, reader.OldGuid(target));
-                    Assert.NotEqual(source, target);
-                }
-
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
                     var target = targetEvents[i].Event.To<MyEvent>();
 
                     var source = sourceEvents[i].Event.To<MyEvent>();
 
-                    CompareGuid(source.Payload.Values.First().Key, target.Payload.Values.First().Key);
-                    CompareGuid(source.Payload.GuidRaw, target.Payload.GuidRaw);
-                    CompareGuid(source.Payload.GuidNamed.Id, target.Payload.GuidNamed.Id);
-                    CompareGuid(source.Headers.GetGuid("Id"), target.Headers.GetGuid("Id"));
+                    Assert.Equal(source.Payload.Values.First().Key, target.Payload.Values.First().Key);
+                    Assert.Equal(source.Payload.DomainIdRaw, target.Payload.DomainIdRaw);
+                    Assert.Equal(source.Payload.DomainIdNamed.Id, target.Payload.DomainIdNamed.Id);
 
-                    Assert.Equal(Guid.Empty, target.Payload.GuidEmpty);
+                    Assert.Equal(DomainId.Empty, target.Payload.DomainIdEmpty);
                 }
             }
         }

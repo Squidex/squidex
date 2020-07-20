@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public Task DoAsync(Instant now, Func<IContentEntity, Task> callback)
         {
-            Guard.NotNull(callback);
+            Guard.NotNull(callback, nameof(callback));
 
             return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true)
                 .Not(x => x.DataByIds)

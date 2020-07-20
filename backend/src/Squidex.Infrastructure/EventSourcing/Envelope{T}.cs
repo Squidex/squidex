@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope(T payload, EnvelopeHeaders? headers = null)
         {
-            Guard.NotNull(payload);
+            Guard.NotNull(payload, nameof(payload));
 
             this.payload = payload;
 
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<TOther> To<TOther>() where TOther : class, IEvent
         {
-            return new Envelope<TOther>((payload as TOther)!, headers.Clone());
+            return new Envelope<TOther>((payload as TOther)!, headers.CloneHeaders());
         }
 
         public static implicit operator Envelope<IEvent>(Envelope<T> source)

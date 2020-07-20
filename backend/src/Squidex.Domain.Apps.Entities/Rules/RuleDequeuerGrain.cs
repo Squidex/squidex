@@ -26,16 +26,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
-        private readonly ConcurrentDictionary<Guid, bool> executing = new ConcurrentDictionary<Guid, bool>();
+        private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly IClock clock;
         private readonly ISemanticLog log;
 
         public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
         {
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(ruleService);
-            Guard.NotNull(clock);
-            Guard.NotNull(log);
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(ruleService, nameof(ruleService));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(log, nameof(log));
 
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                     ExecutionResult = response.Status,
                     Finished = now,
                     JobNext = jobDelay,
-                    JobResult = ComputeJobResult(response.Status, jobDelay),
+                    JobResult = jobResult
                 };
 
                 await ruleEventRepository.UpdateAsync(@event.Job, update);

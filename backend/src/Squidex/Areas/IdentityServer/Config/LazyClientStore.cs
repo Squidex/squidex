@@ -40,10 +40,10 @@ namespace Squidex.Areas.IdentityServer.Config
             IOptions<MyIdentityOptions> identityOptions,
             IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(identityOptions);
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(urlsOptions);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(identityOptions, nameof(identityOptions));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
             this.serviceProvider = serviceProvider;
 
@@ -65,7 +65,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
             if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
             {
-                var app = await appProvider.GetAppAsync(appName);
+                var app = await appProvider.GetAppAsync(appName, true);
 
                 var appClient = app?.Clients.GetOrDefault(appClientId);
 

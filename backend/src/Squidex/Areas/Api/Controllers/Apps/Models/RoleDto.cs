@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public RoleDto WithLinks(Resources resources)
         {
-            var values = new { app = resources.App, name = Name };
+            var values = new { app = resources.App, roleName = Name };
 
             if (!IsDefaultRole)
             {

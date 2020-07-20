@@ -14,16 +14,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IBackupService
     {
-        Task StartBackupAsync(Guid appId, RefToken actor);
+        Task StartBackupAsync(DomainId appId, RefToken actor);
 
         Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName);
 
         Task<IRestoreJob?> GetRestoreAsync();
 
-        Task<List<IBackupJob>> GetBackupsAsync(Guid appId);
+        Task<List<IBackupJob>> GetBackupsAsync(DomainId appId);
 
-        Task<IBackupJob?> GetBackupAsync(Guid appId, Guid backupId);
+        Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId);
 
-        Task DeleteBackupAsync(Guid appId, Guid backupId);
+        Task DeleteBackupAsync(DomainId appId, DomainId backupId);
     }
 }

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         public AppPattern(string name, string pattern, string? message = null)
             : base(name)
         {
-            Guard.NotNullOrEmpty(pattern);
+            Guard.NotNullOrEmpty(pattern, nameof(pattern));
 
             Pattern = pattern;
 

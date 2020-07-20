@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,9 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly NamedId<long> nestedId = NamedId.Of(2L, "age");
         private readonly SchemaDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return SchemaId; }
+            get { return DomainId.Combine(AppId, SchemaId); }
         }
 
         public SchemaDomainObjectTests()
@@ -695,7 +694,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateSchema { Name = SchemaName });
+            return PublishAsync(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
         }
 
         private Task ExecuteAddArrayFieldAsync()
@@ -743,7 +742,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
         }
 
-        private async Task<object?> PublishIdempotentAsync(SchemaCommand command)
+        private async Task<object?> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             var result = await PublishAsync(command);
 
@@ -758,7 +757,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return result;
         }
 
-        private async Task<object?> PublishAsync(SchemaCommand command)
+        private async Task<object?> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 

@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class DeleteWorkflow : AppCommand
+    public sealed class DeleteWorkflow : AppUpdateCommand
     {
-        public Guid WorkflowId { get; set; }
+        public DomainId WorkflowId { get; set; }
     }
 }

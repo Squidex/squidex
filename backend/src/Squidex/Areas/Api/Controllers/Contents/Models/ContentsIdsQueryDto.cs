@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -17,6 +17,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The list of ids to query.
         /// </summary>
         [Required]
-        public List<Guid> Ids { get; set; }
+        public List<DomainId> Ids { get; set; }
     }
 }

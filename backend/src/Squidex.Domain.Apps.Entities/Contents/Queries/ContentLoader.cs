@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
@@ -19,25 +18,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentLoader(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity> GetAsync(Guid id, long version)
+        public async Task<IContentEntity> GetAsync(DomainId appId, DomainId id, long version)
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
-                var grain = grainFactory.GetGrain<IContentGrain>(id);
+                var key = DomainId.Combine(appId, id).ToString();
 
-                var content = await grain.GetStateAsync(version);
+                var contentGrain = grainFactory.GetGrain<IContentGrain>(key);
+                var contentState = await contentGrain.GetStateAsync(version);
 
-                if (content.Value == null || (version > EtagVersion.Any && content.Value.Version != version))
+                var content = contentState.Value;
+
+                if (content == null || content.Version <= EtagVersion.Empty || (version > EtagVersion.Any && content.Version != version))
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return content.Value;
+                return content;
             }
         }
     }

@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class RemoveContributor : AppCommand
+    public sealed class RemoveContributor : AppUpdateCommand
     {
         public string ContributorId { get; set; }
     }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,20 +14,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetFileStore
     {
-        string? GeneratePublicUrl(Guid id, long fileVersion);
+        string? GeneratePublicUrl(DomainId appId, DomainId id, long fileVersion);
 
-        Task<long> GetFileSizeAsync(Guid id, long fileVersion, CancellationToken ct = default);
+        Task<long> GetFileSizeAsync(DomainId appId, DomainId id, long fileVersion, CancellationToken ct = default);
 
-        Task CopyAsync(string tempFile, Guid id, long fileVersion, CancellationToken ct = default);
+        Task CopyAsync(string tempFile, DomainId appId, DomainId id, long fileVersion, CancellationToken ct = default);
 
         Task UploadAsync(string tempFile, Stream stream, CancellationToken ct = default);
 
-        Task UploadAsync(Guid id, long fileVersion, Stream stream, CancellationToken ct = default);
+        Task UploadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream, CancellationToken ct = default);
 
-        Task DownloadAsync(Guid id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default);
+        Task DownloadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default);
 
         Task DeleteAsync(string tempFile);
 
-        Task DeleteAsync(Guid id, long fileVersion);
+        Task DeleteAsync(DomainId appId, DomainId id, long fileVersion);
     }
 }

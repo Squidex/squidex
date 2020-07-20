@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task TrackUsagesAsync(UsageUpdate update)
         {
-            Guard.NotNull(update);
+            Guard.NotNull(update, nameof(update));
 
             if (update.Counters.Count > 0)
             {

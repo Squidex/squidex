@@ -23,6 +23,8 @@ namespace Squidex.Infrastructure.Assets
 
         public float? FocusY { get; set; }
 
+        public bool KeepFormat { get; set; }
+
         public bool IsValid
         {
             get { return Width > 0 || Height > 0 || Quality > 0; }

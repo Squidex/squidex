@@ -9,7 +9,7 @@
 
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MathHelper, StatefulControlComponent, Types } from '@app/framework/internal';
+import { getTagValues, MathHelper, StatefulControlComponent, TagValue, Types } from '@app/framework/internal';
 
 export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true
@@ -19,7 +19,10 @@ let CACHED_FONT: string;
 
 interface State {
     // The checked values.
-    checkedValues: ReadonlyArray<string>;
+    checkedValues: ReadonlyArray<TagValue>;
+
+    // True when all checkboxes can be shown as single line.
+    isSingleLine?: boolean;
 }
 
 @Component({
@@ -33,18 +36,23 @@ interface State {
 })
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked, OnChanges {
     private childrenWidth = 0;
+    private checkedValuesRaw: any;
     private containerWidth = 0;
     private labelsMeasured = false;
 
     public readonly controlId = MathHelper.guid();
 
-    public isSingleLine = false;
-
     @ViewChild('container', { static: false })
     public containerElement: ElementRef<HTMLDivElement>;
 
     @Input()
-    public values: ReadonlyArray<string> = [];
+    public set values(value: ReadonlyArray<string | TagValue>) {
+        this.valuesSorted = getTagValues(value);
+
+        this.writeValue(this.checkedValuesRaw);
+    }
+
+    public valuesSorted: ReadonlyArray<TagValue> = [];
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
@@ -97,9 +105,9 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
                 let width = 0;
 
-                for (let text of this.values) {
+                for (const value of this.valuesSorted) {
                     width += 30;
-                    width += ctx.measureText(text).width;
+                    width += ctx.measureText(value.name).width;
                 }
 
                 this.childrenWidth = width;
@@ -112,7 +120,9 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     }
 
     private calculateSingleLine() {
-        this.isSingleLine = this.childrenWidth < this.containerWidth;
+        const isSingleLine = this.childrenWidth < this.containerWidth;
+
+        this.next({ isSingleLine });
     }
 
     private calculateStyle() {
@@ -135,12 +145,18 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     }
 
     public writeValue(obj: any) {
-        const checkedValues = Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [];
+        this.checkedValuesRaw = obj;
+
+        let checkedValues: TagValue[] = [];
+
+        if (Types.isArray(obj) && obj.length > 0) {
+            checkedValues = this.valuesSorted.filter(x => obj.indexOf(x.value) >= 0);
+        }
 
         this.next(s => ({ ...s, checkedValues }));
     }
 
-    public check(isChecked: boolean, value: string) {
+    public check(isChecked: boolean, value: TagValue) {
         let checkedValues = this.snapshot.checkedValues;
 
         if (isChecked) {
@@ -151,10 +167,10 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
         this.next(s => ({ ...s, checkedValues }));
 
-        this.callChange([...checkedValues]);
+        this.callChange(checkedValues.map(x => x.id));
     }
 
-    public isChecked(value: string) {
+    public isChecked(value: TagValue) {
         return this.snapshot.checkedValues.indexOf(value) >= 0;
     }
 }

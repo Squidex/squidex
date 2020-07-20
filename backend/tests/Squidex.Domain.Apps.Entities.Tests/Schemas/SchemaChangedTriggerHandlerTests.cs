@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -31,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
             sut = new SchemaChangedTriggerHandler(scriptEngine);
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new AppCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new AppCreated(), trigger, DomainId.NewGuid());
 
                 Assert.False(result);
             });
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new SchemaCreated(), trigger, Guid.NewGuid());
+                var result = sut.Trigger(new SchemaCreated(), trigger, DomainId.NewGuid());
 
                 Assert.True(result);
             });
@@ -136,12 +137,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
         }

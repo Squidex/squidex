@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,9 +32,25 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_get_app()
         {
+            var w = Stopwatch.StartNew();
+
             var app = await _.Apps.GetAppAsync(_.AppName);
 
             Assert.Equal(_.AppName, app.Name);
+
+            w.Stop();
+
+            Debug.WriteLine("ELAPSED: {0}", w.Elapsed);
+
+            var w2 = Stopwatch.StartNew();
+
+            app = await _.Apps.GetAppAsync(_.AppName);
+
+            Assert.Equal(_.AppName, app.Name);
+
+            w2.Stop();
+
+            Debug.WriteLine("ELAPSED: {0}", w2.Elapsed);
         }
 
         [Fact]
@@ -186,7 +203,7 @@ namespace TestSuite.ApiTests
         {
             var roleName = Guid.NewGuid().ToString();
             var roleClient = Guid.NewGuid().ToString();
-            var roleContributor1 = "role@squidex.io";
+            var roleContributor1 = "role1@squidex.io";
             var roleContributor2 = "role2@squidex.io";
 
             // STEP 1: Add role.

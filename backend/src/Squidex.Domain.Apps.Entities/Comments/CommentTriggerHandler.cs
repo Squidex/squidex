@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
         {
-            Guard.NotNull(scriptEngine);
-            Guard.NotNull(userResolver);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             this.scriptEngine = scriptEngine;
 
@@ -76,12 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 return true;
             }
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["event"] = @event
             };
 
-            return scriptEngine.Evaluate(context, trigger.Condition);
+            return scriptEngine.Evaluate(vars, trigger.Condition);
         }
     }
 }

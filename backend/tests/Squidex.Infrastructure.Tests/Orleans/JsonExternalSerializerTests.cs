@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Orleans
             }
         }
 
-        private static DeserializationContext CreateReader(MemoryStream buffer)
+        private static IDeserializationContext CreateReader(MemoryStream buffer)
         {
             var reader = A.Fake<IBinaryTokenStreamReader>();
 
@@ -89,10 +89,15 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => reader.Length)
                 .ReturnsLazily(x => (int)buffer.Length);
 
-            return new DeserializationContext(null) { StreamReader = reader };
+            var context = A.Fake<IDeserializationContext>();
+
+            A.CallTo(() => context.StreamReader)
+                .Returns(reader);
+
+            return context;
         }
 
-        private static SerializationContext CreateWriter(MemoryStream buffer)
+        private static ISerializationContext CreateWriter(MemoryStream buffer)
         {
             var writer = A.Fake<IBinaryTokenStreamWriter>();
 
@@ -101,7 +106,12 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => writer.CurrentOffset)
                 .ReturnsLazily(x => (int)buffer.Position);
 
-            return new SerializationContext(null) { StreamWriter = writer };
+            var context = A.Fake<ISerializationContext>();
+
+            A.CallTo(() => context.StreamWriter)
+                .Returns(writer);
+
+            return context;
         }
 
         private static List<int> ArrayOfLength(int length)

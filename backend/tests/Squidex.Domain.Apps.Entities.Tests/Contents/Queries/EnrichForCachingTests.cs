@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly ISchemaEntity schema;
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly Context requestContext;
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
         private readonly EnrichForCaching sut;
 
@@ -69,19 +69,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
 
-            A.CallTo(() => requestCache.AddDependency(content.Id, content.Version))
+            A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(schema.Id, schema.Version))
+            A.CallTo(() => requestCache.AddDependency(schema.UniqueId, schema.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(requestContext.App.Id, requestContext.App.Version))
+            A.CallTo(() => requestCache.AddDependency(requestContext.App.UniqueId, requestContext.App.Version))
                 .MustHaveHappened();
         }
 
         private ContentEntity CreateContent()
         {
-            return new ContentEntity { Id = Guid.NewGuid(), SchemaId = schemaId, Version = 13 };
+            return new ContentEntity { AppId = appId, Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
         }
     }
 }

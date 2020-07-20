@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
@@ -14,13 +15,20 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer
     {
-        private static volatile int isRegistered;
+        private static int isRegistered;
 
         public static void Register()
         {
             if (Interlocked.Increment(ref isRegistered) == 1)
             {
-                BsonSerializer.RegisterSerializer(new InstantSerializer());
+                try
+                {
+                    BsonSerializer.RegisterSerializer(new InstantSerializer());
+                }
+                catch (BsonSerializationException)
+                {
+                    return;
+                }
             }
         }
 

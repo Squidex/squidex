@@ -52,25 +52,25 @@ export class ArrayEditorComponent {
     }
 
     public collapseAll() {
-        this.children.forEach(component => {
-            component.collapse();
+        this.children.forEach(child => {
+            child.collapse();
         });
     }
 
     public expandAll() {
-        this.children.forEach(component => {
-            component.expand();
+        this.children.forEach(child => {
+            child.expand();
         });
     }
 
     private reset() {
-        this.children.forEach(component => {
-            component.reset();
+        this.children.forEach(child => {
+            child.reset();
         });
     }
 
     public move(control: AbstractControl, index: number) {
-        let controls = [...this.arrayControl.controls];
+        const controls = [...this.arrayControl.controls];
 
         controls.splice(controls.indexOf(control), 1);
         controls.splice(index, 0, control);

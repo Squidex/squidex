@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetRules), new { app }, response);
         }
@@ -160,11 +159,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
+        public async Task<IActionResult> PutRule(string app, string id, [FromBody] UpdateRuleDto request)
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -183,11 +182,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
-        public async Task<IActionResult> EnableRule(string app, Guid id)
+        public async Task<IActionResult> EnableRule(string app, string id)
         {
             var command = new EnableRule { RuleId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -206,11 +205,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DisableRule(string app, Guid id)
+        public async Task<IActionResult> DisableRule(string app, string id)
         {
             var command = new DisableRule { RuleId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -228,7 +227,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/{id}/trigger/")]
         [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
-        public async Task<IActionResult> TriggerRule(string app, Guid id)
+        public async Task<IActionResult> TriggerRule(string app, string id)
         {
             var command = new TriggerRule { RuleId = id };
 
@@ -250,7 +249,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(204)]
         [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRuleRun(string app, Guid id)
+        public async Task<IActionResult> PutRuleRun(string app, string id)
         {
             await ruleRunnerService.RunAsync(App.Id, id);
 
@@ -270,7 +269,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/{id}/")]
         [ApiPermission(Permissions.AppRulesDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteRule(string app, Guid id)
+        public async Task<IActionResult> DeleteRule(string app, string id)
         {
             await CommandBus.PublishAsync(new DeleteRule { RuleId = id });
 
@@ -293,9 +292,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
         [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetEvents(string app, [FromQuery] Guid? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<IActionResult> GetEvents(string app, [FromQuery] string? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
+            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, DomainId.CreateNullable(ruleId), skip, take);
 
             var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources);
 
@@ -315,7 +314,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/events/{id}/")]
         [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutEvent(string app, Guid id)
+        public async Task<IActionResult> PutEvent(string app, string id)
         {
             var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
@@ -342,7 +341,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/events/{id}/")]
         [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteEvent(string app, Guid id)
+        public async Task<IActionResult> DeleteEvent(string app, string id)
         {
             var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
@@ -356,7 +355,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             return NoContent();
         }
 
-        private async Task<RuleDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<RuleDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

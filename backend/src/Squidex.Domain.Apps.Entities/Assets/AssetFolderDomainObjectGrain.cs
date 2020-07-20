@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task OnActivateAsync(Guid key)
+        protected override Task OnActivateAsync(string key)
         {
             TryDelayDeactivation(Lifetime);
 

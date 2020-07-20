@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             consumers.Add(new EventConsumerInfo
             {
-                Name = "Consumer1",
+                Name = "Consumer1"
             });
 
             consumers.Add(new EventConsumerInfo

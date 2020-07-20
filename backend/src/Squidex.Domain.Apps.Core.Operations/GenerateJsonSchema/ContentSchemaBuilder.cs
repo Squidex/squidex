@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
     {
         public JsonSchema CreateContentSchema(Schema schema, JsonSchema dataSchema)
         {
-            Guard.NotNull(schema);
-            Guard.NotNull(dataSchema);
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(dataSchema, nameof(dataSchema));
 
             var schemaName = schema.Properties.Label.WithFallback(schema.Name);
 
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             {
                 Properties =
                 {
-                    ["id"] = SchemaBuilder.GuidProperty($"The id of the {schemaName} content.", true),
+                    ["id"] = SchemaBuilder.StringProperty($"The id of the {schemaName} content.", true),
                     ["data"] = SchemaBuilder.ObjectProperty(dataSchema, $"The data of the {schemaName}.", true),
                     ["dataDraft"] = SchemaBuilder.ObjectProperty(dataSchema, $"The draft data of the {schemaName}."),
                     ["version"] = SchemaBuilder.NumberProperty($"The version of the {schemaName}.", true),

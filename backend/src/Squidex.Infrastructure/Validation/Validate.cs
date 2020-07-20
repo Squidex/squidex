@@ -19,11 +19,7 @@ namespace Squidex.Infrastructure.Validation
 
             var addValidation = new AddValidation((m, p) =>
             {
-                if (errors == null)
-                {
-                    errors = new List<ValidationError>();
-                }
-
+                errors ??= new List<ValidationError>();
                 errors.Add(new ValidationError(m, p));
             });
 
@@ -41,11 +37,7 @@ namespace Squidex.Infrastructure.Validation
 
             var addValidation = new AddValidation((m, p) =>
             {
-                if (errors == null)
-                {
-                    errors = new List<ValidationError>();
-                }
-
+                errors ??= new List<ValidationError>();
                 errors.Add(new ValidationError(m, p));
             });
 

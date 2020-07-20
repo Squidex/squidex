@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = assetType,
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var assetId = c.GetArgument<Guid>("id");
+                    var assetId = c.GetArgument<string>("id");
 
                     return e.FindAssetAsync(assetId);
                 }),
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = contentType,
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var contentId = c.GetArgument<Guid>("id");
+                    var contentId = c.GetArgument<string>("id");
 
                     return e.FindContentAsync(contentId);
                 }),
@@ -104,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
+        private void AddContentQueries(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
         {
             AddField(new FieldType
             {
@@ -142,9 +143,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = "The id of the asset (GUID).",
+                    Description = "The id of the asset (DomainId).",
                     DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.NonNullGuid
+                    ResolvedType = AllTypes.NonNullDomainId
                 }
             };
         }
@@ -156,9 +157,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = $"The id of the {schemaName} content (GUID)",
+                    Description = $"The id of the {schemaName} content (DomainId)",
                     DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.NonNullGuid
+                    ResolvedType = AllTypes.NonNullDomainId
                 }
             };
         }

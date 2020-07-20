@@ -21,8 +21,8 @@ namespace Squidex.Infrastructure.Assets
 
         public FolderAssetStore(string path, ISemanticLog log)
         {
-            Guard.NotNullOrEmpty(path);
-            Guard.NotNull(log);
+            Guard.NotNullOrEmpty(path, nameof(path));
+            Guard.NotNull(log, nameof(log));
 
             this.log = log;
 
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, BytesRange range, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             var file = GetFile(fileName, nameof(fileName));
 
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNull(stream);
+            Guard.NotNull(stream, nameof(stream));
 
             var file = GetFile(fileName, nameof(fileName));
 

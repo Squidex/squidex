@@ -8,24 +8,29 @@ ARG SQUIDEX__VERSION=4.0.0
 WORKDIR /src
 
 # Copy nuget project files.
-COPY backend/**/**/*.csproj /tmp/
-# Copy nuget.config for package sources.
-COPY backend/NuGet.Config /tmp/
+COPY backend/*.sln backend/NuGet.Config  ./
 
-# Install nuget packages
-RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
+# Copy the main source project files
+COPY backend/src/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
+
+# Copy the test project files
+COPY backend/tests/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
+
+# Copy the extension project files
+COPY backend/extensions/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p extensions/${file%.*}/ && mv $file extensions/${file%.*}/; done
+
+RUN dotnet restore
 
 COPY backend .
  
 # Test Backend
-RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies \ 
- && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj --filter Category!=Dependencies \ 
- && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj --filter Category!=Dependencies \
- && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj --filter Category!=Dependencies \
- && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj --filter Category!=Dependencies
+RUN dotnet test --no-restore --filter Category!=Dependencies
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION
+RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION
 
 
 #

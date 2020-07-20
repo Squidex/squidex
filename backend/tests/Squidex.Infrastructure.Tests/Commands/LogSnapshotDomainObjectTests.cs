@@ -21,15 +21,15 @@ namespace Squidex.Infrastructure.Commands
 {
     public class LogSnapshotDomainObjectTests
     {
-        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly ISnapshotStore<MyDomainState, Guid> snapshotStore = A.Fake<ISnapshotStore<MyDomainState, Guid>>();
+        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
+        private readonly ISnapshotStore<MyDomainState, DomainId> snapshotStore = A.Fake<ISnapshotStore<MyDomainState, DomainId>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
-        private readonly Guid id = Guid.NewGuid();
+        private readonly DomainId id = DomainId.NewGuid();
         private readonly MyLogDomainObject sut;
 
         public sealed class MyLogDomainObject : LogSnapshotDomainObject<MyDomainState>
         {
-            public MyLogDomainObject(IStore<Guid> store)
+            public MyLogDomainObject(IStore<DomainId> store)
                : base(store, A.Dummy<ISemanticLog>())
             {
             }
@@ -147,7 +147,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.True(result is EntityCreatedResult<Guid>);
+            Assert.True(result is EntityCreatedResult<DomainId>);
 
             Assert.Empty(sut.GetUncomittedEvents());
 
@@ -217,7 +217,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_rebuild_state_async()
+        public async Task Should_rebuild_state()
         {
             SetupCreated(4);
 
@@ -227,6 +227,14 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_on_rebuild_when_no_event_found()
+        {
+            SetupEmpty();
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.RebuildStateAsync());
         }
 
         [Fact]
@@ -293,7 +301,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupEmpty();
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<Guid>._, A<MyDomainState>._, -1, 0))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<MyDomainState>._, -1, 0))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
@@ -309,7 +317,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<Guid>._, A<MyDomainState>._, 0, 1))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<MyDomainState>._, 0, 1))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto()));

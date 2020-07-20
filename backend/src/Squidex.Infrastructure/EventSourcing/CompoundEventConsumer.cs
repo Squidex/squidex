@@ -25,8 +25,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CompoundEventConsumer(IEventConsumer[] inners)
         {
-            Guard.NotNull(inners);
-            Guard.NotEmpty(inners);
+            Guard.NotNull(inners, nameof(inners));
+            Guard.NotEmpty(inners, nameof(inners));
 
             this.inners = inners;
 
@@ -41,9 +41,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CompoundEventConsumer(string name, IEventConsumer first, params IEventConsumer[] inners)
         {
-            Guard.NotNull(first);
-            Guard.NotNull(inners);
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNull(first, nameof(first));
+            Guard.NotNull(inners, nameof(inners));
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             this.inners = new[] { first }.Union(inners).ToArray();
 

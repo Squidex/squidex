@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class RevokeClient : AppCommand
+    public sealed class RevokeClient : AppUpdateCommand
     {
         public string Id { get; set; }
     }

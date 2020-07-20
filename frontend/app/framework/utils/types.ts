@@ -56,6 +56,10 @@ export module Types {
         return isArrayOf(value, v => isNumber(v));
     }
 
+    export function isArrayOfObject(value: any): value is Array<Object> {
+        return isArrayOf(value, v => isObject(v));
+    }
+
     export function isArrayOfString(value: any): value is Array<string> {
         return isArrayOf(value, v => isString(v));
     }
@@ -114,7 +118,7 @@ export module Types {
         } else if (Types.isObject(lhs)) {
             const result = {};
 
-            for (let key in any) {
+            for (const key in any) {
                 if (any.hasOwnProperty(key)) {
                     result[key] = clone(lhs[key]);
                 }
@@ -162,7 +166,7 @@ export module Types {
                 return false;
             }
 
-            for (let key in lhs) {
+            for (const key in lhs) {
                 if (lhs.hasOwnProperty(key)) {
                     if (!equals(lhs[key], rhs[key], lazyString)) {
                         return false;

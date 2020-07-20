@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class CompareFilter<TValue> : FilterNode<TValue>
@@ -17,15 +19,20 @@ namespace Squidex.Infrastructure.Queries
 
         public CompareFilter(PropertyPath path, CompareOperator @operator, TValue value)
         {
-            Guard.NotNull(path);
-            Guard.NotNull(value);
-            Guard.Enum(@operator);
+            Guard.NotNull(path, nameof(path));
+            Guard.NotNull(value, nameof(value));
+            Guard.Enum(@operator, nameof(@operator));
 
             Path = path;
 
             Operator = @operator;
 
             Value = value;
+        }
+
+        public override void AddFields(HashSet<string> fields)
+        {
+            fields.Add(Path.ToString());
         }
 
         public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)

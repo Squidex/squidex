@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class NegateFilter<TValue> : FilterNode<TValue>
@@ -13,9 +15,14 @@ namespace Squidex.Infrastructure.Queries
 
         public NegateFilter(FilterNode<TValue> filter)
         {
-            Guard.NotNull(filter);
+            Guard.NotNull(filter, nameof(filter));
 
             Filter = filter;
+        }
+
+        public override void AddFields(HashSet<string> fields)
+        {
+            Filter.AddFields(fields);
         }
 
         public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)

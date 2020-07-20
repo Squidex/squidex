@@ -34,13 +34,9 @@ namespace Squidex.Infrastructure.Log
 
         public void Listen(IDisposable hook)
         {
-            Guard.NotNull(hook);
+            Guard.NotNull(hook, nameof(hook));
 
-            if (hooks == null)
-            {
-                hooks = new List<IDisposable>(1);
-            }
-
+            hooks ??= new List<IDisposable>(1);
             hooks.Add(hook);
         }
 

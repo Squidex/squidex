@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public abstract class HandlerTestBase<TState>
     {
-        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
+        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
         private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
 
@@ -29,9 +29,9 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected RefToken ActorClient { get; } = new RefToken(RefTokenType.Client, "client");
 
-        protected Guid AppId { get; } = Guid.NewGuid();
+        protected DomainId AppId { get; } = DomainId.NewGuid();
 
-        protected Guid SchemaId { get; } = Guid.NewGuid();
+        protected DomainId SchemaId { get; } = DomainId.NewGuid();
 
         protected string AppName { get; } = "my-app";
 
@@ -39,19 +39,19 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected ClaimsPrincipal User { get; } = Mocks.FrontendUser();
 
-        protected NamedId<Guid> AppNamedId
+        protected NamedId<DomainId> AppNamedId
         {
             get { return NamedId.Of(AppId, AppName); }
         }
 
-        protected NamedId<Guid> SchemaNamedId
+        protected NamedId<DomainId> SchemaNamedId
         {
             get { return NamedId.Of(SchemaId, SchemaName); }
         }
 
-        protected abstract Guid Id { get; }
+        protected abstract DomainId Id { get; }
 
-        public IStore<Guid> Store
+        public IStore<DomainId> Store
         {
             get { return store; }
         }
@@ -81,11 +81,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             command.ExpectedVersion = EtagVersion.Any;
-
-            if (command.Actor == null)
-            {
-                command.Actor = Actor;
-            }
+            command.Actor ??= Actor;
 
             if (command.User == null && command.Actor.IsSubject)
             {

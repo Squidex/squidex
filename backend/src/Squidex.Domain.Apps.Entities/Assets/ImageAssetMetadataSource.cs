@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
         {
-            Guard.NotNull(assetThumbnailGenerator);
+            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
 
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }

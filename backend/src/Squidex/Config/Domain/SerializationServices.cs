@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01;
+using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core;
@@ -36,12 +36,14 @@ namespace Squidex.Config.Domain
                 new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new ContentFieldDataConverter(),
+                new DomainIdConverter(),
                 new EnvelopeHeadersConverter(),
                 new FilterConverter(),
                 new InstantConverter(),
                 new JsonValueConverter(),
                 new LanguageConverter(),
                 new LanguagesConfigConverter(),
+                new NamedDomainIdConverter(),
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),

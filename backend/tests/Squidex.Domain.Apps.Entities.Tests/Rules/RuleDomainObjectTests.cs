@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
@@ -26,12 +25,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
-        private readonly Guid ruleId = Guid.NewGuid();
+        private readonly DomainId ruleId = DomainId.NewGuid();
         private readonly RuleDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return ruleId; }
+            get { return DomainId.Combine(AppId, ruleId); }
         }
 
         public sealed class TestAction : RuleAction
@@ -165,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             Assert.Null(result);
 
-            A.CallTo(() => ruleEnqueuer.Enqueue(sut.Snapshot.RuleDef, sut.Id,
+            A.CallTo(() => ruleEnqueuer.Enqueue(sut.Snapshot.RuleDef, sut.Snapshot.Id,
                 A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
                 .MustHaveHappened();
         }

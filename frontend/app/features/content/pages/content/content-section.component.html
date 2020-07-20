@@ -1,0 +1,30 @@
+<div class="header" *ngIf="section.separator; let separator">
+    <div class="row no-gutters">
+        <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
+                <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
+            </button>
+        </div>
+        <div class="col">
+            <h3>{{separator!.displayName}}</h3>
+
+            <sqx-form-hint *ngIf="separator!.properties.hints?.length > 0">
+                {{separator!.properties.hints}}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>
+
+<div [class.hidden]="isCollapsed">
+    <sqx-content-field *ngFor="let field of section.fields; trackBy: trackByField"
+        [field]="field"
+        [fieldForm]="getFieldForm(field)"
+        [fieldFormCompare]="getFieldFormCompare(field)"
+        [form]="form"
+        [formContext]="formContext"
+        (languageChange)="languageChange.emit($event)"
+        [language]="language"
+        [languages]="languages"
+        [schema]="schema">
+    </sqx-content-field>
+</div>

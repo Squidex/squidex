@@ -9,6 +9,7 @@ using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -45,12 +46,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         public bool IsArchived { get; set; }
 
+        public DomainId UniqueId
+        {
+            get { return Id; }
+        }
+
         public override bool ApplyEvent(IEvent @event)
         {
             switch (@event)
             {
                 case AppCreated e:
                     {
+                        Id = e.AppId.Id;
+
                         SimpleMapper.Map(e, this);
 
                         return true;

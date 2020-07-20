@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         internal RuleActionRegistration(Type actionType)
         {
-            Guard.NotNull(actionType);
+            Guard.NotNull(actionType, nameof(actionType));
 
             ActionType = actionType;
         }

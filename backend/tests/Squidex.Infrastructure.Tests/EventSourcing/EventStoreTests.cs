@@ -269,73 +269,9 @@ namespace Squidex.Infrastructure.EventSourcing
             Assert.Empty(readEvents);
         }
 
-        [Fact]
-        public async Task Should_query_events_by_property()
-        {
-            var keyed1 = new EnvelopeHeaders();
-            var keyed2 = new EnvelopeHeaders();
-
-            keyed1.Add("key", Guid.NewGuid().ToString());
-            keyed2.Add("key", Guid.NewGuid().ToString());
-
-            var streamName1 = $"test-{Guid.NewGuid()}";
-            var streamName2 = $"test-{Guid.NewGuid()}";
-
-            var events1 = new[]
-            {
-                new EventData("Type1", keyed1, "1"),
-                new EventData("Type2", keyed2, "2")
-            };
-
-            var events2 = new[]
-            {
-                new EventData("Type3", keyed2, "3"),
-                new EventData("Type4", keyed1, "4")
-            };
-
-            await Sut.CreateIndexAsync("key");
-
-            await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
-            await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
-
-            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString());
-
-            var expected = new[]
-            {
-                new StoredEvent(streamName1, "Position", 1, events1[1]),
-                new StoredEvent(streamName2, "Position", 0, events2[0])
-            };
-
-            ShouldBeEquivalentTo(readEvents, expected);
-        }
-
         private Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long position = EtagVersion.Any)
         {
             return Sut.QueryAsync(streamName, position);
-        }
-
-        private async Task<IReadOnlyList<StoredEvent>?> QueryWithFilterAsync(string property, object value)
-        {
-            using (var cts = new CancellationTokenSource(30000))
-            {
-                while (!cts.IsCancellationRequested)
-                {
-                    var readEvents = new List<StoredEvent>();
-
-                    await Sut.QueryAsync(x => { readEvents.Add(x); return Task.CompletedTask; }, property, value, null, cts.Token);
-
-                    await Task.Delay(500, cts.Token);
-
-                    if (readEvents.Count > 0)
-                    {
-                        return readEvents;
-                    }
-                }
-
-                cts.Token.ThrowIfCancellationRequested();
-
-                return null;
-            }
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryWithCallbackAsync(string? streamFilter = null, string? position = null)

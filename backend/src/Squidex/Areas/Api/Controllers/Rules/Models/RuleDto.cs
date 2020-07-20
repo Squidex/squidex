@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using NodaTime;
@@ -23,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The id of the rule.
         /// </summary>
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         /// <summary>
         /// The user that has created the rule.
@@ -90,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public Instant? LastExecuted { get; set; }
 
-        public static RuleDto FromRule(IEnrichedRuleEntity rule, Guid? runningRuleId, Resources resources)
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, DomainId? runningRuleId, Resources resources)
         {
             var result = new RuleDto();
 
@@ -105,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             return result.CreateLinks(resources, runningRuleId);
         }
 
-        private RuleDto CreateLinks(Resources resources, Guid? runningRuleId)
+        private RuleDto CreateLinks(Resources resources, DomainId? runningRuleId)
         {
             var values = new { app = resources.App, id = Id };
 

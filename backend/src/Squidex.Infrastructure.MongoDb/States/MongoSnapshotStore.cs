@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.States
 
         private static bool Register(JsonSerializer jsonSerializer)
         {
-            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
             BsonJsonConvention.Register(jsonSerializer);
 
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.States
             using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {
                 var existing =
-                    await Collection.Find(x => x.Id.Equals(key))
+                    await Collection.Find(x => x.DocumentId.Equals(key))
                         .FirstOrDefaultAsync();
 
                 if (existing != null)
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.States
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {
-                await Collection.DeleteOneAsync(x => x.Id.Equals(key));
+                await Collection.DeleteOneAsync(x => x.DocumentId.Equals(key));
             }
         }
     }

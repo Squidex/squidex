@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Infrastructure;
 
@@ -13,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public abstract class EnrichedEvent
     {
-        public NamedId<Guid> AppId { get; set; }
+        public NamedId<DomainId> AppId { get; set; }
 
         public Instant Timestamp { get; set; }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
     {
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly RuleEnricher sut;
 
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
             Assert.Null(result.LastExecuted);
 
-            A.CallTo(() => requestCache.AddDependency(source.Id, source.Version))
+            A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
             A.CallTo(() => requestCache.AddDependency(null))
@@ -65,18 +64,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id))
                 .Returns(new List<RuleStatistics> { stats });
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => requestCache.AddDependency(source.Id, source.Version))
+            A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
             A.CallTo(() => requestCache.AddDependency(stats.LastExecuted))
                 .MustHaveHappened();
         }
 
-        private RuleEntity CreateRule()
+        private IRuleEntity CreateRule()
         {
-            return new RuleEntity { AppId = appId, Id = Guid.NewGuid(), Version = 13 };
+            return new RuleEntity { AppId = appId, Id = DomainId.NewGuid(), Version = 13 };
         }
     }
 }

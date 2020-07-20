@@ -26,6 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOperationContext
     {
+        private static readonly ScriptOptions ScriptOptions = new ScriptOptions
+        {
+            AsContext = true,
+            CanDisallow = true,
+            CanReject = true
+        };
+
         private readonly IScriptEngine scriptEngine;
         private readonly IAppProvider appProvider;
         private readonly IEnumerable<IValidatorsFactory> factories;
@@ -47,18 +54,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             get { return schema; }
         }
 
-        public async Task LoadAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized)
+        public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, Func<string> message, bool optimized)
         {
             var (app, schema) = await appProvider.GetAppWithSchemaAsync(appId.Id, schemaId.Id);
 
             if (app == null)
             {
-                throw new InvalidOperationException("Cannot resolve app.");
+                throw new InvalidOperationException($"Cannot resolve app with id {appId}.");
             }
 
             if (schema == null)
             {
-                throw new InvalidOperationException("Cannot resolve schema.");
+                throw new InvalidOperationException($"Cannot resolve schema with id id {schemaId}.");
             }
 
             this.app = app;
@@ -111,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptVars context)
         {
             Enrich(context);
 
@@ -122,10 +129,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return context.Data!;
             }
 
-            return await scriptEngine.ExecuteAndTransformAsync(context, actualScript);
+            return await scriptEngine.TransformAsync(context, actualScript, ScriptOptions);
         }
 
-        public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
+        public async Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptVars context)
         {
             Enrich(context);
 
@@ -136,10 +143,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return;
             }
 
-            await scriptEngine.ExecuteAsync(context, GetScript(script));
+            await scriptEngine.ExecuteAsync(context, GetScript(script), ScriptOptions);
         }
 
-        private void Enrich(ScriptContext context)
+        private void Enrich(ScriptVars context)
         {
             context.ContentId = command.ContentId;
             context.AppId = app.Id;

@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Json.Objects
             }
             set
             {
-                Guard.NotNull(key);
+                Guard.NotNull(key, nameof(key));
 
                 inner[key] = value ?? JsonValue.Null;
             }
@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return Equals(obj as JsonObject);
         }
 
-        public bool Equals(IJsonValue other)
+        public bool Equals([AllowNull] IJsonValue other)
         {
             return Equals(other as JsonObject);
         }
@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
         {
-            Guard.NotNull(pathSegment);
+            Guard.NotNull(pathSegment, nameof(pathSegment));
 
             return TryGetValue(pathSegment, out result!);
         }

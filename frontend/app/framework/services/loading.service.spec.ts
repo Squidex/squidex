@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 import { LoadingService, LoadingServiceFactory } from './loading.service';
 
 describe('LoadingService', () => {
-    let events = new Subject<Event>();
+    const events = new Subject<Event>();
 
     it('should instantiate from factory', () => {
         const loadingService = LoadingServiceFactory(<any>{ events });

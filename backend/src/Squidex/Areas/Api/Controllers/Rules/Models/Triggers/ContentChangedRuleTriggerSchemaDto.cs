@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
@@ -14,7 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// <summary>
         /// The id of the schema.
         /// </summary>
-        public Guid SchemaId { get; set; }
+        public DomainId SchemaId { get; set; }
 
         /// <summary>
         /// Javascript condition when to trigger.

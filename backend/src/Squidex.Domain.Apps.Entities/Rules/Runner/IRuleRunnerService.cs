@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public interface IRuleRunnerService
     {
-        Task RunAsync(Guid appId, Guid ruleId);
+        Task RunAsync(DomainId appId, DomainId ruleId);
 
-        Task CancelAsync(Guid appId);
+        Task CancelAsync(DomainId appId);
 
-        Task<Guid?> GetRunningRuleIdAsync(Guid appId);
+        Task<DomainId?> GetRunningRuleIdAsync(DomainId appId);
     }
 }

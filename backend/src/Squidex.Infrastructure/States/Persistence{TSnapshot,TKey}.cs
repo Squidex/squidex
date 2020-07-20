@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events)
         {
-            Guard.NotNull(events);
+            Guard.NotNull(events, nameof(events));
 
             var eventArray = events.ToArray();
 

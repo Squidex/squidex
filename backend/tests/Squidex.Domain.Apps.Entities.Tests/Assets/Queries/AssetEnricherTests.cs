@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly IAssetMetadataSource assetMetadataSource1 = A.Fake<IAssetMetadataSource>();
         private readonly IAssetMetadataSource assetMetadataSource2 = A.Fake<IAssetMetadataSource>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext = Context.Anonymous();
         private readonly AssetEnricher sut;
 
@@ -51,11 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_enrich_with_cache_dependencies()
         {
-            var source = new AssetEntity { AppId = appId, Id = Guid.NewGuid(), Version = 13 };
+            var source = new AssetEntity { AppId = appId, Id = DomainId.NewGuid(), Version = 13 };
 
             var result = await sut.EnrichAsync(source, requestContext);
 
-            A.CallTo(() => requestCache.AddDependency(result.Id, result.Version))
+            A.CallTo(() => requestCache.AddDependency(result.UniqueId, result.Version))
                 .MustHaveHappened();
         }
 

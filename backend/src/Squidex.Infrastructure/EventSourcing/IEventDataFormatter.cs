@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventDataFormatter
     {
-        Envelope<IEvent> Parse(EventData eventData, Func<string, string>? stringConverter = null);
+        Envelope<IEvent> Parse(EventData eventData);
 
         EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
     }

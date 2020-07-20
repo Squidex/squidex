@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static async Task<NamedId<Guid>> CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Authentication Schemes")

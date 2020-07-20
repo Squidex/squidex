@@ -16,7 +16,9 @@ namespace Squidex.Infrastructure.EventSourcing
         private static readonly ObjectPool<StringBuilder> StringBuilderPool =
             new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(946681200, 0);
+        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0, 0);
+
+        public static readonly StreamPosition Empty = new StreamPosition(EmptyTimestamp, -1, -1);
 
         public BsonTimestamp Timestamp { get; }
 
@@ -64,13 +66,16 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var parts = position.Split('-');
 
-                return new StreamPosition(
-                    new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])),
-                    long.Parse(parts[2]),
-                    long.Parse(parts[3]));
+                if (parts.Length == 4)
+                {
+                    return new StreamPosition(
+                        new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])),
+                        long.Parse(parts[2]),
+                        long.Parse(parts[3]));
+                }
             }
 
-            return new StreamPosition(EmptyTimestamp, -1, -1);
+            return Empty;
         }
     }
 }

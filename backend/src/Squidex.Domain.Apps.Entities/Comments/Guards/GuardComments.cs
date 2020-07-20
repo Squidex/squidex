@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
@@ -19,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
     {
         public static void CanCreate(CreateComment command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot create comment.", e =>
             {
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
         public static void CanUpdate(string commentsId, List<Envelope<CommentsEvent>> events, UpdateComment command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             var comment = FindComment(events, command.CommentId);
 
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
         public static void CanDelete(string commentsId, List<Envelope<CommentsEvent>> events, DeleteComment command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             var comment = FindComment(events, command.CommentId);
 
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             }
         }
 
-        private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, Guid commentId)
+        private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, DomainId commentId)
         {
             Envelope<CommentCreated>? result = null;
 

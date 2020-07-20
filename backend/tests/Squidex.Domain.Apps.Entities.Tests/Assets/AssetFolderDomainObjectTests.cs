@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,18 +22,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderState>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly Guid parentId = Guid.NewGuid();
-        private readonly Guid assetFolderId = Guid.NewGuid();
+        private readonly DomainId parentId = DomainId.NewGuid();
+        private readonly DomainId assetFolderId = DomainId.NewGuid();
         private readonly AssetFolderDomainObject sut;
 
-        protected override Guid Id
+        protected override DomainId Id
         {
-            get { return assetFolderId; }
+            get { return DomainId.Combine(AppId, assetFolderId); }
         }
 
         public AssetFolderDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             sut = new AssetFolderDomainObject(Store, assetQuery, A.Dummy<ISemanticLog>());
@@ -63,10 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetFolderEvent(new AssetFolderCreated
-                    {
-                        FolderName = command.FolderName
-                    })
+                    CreateAssetFolderEvent(new AssetFolderCreated { FolderName = command.FolderName })
                 );
         }
 

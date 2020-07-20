@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public NamedContentData AddField(string name, ContentFieldData? data)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             this[name] = data;
 
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return clone;
         }
 
-        public bool Equals(NamedContentData other)
+        public bool Equals([AllowNull] NamedContentData other)
         {
             return base.Equals(other);
         }

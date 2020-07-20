@@ -13,36 +13,34 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     internal static class ScriptOperations
     {
-        public static Engine AddDisallow(this Engine engine)
-        {
-            engine.SetValue("disallow", new DisallowDelegate(Disallow));
+        private delegate void MessageDelegate(string? message);
 
-            return engine;
-        }
-
-        private delegate void DisallowDelegate(string? message);
-
-        private static void Disallow(string? message = null)
+        private static readonly MessageDelegate Disallow = message =>
         {
             message = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
 
             throw new DomainForbiddenException(message);
-        }
+        };
 
-        public static Engine AddReject(this Engine engine)
-        {
-            engine.SetValue("reject", new RejectDelegate(Reject));
-
-            return engine;
-        }
-
-        private delegate void RejectDelegate(string? message);
-
-        private static void Reject(string? message = null)
+        private static readonly MessageDelegate Reject = message =>
         {
             var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
 
             throw new ValidationException("Script rejected the operation.", errors);
+        };
+
+        public static Engine AddDisallow(this Engine engine)
+        {
+            engine.SetValue("disallow", Disallow);
+
+            return engine;
+        }
+
+        public static Engine AddReject(this Engine engine)
+        {
+            engine.SetValue("reject", Reject);
+
+            return engine;
         }
     }
 }

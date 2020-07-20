@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -24,12 +23,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public MongoIndexStorage(IGridFSBucket<string> bucket)
         {
-            Guard.NotNull(bucket);
+            Guard.NotNull(bucket, nameof(bucket));
 
             this.bucket = bucket;
         }
 
-        public async Task<LuceneDirectory> CreateDirectoryAsync(Guid ownerId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(DomainId ownerId)
         {
             var fileId = $"index_{ownerId}";
 

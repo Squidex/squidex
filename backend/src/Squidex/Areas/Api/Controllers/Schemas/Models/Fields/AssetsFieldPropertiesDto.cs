@@ -15,6 +15,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The preview mode for the asset.
+        /// </summary>
+        public AssetPreviewMode PreviewMode { get; set; }
+
+        /// <summary>
         /// The minimum allowed items for the field value.
         /// </summary>
         public int? MinItems { get; set; }

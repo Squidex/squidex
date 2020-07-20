@@ -6,16 +6,8 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasState, StatefulComponent } from '@app/shared/internal';
-
-interface State {
-    // The filtered schemas.
-    filtered: ReadonlyArray<SchemaDto>;
-
-    // True when the category is open.
-    isOpen?: boolean;
-}
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasList, SchemasState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-schema-category',
@@ -26,7 +18,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SchemaCategoryComponent extends StatefulComponent<State> implements OnInit, OnChanges {
+export class SchemaCategoryComponent implements OnChanges {
     @Output()
     public remove = new EventEmitter();
 
@@ -39,42 +31,35 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
     @Input()
     public forContent: boolean;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    public filteredSchemas: SchemasList;
+
+    public isCollapsed = false;
+
+    constructor(
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
-        super(changeDetector, { filtered: [], isOpen: true });
-    }
-
-    public ngOnInit() {
-        this.next(s => ({ ...s, isOpen: !this.localStore.getBoolean(this.configKey()) }));
     }
 
     public toggle() {
-        this.next(s => ({ ...s, isOpen: !s.isOpen }));
+        this.isCollapsed = !this.isCollapsed;
 
-        this.localStore.setBoolean(this.configKey(), !this.snapshot.isOpen);
+        this.localStore.setBoolean(this.configKey(), this.isCollapsed);
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes['schemaCategory'] || changes['schemasFilter']) {
-            let filtered = this.schemaCategory.schemas;
+    public ngOnChanges() {
+        this.filteredSchemas = this.schemaCategory.schemas;
 
-            if (this.forContent) {
-                filtered = filtered.filter(x => x.canReadContents && x.isPublished);
-            }
+        if (this.forContent) {
+            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished);
+        }
 
-            let isOpen = false;
+        if (this.schemasFilter) {
+            this.filteredSchemas = this.filteredSchemas.filter(x => x.name.indexOf(this.schemasFilter) >= 0);
 
-            if (this.schemasFilter) {
-                filtered = filtered.filter(x => x.name.indexOf(this.schemasFilter) >= 0);
-
-                isOpen = true;
-            } else {
-                isOpen = this.localStore.get(`schema-category.${this.schemaCategory.name}`) !== 'false';
-            }
-
-            this.next(s => ({ ...s, isOpen, filtered }));
+            this.isCollapsed = false;
+        } else {
+            this.isCollapsed = this.localStore.getBoolean(this.configKey());
         }
     }
 
@@ -92,11 +77,11 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
         }
     }
 
-    public trackBySchema(index: number, schema: SchemaDto) {
+    public trackBySchema(schema: SchemaDto) {
         return schema.id;
     }
 
     private configKey(): string {
-        return `squidex.schema.category.${this.schemaCategory.name}.closed`;
+        return `squidex.schema.category.${this.schemaCategory.name}.collapsed`;
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -32,10 +31,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly ITextIndex contentIndex = A.Fake<ITextIndex>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
-        private readonly NamedId<Guid> schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
-        private readonly NamedId<Guid> schemaId3 = NamedId.Of(Guid.NewGuid(), "my-schema3");
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+        private readonly NamedId<DomainId> schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
+        private readonly NamedId<DomainId> schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
         private readonly ContentsSearchSource sut;
 
         public ContentsSearchSourceTests()
@@ -54,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_content_with_default_name()
         {
-            var content = new ContentEntity { Id = Guid.NewGuid(), SchemaId = schemaId1 };
+            var content = new ContentEntity { Id = DomainId.NewGuid(), SchemaId = schemaId1 };
 
             await TestContentAsyc(content, "Content");
         }
@@ -64,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Data =
                     new NamedContentData()
                         .AddField("field1",
@@ -89,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Data =
                     new NamedContentData()
                         .AddField("field",
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Data =
                     new NamedContentData()
                         .AddField("field",
@@ -131,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity
             {
-                Id = Guid.NewGuid(),
+                Id = DomainId.NewGuid(),
                 Data =
                     new NamedContentData()
                         .AddField("field",
@@ -171,29 +170,31 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
             A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>._, ctx.Scope()))
-                .Returns(new List<Guid>());
+                .Returns(new List<DomainId>());
 
             var result = await sut.SearchAsync("query", ctx);
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<IReadOnlyList<Guid>>._))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<IReadOnlyList<DomainId>>._))
                 .MustNotHaveHappened();
         }
 
-        private async Task TestContentAsyc(IEnrichedContentEntity content, string expectedName)
+        private async Task TestContentAsyc(ContentEntity content, string expectedName)
         {
+            content.AppId = appId;
+
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
             var searchFilter = SearchFilter.MustHaveSchemas(schemaId1.Id, schemaId2.Id);
 
-            var ids = new List<Guid> { content.Id };
+            var ids = new List<DomainId> { content.Id };
 
             A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>.That.IsEqualTo(searchFilter), ctx.Scope()))
                 .Returns(ids);
 
             A.CallTo(() => contentQuery.QueryAsync(ctx, ids))
-                .Returns(ResultList.CreateFrom(1, content));
+                .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");
@@ -205,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     .Add(expectedName, SearchResultType.Content, "content-url"));
         }
 
-        private Context ContextWithPermissions(params NamedId<Guid>[] allowedSchemas)
+        private Context ContextWithPermissions(params NamedId<DomainId>[] allowedSchemas)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

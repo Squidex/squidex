@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
-    public class RuleStatistics
+    public sealed class RuleStatistics
     {
-        public Guid AppId { get; set; }
+        public DomainId AppId { get; set; }
 
-        public Guid RuleId { get; set; }
+        public DomainId RuleId { get; set; }
 
         public int NumSucceeded { get; set; }
 

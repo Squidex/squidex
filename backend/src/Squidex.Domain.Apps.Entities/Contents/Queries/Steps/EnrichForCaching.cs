@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichForCaching(IRequestCache requestCache)
         {
-            Guard.NotNull(requestCache);
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.requestCache = requestCache;
         }
@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var content in group)
                 {
-                    requestCache.AddDependency(content.Id, content.Version);
-                    requestCache.AddDependency(app.Id, app.Version);
-                    requestCache.AddDependency(schema.Id, schema.Version);
+                    requestCache.AddDependency(content.UniqueId, content.Version);
+                    requestCache.AddDependency(schema.UniqueId, schema.Version);
+                    requestCache.AddDependency(app.UniqueId, app.Version);
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return Task.CompletedTask;
         }
 
-        public async Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
+        public async Task ExecuteAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, params IndexCommand[] commands)
         {
             foreach (var command in commands)
             {
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        private async Task UpsertAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, UpsertIndexEntry upsert)
+        private async Task UpsertAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, UpsertIndexEntry upsert)
         {
             var data = new
             {
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 schemaName = schemaId.Name,
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,
-                texts = upsert.Texts,
+                texts = upsert.Texts
             };
 
             var result = await client.IndexAsync<StringResponse>(IndexName, upsert.DocId, CreatePost(data));
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return new SerializableData<T>(data);
         }
 
-        public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
+        public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
         {
             var serveField = GetServeField(scope);
 
@@ -178,13 +178,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 throw result.OriginalException;
             }
 
-            var ids = new List<Guid>();
+            var ids = new List<DomainId>();
 
             foreach (var item in result.Body.hits.hits)
             {
                 if (item != null)
                 {
-                    ids.Add(Guid.Parse(item["_source"]["contentId"]));
+                    ids.Add(item["_source"]["contentId"]);
                 }
             }
 

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
@@ -20,21 +21,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
     {
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IGrainFactory grainFactory;
+        private readonly IReplicatedCache replicatedCache;
 
-        public SchemasIndex(IGrainFactory grainFactory)
+        public SchemasIndex(IGrainFactory grainFactory, IReplicatedCache replicatedCache)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(replicatedCache, nameof(replicatedCache));
 
             this.grainFactory = grainFactory;
+
+            this.replicatedCache = replicatedCache;
         }
 
-        public Task RebuildAsync(Guid appId, Dictionary<string, Guid> schemas)
+        public Task RebuildAsync(DomainId appId, Dictionary<string, DomainId> schemas)
         {
             return Index(appId).RebuildAsync(schemas);
         }
 
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId, bool allowDeleted = false)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -42,43 +48,63 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 var schemas =
                     await Task.WhenAll(
-                        ids.Select(id => GetSchemaAsync(appId, id, allowDeleted)));
+                        ids.Select(id => GetSchemaAsync(appId, id, false)));
 
                 return schemas.NotNull().ToList();
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool canCache)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
+                var cacheKey = GetCacheKey(appId, name);
+
+                if (canCache)
+                {
+                    if (replicatedCache.TryGetValue(cacheKey, out var cachedSchema))
+                    {
+                        return cachedSchema as ISchemaEntity;
+                    }
+                }
+
                 var id = await GetSchemaIdAsync(appId, name);
 
-                if (id == default)
+                if (id == DomainId.Empty)
                 {
                     return null;
                 }
 
-                return await GetSchemaAsync(appId, id, allowDeleted);
+                return await GetSchemaAsync(appId, id, canCache);
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                var cacheKey = GetCacheKey(appId, id);
 
-                if (IsFound(schema.Value, allowDeleted))
+                if (canCache)
                 {
-                    return schema.Value;
+                    if (replicatedCache.TryGetValue(cacheKey, out var cachedSchema))
+                    {
+                        return cachedSchema as ISchemaEntity;
+                    }
                 }
 
-                return null;
+                var schema = await GetSchemaCoreAsync(DomainId.Combine(appId, id));
+
+                if (schema != null)
+                {
+                    CacheIt(schema, false);
+                }
+
+                return schema;
             }
         }
 
-        private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
+        private async Task<DomainId> GetSchemaIdAsync(DomainId appId, string name)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -86,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetSchemaIdsAsync(Guid appId)
+        private async Task<List<DomainId>> GetSchemaIdsAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
@@ -125,11 +151,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 await next(context);
 
-                if (context.IsCompleted)
+                if (context.IsCompleted && context.Command is SchemaCommand schemaCommand)
                 {
-                    if (context.Command is DeleteSchema deleteSchema)
+                    var schema = await GetSchemaCoreAsync(schemaCommand.AggregateId);
+
+                    if (schema != null)
                     {
-                        await DeleteSchemaAsync(deleteSchema);
+                        CacheIt(schema, true);
+
+                        if (context.Command is DeleteSchema)
+                        {
+                            await DeleteSchemaAsync(schema);
+                        }
                     }
                 }
             }
@@ -156,26 +189,42 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return null;
         }
 
-        private async Task DeleteSchemaAsync(DeleteSchema commmand)
+        private Task DeleteSchemaAsync(ISchemaEntity schema)
         {
-            var schemaId = commmand.SchemaId;
+            return Index(schema.AppId.Id).RemoveAsync(schema.Id);
+        }
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync();
+        private ISchemasByAppIndexGrain Index(DomainId appId)
+        {
+            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.ToString());
+        }
 
-            if (IsFound(schema.Value, true))
+        private async Task<ISchemaEntity?> GetSchemaCoreAsync(DomainId id)
+        {
+            var schema = (await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync()).Value;
+
+            if (schema.Version <= EtagVersion.Empty)
             {
-                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId);
+                return null;
             }
+
+            return schema;
         }
 
-        private ISchemasByAppIndexGrain Index(Guid appId)
+        private string GetCacheKey(DomainId appId, string name)
         {
-            return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId);
+            return $"SCHEMAS_NAME_{appId}_{name}";
         }
 
-        private static bool IsFound(ISchemaEntity entity, bool allowDeleted)
+        private string GetCacheKey(DomainId appId, DomainId id)
         {
-            return entity.Version > EtagVersion.Empty && (!entity.IsDeleted || allowDeleted);
+            return $"SCHEMAS_ID_{appId}_{id}";
+        }
+
+        private void CacheIt(ISchemaEntity schema, bool publish)
+        {
+            replicatedCache.Add(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish);
+            replicatedCache.Add(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish);
         }
     }
 }

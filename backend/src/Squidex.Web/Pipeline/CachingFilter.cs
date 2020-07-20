@@ -24,8 +24,8 @@ namespace Squidex.Web.Pipeline
 
         public CachingFilter(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions)
         {
-            Guard.NotNull(cachingManager);
-            Guard.NotNull(cachingOptions);
+            Guard.NotNull(cachingManager, nameof(cachingManager));
+            Guard.NotNull(cachingOptions, nameof(cachingOptions));
 
             this.cachingOptions = cachingOptions.Value;
             this.cachingManager = cachingManager;

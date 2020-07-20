@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using StaticNamedId = Squidex.Infrastructure.NamedId;
@@ -14,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public static class SchemaExtensions
     {
-        public static NamedId<Guid> NamedId(this ISchemaEntity schema)
+        public static NamedId<DomainId> NamedId(this ISchemaEntity schema)
         {
             return StaticNamedId.Of(schema.Id, schema.SchemaDef.Name);
         }

@@ -39,6 +39,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                     new FilterConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
+                    new NamedDomainIdConverter(),
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),

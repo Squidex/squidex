@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 
@@ -19,9 +18,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         IEntityWithTags,
         IAssetInfo
     {
-        NamedId<Guid> AppId { get; }
+        NamedId<DomainId> AppId { get; }
 
-        Guid ParentId { get; }
+        DomainId ParentId { get; }
 
         string MimeType { get; }
 

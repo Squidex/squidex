@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(assetQuery);
-            Guard.NotNull(urlGenerator);
+            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.assetQuery = assetQuery;
 

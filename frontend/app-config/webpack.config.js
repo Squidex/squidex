@@ -32,7 +32,9 @@ const plugins = {
     // https://www.npmjs.com/package/webpack-bundle-analyzer
     BundleAnalyzerPlugin: require('webpack-bundle-analyzer').BundleAnalyzerPlugin,
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
-    BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin
+    BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin,
+    // https://webpack.js.org/plugins/copy-webpack-plugin/
+    CopyPlugin : require('copy-webpack-plugin')
 };
 
 module.exports = function (env) {
@@ -204,6 +206,29 @@ module.exports = function (env) {
                 // Add errors to webpack instead of warnings
                 failOnError: true
             }),
+            new plugins.CopyPlugin({
+                patterns: [
+                  { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
+
+                  { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce/tinymce.min.js' },
+                  { from: './node_modules/tinymce/plugins/advlist', to: 'dependencies/tinymce/plugins/advlist' },
+                  { from: './node_modules/tinymce/plugins/code', to: 'dependencies/tinymce/plugins/code' },
+                  { from: './node_modules/tinymce/plugins/image', to: 'dependencies/tinymce/plugins/image' },
+                  { from: './node_modules/tinymce/plugins/link', to: 'dependencies/tinymce/plugins/link' },
+                  { from: './node_modules/tinymce/plugins/lists', to: 'dependencies/tinymce/plugins/lists' },
+                  { from: './node_modules/tinymce/plugins/media', to: 'dependencies/tinymce/plugins/media' },
+                  { from: './node_modules/tinymce/plugins/paste', to: 'dependencies/tinymce/plugins/paste' },
+                  { from: './node_modules/tinymce/skins', to: 'dependencies/tinymce/skins' },
+                  { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
+
+                  { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
+                  { from: './node_modules/ace-builds/src-min/mode-javascript.js', to: 'dependencies/ace/mode-javascript.js' },
+                  { from: './node_modules/ace-builds/src-min/worker-javascript.js', to: 'dependencies/ace/worker-javascript.js' },
+
+                  { from: './node_modules/font-awesome/css/font-awesome.min.css', to: 'dependencies/font-awesome/css/font-awesome.min.css' },
+                  { from: './node_modules/font-awesome/fonts', to: 'dependencies/font-awesome/fonts' },
+                ],
+              }),
         ],
 
         devServer: {

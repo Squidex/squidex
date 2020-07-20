@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -26,13 +27,21 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public AssetFolderDto[] Items { get; set; }
 
-        public static AssetFoldersDto FromAssets(IResultList<IAssetFolderEntity> assetFolders, Resources resources)
+        /// <summary>
+        /// The path to the current folder.
+        /// </summary>
+        [Required]
+        public AssetFolderDto[] Path { get; set; }
+
+        public static AssetFoldersDto FromAssets(IResultList<IAssetFolderEntity> assetFolders, IEnumerable<IAssetFolderEntity> path, Resources resources)
         {
             var response = new AssetFoldersDto
             {
                 Total = assetFolders.Total,
                 Items = assetFolders.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray()
             };
+
+            response.Path = path.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray();
 
             return CreateLinks(response, resources);
         }

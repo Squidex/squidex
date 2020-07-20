@@ -11,16 +11,16 @@ namespace TestSuite.Fixtures
 {
     public class ClientFixture : ClientManagerFixture
     {
-        public IAppsClient Apps => ClientManager.CreateAppsClient();
+        public IAppsClient Apps => Squidex.Apps;
 
-        public IBackupsClient Backups => ClientManager.CreateBackupsClient();
+        public IBackupsClient Backups => Squidex.Backups;
 
-        public ILanguagesClient Languages => ClientManager.CreateLanguagesClient();
+        public ILanguagesClient Languages => Squidex.Languages;
 
-        public IPingClient Ping => ClientManager.CreatePingClient();
+        public IPingClient Ping => Squidex.Ping;
 
-        public IRulesClient Rules => ClientManager.CreateRulesClient();
+        public IRulesClient Rules => Squidex.Rules;
 
-        public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
+        public ISchemasClient Schemas => Squidex.Schemas;
     }
 }

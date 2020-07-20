@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Collections
 
         public ImmutableDictionary(Dictionary<TKey, TValue> inner)
         {
-            Guard.NotNull(inner);
+            Guard.NotNull(inner, nameof(inner));
 
             this.inner = inner;
         }

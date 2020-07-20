@@ -25,5 +25,33 @@ namespace Squidex.Extensions.Actions.Kafka
         [DataType(DataType.Text)]
         [Formattable]
         public string TopicName { get; set; }
+
+        [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Payload { get; set; }
+
+        [Display(Name = "Key", Description = "The message key, commonly used for partitioning.")]
+        [DataType(DataType.Text)]
+        [Formattable]
+        public string Key { get; set; }
+
+        [Display(Name = "Partition Key", Description = "The partition key, only used when we don't want to define partiontionig with key.")]
+        [DataType(DataType.Text)]
+        [Formattable]
+        public string PartitionKey { get; set; }
+
+        [Display(Name = "Partition Count", Description = "Define the number of partitions for specific topic.")]
+        [DataType(DataType.Text)]
+        public int PartitionCount { get; set; }
+
+        [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Headers { get; set; }
+
+        [Display(Name = "Schema (Optional)", Description = "Define a specific AVRO schema in JSON format.")]
+        [DataType(DataType.MultilineText)]
+        public string Schema { get; set; }
     }
 }

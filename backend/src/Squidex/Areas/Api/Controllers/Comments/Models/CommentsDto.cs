@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Comments.Models
 {
@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// <summary>
         /// The deleted comments since the last version.
         /// </summary>
-        public List<Guid>? DeletedComments { get; set; }
+        public List<DomainId>? DeletedComments { get; set; }
 
         /// <summary>
         /// The current version.

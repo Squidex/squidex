@@ -100,10 +100,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var source = new AssetEntity
             {
-                Metadata = new AssetMetadata()
+                Metadata = new AssetMetadata
                 {
                     ["pixelWidth"] = JsonValue.Create(128),
-                    ["pixelHeight"] = JsonValue.Create(55),
+                    ["pixelHeight"] = JsonValue.Create(55)
                 },
                 Type = AssetType.Image
             };

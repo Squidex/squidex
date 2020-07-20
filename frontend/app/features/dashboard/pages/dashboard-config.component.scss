@@ -1,0 +1,11 @@
+.settings-button {
+    border: 0;
+    border-radius: 30px;
+    transition: background .4s ease, color .4s ease, border .4s ease;
+}
+
+.json-editor ::ng-deep {
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
+}

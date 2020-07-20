@@ -19,18 +19,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
     {
         Task UpdateAsync(RuleJob job, RuleJobUpdate update);
 
-        Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default);
+        Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default);
 
-        Task EnqueueAsync(Guid id, Instant nextAttempt);
+        Task EnqueueAsync(DomainId id, Instant nextAttempt);
 
-        Task CancelAsync(Guid id);
+        Task CancelAsync(DomainId id);
 
         Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default);
 
-        Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId);
+        Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId);
 
-        Task<IResultList<IRuleEventEntity>> QueryByAppAsync(Guid appId, Guid? ruleId = null, int skip = 0, int take = 20);
+        Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20);
 
-        Task<IRuleEventEntity> FindAsync(Guid id);
+        Task<IRuleEventEntity> FindAsync(DomainId id);
     }
 }

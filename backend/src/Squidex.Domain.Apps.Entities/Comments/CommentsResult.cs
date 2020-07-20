@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Events.Comments;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Comments
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public List<Comment> UpdatedComments { get; set; } = new List<Comment>();
 
-        public List<Guid> DeletedComments { get; set; } = new List<Guid>();
+        public List<DomainId> DeletedComments { get; set; } = new List<DomainId>();
 
         public long Version { get; set; }
 

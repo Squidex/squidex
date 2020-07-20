@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
         [ApiPermission(Permissions.AppBackupsDelete)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteBackup(string app, Guid id)
+        public async Task<IActionResult> DeleteBackup(string app, string id)
         {
             await backupService.DeleteBackupAsync(AppId, id);
 

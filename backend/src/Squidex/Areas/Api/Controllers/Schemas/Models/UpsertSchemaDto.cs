@@ -54,7 +54,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public bool IsPublished { get; set; }
 
-        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertSchemaDto
+        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command)
+            where TCommand : SchemaCommand, IUpsertCommand where TDto : UpsertSchemaDto
         {
             SimpleMapper.Map(dto, command);
 

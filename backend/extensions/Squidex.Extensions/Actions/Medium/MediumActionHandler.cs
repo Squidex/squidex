@@ -42,17 +42,17 @@ namespace Squidex.Extensions.Actions.Medium
             this.serializer = serializer;
         }
 
-        protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
+        protected override async Task<(string Description, MediumJob Data)> CreateJobAsync(EnrichedEvent @event, MediumAction action)
         {
             var ruleJob = new MediumJob { AccessToken = action.AccessToken, PublicationId = action.PublicationId };
 
             var requestBody = new
             {
-                title = Format(action.Title, @event),
+                title = await FormatAsync(action.Title, @event),
                 contentFormat = action.IsHtml ? "html" : "markdown",
-                content = Format(action.Content, @event),
-                canonicalUrl = Format(action.CanonicalUrl, @event),
-                tags = ParseTags(@event, action)
+                content = await FormatAsync(action.Content, @event),
+                canonicalUrl = await FormatAsync(action.CanonicalUrl, @event),
+                tags = await ParseTagsAsync(@event, action)
             };
 
             ruleJob.RequestBody = ToJson(requestBody);
@@ -60,7 +60,7 @@ namespace Squidex.Extensions.Actions.Medium
             return (Description, ruleJob);
         }
 
-        private string[] ParseTags(EnrichedEvent @event, MediumAction action)
+        private async Task<string[]> ParseTagsAsync(EnrichedEvent @event, MediumAction action)
         {
             if (string.IsNullOrWhiteSpace(action.Tags))
             {
@@ -69,7 +69,7 @@ namespace Squidex.Extensions.Actions.Medium
 
             try
             {
-                var jsonTags = Format(action.Tags, @event);
+                var jsonTags = await FormatAsync(action.Tags, @event);
 
                 return serializer.Deserialize<string[]>(jsonTags);
             }

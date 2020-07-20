@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public BulkUpdateCommandMiddleware(IServiceProvider serviceProvider, IContentQueryService contentQuery, IContextProvider contextProvider)
         {
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(contentQuery);
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.serviceProvider = serviceProvider;
             this.contentQuery = contentQuery;
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 case BulkUpdateType.ChangeStatus:
                                     {
-                                        if (id == null || id == default)
+                                        if (id == null || id == DomainId.Empty)
                                         {
                                             throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
                                         }
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 case BulkUpdateType.Delete:
                                     {
-                                        if (id == null || id == default)
+                                        if (id == null || id == DomainId.Empty)
                                         {
                                             throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
                                         }
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<Guid?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
+        private async Task<DomainId?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
         {
             var id = job.Id;
 

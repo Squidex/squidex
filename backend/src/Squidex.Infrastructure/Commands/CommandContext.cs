@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private Tuple<object?>? result;
 
-        public Guid ContextId { get; } = Guid.NewGuid();
+        public DomainId ContextId { get; } = DomainId.NewGuid();
 
         public ICommand Command { get; }
 
@@ -31,8 +31,8 @@ namespace Squidex.Infrastructure.Commands
 
         public CommandContext(ICommand command, ICommandBus commandBus)
         {
-            Guard.NotNull(command);
-            Guard.NotNull(commandBus);
+            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             Command = command;
             CommandBus = commandBus;

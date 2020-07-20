@@ -28,7 +28,7 @@ namespace Squidex.Web.Pipeline
 
         public AppResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider);
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
         }
@@ -41,7 +41,9 @@ namespace Squidex.Web.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var app = await appProvider.GetAppAsync(appName);
+                var canCache = !user.IsInClient(DefaultClients.Frontend);
+
+                var app = await appProvider.GetAppAsync(appName, canCache);
 
                 if (app == null)
                 {
@@ -90,7 +92,7 @@ namespace Squidex.Web.Pipeline
             await next();
         }
 
-        private Context SetContext(HttpContext httpContext, IAppEntity app)
+        private static Context SetContext(HttpContext httpContext, IAppEntity app)
         {
             var requestContext = new Context(httpContext.User, app);
 

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
 {
@@ -24,7 +24,17 @@ namespace Squidex.Infrastructure.Queries
 
         public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn)
         {
-            var pruned = nodeIn.Filters.Select(x => x.Accept(this)!).NotNull().ToList();
+            var pruned = new List<FilterNode<TValue>>(nodeIn.Filters.Count);
+
+            foreach (var filter in nodeIn.Filters)
+            {
+                var transformed = filter.Accept(this);
+
+                if (transformed != null)
+                {
+                    pruned.Add(transformed);
+                }
+            }
 
             if (pruned.Count == 1)
             {

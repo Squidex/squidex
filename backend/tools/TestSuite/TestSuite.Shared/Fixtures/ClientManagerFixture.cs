@@ -6,47 +6,27 @@
 // ==========================================================================
 
 using System;
-using System.Net.Http;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Configuration;
 
 namespace TestSuite.Fixtures
 {
     public class ClientManagerFixture : IDisposable
     {
-        public string ServerUrl { get; } = "https://localhost:5001";
+        public ClientManagerWrapper Squidex { get; }
 
-        public string ClientId { get; } = "root";
+        public string AppName => ClientManager.Options.AppName;
 
-        public string ClientSecret { get; } = "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=";
+        public string ClientId => ClientManager.Options.ClientId;
 
-        public string AppName { get; } = "integration-tests";
+        public string ClientSecret => ClientManager.Options.ClientSecret;
 
-        public SquidexClientManager ClientManager { get; }
+        public string ServerUrl => ClientManager.Options.Url;
 
-        public sealed class Configurator : IHttpConfigurator
-        {
-            public void Configure(HttpClient httpClient)
-            {
-            }
-
-            public void Configure(HttpClientHandler httpClientHandler)
-            {
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, error) => true;
-            }
-        }
+        public SquidexClientManager ClientManager => Squidex.ClientManager;
 
         public ClientManagerFixture()
         {
-            ClientManager = new SquidexClientManager(new SquidexOptions
-            {
-                AppName = AppName,
-                ClientId = ClientId,
-                ClientSecret = ClientSecret,
-                Configurator = new Configurator(),
-                ReadResponseAsString = true,
-                Url = ServerUrl
-            });
+            Squidex = ClientManagerWrapper.CreateAsync().Result;
         }
 
         public virtual void Dispose()

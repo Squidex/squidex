@@ -50,14 +50,14 @@ namespace Squidex.Web
             get { return HttpContext.Context(); }
         }
 
-        protected Guid AppId
+        protected DomainId AppId
         {
             get { return App.Id; }
         }
 
         protected ApiController(ICommandBus commandBus)
         {
-            Guard.NotNull(commandBus);
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             CommandBus = commandBus;
 

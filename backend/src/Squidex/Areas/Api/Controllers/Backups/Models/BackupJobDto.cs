@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// <summary>
         /// The id of the backup job.
         /// </summary>
-        public Guid Id { get; set; }
+        public DomainId Id { get; set; }
 
         /// <summary>
         /// The time when the job has been started.

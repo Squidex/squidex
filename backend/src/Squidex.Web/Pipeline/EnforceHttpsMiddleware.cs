@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -19,7 +18,7 @@ namespace Squidex.Web.Pipeline
 
         public EnforceHttpsMiddleware(IOptions<UrlsOptions> urlsOptions)
         {
-            Guard.NotNull(urlsOptions);
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
             this.urlsOptions = urlsOptions.Value;
         }
@@ -34,7 +33,7 @@ namespace Squidex.Web.Pipeline
             {
                 var hostName = context.Request.Host.ToString().ToLowerInvariant();
 
-                if (!string.Equals(context.Request.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+                if (!context.Request.IsHttps)
                 {
                     var newUrl = string.Concat("https://", hostName, context.Request.Path, context.Request.QueryString);
 

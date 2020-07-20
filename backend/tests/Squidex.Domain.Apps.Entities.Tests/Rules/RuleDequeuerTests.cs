@@ -74,10 +74,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Should_not_execute_if_already_running()
         {
-            var id = Guid.NewGuid();
+            var id = DomainId.NewGuid();
 
-            var @event1 = CreateEvent(1, "MyAction", "{}", id);
-            var @event2 = CreateEvent(1, "MyAction", "{}", id);
+            var event1 = CreateEvent(1, "MyAction", "{}", id);
+            var event2 = CreateEvent(1, "MyAction", "{}", id);
 
             A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
                 .ReturnsLazily(async () =>
@@ -88,8 +88,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 });
 
             await Task.WhenAll(
-                sut.HandleAsync(@event1),
-                sut.HandleAsync(@event2));
+                sut.HandleAsync(event1),
+                sut.HandleAsync(event2));
 
             A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
@@ -139,10 +139,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private IRuleEventEntity CreateEvent(int numCalls, string actionName, string actionData)
         {
-            return CreateEvent(numCalls, actionName, actionData, Guid.NewGuid());
+            return CreateEvent(numCalls, actionName, actionData, DomainId.NewGuid());
         }
 
-        private IRuleEventEntity CreateEvent(int numCalls, string actionName, string actionData, Guid id)
+        private IRuleEventEntity CreateEvent(int numCalls, string actionName, string actionData, DomainId id)
         {
             var @event = A.Fake<IRuleEventEntity>();
 

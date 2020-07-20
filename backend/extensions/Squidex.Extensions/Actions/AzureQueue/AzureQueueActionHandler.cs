@@ -32,9 +32,9 @@ namespace Squidex.Extensions.Actions.AzureQueue
             });
         }
 
-        protected override (string Description, AzureQueueJob Data) CreateJob(EnrichedEvent @event, AzureQueueAction action)
+        protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(EnrichedEvent @event, AzureQueueAction action)
         {
-            var queueName = Format(action.Queue, @event);
+            var queueName = await FormatAsync(action.Queue, @event);
 
             var ruleDescription = $"Send AzureQueueJob to azure queue '{queueName}'";
             var ruleJob = new AzureQueueJob
@@ -49,7 +49,7 @@ namespace Squidex.Extensions.Actions.AzureQueue
 
         protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job, CancellationToken ct = default)
         {
-            var queue = clients.GetClient((job.QueueConnectionString, job.QueueName));
+            var queue = await clients.GetClientAsync((job.QueueConnectionString, job.QueueName));
 
             await queue.AddMessageAsync(new CloudQueueMessage(job.MessageBodyV2), null, null, null, null, ct);
 

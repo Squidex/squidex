@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -97,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutPattern(string app, Guid id, [FromBody] UpdatePatternDto request)
+        public async Task<IActionResult> PutPattern(string app, string id, [FromBody] UpdatePatternDto request)
         {
             var command = request.ToUpdateCommand(id);
 
@@ -123,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermission(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeletePattern(string app, Guid id)
+        public async Task<IActionResult> DeletePattern(string app, string id)
         {
             var command = new DeletePattern { PatternId = id };
 

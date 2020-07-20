@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -98,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermission(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutWorkflow(string app, Guid id, [FromBody] UpdateWorkflowDto request)
+        public async Task<IActionResult> PutWorkflow(string app, string id, [FromBody] UpdateWorkflowDto request)
         {
             var command = request.ToCommand(id);
 
@@ -121,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermission(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteWorkflow(string app, Guid id)
+        public async Task<IActionResult> DeleteWorkflow(string app, string id)
         {
             var command = new DeleteWorkflow { WorkflowId = id };
 

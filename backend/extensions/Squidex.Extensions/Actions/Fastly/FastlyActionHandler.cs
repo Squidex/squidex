@@ -24,7 +24,7 @@ namespace Squidex.Extensions.Actions.Fastly
         public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory);
+            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
 
             this.httpClientFactory = httpClientFactory;
         }

@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)
         {
-            Guard.NotNull(steps);
-            Guard.NotNull(contentQuery);
+            Guard.NotNull(steps, nameof(steps));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
 
             this.steps = steps;
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context)
         {
-            Guard.NotNull(content);
+            Guard.NotNull(content, nameof(content));
 
             var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context);
 
@@ -47,8 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
-            Guard.NotNull(contents);
-            Guard.NotNull(context);
+            Guard.NotNull(contents, nameof(contents));
+            Guard.NotNull(context, nameof(context));
 
             return EnrichInternalAsync(contents, false, context);
         }
@@ -78,9 +78,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         results.Add(result);
                     }
 
-                    var schemaCache = new Dictionary<Guid, Task<ISchemaEntity>>();
+                    var schemaCache = new Dictionary<DomainId, Task<ISchemaEntity>>();
 
-                    Task<ISchemaEntity> GetSchema(Guid id)
+                    Task<ISchemaEntity> GetSchema(DomainId id)
                     {
                         return schemaCache.GetOrAdd(id, x => ContentQuery.GetSchemaOrThrowAsync(context, x.ToString()));
                     }

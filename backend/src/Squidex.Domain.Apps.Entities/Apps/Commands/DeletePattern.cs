@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class DeletePattern : AppCommand
+    public sealed class DeletePattern : AppUpdateCommand
     {
-        public Guid PatternId { get; set; }
+        public DomainId PatternId { get; set; }
     }
 }
