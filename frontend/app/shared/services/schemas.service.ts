@@ -54,6 +54,7 @@ export class SchemaDto {
     public readonly canUpdateScripts: boolean;
     public readonly canUpdateUIFields: boolean;
     public readonly canUpdateUrls: boolean;
+    public readonly canUpdateRules: boolean;
 
     public readonly displayName: string;
 
@@ -87,12 +88,16 @@ export class SchemaDto {
         this.canUpdateScripts = hasAnyLink(links, 'update/scripts');
         this.canUpdateUIFields = hasAnyLink(links, 'fields/ui');
         this.canUpdateUrls = hasAnyLink(links, 'update/urls');
+        this.canUpdateRules = hasAnyLink(links, 'update/rules');
 
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
 }
 
 export type TableField = RootFieldDto | string;
+
+export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
+export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
 
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
@@ -112,6 +117,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly fields: ReadonlyArray<RootFieldDto> = [],
         public readonly fieldsInLists: FieldNames = [],
         public readonly fieldsInReferences: FieldNames = [],
+        public readonly fieldRules: ReadonlyArray<FieldRule> = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {
@@ -410,6 +416,21 @@ export class SchemasService {
             pretifyError('Failed to update schema scripts. Please reload.'));
     }
 
+    public putFieldRules(appName: string, resource: Resource, dto: ReadonlyArray<FieldRule>, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['update/rules'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, { fieldRules: dto }).pipe(
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'RulesConfigured', appName);
+            }),
+            pretifyError('Failed to update schema rules. Please reload.'));
+    }
+
     public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto & any, version: Version): Observable<SchemaDetailsDto> {
         const link = resource._links['update/sync'];
 
@@ -701,6 +722,7 @@ function parseSchemaWithDetails(response: any) {
         fields,
         response.fieldsInLists,
         response.fieldsInReferences,
+        response.fieldRules,
         response.scripts || {},
         response.previewUrls || {});
 }

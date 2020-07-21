@@ -281,7 +281,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
-export type ReferencesFieldEditor = 'List' | 'Dropdown';
+export type ReferencesFieldEditor = 'List' | 'Dropdown' | 'Checkboxes' | 'Tags';
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'References';

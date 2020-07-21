@@ -41,7 +41,7 @@
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
                     <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
-                            <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                            <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
     
                             <sqx-autocomplete [underlined]="true" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                         </div>

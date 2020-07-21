@@ -1,0 +1,25 @@
+.content {
+    margin-top: 1rem;
+}
+
+.card-header,
+.card-footer {
+    padding: 1.25rem;
+}
+
+.col-action {
+    @include force-width(7rem);
+}
+
+.preview {
+    background-color: $color-input;
+    border: 0;
+    border-radius: 4px;
+    opacity: .4;
+}
+
+.label {
+    font-size: .9rem;
+    font-weight: normal;
+    line-height: 2.4rem;
+}

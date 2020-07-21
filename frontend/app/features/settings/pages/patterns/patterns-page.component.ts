@@ -27,7 +27,7 @@ export class PatternsPageComponent implements OnInit {
         this.patternsState.load(true);
     }
 
-    public trackByPattern(index: number, pattern: PatternDto) {
+    public trackByPattern(_index: number, pattern: PatternDto) {
         return pattern.id;
     }
 }

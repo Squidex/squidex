@@ -117,7 +117,7 @@ export class WorkflowComponent implements OnChanges {
         this.selectedTab = tab;
     }
 
-    public trackByStep(index: number, step: WorkflowStep) {
+    public trackByStep(_index: number, step: WorkflowStep) {
         return step.name;
     }
 }

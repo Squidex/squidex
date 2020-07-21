@@ -101,6 +101,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                         break;
                     }
 
+                case SchemaFieldRulesConfigured e:
+                    {
+                        SchemaDef = SchemaDef.SetFieldRules(e.FieldRules);
+
+                        break;
+                    }
+
                 case SchemaPublished _:
                     {
                         SchemaDef = SchemaDef.Publish();

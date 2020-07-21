@@ -20,9 +20,6 @@ export class CommentTriggerComponent implements OnInit {
     @Input()
     public triggerForm: FormGroup;
 
-    @Input()
-    public triggerFormSubmitted = false;
-
     public ngOnInit() {
         this.triggerForm.setControl('condition',
             new FormControl(this.trigger.condition || ''));

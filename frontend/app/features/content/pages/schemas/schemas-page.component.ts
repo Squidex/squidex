@@ -40,7 +40,7 @@ export class SchemasPageComponent implements OnInit {
         this.localStore.setBoolean('content.schemas.collapsed', this.isCollapsed);
     }
 
-    public trackByCategory(index: number, category: SchemaCategory) {
+    public trackByCategory(_index: number, category: SchemaCategory) {
         return category.name;
     }
 }

@@ -6,9 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, NestedFieldDto } from '@app/shared';
-import { FieldSection } from './../group-fields.pipe';
+import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldSection, NestedFieldDto } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
@@ -19,13 +17,13 @@ import { FieldEditorComponent } from './field-editor.component';
 })
 export class ArraySectionComponent {
     @Input()
-    public itemForm: FormGroup;
-
-    @Input()
     public form: EditContentForm;
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formSection: FieldSection<NestedFieldDto, FieldArrayItemForm>;
 
     @Input()
     public language: AppLanguageDto;
@@ -33,15 +31,8 @@ export class ArraySectionComponent {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
-    public section: FieldSection<NestedFieldDto>;
-
     @ViewChildren(FieldEditorComponent)
     public editors: QueryList<FieldEditorComponent>;
-
-    public getControl(field: NestedFieldDto) {
-        return this.itemForm.get(field.name)!;
-    }
 
     public reset() {
         this.editors.forEach(editor => {
@@ -49,7 +40,7 @@ export class ArraySectionComponent {
         });
     }
 
-    public trackByField(index: number, field: NestedFieldDto) {
-        return field.fieldId;
+    public trackByField(_index: number, field: FieldArrayItemForm) {
+        return field.field.fieldId;
     }
 }

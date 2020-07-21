@@ -21,9 +21,6 @@ export class UsageTriggerComponent implements OnInit {
     @Input()
     public triggerForm: FormGroup;
 
-    @Input()
-    public triggerFormSubmitted = false;
-
     public ngOnInit() {
         this.triggerForm.setControl('limit',
             new FormControl(this.trigger.limit || 20000, [

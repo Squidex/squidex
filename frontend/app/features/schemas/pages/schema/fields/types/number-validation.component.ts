@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
 })
 export class NumberValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -33,20 +33,20 @@ export class NumberValidationComponent implements OnInit {
         this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
 
         if (this.showUnique) {
-            this.editForm.setControl('isUnique',
+            this.fieldForm.setControl('isUnique',
                 new FormControl(this.properties.isUnique));
         }
 
-        this.editForm.setControl('maxValue',
+        this.fieldForm.setControl('maxValue',
             new FormControl(this.properties.maxValue));
 
-        this.editForm.setControl('minValue',
+        this.fieldForm.setControl('minValue',
             new FormControl(this.properties.minValue));
 
-        this.editForm.setControl('defaultValue',
+        this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            hasNoValue$(this.editForm.controls['isRequired']);
+            hasNoValue$(this.fieldForm.controls['isRequired']);
     }
 }

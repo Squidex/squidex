@@ -30,9 +30,6 @@ export class ContentChangedTriggerComponent implements OnInit {
     @Input()
     public triggerForm: FormGroup;
 
-    @Input()
-    public triggerFormSubmitted = false;
-
     public triggerSchemas: ReadonlyArray<TriggerSchemaForm>;
 
     public schemaToAdd: SchemaDto;
@@ -99,7 +96,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         this.schemaToAdd = this.schemasToAdd[0];
     }
 
-    public trackBySchema(index: number, schema: SchemaDto) {
+    public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
     }
 }

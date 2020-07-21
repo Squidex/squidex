@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
 })
 export class DateTimeValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -31,28 +31,28 @@ export class DateTimeValidationComponent implements OnInit {
     public calculatedDefaultValues: ReadonlyArray<string> = ['Now', 'Today'];
 
     public ngOnInit() {
-        this.editForm.setControl('calculatedDefaultValue',
+        this.fieldForm.setControl('calculatedDefaultValue',
             new FormControl(this.properties.calculatedDefaultValue));
 
-        this.editForm.setControl('maxValue',
+        this.fieldForm.setControl('maxValue',
             new FormControl(this.properties.maxValue, [
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.editForm.setControl('minValue',
+        this.fieldForm.setControl('minValue',
             new FormControl(this.properties.minValue, [
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.editForm.setControl('defaultValue',
+        this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue, [
                 ValidatorsEx.validDateTime()
             ]));
 
         this.showDefaultValues =
-            hasNoValue$(this.editForm.controls['isRequired']);
+            hasNoValue$(this.fieldForm.controls['isRequired']);
 
         this.showDefaultValue =
-            hasNoValue$(this.editForm.controls['calculatedDefaultValue']);
+            hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
     }
 }

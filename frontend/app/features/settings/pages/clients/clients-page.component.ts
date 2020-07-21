@@ -30,7 +30,7 @@ export class ClientsPageComponent implements OnInit {
         this.clientsState.load(true);
     }
 
-    public trackByClient(index: number, client: ClientDto) {
+    public trackByClient(_index: number, client: ClientDto) {
         return client.id;
     }
 }

@@ -7,8 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, RootFieldDto, sorted } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -25,7 +24,7 @@ export class ArrayEditorComponent {
     public formContext: any;
 
     @Input()
-    public field: RootFieldDto;
+    public formModel: FieldArrayForm;
 
     @Input()
     public language: AppLanguageDto;
@@ -33,22 +32,31 @@ export class ArrayEditorComponent {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
-    public arrayControl: FormArray;
-
     @ViewChildren(ArrayItemComponent)
     public children: QueryList<ArrayItemComponent>;
 
+    public get field() {
+        return this.formModel.field;
+    }
+
     public itemRemove(index: number) {
-        this.form.arrayItemRemove(this.field, this.language, index);
+        this.formModel.removeItemAt(index);
     }
 
-    public itemAdd(value?: FormGroup) {
-        this.form.arrayItemInsert(this.field, this.language, value);
+    public itemAdd(value?: FieldArrayItemForm) {
+        this.formModel.addItem(value);
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<AbstractControl>>) {
-        this.sortInternal(sorted(event));
+    public sort(event: CdkDragDrop<ReadonlyArray<FieldArrayItemForm>>) {
+        this.formModel.sort(sorted(event));
+
+        this.reset();
+    }
+
+    public move(index: number, item: FieldArrayItemForm) {
+        this.formModel.move(index, item);
+
+        this.reset();
     }
 
     public collapseAll() {
@@ -67,22 +75,5 @@ export class ArrayEditorComponent {
         this.children.forEach(child => {
             child.reset();
         });
-    }
-
-    public move(control: AbstractControl, index: number) {
-        const controls = [...this.arrayControl.controls];
-
-        controls.splice(controls.indexOf(control), 1);
-        controls.splice(index, 0, control);
-
-        this.sortInternal(controls);
-    }
-
-    private sortInternal(controls: ReadonlyArray<AbstractControl>) {
-        for (let i = 0; i < controls.length; i++) {
-            this.arrayControl.setControl(i, controls[i]);
-        }
-
-        this.reset();
     }
 }

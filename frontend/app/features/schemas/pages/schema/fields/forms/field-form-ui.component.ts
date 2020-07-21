@@ -16,7 +16,7 @@ import { FieldDto } from '@app/shared';
 })
 export class FieldFormUIComponent {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;

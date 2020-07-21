@@ -8,7 +8,7 @@
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
@@ -71,22 +71,46 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 }
 
-type AddPreviewUrlFormType = { name: string, url: string };
+export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
+    constructor(
+        private readonly formBuilder: FormBuilder
+    ) {
+        super(formBuilder.array([]));
+    }
 
-export class AddPreviewUrlForm extends Form<FormGroup, AddPreviewUrlFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]
-            ],
-            url: ['',
-                [
-                    Validators.required
-                ]
-            ]
-        }));
+    public add(fieldNames: ReadonlyArray<string>) {
+        this.form.push(
+            this.formBuilder.group({
+                action: ['Disable',
+                    [
+                        Validators.required
+                    ]
+                ],
+                field: [fieldNames[0],
+                    [
+                        Validators.required
+                    ]
+                ],
+                condition: ''
+            }));
+    }
+
+    public remove(index: number) {
+        this.form.removeAt(index);
+    }
+
+    public transformLoad(value: Partial<SchemaDetailsDto>) {
+        const result = value.fieldRules || [];
+
+        while (this.form.controls.length < result.length) {
+            this.add([]);
+        }
+
+        while (this.form.controls.length > result.length) {
+            this.remove(this.form.controls.length - 1);
+        }
+
+        return result;
     }
 }
 
@@ -99,15 +123,15 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         super(formBuilder.array([]));
     }
 
-    public add(value: any) {
+    public add() {
         this.form.push(
             this.formBuilder.group({
-                name: [value.name,
+                name: ['',
                     [
                         Validators.required
                     ]
                 ],
-                url: [value.url,
+                url: ['',
                     [
                         Validators.required
                     ]
@@ -127,7 +151,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         const length = Object.keys(previewUrls).length;
 
         while (this.form.controls.length < length) {
-            this.add({});
+            this.add();
         }
 
         while (this.form.controls.length > length) {

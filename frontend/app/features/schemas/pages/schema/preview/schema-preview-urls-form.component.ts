@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddPreviewUrlForm, ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',
@@ -17,8 +17,6 @@ import { AddPreviewUrlForm, ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasS
 export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
-
-    public addForm = new AddPreviewUrlForm(this.formBuilder);
 
     public editForm = new ConfigurePreviewUrlsForm(this.formBuilder);
 
@@ -37,22 +35,8 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
         this.editForm.setEnabled(this.isEditable);
     }
 
-    public cancelAdd() {
-        this.addForm.submitCompleted();
-    }
-
     public add() {
-        if (!this.isEditable) {
-            return;
-        }
-
-        const value = this.addForm.submit();
-
-        if (value) {
-            this.editForm.add(value);
-
-            this.cancelAdd();
-        }
+        this.editForm.add();
     }
 
     public saveSchema() {

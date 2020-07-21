@@ -16,7 +16,7 @@ import { FieldDto, PatternDto } from '@app/shared';
 })
 export class FieldFormValidationComponent {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;

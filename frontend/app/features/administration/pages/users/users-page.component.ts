@@ -44,7 +44,7 @@ export class UsersPageComponent extends ResourceOwner implements OnInit {
         this.usersState.search(this.usersFilter.value);
     }
 
-    public trackByUser(index: number, user: UserDto) {
+    public trackByUser(_ndex: number, user: UserDto) {
         return user.id;
     }
 }

@@ -133,6 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 AddPutLink("update", resources.Url<SchemasController>(x => nameof(x.PutSchema), values));
                 AddPutLink("update/sync", resources.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
                 AddPutLink("update/urls", resources.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
+                AddPutLink("update/rules", resources.Url<SchemasController>(x => nameof(x.PutRules), values));
                 AddPutLink("update/category", resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
             }
 

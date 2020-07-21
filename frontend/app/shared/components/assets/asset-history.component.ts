@@ -51,7 +51,7 @@ export class AssetHistoryComponent implements OnChanges {
                 }));
     }
 
-    public trackByEvent(index: number, assetEvent: AssetEvent) {
+    public trackByEvent(_index: number, assetEvent: AssetEvent) {
         return assetEvent.event.eventId;
     }
 }

@@ -16,7 +16,7 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 })
 export class ReferencesUIComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,12 +25,12 @@ export class ReferencesUIComponent implements OnInit {
     public properties: ReferencesFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
 
-        this.editForm.setControl('resolveReference',
+        this.fieldForm.setControl('resolveReference',
             new FormControl(this.properties.resolveReference));
     }
 }

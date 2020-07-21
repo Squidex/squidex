@@ -188,6 +188,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         return Snapshot;
                     });
 
+                case ConfigureFieldRules configureFieldRules:
+                    return UpdateReturn(configureFieldRules, c =>
+                    {
+                        GuardSchema.CanConfigureFieldRules(c);
+
+                        ConfigureFieldRules(c);
+
+                        return Snapshot;
+                    });
+
                 case ConfigureScripts configureScripts:
                     return UpdateReturn(configureScripts, c =>
                     {
@@ -323,6 +333,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public void ConfigureScripts(ConfigureScripts command)
         {
             RaiseEvent(command, new SchemaScriptsConfigured());
+        }
+
+        public void ConfigureFieldRules(ConfigureFieldRules command)
+        {
+            RaiseEvent(command, new SchemaFieldRulesConfigured { FieldRules = command.ToFieldRules() });
         }
 
         public void ChangeCategory(ChangeCategory command)

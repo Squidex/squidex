@@ -1,4 +1,4 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
 
@@ -14,7 +14,7 @@
         <label class="col-3 col-form-label">Editor</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Map'">
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Map'">
                 <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Map" />
 
                 <i class="icon-control-Map"></i>

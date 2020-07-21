@@ -59,37 +59,32 @@
                         <ng-container *ngSwitchCase="'AssetChanged'">
                             <sqx-asset-changed-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-asset-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Comment'">
                             <sqx-comment-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-comment-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'ContentChanged'">
                             <sqx-content-changed-trigger
                                 [schemas]="schemas"
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-content-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'SchemaChanged'">
                             <sqx-schema-changed-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-schema-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Usage'">
                             <sqx-usage-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-usage-trigger>
                         </ng-container>
                     </ng-container>
@@ -117,8 +112,7 @@
                     <sqx-generic-action
                         [definition]="actionElement"
                         [action]="action"
-                        [actionForm]="actionForm.form"
-                        [actionFormSubmitted]="actionForm.submitted | async">
+                        [actionForm]="actionForm.form">
                     </sqx-generic-action>
                 </form>
             </ng-container>

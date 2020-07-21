@@ -87,7 +87,7 @@ export class WorkflowStepComponent implements OnChanges {
         this.update.emit({ noUpdateRoles });
     }
 
-    public trackByTransition(index: number, transition: WorkflowTransition) {
+    public trackByTransition(_index: number, transition: WorkflowTransition) {
         return transition.to;
     }
 }

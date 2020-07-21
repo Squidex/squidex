@@ -37,7 +37,7 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
         this.backupsState.start();
     }
 
-    public trackByBackup(index: number, item: BackupDto) {
+    public trackByBackup(_index: number, item: BackupDto) {
         return item.id;
     }
 }

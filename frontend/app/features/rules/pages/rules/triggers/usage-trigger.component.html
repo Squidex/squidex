@@ -2,7 +2,7 @@
     <div class="form-group">
         <label for="limit">Limit</label>
 
-        <sqx-control-errors for="limit" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+        <sqx-control-errors for="limit"></sqx-control-errors>
 
         <input type="number" step="1" class="form-control" id="limit" formControlName="limit" />
         
@@ -14,7 +14,7 @@
     <div class="form-group">
         <label for="condition">Days</label>
 
-        <sqx-control-errors for="numDays" fieldName="Days" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+        <sqx-control-errors for="numDays" fieldName="Days"></sqx-control-errors>
 
         <input type="number" step="1" class="form-control" id="condition" formControlName="numDays" />
         

@@ -16,7 +16,7 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 })
 export class GeolocationValidationComponent {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;

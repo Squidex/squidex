@@ -80,14 +80,12 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <sqx-field-form
+            <sqx-field-form showButtons="true"
                 (cancel)="toggleEditing()"
-                [showButtons]="true"
-                [patterns]="patterns"
-                [editForm]="editForm.form"
-                [editFormSubmitted]="editForm.submitted | async"
-                [isEditable]="isEditable"
-                [field]="field">
+                [patterns]="patterns" 
+                [fieldForm]="editForm.form"
+                [field]="field"
+                [isEditable]="isEditable">
             </sqx-field-form>
         </form> 
     </div>

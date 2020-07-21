@@ -1,11 +1,11 @@
-<div *ngIf="field">
+<div *ngIf="formModel">
     <label>
         {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
 
     <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
 
-    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName"></sqx-control-errors>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
@@ -19,11 +19,9 @@
 		<ng-template #noEditor>
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
-                    <sqx-array-editor 
-                        [arrayControl]="arrayControl"
-                        [form]="form"
+                    <sqx-array-editor
+                        [formModel]="formModel"
                         [formContext]="formContext"
-                        [field]="rootField"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>

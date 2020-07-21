@@ -45,7 +45,7 @@ export class ClientComponent {
         this.clientsState.update(this.client, { name });
     }
 
-    public trackByRole(role: RoleDto) {
+    public trackByRole(_index: number, role: RoleDto) {
         return role.name;
     }
 }

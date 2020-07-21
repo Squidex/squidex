@@ -39,7 +39,7 @@ export class PlansPageComponent implements OnInit {
         this.plansState.load(true, this.overridePlanId);
     }
 
-    public trackByPlan(index: number, planInfo: { plan: PlanDto }) {
+    public trackByPlan(_index: number, planInfo: { plan: PlanDto }) {
         return planInfo.plan.id;
     }
 }

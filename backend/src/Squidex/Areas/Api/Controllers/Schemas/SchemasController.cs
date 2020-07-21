@@ -208,6 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The preview urls for the schema.</param>
         /// <returns>
         /// 200 => Schema updated.
+        /// 400 => Schema urls are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -232,7 +233,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema scripts object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema properties are not valid.
+        /// 400 => Schema scripts are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -241,6 +242,31 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous(Permissions.AppSchemasScripts)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutScripts(string app, string name, [FromBody] SchemaScriptsDto request)
+        {
+            var command = request.ToCommand();
+
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update the rules.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The schema rules object that needs to updated.</param>
+        /// <returns>
+        /// 200 => Schema updated.
+        /// 400 => Schema rules are not valid.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/rules/")]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutRules(string app, string name, [FromBody] ConfigureFieldRulesDto request)
         {
             var command = request.ToCommand();
 
